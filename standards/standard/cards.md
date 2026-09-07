@@ -58,19 +58,18 @@ bullet and reads nothing of the file it names
 `define: list[Pointer[Standard]]` in
 [Card Cells](/doc-types/standard-card/contract-shape.md#the-card).
 
-## Audit cites a lint or an audit
+## Audit cites a lint
 
-An Audit bullet cites a lint by a `/scripts/` link or an audit by a
-judgment link, `/judgments/*.yaml` or a `/standards/semantic-validation/`
-document; a third-party detector is its bare name and pin; and a cell
-with no checker holds the one bullet `none`.
+An Audit bullet cites a first-party lint by a `/scripts/` link; a
+third-party detector by its bare name and pin; and a cell with no checker
+holds the one bullet `none`.
 
 A lint is a deterministic detector held to the `--list-rules` contract
-([Detectors](/standards/standard/detectors.md#a-first-party-detector));
-an audit is an LLM judge and carries no script contract. standards-lint's
-rule matrix collects only the `/scripts/` links (`standard.rule-matrix`),
-so a judgment link and a bare name sit outside it by construction. A card
-audits `none` when no automatic check exists, so the gap stays visible.
+([Detectors](/standards/standard/detectors.md#a-first-party-detector)).
+standards-lint's rule matrix collects only the `/scripts/` links
+(`standard.rule-matrix`), so a bare name sits outside it by construction.
+A card audits `none` when no automatic check exists, so the gap stays
+visible.
 
 ## No shadowing
 

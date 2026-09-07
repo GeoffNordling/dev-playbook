@@ -48,8 +48,8 @@ consumer's own pin.
 
 The canonical config carries the pinned `playbook-lint` hook, dev-playbook's
 whole detector set behind one id, the ruff, shellcheck, and shfmt hooks at
-canonical revs, and the pre-push `make check-judgments-cache` hook,
-installing both the commit and push stages. In dev-playbook the pinned
+canonical revs, and the pre-push `make check` hook, installing both the
+commit and push stages. In dev-playbook the pinned
 block is absent, replaced by the dogfood block
 ([Distribution Channel](/standards/distribution/channel.md#dogfood-in-place-of-the-pin)).
 
@@ -65,11 +65,8 @@ repo with `<code-roots>` replaced by whichever of `src`, `tests`, and
 `check` = every deterministic check whose remedy is in the repo's own
 hands passes. Its recipe is the full hook suite, and layers add
 prerequisites; in a Python repo `check: format-check lint typecheck test`.
-`check-judgments-cache` is `check` with the semantic
-[cache gate](/standards/semantic-validation/cache-gate.md) armed and is
-the pre-push hook's entry; a machine without the cache sets
-`NO_JUDGMENT_CACHE=1` ([Machines](/docs/machines.md)). Every canonical
-target is `.PHONY`. `check` is a strict superset of the CI gate, so a
+`check` is also the pre-push hook's entry. Every canonical target is
+`.PHONY`. `check` is a strict superset of the CI gate, so a
 green local `check` guarantees a green cloud run.
 
 ## pyproject.toml

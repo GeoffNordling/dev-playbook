@@ -440,8 +440,8 @@ def _audit_citations(path: Path) -> list[str]:
     """The first-party detector names an Audit cell cites via ``/scripts/`` links.
 
     Third-party detectors (ruff, shellcheck, shfmt) are cited by name and pin,
-    never a ``/scripts/`` link, and non-script pointers (judgment files) target
-    other trees -- both fall outside the matrix by this scoping.
+    never a ``/scripts/`` link, and non-script pointers target other trees --
+    both fall outside the matrix by this scoping.
     """
     names: list[str] = []
     for line in _section_lines(path, "Audit"):

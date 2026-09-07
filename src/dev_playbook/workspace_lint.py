@@ -157,7 +157,6 @@ CANONICAL_CONFIG = (
 GOVERNED = (
     "dev-playbook",
     "story-forge",
-    "spec-tools",
     "mission-control",
     "sysadmin-playbook",
     "sounds",

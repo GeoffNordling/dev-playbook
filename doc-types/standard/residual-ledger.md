@@ -140,16 +140,6 @@ deliberate external evaluation ends in a record: its object is the
 evaluation, an event, so it binds outside the population the way
 Candidates' The only future-work file does.
 
-### semantic-validation/declarations
-
-Could not express one class of object: the population spans a TOML
-table, a YAML file, and an entry, joined only by the repo that holds
-them, the way `distribution/channel` does. Could not name the bench
-values: Fields points at `bench.py`, the way No slop tics points at the
-catalog. Could not express that a claim still holds of its evidence:
-that state is a fact about files outside the population, and only the
-LLM judge rules on it.
-
 ### harness/claude-content
 
 Could not express One scope over one member alone: a nested file's

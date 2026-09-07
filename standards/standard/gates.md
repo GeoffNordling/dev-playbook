@@ -18,14 +18,14 @@ A card's Enforce cell names a gate by its rung name
 
 A gate is one of three, named by its rung: the **commit gate**,
 `git commit`, running the pre-commit hook suite on the staged files; the
-**push gate**, `git push`, running `make check-judgments-cache` through
-the pre-push stage; and the **CI gate**, every push and pull request on
+**push gate**, `git push`, running `make check` through the pre-push
+stage; and the **CI gate**, every push and pull request on
 GitHub, running the canonical workflow.
 
 | Gate | Trigger | What runs |
 |---|---|---|
 | **commit gate** | `git commit` | the pre-commit hook suite, on staged files |
-| **push gate** | `git push` | `make check-judgments-cache`, via the pre-push stage |
+| **push gate** | `git push` | `make check`, via the pre-push stage |
 | **CI gate** | every push and PR on GitHub | the canonical [ci.yml](/standards/build/canonical.md#ciyml) |
 
 A pre-commit hook fires at every rung: the commit gate runs it on the
@@ -64,7 +64,7 @@ review.
 
 A detector is skipped at a gate only where its input is machine-local
 rather than held in the repository: the cited repos ref-lint resolves
-against, the judgment cache pytest reads; a skip is a `SKIP=<detector>`
+against; a skip is a `SKIP=<detector>`
 environment entry the `playbook-lint` dispatcher honors, it announces
 itself on every run, and which machine skips what is recorded in
 [Machines](/docs/machines.md).

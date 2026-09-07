@@ -66,7 +66,6 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `harness-files-lint` | [runbook-conventions.md](/standards/harness/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
-| `judgments-lint` | [declarations.md](/standards/semantic-validation/declarations.md) | Judgment declaration validity |
 | `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
 | `standards-lint` | [standard.md](/standards/standard.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
 
@@ -93,12 +92,9 @@ the installed `dev_playbook` package:
 - `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `prose-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `repo-lint` self-check). Consumed by `repo-init`.
 
-The larger surfaces are subpackages: `dev_playbook.judgments` (declaration
-loading/validation and the plan/render/record runner, behind `judgments-lint`
-and `judgments-run`), `dev_playbook.transcript_export` (the Claude Code session
-model, classifier, and renderer behind `transcript-export`),
-`dev_playbook.skipcache` (the seen-set the judgments runner uses to skip
-already-recorded work), and `dev_playbook.factory`, whose pieces are the
+The larger surfaces are subpackages: `dev_playbook.transcript_export` (the
+Claude Code session model, classifier, and renderer behind
+`transcript-export`) and `dev_playbook.factory`, whose pieces are the
 software factory's append-only run ledger — the `ledger` table beside the
 hook-capture `events` table, its per-kind writers and its two read queries; the
 job launcher that sweeps a launch's credentials, spawns a factory node, watches
@@ -140,7 +136,6 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `file-graph` | Build the file graph of a repo per [file-graph.md](/instruments/file-graph.md) — every file bucketed, every reference a typed edge, reachability/components/orphans/defects queries; JSON to stdout, `--html` assembles the viz |
-| `judgments-run` | Plan / render / record over a repo's judgment declarations (driven by the `/judgments-sweep` skill) |
 | `griffe-outline` | Print class/function structure of a Python package |
 | `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |

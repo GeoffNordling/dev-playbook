@@ -185,20 +185,6 @@ def test_test_file_under_an_unrecognized_scope_directory_is_flagged(
     assert "tests/helpers/pkg/test_thing.py" in result.stdout
 
 
-def test_gate_test_under_agent_review_is_outside_the_rule(tmp_path: Path) -> None:
-    """``tests/agent_review/`` holds free-stem gate tests; one named after a src
-    module is never measured against it."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "src/pkg/thing.py": "def public():\n    return 1\n",
-            "tests/agent_review/test_thing.py": "def test_it():\n    pass\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
 def test_test_file_matching_no_module_is_outside_the_rule(tmp_path: Path) -> None:
     """A flattened name whose stem names no src module is not policed."""
     repo = make_repo(

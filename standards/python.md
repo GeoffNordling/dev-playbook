@@ -39,8 +39,8 @@ layout, helpers, formatting, and type annotations.
   — the **commit gate**, where python-lint (dispatched by the published
   `playbook-lint` hook) and ruff's two pinned hooks block every commit:
   `ruff-check` reports, `ruff-format` rewrites
-- `make check-judgments-cache` — the **push gate**, where `make check` runs
-  mypy and `ruff format --check`, either of which blocks the push
+- `make check` — the **push gate**, where it runs mypy and
+  `ruff format --check`, either of which blocks the push
 
 ## Adopt
 

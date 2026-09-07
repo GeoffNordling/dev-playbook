@@ -6,26 +6,12 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
-# Console scripts so a consumer that installs this package resolves the
-# judgments CLIs on its venv PATH. They wrap the same library entry points the
-# scripts/ pre-commit shims call, so the two channels behave identically.
-[project.scripts]
-judgments-run = "dev_playbook.judgments.runner:run_cli"
-judgments-lint = "dev_playbook.judgments.loader:lint_cli"
-
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network
 # and no PyPI -- the single package is discovered at src/dev_playbook.
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
-
-# Workspace-wide tooling that resolves from the repo root reads this table.
-# Declarations live in the judgments/*.yaml claim-family files, each keyed by
-# content; a judgments-sweep run judges whatever an edit to a declaration or a
-# file it puts on trial has re-keyed out of the cache.
-[tool.judgments]
-paths = ["judgments/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

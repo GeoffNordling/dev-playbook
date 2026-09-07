@@ -277,7 +277,7 @@ def classify(link_text, link_target, source_file):
         name, ntype = base[:-3] if base.endswith(".md") else base, "Standard"
     elif "/scripts/" in real or re.search(r"\.(sh|py|bash)$", base):
         # the path segment types extensionless scripts (repo-lint,
-        # judgments-run), the same rule agents/ uses
+        # playbook-lint), the same rule agents/ uses
         name, ntype = base, "Script"
     else:
         return link_text  # not a runbook: the link text travels verbatim

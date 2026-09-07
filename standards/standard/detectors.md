@@ -16,7 +16,7 @@ script the audited repo hosts at `scripts/<name>`; a third-party one,
 `ruff`, `shellcheck`, `shfmt`, is cited by its bare name and pin
 ([Cells](/doc-types/standard-card/encoding.md#cells)). What an Audit cell
 cites, and how, is
-[Card Catalog](/standards/standard/cards.md#audit-cites-a-lint-or-an-audit).
+[Card Catalog](/standards/standard/cards.md#audit-cites-a-lint).
 
 ## Read-only
 

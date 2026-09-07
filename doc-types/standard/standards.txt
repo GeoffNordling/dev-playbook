@@ -18,7 +18,6 @@ knowledge-organization  working-documentation-sets  a working documentation set,
 modules                 design                      a module in a governed repo's source: anything with an interface and an implementation
 prose                   conventions                 an authored document, except type: Reference and the paths in .prose-lint-exempt
 python                  style                       a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang
-semantic-validation     declarations                a repo's judgment declarations: the [tool.judgments] table in its pyproject.toml, the declaration files the table's globs match, and every entry in them
 shell                   conventions                 a shell file in a governed repo
 standard                cards                       a repo's card catalog: the flat standards/<name>.md cards and the standards/index.md that lists them
 standard                detectors                   a detector: a read-only check an Audit cell cites, first-party at scripts/<name> or third-party by its pin
@@ -176,13 +175,6 @@ python                  style                       helper-justification        
 python                  style                       helper-placement                                  —
 python                  style                       module-layout                                     —
 python                  style                       no-future-annotations                             —
-semantic-validation     declarations                evidence-and-reference-paths                      —
-semantic-validation     declarations                fields                                            —
-semantic-validation     declarations                file-shape                                        —
-semantic-validation     declarations                one-file-per-claim-family                         —
-semantic-validation     declarations                opt-in-table                                      —
-semantic-validation     declarations                the-bar                                           —
-semantic-validation     declarations                unique-id                                         —
 shell                   conventions                 bash-declared                                     —
 shell                   conventions                 bounded-to-shell-integration                      sourced-fragments
 shell                   conventions                 dialect-directive                                 sourced-fragments
@@ -192,7 +184,7 @@ shell                   conventions                 glue-only                   
 shell                   conventions                 no-shebang-no-strict-mode                         sourced-fragments
 shell                   conventions                 shellcheck-clean                                  —
 shell                   conventions                 strict-mode                                       executable-scripts
-standard                cards                       audit-cites-a-lint-or-an-audit                    —
+standard                cards                       audit-cites-a-lint                                —
 standard                cards                       define-points-only-at-standards                   —
 standard                cards                       flat-layout                                       —
 standard                cards                       no-shadowing                                      —

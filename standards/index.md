@@ -19,7 +19,6 @@ alphabetical; directories last.
 - [Prose](/standards/prose.md) — Governs how prose is written in every workspace document — voice, structure, and brevity
 - [Python](/standards/python.md) — Governs how Python source is written — fail-loud code, docstrings, module layout, helpers, formatting, and type annotations
 - [Python Testing](/standards/testing.md) — Governs how Python tests are written — the pytest framework, mirror layout, test structure, behavioral focus, doubles, and fixtures
-- [Semantic Validation](/standards/semantic-validation.md) — Governs how claims only language can check — accuracy, honesty, scope — are validated and kept from drifting as the underlying files change
 - [Shell](/standards/shell.md) — Governs how shell is written — the glue-only boundary, strict mode, declared bash, and the shellcheck and shfmt bars every file clears
 - [Tracking](/standards/tracking.md) — Governs how work is tracked — candidates, issue shapes, the label scheme, and repository settings
 - [Decision Record Conventions](/standards/decisions/records.md) — How a Decision Record is written, from the bar that warrants one and the directory that holds it to its scope, template, date, numbering, immutability, status vocabulary, optional sections, and the pin on an external-convention evaluation
@@ -37,6 +36,5 @@ alphabetical; directories last.
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, working documentation sets
 - [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — conventions and the slop-tics catalog
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
-- [semantic-validation/](/standards/semantic-validation/index.md) — The Semantic Validation card's one Standard, a repo's judgment declarations, and the guides to the cache gate and to consuming the tooling
 - [standard/](/standards/standard/index.md) — The Meta-Standard card's three Standards, one object each (the card catalog, a gate, and a detector), and the guide to standing up a repo-scoped standard in a consumer repo
 - [tracking/](/standards/tracking/index.md) — The Tracking card's four Standards, one object each — the candidate register, an issue, a repo's labels, and its GitHub settings — and the guide to linking issues on GitHub

@@ -43,9 +43,9 @@ restate the content of their targets.
   fixed name (**commit gate**, **push gate**, **CI gate**), defined in
   [Gates](/standards/standard/gates.md). A cell cites the single rung
   where the detector is stationed — where its wiring lives (pre-commit
-  hooks → the commit gate; tools that run only inside `make check` /
-  `make check-judgments-cache` → the push gate); the hook pattern in Gates
-  implies the echoes at the other rungs. On demand: a script or skill the
+  hooks → the commit gate; tools that run only inside `make check` → the
+  push gate); the hook pattern in Gates implies the echoes at the other
+  rungs. On demand: a script or skill the
   user, a schedule, or a process step invokes, which rewrites the object
   into conformance and leaves the result for review, marked
   **on demand** beside its link. A code review is a one-time checkpoint,
