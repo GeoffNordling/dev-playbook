@@ -130,6 +130,29 @@ the design later. You do not resolve it by editing the design.
   `(json_path, message)` and raises `ContractError` on the first, so the same
   bad instance always names the same field.
 
+- **Only the root `tests/conftest.py` may exist.** Task 3 tried the nested
+  `tests/dev_playbook/cloa_viewer/conftest.py` the plan asked for and it broke
+  the collection of seven existing suites: pytest prepends each collected
+  file's directory to `sys.path`, so a second `conftest.py` anywhere under
+  `tests/` shadows the root one and `from conftest import init_repo` finds the
+  wrong file. The shared fixture lives at `tests/cloa_viewer_fixtures.py`
+  instead, as `build_checkout(tmp_path) -> Path` — `tests/` is also the only
+  directory both pytest and mypy resolve a bare import from. A test module
+  wraps it in its own three-line `checkout` fixture rather than importing a
+  fixture, because ruff reads an imported fixture as redefined by every test
+  that takes it as a parameter (F811). Never add a `conftest.py` below
+  `tests/`, and never build a second fixture repo.
+- **A kind module never imports `registry`.** `View` and `Kind` are defined in
+  `src/dev_playbook/cloa_viewer/entry.py`; `registry` re-exports both (they are
+  in its `__all__`) and imports every kind module to build `KINDS`, so a kind
+  importing `registry` back would deadlock the import. Import them from
+  `entry`. `registry.kind_by_name` raises `KeyError` naming what was asked.
+- **Link targets resolve in one place.** `src/dev_playbook/cloa_viewer/identity.py`
+  holds `resolve_target(source, target)` (drops a `#fragment`, resolves a
+  leading `/` against the checkout root and anything else against the source
+  file's directory, normalizes `..`) and `is_external(target)` (`http://`,
+  `https://`, `mailto:`). Task 4's `links_out` uses both; do not write a second
+  resolver.
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
@@ -182,7 +205,7 @@ the design later. You do not resolve it by editing the design.
   the same basename differ; `write_json` leaves no `.tmp` file behind. Gate
   green.
 
-- [ ] **Task 3: the registry and the index-tree kind.** Create
+- [x] **Task 3: the registry and the index-tree kind.** Create
   `src/dev_playbook/cloa_viewer/registry.py` with
   `@dataclass(frozen=True) class Kind: name: str; version: int; per_subject: bool; generate: Callable[[Path], list[View]]`
   where `View` is a frozen dataclass `relpath: str; envelope: dict` (relpath is

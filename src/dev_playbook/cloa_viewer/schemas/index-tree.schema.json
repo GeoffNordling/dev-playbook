@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "index-tree.schema.json",
+  "title": "index-tree payload",
+  "description": "Every tracked markdown file, arranged by the index.md hierarchy, plus every one no index reaches.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "unindexed"
+  ],
+  "properties": {
+    "root": {
+      "description": "The checkout root as a directory node; its identity is the empty string.",
+      "$ref": "#/$defs/directory"
+    },
+    "unindexed": {
+      "description": "The file nodes the walk never reached, sorted by identity.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    }
+  },
+  "$defs": {
+    "directory": {
+      "description": "One directory row: the facts its index.md carries, and what it lists.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "title",
+        "description",
+        "words",
+        "children"
+      ],
+      "properties": {
+        "identity": {
+          "description": "The repo-relative path with a trailing slash, empty for the root.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The index's H1, or the directory name when the index is missing.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The first sentence of the index's introduction.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "words": {
+          "description": "The sum of the word counts below this directory.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "children": {
+          "description": "The rows this directory holds, its own index.md first, then listing order.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/directory"
+              },
+              {
+                "$ref": "#/$defs/file"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "file": {
+      "description": "One file row: its frontmatter facts and its word count.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "type",
+        "title",
+        "description",
+        "words",
+        "exists"
+      ],
+      "properties": {
+        "identity": {
+          "description": "The repo-relative path.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The frontmatter type, null when the file carries none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
+          "description": "The frontmatter title, null when the file carries none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "description": "The frontmatter description, null when the file carries none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "words": {
+          "description": "The word count of the body after the frontmatter.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "exists": {
+          "description": "False when an index lists a file the checkout does not carry.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
