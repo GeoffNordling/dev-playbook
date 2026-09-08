@@ -353,6 +353,25 @@ the design later. You do not resolve it by editing the design.
   run went through `playwright.sync_api` in a scratchpad script instead, which
   works with no extension and is what task 13 uses anyway. Start the server as
   `.venv/bin/cloa-viewer --port <port>` and stop it with `pkill -f`.
+- **The page splits the frontmatter off the source before rendering it.**
+  markdown-it reads a frontmatter block as a setext heading — the closing `---`
+  underlines the last key — so rendering `payload.source` whole put the whole
+  YAML block on screen as one enormous title. `MarkdownFile.tsx`'s `split()`
+  takes the block off the front and shows it as YAML in a `<pre>`, and renders
+  only the body as markdown. The generator still writes the file as written,
+  which is what the contract says; if a later kind wants the body alone, that
+  is a payload field and a `kind_version` bump, not a second split on the page.
+- **A link inside the rendered source opens a panel, and never navigates.**
+  `followLink` cancels every anchor click inside `.file-source` and looks the
+  anchor's `href` up in a map built from `links_out`, so the browser still
+  resolves nothing: the generator scored that target and gave it its identity.
+  Without the cancel a relative link would navigate the page off the viewer
+  and lose the whole room. An external link opens in its own tab.
+- **`testing-lint` forbids `if`/`else` and `try`/`except` in a `test_*` body**,
+  and a fixture is exempt (`src/dev_playbook/testing_lint.py`, rule
+  `testing.no-logic`). Task 13's end-to-end test therefore keeps the build
+  guard and the server's start and kill in the `address` fixture in
+  `tests/dev_playbook/cloa_viewer/test_cli.py`, which yields the page's URL.
 
 ## Tasks
 
@@ -684,7 +703,7 @@ the design later. You do not resolve it by editing the design.
   and `broken` across all views (before this task: 711, 20, 0, 195). Gate
   green.
 
-- [ ] **Task 13: the file panel and the Playwright test.** Create
+- [x] **Task 13: the file panel and the Playwright test.** Create
   `src/kinds/markdown-file/MarkdownFile.tsx`: a facts row (`type`, `words`,
   heading count), a `Headings` list indented by level, `Links out` as a
   list with the status shown as a badge (`ok`, `broken`, `external`,

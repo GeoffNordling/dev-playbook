@@ -1,11 +1,22 @@
+import os
+import socket
+import subprocess
+import time
+from collections.abc import Iterator
 from pathlib import Path
 
+import httpx
 import pytest
 from cloa_viewer_fixtures import build_checkout
+from playwright.sync_api import Page, expect
 from starlette.applications import Starlette
 
 from dev_playbook.cloa_viewer import cli, registry, state
 from dev_playbook.cloa_viewer.entry import Kind, View
+
+# tests/dev_playbook/cloa_viewer/test_cli.py -> the checkout root, which holds
+# the .venv the end-to-end test starts the real command from.
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 @pytest.fixture
@@ -46,6 +57,66 @@ def record_serve(monkeypatch: pytest.MonkeyPatch) -> list[tuple[Starlette, int]]
 def breaking_generate(checkout: Path) -> list[View]:
     """Stand in for a kind whose generator raises."""
     raise RuntimeError("the generator broke")
+
+
+def free_port() -> int:
+    """A port nothing holds, found by binding one and letting it go again."""
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        return int(probe.getsockname()[1])
+
+
+def start_server(
+    checkout: Path, port: int, state_home: Path
+) -> subprocess.Popen[bytes]:
+    """Start the real command on ``checkout``, and wait until it answers.
+
+    The entry point is run directly rather than through ``uv run``: uv stays
+    the parent, so killing it leaves the server holding the port and the event
+    stream, and terminating it waits on uvicorn's graceful shutdown, which a
+    page holding the stream open blocks for as long as the page lives.
+    """
+    server = subprocess.Popen(
+        [
+            str(REPO_ROOT / ".venv" / "bin" / "cloa-viewer"),
+            str(checkout),
+            "--port",
+            str(port),
+        ],
+        cwd=REPO_ROOT,
+        env={**os.environ, "XDG_STATE_HOME": str(state_home)},
+    )
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        if server.poll() is not None:
+            raise AssertionError(f"cloa-viewer exited with {server.returncode}")
+        try:
+            httpx.get(f"http://127.0.0.1:{port}/api/checkouts", timeout=1)
+        except httpx.HTTPError:
+            time.sleep(0.1)
+        else:
+            return server
+    server.kill()
+    raise AssertionError("cloa-viewer did not answer within 10 seconds")
+
+
+@pytest.fixture
+def address(checkout: Path, tmp_path: Path) -> Iterator[str]:
+    """The real command serving the fixture checkout; yields the page's address.
+
+    The command serves the page ``make web`` builds inside the package, so a
+    checkout that has never built it cannot run this at all: that is a missing
+    build step, not a failing viewer, and the fixture says which.
+    """
+    if not (cli.dist_dir() / "index.html").is_file():
+        pytest.fail("run make web first")
+    port = free_port()
+    server = start_server(checkout, port, tmp_path)
+    try:
+        yield f"http://127.0.0.1:{port}/"
+    finally:
+        server.kill()
+        server.wait(timeout=10)
 
 
 def test_port_defaults_to_8765() -> None:
@@ -179,3 +250,17 @@ def test_the_current_checkout_is_the_repo_root(
 ) -> None:
     monkeypatch.chdir(checkout / "docs")
     assert cli.current_checkout().resolve() == checkout.resolve()
+
+
+def test_page_shows_tree_and_updates(checkout: Path, address: str, page: Page) -> None:
+    page.goto(address)
+    row = page.locator(".tree .tree-row").filter(has_text="Alpha")
+    expect(row).to_have_count(1)
+    row.click()
+    expect(page.locator(".panel-title")).to_have_text("Alpha")
+    expect(page.locator(".panel-body")).to_contain_text("Second heading")
+    words = page.locator(".panel .file-fact-words .file-fact-value")
+    expect(words).to_have_text("18")
+    alpha = checkout / "alpha.md"
+    alpha.write_text(alpha.read_text() + "\nnine ten\n")
+    expect(words).to_have_text("20", timeout=5000)

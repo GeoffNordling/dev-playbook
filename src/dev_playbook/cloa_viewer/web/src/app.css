@@ -231,3 +231,125 @@ button.topbar-status {
   white-space: pre-wrap;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
+
+/* --- the file panel --- */
+
+.file {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+.file-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter);
+}
+
+.file-fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.file-fact-name {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.file-fact-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.file-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 4px;
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.file-heading {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.file-link {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.badge {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 5px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.badge-ok {
+  border-color: #9bbf9b;
+  color: #2c6e2c;
+}
+
+.badge-broken {
+  border-color: var(--bad);
+  background: var(--bad-ground);
+  color: var(--bad);
+}
+
+.file-target {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+button.file-target-open {
+  color: #1a4fa0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.file-source {
+  border-top: 1px solid var(--line);
+  padding-top: var(--gutter);
+  overflow-wrap: anywhere;
+}
+
+.file-source :first-child {
+  margin-top: 0;
+}
+
+.file-source pre {
+  background: var(--raised);
+  border-radius: 4px;
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.file-frontmatter {
+  margin: 0 0 var(--gutter);
+  padding: 8px;
+  background: var(--raised);
+  border-radius: 4px;
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}

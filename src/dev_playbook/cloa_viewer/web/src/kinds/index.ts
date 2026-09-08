@@ -7,6 +7,7 @@ import type { ComponentType } from "react";
 import type { View } from "../api";
 import type { Viewer } from "../store";
 import { IndexTree } from "./index-tree/IndexTree";
+import { MarkdownFile } from "./markdown-file/MarkdownFile";
 
 /** What a renderer is given: its own view file, and the room it sits in. */
 export interface RendererProps {
@@ -16,4 +17,5 @@ export interface RendererProps {
 
 export const RENDERERS = new Map<string, ComponentType<RendererProps>>([
   ["index-tree", IndexTree],
+  ["markdown-file", MarkdownFile],
 ]);
