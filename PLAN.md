@@ -63,11 +63,13 @@ the design later. You do not resolve it by editing the design.
 
 ## Done when
 
-- `uv run cloa-viewer ~/workspace` started from this checkout discovers every
-  git repo directly under `~/workspace/` and every linked worktree of each,
-  refreshes them all, and serves one page whose top bar offers them in a
-  select grouped by repo and labelled by branch. Choosing one swaps the tree
-  and the panels without a reload; a reload returns to the chosen one.
+- `uv run cloa-viewer <directory>` for a directory that is not a checkout
+  discovers every git repo directly under it and every linked worktree of
+  each, refreshes them all, and serves one page whose top bar offers them in
+  a select grouped by repo and labelled by branch. Choosing one swaps the
+  tree and the panels without a reload; a reload returns to the chosen one.
+  Discovery is proven on fixture repos; the smoke run covers dev-playbook's
+  main checkout and this worktree, never the other repos in `~/workspace`.
 - The tree shows two groups, `Concept documents` and `Harness-owned files`,
   by `dev_playbook.md.classify`; `PLAN.md` and `PROGRESS.md` appear nowhere
   and have no view file. Levels are separated by guide lines. No row shows a
@@ -119,8 +121,8 @@ the design later. You do not resolve it by editing the design.
 - **inotify budget on this machine.** `fs.inotify.max_user_watches` is
   269696 and `max_user_instances` is 128. One `watchfiles.awatch` per
   checkout uses one instance; `~/workspace` holds about 20 repos and 2
-  worktrees today, well inside both. Record the numbers you see in the smoke
-  run.
+  worktrees today, well inside both. The smoke run watches two checkouts;
+  record the numbers you see.
 - **Fixture checkout.** `tests/cloa_viewer_fixtures.py` holds
   `build_checkout(tmp_path) -> Path`, which creates `tmp_path / "fixture"`
   (canonical repo name `fixture`) with exactly the files listed in loop 1's
@@ -443,18 +445,40 @@ the design later. You do not resolve it by editing the design.
   `#<dir>`, and the tree still show `Alpha`; `page.reload()` keeps that
   selection. `make web`, then gate green.
 
-- [ ] **Task 9: the smoke run on the real workspace.** Run `make web`,
-  then start `.venv/bin/cloa-viewer ~/workspace --port <free port>` with
-  the real `XDG_STATE_HOME` unset, from this checkout, and time it from
-  launch to the printed address. With a Playwright script from the
-  scratchpad: load the page, read the select's optgroups and options,
-  switch to `dev-playbook`'s `main` and then to this worktree's branch,
-  screenshot each, and read `/api/checkouts`. Kill only that PID. Record
-  in the PROGRESS line: the number of repos and worktrees discovered, the
-  startup time, every checkout whose refresh record has a failed generator
-  and the first line of each error, and the inotify instance count during
-  the run (`ls /proc/<pid>/fd | wc -l` is enough). A failed generator in
-  another repo is a finding for the user, not a blocker: do not edit a
-  generator to tolerate it unless the traceback shows a defect in this
-  package's own code, in which case fix the defect with a test. No code
-  change is expected from this task otherwise. Gate green.
+- [ ] **Task 9: the smoke run on dev-playbook's checkouts.** The smoke
+  run covers dev-playbook only: the other repos under `~/workspace` are
+  not maintained to this repo's standard, and their edge cases are not
+  this loop's business, so do not point the server at `~/workspace`. Run
+  `make web`, then start
+  `.venv/bin/cloa-viewer ~/workspace/dev-playbook <this worktree's absolute path> --port <free port>`
+  with the real `XDG_STATE_HOME` unset, from this checkout, and time it
+  from launch to the printed address. Two checkouts of one repo is the
+  case the toggle exists for: one optgroup, two branches. With a
+  Playwright script from the scratchpad: load the page, read the select's
+  optgroups and options, switch to `main` and then back to this
+  worktree's branch, screenshot each, confirm the tree shows the two
+  group headers on both, and read `/api/checkouts`. Kill only that PID.
+  Record in the PROGRESS line: the startup time, the two entries
+  `/api/checkouts` listed, every generator that failed with the first
+  line of its error, and the inotify instance count during the run
+  (`ls /proc/<pid>/fd | wc -l` is enough). A failed generator on `main`
+  is a finding for the user, not a blocker: do not edit a generator to
+  tolerate it unless the traceback shows a defect in this package's own
+  code, in which case fix the defect with a test. No code change is
+  expected from this task otherwise. Gate green.
+
+- [ ] **Task 10: Ctrl-C stops the server while a page is open.** The user
+  pressed Ctrl-C four times on `uv run cloa-viewer` with the page open and
+  the server did not exit: uvicorn's graceful shutdown waits for the open
+  event stream for as long as the page lives (the `start_server` docstring
+  in `test_cli.py` already records this). In `cli.serve`, pass
+  `timeout_graceful_shutdown=2` to `uvicorn.run`, so an interrupt closes
+  the stream and exits within about two seconds. Test in `test_cli.py`:
+  refactor so a `server` fixture starts the process and yields it, and
+  `address` derives the URL from it (behaviour unchanged for the existing
+  end-to-end tests); add
+  `test_interrupt_stops_the_server_while_a_page_holds_the_stream(server, address, page)`:
+  `page.goto(address)`, wait for `.tree` to be visible, then
+  `server.send_signal(signal.SIGINT)` and `server.wait(timeout=10)`, and
+  assert `server.returncode == 0`. The fixture's `finally` still calls
+  `kill()`, which is a no-op on a process already reaped. Gate green.
