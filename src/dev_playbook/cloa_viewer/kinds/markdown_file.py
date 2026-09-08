@@ -9,6 +9,10 @@ detail behind a CLOA panel, and the whole panel for a file no CLOA kind covers.
 ``links_in`` is why the generator reads every file before it writes any: the
 files pointing at a document are found only by resolving every other document's
 links first, so the walk is two passes over one read of the checkout.
+
+A file ``md.classify`` calls ``excluded`` — the transient ``PLAN.md`` and
+``PROGRESS.md`` pair — gets no view file, so the tree and the panels agree on
+what is in the bundle without either one deciding it.
 """
 
 import re
@@ -20,6 +24,7 @@ from dev_playbook.cloa_viewer.entry import Kind, View
 from dev_playbook.cloa_viewer.identity import citation_repo, is_external, resolve_target
 from dev_playbook.gitrepo import canonical_repo_name, git_files
 from dev_playbook.md import (
+    classify,
     github_slug,
     is_decision_record,
     lines_outside_fences,
@@ -30,6 +35,7 @@ from dev_playbook.md import (
 KIND_NAME = "markdown-file"
 KIND_VERSION = 1
 MARKDOWN_SUFFIX = ".md"
+EXCLUDED_CLASS = "excluded"
 ANCHOR_PREFIX = "#"
 # An ATX heading: the hashes say the level, the rest is the text the slug and
 # the panel show.
@@ -142,7 +148,9 @@ def generate(checkout: Path) -> list[View]:
     tracked = set(git_files(checkout))
     repo = canonical_repo_name(checkout)
     subjects = sorted(
-        relpath for relpath in tracked if relpath.endswith(MARKDOWN_SUFFIX)
+        relpath
+        for relpath in tracked
+        if relpath.endswith(MARKDOWN_SUFFIX) and classify(relpath) != EXCLUDED_CLASS
     )
     sources = {
         identity: (checkout / identity).read_text(encoding="utf-8")

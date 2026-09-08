@@ -250,6 +250,26 @@ the design later. You do not resolve it by editing the design.
   `count?: string` and renders `.tree-count` only when it is given; the
   `Unindexed` row is the one caller that passes one today. Task 4's group row
   and `Not indexed` row need no new prop for their `N files`.
+- **The fixture holds nine markdown files after task 4**, one of every
+  `classify` answer: the seven from task 2, plus `CLAUDE.md` (`harness`) and
+  `PLAN.md` (`excluded`). `CLAUDE.md` sorts *before* `alpha.md` — capitals
+  precede lowercase — so it is the first entry in every sorted view-file list.
+  Three counts moved with it and a future task that adds a file must move them
+  again: `test_refresh.py`'s `markdown-file` count (now 8),
+  `test_server.py::test_the_file_list_holds_every_view_file` (the plan did not
+  name this one), and `test_markdown_file.py`'s relpath list.
+- **A stand-in payload in a test must satisfy the schema's `required`.**
+  `test_refresh.py`'s `bad_payload_generate` breaks `$.root` on purpose and
+  asserts the error names `$.root`; `state.validate` sorts errors by json path,
+  so `$` (a missing top-level key) would sort first and win. When
+  `index-tree.schema.json` gained required `harness`, that stand-in had to gain
+  `"harness": []` to keep failing where the test says it fails.
+- **`Row` in `IndexTree.tsx` builds its class list from named booleans**
+  (`group`, `bad`, `missing`), not a ternary, so task 5 adds `tree-row-directory`
+  by pushing one more class. `.tree-group` carries the uppercase muted style and
+  `.tree-row-bad .tree-title` the red; neither touches `.tree-row` itself, so the
+  Playwright selector `.tree .tree-row` still matches every row including the two
+  group headers.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -315,7 +335,7 @@ the design later. You do not resolve it by editing the design.
   `alpha.md`, `expect(page.locator(".panel-body")).to_contain_text("nine ten", timeout=5000)`.
   `make web`, then gate green.
 
-- [ ] **Task 4: the two groups, by `classify`.** In `kinds/index_tree.py`,
+- [x] **Task 4: the two groups, by `classify`.** In `kinds/index_tree.py`,
   `generate` takes every `.md` path from `git_files(checkout)` and drops
   those `md.classify` calls `excluded`; the walk runs over the rest; the
   payload becomes `root` (as now), `unindexed` (the `concept` and `index`

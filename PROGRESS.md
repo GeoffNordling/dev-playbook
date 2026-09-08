@@ -37,3 +37,21 @@ in git history there. This file starts over for loop 2, the room.
   refreshed source ends with the appended line; `test_cli.py` waits for
   `nine ten` in the panel body instead of a count of 20. `make web` rebuilt,
   gate green. Next: task 4, the two groups by `md.classify`.
+- Task 4 done: `kinds/index_tree.py` drops every `md.classify` `excluded` path
+  before the walk and splits the leftovers into `unindexed` (concept and index)
+  and a new `harness` list, all three required in
+  `schemas/index-tree.schema.json` (`kind_version` still 1);
+  `kinds/markdown_file.py` skips an `excluded` file so it gets no view.
+  `IndexTree.tsx` now opens with two group rows, `Concept documents` (holding
+  the root hierarchy and, only when it is non-empty, a collapsed red
+  `Not indexed` row) and `Harness-owned files` with its `N files`; `Row` builds
+  its classes from `group`/`bad`/`missing` booleans and `app.css` gained
+  `.tree-group` and `.tree-row-bad .tree-title`. The fixture gained `CLAUDE.md`
+  and `PLAN.md`. Three plan slips for the user: the plan did not name
+  `test_server.py::test_the_file_list_holds_every_view_file`, which lists view
+  paths and needed `markdown-file/CLAUDE.md.json`; nor
+  `test_refresh.py`'s `bad_payload_generate`, whose stand-in payload needed
+  `"harness": []` so its deliberate failure stays `$.root` rather than a
+  missing-key error at `$`; and `CLAUDE.md` sorts before `alpha.md`, so it
+  heads every sorted list rather than trailing it. `make web` rebuilt, gate
+  green, 1297 tests. Next: task 5, levels told apart by eye.

@@ -96,6 +96,7 @@ def test_the_file_list_holds_every_view_file(
     listed = client.get(f"/api/checkouts/{directory_name(checkout)}/files").json()
     assert listed == [
         "index-tree.json",
+        "markdown-file/CLAUDE.md.json",
         "markdown-file/alpha.md.json",
         "markdown-file/docs/beta.md.json",
         "markdown-file/docs/decisions/0001-alpha.md.json",

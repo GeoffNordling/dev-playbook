@@ -20,6 +20,17 @@ def payload_of(checkout: Path) -> dict[str, Any]:
     return payload
 
 
+def identities(payload: dict[str, Any]) -> set[str]:
+    """Every identity the payload names, in the hierarchy and in both flat lists."""
+    found = {node["identity"] for node in payload["unindexed"] + payload["harness"]}
+    pending = [payload["root"]]
+    while pending:
+        node = pending.pop()
+        found.add(node["identity"])
+        pending.extend(node.get("children", []))
+    return found
+
+
 def test_the_kind_writes_one_view_at_index_tree_json(checkout: Path) -> None:
     assert [view.relpath for view in index_tree.generate(checkout)] == [
         "index-tree.json"
@@ -94,9 +105,18 @@ def test_a_directory_lists_its_own_index_then_its_listing(checkout: Path) -> Non
     ]
 
 
-def test_a_file_no_index_reaches_is_unindexed(checkout: Path) -> None:
+def test_a_concept_document_no_index_reaches_is_unindexed(checkout: Path) -> None:
     unindexed = payload_of(checkout)["unindexed"]
     assert [node["identity"] for node in unindexed] == ["orphan.md"]
+
+
+def test_a_harness_owned_file_is_its_own_group(checkout: Path) -> None:
+    harness = payload_of(checkout)["harness"]
+    assert [node["identity"] for node in harness] == ["CLAUDE.md"]
+
+
+def test_an_excluded_file_has_no_row_anywhere(checkout: Path) -> None:
+    assert "PLAN.md" not in identities(payload_of(checkout))
 
 
 def test_a_listed_file_the_checkout_lacks_is_flagged_missing(tmp_path: Path) -> None:

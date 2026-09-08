@@ -1,12 +1,20 @@
 """The ``index-tree`` kind: the checkout's markdown, arranged by its indexes.
 
-One view file per checkout. The walk starts at the root ``index.md`` and
-follows every listing entry, so the tree on screen is the hierarchy the
+One view file per checkout, in the two groups the
+[File Roles](/standards/knowledge-organization/file-roles.md) guide names.
+The concept documents come from the walk: it starts at the root ``index.md``
+and follows every listing entry, so the tree on screen is the hierarchy the
 [Indexes](/standards/knowledge-organization/indexes.md) standard describes and
-nothing else. Every tracked markdown file the walk never reaches lands in
-``unindexed``, because total accounting is a principle: a file no index names
-is exactly the file the user needs to see
+nothing else. A concept document the walk never reaches lands in ``unindexed``,
+because total accounting is a principle: a file no index names is exactly the
+file the user needs to see
 ([CLOA Viewer](/worktree-cloa-viewer-tool-working-docs/ROOT.md#principles)).
+The harness-owned files the walk never reaches land in ``harness``, a flat list.
+
+Which group a file belongs to is ``md.classify``, the one encoding of the
+boundary, never a test of this module's own: the tree and okf-lint cannot
+disagree about a file's role when they ask the same function. A file that
+function calls ``excluded`` gets no row at all.
 
 A row carries no size of any sort. How big or how complex a document is will
 be a kind of its own, designed on its own, and a summed count is not it
@@ -20,13 +28,20 @@ from dev_playbook.cloa_viewer import state
 from dev_playbook.cloa_viewer.entry import Kind, View
 from dev_playbook.cloa_viewer.identity import is_external, resolve_target
 from dev_playbook.gitrepo import canonical_repo_name, git_files
-from dev_playbook.md import lines_outside_fences, markdown_links, parse_frontmatter
+from dev_playbook.md import (
+    classify,
+    lines_outside_fences,
+    markdown_links,
+    parse_frontmatter,
+)
 
 KIND_NAME = "index-tree"
 KIND_VERSION = 1
 TITLE = "Index tree"
 INDEX_FILE = "index.md"
 MARKDOWN_SUFFIX = ".md"
+EXCLUDED_CLASS = "excluded"
+HARNESS_CLASS = "harness"
 HEADING_PREFIX = "# "
 LISTING_PREFIX = "- "
 SENTENCE_END = ". "
@@ -153,17 +168,26 @@ def _directory_node(
 def generate(checkout: Path) -> list[View]:
     """The one ``index-tree`` view file describing ``checkout``."""
     tracked = {
-        relpath for relpath in git_files(checkout) if relpath.endswith(MARKDOWN_SUFFIX)
+        relpath
+        for relpath in git_files(checkout)
+        if relpath.endswith(MARKDOWN_SUFFIX) and classify(relpath) != EXCLUDED_CLASS
     }
     reached: set[str] = set()
     root = _directory_node(
         checkout, "", tracked, reached, canonical_repo_name(checkout)
     )
+    left_over = sorted(tracked - reached)
     payload: dict[str, Any] = {
         "root": root,
         "unindexed": [
             _file_node(checkout, relpath, tracked)
-            for relpath in sorted(tracked - reached)
+            for relpath in left_over
+            if classify(relpath) != HARNESS_CLASS
+        ],
+        "harness": [
+            _file_node(checkout, relpath, tracked)
+            for relpath in left_over
+            if classify(relpath) == HARNESS_CLASS
         ],
     }
     return [

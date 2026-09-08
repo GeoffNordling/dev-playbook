@@ -165,6 +165,22 @@ button.topbar-status {
   line-height: 1.4;
 }
 
+/* The two group headers. Set small and quiet rather than large and loud: they
+   name the halves of the tree once, and the documents under them are what the
+   eye is meant to land on. */
+.tree-group {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The Not indexed row: okf-lint calls an unreached concept document a defect,
+   so the row that gathers them is drawn as one. */
+.tree-row-bad .tree-title {
+  color: var(--bad);
+}
+
 .tree-row-missing {
   opacity: 0.5;
 }

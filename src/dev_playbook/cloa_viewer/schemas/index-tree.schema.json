@@ -2,12 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "index-tree.schema.json",
   "title": "index-tree payload",
-  "description": "Every tracked markdown file, arranged by the index.md hierarchy, plus every one no index reaches.",
+  "description": "Every tracked markdown file md.classify does not exclude, in two groups: the concept documents the index.md hierarchy arranges, plus the ones it never reaches, and the harness-owned files as a flat list.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "root",
-    "unindexed"
+    "unindexed",
+    "harness"
   ],
   "properties": {
     "root": {
@@ -15,7 +16,14 @@
       "$ref": "#/$defs/directory"
     },
     "unindexed": {
-      "description": "The file nodes the walk never reached, sorted by identity.",
+      "description": "The concept and index file nodes the walk never reached, sorted by identity.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "harness": {
+      "description": "The harness-owned file nodes the walk never reached, sorted by identity.",
       "type": "array",
       "items": {
         "$ref": "#/$defs/file"

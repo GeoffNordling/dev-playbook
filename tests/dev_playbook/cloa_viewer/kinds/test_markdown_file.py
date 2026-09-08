@@ -47,8 +47,11 @@ def envelope_of(checkout: Path, identity: str) -> dict[str, Any]:
     raise AssertionError(f"no view for {identity}")
 
 
-def test_the_kind_writes_one_view_per_markdown_file(checkout: Path) -> None:
+def test_the_kind_writes_one_view_per_markdown_file_except_the_excluded(
+    checkout: Path,
+) -> None:
     assert [view.relpath for view in markdown_file.generate(checkout)] == [
+        "markdown-file/CLAUDE.md.json",
         "markdown-file/alpha.md.json",
         "markdown-file/docs/beta.md.json",
         "markdown-file/docs/decisions/0001-alpha.md.json",

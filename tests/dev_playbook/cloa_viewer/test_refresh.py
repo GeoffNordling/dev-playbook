@@ -31,7 +31,7 @@ def bad_payload_generate(checkout: Path) -> list[View]:
                 1,
                 "Index tree",
                 None,
-                {"root": {}, "unindexed": []},
+                {"root": {}, "unindexed": [], "harness": []},
                 commit="46321be7c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5",
                 generator="tests.dev_playbook.cloa_viewer.test_refresh",
             ),
@@ -62,7 +62,7 @@ def test_the_record_names_every_generator_and_what_it_wrote(checkout: Path) -> N
     record = refresh.refresh(checkout)
     assert record["generators"] == [
         {"kind": "index-tree", "status": "ok", "count": 1, "error": None},
-        {"kind": "markdown-file", "status": "ok", "count": 7, "error": None},
+        {"kind": "markdown-file", "status": "ok", "count": 8, "error": None},
     ]
 
 

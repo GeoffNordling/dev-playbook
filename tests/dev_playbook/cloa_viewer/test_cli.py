@@ -254,6 +254,8 @@ def test_the_current_checkout_is_the_repo_root(
 
 def test_page_shows_tree_and_updates(checkout: Path, address: str, page: Page) -> None:
     page.goto(address)
+    expect(page.locator(".tree")).to_contain_text("Harness-owned files")
+    expect(page.locator(".tree")).to_contain_text("Not indexed")
     row = page.locator(".tree .tree-row").filter(has_text="Alpha")
     expect(row).to_have_count(1)
     row.click()
