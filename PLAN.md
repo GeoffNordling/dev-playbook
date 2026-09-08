@@ -117,6 +117,19 @@ the design later. You do not resolve it by editing the design.
   rootdir, so every test module basename must be unique across the whole
   `tests/` tree. `tests/dev_playbook/cloa_viewer/test_cli.py` already exists
   (task 1); name new ones so they do not collide with any other suite.
+- **The state module is the only writer.** Task 2 built
+  `dev_playbook.cloa_viewer.state`. Import from it, never re-derive: `state_root`,
+  `checkout_dir`, `head_commit`, `branch_name`, `write_checkout_json`,
+  `envelope`, `load_schema`, `validate`, `write_json`, and `ContractError`.
+  `load_schema("envelope")` finds `schemas/envelope.schema.json` through
+  `importlib.resources.files("dev_playbook.cloa_viewer")`, so a new kind schema
+  is one JSON file dropped into that same directory and nothing else.
+  `write_json` sorts keys, indents by 2, ends with a newline, and stages at
+  `path.with_suffix(".tmp")` before `os.replace` — a caller must not write a
+  view file any other way. `validate` sorts the validator's errors by
+  `(json_path, message)` and raises `ContractError` on the first, so the same
+  bad instance always names the same field.
+
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
@@ -139,7 +152,7 @@ the design later. You do not resolve it by editing the design.
   for that). Run `uv sync`, then `uv run cloa-viewer --help` prints usage.
   Gate green.
 
-- [ ] **Task 2: the state module.** Create `src/dev_playbook/cloa_viewer/state.py`
+- [x] **Task 2: the state module.** Create `src/dev_playbook/cloa_viewer/state.py`
   and `src/dev_playbook/cloa_viewer/schemas/envelope.schema.json`. The schema
   is JSON Schema draft 2020-12, `type: object`, `additionalProperties: false`,
   `required` all seven fields: `envelope` (const `1`), `kind` (string,

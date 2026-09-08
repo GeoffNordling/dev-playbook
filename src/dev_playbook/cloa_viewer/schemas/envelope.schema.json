@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "envelope.schema.json",
+  "title": "View file envelope",
+  "description": "The seven top-level fields every view file carries. A kind's own schema governs payload.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "envelope",
+    "kind",
+    "kind_version",
+    "title",
+    "subject",
+    "stamp",
+    "payload"
+  ],
+  "properties": {
+    "envelope": {
+      "description": "The envelope version.",
+      "const": 1
+    },
+    "kind": {
+      "description": "The registered kind name.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "kind_version": {
+      "description": "The version of the kind's payload schema.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "description": "The panel's heading.",
+      "type": "string",
+      "minLength": 1
+    },
+    "subject": {
+      "description": "The identity the file is about, or null for a per-checkout kind.",
+      "type": ["string", "null"]
+    },
+    "stamp": {
+      "description": "Which commit the file describes and what produced it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "generated_at",
+        "generator"
+      ],
+      "properties": {
+        "commit": {
+          "description": "The checkout's HEAD when the generator ran.",
+          "type": "string"
+        },
+        "generated_at": {
+          "description": "When the generator ran, UTC RFC 3339 with a Z suffix.",
+          "type": "string"
+        },
+        "generator": {
+          "description": "The module that wrote the file.",
+          "type": "string"
+        }
+      }
+    },
+    "payload": {
+      "description": "The object the kind's schema governs.",
+      "type": "object"
+    }
+  }
+}
