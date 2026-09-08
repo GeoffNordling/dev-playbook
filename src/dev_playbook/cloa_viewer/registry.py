@@ -13,11 +13,11 @@ back.
 """
 
 from dev_playbook.cloa_viewer.entry import Kind, View
-from dev_playbook.cloa_viewer.kinds import index_tree
+from dev_playbook.cloa_viewer.kinds import index_tree, markdown_file
 
 __all__ = ["KINDS", "Kind", "View", "kind_by_name"]
 
-KINDS: tuple[Kind, ...] = (index_tree.KIND,)
+KINDS: tuple[Kind, ...] = (index_tree.KIND, markdown_file.KIND)
 
 
 def kind_by_name(name: str) -> Kind:

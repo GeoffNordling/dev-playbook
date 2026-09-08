@@ -153,6 +153,20 @@ the design later. You do not resolve it by editing the design.
   file's directory, normalizes `..`) and `is_external(target)` (`http://`,
   `https://`, `mailto:`). Task 4's `links_out` uses both; do not write a second
   resolver.
+- **A link target resolves in the kind, not only in `identity`.** Task 4 added
+  `_target_identity(source, target)` to `kinds/markdown_file.py`: a bare
+  `#anchor` target names the file it sits in, and everything else goes to
+  `identity.resolve_target`. Without that case `resolve_target("a.md", "#x")`
+  answers `"."` — the source's own directory — and 15 files in this repo that
+  link to their own headings would every one read as `broken`.
+- **`links_out` has three statuses, and a Citation reads as `broken`.** Run on
+  this checkout the kind writes 202 views that all validate, scoring 711 `ok`,
+  20 `external`, and 195 `broken`; nearly every broken one is a
+  `~/workspace/<repo>/...` Citation the cross-reference standard requires for a
+  cross-repo target. The rule is the plan's, and correct as written — the target
+  names no path in this checkout — but the panel cannot tell a citation from a
+  dead link. Telling them apart is a fourth status and so a design change, for
+  the user to settle, not a later task to assume.
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
@@ -250,7 +264,7 @@ the design later. You do not resolve it by editing the design.
   payload validates against the schema; a repo with no root `index.md`
   puts every file in `unindexed`. Gate green.
 
-- [ ] **Task 4: the markdown-file kind.** Create
+- [x] **Task 4: the markdown-file kind.** Create
   `src/dev_playbook/cloa_viewer/kinds/markdown_file.py` exporting `KIND`
   (name `markdown-file`, version 1, per_subject True) and `generate`, and
   `schemas/markdown-file.schema.json`. One view per `.md` path in
