@@ -219,6 +219,26 @@ the design later. You do not resolve it by editing the design.
   never through a test client.
 - **Starlette warns that `httpx` is deprecated for `TestClient`** in favor of
   `httpx2`. It is a warning only, and `make check` is green with it.
+- **The checkout watcher's `.git` filter is what stops a refresh loop.** Task 7
+  built `dev_playbook.cloa_viewer.watch.watch_checkout(checkout, *, debounce_ms,
+  stop)`, and its `outside_git(change, path)` filter drops every path with a
+  `.git` component. A refresh runs `git ls-files` and `git rev-parse`, and git
+  writes inside `.git` when it does, so without the filter each refresh would
+  trigger the watcher that started it and the loop would never settle.
+  `CHECKOUT_DEBOUNCE_MS` is 300.
+- **The whole live-update loop is closed, and it costs about 0.17 seconds.**
+  Measured on a two-file checkout through the app's own `lifespan_context`:
+  appending a line to `alpha.md` published `markdown-file/alpha.md.json`,
+  `markdown-file/index.md.json`, `index-tree.json`, and one `refreshed`, all
+  within 0.17s of the write, against the two-second budget in "Done when".
+  Nothing else arrived in the three seconds after, which is also the evidence
+  that the `.git` filter holds.
+- **`build_app` now starts a watcher per checkout.** `_lifespan` creates
+  `watch_state()` plus one `watch.watch_checkout(checkout)` task per entry of
+  `app.state.checkouts`, and cancels them all on shutdown. `TestClient` without
+  `with` still runs no lifespan, so the route tests start no watcher; a test
+  that does use `with TestClient(...)` will refresh its fixture checkout for
+  real on every edit under it.
 
 ## Tasks
 
@@ -398,7 +418,7 @@ the design later. You do not resolve it by editing the design.
   returns a record with two generators. Test `publish` by subscribing a
   queue and asserting the message arrives. Gate green.
 
-- [ ] **Task 7: the checkout watcher.** Create
+- [x] **Task 7: the checkout watcher.** Create
   `src/dev_playbook/cloa_viewer/watch.py` with
   `async def watch_checkout(checkout: Path, *, debounce_ms: int = 300, stop: asyncio.Event | None = None) -> None`
   that runs `watchfiles.awatch(checkout, debounce=debounce_ms, stop_event=stop, watch_filter=...)`

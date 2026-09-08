@@ -11,6 +11,10 @@ directory and turns every view file written or removed into one message; the
 subscribers, one queue per open page, carry it to a server-sent events stream.
 The page then fetches that one file and re-renders that one panel, so a refresh
 that rewrote two hundred files still moves only what changed on screen.
+
+The other two jobs are started here but written elsewhere: ``build_app`` runs
+one ``watch.watch_checkout`` task per checkout, and each of those calls the
+refresh in ``refresh``.
 """
 
 import asyncio
@@ -29,7 +33,7 @@ from starlette.responses import FileResponse, JSONResponse, Response, StreamingR
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from dev_playbook.cloa_viewer import refresh, registry, state
+from dev_playbook.cloa_viewer import refresh, registry, state, watch
 
 CHECKOUT_FILE = "checkout.json"
 EVENT_CHANGED = "changed"
@@ -267,12 +271,22 @@ def _frame(message: dict[str, Any]) -> str:
 
 @contextlib.asynccontextmanager
 async def _lifespan(app: Starlette) -> AsyncIterator[None]:
-    """Run the state watcher for as long as the server serves."""
-    watcher = asyncio.create_task(watch_state())
+    """Run the watchers for as long as the server serves.
+
+    One state watcher for the whole state directory, and one checkout watcher
+    per checkout on this server: together they close the loop from an edit in
+    the checkout to a message on an open page.
+    """
+    watchers = [asyncio.create_task(watch_state())]
+    watchers += [
+        asyncio.create_task(watch.watch_checkout(checkout))
+        for checkout in app.state.checkouts.values()
+    ]
     try:
         yield
     finally:
-        watcher.cancel()
+        for watcher in watchers:
+            watcher.cancel()
 
 
 def build_app(checkouts: list[Path], dist: Path) -> Starlette:
