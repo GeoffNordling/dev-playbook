@@ -23,6 +23,13 @@ export interface Viewer {
   checkout: Checkout | null;
   /** Every view file of the selected checkout, by its path under that checkout. */
   views: ReadonlyMap<string, Validated>;
+  /**
+   * Whether that map has arrived.
+   *
+   * An empty map is the checkout's first moment, not an empty checkout, and
+   * the tree must not call a view file missing before the fetch answers.
+   */
+  loaded: boolean;
   record: RefreshRecord | null;
   connection: Connection;
   /** The open panels, newest first. */
@@ -40,6 +47,7 @@ export function useViewer(): Viewer {
   const [checkouts, setCheckouts] = useState<Checkout[]>([]);
   const [checkout, setCheckout] = useState<Checkout | null>(null);
   const [views, setViews] = useState<ReadonlyMap<string, Validated>>(new Map());
+  const [loaded, setLoaded] = useState(false);
   const [record, setRecord] = useState<RefreshRecord | null>(null);
   const [connection, setConnection] = useState<Connection>("connecting");
   const [open, setOpen] = useState<readonly string[]>([]);
@@ -77,6 +85,7 @@ export function useViewer(): Viewer {
     }
     let live = true;
     setViews(new Map());
+    setLoaded(false);
     setOpen([]);
     setRecord(null);
     setFailure(null);
@@ -88,6 +97,7 @@ export function useViewer(): Viewer {
       );
       if (live) {
         setViews(new Map(entries));
+        setLoaded(true);
       }
       const found = await fetchRefresh(dir);
       if (live) {
@@ -154,6 +164,7 @@ export function useViewer(): Viewer {
     checkouts,
     checkout,
     views,
+    loaded,
     record,
     connection,
     open,

@@ -311,6 +311,28 @@ the design later. You do not resolve it by editing the design.
   open connection; a test that terminates and waits will hang. Either kill the
   process directly, or give `cli.serve` a `timeout_graceful_shutdown`.
 
+- **The left column and a panel draw a view file the same way.** Task 11 moved
+  the resolution out of `PanelStack` into `src/components/ViewBody.tsx`: a path
+  to the store's entry, then the kind's renderer, an `ErrorPanel` naming the
+  field when the file failed its schema, or `no renderer for kind <kind>`. The
+  tree region and every panel go through it, so one broken view file looks the
+  same wherever it lands. The tree is not special-cased: it is the view file
+  `index-tree.json` rendered by the `index-tree` renderer, registered in
+  `RENDERERS` like any other.
+- **The store gained `loaded`, and the tree needs it.** An empty `views` map is
+  the checkout's first moment, not a checkout with no view files. Without the
+  flag the left column drew a red `no view file` for `index-tree.json` on every
+  load until the fetch answered. `App` renders the tree only when
+  `viewer.loaded`.
+- **Playwright's `has_text` is case-insensitive substring matching**, which
+  task 13's test must respect: `.tree-row` filtered by `has_text="Doc-Types"`
+  matched the *directory* row `doc-types/ — index` and collapsed it instead of
+  opening a panel. Match a row by an exact string, or by index.
+- **The Chrome extension was not connected in task 11's session.** The smoke
+  run went through `playwright.sync_api` in a scratchpad script instead, which
+  works with no extension and is what task 13 uses anyway. Start the server as
+  `.venv/bin/cloa-viewer --port <port>` and stop it with `pkill -f`.
+
 ## Tasks
 
 - [x] **Task 1: package skeleton and dependencies.** Create
@@ -574,7 +596,7 @@ the design later. You do not resolve it by editing the design.
   three-region grid, left column 320px, no framework. `make web` succeeds;
   gate green.
 
-- [ ] **Task 11: the tree renderer.** Create
+- [x] **Task 11: the tree renderer.** Create
   `src/kinds/index-tree/IndexTree.tsx` rendering the `index-tree` view from
   the store in the left column: a directory row shows a disclosure
   triangle, the title, the description in muted text, and the word count

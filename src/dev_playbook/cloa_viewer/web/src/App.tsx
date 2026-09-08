@@ -7,7 +7,12 @@ import { Banner } from "./components/Banner";
 import { ErrorPanel } from "./components/ErrorPanel";
 import { PanelStack } from "./components/PanelStack";
 import { TopBar } from "./components/TopBar";
+import { ViewBody } from "./components/ViewBody";
 import { useViewer } from "./store";
+
+// The tree is one view file like any other, at the path the contract fixes
+// for a per-checkout kind.
+const TREE_PATH = "index-tree.json";
 
 export function App() {
   const viewer = useViewer();
@@ -18,7 +23,9 @@ export function App() {
         <TopBar viewer={viewer} />
       </header>
       <div className="regions">
-        <nav className="tree">tree</nav>
+        <nav className="tree">
+          {viewer.loaded ? <ViewBody path={TREE_PATH} viewer={viewer} /> : null}
+        </nav>
         <main className="center">
           {viewer.failure === null ? null : (
             <ErrorPanel path="cloa-viewer" error={viewer.failure} />
