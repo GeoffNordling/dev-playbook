@@ -287,6 +287,22 @@ the design later. You do not resolve it by editing the design.
   which leaves `orphan.md` unreached. Give any such throwaway server its own
   `XDG_STATE_HOME` so it never fights the user's viewer over a checkout
   directory in `~/.local/state`.
+- **Discovery mixes resolved and unresolved paths, on purpose.**
+  `discover.worktrees` returns what `git worktree list --porcelain` prints,
+  `.resolve()`d; `discover.checkouts` returns a source that is itself a
+  checkout exactly as it was given. Every caller must therefore resolve its
+  sources before handing them over — `cli.main` already does
+  (`Path(path).resolve()`), and task 7 must keep that, or `rescan` will see
+  the same checkout twice under two spellings and `state.checkout_dir` will
+  disagree with itself.
+- **The fixture holds ten files after task 6**, the ninth markdown one plus a
+  `.gitignore` = `.claude/worktrees/\n`. It is not markdown, so no view-file
+  count moved; `git_files` grew by one entry, which only
+  `markdown_file.generate`'s `tracked` set sees and nothing asserts on.
+  `add_worktree(checkout, name)` puts a linked worktree on a new branch at
+  `<checkout>/.claude/worktrees/<name>` and returns that path unresolved —
+  equal to git's resolved answer because pytest's `tmp_path` is already real
+  (`/tmp` is not a symlink on this machine).
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -395,7 +411,7 @@ the design later. You do not resolve it by editing the design.
   group headers read as headers, and the `Not indexed` row is red. Write
   what you saw in the PROGRESS line. `make web`, then gate green.
 
-- [ ] **Task 6: discovery.** Create `src/dev_playbook/cloa_viewer/discover.py`
+- [x] **Task 6: discovery.** Create `src/dev_playbook/cloa_viewer/discover.py`
   with `is_checkout(path: Path) -> bool` (true when `path / ".git"`
   exists, a directory for a main checkout or a file for a linked
   worktree); `worktrees(repo: Path) -> list[Path]`, which runs

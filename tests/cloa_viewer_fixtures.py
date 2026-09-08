@@ -8,6 +8,10 @@ decisions index, a numbered Decision Record whose two links are one resolving
 and one gone, an orphan no index reaches, a harness-owned ``CLAUDE.md``, and an
 excluded ``PLAN.md`` that must reach neither the tree nor a view file.
 
+The tenth file is a ``.gitignore`` holding ``.claude/worktrees/``, so a worktree
+``add_worktree`` puts there stays out of the main checkout's ``git_files``, the
+way this workspace's own repos are arranged.
+
 It sits here, beside ``transcript_fakes``, rather than in a ``conftest.py``
 under ``tests/dev_playbook/cloa_viewer/``. A second ``conftest.py`` anywhere
 under ``tests/`` shadows the root one, because pytest prepends each collected
@@ -21,11 +25,17 @@ its own rather than importing a fixture, because ruff reads an imported fixture
 as redefined by every test that takes it as a parameter (F811).
 """
 
+import subprocess
 from pathlib import Path
 
 from conftest import commit_all, init_repo
 
+from dev_playbook.gitrepo import no_git_env
+
+WORKTREES_DIR = ".claude/worktrees"
+
 FILES = {
+    ".gitignore": f"{WORKTREES_DIR}/\n",
     "index.md": (
         "# Fixture — index\n"
         "\n"
@@ -96,7 +106,7 @@ FILES = {
 
 
 def build_checkout(tmp_path: Path) -> Path:
-    """Write and commit a checkout holding the nine files above; return its root."""
+    """Write and commit a checkout holding the files above; return its root."""
     repo = tmp_path / "fixture"
     init_repo(repo)
     for relpath, text in FILES.items():
@@ -105,3 +115,21 @@ def build_checkout(tmp_path: Path) -> Path:
         path.write_text(text)
     commit_all(repo)
     return repo
+
+
+def add_worktree(checkout: Path, name: str) -> Path:
+    """Add a linked worktree of ``checkout`` on a new branch ``name``; return its root.
+
+    It lands under ``.claude/worktrees/``, which the fixture's ``.gitignore``
+    covers, so the main checkout's file list does not grow the worktree's copy
+    of every file. The branch is new, so the label the page shows for it differs
+    from the main checkout's.
+    """
+    path = checkout / WORKTREES_DIR / name
+    subprocess.run(
+        ["git", "-C", str(checkout), "worktree", "add", str(path), "-b", name],
+        check=True,
+        capture_output=True,
+        env=no_git_env(),
+    )
+    return path

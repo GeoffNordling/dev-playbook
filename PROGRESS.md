@@ -73,3 +73,19 @@ in git history there. This file starts over for loop 2, the room.
   confirmed on a fixture checkout instead, where `Not indexed` computes to
   `rgb(179, 38, 30)`, the `--bad` red, over its one `orphan.md` child.
   `make web` rebuilt, gate green, 1297 tests. Next: task 6, discovery.
+- Task 6 done: `src/dev_playbook/cloa_viewer/discover.py` holds `is_checkout`
+  (the `.git` marker exists, directory or file alike), `worktrees` (the
+  `worktree <path>` line of every `git worktree list --porcelain` block that
+  carries no `bare` or `prunable` line, resolved, main checkout first), and
+  `checkouts` (a checkout source is itself; any other source scans its
+  immediate child directories in name order, `ValueError` when none yields a
+  checkout; deduplicated with `dict.fromkeys`). `tests/cloa_viewer_fixtures.py`
+  gained `add_worktree(checkout, name)` and a `.gitignore` holding
+  `.claude/worktrees/`, its tenth file — not markdown, so no view-file count
+  moved and no existing test needed touching. Five tests in
+  `tests/dev_playbook/cloa_viewer/test_discover.py` over three chained
+  fixtures (`ws`, `main`, `wt`), because `testing-lint` forbids logic in a test
+  body. One note for the user, not a plan slip: `checkouts` returns a checkout
+  source unresolved and a `worktrees` path resolved, so task 7's callers must
+  resolve their sources first — `cli.main` already does. Gate green, 1302
+  tests. Next: task 7, the server discovers and the command scans.
