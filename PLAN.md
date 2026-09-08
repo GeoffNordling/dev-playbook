@@ -346,6 +346,20 @@ the design later. You do not resolve it by editing the design.
   (the `ws` directory holding the checkout and a `wt` worktree, two checkouts
   of one repo) are three lines each over it. Task 10's `server` fixture
   replaces this, and must keep both.
+- **`cli.main`'s address line is block-buffered when stdout is not a tty.**
+  Python line-buffers a terminal and block-buffers a pipe or a file, so a
+  script that waits for `cloa-viewer at http://…` in a redirected stdout sees
+  nothing until the process exits — the first smoke attempt sat 2 minutes 20
+  on a server that had been answering for most of it. Run the command with
+  `PYTHONUNBUFFERED=1` when you need that line, or poll `/api/checkouts` the
+  way `test_cli.start_server` does. The command itself is not at fault.
+- **The smoke run's numbers, 2026-09-08** (task 9, over
+  `~/workspace/dev-playbook` and this worktree): 6.65 s from launch to the
+  printed address, both checkouts refreshed serially before the server starts;
+  `markdown-file` writes 194 views on `main` and 200 here, `index-tree` one
+  each, no generator failed. The server process holds 16 file descriptors, 3
+  of them inotify instances — one state watcher plus one per checkout — against
+  a machine-wide 74 of `max_user_instances` 128.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -541,7 +555,7 @@ the design later. You do not resolve it by editing the design.
   `#<dir>`, and the tree still show `Alpha`; `page.reload()` keeps that
   selection. `make web`, then gate green.
 
-- [ ] **Task 9: the smoke run on dev-playbook's checkouts.** The smoke
+- [x] **Task 9: the smoke run on dev-playbook's checkouts.** The smoke
   run covers dev-playbook only: the other repos under `~/workspace` are
   not maintained to this repo's standard, and their edge cases are not
   this loop's business, so do not point the server at `~/workspace`. Run

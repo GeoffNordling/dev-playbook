@@ -137,3 +137,25 @@ in git history there. This file starts over for loop 2, the room.
   and the hash read. Seen on screen — the toggle reads `main`, switches to `wt`,
   and the tree redraws under it. `make web` rebuilt, gate green, 1314 tests.
   Next: task 9, the smoke run on dev-playbook's checkouts.
+- Task 9 done, no code changed: `.venv/bin/cloa-viewer` given the repo's main
+  checkout and this worktree as its two arguments, `--port 8791`, with the real
+  `XDG_STATE_HOME`, 6.65 s from launch to the printed address, stderr empty. `/api/checkouts` listed the two
+  entries the toggle exists for, one repo and two branches:
+  `dev-playbook-342af143` / `main` / `/home/geoff/workspace/dev-playbook` at
+  `0467d7dc`, and `cloa-viewer-tool-9d5ec20d` / `worktree-cloa-viewer-tool` /
+  the worktree at `faf07aca`. No generator failed: both `refresh.json` records
+  say `ok` for `index-tree` (1 view each) and `markdown-file` (194 views on
+  `main`, 200 here). inotify during the run: the server held 16 file
+  descriptors, 3 of them inotify instances, machine-wide 74 of the 128
+  `max_user_instances`. Playwright from the scratchpad: one optgroup
+  `dev-playbook` with options `main` and `worktree-cloa-viewer-tool`, both
+  group headers `Concept documents` and `Harness-owned files` present on every
+  checkout and after a reload, switching to `main` and back rewrote the hash
+  and redrew the tree (69 rows against 70) and the refresh stamp followed the
+  branch's HEAD, reload kept the worktree selected, console clean. One finding
+  for the user, not a defect and no plan slip: the address line is
+  block-buffered when stdout is redirected, so the first attempt looked hung
+  for 2m20 while the server was already answering — `PYTHONUNBUFFERED=1`, or
+  polling the port as `test_cli.start_server` does, is the way to wait for it.
+  Next: task 10, `timeout_graceful_shutdown` so Ctrl-C stops the server while
+  a page holds the stream.
