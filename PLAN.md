@@ -244,6 +244,10 @@ the design later. You do not resolve it by editing the design.
   `.badge-broken`; `citation` and now `decision-record` fall through to the
   muted `.badge` base, so task 2 changed no CSS. Adding a rule for
   `.badge-decision-record` would be the thing that made it stand out.
+- **`Row`'s `count` is optional after task 3.** `IndexTree.tsx`'s `Row` takes
+  `count?: string` and renders `.tree-count` only when it is given; the
+  `Unindexed` row is the one caller that passes one today. Task 4's group row
+  and `Not indexed` row need no new prop for their `N files`.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -294,7 +298,7 @@ the design later. You do not resolve it by editing the design.
   children are `docs/index.md`, `docs/beta.md`, `decisions/` in that order.
   Every payload still validates. Gate green.
 
-- [ ] **Task 3: no word counts.** Remove `words` from both node shapes in
+- [x] **Task 3: no word counts.** Remove `words` from both node shapes in
   `kinds/index_tree.py` and from the payload in `kinds/markdown_file.py`,
   from both schemas (`kind_version` stays 1), from `IndexTree.tsx` (the
   `count` on directory and file rows goes; the `Unindexed` row's

@@ -26,3 +26,14 @@ in git history there. This file starts over for loop 2, the room.
   word sums had to move with it (`docs/` 43, root 85) to keep the gate green
   until task 3 deletes them. `make web` rebuilt, gate green, 1297 tests.
   Next: task 3, removing word counts everywhere.
+- Task 3 done: `words` is gone from both node shapes in `kinds/index_tree.py`,
+  from the payload in `kinds/markdown_file.py`, from both schemas
+  (`kind_version` still 1), and from `IndexTree.tsx` and `MarkdownFile.tsx`;
+  `Row`'s `count` became optional so the `Unindexed` row keeps its `N files`.
+  Both module docstrings say what replaced the count: size is a kind of its
+  own, per `registry.md`. Tests: the two summed-word tests in
+  `kinds/test_index_tree.py` are deleted (1297 → 1295) and every other word
+  assertion dropped; `test_watch.py` now polls `source_of` and asserts the
+  refreshed source ends with the appended line; `test_cli.py` waits for
+  `nine ten` in the panel body instead of a count of 20. `make web` rebuilt,
+  gate green. Next: task 4, the two groups by `md.classify`.

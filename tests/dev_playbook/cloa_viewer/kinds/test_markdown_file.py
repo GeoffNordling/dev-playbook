@@ -136,7 +136,6 @@ def test_a_file_with_no_frontmatter_has_null_facts(checkout: Path) -> None:
         None,
         None,
     )
-    assert orphan["words"] == 4
 
 
 def test_the_source_is_the_file_as_written(checkout: Path) -> None:

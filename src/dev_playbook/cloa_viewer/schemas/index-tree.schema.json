@@ -31,7 +31,6 @@
         "identity",
         "title",
         "description",
-        "words",
         "children"
       ],
       "properties": {
@@ -50,11 +49,6 @@
             "null"
           ]
         },
-        "words": {
-          "description": "The sum of the word counts below this directory.",
-          "type": "integer",
-          "minimum": 0
-        },
         "children": {
           "description": "The rows this directory holds, its own index.md first, then listing order.",
           "type": "array",
@@ -72,7 +66,7 @@
       }
     },
     "file": {
-      "description": "One file row: its frontmatter facts and its word count.",
+      "description": "One file row: its frontmatter facts.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -80,7 +74,6 @@
         "type",
         "title",
         "description",
-        "words",
         "exists"
       ],
       "properties": {
@@ -108,11 +101,6 @@
             "string",
             "null"
           ]
-        },
-        "words": {
-          "description": "The word count of the body after the frontmatter.",
-          "type": "integer",
-          "minimum": 0
         },
         "exists": {
           "description": "False when an index lists a file the checkout does not carry.",

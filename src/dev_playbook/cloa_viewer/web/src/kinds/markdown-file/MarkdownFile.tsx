@@ -38,7 +38,6 @@ export interface MarkdownFilePayload {
   type: string | null;
   title: string | null;
   description: string | null;
-  words: number;
   headings: Heading[];
   links_out: Link[];
   links_in: string[];
@@ -65,7 +64,6 @@ export function MarkdownFile({ view, viewer }: RendererProps) {
     <div className="file">
       <div className="file-facts">
         <Fact name="type" value={payload.type ?? "—"} />
-        <Fact name="words" value={String(payload.words)} />
         <Fact name="headings" value={String(payload.headings.length)} />
       </div>
       <Section title="Headings">

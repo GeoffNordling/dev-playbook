@@ -9,7 +9,6 @@
     "type",
     "title",
     "description",
-    "words",
     "headings",
     "links_out",
     "links_in",
@@ -36,11 +35,6 @@
         "string",
         "null"
       ]
-    },
-    "words": {
-      "description": "The word count of the body after the frontmatter.",
-      "type": "integer",
-      "minimum": 0
     },
     "headings": {
       "description": "Every heading outside a fence, in document order.",

@@ -62,14 +62,13 @@ def test_the_root_takes_its_title_and_first_sentence_from_its_index(
     assert root["description"] == "The fixture bundle"
 
 
-def test_a_file_row_carries_its_frontmatter_and_word_count(checkout: Path) -> None:
+def test_a_file_row_carries_its_frontmatter(checkout: Path) -> None:
     alpha = payload_of(checkout)["root"]["children"][1]
     assert alpha == {
         "identity": "alpha.md",
         "type": "Guide",
         "title": "Alpha",
         "description": "The alpha document",
-        "words": 18,
         "exists": True,
     }
 
@@ -81,7 +80,6 @@ def test_a_file_with_no_frontmatter_has_null_facts(checkout: Path) -> None:
         "type": None,
         "title": None,
         "description": None,
-        "words": 24,
         "exists": True,
     }
 
@@ -96,20 +94,9 @@ def test_a_directory_lists_its_own_index_then_its_listing(checkout: Path) -> Non
     ]
 
 
-def test_a_directory_sums_the_words_below_it(checkout: Path) -> None:
-    docs = payload_of(checkout)["root"]["children"][2]
-    assert [child["words"] for child in docs["children"]] == [19, 3, 21]
-    assert docs["words"] == 43
-
-
-def test_the_root_sums_every_directory_and_file_it_reaches(checkout: Path) -> None:
-    assert payload_of(checkout)["root"]["words"] == 85
-
-
 def test_a_file_no_index_reaches_is_unindexed(checkout: Path) -> None:
     unindexed = payload_of(checkout)["unindexed"]
     assert [node["identity"] for node in unindexed] == ["orphan.md"]
-    assert unindexed[0]["words"] == 4
 
 
 def test_a_listed_file_the_checkout_lacks_is_flagged_missing(tmp_path: Path) -> None:
@@ -124,7 +111,6 @@ def test_a_listed_file_the_checkout_lacks_is_flagged_missing(tmp_path: Path) -> 
         "type": None,
         "title": None,
         "description": None,
-        "words": 0,
         "exists": False,
     }
 
@@ -143,7 +129,6 @@ def test_a_checkout_with_no_root_index_holds_every_file_as_unindexed(
         "identity": "",
         "title": "flat",
         "description": None,
-        "words": 0,
         "children": [],
     }
 

@@ -13,17 +13,15 @@ export interface DirectoryNode {
   identity: string;
   title: string;
   description: string | null;
-  words: number;
   children: TreeNode[];
 }
 
-/** One file row: its frontmatter facts and its word count. */
+/** One file row: its frontmatter facts. */
 export interface FileNode {
   identity: string;
   type: string | null;
   title: string | null;
   description: string | null;
-  words: number;
   exists: boolean;
 }
 
@@ -107,7 +105,6 @@ function Directory({
         open={open}
         title={node.title}
         description={node.description}
-        count={String(node.words)}
         onClick={() => {
           toggle(node.identity);
         }}
@@ -152,7 +149,6 @@ function File({
       open={null}
       title={node.title ?? node.identity}
       description={node.description}
-      count={String(node.words)}
       missing={!node.exists}
       onClick={() => {
         openFile(viewer, node.identity);
@@ -192,7 +188,8 @@ function Row({
   open: boolean | null;
   title: string;
   description: string | null;
-  count: string;
+  /** The trailing figure, on the rows that have one to show. */
+  count?: string;
   missing?: boolean;
   onClick: () => void;
 }) {
@@ -213,7 +210,7 @@ function Row({
           <span className="tree-description">{description}</span>
         )}
       </span>
-      <span className="tree-count">{count}</span>
+      {count === undefined ? null : <span className="tree-count">{count}</span>}
     </button>
   );
 }

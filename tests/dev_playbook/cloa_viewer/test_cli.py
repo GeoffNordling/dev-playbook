@@ -259,8 +259,6 @@ def test_page_shows_tree_and_updates(checkout: Path, address: str, page: Page) -
     row.click()
     expect(page.locator(".panel-title")).to_have_text("Alpha")
     expect(page.locator(".panel-body")).to_contain_text("Second heading")
-    words = page.locator(".panel .file-fact-words .file-fact-value")
-    expect(words).to_have_text("18")
     alpha = checkout / "alpha.md"
     alpha.write_text(alpha.read_text() + "\nnine ten\n")
-    expect(words).to_have_text("20", timeout=5000)
+    expect(page.locator(".panel-body")).to_contain_text("nine ten", timeout=5000)

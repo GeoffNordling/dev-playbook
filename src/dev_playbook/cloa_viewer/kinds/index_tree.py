@@ -8,8 +8,9 @@ nothing else. Every tracked markdown file the walk never reaches lands in
 is exactly the file the user needs to see
 ([CLOA Viewer](/worktree-cloa-viewer-tool-working-docs/ROOT.md#principles)).
 
-A directory row carries the sum of the words below it, so the tree answers
-where a repo's documentation weight sits without opening a file.
+A row carries no size of any sort. How big or how complex a document is will
+be a kind of its own, designed on its own, and a summed count is not it
+([Registry](/worktree-cloa-viewer-tool-working-docs/registry.md#index-tree)).
 """
 
 from pathlib import Path, PurePosixPath
@@ -32,7 +33,7 @@ SENTENCE_END = ". "
 
 
 def _file_node(checkout: Path, identity: str, tracked: set[str]) -> dict[str, Any]:
-    """One file row: its frontmatter facts and word count, or nulls when absent.
+    """One file row: its frontmatter facts, or nulls when the file is absent.
 
     An index that lists a file git does not carry is a defect the tree has to
     show rather than hide, so the row survives with ``exists`` false.
@@ -43,17 +44,15 @@ def _file_node(checkout: Path, identity: str, tracked: set[str]) -> dict[str, An
             "type": None,
             "title": None,
             "description": None,
-            "words": 0,
             "exists": False,
         }
-    front, body = parse_frontmatter((checkout / identity).read_text(encoding="utf-8"))
+    front, _ = parse_frontmatter((checkout / identity).read_text(encoding="utf-8"))
     facts = front or {}
     return {
         "identity": identity,
         "type": facts.get("type"),
         "title": facts.get("title"),
         "description": facts.get("description"),
-        "words": len(body.split()),
         "exists": True,
     }
 
@@ -123,7 +122,6 @@ def _directory_node(
             "identity": identity,
             "title": name,
             "description": None,
-            "words": 0,
             "children": [],
         }
     if index in reached:
@@ -148,7 +146,6 @@ def _directory_node(
         "identity": identity,
         "title": _heading(body) or name,
         "description": _opening_sentence(body),
-        "words": sum(child["words"] for child in children),
         "children": children,
     }
 

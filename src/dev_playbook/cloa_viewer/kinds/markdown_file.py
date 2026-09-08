@@ -1,8 +1,8 @@
 """The ``markdown-file`` kind: what one markdown file is, and what touches it.
 
-One view file per tracked markdown file: its frontmatter facts, its word count,
-its headings, the links it makes with whether each one resolves, the files that
-link back to it, and its source as written
+One view file per tracked markdown file: its frontmatter facts, its headings,
+the links it makes with whether each one resolves, the files that link back to
+it, and its source as written
 ([Registry](/worktree-cloa-viewer-tool-working-docs/registry.md)). It is the
 detail behind a CLOA panel, and the whole panel for a file no CLOA kind covers.
 
@@ -165,7 +165,6 @@ def generate(checkout: Path) -> list[View]:
             "type": facts.get("type"),
             "title": facts.get("title"),
             "description": facts.get("description"),
-            "words": len(body.split()),
             "headings": _headings(body),
             "links_out": outbound[identity],
             "links_in": inbound[identity],

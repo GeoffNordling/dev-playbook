@@ -10,7 +10,6 @@ from dev_playbook.cloa_viewer import refresh, state, watch
 
 ALPHA_VIEW = "markdown-file/alpha.md.json"
 APPENDED = "Nine ten eleven twelve.\n"
-APPENDED_WORDS = 4
 DEBOUNCE_MS = 50
 POLL_SECONDS = 0.05
 SETTLE_SECONDS = 0.5
@@ -23,15 +22,15 @@ def checkout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return build_checkout(tmp_path)
 
 
-def words_of(checkout: Path) -> int:
-    """The word count the last refresh wrote for ``alpha.md``."""
+def source_of(checkout: Path) -> str:
+    """The source the last refresh wrote for ``alpha.md``."""
     view = state.checkout_dir(checkout) / ALPHA_VIEW
-    words: int = json.loads(view.read_text())["payload"]["words"]
-    return words
+    source: str = json.loads(view.read_text())["payload"]["source"]
+    return source
 
 
-async def words_after_an_edit(checkout: Path, before: int) -> int:
-    """Append a line to ``alpha.md`` under the watcher, and return the new count.
+async def source_after_an_edit(checkout: Path, before: str) -> str:
+    """Append a line to ``alpha.md`` under the watcher, and return the new source.
 
     The watcher starts first and settles, so the edit lands while it is
     running; the poll then waits for the refresh the edit caused to rewrite the
@@ -49,11 +48,11 @@ async def words_after_an_edit(checkout: Path, before: int) -> int:
         loop = asyncio.get_running_loop()
         deadline = loop.time() + TIMEOUT_SECONDS
         while loop.time() < deadline:
-            words = words_of(checkout)
-            if words != before:
-                return words
+            source = source_of(checkout)
+            if source != before:
+                return source
             await asyncio.sleep(POLL_SECONDS)
-        raise AssertionError(f"{ALPHA_VIEW} still reads {before} words")
+        raise AssertionError(f"{ALPHA_VIEW} still reads the source it started with")
     finally:
         stop.set()
         await asyncio.wait_for(watcher, TIMEOUT_SECONDS)
@@ -63,9 +62,9 @@ def test_an_edit_in_the_checkout_refreshes_the_file_it_changed(
     checkout: Path,
 ) -> None:
     refresh.refresh(checkout)
-    before = words_of(checkout)
-    after = asyncio.run(words_after_an_edit(checkout, before))
-    assert after == before + APPENDED_WORDS
+    before = source_of(checkout)
+    after = asyncio.run(source_after_an_edit(checkout, before))
+    assert after.endswith(APPENDED)
 
 
 def test_a_path_inside_git_is_not_watched() -> None:
