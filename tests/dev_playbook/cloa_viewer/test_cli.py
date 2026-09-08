@@ -35,6 +35,14 @@ def dist(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def empty(tmp_path: Path) -> Path:
+    """A directory holding no repository at all."""
+    nothing = tmp_path / "empty"
+    nothing.mkdir()
+    return nothing
+
+
+@pytest.fixture
 def unbuilt(tmp_path: Path) -> Path:
     """A stand-in for a web directory ``make web`` has never built."""
     built = tmp_path / "unbuilt"
@@ -127,12 +135,12 @@ def test_port_flag_parses_to_an_integer() -> None:
     assert cli.parse_args(["--port", "9000"]).port == 9000
 
 
-def test_checkout_arguments_collect_into_a_list() -> None:
-    assert cli.parse_args(["/a", "/b"]).checkout == ["/a", "/b"]
+def test_path_arguments_collect_into_a_list() -> None:
+    assert cli.parse_args(["/a", "/b"]).path == ["/a", "/b"]
 
 
-def test_no_checkout_argument_is_an_empty_list() -> None:
-    assert cli.parse_args([]).checkout == []
+def test_no_path_argument_is_an_empty_list() -> None:
+    assert cli.parse_args([]).path == []
 
 
 def test_unknown_flag_exits() -> None:
@@ -235,14 +243,34 @@ def test_a_working_generator_says_nothing_on_stderr(
     assert capsys.readouterr().err == ""
 
 
-def test_no_checkout_argument_serves_the_repo_holding_the_directory(
+def test_no_path_argument_serves_the_repo_holding_the_directory(
     checkout: Path, dist: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     use_dist(monkeypatch, dist)
     calls = record_serve(monkeypatch)
     monkeypatch.chdir(checkout / "docs")
     cli.main([])
-    assert list(calls[0][0].state.checkouts) == [state.checkout_dir(checkout).name]
+    assert calls[0][0].state.sources == [checkout.resolve()]
+
+
+def test_a_path_holding_no_checkout_returns_two(
+    empty: Path, dist: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_dist(monkeypatch, dist)
+    record_serve(monkeypatch)
+    assert cli.main([str(empty)]) == 2
+
+
+def test_a_path_holding_no_checkout_is_named_on_stderr(
+    empty: Path,
+    dist: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    use_dist(monkeypatch, dist)
+    record_serve(monkeypatch)
+    cli.main([str(empty)])
+    assert capsys.readouterr().err == f"{empty}: no checkout found\n"
 
 
 def test_the_current_checkout_is_the_repo_root(

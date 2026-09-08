@@ -89,3 +89,27 @@ in git history there. This file starts over for loop 2, the room.
   source unresolved and a `worktrees` path resolved, so task 7's callers must
   resolve their sources first — `cli.main` already does. Gate green, 1302
   tests. Next: task 7, the server discovers and the command scans.
+- Task 7 done: `server.build_app(sources, dist)` now keeps the paths the
+  command was given, and `server.rescan(app)` turns them into checkouts again
+  in `_lifespan` and on every `GET /api/checkouts` — refreshing and watching a
+  checkout that appeared, and stopping the watcher and `shutil.rmtree`ing the
+  state directory of one that vanished. `watch.watch_filter(ignore)` builds the
+  watcher's filter so a worktree inside a checkout is the outer watcher's
+  business no longer. `cli`'s positional is `path`, `cli.default_source()`
+  falls back to `Path.cwd()` when `git rev-parse` fails, and a source yielding
+  no checkout prints `<path>: no checkout found` and returns 2. Four plan
+  slips for the user. (1) `build_app` cannot fill `app.state.checkouts`
+  eagerly any more — `rescan` diffs against it, so a pre-filled list would
+  start no watchers at all — which means a `TestClient` without `with` now
+  404s every checkout route, so `test_server.py`'s `client` fixture became a
+  `with TestClient(...)` generator and every route test runs the lifespan.
+  (2) Renaming the positional moved two parse tests the plan did not name,
+  `test_checkout_arguments_collect_into_a_list` and
+  `test_no_checkout_argument_is_an_empty_list`. (3) The plan's removal test
+  says the list holds two afterwards; as an independent test with its own
+  fixtures it holds one, `main` alone, and it is two tests because the list and
+  the state directory are two observations. (4) `refresh.json`'s `finished` is
+  a whole-second timestamp and cannot tell "did not refresh" from "refreshed
+  twice in one second", so the ignore test polls the record's `st_mtime_ns`;
+  proved by mutation — with `ignore=[]` it fails. Gate green, 1311 tests.
+  Next: task 8, the toggle on the page.

@@ -1,14 +1,16 @@
 import asyncio
+import subprocess
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import pytest
 import watchfiles
-from cloa_viewer_fixtures import build_checkout
+from cloa_viewer_fixtures import add_worktree, build_checkout
 from starlette.testclient import TestClient
 
 from dev_playbook.cloa_viewer import refresh, server, state
+from dev_playbook.gitrepo import no_git_env
 
 QUIET_SECONDS = 2.0
 SETTLE_SECONDS = 0.5
@@ -37,15 +39,50 @@ def dist(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def client(checkout: Path, dist: Path) -> TestClient:
-    """A client on a server holding the refreshed fixture checkout."""
+def client(checkout: Path, dist: Path) -> Iterator[TestClient]:
+    """A client on a server holding the refreshed fixture checkout.
+
+    ``with`` runs the lifespan, and the lifespan is where the server discovers
+    its checkouts: without it ``app.state.checkouts`` stays empty and every
+    route that names a checkout answers 404.
+    """
     refresh.refresh(checkout)
-    return TestClient(server.build_app([checkout], dist))
+    with TestClient(server.build_app([checkout], dist)) as running:
+        yield running
+
+
+@pytest.fixture
+def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A directory of repos, the shape ``~/workspace`` has."""
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path))
+    return tmp_path / "ws"
+
+
+@pytest.fixture
+def main(workspace: Path) -> Path:
+    """The one repo in that workspace, a main checkout."""
+    return build_checkout(workspace)
+
+
+@pytest.fixture
+def worktree(main: Path) -> Path:
+    """A linked worktree of that repo, under its own ``.claude/worktrees/``."""
+    return add_worktree(main, "wt")
 
 
 def directory_name(checkout: Path) -> str:
     """The name the server addresses ``checkout`` by."""
     return state.checkout_dir(checkout).name
+
+
+def remove_worktree(repo: Path, worktree: Path) -> None:
+    """Have git drop ``worktree``, the way a user finished with a branch does."""
+    subprocess.run(
+        ["git", "-C", str(repo), "worktree", "remove", str(worktree)],
+        check=True,
+        capture_output=True,
+        env=no_git_env(),
+    )
 
 
 def test_the_root_serves_the_built_page(client: TestClient) -> None:
@@ -88,6 +125,45 @@ def test_the_checkout_list_carries_the_facts_on_disk(
             "head": state.head_commit(checkout),
         }
     ]
+
+
+def test_a_workspace_source_lists_the_repo_and_its_worktree(
+    workspace: Path, main: Path, worktree: Path, dist: Path
+) -> None:
+    with TestClient(server.build_app([workspace], dist)) as running:
+        listed = running.get("/api/checkouts").json()
+    assert [entry["path"] for entry in listed] == [str(main), str(worktree)]
+
+
+def test_a_worktree_added_while_the_server_runs_joins_the_list(
+    workspace: Path, main: Path, worktree: Path, dist: Path
+) -> None:
+    with TestClient(server.build_app([workspace], dist)) as running:
+        second = add_worktree(main, "second")
+        listed = running.get("/api/checkouts").json()
+    assert {entry["path"] for entry in listed} == {
+        str(main),
+        str(worktree),
+        str(second),
+    }
+
+
+def test_a_removed_worktree_leaves_the_list(
+    workspace: Path, main: Path, worktree: Path, dist: Path
+) -> None:
+    with TestClient(server.build_app([workspace], dist)) as running:
+        remove_worktree(main, worktree)
+        listed = running.get("/api/checkouts").json()
+    assert [entry["path"] for entry in listed] == [str(main)]
+
+
+def test_a_removed_worktree_loses_its_state_directory(
+    workspace: Path, main: Path, worktree: Path, dist: Path
+) -> None:
+    with TestClient(server.build_app([workspace], dist)) as running:
+        remove_worktree(main, worktree)
+        running.get("/api/checkouts")
+    assert not state.checkout_dir(worktree).exists()
 
 
 def test_the_file_list_holds_every_view_file(

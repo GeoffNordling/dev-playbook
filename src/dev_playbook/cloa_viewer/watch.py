@@ -14,6 +14,7 @@ does.
 """
 
 import asyncio
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import watchfiles
@@ -34,13 +35,37 @@ def outside_git(change: watchfiles.Change, path: str) -> bool:
     return GIT_DIR not in Path(path).parts
 
 
+def watch_filter(
+    ignore: Sequence[Path],
+) -> Callable[[watchfiles.Change, str], bool]:
+    """The filter for a watcher whose checkout holds the checkouts in ``ignore``.
+
+    A linked worktree under the main checkout's ``.claude/worktrees/`` sits
+    inside the directory the outer watcher watches, and it is a checkout of its
+    own with a watcher and a state directory of its own. Without this an edit
+    there would refresh both checkouts, and the outer refresh would be pure
+    waste because the worktree's files are not the outer checkout's files.
+    """
+
+    def keep(change: watchfiles.Change, path: str) -> bool:
+        return outside_git(change, path) and not any(
+            Path(path).is_relative_to(other) for other in ignore
+        )
+
+    return keep
+
+
 async def watch_checkout(
     checkout: Path,
     *,
+    ignore: Sequence[Path] = (),
     debounce_ms: int = CHECKOUT_DEBOUNCE_MS,
     stop: asyncio.Event | None = None,
 ) -> None:
     """Refresh ``checkout`` after every settled batch of changes to its files.
+
+    ``ignore`` names the other checkouts that lie inside this one; a change
+    below any of them belongs to that checkout's watcher, not this one.
 
     The refresh is ordinary blocking code, so it runs on a worker thread and
     the server keeps answering every other request while it does.
@@ -49,6 +74,6 @@ async def watch_checkout(
         checkout,
         debounce=debounce_ms,
         stop_event=stop,
-        watch_filter=outside_git,
+        watch_filter=watch_filter(ignore),
     ):
         await asyncio.to_thread(refresh.refresh, checkout)

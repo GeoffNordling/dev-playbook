@@ -303,6 +303,28 @@ the design later. You do not resolve it by editing the design.
   `<checkout>/.claude/worktrees/<name>` and returns that path unresolved —
   equal to git's resolved answer because pytest's `tmp_path` is already real
   (`/tmp` is not a symlink on this machine).
+- **The server holds sources, not checkouts, after task 7.**
+  `build_app(sources, dist)` sets `app.state.sources` (absolute resolved paths —
+  the caller resolves, `build_app` does not), `app.state.checkouts = []`
+  (a `list[Path]`, `rescan`'s answer), and `app.state.watchers = {}`
+  (`dict[Path, tuple[asyncio.Task[None], asyncio.Event]]`, the type alias
+  `server.Watcher`). `_checkout_path` scans the list comparing
+  `state.checkout_dir(c).name`. `rescan(app)` runs in `_lifespan` before
+  `watch_state` and again in `GET /api/checkouts`. **A `TestClient` used
+  without `with` therefore runs no discovery**: the checkout list stays empty
+  and every `/api/checkouts/{dir}/…` route answers 404, which is why
+  `test_server.py`'s `client` fixture is now a `with TestClient(...)`
+  generator and every route test runs the real watchers.
+- **`watch.watch_filter(ignore)` builds the watcher's filter closure**;
+  `watch_checkout` takes `ignore: Sequence[Path] = ()` and `_start_watcher` in
+  `server` fills it with every discovered checkout that `is_relative_to` this
+  one. A watcher is started once and never restarted, so a worktree created
+  after its parent's watcher started is not in that parent's `ignore`; the
+  parent then refreshes on edits inside it, which is waste, not error, because
+  `.gitignore` keeps the worktree out of the parent's file list.
+- **`refresh.json`'s `finished` cannot prove a refresh did not happen.** It is
+  RFC 3339 to the second, so two refreshes inside one second read the same.
+  `test_watch.py`'s `refreshed_at` polls the file's `st_mtime_ns` instead.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -438,7 +460,7 @@ the design later. You do not resolve it by editing the design.
   empty directory you create) raises `ValueError`; `is_checkout(wt)` is
   true and `is_checkout(ws)` is false. Gate green.
 
-- [ ] **Task 7: the server discovers, and the command scans.**
+- [x] **Task 7: the server discovers, and the command scans.**
   `server.build_app(sources: list[Path], dist: Path) -> Starlette` now
   takes the paths the command was given. `app.state.sources` holds them,
   `app.state.checkouts: list[Path]` the current list, and
