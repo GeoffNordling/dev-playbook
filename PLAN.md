@@ -103,16 +103,27 @@ the design later. You do not resolve it by editing the design.
 - **State directory in tests.** Every test that touches the state directory
   sets `XDG_STATE_HOME` to `tmp_path` with `monkeypatch.setenv` so nothing
   touches `~/.local/state`.
-- **Playwright.** Chromium is already cached under `~/.cache/ms-playwright`.
-  If the Playwright test reports a missing browser, run
+- **Playwright.** Chromium is already cached under `~/.cache/ms-playwright`
+  (builds 1234 and 1243). Task 1 installed playwright 1.62.0 with
+  pytest-playwright 0.9.0, which may want a build neither of those is. If the
+  Playwright test reports a missing browser, run
   `uv run playwright install chromium` once and note the result here.
+- **`uv.lock` moves with `pyproject.toml`.** The lock file is tracked and
+  `uv sync` rewrites it, so a task that edits `pyproject.toml` also changes
+  `uv.lock`. That is expected and committed with the task, not a scope
+  violation. Task 1 locked starlette 1.6.0, uvicorn 0.52.4, watchfiles 1.2.0,
+  jsonschema 4.26.0, httpx 0.28.1.
+- **No `__init__.py` anywhere under `tests/`.** pytest imports test modules by
+  rootdir, so every test module basename must be unique across the whole
+  `tests/` tree. `tests/dev_playbook/cloa_viewer/test_cli.py` already exists
+  (task 1); name new ones so they do not collide with any other suite.
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
 
 ## Tasks
 
-- [ ] **Task 1: package skeleton and dependencies.** Create
+- [x] **Task 1: package skeleton and dependencies.** Create
   `src/dev_playbook/cloa_viewer/__init__.py` (zero bytes) and
   `src/dev_playbook/cloa_viewer/kinds/__init__.py` (zero bytes). In
   `pyproject.toml` add, without touching existing lines: a dependency group
