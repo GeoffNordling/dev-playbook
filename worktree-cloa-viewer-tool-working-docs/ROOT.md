@@ -15,8 +15,9 @@ deleted before the branch merges
 ## Goal
 
 cloa-viewer puts a checkout's markdown on a browser screen at the
-correct level of abstraction, so the user can understand documentation
-that the terminal and the IDE show only as text. The CLOA objects, whose
+[correct level of abstraction](/docs/system-legibility.md#the-cloa), so
+the user can understand documentation that the terminal and the IDE show
+only as text. The CLOA objects, whose
 only face today is a proof-of-concept text file nobody opens,
 [chains.txt](/doc-types/runbook/chains.txt),
 [standards.txt](/doc-types/standard/standards.txt), and
