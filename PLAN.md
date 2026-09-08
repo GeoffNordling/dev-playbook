@@ -188,6 +188,25 @@ the design later. You do not resolve it by editing the design.
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
+- **The page's own versions, resolved by task 9.** React 19.2, react-dom 19.2,
+  ajv 8.20, markdown-it 15.0; TypeScript 7.0, Vite 8.2, `@vitejs/plugin-react`
+  6.1, and the three `@types` packages. TypeScript 7 is the native compiler and
+  `tsc --noEmit` is fast enough to sit in a pre-commit hook. Vite 8 writes
+  exactly `dist/index.html` plus `dist/assets/index-<hash>.js`, which is the
+  layout `server.build_app` already serves: `/` from `dist/index.html` and the
+  mount `/assets` from `dist/assets`. `package.json` sets `"type": "module"`,
+  which Vite 8 needs for an ESM `vite.config.ts`.
+- **`make check` now needs `node_modules`.** The `web-typecheck` pre-commit hook
+  runs `make web-check`, so a checkout that has never run `make web` fails the
+  gate at that hook, not at a Python check. Run `make web` once after cloning.
+- **The Makefile carries a second `.PHONY` line, on purpose.** `scripts/repo-lint`
+  compares the canonical `Makefile.python` fragment as one contiguous verbatim
+  run (`find_run` in that script), and its first line is
+  `.PHONY: format format-check lint typecheck test check`. Adding `web` and
+  `web-check` to that line would break the compare, so task 9 appended a
+  separate `.PHONY: web web-check` below the canonical block instead — the same
+  thing to Make, and `./scripts/repo-lint .` reports clean. Append future
+  targets the same way, and never edit a canonical line.
 - **A renamed directory tells the watcher almost nothing, and this shapes both
   `refresh` and `server`.** Task 6 measured it: publishing the `markdown-file`
   kind renames its whole directory into place, and the kernel reports that as
@@ -461,7 +480,7 @@ the design later. You do not resolve it by editing the design.
   returns 0, `refresh.json` exists, and `serve` received port 9001. Gate
   green.
 
-- [ ] **Task 9: the web project, the build target, the type check hook.**
+- [x] **Task 9: the web project, the build target, the type check hook.**
   Create `src/dev_playbook/cloa_viewer/web/` with `package.json` (name
   `cloa-viewer-web`, private, scripts `build` = `tsc --noEmit && vite build`,
   `typecheck` = `tsc --noEmit`, `dev` = `vite`; dependencies `react`,

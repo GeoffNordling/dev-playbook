@@ -28,3 +28,7 @@ dotfiles/dot-claude/todos/
 dotfiles/dot-claude/sessions/
 dotfiles/dot-claude/plugins/
 dotfiles/dot-claude/projects/
+
+# cloa-viewer web project — installed and built, never committed
+src/dev_playbook/cloa_viewer/web/node_modules/
+src/dev_playbook/cloa_viewer/web/dist/

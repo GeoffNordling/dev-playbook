@@ -35,3 +35,9 @@ repos:
         language: script
         pass_filenames: false
         always_run: true
+      - id: web-typecheck
+        name: web typecheck
+        entry: make web-check
+        language: system
+        pass_filenames: false
+        files: ^src/dev_playbook/cloa_viewer/web/
