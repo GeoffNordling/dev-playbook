@@ -51,6 +51,8 @@ def test_the_kind_writes_one_view_per_markdown_file(checkout: Path) -> None:
     assert [view.relpath for view in markdown_file.generate(checkout)] == [
         "markdown-file/alpha.md.json",
         "markdown-file/docs/beta.md.json",
+        "markdown-file/docs/decisions/0001-alpha.md.json",
+        "markdown-file/docs/decisions/index.md.json",
         "markdown-file/docs/index.md.json",
         "markdown-file/index.md.json",
         "markdown-file/orphan.md.json",
@@ -105,10 +107,21 @@ def test_a_link_out_is_ok_when_the_checkout_holds_its_target(checkout: Path) -> 
     ]
 
 
+def test_a_gone_target_of_a_decision_record_is_not_broken(checkout: Path) -> None:
+    assert payloads_of(checkout)["docs/decisions/0001-alpha.md"]["links_out"] == [
+        {"target": "/alpha.md", "status": "ok", "identity": "alpha.md"},
+        {"target": "/gone.md", "status": "decision-record", "identity": "gone.md"},
+    ]
+
+
 def test_links_in_lists_every_other_file_that_links_here(checkout: Path) -> None:
     assert payloads_of(checkout)["docs/beta.md"]["links_in"] == [
         "alpha.md",
         "docs/index.md",
+    ]
+    assert payloads_of(checkout)["alpha.md"]["links_in"] == [
+        "docs/decisions/0001-alpha.md",
+        "index.md",
     ]
 
 

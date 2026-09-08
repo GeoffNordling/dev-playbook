@@ -1,9 +1,11 @@
 """The one fixture checkout every cloa-viewer suite reads.
 
-Five markdown files: a root index listing a document and a directory, that
+Seven markdown files: a root index listing a document and a directory, that
 document with frontmatter and four links — one resolving, one broken, a
 Citation of this repo and a Citation of another — a docs index listing one
-document, that document, and an orphan no index reaches.
+document and a directory, that document, a decisions index, a numbered
+Decision Record whose two links are one resolving and one gone, and an orphan
+no index reaches.
 
 It sits here, beside ``transcript_fakes``, rather than in a ``conftest.py``
 under ``tests/dev_playbook/cloa_viewer/``. A second ``conftest.py`` anywhere
@@ -55,6 +57,7 @@ FILES = {
         "The docs directory.\n"
         "\n"
         "- [Beta](/docs/beta.md) — The beta document\n"
+        "- [decisions/](/docs/decisions/index.md) — The decisions directory\n"
     ),
     "docs/beta.md": (
         "---\n"
@@ -67,12 +70,30 @@ FILES = {
         "\n"
         "Six.\n"
     ),
+    "docs/decisions/index.md": (
+        "# decisions — index\n"
+        "\n"
+        "The fixture decisions.\n"
+        "\n"
+        "- [Alpha decided](/docs/decisions/0001-alpha.md) — The fixture decision\n"
+    ),
+    "docs/decisions/0001-alpha.md": (
+        "---\n"
+        "type: Decision-Record\n"
+        "title: Alpha decided\n"
+        "description: The fixture decision\n"
+        "---\n"
+        "\n"
+        "# Alpha decided\n"
+        "\n"
+        "See [alpha](/alpha.md) and [gone](/gone.md).\n"
+    ),
     "orphan.md": "# Orphan\n\nSeven eight.\n",
 }
 
 
 def build_checkout(tmp_path: Path) -> Path:
-    """Write and commit a checkout holding the five files above; return its root."""
+    """Write and commit a checkout holding the seven files above; return its root."""
     repo = tmp_path / "fixture"
     init_repo(repo)
     for relpath, text in FILES.items():

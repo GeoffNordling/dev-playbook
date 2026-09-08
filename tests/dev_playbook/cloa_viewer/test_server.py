@@ -98,6 +98,8 @@ def test_the_file_list_holds_every_view_file(
         "index-tree.json",
         "markdown-file/alpha.md.json",
         "markdown-file/docs/beta.md.json",
+        "markdown-file/docs/decisions/0001-alpha.md.json",
+        "markdown-file/docs/decisions/index.md.json",
         "markdown-file/docs/index.md.json",
         "markdown-file/index.md.json",
         "markdown-file/orphan.md.json",

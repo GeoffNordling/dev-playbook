@@ -21,6 +21,7 @@ from dev_playbook.cloa_viewer.identity import citation_repo, is_external, resolv
 from dev_playbook.gitrepo import canonical_repo_name, git_files
 from dev_playbook.md import (
     github_slug,
+    is_decision_record,
     lines_outside_fences,
     markdown_links,
     parse_frontmatter,
@@ -86,6 +87,12 @@ def _link(source: str, target: str, tracked: set[str], repo: str) -> Link:
     a generator reads one checkout, and ``ref-lint`` already verifies those
     targets on disk. A Citation of ``repo`` is a link into this checkout like
     any other, so it scores ``ok`` or ``broken`` by the file it names.
+
+    A link out of a numbered Decision Record that names no tracked file is the
+    status ``decision-record`` rather than ``broken``. The record is immutable,
+    so the stale reference is accepted staleness, and ``ref-lint`` skips the
+    same file as a source for the same reason: both ask
+    ``md.is_decision_record``, so the screen and the check cannot disagree.
     """
     if is_external(target):
         return {"target": target, "status": "external", "identity": None}
@@ -93,7 +100,9 @@ def _link(source: str, target: str, tracked: set[str], repo: str) -> Link:
     if citation is not None and citation != repo:
         return {"target": target, "status": "citation", "identity": None}
     identity = _target_identity(source, target, repo)
-    status = "ok" if identity in tracked else "broken"
+    if identity in tracked:
+        return {"target": target, "status": "ok", "identity": identity}
+    status = "decision-record" if is_decision_record(source) else "broken"
     return {"target": target, "status": status, "identity": identity}
 
 

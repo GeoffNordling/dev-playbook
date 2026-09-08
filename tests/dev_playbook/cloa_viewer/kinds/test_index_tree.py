@@ -86,15 +86,24 @@ def test_a_file_with_no_frontmatter_has_null_facts(checkout: Path) -> None:
     }
 
 
-def test_a_directory_sums_the_words_below_it(checkout: Path) -> None:
+def test_a_directory_lists_its_own_index_then_its_listing(checkout: Path) -> None:
     docs = payload_of(checkout)["root"]["children"][2]
     assert docs["title"] == "docs — index"
-    assert [child["words"] for child in docs["children"]] == [13, 3]
-    assert docs["words"] == 16
+    assert [child["identity"] for child in docs["children"]] == [
+        "docs/index.md",
+        "docs/beta.md",
+        "docs/decisions/",
+    ]
+
+
+def test_a_directory_sums_the_words_below_it(checkout: Path) -> None:
+    docs = payload_of(checkout)["root"]["children"][2]
+    assert [child["words"] for child in docs["children"]] == [19, 3, 21]
+    assert docs["words"] == 43
 
 
 def test_the_root_sums_every_directory_and_file_it_reaches(checkout: Path) -> None:
-    assert payload_of(checkout)["root"]["words"] == 58
+    assert payload_of(checkout)["root"]["words"] == 85
 
 
 def test_a_file_no_index_reaches_is_unindexed(checkout: Path) -> None:

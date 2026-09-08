@@ -16,8 +16,15 @@ export interface Heading {
   slug: string;
 }
 
-/** How a link out resolved, as the generator scored it. */
-export type LinkStatus = "external" | "citation" | "ok" | "broken";
+// How a link out resolved, as the generator scored it. Only "broken" is red:
+// "decision-record" — a stale link out of an immutable Decision Record — and
+// "citation" both take the neutral .badge style, because neither is a defect.
+export type LinkStatus =
+  | "external"
+  | "citation"
+  | "ok"
+  | "decision-record"
+  | "broken";
 
 /** One link the file makes: as written, how it resolved, and what it names. */
 export interface Link {

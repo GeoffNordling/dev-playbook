@@ -62,7 +62,7 @@ def test_the_record_names_every_generator_and_what_it_wrote(checkout: Path) -> N
     record = refresh.refresh(checkout)
     assert record["generators"] == [
         {"kind": "index-tree", "status": "ok", "count": 1, "error": None},
-        {"kind": "markdown-file", "status": "ok", "count": 5, "error": None},
+        {"kind": "markdown-file", "status": "ok", "count": 7, "error": None},
     ]
 
 

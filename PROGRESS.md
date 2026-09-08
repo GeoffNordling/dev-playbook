@@ -13,3 +13,16 @@ in git history there. This file starts over for loop 2, the room.
   dropped its private constants and its `re` import. `uv run scripts/ref-lint`
   says `767 references, all ok` both before and after. Gate green, 1295 tests.
   Next: task 2, the `decision-record` link status in `kinds/markdown_file.py`.
+- Task 2 done: `_link` in `kinds/markdown_file.py` now answers
+  `decision-record` — not `broken` — for an unresolved target of a file
+  `md.is_decision_record` accepts, keeping the resolved identity; the status
+  enum and its description grew in `schemas/markdown-file.schema.json`
+  (`kind_version` still 1) and `LinkStatus` in `MarkdownFile.tsx`, which needs
+  no CSS because `.badge` is already neutral. The fixture gained
+  `docs/decisions/index.md` and `docs/decisions/0001-alpha.md` and a listing
+  line in `docs/index.md`, so `markdown-file` writes 7 views. Two plan slips
+  for the user: `docs/`'s third child identity is `docs/decisions/`, not
+  `decisions/` (a directory node carries its full path), and the fixture's
+  word sums had to move with it (`docs/` 43, root 85) to keep the gate green
+  until task 3 deletes them. `make web` rebuilt, gate green, 1297 tests.
+  Next: task 3, removing word counts everywhere.

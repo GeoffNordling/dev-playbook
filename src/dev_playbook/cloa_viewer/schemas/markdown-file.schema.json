@@ -111,11 +111,12 @@
           "type": "string"
         },
         "status": {
-          "description": "external for a link out of the checkout, citation for a ~/workspace/<repo>/ reference to another repo which is never checked here, ok when the target names a tracked file, broken otherwise.",
+          "description": "external for a link out of the checkout, citation for a ~/workspace/<repo>/ reference to another repo which is never checked here, ok when the target names a tracked file, decision-record when it names none and the file making the link is a numbered Decision Record whose staleness is accepted, broken otherwise.",
           "enum": [
             "external",
             "citation",
             "ok",
+            "decision-record",
             "broken"
           ]
         },

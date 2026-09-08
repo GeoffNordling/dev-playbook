@@ -233,6 +233,17 @@ the design later. You do not resolve it by editing the design.
   `md.RECORD_NAME`, and `md.is_decision_record(relpath)` are the one home;
   ref-lint reads `md.RECORDS_DIR` and calls the predicate, and no longer
   imports `re`. Task 2 calls `md.is_decision_record(source)`.
+- **The fixture holds seven markdown files after task 2.** `index.md`,
+  `alpha.md`, `docs/index.md`, `docs/beta.md`, `docs/decisions/index.md`,
+  `docs/decisions/0001-alpha.md`, `orphan.md`. A directory node's identity is
+  the full repo-relative path with a trailing slash, so `docs/`'s third child
+  is `docs/decisions/`, not `decisions/` as task 2's wording had it. Word sums
+  moved with the new files — `docs/` is 43 and `root` is 85 — and task 3
+  deletes those assertions along with `words` itself.
+- **A neutral badge needs no CSS.** `app.css` styles only `.badge-ok` and
+  `.badge-broken`; `citation` and now `decision-record` fall through to the
+  muted `.badge` base, so task 2 changed no CSS. Adding a rule for
+  `.badge-decision-record` would be the thing that made it stand out.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -259,7 +270,7 @@ the design later. You do not resolve it by editing the design.
   `uv run scripts/ref-lint` on this checkout before and after: the same
   count of references, all ok. Gate green.
 
-- [ ] **Task 2: the `decision-record` link status.** In
+- [x] **Task 2: the `decision-record` link status.** In
   `kinds/markdown_file.py`, `_link` answers in this order: `external`;
   `citation`; `ok` when the identity is tracked; `decision-record` when
   `md.is_decision_record(source)`; else `broken`. A `decision-record` link
