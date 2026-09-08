@@ -59,9 +59,10 @@ before.
 JSON Schema is the bridge: the server validates before it writes, the
 page validates before it renders, both against the same files.
 
-Package shape, the guess: one directory per kind under `src/cloa_viewer/`
-holding its schema and generator, and the page under `web/` inside it
-with one renderer directory per kind. Library choices are made at the
+Package shape, the guess: one module per kind under
+`src/dev_playbook/cloa_viewer/kinds/`, the schemas in one `schemas/`
+directory beside them, and the page under `web/` inside the package with
+one renderer directory per kind. Library choices are made at the
 first build, not here.
 
 ## Checks

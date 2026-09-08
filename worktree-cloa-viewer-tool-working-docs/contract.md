@@ -64,7 +64,7 @@ Every view file is one JSON object with exactly these top-level fields:
 | `payload` | the object the kind's schema governs |
 
 A missing field, an extra field, or a wrong type rejects the whole file.
-The envelope schema lives once, at `src/cloa_viewer/envelope.schema.json`;
+The envelope schema lives once, in the package's `schemas/` directory;
 kind schemas govern `payload` only. The checkout and the repo are not in
 the file: the directory says them.
 

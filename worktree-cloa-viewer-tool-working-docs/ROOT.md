@@ -73,8 +73,9 @@ the chain updates within a second.
 
 ## Constraints
 
-- The package lives in dev-playbook at `src/cloa_viewer/`. Breaking it
-  out into its own repo is a later choice.
+- The package lives in dev-playbook at `src/dev_playbook/cloa_viewer/`,
+  a subpackage, because the build standard allows one package under
+  `src/`. Breaking it out into its own repo is a later choice.
 - The tool runs on the user's machine at a localhost address. It is never
   an artifact or a hosted page.
 - The canonical artifacts stay untouched
@@ -124,8 +125,9 @@ In build order. The first six items are the vertical slice: disk to
 browser with the two navigation kinds. The three CLOA kinds follow as
 registry entries.
 
-- **Package and command** — `src/cloa_viewer/` with the `cloa-viewer`
-  entry point, its dependencies kept out of what other repos install.
+- **Package and command** — `src/dev_playbook/cloa_viewer/` with the
+  `cloa-viewer` entry point, its dependencies kept out of what other repos
+  install.
 - **Contract module** — the state directory layout, the envelope schema,
   write-with-validation, `checkout.json`, and the refresh record.
 - **First two kinds** — `index-tree` and `markdown-file`: schemas,
