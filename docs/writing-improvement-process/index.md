@@ -1,6 +1,6 @@
 # docs/writing-improvement-process/ — index
 
-The writing-improvement process's working files. The process itself is
+The writing-improvement process's files. The process itself is
 [writing-improvement-process.md](/docs/writing-improvement-process.md).
 
 - [Writing Improvement Log](/docs/writing-improvement-process/writing-improvement-log.md) — The running log of document-writing sessions — which document, what went wrong, and what fixed it, newest first

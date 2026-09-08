@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Working Documentation Sets
-description: How the in-process Markdown files of one work stream are organized as a set — root plan, member links, single-home facts, worklists, and local terms
+description: How the in-process Markdown files of one work stream are organized as a set — the branch directory it lives in, root plan, member links, single-home facts, worklists, and local terms
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -34,7 +34,8 @@ still binds.
 A set is a tree: one root file, and every other member reached from it by a
 path of links.
 
-- The root is the document the work started from — the plan holding the goal.
+- The root, `ROOT.md` ([where a set lives](#where-a-set-lives)), is the
+  document the work started from — the plan holding the goal.
 - A member links what it depends on: its parent, its children, the sibling
   whose fact it defers to. The root need not link every member.
 - A working file no path from the root reaches is an orphan.
@@ -42,6 +43,18 @@ path of links.
 Links take the form
 [Cross-References](/standards/knowledge-organization/cross-references.md)
 gives them.
+
+## Where a set lives
+
+A set is one directory at the repo root, `<branch>-working-docs/`, named
+for the branch the work runs on; it holds the set's `index.md`, its root
+file `ROOT.md`, and its members under lowercase kebab-case names, and it
+exists on that branch alone, drained into permanent homes or deleted
+before the branch merges.
+
+The branch `fix-index-drift` keeps its set in
+`fix-index-drift-working-docs/`. `main` carries no such directory, and a
+set under `docs/` is the defect: `docs/` holds permanent documents.
 
 ## Worklist
 

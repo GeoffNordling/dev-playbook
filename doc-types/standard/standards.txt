@@ -133,6 +133,7 @@ knowledge-organization  working-documentation-sets  one-home-per-fact           
 knowledge-organization  working-documentation-sets  shape                                             —
 knowledge-organization  working-documentation-sets  speculative-voice                                 —
 knowledge-organization  working-documentation-sets  terms                                             —
+knowledge-organization  working-documentation-sets  where-a-set-lives                                 —
 knowledge-organization  working-documentation-sets  worklist                                          —
 modules                 design                      a-port-at-a-process-boundary                      —
 modules                 design                      deep-not-shallow                                  —

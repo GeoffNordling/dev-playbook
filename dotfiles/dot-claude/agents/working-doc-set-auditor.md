@@ -18,8 +18,8 @@ sections, read as the briefings qualify them, are the audit's whole
 rulebook. A rule outside
 the assignment belongs to a sibling auditor.
 
-The set is the root plus every working file it links, plus any sibling
-working file the root fails to link — an unlinked sibling is itself a
+The set is the root plus every member it links, plus any file in the
+set's directory the root fails to link — an unlinked member is itself a
 finding, never a reason to skip the file. Read every member in full
 before judging anything.
 

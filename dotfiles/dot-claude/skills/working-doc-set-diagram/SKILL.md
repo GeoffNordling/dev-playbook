@@ -40,15 +40,15 @@ index.md
 ROOT.md ···························· role: section · section · section
    │
    ▼
-BRANCHING-FILE.md ·················· role: section · section ·
+branching-file.md ·················· role: section · section ·
    │        │                        section · section
    │        └───────────────────────┐
    ▼                                ▼
-MAIN-CHILD.md ············ role:    SIDE-CHILD.md
+main-child.md ············ role:    side-child.md
    │                       section  role: section · section
    │                       section
    ▼
-LEAF-FILE.md ······················· role: section · section
+leaf-file.md ······················· role: section · section
    │
    ▼
 subdirectory/ ······················ file · file

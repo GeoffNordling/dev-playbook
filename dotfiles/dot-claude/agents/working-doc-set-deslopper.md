@@ -40,6 +40,7 @@ the set's root file, and that auditor's assigned sections:
   [point at canonical artifacts](~/workspace/dev-playbook/standards/prose/conventions.md#point-at-canonical-artifacts).
 - **Set shape** —
   [shape](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#shape),
+  [where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#where-a-set-lives),
   [worklist](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#worklist),
   [buckets](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#buckets),
   [terms](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#terms),

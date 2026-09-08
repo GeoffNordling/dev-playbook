@@ -15,10 +15,11 @@ in a fork subagent; the session dispatches and reviews.
 
 ## Target
 
-A set is a collection of working Markdown documents: one root file — the
-plan the work started from — plus the files it links. Audit the set
-`set-hint` names, or the one in focus in the conversation. Where neither
-resolves to a root file, ask.
+A set is the directory `<branch>-working-docs/` at the repo root
+([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#where-a-set-lives)):
+its root file `ROOT.md` — the plan the work started from — plus the
+members it links. Audit the set `set-hint` names, or the current branch's
+set. Where neither directory exists, ask.
 
 ## Pre-flight
 
