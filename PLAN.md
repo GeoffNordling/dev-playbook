@@ -271,6 +271,45 @@ the design later. You do not resolve it by editing the design.
   directory as well as `index.html`: `build_app` mounts
   `StaticFiles(directory=dist / "assets")`, which raises at build time when the
   directory is missing.
+- **The page's seams, and which module owns what.** Task 10 built them.
+  `src/api.ts` is the only module that calls `fetch` or opens an `EventSource`,
+  and it carries every shape the page has of the contract. `src/validate.ts`
+  compiles the envelope schema and every registered kind's schema once, in
+  `loadSchemas()`, so `validateView(json)` is **synchronous** and a view file
+  reaches the screen without a round trip; the store awaits `loadSchemas()`
+  before it validates anything. `src/store.ts` `useViewer()` holds all state and
+  is the only place that fetches. `src/kinds/index.ts` `RENDERERS` is a `Map`,
+  not a `Record`, because `noUncheckedIndexedAccess` is off and `RECORD[key]`
+  would type as never-undefined; `.get()` gives the `| undefined` the missing
+  renderer panel needs. A renderer is given `{view, viewer}`, so task 13's file
+  panel can open another panel without new plumbing.
+- **Ajv must be the 2020 build.** `import { Ajv2020 } from "ajv/dist/2020"`.
+  Every schema declares draft 2020-12, and plain `import Ajv from "ajv"` is
+  draft-07 and refuses them at compile time. `Ajv2020` is a named export, so
+  there is no CommonJS default-interop question either.
+- **`openError(path, error)` is how a panel with no view file opens.** The store
+  puts an error entry into `views` under that path and opens it, so the panel
+  stack needs no second code path. Task 10's red refresh status uses it with
+  the path `refresh.json`; task 11's `no view file for <identity>` is the same
+  call.
+- **The connection has three states, not two.** `connecting`, `connected`,
+  `disconnected` in `api.ts`; the banner shows on `disconnected` only. A page
+  that has not opened the stream yet is connecting, so the red banner does not
+  flash on every load.
+- **Vite now writes a CSS file as well.** `dist/assets/index-<hash>.css` beside
+  the JS, since `App.tsx` imports `app.css`. It is under `assets/`, which
+  `build_app` mounts, so the server needed no change — but the earlier note
+  saying Vite writes "exactly `index.html` plus one `.js`" is now out of date.
+- **`uv run cloa-viewer` in a subprocess orphans the server, and this shapes
+  task 13.** Measured twice: `subprocess.Popen(["uv", "run", "cloa-viewer", …])`
+  makes `uv` the parent, so `Popen.kill()` kills `uv` and leaves the server
+  holding the port and the event stream — the page under test stayed connected,
+  the disconnect never happened, and the next run's server could not bind. Start
+  `<repo>/.venv/bin/cloa-viewer` directly instead. Worse for a `finally`:
+  `Popen.terminate()` on the `uv` wrapper did not return within 20 seconds while
+  a page held the stream open, because uvicorn's graceful shutdown waits for the
+  open connection; a test that terminates and waits will hang. Either kill the
+  process directly, or give `cli.serve` a `timeout_graceful_shutdown`.
 
 ## Tasks
 
@@ -506,7 +545,7 @@ the design later. You do not resolve it by editing the design.
   `uv run cloa-viewer --port 8765` prints the address (stop it) and
   `curl http://127.0.0.1:8765/` returns the page. Gate green.
 
-- [ ] **Task 10: the page shell.** In the web project create `src/api.ts`
+- [x] **Task 10: the page shell.** In the web project create `src/api.ts`
   (typed fetchers for every `/api` route from task 6, and an `EventSource`
   wrapper `subscribe(onMessage, onStateChange)` that reports connected or
   disconnected), `src/validate.ts` (fetch the envelope schema and each kind
