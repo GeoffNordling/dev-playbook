@@ -16,8 +16,8 @@ deleted before the branch merges
 
 cloa-viewer puts a checkout's markdown on a browser screen at the
 correct level of abstraction, so the user can understand documentation
-that the terminal and the IDE show only as text. The CLOA objects, which
-exist on disk today only as first-pass text approximations nobody opens,
+that the terminal and the IDE show only as text. The CLOA objects, whose
+only face today is a proof-of-concept text file nobody opens,
 [chains.txt](/doc-types/runbook/chains.txt),
 [standards.txt](/doc-types/standard/standards.txt), and
 [cards.txt](/doc-types/standard-card/cards.txt), become panels the user
@@ -61,8 +61,15 @@ the chain updates within a second.
   generator succeeds or the refresh record names its failure. Nothing is
   hidden or silently dropped.
 - **The CLOA object is the default face.** Clicking a file shows its
-  CLOA object when one exists. Frontmatter facts, links, and source are
-  the exception, one click further.
+  CLOA object when one exists. The markdown behind it, frontmatter facts,
+  links, and source, is one click further. The screen is not limited to
+  CLOA objects; the default is.
+- **The design space is the CLOA.** A screen is a composition of
+  registry kinds and nothing else, so the space of possible screens is
+  the set of combinations of those kinds. Each kind is simple, so that
+  set is small enough to walk and to filter down to the combinations
+  that answer a question a person asks of the system
+  ([Design](/worktree-cloa-viewer-tool-working-docs/design.md)).
 - **Total accounting.** Every tracked markdown file appears in the tree,
   whether an index reaches it or not.
 - **The user owns the room.** The user opens, arranges, and closes
@@ -80,12 +87,13 @@ the chain updates within a second.
   [Reference chain](/doc-types/runbook/contract-shape.md) does not. A
   panel that needs a primitive the shape lacks is a change to the object,
   a separate work stream agreed with the user before it starts. The
-  generated text files, `chains.txt` and its two siblings, were first-pass
-  approximations of the objects and constrain nothing. How an object
-  draws is the renderer's to decide, which the doc-type itself says
-  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)), so the
-  drawing rules are stated here, in the kind's registry entry, and the
-  meaning they draw is the doc-type's.
+  generated text files, `chains.txt` and its two siblings, were the proof
+  of concept, the first prototype of this dashboard. They constrain
+  nothing, and carrying them to the screen as they are is not the goal.
+  How an object draws is the renderer's to decide, which the doc-type
+  itself says ([Reference Chain Encoding](/doc-types/runbook/encoding.md)),
+  so the drawing rules are stated here, in the kind's registry entry, and
+  the meaning they draw is the doc-type's.
 - **Greenfield inside the definition.** What the definition does not
   prohibit is allowed. Stitching a chain into the chains its do-edges
   name is one such move: the contract shape describes it and no text file
@@ -105,7 +113,11 @@ the chain updates within a second.
   a subpackage, because the build standard allows one package under
   `src/`. Breaking it out into its own repo is a later choice.
 - The tool runs on the user's machine at a localhost address. It is never
-  an artifact or a hosted page.
+  an artifact or a hosted page. Whether the page stays this tool's own
+  shell or becomes a VS Code extension is open. The user leans to the
+  shell, because the dashboard is to be composable and flexible and VS
+  Code lays panels out as tabs. The panels are HTML in either home, so
+  the choice would move the shell and not the kinds.
 - The canonical artifacts stay untouched
   ([Canonical Artifacts](/standards/build/canonical.md)).
 - The viewer reads only the state directory. It never reads a checkout.
@@ -118,6 +130,29 @@ the chain updates within a second.
   screen and the checks can never disagree.
 - The text views retire. `chains.txt`, `standards.txt`, `cards.txt`, and
   the `scripts/` shims that write them go when their kinds land.
+
+## Working agreements
+
+How the user and the agent design a panel together. These bind the
+design sessions, not the code.
+
+- Design happens in the terminal, as Unicode sketches, or at most a
+  quick SVG. A sketch is judged in the turn it appears and then dropped.
+- No prototype is built inside the design loop. A detailed build, a mock
+  over real data or a renderer, goes to a dedicated subagent or a loop
+  and takes the time it takes.
+- One object at a time. The runbook first. Interlinking the three kinds
+  is not an ambition.
+- A panel speaks in its doc-type's terms only. A new term is approved by
+  the user and written into the doc-type's pages before the viewer uses
+  it.
+- When it is unclear whether a move draws the object or changes it, the
+  user decides.
+- A design turn asks at most one or two loose questions, never a batch.
+- The text files are never cited as constraints. What they drew is not
+  what the screen must draw.
+- As this becomes a long-lived project, the principles, constraints, and
+  agreements here need firmer structure than one root file. How is open.
 
 ## Terms
 
@@ -146,6 +181,9 @@ the chain updates within a second.
   arrangement, the refresh record, and the failure rules.
 - [Registry](/worktree-cloa-viewer-tool-working-docs/registry.md) — what
   a registry entry is, the five v1 kinds, and the kinds deferred.
+- [Design](/worktree-cloa-viewer-tool-working-docs/design.md) — how a
+  panel is designed: the design space, the questions a person asks of
+  the system, and the ideas recorded for the runbook kind.
 - [Viewer](/worktree-cloa-viewer-tool-working-docs/viewer.md) — the page
   in the browser: layout, tree, panels, toggle, refresh, and failure on
   screen.
@@ -155,18 +193,21 @@ the chain updates within a second.
 
 ## Planned
 
-In build order. The vertical slice is built (see Completed). The room
-comes next, then the three CLOA kinds as registry entries.
+In build order. The vertical slice and the room are built (see
+Completed). The runbook kind comes next, designed before it is built,
+then the other two CLOA kinds.
 
-- **The room** — the tree in the two groups the standard names with an
-  excluded file absent, levels told apart by eye, word counts gone, the
-  `decision-record` link status, and the workspace toggle: discovery of
-  every checkout under `~/workspace/` and a switch between them without
-  a restart.
+- **Runbook design** — a design session for the runbook kind, starting
+  from the ideas in
+  [Design](/worktree-cloa-viewer-tool-working-docs/design.md): the panel
+  of one runbook, the view of every runbook, and how runbooks relate.
+  Nothing there is settled. The session ends with the drawing rules
+  written into the kind's registry entry.
 - **Pinning and the arrangement** — pin, close others, and the
   arrangement saved and restored per checkout.
 - **runbook-chain** — chaingen moves into the package as the kind's
-  generator; the renderer draws the chain; `chains.txt` and the shim go.
+  generator; the renderer draws the settled design; `chains.txt` and the
+  shim go.
 - **standard** — rulegen moves the same way; `standards.txt` goes.
 - **standard-card** — cardgen moves the same way; `cards.txt` goes.
 - **Docs follow the moves** — the `doc-types/` indexes and pages that
@@ -181,9 +222,16 @@ comes next, then the three CLOA kinds as registry entries.
   contract module, `index-tree` and `markdown-file`, the server with
   refresh and both watchers and the event stream, the page skeleton, the
   tree and file panels, the front-end checks, and the red refresh status.
+- **The room** — loop 2, 2026-09-08: the tree in the two groups with
+  nested guide lines and no word counts, the `decision-record` link
+  status, discovery of every checkout under a directory of repos with
+  rediscovery while the server runs, the checkout toggle on the page, a
+  smoke run over dev-playbook's two checkouts, and Ctrl-C stopping the
+  server while a page holds the stream.
 
 ## Acronyms
 
 CLOA — Correct Level of Abstraction. IDE — Integrated Development
 Environment. JSON — JavaScript Object Notation. HTTP — Hypertext Transfer
-Protocol.
+Protocol. SVG — Scalable Vector Graphics. HTML — Hypertext Markup
+Language.

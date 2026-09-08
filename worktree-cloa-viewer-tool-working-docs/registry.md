@@ -74,23 +74,28 @@ records is shared with ref-lint, never copied.
 ## runbook-chain
 
 Per subject, one per runbook, an agent definition or a skill. The
-Reference chain as data, the thing `chains.txt` draws as text today:
-the runbook's header facts and its edges, each with its verb, its
-target, its note, and its condition when it has one
+Reference chain as data: the root with its name, type, and node data,
+the signature, and the edges in firing order, each with its operation,
+its target, its condition when it has one, and its annotation
 ([Reference Chain](/doc-types/runbook/contract-shape.md),
-[Reference Chain Encoding](/doc-types/runbook/encoding.md)).
+[Reference Chain Encoding](/doc-types/runbook/encoding.md)). How the
+panel draws it is not settled. The ideas are in
+[Design](/worktree-cloa-viewer-tool-working-docs/design.md), and the
+drawing rules land here when the design session settles them.
 
 ## standard
 
 Per subject, one per Standard file. Its card, its population, and its
-rules with their conditions, the rows `standards.txt` lists today
-([Population and Rules Encoding](/doc-types/standard/encoding.md)).
+rules with their conditions
+([Population and Rules Encoding](/doc-types/standard/encoding.md)). How
+the panel draws it is not designed yet.
 
 ## standard-card
 
-Per subject, one per Standard-Card file. The four cells and the pointers
-in each, the rows `cards.txt` lists today
-([Card Cells](/doc-types/standard-card/contract-shape.md)).
+Per subject, one per Standard-Card file. The four cells and the
+pointers in each
+([Card Cells](/doc-types/standard-card/contract-shape.md)). How the
+panel draws it is not designed yet.
 
 ## Deferred
 
@@ -98,6 +103,11 @@ Kinds and writers outside v1, in the likely order of arrival:
 
 - **force-graph** — the checkout's link graph, for the connectivity
   questions the tree cannot answer. First to add.
+- **Every-runbook kinds** — one view of the whole runbook population,
+  grouped and measured, and the do-graph that relates runbooks to one
+  another. The ideas are in
+  [Design](/worktree-cloa-viewer-tool-working-docs/design.md); which of
+  them become kinds is the runbook design session's to decide.
 - **mermaid** — a diagram rendered from mermaid source.
 - **The agent as a second writer** — view files an agent authors, and a
   flag that opens a panel without a click. The state directory already
