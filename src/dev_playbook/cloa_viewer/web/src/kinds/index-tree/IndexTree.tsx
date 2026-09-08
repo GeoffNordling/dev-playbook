@@ -4,6 +4,10 @@
 // a flat list. It is the page's only way in — clicking a file row opens that
 // file's panel — so total accounting matters here: a file an index lists but
 // the checkout does not carry still gets a row, marked.
+//
+// A level is told from the next by eye rather than by hunting for the triangle:
+// every open row nests its children in one .tree-children box, which draws the
+// guide line and the step in, so nothing here computes an indent.
 
 import { useCallback, useState } from "react";
 
@@ -43,8 +47,6 @@ const CONCEPTS = "concepts";
 const HARNESS = "harness";
 const UNINDEXED = "unindexed";
 
-const INDENT_PX = 14;
-
 export function IndexTree({ view, viewer }: RendererProps) {
   // The view validated against index-tree.schema.json before it reached the
   // store, so the payload is this shape and the page does not check again.
@@ -66,7 +68,6 @@ export function IndexTree({ view, viewer }: RendererProps) {
   return (
     <div className="tree-rows">
       <Row
-        depth={0}
         open={expanded.has(CONCEPTS)}
         group
         title="Concept documents"
@@ -76,10 +77,9 @@ export function IndexTree({ view, viewer }: RendererProps) {
         }}
       />
       {expanded.has(CONCEPTS) ? (
-        <>
+        <div className="tree-children">
           <Directory
             node={payload.root}
-            depth={1}
             expanded={expanded}
             toggle={toggle}
             viewer={viewer}
@@ -90,10 +90,9 @@ export function IndexTree({ view, viewer }: RendererProps) {
             toggle={toggle}
             viewer={viewer}
           />
-        </>
+        </div>
       ) : null}
       <Row
-        depth={0}
         open={expanded.has(HARNESS)}
         group
         title="Harness-owned files"
@@ -103,11 +102,13 @@ export function IndexTree({ view, viewer }: RendererProps) {
           toggle(HARNESS);
         }}
       />
-      {expanded.has(HARNESS)
-        ? payload.harness.map((node) => (
-            <File key={node.identity} node={node} depth={1} viewer={viewer} />
-          ))
-        : null}
+      {expanded.has(HARNESS) ? (
+        <div className="tree-children">
+          {payload.harness.map((node) => (
+            <File key={node.identity} node={node} viewer={viewer} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -136,7 +137,6 @@ function Unindexed({
   return (
     <>
       <Row
-        depth={1}
         open={open}
         bad
         title="Not indexed"
@@ -146,24 +146,24 @@ function Unindexed({
           toggle(UNINDEXED);
         }}
       />
-      {open
-        ? nodes.map((node) => (
-            <File key={node.identity} node={node} depth={2} viewer={viewer} />
-          ))
-        : null}
+      {open ? (
+        <div className="tree-children">
+          {nodes.map((node) => (
+            <File key={node.identity} node={node} viewer={viewer} />
+          ))}
+        </div>
+      ) : null}
     </>
   );
 }
 
 function Directory({
   node,
-  depth,
   expanded,
   toggle,
   viewer,
 }: {
   node: DirectoryNode;
-  depth: number;
   expanded: ReadonlySet<string>;
   toggle: (identity: string) => void;
   viewer: Viewer;
@@ -172,7 +172,6 @@ function Directory({
   return (
     <>
       <Row
-        depth={depth}
         open={open}
         title={node.title}
         description={node.description}
@@ -180,43 +179,30 @@ function Directory({
           toggle(node.identity);
         }}
       />
-      {open
-        ? node.children.map((child) =>
+      {open ? (
+        <div className="tree-children">
+          {node.children.map((child) =>
             isDirectory(child) ? (
               <Directory
                 key={child.identity}
                 node={child}
-                depth={depth + 1}
                 expanded={expanded}
                 toggle={toggle}
                 viewer={viewer}
               />
             ) : (
-              <File
-                key={child.identity}
-                node={child}
-                depth={depth + 1}
-                viewer={viewer}
-              />
+              <File key={child.identity} node={child} viewer={viewer} />
             ),
-          )
-        : null}
+          )}
+        </div>
+      ) : null}
     </>
   );
 }
 
-function File({
-  node,
-  depth,
-  viewer,
-}: {
-  node: FileNode;
-  depth: number;
-  viewer: Viewer;
-}) {
+function File({ node, viewer }: { node: FileNode; viewer: Viewer }) {
   return (
     <Row
-      depth={depth}
       open={null}
       title={node.title ?? node.identity}
       description={node.description}
@@ -246,7 +232,6 @@ function openFile(viewer: Viewer, identity: string): void {
 }
 
 function Row({
-  depth,
   open,
   title,
   description,
@@ -256,7 +241,6 @@ function Row({
   missing = false,
   onClick,
 }: {
-  depth: number;
   /** Whether the disclosure triangle points down, or null on a file row. */
   open: boolean | null;
   title: string;
@@ -274,6 +258,11 @@ function Row({
   if (group) {
     classes.push("tree-group");
   }
+  // Every row that opens holds others, and is set heavier than the files in
+  // it. The group headers carry a style of their own and keep it.
+  if (open !== null && !group) {
+    classes.push("tree-row-directory");
+  }
   if (bad) {
     classes.push("tree-row-bad");
   }
@@ -281,12 +270,7 @@ function Row({
     classes.push("tree-row-missing");
   }
   return (
-    <button
-      type="button"
-      className={classes.join(" ")}
-      style={{ paddingLeft: `${depth * INDENT_PX}px` }}
-      onClick={onClick}
-    >
+    <button type="button" className={classes.join(" ")} onClick={onClick}>
       <span className="tree-twist">{twist(open)}</span>
       <span className="tree-text">
         <span className="tree-title">

@@ -265,11 +265,28 @@ the design later. You do not resolve it by editing the design.
   `index-tree.schema.json` gained required `harness`, that stand-in had to gain
   `"harness": []` to keep failing where the test says it fails.
 - **`Row` in `IndexTree.tsx` builds its class list from named booleans**
-  (`group`, `bad`, `missing`), not a ternary, so task 5 adds `tree-row-directory`
-  by pushing one more class. `.tree-group` carries the uppercase muted style and
+  (`group`, `bad`, `missing`), not a ternary; task 5 pushed
+  `tree-row-directory` the same way. `.tree-group` carries the uppercase muted style and
   `.tree-row-bad .tree-title` the red; neither touches `.tree-row` itself, so the
   Playwright selector `.tree .tree-row` still matches every row including the two
   group headers.
+- **The tree nests, and nothing computes an indent.** After task 5 every open
+  row puts its children in one `<div className="tree-children">` — the two
+  group rows, every directory, and the `Not indexed` row alike — and that box
+  carries both the step in and the guide line. `Row` takes no `depth` and sets
+  no inline style; a task that adds a level adds a box, never a number.
+  `.tree-row-directory` (any row whose `open` is not null and is not a group,
+  so the `Not indexed` row too) is `font-weight: 600`, with one extra rule the
+  plan did not name, `.tree-row-directory .tree-description { font-weight: 400 }`,
+  so the heavier setting reads as the title rather than the whole row.
+- **This checkout has no unindexed concept document**, so the red `Not indexed`
+  row never appears on a server pointed at it — okf-lint is green here. To see
+  that row, point the server at a fixture checkout: build one outside the repo
+  with `PYTHONPATH=<repo>/tests python -c "from pathlib import Path; from
+  cloa_viewer_fixtures import build_checkout; build_checkout(Path('<dir>'))"`,
+  which leaves `orphan.md` unreached. Give any such throwaway server its own
+  `XDG_STATE_HOME` so it never fights the user's viewer over a checkout
+  directory in `~/.local/state`.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -362,7 +379,7 @@ the design later. You do not resolve it by editing the design.
   contain the text `Harness-owned files` and the text `Not indexed`.
   `make web`, then gate green.
 
-- [ ] **Task 5: levels told apart by eye.** In `IndexTree.tsx`, stop
+- [x] **Task 5: levels told apart by eye.** In `IndexTree.tsx`, stop
   indenting with `paddingLeft` and `depth`: a directory's children render
   inside a `<div className="tree-children">`, one per open directory, and
   the group rows' children the same way. In `app.css`:

@@ -55,3 +55,21 @@ in git history there. This file starts over for loop 2, the room.
   missing-key error at `$`; and `CLAUDE.md` sorts before `alpha.md`, so it
   heads every sorted list rather than trailing it. `make web` rebuilt, gate
   green, 1297 tests. Next: task 5, levels told apart by eye.
+- Task 5 done: `IndexTree.tsx` dropped `INDENT_PX`, `depth`, and the inline
+  `paddingLeft`; every open row — both group rows, every directory, and the
+  `Not indexed` row — now wraps its children in one
+  `<div className="tree-children">`, and `app.css` gives that box the 10px
+  margin, 6px padding and the `var(--line)` guide line, with
+  `.tree-row-directory` at `font-weight: 600`. `--line` already existed at
+  `#d8d8d8`. One plan slip for the user: the plan set the weight on the whole
+  row, which made the description bold too, so a second rule,
+  `.tree-row-directory .tree-description { font-weight: 400 }`, keeps the
+  heavier setting on the title. Seen on screen, two Playwright screenshots
+  from the scratchpad against servers on free ports with their own
+  `XDG_STATE_HOME`: on this checkout, four nested guide lines stepping right
+  through `Concept documents` → root → `doc-types/` → `doc-types/runbook/`,
+  the two group headers small uppercase muted, directory titles bold and file
+  titles normal; this checkout has no unindexed document, so the red row was
+  confirmed on a fixture checkout instead, where `Not indexed` computes to
+  `rgb(179, 38, 30)`, the `--bad` red, over its one `orphan.md` child.
+  `make web` rebuilt, gate green, 1297 tests. Next: task 6, discovery.

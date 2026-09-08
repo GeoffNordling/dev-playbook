@@ -136,6 +136,24 @@ button.topbar-status {
   background: var(--ground);
 }
 
+/* One box per open row, holding that row's children. The guide line down its
+   left edge is what tells a level from the next, so the tree needs no computed
+   indent at all: the boxes nest, and the steps in come with them. */
+.tree-children {
+  margin-left: 10px;
+  padding-left: 6px;
+  border-left: 1px solid var(--line);
+}
+
+/* A row that holds others is set heavier than the files inside it. */
+.tree-row-directory {
+  font-weight: 600;
+}
+
+.tree-row-directory .tree-description {
+  font-weight: 400;
+}
+
 .tree-twist {
   color: var(--muted);
   line-height: 1.4;
