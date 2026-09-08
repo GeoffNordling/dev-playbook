@@ -159,3 +159,20 @@ in git history there. This file starts over for loop 2, the room.
   polling the port as `test_cli.start_server` does, is the way to wait for it.
   Next: task 10, `timeout_graceful_shutdown` so Ctrl-C stops the server while
   a page holds the stream.
+- Task 10 done, the last task in the plan: `cli.serve` passes
+  `timeout_graceful_shutdown=SHUTDOWN_SECONDS` (a new constant, 2) to
+  `uvicorn.run`, and its docstring says why — a graceful shutdown waits for
+  every open connection and the page's event stream never closes on its own.
+  `test_cli.py`'s `serving` contextmanager now takes a `port` and yields the
+  `Popen` instead of a URL, and the fixture chain is `port` → `server` →
+  `address`, so a test can signal the process and read its exit status;
+  `workspace_address` builds its URL from the same `port` fixture. The new
+  `test_interrupt_stops_the_server_while_a_page_holds_the_stream` loads the
+  page, waits for `.tree`, sends SIGINT and asserts `returncode == 0`. Proved
+  by mutation: with the argument removed the test fails with
+  `subprocess.TimeoutExpired` after 10 s, which is the user's four-Ctrl-C
+  report exactly. Two docstrings that claimed the old behaviour were corrected
+  — `start_server`'s (uv swallows the signal, rather than the shutdown
+  blocking forever) and the Playwright working note, which still named the
+  `address` fixture as the holder of the guard and the kill. No plan slips.
+  Gate green, 1315 tests. Next: nothing — every task in this plan is complete.

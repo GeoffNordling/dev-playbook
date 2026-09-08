@@ -1,5 +1,6 @@
 import contextlib
 import os
+import signal
 import socket
 import subprocess
 import time
@@ -82,8 +83,7 @@ def start_server(
 
     The entry point is run directly rather than through ``uv run``: uv stays
     the parent, so killing it leaves the server holding the port and the event
-    stream, and terminating it waits on uvicorn's graceful shutdown, which a
-    page holding the stream open blocks for as long as the page lives.
+    stream, and a signal reaches uv rather than the server it wraps.
     """
     server = subprocess.Popen(
         [
@@ -110,29 +110,47 @@ def start_server(
 
 
 @contextlib.contextmanager
-def serving(source: Path, state_home: Path) -> Iterator[str]:
-    """Run the real command on ``source``, and yield the page's address.
+def serving(
+    source: Path, state_home: Path, port: int
+) -> Iterator[subprocess.Popen[bytes]]:
+    """Run the real command on ``source`` at ``port``, and yield the process.
 
     The command serves the page ``make web`` builds inside the package, so a
     checkout that has never built it cannot run this at all: that is a missing
     build step, not a failing viewer, and this says which.
+
+    ``kill`` on the way out is a no-op on a process a test already stopped, so
+    a test is free to stop the server itself and read the status it exited with.
     """
     if not (cli.dist_dir() / "index.html").is_file():
         pytest.fail("run make web first")
-    port = free_port()
-    server = start_server(source, port, state_home)
+    running = start_server(source, port, state_home)
     try:
-        yield f"http://127.0.0.1:{port}/"
+        yield running
     finally:
-        server.kill()
-        server.wait(timeout=10)
+        running.kill()
+        running.wait(timeout=10)
 
 
 @pytest.fixture
-def address(checkout: Path, tmp_path: Path) -> Iterator[str]:
+def port() -> int:
+    """The port this test's own server holds, so two runs never collide."""
+    return free_port()
+
+
+@pytest.fixture
+def server(
+    checkout: Path, tmp_path: Path, port: int
+) -> Iterator[subprocess.Popen[bytes]]:
     """The real command serving the fixture checkout alone."""
-    with serving(checkout, tmp_path) as url:
-        yield url
+    with serving(checkout, tmp_path, port) as running:
+        yield running
+
+
+@pytest.fixture
+def address(server: subprocess.Popen[bytes], port: int) -> str:
+    """The address of that server's page."""
+    return f"http://127.0.0.1:{port}/"
 
 
 @pytest.fixture
@@ -169,10 +187,12 @@ def worktree(in_workspace: Path) -> Path:
 
 
 @pytest.fixture
-def workspace_address(workspace: Path, worktree: Path, tmp_path: Path) -> Iterator[str]:
+def workspace_address(
+    workspace: Path, worktree: Path, tmp_path: Path, port: int
+) -> Iterator[str]:
     """The real command serving that directory: two checkouts of one repo."""
-    with serving(workspace, tmp_path) as url:
-        yield url
+    with serving(workspace, tmp_path, port):
+        yield f"http://127.0.0.1:{port}/"
 
 
 def test_port_defaults_to_8765() -> None:
@@ -340,6 +360,16 @@ def test_page_shows_tree_and_updates(checkout: Path, address: str, page: Page) -
     alpha = checkout / "alpha.md"
     alpha.write_text(alpha.read_text() + "\nnine ten\n")
     expect(page.locator(".panel-body")).to_contain_text("nine ten", timeout=5000)
+
+
+def test_interrupt_stops_the_server_while_a_page_holds_the_stream(
+    server: subprocess.Popen[bytes], address: str, page: Page
+) -> None:
+    page.goto(address)
+    expect(page.locator(".tree")).to_be_visible()
+    server.send_signal(signal.SIGINT)
+    server.wait(timeout=10)
+    assert server.returncode == 0
 
 
 def test_the_toggle_lists_every_discovered_checkout(

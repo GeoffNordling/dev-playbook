@@ -133,13 +133,21 @@ the design later. You do not resolve it by editing the design.
   sets `XDG_STATE_HOME` to `tmp_path` with `monkeypatch.setenv` so nothing
   touches `~/.local/state`.
 - **Playwright.** Chromium is cached under `~/.cache/ms-playwright`; the
-  end-to-end test in `tests/dev_playbook/cloa_viewer/test_cli.py` starts
+  end-to-end tests in `tests/dev_playbook/cloa_viewer/test_cli.py` start
   `<repo>/.venv/bin/cloa-viewer` directly (never through `uv run`, which
-  orphans the server) from the `address` fixture, which also holds the
-  `run make web first` guard and the kill, because `testing-lint` forbids
-  `if`/`try` in a `test_*` body (`src/dev_playbook/testing_lint.py`, rule
-  `testing.no-logic`). Playwright's `has_text` is a case-insensitive
-  substring match; match a row by an exact string or by index.
+  orphans the server and swallows a signal) from the `serving`
+  contextmanager, which also holds the `run make web first` guard and the
+  kill, because `testing-lint` forbids `if`/`try` in a `test_*` body
+  (`src/dev_playbook/testing_lint.py`, rule `testing.no-logic`). The fixture
+  chain is `port` → `server` (the `Popen`) → `address` (the URL), so a test
+  can signal the process and read its exit status. Playwright's `has_text` is
+  a case-insensitive substring match; match a row by an exact string or by
+  index.
+- **Graceful shutdown blocks on the event stream.** `uvicorn.run` waits for
+  every open connection before it exits, and the page's SSE stream never
+  closes on its own, so Ctrl-C hangs for as long as a page is open.
+  `cli.serve` passes `timeout_graceful_shutdown=cli.SHUTDOWN_SECONDS` (2) to
+  cut that wait. Any future call to `uvicorn.run` needs the same argument.
 - **`uv.lock` moves with `pyproject.toml`.** Not expected this loop: no task
   edits `pyproject.toml`.
 - **No `__init__.py` anywhere under `tests/`, and only the root
@@ -577,7 +585,7 @@ the design later. You do not resolve it by editing the design.
   code, in which case fix the defect with a test. No code change is
   expected from this task otherwise. Gate green.
 
-- [ ] **Task 10: Ctrl-C stops the server while a page is open.** The user
+- [x] **Task 10: Ctrl-C stops the server while a page is open.** The user
   pressed Ctrl-C four times on `uv run cloa-viewer` with the page open and
   the server did not exit: uvicorn's graceful shutdown waits for the open
   event stream for as long as the page lives (the `start_server` docstring

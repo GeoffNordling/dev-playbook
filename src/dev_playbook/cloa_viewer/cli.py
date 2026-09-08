@@ -39,6 +39,7 @@ INDEX_FILE = "index.html"
 LOG_LEVEL = "warning"
 NO_CHECKOUT_STATUS = 2
 NO_PAGE_STATUS = 2
+SHUTDOWN_SECONDS = 2
 WEB_DIR = "web"
 
 
@@ -101,8 +102,20 @@ def default_source() -> Path:
 
 
 def serve(app: Starlette, port: int) -> None:
-    """Serve ``app`` on the loopback address at ``port`` until it stops."""
-    uvicorn.run(app, host=HOST, port=port, log_level=LOG_LEVEL)
+    """Serve ``app`` on the loopback address at ``port`` until it stops.
+
+    A graceful shutdown waits for every open connection to close, and the
+    page's event stream never closes on its own: without a limit, Ctrl-C leaves
+    the server running for as long as one page is open. ``SHUTDOWN_SECONDS``
+    cuts the wait short, so an interrupt stops the process.
+    """
+    uvicorn.run(
+        app,
+        host=HOST,
+        port=port,
+        log_level=LOG_LEVEL,
+        timeout_graceful_shutdown=SHUTDOWN_SECONDS,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
