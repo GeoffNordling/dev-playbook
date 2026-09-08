@@ -21,3 +21,4 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
 - [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its user checkpoints
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace
+- [worktree-cloa-viewer-tool-working-docs/](/worktree-cloa-viewer-tool-working-docs/index.md) — The working documentation set for cloa-viewer, the local visual IDE for one checkout's markdown
