@@ -16,22 +16,43 @@ parent is [CLOA Viewer](/worktree-cloa-viewer-tool-working-docs/ROOT.md).
 
 ## The command
 
-`cloa-viewer [checkout ...]` is the only command. It refreshes each
-checkout, starts the server, and prints the address to open. With no
-argument the checkout is the repo that contains the current directory.
-There are no subcommands in v1. A browser page cannot watch a disk on its
-own, so some program must run while the page is open, and this command
-is that program.
+`cloa-viewer [path ...] [--port N]` is the only command. A path that is
+a checkout is shown as it is. A path that is not one, `~/workspace/`
+being the case that matters, is scanned: each git repo directly below it,
+and every linked worktree of each, found with `git worktree list`,
+becomes a checkout. No path means the current directory by the same
+rule, so inside a repo it is that repo. A path that yields no checkout
+stops the command with an error naming it. The command refreshes each
+checkout, starts the server, and prints the address to open. There are
+no subcommands in v1. A browser page cannot watch a disk on its own, so
+some program must run while the page is open, and this command is that
+program.
 
-## The server's four jobs
+The usual launch, from any directory, is
 
+```sh
+uv run --project ~/workspace/dev-playbook cloa-viewer ~/workspace
+```
+
+which runs the code of dev-playbook's main checkout over every checkout
+in the workspace. One server is enough: repo, branch, and worktree are
+chosen on the page, not on the command line.
+
+## The server's five jobs
+
+- **Discover** — turn the paths it was given into the list of checkouts,
+  and do it again each time the page asks for the list. A checkout that
+  appeared is refreshed and watched; one that vanished is dropped, its
+  watcher stopped, and its state directory removed.
 - **Refresh** — run every registered generator for a checkout, validate
   each view file against the envelope and its kind schema before writing
   it, and write the refresh record.
 - **Watch the checkout** — on any change to a tracked file, wait a short
   settle time, then refresh. Each of the three current generators runs
   in under a tenth of a second on this repo, so a full refresh on every
-  change is affordable.
+  change is affordable. A checkout that lies inside another, a worktree
+  under the main checkout's `.claude/worktrees/`, is watched on its own
+  and ignored by the outer checkout's watcher.
 - **Watch the state directory** — on any view file written or removed,
   push an event to every open page.
 - **Serve** — the page, the view files, the schemas, the kind list, the

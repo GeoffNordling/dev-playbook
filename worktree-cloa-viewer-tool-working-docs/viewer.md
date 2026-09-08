@@ -25,9 +25,15 @@ Three fixed regions, none movable in v1:
 
 ## The tree
 
-The tree renders the `index-tree` view file. Directories expand and
-collapse; each entry shows its title, its description, and its word
-count. The unindexed list sits last, marked as such. Clicking a file
+The tree renders the `index-tree` view file in its two groups, headed
+`Concept documents` and `Harness-owned files`. Under the first,
+directories expand and collapse, and each level is told from the next by
+eye, not by hunting for the triangle: a guide line runs down each level,
+and an index row is set heavier than a file row. Each entry shows its
+title and its description, nothing else. A concept document no index
+reaches sits at the end of the first group under a red `Not indexed`
+row, the tree's way of showing the defect okf-lint reports. The second
+group is a flat list by identity. Clicking a file
 opens its CLOA panel: the Reference chain for a runbook, the rules for a
 Standard, the cells for a card. A file with no CLOA kind opens its
 `markdown-file` panel. A panel already open comes to the top of the
@@ -54,10 +60,19 @@ cross-reference.
 
 ## The checkout toggle
 
-The toggle lists the checkouts the server was started with. Switching
-swaps the tree, the panels, and the arrangement to that checkout's
-directory. View files of a checkout the server was not given this run
-stay on disk and off screen.
+The toggle lists every checkout the server discovered
+([Server and Stack](/worktree-cloa-viewer-tool-working-docs/server-and-stack.md#the-command)),
+grouped by repo and labelled by branch, so a main checkout and its
+worktrees sit together. Switching swaps the tree, the panels, and the
+arrangement to that checkout's directory, with nothing to restart. The
+page keeps the choice in its address, so a reload returns to the same
+checkout. The list is discovered again each time the page asks for it,
+which it does on load and after every refresh, so a worktree created or
+removed while the server runs appears or disappears on its own, and a
+branch change shows in the label. Until the arrangement is saved, the
+page keeps each checkout's open panels for its own lifetime, so
+switching away and back finds the room as it was left. View files of a
+checkout the server was not given this run stay on disk and off screen.
 
 ## Refresh
 
@@ -71,8 +86,10 @@ failed generator; clicking it shows the error text.
 The failure rules in the Contract look like this on screen: a red panel
 in the place of a view file that failed validation, naming the file and
 the field; a banner across the top while the connection is lost; a badge
-on a panel whose commit is behind the checkout's HEAD, showing both; and
-a red refresh status for a failed generator.
+on a panel whose commit is behind the checkout's HEAD, showing both; a
+red refresh status for a failed generator; and a red `Not indexed` row
+in the tree. A link badge reading `decision-record` is not a failure and
+is not red: it says the source is immutable and its target has moved on.
 
 ## Acronyms
 

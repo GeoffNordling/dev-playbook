@@ -32,20 +32,28 @@ shown on screen.
 
 ## index-tree
 
-Per checkout. Every tracked markdown file, arranged by the `index.md`
-hierarchy ([Indexes](/standards/knowledge-organization/indexes.md)),
-plus every tracked markdown file no index reaches, in a flagged
-unindexed list. Tracked means what
-[gitrepo.py](/src/dev_playbook/gitrepo.py) lists. Each entry carries its
-identity, its title and description, and its word count; a directory's
-count sums what is below it.
+Per checkout. Every tracked markdown file, in the two groups the
+[File Roles](/standards/knowledge-organization/file-roles.md) guide
+names: **concept documents**, arranged by the `index.md` hierarchy
+([Indexes](/standards/knowledge-organization/indexes.md)), and
+**harness-owned files**, a flat list. Tracked means what
+[gitrepo.py](/src/dev_playbook/gitrepo.py) lists; the group is what
+`classify()` in [md.py](/src/dev_playbook/md.py) answers, the one
+encoding of the boundary, so the tree and okf-lint can never disagree. A
+file that function calls excluded, the `PLAN.md` and `PROGRESS.md` pair,
+has no row and no view file of any kind. A concept document that no
+index reaches is listed under the hierarchy as not indexed and drawn as a
+defect, because okf-lint reports it as one. Each entry carries its
+identity, its title, and its description. There is no word count: how
+big or how complex a document is will be a kind of its own, designed on
+its own, and a summed count is not it.
 
 ## markdown-file
 
-Per subject, one per tracked markdown file. What the file is and what
-touches it: its frontmatter facts, its word count, its headings, its
-links out with whether each resolves, its links in, and the source
-itself as markdown for the page to render. It is the detail behind a
+Per subject, one per tracked markdown file that `classify()` does not
+exclude. What the file is and what touches it: its frontmatter facts,
+its headings, its links out with whether each resolves, its links in,
+and the source itself as markdown for the page to render. It is the detail behind a
 CLOA panel, reached by a button, and the default panel only for a file
 with no CLOA kind.
 
@@ -55,7 +63,13 @@ Citation of this repo
 ([Cross-References](/standards/knowledge-organization/cross-references.md#workspace-path-for-a-stable-location))
 resolves into the checkout like a root-absolute link. A Citation of
 another repo is reported as a citation and not checked: a generator
-reads one checkout, and ref-lint already verifies those targets.
+reads one checkout, and ref-lint already verifies those targets. A link
+out of a numbered decision record whose target is gone is reported as
+`decision-record`, not broken: records are immutable
+([Decision Records](/standards/decisions/records.md)), ref-lint exempts
+them as sources for that reason, and the status names the object as it
+is rather than inventing a word. The predicate that says which files are
+records is shared with ref-lint, never copied.
 
 ## runbook-chain
 

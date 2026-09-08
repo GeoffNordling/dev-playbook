@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: CLOA Viewer
-description: The plan for cloa-viewer, a local visual IDE for one checkout's markdown that shows registered kinds from view files on disk
+description: The plan for cloa-viewer, a local visual IDE for the markdown of every checkout in the workspace that shows registered kinds from view files on disk
 ---
 
 # CLOA Viewer
@@ -14,7 +14,7 @@ deleted before the branch merges
 
 ## Goal
 
-cloa-viewer puts one checkout's markdown on a browser screen at the
+cloa-viewer puts a checkout's markdown on a browser screen at the
 correct level of abstraction, so the user can understand documentation
 that the terminal and the IDE show only as text. The CLOA objects that
 exist today as generated text files nobody opens,
@@ -35,9 +35,11 @@ them. Which tools, and what each shows, is specified under
 [Code legibility](/CANDIDATES.md#code-legibility) in the candidates
 list; the registry names them among the deferred kinds.
 
-The acceptance picture. The user starts the viewer on this checkout. The
-left side shows every tracked markdown file in the `index.md` hierarchy,
-each with its description and word count. The user clicks
+The acceptance picture. The user starts the viewer once, from
+`~/workspace/`, and picks this checkout from the toggle. The left side
+shows every tracked markdown file in the two groups the File Roles guide
+names: concept documents in the `index.md` hierarchy, and harness-owned
+files, each with its description. The user clicks
 `dotfiles/dot-claude/agents/adjudicator.md`: its Reference chain appears,
 the CLOA object itself. A button on that panel opens the file's details,
 its frontmatter facts, its links in and out, and its rendered source, for
@@ -81,7 +83,13 @@ the chain updates within a second.
 - The canonical artifacts stay untouched
   ([Canonical Artifacts](/standards/build/canonical.md)).
 - The viewer reads only the state directory. It never reads a checkout.
-- One checkout is on screen at a time; a toggle switches between them.
+- One checkout is on screen at a time; the toggle switches between every
+  checkout the workspace holds, main checkouts and worktrees alike, from
+  one server that never has to be restarted to change repo or branch.
+- The viewer classifies nothing itself. Which files are concept
+  documents, harness-owned, or excluded, and which link sources are
+  immutable, comes from the same functions the repo's linters use, so the
+  screen and the checks can never disagree.
 - The text views retire. `chains.txt`, `standards.txt`, `cards.txt`, and
   the `scripts/` shims that write them go when their kinds land.
 
@@ -121,41 +129,32 @@ the chain updates within a second.
 
 ## Planned
 
-In build order. The first six items are the vertical slice: disk to
-browser with the two navigation kinds. The three CLOA kinds follow as
-registry entries.
+In build order. The vertical slice is built (see Completed). The room
+comes next, then the three CLOA kinds as registry entries.
 
-- **Package and command** — `src/dev_playbook/cloa_viewer/` with the
-  `cloa-viewer` entry point, its dependencies kept out of what other repos
-  install.
-- **Contract module** — the state directory layout, the envelope schema,
-  write-with-validation, `checkout.json`, and the refresh record.
-- **First two kinds** — `index-tree` and `markdown-file`: schemas,
-  generators on `md.py` and `gitrepo.py`, and generator tests.
-- **Server** — refresh, the checkout watcher, the state watcher, the
-  event stream, and the HTTP routes for the page, view files, schemas,
-  and the arrangement.
-- **Page skeleton** — the Vite project, the event client, schema
-  validation on load, the error panel, the disconnected banner, the top
-  bar, and the checkout toggle.
-- **Tree and file panels** — the two renderers, panel open and close,
-  pinning, and the arrangement saved and restored.
+- **The room** — the tree in the two groups the standard names with an
+  excluded file absent, levels told apart by eye, word counts gone, the
+  `decision-record` link status, and the workspace toggle: discovery of
+  every checkout under `~/workspace/` and a switch between them without
+  a restart.
+- **Pinning and the arrangement** — pin, close others, and the
+  arrangement saved and restored per checkout.
 - **runbook-chain** — chaingen moves into the package as the kind's
   generator; the renderer draws the chain; `chains.txt` and the shim go.
 - **standard** — rulegen moves the same way; `standards.txt` goes.
 - **standard-card** — cardgen moves the same way; `cards.txt` goes.
 - **Docs follow the moves** — the `doc-types/` indexes and pages that
   name the text files and the shims, and `scripts/index.md`.
-- **Front-end checks** — a local pre-commit hook block for the type check
-  and the renderer tests, and a `web` Makefile target that builds the
-  page.
-- **Stale and refresh status** — the stale badge, and the refresh status
-  that turns red on a failed generator.
+- **Stale badge** — the badge on a panel whose commit is behind HEAD.
 
 ## Completed
 
 - **Design settled** — the decisions this set records, reached in one
   design session on 2026-09-08.
+- **Vertical slice** — loop 1, 2026-09-08: the package and command, the
+  contract module, `index-tree` and `markdown-file`, the server with
+  refresh and both watchers and the event stream, the page skeleton, the
+  tree and file panels, the front-end checks, and the red refresh status.
 
 ## Acronyms
 
