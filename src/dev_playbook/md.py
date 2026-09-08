@@ -65,6 +65,13 @@ ROOTLESS_SEGMENTS = {"skills", "rules", "agents"}
 # The one file the harness injects by name rather than by directory.
 INJECTED_CONTEXT_FILE = "CLAUDE.md"
 
+# The directory holding the numbered Decision Records, and the name shape of a
+# record in it: NNNN-slug.md. Both live here, beside is_decision_record, because
+# more than one caller needs the same test; the scope is docs/decisions/, so
+# standards/decisions/ — the contract, not the records — is untouched by it.
+RECORDS_DIR = ("docs", "decisions")
+RECORD_NAME = re.compile(r"^\d+-.+\.md$")
+
 
 class UnclosedFence(ValueError):
     """A fenced code block that nothing ever closes.
@@ -288,6 +295,21 @@ def classify(relpath: str) -> str:
     if "skills" in dirparts and ({"references", "scripts"} & set(dirparts)):
         return "harness"
     return "concept"
+
+
+def is_decision_record(relpath: str) -> bool:
+    """True for a numbered Decision Record — ``docs/decisions/NNNN-slug.md``.
+
+    A numbered record is immutable, so its outbound references are accepted
+    staleness: ``ref-lint`` skips one as a source, and the viewer's
+    ``markdown-file`` kind badges a link out of one ``decision-record`` rather
+    than ``broken``. The two callers decide it here so the check and the screen
+    can never disagree.
+    """
+    parts = PurePosixPath(relpath).parts
+    return parts[: len(RECORDS_DIR)] == RECORDS_DIR and bool(
+        RECORD_NAME.match(parts[-1])
+    )
 
 
 def find_files(root: Path) -> list[Path]:

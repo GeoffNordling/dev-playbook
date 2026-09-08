@@ -196,6 +196,17 @@ class TestClassify:
         assert md.classify(relpath) == kind
 
 
+class TestIsDecisionRecord:
+    def test_a_numbered_record_is_a_decision_record(self) -> None:
+        assert md.is_decision_record("docs/decisions/0007-choose.md") is True
+
+    def test_the_records_index_is_not_a_decision_record(self) -> None:
+        assert md.is_decision_record("docs/decisions/index.md") is False
+
+    def test_another_decisions_directory_holds_no_records(self) -> None:
+        assert md.is_decision_record("standards/decisions/0007-choose.md") is False
+
+
 class TestHasFixedRepoRoot:
     def test_roster_is_exactly_the_three_rootless_segments(self) -> None:
         expected = {"skills", "rules", "agents"}

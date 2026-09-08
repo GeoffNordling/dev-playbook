@@ -223,17 +223,24 @@ the design later. You do not resolve it by editing the design.
 - **Vite writes `dist/index.html`, `dist/assets/index-<hash>.js`, and
   `dist/assets/index-<hash>.css`.** `build_app` serves `/` and mounts
   `/assets`, so a new asset needs no server change.
-- **ref-lint's records policy today.** `scripts/ref-lint` lines 64–113 hold
+- **ref-lint's records policy today.** ~~`scripts/ref-lint` lines 64–113 hold
   `RECORDS_DIR = ("docs", "decisions")`, `_RECORD_NAME = re.compile(r"^\d+-.+\.md$")`,
   `_VALIDATED_RECORDS_FILES`, `UnclassifiedRecordsFile`, and
   `source_files(repo_root)`, which skips a numbered record as a source
   ("immutable, accepted staleness"). ref-lint already does `from dev_playbook import md`
   and is tested by `tests/test_ref_lint.py`, which must stay green when task
-  1 moves the predicate.
+  1 moves the predicate.~~ Done in task 1: `md.RECORDS_DIR`,
+  `md.RECORD_NAME`, and `md.is_decision_record(relpath)` are the one home;
+  ref-lint reads `md.RECORDS_DIR` and calls the predicate, and no longer
+  imports `re`. Task 2 calls `md.is_decision_record(source)`.
+- **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
+  (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
+  a different need from the boolean predicate and is out of scope for this
+  loop — do not touch it.
 
 ## Tasks
 
-- [ ] **Task 1: the decision-record predicate, shared.** In
+- [x] **Task 1: the decision-record predicate, shared.** In
   `src/dev_playbook/md.py`, in the constants block, add
   `RECORDS_DIR = ("docs", "decisions")` and
   `RECORD_NAME = re.compile(r"^\d+-.+\.md$")`, and beside `classify` add
