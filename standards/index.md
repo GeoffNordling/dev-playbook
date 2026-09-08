@@ -13,7 +13,6 @@ alphabetical; directories last.
 - [Decision Records](/standards/decisions.md) — Governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, immutability, and status vocabulary
 - [Distribution](/standards/distribution.md) — Governs how dev-playbook's checks reach the governed repos — the published hook, the roster, dogfooding, and the pinned rev
 - [Harness Files](/standards/harness.md) — Governs how the files Claude Code loads are written — a CLAUDE.md's content and a runbook's format
-- [Instruments](/standards/instrument.md) — Governs how purpose-built devices — artifact formats with tooling — are specified and kept conformant
 - [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and working documentation sets
 - [Module Design](/standards/modules.md) — Governs how modules are designed — interfaces, depth, and seams
 - [Prose](/standards/prose.md) — Governs how prose is written in every workspace document — voice, structure, and brevity
@@ -23,7 +22,6 @@ alphabetical; directories last.
 - [Tracking](/standards/tracking.md) — Governs how work is tracked — candidates, issue shapes, the label scheme, and repository settings
 - [Decision Record Conventions](/standards/decisions/records.md) — How a Decision Record is written, from the bar that warrants one and the directory that holds it to its scope, template, date, numbering, immutability, status vocabulary, optional sections, and the pin on an external-convention evaluation
 - [Distribution Channel](/standards/distribution/channel.md) — How dev-playbook's checks reach the governed repos — the one published hook, the roster, a publisher's local block, and a consumer's pinned rev
-- [Instruments and Instrument Specs](/standards/instrument/format.md) — What an instrument is and the Instrument Spec contract every instrument carries
 - [Module Design Conventions](/standards/modules/design.md) — The deep-module contract — depth, the deletion test, the seam rules, and the port at a process boundary
 - [Python Style](/standards/python/style.md) — How a Python file is written — empty initializers, docstrings, fail-loud values, statement order, banned future imports, helper shape, formatting, and annotations
 - [Shell Conventions](/standards/shell/conventions.md) — How a shell file is written — the glue boundary, strict mode, declared bash, the shellcheck and shfmt bars, and what a sourced fragment carries

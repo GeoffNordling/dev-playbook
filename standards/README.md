@@ -29,7 +29,6 @@ governs lives wherever that population naturally lives:
 |---|---|
 | `build/` | every repo tree in the workspace |
 | `harness/` | the harness files in every repo |
-| `instrument/` | the specs in `instruments/` |
 | `standard/` | the cards in this very directory |
 
 The last row is the one loop: the meta-standard's population is the cards
@@ -38,7 +37,6 @@ governance hierarchy. It is not — everything here is under the
 meta-standard **in form only** (the card format), while each standard's
 substance governs its own population, one rung down. A rejection always
 cites exactly one rung up: a bad Makefile is rejected by `build/`, never by
-`standard/`; an unspecced device by `instrument/format.md`, never
-by a datasheet spec.
+`standard/`.
 
 The full catalog is [`index.md`](/standards/index.md).

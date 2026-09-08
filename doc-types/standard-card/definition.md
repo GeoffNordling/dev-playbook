@@ -30,10 +30,7 @@ card's.
 
 Not everything normative is a standard. A device built to serve a purpose
 — an artifact format, a tool, a template — is an answer, so it belongs
-inside a cell rather than in the catalog. Such devices are **instruments**;
-each carries a prescriptive contract of its own, typed `Instrument-Spec`.
-The instrument concept is defined in
-[Instruments and Instrument Specs](/standards/instrument/format.md).
+inside a cell rather than in the catalog.
 
 ## Scope
 

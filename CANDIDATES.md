@@ -67,8 +67,6 @@ description: Uncommitted future work — described, not yet promoted to issues
   the two regions and the moves between them become a Guide where they are,
   and the `gh` mechanics move into the review runbooks
   ([0027](/docs/decisions/0027-registry-refactor-rulings.md)).
-- **Instruments remade** — the instruments are due for a redesign; nothing
-  new is built on their current form until then.
 - **The inheritance pattern's home** — dev-playbook declares a system once,
   consumers inherit it, a repo declares only what is local; this is stated
   per system in `CLAUDE.md`, the Standard doc-type's Scope, and Document
@@ -106,10 +104,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   takes several corrective passes before it reads well; every pass is a
   chance to codify rules, procedures, and algorithms for writing the next
   one correctly, and no flywheel exists today.
-- **OKF graphs and traces** — the
-  [file-graph](/instruments/file-graph.md) instrument already renders the
-  corpus as a force graph; lean on it and on OKF views generally to
-  understand the system. "OKF trace" has no definition; decide whether a
+- **OKF traces** — "OKF trace" has no definition; decide whether a
   trace is the Reference chain `scripts/chaingen` draws or something more.
 
 ## Code legibility

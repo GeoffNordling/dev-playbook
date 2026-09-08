@@ -124,20 +124,6 @@
   ├─does────► [commit] Skill
   └─reports─► outcome: str    what was committed, the one at-risk item from step 2 if there was one, and a plain ready verdict
 
-[datasheet] Skill · model: opus, effort: xhigh
-  ├─args────► subject
-  ├─args────► scope
-  ├─reads───► datasheet.md    end-to-end, before anything else
-  ├─reads───► datasheet-example.html    end-to-end, before anything else
-  ├ ╌ reports ╌ ► outcome: str    exactly what is needed    if either is missing or ambiguous
-  ├ ╌ reports ╌ ► outcome: str    the overlap    if the new manifest overlaps another subject's manifest
-  ├─writes──► scratch    a self-ignoring `.datasheet/` directory
-  ├ ╌ does ╌ ► [griffe-outline] Script    over each package in scope, appending its outline to the scratch directory    if the scope holds a Python package
-  ├─writes──► local file    the sheet to `readings/datasheet/<subject>.html`
-  ├─does────► [check_datasheet.py] Script    against the sheet, from this skill's base directory
-  ├ ╌ reports ╌ ► outcome: str    why the sheet is nonconformant    if a contract rule cannot be satisfied
-  └─reports─► outcome: str    the sheet path, the checker's one-line summary, and the Behavior labels used
-
 [design] Skill · model: inherit, effort: xhigh
   ├─args────► issue
   ├─reads───► [design] Standard

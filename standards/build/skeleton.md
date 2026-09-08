@@ -116,8 +116,6 @@ Standard that owns the content:
   document.
 - `docs/decisions/` — Decision Records
   ([Decision Record Conventions](/standards/decisions/records.md)).
-- `readings/` — instrument output, one subdirectory per instrument
-  ([Instruments and Instrument Specs](/standards/instrument/format.md)).
 - `.claude/` — Claude Code files ([Harness Files](/standards/harness/index.md));
   `worktrees/` under it is gitignored.
 

@@ -40,7 +40,6 @@ and its shape is Type Registry's rule. Alphabetical by type name.
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
 | `Guide` | An explanation of a process or a system, read to understand it; never cited to reject work. |
-| `Instrument-Spec` | The prescriptive contract for an instrument — a purpose-built artifact format with tooling, employed by standards but never a standard itself; implementations must satisfy it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
