@@ -49,6 +49,14 @@ itself as markdown for the page to render. It is the detail behind a
 CLOA panel, reached by a button, and the default panel only for a file
 with no CLOA kind.
 
+A link out carries its identity when it names something in the checkout,
+so the page opens the target without resolving a path itself. A
+Citation of this repo
+([Cross-References](/standards/knowledge-organization/cross-references.md#workspace-path-for-a-stable-location))
+resolves into the checkout like a root-absolute link. A Citation of
+another repo is reported as a citation and not checked: a generator
+reads one checkout, and ref-lint already verifies those targets.
+
 ## runbook-chain
 
 Per subject, one per runbook, an agent definition or a skill. The

@@ -166,7 +166,11 @@ the design later. You do not resolve it by editing the design.
   cross-repo target. The rule is the plan's, and correct as written — the target
   names no path in this checkout — but the panel cannot tell a citation from a
   dead link. Telling them apart is a fourth status and so a design change, for
-  the user to settle, not a later task to assume.
+  the user to settle, not a later task to assume. Settled by the user on
+  2026-09-08 and carried out by task 12: a same-repo Citation resolves into the
+  checkout, a cross-repo Citation is the status `citation`, and a
+  `~/.claude/...` target stays `broken`, because the tracked copy under
+  `dotfiles/dot-claude/` is the one the viewer shows.
 - **`refresh` reads the registry at call time.** Task 5 built
   `dev_playbook.cloa_viewer.refresh.refresh(checkout)`, the only thing that
   writes a checkout directory. It does `from dev_playbook.cloa_viewer import
@@ -527,14 +531,66 @@ the design later. You do not resolve it by editing the design.
   Register the kind in `src/kinds/index.ts`. `make web` succeeds; gate
   green.
 
-- [ ] **Task 12: the file panel and the Playwright test.** Create
+- [ ] **Task 12: citation links and link identities.** The cross-reference
+  standard ([Cross-References](/standards/knowledge-organization/cross-references.md))
+  writes a reference to another repo as a Citation,
+  `~/workspace/<repo>/<path>`, and a reference from a skill, rule, or agent
+  definition to its own repo in the same form. Task 4 scores both `broken`.
+  The user settled the rule: a same-repo Citation resolves into the checkout
+  like a `/` link; a cross-repo Citation is a fourth status, `citation`,
+  never checked, because a generator reads one checkout and `ref-lint`
+  already verifies those targets on disk; a `~/.claude/...` target stays
+  `broken`. The same task gives every link its identity, which the contract
+  requires of any payload field that names a thing in the checkout and
+  which the file panel needs to open a linked file without resolving paths
+  in the browser. In `identity.py`: add `WORKSPACE_PREFIX = "~/workspace/"`
+  and `citation_repo(target: str) -> str | None`, the `<repo>` segment when
+  the target starts with the prefix, else `None`; give `resolve_target` a
+  third parameter `repo: str`, the checkout's canonical repo name; when
+  `citation_repo(target) == repo`, the identity is the path after
+  `~/workspace/<repo>/`, normalized, fragment dropped; when it names another
+  repo, raise `ValueError(f"{target}: a citation of another repo has no identity in this checkout")`,
+  because an index that lists another repo's file is a defect the refresh
+  record should name. In `kinds/markdown_file.py`: `generate` computes
+  `repo = canonical_repo_name(checkout)` (from `dev_playbook.gitrepo`) once
+  and passes it down; a link object becomes `{target, status, identity}`,
+  where `identity` is the resolved identity for `ok` and `broken` and `null`
+  for `external` and `citation`; `_status` answers `external` first as now,
+  then `citation` when `citation_repo(target)` is a repo other than `repo`,
+  then `ok` or `broken` by identity as now; `links_in` counts a same-repo
+  Citation that resolves `ok` like any other link. In `kinds/index_tree.py`:
+  pass `repo` to `resolve_target`; nothing else changes. Schema: the link
+  object gains required `identity` (`["string", "null"]`), the `status`
+  enum gains `citation`, and the description names the four cases;
+  `kind_version` stays 1, since no view file of this kind has shipped.
+  Fixture: in `tests/cloa_viewer_fixtures.py` append to `alpha.md`'s body,
+  after `Four five.\n`, the line
+  `\nSee [beta again](~/workspace/fixture/docs/beta.md#beta) and [afar](~/workspace/elsewhere/notes.md).\n`
+  (the fixture repo's canonical name is `fixture`, the directory
+  `build_checkout` creates); alpha's `words` becomes 18 and the root sum
+  58 in `kinds/test_index_tree.py`. Tests: in `kinds/test_markdown_file.py`
+  every `links_out` expectation gains its `identity`, and `alpha.md`'s
+  becomes, in order, `/docs/beta.md` `ok` `docs/beta.md`; `/missing.md`
+  `broken` `missing.md`; `~/workspace/fixture/docs/beta.md#beta` `ok`
+  `docs/beta.md`; `~/workspace/elsewhere/notes.md` `citation` `null`;
+  `docs/beta.md`'s `links_in` stays `["alpha.md", "docs/index.md"]`. New
+  `tests/dev_playbook/cloa_viewer/test_identity.py` with three literal
+  cases: `resolve_target("a.md", "~/workspace/fixture/docs/b.md#x", "fixture") == "docs/b.md"`,
+  `resolve_target("a.md", "/docs/b.md", "fixture") == "docs/b.md"`, and
+  `resolve_target("a.md", "~/workspace/other/b.md", "fixture")` raising
+  `ValueError`. Before the commit, smoke-run the kind on this checkout and
+  record in the PROGRESS line the counts of `ok`, `external`, `citation`,
+  and `broken` across all views (before this task: 711, 20, 0, 195). Gate
+  green.
+
+- [ ] **Task 13: the file panel and the Playwright test.** Create
   `src/kinds/markdown-file/MarkdownFile.tsx`: a facts row (`type`, `words`,
   heading count), a `Headings` list indented by level, `Links out` as a
-  list with the status shown as a badge (`ok`, `broken`, `external`),
-  `Links in` as a list, then the source rendered with `markdown-it`
-  (`html: false`). A link in `Links out` or `Links in` whose target is a
-  markdown file with a view in the store opens that file's panel. Register
-  the kind. Then in `tests/dev_playbook/cloa_viewer/test_cli.py` add
+  list with the status shown as a badge (`ok`, `broken`, `external`,
+  `citation`), `Links in` as a list, then the source rendered with
+  `markdown-it` (`html: false`). A `Links out` entry whose `identity` has a
+  view in the store, and every `Links in` entry with one, opens that file's
+  panel; the browser resolves no paths itself. Register the kind. Then in `tests/dev_playbook/cloa_viewer/test_cli.py` add
   `test_page_shows_tree_and_updates(checkout, page, tmp_path, monkeypatch)`:
   fail immediately with the message `run make web first` if
   `dist/index.html` is missing; pick a free port with a bound socket;
