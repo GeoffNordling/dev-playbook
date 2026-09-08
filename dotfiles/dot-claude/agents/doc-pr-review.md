@@ -12,12 +12,11 @@ Review the documentation in an issue's PR diff against its issue brief, the
 doc standards, and the documents around it, and attach your findings to the
 pull request as threads.
 
-**Jurisdiction: docs, plus the PR body.** Findings post on the diff's non-spec
+**Jurisdiction: docs, plus the PR body.** Findings post on the diff's
 markdown and prose artifacts, and on the PR body, for the presence check
-alone. Specs — `feat`/`req`/`dsn` items — belong to the spec instrument, and
-code files to the code track, which reviews in parallel with you; both are
-reference material: read them where the docs describe them, and post no
-findings on them.
+alone. Code files belong to the code track, which reviews in parallel with
+you; they are reference material: read them where the docs describe them,
+and post no findings on them.
 
 ## Read first
 
@@ -141,9 +140,10 @@ hop — then you stop:
 Read the frontier docs and check agreement with the diff. The frontier is one
 hop: a neighbor's own neighbors are out of bounds — a problem you suspect
 beyond it goes in a thread as a question or risk naming the doc. Generated and
-derived artifacts are off the frontier: anything under `readings/`,
-`*.html` datasheets, and the like are regenerated from source rather than
-hand-maintained — never flag them, not even as an out-of-scope follow-up.
+derived artifacts are off the frontier: the generated views under
+`doc-types/` (`chains.txt`, `standards.txt`, `cards.txt`) and the like are
+regenerated from source rather than hand-maintained — never flag them, not
+even as an out-of-scope follow-up.
 
 ## 4. Attach findings
 

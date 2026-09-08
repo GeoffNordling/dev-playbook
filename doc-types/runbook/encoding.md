@@ -134,7 +134,7 @@ span requires a fenced git command block in the same step, and span
 and block must agree.
 
 ```
-{Write to scratch a self-ignoring `.datasheet/` directory}
+{Write to scratch a self-ignoring `.outline/` directory}
 
   ├─writes──► scratch
 ```

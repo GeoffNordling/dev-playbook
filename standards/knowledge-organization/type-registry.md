@@ -51,5 +51,5 @@ sibling consumers.
 
 A row carries the type's name and its cell, and nothing else: the
 per-type constraints upstream types impose, `resource` on
-`Recipe-Description` or `## Employed by` on `Instrument-Spec`, stay
-hardcoded upstream, and a local type declares none.
+`Recipe-Description` for one, stay hardcoded upstream, and a local type
+declares none.

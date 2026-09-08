@@ -24,10 +24,6 @@ harness                 define   /standards/harness/runbook-conventions.md
 harness                 audit    /scripts/harness-files-lint
 harness                 enforce  commit gate
 harness                 adopt    /dotfiles/dot-claude/skills/runbook-creator/SKILL.md
-instrument              define   /standards/instrument/format.md
-instrument              audit    /scripts/okf-lint
-instrument              enforce  commit gate
-instrument              adopt    none
 knowledge-organization  define   /standards/knowledge-organization/document-types.md
 knowledge-organization  define   /standards/knowledge-organization/type-registry.md
 knowledge-organization  define   /standards/knowledge-organization/indexes.md

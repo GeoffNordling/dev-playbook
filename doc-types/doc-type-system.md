@@ -34,7 +34,6 @@ rows with one or two files last.
 | Decision-Record | decision records | Pending — the first run of the doc-type build loop ([#474](https://github.com/GeoffNordling/dev-playbook/issues/474)) |
 | General-Sheet | — | Pending; its replacement is an open question ([Candidates](/CANDIDATES.md)) |
 | Guide | guides | Important; no doc-type built yet |
-| Instrument-Spec | instruments | Pending; the instruments are to be remade first ([Candidates](/CANDIDATES.md)) |
 | Log | logs | Pending; the user's to rule |
 | README | readmes | Pending |
 | Recipe-Description | recipes | Pending |
