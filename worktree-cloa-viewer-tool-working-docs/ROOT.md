@@ -136,8 +136,9 @@ the chain updates within a second.
 How the user and the agent design a panel together. These bind the
 design sessions, not the code.
 
-- Design happens in the terminal, as Unicode sketches, or at most a
-  quick SVG. A sketch is judged in the turn it appears and then dropped.
+- Design happens in the terminal, as Unicode sketches. The most a turn
+  adds is one static SVG, fake data and no script, that the user opens in
+  the browser. A sketch is judged in the turn it appears and then dropped.
 - No prototype is built inside the design loop. A detailed build, a mock
   over real data or a renderer, goes to a dedicated subagent or a loop
   and takes the time it takes.
