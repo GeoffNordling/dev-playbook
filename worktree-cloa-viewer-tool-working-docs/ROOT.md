@@ -16,8 +16,8 @@ deleted before the branch merges
 
 cloa-viewer puts a checkout's markdown on a browser screen at the
 correct level of abstraction, so the user can understand documentation
-that the terminal and the IDE show only as text. The CLOA objects that
-exist today as generated text files nobody opens,
+that the terminal and the IDE show only as text. The CLOA objects, which
+exist on disk today only as first-pass text approximations nobody opens,
 [chains.txt](/doc-types/runbook/chains.txt),
 [standards.txt](/doc-types/standard/standards.txt), and
 [cards.txt](/doc-types/standard-card/cards.txt), become panels the user
@@ -72,6 +72,32 @@ the chain updates within a second.
 - **Code views are applied, not invented.** A code kind wraps an existing
   tool's output. The registry entry is the adapter and the renderer; the
   analysis is the tool's.
+- **The objects are already defined; the viewer only draws them.** A
+  CLOA object is defined by its doc-type pages under `doc-types/`, the
+  contract shape above all. A panel uses the object's own primitives and
+  the object's own terms, and mints neither: a runbook panel says edge,
+  node, bucket, condition, and never a word the
+  [Reference chain](/doc-types/runbook/contract-shape.md) does not. A
+  panel that needs a primitive the shape lacks is a change to the object,
+  a separate work stream agreed with the user before it starts. The
+  generated text files, `chains.txt` and its two siblings, were first-pass
+  approximations of the objects and constrain nothing. How an object
+  draws is the renderer's to decide, which the doc-type itself says
+  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)), so the
+  drawing rules are stated here, in the kind's registry entry, and the
+  meaning they draw is the doc-type's.
+- **Greenfield inside the definition.** What the definition does not
+  prohibit is allowed. Stitching a chain into the chains its do-edges
+  name is one such move: the contract shape describes it and no text file
+  ever drew it. When it is unclear whether a move draws the object or
+  changes it, the user decides.
+- **Design like a visual designer.** A panel follows data visualization
+  practice. Each visual channel, hue, shape, line style, position, carries
+  one variable of the object and means the same thing on every panel of
+  that kind. A channel that carries nothing is not used. A shape always
+  has its word beside it. Red is reserved for defects. The facts a reader
+  needs first, a runbook's signature and its effects, sit where the eye
+  lands first.
 
 ## Constraints
 
