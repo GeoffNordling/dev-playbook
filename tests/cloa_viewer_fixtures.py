@@ -1,8 +1,9 @@
 """The one fixture checkout every cloa-viewer suite reads.
 
 Five markdown files: a root index listing a document and a directory, that
-document with frontmatter and two links, a docs index listing one document,
-that document, and an orphan no index reaches.
+document with frontmatter and four links — one resolving, one broken, a
+Citation of this repo and a Citation of another — a docs index listing one
+document, that document, and an orphan no index reaches.
 
 It sits here, beside ``transcript_fakes``, rather than in a ``conftest.py``
 under ``tests/dev_playbook/cloa_viewer/``. A second ``conftest.py`` anywhere
@@ -44,6 +45,9 @@ FILES = {
         "## Second heading\n"
         "\n"
         "Four five.\n"
+        "\n"
+        "See [beta again](~/workspace/fixture/docs/beta.md#beta) and "
+        "[afar](~/workspace/elsewhere/notes.md).\n"
     ),
     "docs/index.md": (
         "# docs — index\n"

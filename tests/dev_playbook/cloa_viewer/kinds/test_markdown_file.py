@@ -90,8 +90,18 @@ def test_a_heading_carries_its_level_text_and_slug(checkout: Path) -> None:
 
 def test_a_link_out_is_ok_when_the_checkout_holds_its_target(checkout: Path) -> None:
     assert payloads_of(checkout)["alpha.md"]["links_out"] == [
-        {"target": "/docs/beta.md", "status": "ok"},
-        {"target": "/missing.md", "status": "broken"},
+        {"target": "/docs/beta.md", "status": "ok", "identity": "docs/beta.md"},
+        {"target": "/missing.md", "status": "broken", "identity": "missing.md"},
+        {
+            "target": "~/workspace/fixture/docs/beta.md#beta",
+            "status": "ok",
+            "identity": "docs/beta.md",
+        },
+        {
+            "target": "~/workspace/elsewhere/notes.md",
+            "status": "citation",
+            "identity": None,
+        },
     ]
 
 
@@ -126,11 +136,11 @@ def test_a_link_off_the_checkout_or_back_to_the_file_is_not_broken(
     link_shapes: dict[str, Any],
 ) -> None:
     assert link_shapes["notes.md"]["links_out"] == [
-        {"target": "https://example.com", "status": "external"},
-        {"target": "mailto:a@b.c", "status": "external"},
-        {"target": "#notes", "status": "ok"},
-        {"target": "partner.md", "status": "ok"},
-        {"target": "other.md", "status": "broken"},
+        {"target": "https://example.com", "status": "external", "identity": None},
+        {"target": "mailto:a@b.c", "status": "external", "identity": None},
+        {"target": "#notes", "status": "ok", "identity": "notes.md"},
+        {"target": "partner.md", "status": "ok", "identity": "partner.md"},
+        {"target": "other.md", "status": "broken", "identity": "other.md"},
     ]
 
 

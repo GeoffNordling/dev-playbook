@@ -328,6 +328,27 @@ the design later. You do not resolve it by editing the design.
   task 13's test must respect: `.tree-row` filtered by `has_text="Doc-Types"`
   matched the *directory* row `doc-types/ — index` and collapsed it instead of
   opening a panel. Match a row by an exact string, or by index.
+- **A link out is a `Link`, and only `ok` or `broken` carries an identity.**
+  Task 12 made the link object a `TypedDict` in `kinds/markdown_file.py` —
+  `target`, `status`, `identity` — because `identity` is `str | None` and mypy
+  cannot narrow a `dict[str, str]`. `_links_in` reads `link["identity"]` rather
+  than resolving the target a second time. `identity.resolve_target` now takes
+  a third positional parameter, the checkout's canonical repo name, so both
+  kinds pass one down: `markdown_file.generate` and `index_tree.generate` each
+  call `gitrepo.canonical_repo_name(checkout)` once, and `_directory_node`
+  carries it through the walk. A Citation of another repo makes
+  `resolve_target` **raise**, which is right for a link out (`_link` answers
+  `citation` before it ever resolves) but would abort the whole tree if an
+  `index.md` listed one; no index in this checkout does, and the refresh record
+  naming that failure is the intended behaviour.
+- **The citation rule cut this checkout's broken links by three quarters.**
+  Measured after task 12 across all 202 `markdown-file` views: 858 `ok`, 20
+  `external`, 5 `citation`, 45 `broken`, against 711/20/0/195 before. The 45
+  are real: about half are `~/.claude/...` targets, which stay broken on
+  purpose because the tracked copy under `dotfiles/dot-claude/` is the one the
+  viewer shows, and the rest are same-repo Citations of files that are genuinely
+  gone (`~/workspace/dev-playbook/standards/workflow.md` and
+  `standards/repo-documentation.md`, four references each).
 - **The Chrome extension was not connected in task 11's session.** The smoke
   run went through `playwright.sync_api` in a scratchpad script instead, which
   works with no extension and is what task 13 uses anyway. Start the server as
@@ -611,7 +632,7 @@ the design later. You do not resolve it by editing the design.
   Register the kind in `src/kinds/index.ts`. `make web` succeeds; gate
   green.
 
-- [ ] **Task 12: citation links and link identities.** The cross-reference
+- [x] **Task 12: citation links and link identities.** The cross-reference
   standard ([Cross-References](/standards/knowledge-organization/cross-references.md))
   writes a reference to another repo as a Citation,
   `~/workspace/<repo>/<path>`, and a reference from a skill, rule, or agent

@@ -13,12 +13,12 @@ links first, so the walk is two passes over one read of the checkout.
 
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 from dev_playbook.cloa_viewer import state
 from dev_playbook.cloa_viewer.entry import Kind, View
-from dev_playbook.cloa_viewer.identity import is_external, resolve_target
-from dev_playbook.gitrepo import git_files
+from dev_playbook.cloa_viewer.identity import citation_repo, is_external, resolve_target
+from dev_playbook.gitrepo import canonical_repo_name, git_files
 from dev_playbook.md import (
     github_slug,
     lines_outside_fences,
@@ -33,6 +33,19 @@ ANCHOR_PREFIX = "#"
 # An ATX heading: the hashes say the level, the rest is the text the slug and
 # the panel show.
 HEADING_PATTERN = re.compile(r"^(#{1,6}) (.+)$")
+
+
+class Link(TypedDict):
+    """One link out: as the document writes it, whether it resolves, and what it names.
+
+    ``identity`` is the file the target names in this checkout, and is null for
+    a link that names none — an ``external`` one, or a ``citation`` of another
+    repo — so the page opens a target without resolving a path itself.
+    """
+
+    target: str
+    status: str
+    identity: str | None
 
 
 def _headings(body: str) -> list[dict[str, Any]]:
@@ -54,7 +67,7 @@ def _headings(body: str) -> list[dict[str, Any]]:
     return headings
 
 
-def _target_identity(source: str, target: str) -> str:
+def _target_identity(source: str, target: str, repo: str) -> str:
     """The identity ``target`` names, read from the file at identity ``source``.
 
     A target that is a bare ``#anchor`` names the file it sits in: it carries no
@@ -63,17 +76,28 @@ def _target_identity(source: str, target: str) -> str:
     """
     if target.startswith(ANCHOR_PREFIX):
         return source
-    return resolve_target(source, target)
+    return resolve_target(source, target, repo)
 
 
-def _status(source: str, target: str, tracked: set[str]) -> str:
-    """Whether a link leaves the checkout, lands on a file in it, or breaks."""
+def _link(source: str, target: str, tracked: set[str], repo: str) -> Link:
+    """One link out: whether it leaves the checkout, lands in it, or breaks.
+
+    A Citation of another repo is the status ``citation`` and is never checked:
+    a generator reads one checkout, and ``ref-lint`` already verifies those
+    targets on disk. A Citation of ``repo`` is a link into this checkout like
+    any other, so it scores ``ok`` or ``broken`` by the file it names.
+    """
     if is_external(target):
-        return "external"
-    return "ok" if _target_identity(source, target) in tracked else "broken"
+        return {"target": target, "status": "external", "identity": None}
+    citation = citation_repo(target)
+    if citation is not None and citation != repo:
+        return {"target": target, "status": "citation", "identity": None}
+    identity = _target_identity(source, target, repo)
+    status = "ok" if identity in tracked else "broken"
+    return {"target": target, "status": status, "identity": identity}
 
 
-def _links_out(source: str, body: str, tracked: set[str]) -> list[dict[str, str]]:
+def _links_out(source: str, body: str, tracked: set[str], repo: str) -> list[Link]:
     """Every link the file makes, in reading order, each with its status.
 
     The target is kept as the document writes it, not as it resolves, because
@@ -82,22 +106,23 @@ def _links_out(source: str, body: str, tracked: set[str]) -> list[dict[str, str]
     links = []
     for _, line in lines_outside_fences(body):
         for _text, target in markdown_links(line):
-            links.append({"target": target, "status": _status(source, target, tracked)})
+            links.append(_link(source, target, tracked, repo))
     return links
 
 
-def _links_in(outbound: dict[str, list[dict[str, str]]]) -> dict[str, list[str]]:
+def _links_in(outbound: dict[str, list[Link]]) -> dict[str, list[str]]:
     """For each subject, the sorted identities of the files that link to it.
 
-    Only a resolving link counts, and only from another file: a document's own
-    ``#anchor`` links point at itself and are not links in.
+    Only a resolving link counts, and only such a link carries an identity;
+    and only from another file, because a document's own ``#anchor`` links
+    point at itself and are not links in.
     """
     inbound: dict[str, set[str]] = {identity: set() for identity in outbound}
     for source, links in outbound.items():
         for link in links:
-            if link["status"] != "ok":
+            target = link["identity"]
+            if link["status"] != "ok" or target is None:
                 continue
-            target = _target_identity(source, link["target"])
             if target != source and target in inbound:
                 inbound[target].add(source)
     return {identity: sorted(sources) for identity, sources in inbound.items()}
@@ -106,6 +131,7 @@ def _links_in(outbound: dict[str, list[dict[str, str]]]) -> dict[str, list[str]]
 def generate(checkout: Path) -> list[View]:
     """One ``markdown-file`` view for every tracked markdown file in ``checkout``."""
     tracked = set(git_files(checkout))
+    repo = canonical_repo_name(checkout)
     subjects = sorted(
         relpath for relpath in tracked if relpath.endswith(MARKDOWN_SUFFIX)
     )
@@ -117,7 +143,7 @@ def generate(checkout: Path) -> list[View]:
         identity: parse_frontmatter(sources[identity]) for identity in subjects
     }
     outbound = {
-        identity: _links_out(identity, documents[identity][1], tracked)
+        identity: _links_out(identity, documents[identity][1], tracked, repo)
         for identity in subjects
     }
     inbound = _links_in(outbound)

@@ -18,7 +18,7 @@ from typing import Any
 from dev_playbook.cloa_viewer import state
 from dev_playbook.cloa_viewer.entry import Kind, View
 from dev_playbook.cloa_viewer.identity import is_external, resolve_target
-from dev_playbook.gitrepo import git_files
+from dev_playbook.gitrepo import canonical_repo_name, git_files
 from dev_playbook.md import lines_outside_fences, markdown_links, parse_frontmatter
 
 KIND_NAME = "index-tree"
@@ -107,13 +107,14 @@ def _listing_targets(body: str) -> list[str]:
 
 
 def _directory_node(
-    checkout: Path, identity: str, tracked: set[str], reached: set[str]
+    checkout: Path, identity: str, tracked: set[str], reached: set[str], repo: str
 ) -> dict[str, Any]:
     """One directory row and everything its ``index.md`` lists, in listing order.
 
     ``identity`` ends in ``/``, and is ``""`` for the checkout root.
     ``reached`` collects every identity the walk touches; what is left over is
-    the unindexed list.
+    the unindexed list. ``repo`` is the checkout's canonical repo name, which
+    tells a Citation of this repo from a Citation of another one.
     """
     index = identity + INDEX_FILE
     name = PurePosixPath(identity).name if identity else checkout.name
@@ -133,10 +134,12 @@ def _directory_node(
     for target in _listing_targets(body):
         if is_external(target):
             continue
-        child = resolve_target(index, target)
+        child = resolve_target(index, target, repo)
         if child.endswith(f"/{INDEX_FILE}"):
             children.append(
-                _directory_node(checkout, child[: -len(INDEX_FILE)], tracked, reached)
+                _directory_node(
+                    checkout, child[: -len(INDEX_FILE)], tracked, reached, repo
+                )
             )
         else:
             reached.add(child)
@@ -156,7 +159,9 @@ def generate(checkout: Path) -> list[View]:
         relpath for relpath in git_files(checkout) if relpath.endswith(MARKDOWN_SUFFIX)
     }
     reached: set[str] = set()
-    root = _directory_node(checkout, "", tracked, reached)
+    root = _directory_node(
+        checkout, "", tracked, reached, canonical_repo_name(checkout)
+    )
     payload: dict[str, Any] = {
         "root": root,
         "unindexed": [

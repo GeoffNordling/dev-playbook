@@ -97,12 +97,13 @@
       }
     },
     "link": {
-      "description": "One link the file makes, as written, with whether it resolves.",
+      "description": "One link the file makes, as written, with whether it resolves and what it names.",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "target",
-        "status"
+        "status",
+        "identity"
       ],
       "properties": {
         "target": {
@@ -110,11 +111,19 @@
           "type": "string"
         },
         "status": {
-          "description": "external for a link out of the checkout, ok when it names a tracked file, broken otherwise.",
+          "description": "external for a link out of the checkout, citation for a ~/workspace/<repo>/ reference to another repo which is never checked here, ok when the target names a tracked file, broken otherwise.",
           "enum": [
             "external",
+            "citation",
             "ok",
             "broken"
+          ]
+        },
+        "identity": {
+          "description": "The repo-relative path the target names, null for external and citation.",
+          "type": [
+            "string",
+            "null"
           ]
         }
       }

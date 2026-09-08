@@ -69,7 +69,7 @@ def test_a_file_row_carries_its_frontmatter_and_word_count(checkout: Path) -> No
         "type": "Guide",
         "title": "Alpha",
         "description": "The alpha document",
-        "words": 13,
+        "words": 18,
         "exists": True,
     }
 
@@ -94,7 +94,7 @@ def test_a_directory_sums_the_words_below_it(checkout: Path) -> None:
 
 
 def test_the_root_sums_every_directory_and_file_it_reaches(checkout: Path) -> None:
-    assert payload_of(checkout)["root"]["words"] == 53
+    assert payload_of(checkout)["root"]["words"] == 58
 
 
 def test_a_file_no_index_reaches_is_unindexed(checkout: Path) -> None:
