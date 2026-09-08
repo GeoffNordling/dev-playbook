@@ -184,6 +184,41 @@ the design later. You do not resolve it by editing the design.
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
+- **A renamed directory tells the watcher almost nothing, and this shapes both
+  `refresh` and `server`.** Task 6 measured it: publishing the `markdown-file`
+  kind renames its whole directory into place, and the kernel reports that as
+  one event on the directory and **none at all** on the 202 files inside. The
+  plan's per-file rule alone therefore announced zero new files, while the old
+  `shutil.rmtree` of the live tree announced 202 `removed` ones — the page would
+  have closed every panel and never reopened it. Three changes fix it, and all
+  three are load-bearing: (1) `refresh._publish` renames the live directory to
+  `<staging>/<kind>/retired` instead of deleting it in place, so its per-file
+  deletes land under `.staging/` where the watcher ignores them; (2)
+  `server.messages_for` fans a directory event out into one `changed` per
+  `*.json` below it, which is the only way the page hears about the new files;
+  (3) `messages_for` treats a `deleted` event whose path exists again as
+  `changed`, because the kernel reports a delete inside a just-renamed directory
+  under the directory's **old** name and the two are indistinguishable from the
+  event alone. Dropping (3) makes the suite flaky under `-n auto`, not
+  deterministically red — it lost the race roughly one run in four. Measured on
+  this checkout after the fix: one refresh publishes exactly 203 `changed`, one
+  `refreshed`, zero `removed`.
+- **The state watcher debounces at 200ms, not watchfiles' 1600ms default.**
+  `server.STATE_DEBOUNCE_MS`. The default alone would spend most of the
+  two-second budget for an edit reaching the screen, before task 7's checkout
+  debounce and the refresh itself.
+- **`watch_state` dedupes within a batch.** The same view file is named by both
+  the directory fan-out and a stale per-file event, so one refresh published 499
+  messages for 203 files before the dedupe.
+- **Starlette 1.6 has no `on_startup`.** `Starlette.__init__` takes
+  `lifespan` only; `build_app` passes an `asynccontextmanager`. Task 7's checkout
+  watchers hang off that same `_lifespan`, beside the state watcher.
+- **`TestClient` without `with` runs no lifespan**, so the route tests start no
+  watcher. `httpx.ASGITransport` buffers a whole response and hangs forever on
+  the event stream, so the stream is exercised by `watch_state` plus `publish`,
+  never through a test client.
+- **Starlette warns that `httpx` is deprecated for `TestClient`** in favor of
+  `httpx2`. It is a warning only, and `make check` is green with it.
 
 ## Tasks
 
@@ -327,7 +362,7 @@ the design later. You do not resolve it by editing the design.
   `error`, the other kind's files still exist, and no `.staging` directory
   remains; `checkout.json` holds the fixture's absolute path. Gate green.
 
-- [ ] **Task 6: the server routes and the event stream.** Create
+- [x] **Task 6: the server routes and the event stream.** Create
   `src/dev_playbook/cloa_viewer/server.py` with
   `build_app(checkouts: list[Path], dist: Path) -> starlette.applications.Starlette`.
   Routes: `GET /` serves `dist / "index.html"`; mount `/assets` as

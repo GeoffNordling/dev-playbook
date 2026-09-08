@@ -27,6 +27,7 @@ from dev_playbook.cloa_viewer.entry import Kind, View
 ENVELOPE_SCHEMA = "envelope"
 RECORD_FILE = "refresh.json"
 RECORD_SCHEMA = "refresh"
+RETIRED_DIR = "retired"
 STAGING_DIR = ".staging"
 STATUS_FAILED = "failed"
 STATUS_OK = "ok"
@@ -67,6 +68,11 @@ def _publish(kind: Kind, views: list[View], staging: Path, target: Path) -> None
     no longer holds leaves no view file behind; a per-checkout kind replaces its
     one file. Staging and target sit in the same tree, so every move is an
     ``os.replace`` and no reader sees a partial kind.
+
+    The last run's directory is renamed into staging rather than deleted where
+    it stands. Deleting it in place would reach the state watcher as one
+    removed view file per subject, and the viewer would close every panel of
+    that kind a moment before the replacement arrived.
     """
     if not kind.per_subject:
         for view in views:
@@ -75,8 +81,10 @@ def _publish(kind: Kind, views: list[View], staging: Path, target: Path) -> None
     # A kind that found no subjects still replaces its directory: an empty
     # directory is the honest answer, and last run's files are not.
     (staging / kind.name).mkdir(parents=True, exist_ok=True)
-    _clear(target / kind.name)
-    os.replace(staging / kind.name, target / kind.name)
+    live = target / kind.name
+    if live.exists():
+        os.replace(live, staging / RETIRED_DIR)
+    os.replace(staging / kind.name, live)
 
 
 def refresh(checkout: Path) -> dict[str, Any]:
