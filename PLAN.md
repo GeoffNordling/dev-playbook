@@ -239,6 +239,15 @@ the design later. You do not resolve it by editing the design.
   `with` still runs no lifespan, so the route tests start no watcher; a test
   that does use `with TestClient(...)` will refresh its fixture checkout for
   real on every edit under it.
+- **The command's two seams are `cli.dist_dir()` and `cli.serve()`.** Task 8
+  made the built page a function, `dist_dir() -> Path` (returns
+  `<package>/web/dist`), not a module constant, so a test points the command at
+  a fake `dist` with `monkeypatch.setattr(cli, "dist_dir", lambda: built)`;
+  `serve(app, port)` holds the `uvicorn.run` call alone, so replacing it lets a
+  test drive every other step of `main`. A fake `dist` needs an `assets/`
+  directory as well as `index.html`: `build_app` mounts
+  `StaticFiles(directory=dist / "assets")`, which raises at build time when the
+  directory is missing.
 
 ## Tasks
 
@@ -431,7 +440,7 @@ the design later. You do not resolve it by editing the design.
   `words`), then set `stop`; the new `words` is the old plus the number of
   words you appended. Gate green.
 
-- [ ] **Task 8: the command.** In `cli.py`, `main` now: resolves each
+- [x] **Task 8: the command.** In `cli.py`, `main` now: resolves each
   `checkout` argument (default: the output of `git rev-parse --show-toplevel`
   in the current directory) to an absolute `Path`; locates `dist` at
   `Path(__file__).parent / "web" / "dist"` and, if `dist / "index.html"`
