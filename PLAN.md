@@ -167,6 +167,20 @@ the design later. You do not resolve it by editing the design.
   names no path in this checkout — but the panel cannot tell a citation from a
   dead link. Telling them apart is a fourth status and so a design change, for
   the user to settle, not a later task to assume.
+- **`refresh` reads the registry at call time.** Task 5 built
+  `dev_playbook.cloa_viewer.refresh.refresh(checkout)`, the only thing that
+  writes a checkout directory. It does `from dev_playbook.cloa_viewer import
+  registry` and reads `registry.KINDS` inside the loop, so a test swaps kinds
+  with `monkeypatch.setattr(registry, "KINDS", (...))`; a `from ... import
+  KINDS` anywhere would break that. Staging is
+  `<checkout_dir>/.staging/<kind>/<view relpath>` — nested twice for a
+  per-subject kind (`.staging/markdown-file/markdown-file/<identity>.json`), so
+  publishing is one `os.replace` of `.staging/<kind>/<kind>` onto
+  `<checkout_dir>/<kind>`. The whole `.staging` tree is cleared before the loop
+  (a killed run leaves files behind) and after it, so no state directory ever
+  holds one at rest. `refresh` also validates the record against
+  `schemas/refresh.schema.json` before writing `refresh.json` — an addition to
+  the plan's steps, so the writer and the schema the page reads cannot drift.
 - **Node.** Node 22 and npm 10 are installed. `node_modules/` and `dist/`
   under the web directory are gitignored (task 9); `package-lock.json` is
   committed.
@@ -289,7 +303,7 @@ the design later. You do not resolve it by editing the design.
   `/missing.md` `broken`; `docs/beta.md` has `links_in` `["alpha.md"]`;
   `orphan.md` has `type` `null`; every payload validates. Gate green.
 
-- [ ] **Task 5: refresh.** Create `src/dev_playbook/cloa_viewer/refresh.py`
+- [x] **Task 5: refresh.** Create `src/dev_playbook/cloa_viewer/refresh.py`
   with `refresh(checkout: Path) -> dict` and
   `schemas/refresh.schema.json`. Steps: `write_checkout_json`; record
   `started` (UTC RFC 3339) and `commit` (`head_commit`); for each kind in
