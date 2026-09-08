@@ -72,8 +72,21 @@ body {
   padding: 8px var(--gutter);
 }
 
+/* The same box as .button, so the toggle and the button sit at one height. */
 .topbar-checkout {
+  font: inherit;
   font-weight: 600;
+  color: inherit;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+  cursor: pointer;
+}
+
+.topbar-none {
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .topbar-status {

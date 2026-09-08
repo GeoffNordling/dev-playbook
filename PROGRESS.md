@@ -113,3 +113,27 @@ in git history there. This file starts over for loop 2, the room.
   twice in one second", so the ignore test polls the record's `st_mtime_ns`;
   proved by mutation — with `ignore=[]` it fails. Gate green, 1311 tests.
   Next: task 8, the toggle on the page.
+- Task 8 done: `store.ts` keeps the open panels per checkout (`panels`, a
+  `Map<dir, readonly string[]>`; `Viewer.open` is the current one's entry) and
+  no longer clears them on a switch, `selectCheckout(dir)` sets the selection
+  and writes `window.location.hash`, the load effect reads that hash back
+  through the new `byDir` (match, else first, else null), and a `refreshed`
+  event for any checkout now refetches the checkout list and replaces the
+  selected object, so a branch change shows and a vanished checkout falls back
+  to the first. `TopBar.tsx` has a `<select className="topbar-checkout">` with
+  one `<optgroup>` per repo in list order and one `<option value={dir}
+  title={path}>{branch}</option>` per checkout; `app.css` gives it `.button`'s
+  box (padding `1px 6px` — `2px` made it 27px against the button's 25px) and
+  `.topbar-none` styles the "no checkout" text that stands in before the first
+  answer. Three Playwright tests in `test_cli.py` over a new `workspace` /
+  `in_workspace` / `worktree` / `workspace_address` fixture chain, on the `ws`
+  directory holding the fixture checkout and a `wt` worktree; the old `address`
+  fixture and the new one now share one `serving()` contextmanager. Two notes,
+  not plan slips: an `<option>` is never "visible" to Playwright (wait with
+  `state="attached"`), and "the tree still shows Alpha" proves nothing because
+  both checkouts hold `alpha.md`, so the worktree fixture writes an extra
+  `only-here.md` and the test reads the `Not indexed` row's count going 1 → 2,
+  then clicks it open for the title. Proved by mutation twice: the option count
+  and the hash read. Seen on screen — the toggle reads `main`, switches to `wt`,
+  and the tree redraws under it. `make web` rebuilt, gate green, 1314 tests.
+  Next: task 9, the smoke run on dev-playbook's checkouts.

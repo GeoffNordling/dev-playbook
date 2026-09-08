@@ -325,6 +325,27 @@ the design later. You do not resolve it by editing the design.
 - **`refresh.json`'s `finished` cannot prove a refresh did not happen.** It is
   RFC 3339 to the second, so two refreshes inside one second read the same.
   `test_watch.py`'s `refreshed_at` polls the file's `st_mtime_ns` instead.
+- **The page's state is per checkout, and the address holds the choice.**
+  After task 8 `store.ts` keeps `panels`, a `Map<dir, readonly string[]>`, and
+  `Viewer.open` is the selected checkout's entry or the shared empty
+  `NO_PANELS`; switching no longer clears the open panels, only the views map.
+  `byDir(found, dir)` is the one rule for picking a checkout out of a list —
+  the match, else the first, else null — and load, `selectCheckout` and
+  `relist` (the answer to every `refreshed` event, for any checkout) all use
+  it. `selectCheckout` writes `window.location.hash`, which the load effect
+  reads back. `openPanel`/`closePanel` now depend on `dir`.
+- **An `<option>` is never "visible" to Playwright**, so a wait or an
+  assertion on one must be `state="attached"` or a count/value/attribute check;
+  `expect(page).to_have_url(f"{address}#{dir}")` is the retrying way to assert
+  the hash. Text inside a collapsed tree row is not in the DOM at all: the
+  worktree's `only-here.md` proves a checkout swap through the `Not indexed`
+  row's `2 files` count, and only shows its title after that row is clicked.
+- **`serving(source, state_home)` in `test_cli.py`** is the contextmanager
+  holding the `run make web first` guard, the free port, and the kill; the
+  `address` fixture (the fixture checkout) and the `workspace_address` fixture
+  (the `ws` directory holding the checkout and a `wt` worktree, two checkouts
+  of one repo) are three lines each over it. Task 10's `server` fixture
+  replaces this, and must keep both.
 - **`src/dev_playbook/decisions_lint.py` keeps its own `_RECORD_NAME`**
   (line 63), a *capturing* `^(\d+)-.+\.md$` it reads the number out of. It is
   a different need from the boolean predicate and is out of scope for this
@@ -497,7 +518,7 @@ the design later. You do not resolve it by editing the design.
   (poll `refresh.json`'s `finished` for two seconds and assert it did not
   move). Gate green.
 
-- [ ] **Task 8: the toggle on the page.** In `store.ts`: `open` becomes
+- [x] **Task 8: the toggle on the page.** In `store.ts`: `open` becomes
   per checkout, a `Map<string, readonly string[]>` keyed by `dir`, with
   `open` in the returned `Viewer` still the current checkout's list;
   `selectCheckout(dir: string)` sets the selection and writes

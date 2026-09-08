@@ -1,3 +1,4 @@
+import contextlib
 import os
 import socket
 import subprocess
@@ -7,7 +8,7 @@ from pathlib import Path
 
 import httpx
 import pytest
-from cloa_viewer_fixtures import build_checkout
+from cloa_viewer_fixtures import add_worktree, build_checkout
 from playwright.sync_api import Page, expect
 from starlette.applications import Starlette
 
@@ -108,23 +109,70 @@ def start_server(
     raise AssertionError("cloa-viewer did not answer within 10 seconds")
 
 
-@pytest.fixture
-def address(checkout: Path, tmp_path: Path) -> Iterator[str]:
-    """The real command serving the fixture checkout; yields the page's address.
+@contextlib.contextmanager
+def serving(source: Path, state_home: Path) -> Iterator[str]:
+    """Run the real command on ``source``, and yield the page's address.
 
     The command serves the page ``make web`` builds inside the package, so a
     checkout that has never built it cannot run this at all: that is a missing
-    build step, not a failing viewer, and the fixture says which.
+    build step, not a failing viewer, and this says which.
     """
     if not (cli.dist_dir() / "index.html").is_file():
         pytest.fail("run make web first")
     port = free_port()
-    server = start_server(checkout, port, tmp_path)
+    server = start_server(source, port, state_home)
     try:
         yield f"http://127.0.0.1:{port}/"
     finally:
         server.kill()
         server.wait(timeout=10)
+
+
+@pytest.fixture
+def address(checkout: Path, tmp_path: Path) -> Iterator[str]:
+    """The real command serving the fixture checkout alone."""
+    with serving(checkout, tmp_path) as url:
+        yield url
+
+
+@pytest.fixture
+def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A directory of repos, the case one server covering a workspace is for."""
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path))
+    return tmp_path / "ws"
+
+
+@pytest.fixture
+def in_workspace(workspace: Path) -> Path:
+    """The fixture checkout, sitting inside that directory of repos."""
+    return build_checkout(workspace)
+
+
+@pytest.fixture
+def worktree(in_workspace: Path) -> Path:
+    """A linked worktree of it, on its own branch and holding one file of its own.
+
+    The branch is the label the toggle shows, and the extra document is what
+    tells this checkout's tree from the main checkout's on screen.
+    """
+    added = add_worktree(in_workspace, "wt")
+    (added / "only-here.md").write_text(
+        "---\n"
+        "type: Guide\n"
+        "title: Only here\n"
+        "description: The document the worktree alone holds\n"
+        "---\n"
+        "\n"
+        "# Only here\n"
+    )
+    return added
+
+
+@pytest.fixture
+def workspace_address(workspace: Path, worktree: Path, tmp_path: Path) -> Iterator[str]:
+    """The real command serving that directory: two checkouts of one repo."""
+    with serving(workspace, tmp_path) as url:
+        yield url
 
 
 def test_port_defaults_to_8765() -> None:
@@ -292,3 +340,41 @@ def test_page_shows_tree_and_updates(checkout: Path, address: str, page: Page) -
     alpha = checkout / "alpha.md"
     alpha.write_text(alpha.read_text() + "\nnine ten\n")
     expect(page.locator(".panel-body")).to_contain_text("nine ten", timeout=5000)
+
+
+def test_the_toggle_lists_every_discovered_checkout(
+    workspace_address: str, page: Page
+) -> None:
+    page.goto(workspace_address)
+    expect(page.locator(".topbar-checkout optgroup")).to_have_attribute(
+        "label", "fixture"
+    )
+    expect(page.locator(".topbar-checkout option")).to_have_count(2)
+
+
+def test_choosing_a_checkout_swaps_the_tree_and_the_address(
+    worktree: Path, workspace_address: str, page: Page
+) -> None:
+    page.goto(workspace_address)
+    unindexed = page.locator(".tree .tree-row").filter(has_text="Not indexed")
+    # The main checkout leaves one document unindexed, the worktree two, so the
+    # count is the tree saying which checkout it belongs to.
+    expect(unindexed).to_contain_text("1 files")
+    page.select_option(".topbar-checkout", label="wt")
+    expect(page).to_have_url(f"{workspace_address}#{state.checkout_dir(worktree).name}")
+    expect(unindexed).to_contain_text("2 files")
+    unindexed.click()
+    expect(page.locator(".tree")).to_contain_text("Only here")
+    expect(page.locator(".tree")).to_contain_text("Alpha")
+
+
+def test_a_reload_returns_to_the_chosen_checkout(
+    worktree: Path, workspace_address: str, page: Page
+) -> None:
+    page.goto(workspace_address)
+    page.select_option(".topbar-checkout", label="wt")
+    expect(page).to_have_url(f"{workspace_address}#{state.checkout_dir(worktree).name}")
+    page.reload()
+    expect(page.locator(".topbar-checkout")).to_have_value(
+        state.checkout_dir(worktree).name
+    )
