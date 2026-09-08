@@ -58,11 +58,6 @@ python                  audit    mypy
 python                  enforce  commit gate
 python                  enforce  push gate
 python                  adopt    none
-semantic-validation     define   /standards/semantic-validation/declarations.md
-semantic-validation     audit    /scripts/judgments-lint
-semantic-validation     enforce  push gate
-semantic-validation     enforce  commit gate
-semantic-validation     adopt    /standards/semantic-validation/consuming.md
 shell                   define   /standards/shell/conventions.md
 shell                   audit    shellcheck
 shell                   audit    shfmt

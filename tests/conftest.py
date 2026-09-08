@@ -17,7 +17,7 @@ from dev_playbook import gitrepo
 def _clean_git_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Strip ambient git redirection variables from every test's environment.
 
-    The suite runs inside the pre-push hook (``make check-judgments-cache``),
+    The suite runs inside the pre-push hook (``make check``),
     and from a linked worktree -- where the software factory works -- git
     exports an absolute ``GIT_DIR`` into that hook. It outranks ``git -C``
     and ``cwd=`` in every fixture subprocess: ``git init`` becomes a silent
@@ -97,9 +97,8 @@ def ambient_git_dir(
 def make_repo(tmp_path: Path) -> Callable[[dict[str, str]], Path]:
     """Write a throwaway repo from a {relative path: contents} map; return its root.
 
-    Used by the judgments tests to stand up a fixture repo -- a
-    ``pyproject.toml`` with ``[tool.judgments]``, declaration YAML files, and
-    evidence files -- against ``tmp_path``.
+    Used by the lint tests to stand up a fixture repo -- source files,
+    standards cards, and whatever else a rule reads -- against ``tmp_path``.
     """
 
     def factory(files: dict[str, str]) -> Path:

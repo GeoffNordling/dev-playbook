@@ -47,11 +47,6 @@ misplacement, and the mirror, flat or beneath a scope directory, is the
 one accepted location: mirroring scales with the source tree and keeps
 two modules of the same stem from colliding.
 
-`tests/agent_review/` is the exception. It holds the judgment gate tests
-([cache-gate.md](/standards/semantic-validation/cache-gate.md)), whose
-stems are free-form, and no file under it is measured against a source
-module.
-
 ## Conftest hierarchy
 
 A fixture lives in the `conftest.py` of the narrowest directory whose

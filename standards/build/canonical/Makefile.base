@@ -1,4 +1,3 @@
-.PHONY: check check-judgments-cache
+.PHONY: check
 check:
 	uvx pre-commit run --all-files
-check-judgments-cache: check

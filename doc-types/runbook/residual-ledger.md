@@ -37,8 +37,7 @@ deliberately outside the ontology until a ruling is reversed.
   A prompt device that raises the probability the read happens; ruled
   not accounted.
 - **Agent-held ephemeral state** — counts and set-aside lists a runbook
-  tracks only in its own working memory, persisted nowhere
-  (judgments-sweep's fix-attempt cap and skip list); ruled not
+  tracks only in its own working memory, persisted nowhere; ruled not
   accounted.
 - **User interview loops** — a mid-run, multi-round dialogue with the
   user (runbook-creator's "iterate until the user is satisfied";
@@ -204,12 +203,6 @@ commands (does covers only file-linked runbooks, and none carries a fenced
 probe-picking interviews (no primitive for a question-and-answer round
 with the user), or the `READ:` acknowledgment (targets the
 conversation, not the invoker).
-
-### judgments-sweep
-
-Could not express dispatching the judge fan-out — `Workflow({ name: "judgments", … })`
-is neither an Agent nor a Skill/Script link, so does has no primitive for a
-Workflow call.
 
 ### code-pr-review
 

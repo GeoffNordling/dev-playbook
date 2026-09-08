@@ -39,18 +39,11 @@ bug.
 
 ## What does not run on a secondary
 
-Checks that depend on state local to a machine, rather than present in the
-repository, would report the environment as a defect in the code when run on
-a secondary. They are skipped there, and each announces the skip on every
+A check that depends on state local to a machine, rather than present in
+the repository, would report the environment as a defect in the code when
+run on a secondary. It is skipped there, and announces the skip on every
 run.
 
-- **Judgments.** The seen-set lives in `~/.cache/skipcache`, filled by
-  [`judgments-sweep`](/dotfiles/dot-claude/skills/judgments-sweep/SKILL.md)
-  runs — the cache is local to the primary, so the sweep
-  is a primary-machine activity. Judges never run on a secondary;
-  `SKIP_JUDGMENTS=1` turns each gated judgment into a named pytest skip,
-  and `NO_JUDGMENT_CACHE=1` keeps the push gate from checking the cache
-  either ([Canonical Artifacts](/standards/build/canonical.md#makefile)).
 - **`ref-lint`.** Cross-repo Citations resolve only where the cited repo is
   cloned, and a secondary deliberately carries only some of the workspace's
   repos. `SKIP=ref-lint` stands the detector down.

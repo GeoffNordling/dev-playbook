@@ -271,14 +271,6 @@
   ├─reads───► deviation contract
   └─reports─► outcome: str    findings grouped Q3–Q7
 
-[judgments-sweep] Skill · model: opus, effort: xhigh
-  ├─args────► roots
-  ├─reads───► [declarations] Standard
-  ├─does────► [judgments-run] Script    in `plan` mode
-  ├─writes──► local file    the judgment cache
-  ├─does────► [judgments-run] Script    again, with a `--skip` per set-aside id
-  └─reports─► outcome: str    per root: already cached, judged, passed, fixed-then-passed (each id + the edit made), set aside (each id + its `opinion` or crash history + why), crashed-and-recovered
-
 [log-friction] Skill · model: sonnet, effort: xhigh
   ├─args────► friction
   ├ ╌ reports ╌ ► outcome: str    that there is nothing to record    if there is genuinely nothing to record

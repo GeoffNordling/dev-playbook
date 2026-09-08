@@ -276,14 +276,6 @@ in [node-agent-and-skill-authoring.md](/software-factory/node-agent-and-skill-au
   commit hooks — before finishing its phase; a phase never closes over a red
   tree. The rule is per-phase, not per-commit: individual commits are already
   covered by the commit gate's hook suite.
-- **Judgments sit outside every node.** `make check` leaves the semantic
-  [cache gate](/standards/semantic-validation/cache-gate.md) skipped, and no node arms it
-  or runs a judge — judgments are settled by the periodic sweep, outside the
-  factory. For a **review** skill the exclusion is total: the
-  `judgments/*.yaml` declarations are outside its jurisdiction
-  whether or not the diff changes them, and a judgment — its content, its
-  verdict, or its cache state — appears nowhere in its findings. A stale or red
-  cache mid-traverse is the expected condition, not a defect to report.
 
 ## Pull requests
 

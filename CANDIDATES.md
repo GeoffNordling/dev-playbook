@@ -95,7 +95,8 @@ description: Uncommitted future work — described, not yet promoted to issues
   that.
 - **Deslop regression gate** — something that keeps a rewritten document
   from sliding back into slop. Deterministic rules cannot judge prose
-  quality; the judgments machinery may fit.
+  quality, and no mechanism is named: the judgments machinery that once was
+  is deleted (Decision Record 0028).
 - **Vocabulary change discipline** — a process that forces a conscientious
   decision on every term added to or removed from `CONTEXT.md`, so terms do
   not accrete unexamined.

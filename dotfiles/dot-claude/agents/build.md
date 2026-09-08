@@ -53,8 +53,6 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 3. {Run [/commit](~/.claude/skills/commit/SKILL.md)} on the piece.
 4. Move to the next piece, or to §6 once the issue's scope is fully carried out.
 
-Declarations under `judgments/` are documentation: keep the ones your edits affect accurate as you edit; add new ones rarely — see [The bar](~/workspace/dev-playbook/standards/semantic-validation/declarations.md#the-bar).
-
 ## 5. Escalations
 
 When reality contradicts the brief, {Read [deviation contract](~/workspace/dev-playbook/software-factory/deviation-contract.md); run its three limiters}. Three clean no's: make the fix, log it for the ledger (§6), and keep working. Any yes — or an answer you cannot give cleanly — halt, commit, and escalate as that contract states. Write nothing to GitHub: {Report the escalation envelope; `outcome` is `"escalated"`, carrying in `gist` what the brief said, what reality is, which limiter tripped, and two or three fix options with your recommendation}. Anything else unexpected that stalls the work escalates the same way, minus the limiter step.
