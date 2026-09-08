@@ -43,9 +43,10 @@ stack instead.
 
 A newly opened panel goes to the top of the stack. Close removes it.
 Pinned panels survive "close others"; that is the whole meaning of the
-pin. The open panels, their order, their pins, and the expanded
-directories are saved as the arrangement after every change and
-restored when the page opens on that checkout.
+pin. The arrangement
+([Contract](/worktree-cloa-viewer-tool-working-docs/contract.md#the-arrangement))
+is saved after every change and restored when the page opens on that
+checkout.
 
 ## Everything about one file
 
@@ -61,7 +62,7 @@ cross-reference.
 ## The checkout toggle
 
 The toggle lists every checkout the server discovered
-([Server and Stack](/worktree-cloa-viewer-tool-working-docs/server-and-stack.md#the-command)),
+([Server](/worktree-cloa-viewer-tool-working-docs/server.md#the-command)),
 grouped by repo and labelled by branch, so a main checkout and its
 worktrees sit together. Switching swaps the tree, the panels, and the
 arrangement to that checkout's directory, with nothing to restart. The

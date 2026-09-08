@@ -6,10 +6,11 @@ description: The plan for cloa-viewer, a local visual IDE for the markdown of ev
 
 # CLOA Viewer
 
-This set is speculative. It designs a tool that does not exist yet: a
-guess is written as a guess, and an open question sits beside its topic.
-The set lives on this branch alone and drains into permanent homes or is
-deleted before the branch merges
+cloa-viewer is a local visual IDE for the markdown of every checkout in
+the workspace, and this set is its plan. The set is speculative: it
+designs a tool still being built, a guess is written as a guess, and an
+open question sits beside its topic. The set lives on this branch alone
+and drains into permanent homes or is deleted before the branch merges
 ([Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md)).
 
 ## Goal
@@ -23,7 +24,7 @@ only face today is a proof-of-concept text file nobody opens,
 [standards.txt](/doc-types/standard/standards.txt), and
 [cards.txt](/doc-types/standard-card/cards.txt), become panels the user
 reaches by clicking. The design is general: every panel is one registered
-kind read from one view file on disk, so a new view is a new registry
+kind read from one view file on disk, so a new kind is a new registry
 entry and nothing else changes.
 
 The long-term scope is documentation and code together, because CLOA
@@ -38,14 +39,16 @@ list; the registry names them among the deferred kinds.
 
 The acceptance picture. The user starts the viewer once, from
 `~/workspace/`, and picks this checkout from the toggle. The left side
-shows every tracked markdown file in the two groups the File Roles guide
-names: concept documents in the `index.md` hierarchy, and harness-owned
-files, each with its description. The user clicks
+shows the tree, every tracked markdown file in its two groups
+([index-tree](/worktree-cloa-viewer-tool-working-docs/registry.md#index-tree)),
+each with its description. The user clicks
 `dotfiles/dot-claude/agents/adjudicator.md`: its Reference chain appears,
 the CLOA object itself. A button on that panel opens the file's details,
 its frontmatter facts, its links in and out, and its rendered source, for
 the times the chain is not enough. The user edits the file in the IDE:
-the chain updates within a second.
+the chain redraws within the second that
+[Live update](/worktree-cloa-viewer-tool-working-docs/server.md#live-update)
+targets.
 
 ## Principles
 
@@ -77,7 +80,7 @@ the chain updates within a second.
   panels. Nothing opens on its own.
 - **Simple, standard, modular.** Plain JSON files, JSON Schema, one small
   server, one page. Every kind plugs into the same sockets.
-- **Code views are applied, not invented.** A code kind wraps an existing
+- **Code views come from existing tools.** A code kind wraps an existing
   tool's output. The registry entry is the adapter and the renderer; the
   analysis is the tool's.
 - **The objects are already defined; the viewer only draws them.** A
@@ -111,8 +114,9 @@ the chain updates within a second.
 ## Constraints
 
 - The package lives in dev-playbook at `src/dev_playbook/cloa_viewer/`,
-  a subpackage, because the build standard allows one package under
-  `src/`. Breaking it out into its own repo is a later choice.
+  a subpackage, per
+  [One package under src/](/standards/build/skeleton.md#one-package-under-src).
+  Breaking it out into its own repo is a later choice.
 - The tool runs on the user's machine at a localhost address. It is never
   an artifact or a hosted page. Whether the page stays this tool's own
   shell or becomes a VS Code extension is open. The user leans to the
@@ -121,7 +125,7 @@ the chain updates within a second.
   the choice would move the shell and not the kinds.
 - The canonical artifacts stay untouched
   ([Canonical Artifacts](/standards/build/canonical.md)).
-- The viewer reads only the state directory. It never reads a checkout.
+- The viewer reads only the state directory.
 - One checkout is on screen at a time; the toggle switches between every
   checkout the workspace holds, main checkouts and worktrees alike, from
   one server that never has to be restarted to change repo or branch.
@@ -129,8 +133,6 @@ the chain updates within a second.
   documents, harness-owned, or excluded, and which link sources are
   immutable, comes from the same functions the repo's linters use, so the
   screen and the checks can never disagree.
-- The text views retire. `chains.txt`, `standards.txt`, `cards.txt`, and
-  the `scripts/` shims that write them go when their kinds land.
 
 ## Working agreements
 
@@ -174,6 +176,12 @@ design sessions, not the code.
   describes and what produced it.
 - **arrangement** — the saved record of what is open on screen for one
   checkout.
+- **envelope** — the fixed top-level fields every view file carries
+  around its payload: the envelope version, the kind and its version,
+  the title, the subject, and the stamp.
+- **refresh record** — the outcome of the last refresh for one checkout:
+  when it ran, at which commit, and per kind whether its generator
+  succeeded.
 - **panel** — one view file rendered on screen.
 
 ## Members
@@ -189,9 +197,10 @@ design sessions, not the code.
 - [Viewer](/worktree-cloa-viewer-tool-working-docs/viewer.md) — the page
   in the browser: layout, tree, panels, toggle, refresh, and failure on
   screen.
-- [Server and Stack](/worktree-cloa-viewer-tool-working-docs/server-and-stack.md)
-  — the command, the server's jobs, live update, the two languages, and
-  the checks.
+- [Server](/worktree-cloa-viewer-tool-working-docs/server.md) — the
+  command, the server's five jobs, and live update.
+- [Stack](/worktree-cloa-viewer-tool-working-docs/stack.md) — the two
+  languages, the schema bridge, the package shape, and the checks.
 
 ## Planned
 
@@ -207,11 +216,14 @@ then the other two CLOA kinds.
   written into the kind's registry entry.
 - **Pinning and the arrangement** — pin, close others, and the
   arrangement saved and restored per checkout.
-- **runbook-chain** — chaingen moves into the package as the kind's
+- **runbook-chain** — [chaingen](/scripts/chaingen), the script that
+  writes `chains.txt` today, moves into the package as the kind's
   generator; the renderer draws the settled design; `chains.txt` and the
   shim go.
-- **standard** — rulegen moves the same way; `standards.txt` goes.
-- **standard-card** — cardgen moves the same way; `cards.txt` goes.
+- **standard** — [rulegen](/scripts/rulegen) moves the same way;
+  `standards.txt` goes.
+- **standard-card** — [cardgen](/scripts/cardgen) moves the same way;
+  `cards.txt` goes.
 - **Docs follow the moves** — the `doc-types/` indexes and pages that
   name the text files and the shims, and `scripts/index.md`.
 - **Stale badge** — the badge on a panel whose commit is behind HEAD.
@@ -234,6 +246,6 @@ then the other two CLOA kinds.
 ## Acronyms
 
 CLOA — Correct Level of Abstraction. IDE — Integrated Development
-Environment. JSON — JavaScript Object Notation. HTTP — Hypertext Transfer
-Protocol. SVG — Scalable Vector Graphics. HTML — Hypertext Markup
-Language.
+Environment. JSON — JavaScript Object Notation. API — Application
+Programming Interface. SVG — Scalable Vector Graphics. HTML — Hypertext
+Markup Language.

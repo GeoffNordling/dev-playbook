@@ -1,7 +1,7 @@
 """Discovery: the paths the command was given become the list of checkouts.
 
 This is the first of the server's five jobs
-([Server and Stack](/worktree-cloa-viewer-tool-working-docs/server-and-stack.md)).
+([Server](/worktree-cloa-viewer-tool-working-docs/server.md)).
 A path that is a checkout is shown as it is; a path that is not one,
 ``~/workspace/`` being the case that matters, is scanned for the repos directly
 below it and every linked worktree of each. One server then covers the whole

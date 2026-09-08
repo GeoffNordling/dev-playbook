@@ -10,4 +10,5 @@ Ordering: reading order.
 - [Registry](/worktree-cloa-viewer-tool-working-docs/registry.md) — The registered kinds — what an entry consists of, the five v1 kinds and what each panel shows, and the kinds deferred
 - [Design](/worktree-cloa-viewer-tool-working-docs/design.md) — How a panel is designed — the design space as combinations of kinds, the questions a person asks of the runbook system, and the ideas recorded for the runbook kind, none of them settled
 - [Viewer](/worktree-cloa-viewer-tool-working-docs/viewer.md) — The page in the browser — its fixed regions, the tree, panels and the arrangement, everything about one file, the checkout toggle, refresh, and how failure shows
-- [Server and Stack](/worktree-cloa-viewer-tool-working-docs/server-and-stack.md) — The cloa-viewer command, the server's four jobs, live update by one-way push, the Python and TypeScript stack, and how checks run
+- [Server](/worktree-cloa-viewer-tool-working-docs/server.md) — The cloa-viewer command, the server's five jobs, and live update by one-way push
+- [Stack](/worktree-cloa-viewer-tool-working-docs/stack.md) — The Python and TypeScript stack, JSON Schema as the bridge between them, the package shape, and how checks run

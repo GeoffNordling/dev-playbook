@@ -38,7 +38,7 @@ The questions a person asks, each answered by a term the
 [Reference chain](/doc-types/runbook/contract-shape.md) already has:
 
 1. **What is there** — the population, split Agent and Skill.
-2. **Where do I enter** — the entry points, a runbook no other runbook
+2. **Where does the user enter** — the entry points, a runbook no other runbook
    does. Its complement is the leaves, a runbook that does nothing.
 3. **Who does whom** — the do-graph, the chains joined by their
    do-edges. Its connected clusters are the system's own groups.
@@ -124,11 +124,12 @@ counting whatever its future:
   (build, commit, compact-prep, rewind-compact), one of 3 (the
   working-doc-set-deslop set), one of 2 (document-remove-tics,
   tics-remover), and 19 singletons.
-- The software factory's agents, adjudicator, bug-pr-review,
-  code-pr-review, doc-pr-review, and open-pr, are singletons, and so is
-  issue-overwatch. No runbook does them, because the factory's graph
-  lives in `software-factory.md`, which issue-overwatch reads as a bare
-  imported node. The runbooks alone cannot show how the factory operates.
+- The agents of the
+  [software factory](/software-factory/software-factory.md), adjudicator,
+  bug-pr-review, code-pr-review, doc-pr-review, and open-pr, are
+  singletons, and so is issue-overwatch. No runbook does them, because
+  the factory's graph lives in `software-factory.md`, which
+  issue-overwatch reads as a bare imported node. The runbooks alone cannot show how the factory operates.
   That is structure the system lacks, a fact worth showing, not a defect
   of the viewer. Whether the factory graph becomes a CLOA object of its
   own is open.

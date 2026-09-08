@@ -54,7 +54,7 @@ member your task names:
   two groups, no word count, the `decision-record` status.
 - `viewer.md`: the tree's groups and level guides, the checkout toggle and
   discovery, failure on screen.
-- `server-and-stack.md`: the command's path rule, the server's five jobs.
+- `server.md`: the command's path rule, the server's five jobs.
 
 This plan makes every implementation decision the design leaves open. Where
 this plan and a member disagree on a detail, this plan wins for this loop,
