@@ -44,9 +44,12 @@ arguments: [target]
    and now: instructions, decisions, side notes, insights, asides. Only
    what cannot be recovered by re-reading the committed files, kept
    concise. When the target is a level, the call stack on screen
-   already holds this: carry it whole, with each change from step 3
-   folded onto the Settled line of the level that produced it. Done
-   when nothing that matters is left out.
+   already holds this. Carry the stack down to the resumed level only:
+   the levels below it are the tangent, closed by the rewind, and never
+   appear as levels. Fold what each closed level settled, and each
+   change from step 3, onto the Settled line of the resumed level, one
+   bullet per ruling or commit, so past-self resumes on the outcome and
+   not the detour. Done when nothing that matters is left out.
 
 5. {Report the compaction summary; inside a fenced code block, so the
    user can copy it verbatim and paste it after invoking `/rewind`} and
@@ -66,7 +69,7 @@ The following commits landed during the tangent (not commits you authored):
    - <commit-id> on <branch>.
    - ...
 
-<When the target was a level: "You are at level <N>: <focus>." followed by the call stack, whole. Otherwise the in-conversation information from step 4. Omit this paragraph if everything was captured on disk.>
+<When the target was a level: "You are at level <N>: <focus>." followed by the call stack down to level <N>, the tangent's rulings and commits folded onto level <N>'s Settled line and no level below it. Otherwise the in-conversation information from step 4. Omit this paragraph if everything was captured on disk.>
 ```
 
 **Your /rewind selection target:**
