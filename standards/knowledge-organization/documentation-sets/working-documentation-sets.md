@@ -11,7 +11,7 @@ A **working documentation set** is the group of Markdown files one stream of
 in-process work accumulates, plans, design notes, records, committed to the
 repo and drained into permanent homes or deleted when the work merges. It
 is a
-[documentation set](/standards/knowledge-organization/documentation-sets/standard.md),
+[documentation set](/standards/knowledge-organization/documentation-sets/documentation-sets.md),
 so every rule there binds it; the rules below are the further rules of
 in-process work. What goes inside each file is
 [Knowledge Organization](/standards/knowledge-organization/card.md)'s and
@@ -37,7 +37,7 @@ Every member is reached from the root, `ROOT.md`, by a path of links; the
 root is the document the work started from, the plan holding the goal.
 
 The index still lists every member
-([Documentation Sets](/standards/knowledge-organization/documentation-sets/standard.md));
+([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md));
 the link tree is the second structure, the one that says what depends on
 what. A member links what it depends on: its parent, its children, the
 sibling whose fact it defers to. The root need not link every member. A
@@ -72,7 +72,7 @@ a strand has one Planned and one Completed, in one file.
 ## Buckets
 
 A bucket is a named section role a fact type files under —
-[one home](/standards/knowledge-organization/documentation-sets/standard.md#one-home),
+[one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home),
 made navigable. The list below is a menu: a set uses the buckets its
 work needs, skips the rest, and coins its own where none fits. An audit
 judges placement against the sections the set actually uses; a bucket the set
@@ -95,7 +95,7 @@ root's Terms bucket with a one-line definition, in place of `CONTEXT.md`.
 The set is drained at merge, so a term of the work is not yet the repo's
 vocabulary; it reaches `CONTEXT.md` when the member that carries it lands
 in a permanent home
-([Terms defined once](/standards/knowledge-organization/documentation-sets/standard.md#terms-defined-once)).
+([Terms defined once](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once)).
 
 ## Acronyms
 

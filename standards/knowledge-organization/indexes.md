@@ -55,7 +55,7 @@ directory's own `index.md`.
 
 A subdirectory holding concept documents carries an `index.md` of its
 own and is listed as a child, never recursed into
-([An index in every directory](/standards/knowledge-organization/documentation-sets/standard.md#an-index-in-every-directory)).
+([An index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)).
 
 ## Ordering
 

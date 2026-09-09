@@ -17,8 +17,8 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 - [README Content](/standards/knowledge-organization/readme-content.md)
 - [CONTEXT.md Content](/standards/knowledge-organization/context-content.md)
 - [Cross-References](/standards/knowledge-organization/cross-references.md)
-- [Documentation Sets](/standards/knowledge-organization/documentation-sets/standard.md)
-- [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working.md)
+- [Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)
+- [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
 
 ## Audit
 

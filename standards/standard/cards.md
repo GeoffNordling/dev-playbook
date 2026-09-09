@@ -30,7 +30,7 @@ and the only flat files under `standards/` are `README.md` and
 
 The tree's rule is one directory, one standard: the card and the
 Standards it defines itself by sit together, one documentation set
-([Documentation Sets](/standards/knowledge-organization/documentation-sets/standard.md)),
+([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)),
 with the Standards at `standards/<name>/<standard>.md`
 ([Where a Standard lives](/doc-types/standard/definition.md#where-a-standard-lives)).
 A filename on either level is a kebab-case noun, `card.md` and `index.md`
@@ -58,12 +58,12 @@ and checked — …`, and lists the card first; standards-lint reports a
 departure (`standard.card-directory`).
 
 The card thereby states the set's concern, the sentence
-[Documentation Sets](/standards/knowledge-organization/documentation-sets/standard.md)
+[Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)
 judges the set by, so
-[distinct concerns](/standards/knowledge-organization/documentation-sets/standard.md#distinct-concerns)
+[distinct concerns](/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns)
 is judged among the Standards beside the card, never between a Standard
 and the card that summarizes it, and
-[rows inside the set](/standards/knowledge-organization/documentation-sets/standard.md#rows-inside-the-set)
+[rows inside the set](/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-set)
 holds by construction: every question narrows *the catalog*.
 
 ## Define points only at Standards
@@ -77,7 +77,7 @@ from the Audit, Enforce, or Adopt cell; and a doc-type file from a
 Standard's prose or from a card's lead paragraph. A Standard's one-line
 summary lives once, in the directory's index listing, which carries its
 `description` verbatim
-([one home](/standards/knowledge-organization/documentation-sets/standard.md#one-home));
+([one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home));
 cardgen reads only the link
 ([Cells](/doc-types/standard-card/encoding.md#cells)). No lint checks the
 target's type. The field is `define: list[Pointer[Standard]]` in

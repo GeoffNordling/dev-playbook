@@ -19,7 +19,7 @@ Each rule lives in the lead sentence of its section. If the lead carries the
 rule, the section can stop there. Section size matches topic size.
 
 Across documents the same rule is Documentation Sets'
-[one home](/standards/knowledge-organization/documentation-sets/standard.md#one-home).
+[one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
 
 ## Current state and next steps only
 
@@ -81,7 +81,7 @@ runs or spans lines. The pairs:
 "The symlink is relative." Not "We make the symlink relative."
 
 A member of a
-[working documentation set](/standards/knowledge-organization/documentation-sets/working.md)
+[working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
 may write a guess as a guess.
 
 ## Positive statement

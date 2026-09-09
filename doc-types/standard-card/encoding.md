@@ -61,11 +61,12 @@ kebab-case and names its topic as a noun: a plain
 noun (`conventions.md`, `records.md`, `distribution/`), a noun compound
 (`cache-gate.md`, `context-content.md`), or a gerund compound
 (`linking-issues.md`) — never a bare verb
-(`skill-write.md`). `card.md`, `index.md`, and a special-case
-directory's `standard.md` are the fixed role names, named for what the
-file is in its directory rather than for a topic. When a directory has
-an established family prefix, a new sibling on the same subject keeps
-it.
+(`skill-write.md`). `card.md` and `index.md` are the fixed role names,
+named for what the file is in its directory rather than for a topic; a
+special-case directory's general Standard is named for its topic like
+any other (`documentation-sets/documentation-sets.md`), never
+`standard.md`, which would overload the word. When a directory has an
+established family prefix, a new sibling on the same subject keeps it.
 
 ## The catalog
 

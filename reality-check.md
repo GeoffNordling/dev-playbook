@@ -15,7 +15,7 @@ standard is settled and the auditors come back clean.
 ## What we committed
 
 The general Standard is
-`/standards/knowledge-organization/documentation-sets/standard.md`.
+`/standards/knowledge-organization/documentation-sets/documentation-sets.md`.
 Population: "a documentation set, the concept documents one index.md
 owns, except a numbered Decision Record among them". Six rules, each an
 H2 whose first paragraph is the predicate:
@@ -35,7 +35,7 @@ H2 whose first paragraph is the predicate:
    member is defined once, in `CONTEXT.md`.
 
 Beside it, the one special case so far:
-`/standards/knowledge-organization/documentation-sets/working.md`, the
+`/standards/knowledge-organization/documentation-sets/working-documentation-sets.md`, the
 further rules of a working documentation set (speculative voice, reached
 from the root, where a set lives, worklist, buckets, terms, acronyms).
 
@@ -453,7 +453,7 @@ Root group:
 - `/standards/knowledge-organization/indexes.md:78-92` The root index
   contradicts its own Typeless rule; `document-types.md:87-94` Under
   standards/ is a location rule owned elsewhere; `indexes.md:57-58` →
-  `documentation-sets/standard.md:32-34`.
+  `documentation-sets/documentation-sets.md:32-34`.
 - `/standards/harness/writing-for-agents.md:81-103` Skill mechanics is
   out of concern; *completion criteria* defined at
   `runbook-conventions.md:111-114` and `writing-for-agents.md:50`;
