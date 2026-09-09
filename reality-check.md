@@ -81,6 +81,25 @@ card would cite once it works.
 
 ## The six problems
 
+Progress: 1 settled in `2dca7d7` (one-home admits a view, "a new form
+its own concern needs"; no tiebreak, no examples). 2 settled,
+uncommitted (a definition is a fact; home is the coining member, and
+`CONTEXT.md` only for a term used beyond its set; Doc Conventions
+`:137-139` and CONTEXT.md Content's lead already agree, so no companion
+edit). The `detectors.md` lead is a view under 1. 3 settled, uncommitted: the
+rule is now prediction, "a reader who chose it from the index finds
+nothing in the body they did not expect"; fixed sections and reasons
+pass, a vague description is Document Types' problem, not this rule's.
+4 settled, uncommitted: population exempts a `type: Reference` mirror;
+`standards/index.md` intro names `references/`; Card Catalog's claim
+stays. 5 settled, uncommitted: rule binds the rows of an index, member
+or child set; the boundary is drawn in the lead paragraphs, linked both
+ways, not in the descriptions; definition/encoding "Where a Standard
+lives" is a real doc finding. 6 settled, uncommitted:
+child-inside-its-parent became `rows-inside-the-set`, binding every row,
+member or child, to the intro sentence; `cards.md:66` anchor updated.
+Next: commit, re-run the four auditors with the shared prompt.
+
 ### 1. one-home: a restatement at a different grain reads as a second home
 
 **Rule.** "A fact, rule, or decision is stated in one member, the one

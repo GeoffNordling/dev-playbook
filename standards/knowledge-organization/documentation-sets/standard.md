@@ -1,8 +1,8 @@
 ---
 type: Standard
 title: Documentation Sets
-description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, a child set inside its parent, one home for every fact, distinct concerns, and terms defined once
-population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record among them"
+description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, every row inside the set, one home for every fact, distinct concerns, and terms defined once
+population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Reference mirror among them"
 ---
 
 # Documentation Sets
@@ -18,7 +18,9 @@ in the forms
 gives. A numbered
 [Decision Record](/standards/decisions/records.md) is outside every rule
 here, as it is outside Cross-References: a record frozen at merge
-restates the context of its day and is never rewritten. A member's **concern** is the one line its frontmatter
+restates the context of its day and is never rewritten; so is a
+`type: Reference` mirror, upstream text vendored verbatim and never
+edited here. A member's **concern** is the one purpose its frontmatter
 `description` states
 ([Document Types](/standards/knowledge-organization/document-types.md#description));
 a set's concern is the sentence its index's introduction opens with
@@ -39,22 +41,25 @@ introduction sentence of its own.
 
 ## Body inside its concern
 
-A member's body stays inside its concern: every section answers the one
-question the description names.
+A member serves one purpose, the one its description states, so a reader
+who chose it from the index finds nothing in the body they did not
+expect.
 
-A member that has accumulated several concerns, distinct questions a
-reader might arrive with, splits into one member per concern, or into a
-directory of members with an `index.md` where the concerns nest. A reader
-crawling for one answer then loads one small file. A subject with layers
-may split by layer, each file named for the layer it holds.
+A section that reader would not have predicted is a second purpose: it
+splits into a member of its own, or into a directory of members with an
+`index.md` where the purposes nest, or the description was wrong and is
+rewritten. A reader crawling for one answer then loads one small file.
+What a description says, and how, is Document Types'
+([description](/standards/knowledge-organization/document-types.md#description)).
 
-## Child inside its parent
+## Rows inside the set
 
-A nested set's concern lies inside its parent's: the child index's
-introduction narrows what the parent's names.
+Every row of an index, member or child set, lies inside the concern the
+introduction names: a reader who chose the set from its parent's index
+expects each row they find.
 
-`standards/knowledge-organization/` holds *the Standards on how knowledge
-is organized in markdown*, one part of `standards/`, *the catalog*.
+A row that reader would not expect sits in the wrong set, or the
+introduction is too narrow and is rewritten.
 
 ## One home
 
@@ -69,15 +74,22 @@ The same rule applies inside one document via Doc Conventions'
 
 ## Distinct concerns
 
-No two members of a set declare overlapping concerns: each question a
-reader arrives with has one member that answers it.
+No two rows of an index, member or child set, answer the same question:
+a reader at the index picks one.
 
-Two members whose descriptions overlap are one concern written twice;
-they merge, or the boundary between them is redrawn into both
-descriptions.
+Two neighbouring concerns draw their boundary where there is room, in
+each lead paragraph, each linking the other. Two whose descriptions
+cannot be told apart are one concern written twice, and merge.
 
 ## Terms defined once
 
-A term a set coins and uses in more than one member is defined once, in
-the repo's `CONTEXT.md`
-([CONTEXT.md Content](/standards/knowledge-organization/context-content.md)).
+A term is defined once, in the member whose concern it is; only a term
+used beyond the set that coins it is defined in the repo's `CONTEXT.md`
+instead
+([CONTEXT.md Content](/standards/knowledge-organization/context-content.md)),
+and every other use links the definition.
+
+A definition is a fact like any other, so its home follows
+[one home](#one-home): the widest population the term still holds for.
+A term one set uses stays in that set; `CONTEXT.md` is for the rare term
+that crosses sets.

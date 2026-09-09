@@ -10,7 +10,7 @@ harness                 runbook-conventions          a runbook: a skill bundle o
 knowledge-organization  context-content              a repo's CONTEXT.md
 knowledge-organization  cross-references             a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record
 knowledge-organization  document-types               a concept document
-knowledge-organization  documentation-sets/standard  a documentation set, the concept documents one index.md owns, except a numbered Decision Record among them
+knowledge-organization  documentation-sets/standard  a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Reference mirror among them
 knowledge-organization  documentation-sets/working   a working documentation set, the Markdown files one stream of in-process work accumulates
 knowledge-organization  indexes                      an index.md
 knowledge-organization  readme-content               a README.md
@@ -116,9 +116,9 @@ knowledge-organization  document-types               types                      
 knowledge-organization  document-types               under-standards                                   typed-standard
 knowledge-organization  documentation-sets/standard  an-index-in-every-directory                       —
 knowledge-organization  documentation-sets/standard  body-inside-its-concern                           —
-knowledge-organization  documentation-sets/standard  child-inside-its-parent                           —
 knowledge-organization  documentation-sets/standard  distinct-concerns                                 —
 knowledge-organization  documentation-sets/standard  one-home                                          —
+knowledge-organization  documentation-sets/standard  rows-inside-the-set                               —
 knowledge-organization  documentation-sets/standard  terms-defined-once                                —
 knowledge-organization  documentation-sets/working   acronyms                                          —
 knowledge-organization  documentation-sets/working   buckets                                           —

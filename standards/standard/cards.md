@@ -63,7 +63,7 @@ judges the set by, so
 [distinct concerns](/standards/knowledge-organization/documentation-sets/standard.md#distinct-concerns)
 is judged among the Standards beside the card, never between a Standard
 and the card that summarizes it, and
-[child inside its parent](/standards/knowledge-organization/documentation-sets/standard.md#child-inside-its-parent)
+[rows inside the set](/standards/knowledge-organization/documentation-sets/standard.md#rows-inside-the-set)
 holds by construction: every question narrows *the catalog*.
 
 ## Define points only at Standards

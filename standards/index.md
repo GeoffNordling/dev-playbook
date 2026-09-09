@@ -3,7 +3,9 @@
 The catalog: every standard is one directory here, holding its card
 (`type: Standard-Card`) and the Standards the card's Define cell points
 at, and each row below carries the card's question sentence. See
-[Card Cells](/doc-types/standard-card/contract-shape.md).
+[Card Cells](/doc-types/standard-card/contract-shape.md). One directory,
+`references/`, is no standard: it holds the upstream specifications the
+Standards cite.
 Ordering: README, then the directories — meta-standard first, the rest
 alphabetical.
 
