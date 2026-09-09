@@ -1,6 +1,6 @@
 ---
 name: doc-set-auditor
-description: Audits one documentation set, or a set and its child sets for a fact slice, against the standard sections its launch prompt assigns, reporting findings without editing. Use when the doc-set-deslopper fork dispatches an audit slice.
+description: Audits one documentation set, or a set and its child sets for a fact slice, against the standard sections its launch prompt assigns, reporting findings without editing. Use when the doc-set-deslopper dispatches an audit slice.
 tools: Read, Grep, Glob
 model: sonnet
 effort: high

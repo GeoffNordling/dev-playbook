@@ -73,7 +73,7 @@
 
 [doc-set-deslopper] Agent · model: inherit, effort: xhigh
   ├─reads───► launch prompt    the target directory, whether it is one set or a set with child sets, and the briefings
-  ├─does────► [doc-set-deslopper] Agent    as a fork subagent for each set, parent and children, in one message, each told its target is one set with its facts settled
+  ├─does────► [doc-set-deslopper] Agent    as a typed subagent for each set, parent and children, in one message, each told its target is one set with its facts settled
   ├─does────► [doc-set-auditor] Agent    subagents in one message, one per slice the pass calls for, `model: sonnet`, `effort: high`
   ├─never commits─►
   └─reports─► outcome: str    when the audits are clean, one line saying so

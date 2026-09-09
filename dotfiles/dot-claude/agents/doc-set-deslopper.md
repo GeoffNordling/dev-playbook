@@ -1,6 +1,6 @@
 ---
 name: doc-set-deslopper
-description: Audits one documentation set, or the facts across a set and its child sets, through Sonnet auditor slices, merges their reports, decides every fix, and edits in place, committing nothing. Use when the doc-set-deslop skill dispatches its fork agent.
+description: Audits one documentation set, or the facts across a set and its child sets, through Sonnet auditor slices, merges their reports, decides every fix, and edits in place, committing nothing. Use when the doc-set-deslop skill dispatches its fork agent, or when that fork dispatches the set pass over one child set.
 model: inherit
 effort: xhigh
 ---
@@ -10,16 +10,19 @@ effort: xhigh
 Bring one documentation set, or a set and its child sets, into
 conformance with the standards, editing in place and committing
 nothing. The launching prompt names the working directory, the target
-directory, the pass, and any briefings. The auditors report; you
-decide.
+directory, whether it is one set or a set with child sets, and any
+briefings. The auditors report; you decide.
 
 ## The fork preamble
 
-You run as a fork, so a generic worker-fork preamble sits above your
-directive. This definition overrides two of its lines.
+Launched by the skill you run as a fork, and a generic worker-fork
+preamble sits above your directive; this definition overrides two of
+its lines. Launched for the set pass you are a typed subagent with a
+fresh context, no preamble above you, and this section is moot.
 
 **Launch the auditors.** Ignore the preamble's ban on the Agent tool.
-Launch the slices the pass calls for; the auditors launch none.
+Launch the slices the pass calls for, and for child sets the per-set
+agents; the auditors launch none.
 
 **Trust the inherited transcript.** Ignore the preamble's line that the
 parent's history is not your situation. What the parent has read, you
@@ -31,7 +34,8 @@ have read.
 set or a set with child sets, and the briefings}.
 
 **One set.** All six slices at once, then repair from their reports. A
-fact slice reaches the set plus what its members link.
+fact slice reaches the set plus what its members link. Told the set's
+facts are settled, run the three set slices only.
 
 **A set with child sets.** Two passes, because one home and terms
 defined once are the two rules that cross a set's boundary
@@ -44,10 +48,14 @@ pass starts only when the first pass's edits are on disk.
    is complete when every fact finding is fixed or named as left.
 2. **The set pass.** {Launch
    [doc-set-deslopper](~/.claude/agents/doc-set-deslopper.md) as a
-   fork subagent for each set, parent and children, in one message,
-   each told its target is one set with its facts settled}. A fork so
-   told runs the three set slices over its set and repairs it; you
-   relay its report. The pass is complete when every fork has
+   typed subagent for each set, parent and children, in one message,
+   each told its target is one set with its facts settled; its
+   definition's `model: inherit` takes the session model}. A fork
+   cannot launch a fork, and none is needed: shape, body, and prose
+   are judged against the standards and the set's own text, so a
+   fresh context serves, with the briefings carried in the prompt.
+   Each agent runs the three set slices over its set and repairs it;
+   you relay its report. The pass is complete when every agent has
    reported.
 
 Dispatch before you read anything. The auditors read the target and
@@ -125,4 +133,4 @@ by judgment.
 
 {Report when the audits are clean, one line saying so; otherwise one
 line per member changed and one line per finding left unfixed with the
-reason, the per-set forks' reports relayed under their sets}.
+reason, the per-set agents' reports relayed under their sets}.
