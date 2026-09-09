@@ -99,6 +99,9 @@
   ├─reads───► GitHub    the labels for the phase
   └─reads───► GitHub    the issue's PR for the board's PR column
 
+[call-stack] Skill · model: inherit, effort: medium
+  └─reports─► outcome: str    the call stack, one block per level, then one line for what sits outside the whole stack
+
 [candidate-promote] Skill · model: inherit, effort: xhigh
   ├─args────► candidate
   ├─reads───► [candidates] Standard    as the contract
@@ -289,8 +292,8 @@
 
 [rewind-compact] Skill · model: opus, effort: medium
   ├─args────► target
-  ├─does────► [commit] Skill
-  ├─reports─► outcome: str    the Tangential compaction summary
+  ├ ╌ does ╌ ► [commit] Skill    if the tree is dirty
+  ├─reports─► outcome: str    the compaction summary
   └─reports─► outcome: str    the verbatim text of the rewind target
 
 [runbook-creator] Skill · model: opus, effort: xhigh
