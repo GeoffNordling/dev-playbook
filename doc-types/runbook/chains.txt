@@ -167,7 +167,7 @@
 
 [doc-set-diagram] Skill · model: inherit, effort: medium
   ├─args────► set-hint
-  ├─reads───► `index.md`    , the set's root
+  ├─reads───► `index.md`    at the set's root
   ├ ╌ reads ╌ ► [working-documentation-sets] Standard    § the-link-tree    if the set is a working set, the directory `<branch>-working-docs/`
   └─reports─► outcome: str    the diagram
 
