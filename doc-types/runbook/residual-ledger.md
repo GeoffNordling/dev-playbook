@@ -45,8 +45,7 @@ deliberately outside the ontology until a ruling is reversed.
   context means; ruled not accounted.
 - **Behavior-mode setting** — a runbook whose body installs standing
   behavior in the session's ephemeral context and fires no edge at
-  invocation (orchestrate: "everything below you is a subagent").
-  Ruled residual; admitting it later requires a lintable,
+  invocation. Ruled residual; admitting it later requires a lintable,
   deterministic form.
 - **Presentation gestures** — opening an already-written artifact for
   the user (improve-codebase-architecture's `xdg-open` on its report);
@@ -100,12 +99,6 @@ Could not express committing the ambient repo — `git_detail()` demands
 a `-C <repo>` no honest same-repo command carries — or the
 skip-the-amend decision itself; only its report has a primitive.
 
-### clean-up-branch-worktree
-
-Could not express the ambient-repo `git fetch`/`git merge`, the
-`ExitWorktree` tool call (does covers only file-linked runbooks), or the
-state-reading local `git` commands.
-
 ### idea
 
 Could not express the delegation target's own behavior — the Run edge
@@ -139,12 +132,6 @@ itself (no primitive for an iterative Q&A frontier) or the closing
 "do not act on it until the user confirms" prohibition — it is
 conditional on the user's confirmation, and the Never vocabulary has no
 verb for acting.
-
-### orchestrate
-
-Could not express launching runtime-chosen subagents — `{Launch}`
-needs a link to one agent file and none exists — or the persistent
-session posture, which no primitive covers.
 
 ### intake
 
