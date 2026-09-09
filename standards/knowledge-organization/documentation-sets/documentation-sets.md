@@ -27,6 +27,11 @@ a set's concern is its index's introduction
 ([Indexes](/standards/knowledge-organization/indexes.md#the-introduction)).
 The rules bind the set level, how the members relate to each other and
 to their concerns; what one member holds is [Prose](/standards/prose/card.md)'s.
+Every rule here reads one set: its index, its members, and the index one
+level up and one level down. Two reach farther by their own text,
+[one home](#one-home) into any set or repo and
+[terms defined once](#terms-defined-once) into the repo's `CONTEXT.md`;
+a set is otherwise judged with no neighbour's body open.
 
 ## An index in every directory
 

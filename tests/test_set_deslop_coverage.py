@@ -1,8 +1,9 @@
 """The deslop audit assignments stay in lockstep with the standards they slice.
 
-The working-doc-set-deslopper agent divides two standards among three
-auditors by citing section anchors. Two drifts can silently break that
-division:
+The doc-set-deslopper agent divides two standards among six auditors
+by citing section anchors; the third, Working Documentation Sets, the
+auditor reads whole when the set's root is ROOT.md. Two drifts can
+silently break the division:
 
   - a section added to a standard that no auditor is assigned — the new
     rule is never audited;
@@ -24,18 +25,21 @@ from dev_playbook.md import content_lines, github_slug
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/working-doc-set-deslopper.md"
+DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-deslopper.md"
+AUDITOR = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-auditor.md"
+WORKING_SETS = (
+    REPO_ROOT
+    / "standards/knowledge-organization/documentation-sets/working-documentation-sets.md"
+)
 
 # The sliced standards, each with the leaf headings the division deliberately
 # leaves out: covered by a written exemption or by a deterministic linter.
 EXEMPT: dict[Path, frozenset[str]] = {
     REPO_ROOT
-    / "standards/knowledge-organization/documentation-sets/working-documentation-sets.md": frozenset(),
+    / "standards/knowledge-organization/documentation-sets/documentation-sets.md": frozenset(),
     REPO_ROOT / "standards/prose/conventions.md": frozenset(
         {
-            # Working sets are exempt by the speculative-voice section.
-            "declarative-present-tense",
-            # A working-set member is always a declarative document, never
+            # A set member is always a declarative document, never
             # harness-loaded, so this voice rule never binds it.
             "imperative-and-second-person",
             # prose-lint enforces these deterministically.
@@ -99,3 +103,13 @@ def test_exemptions_name_real_headings() -> None:
         assert not stale, (
             f"EXEMPT names headings gone from {standard.name}: {sorted(stale)}"
         )
+
+
+def test_working_set_rules_are_read_whole() -> None:
+    """The auditor reads Working Documentation Sets whole, so nothing is sliced
+    there; the one thing that can drift is the link itself."""
+    link = "~/workspace/dev-playbook/" + str(WORKING_SETS.relative_to(REPO_ROOT))
+    assert any(link in line for _, line in content_lines(AUDITOR)), (
+        f"{AUDITOR.name} no longer reads {WORKING_SETS.name}; a working set's "
+        "further rules reach no auditor"
+    )

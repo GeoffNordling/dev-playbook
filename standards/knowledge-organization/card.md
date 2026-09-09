@@ -27,8 +27,8 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
 - [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)
-- [working-doc-set-auditor](/dotfiles/dot-claude/agents/working-doc-set-auditor.md)
-  — the LLM judge over one working documentation set, one slice of the
+- [doc-set-auditor](/dotfiles/dot-claude/agents/doc-set-auditor.md)
+  — the LLM judge over one documentation set, one slice of the
   Standards per launch, reporting and editing nothing
 
 ## Enforce
@@ -37,10 +37,10 @@ the README and CONTEXT.md, cross-references, and documentation sets.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — okf-lint, ref-lint, and repo-lint at the **commit gate** in every
   repo's suite, all three dispatched by the published `playbook-lint` hook
-- [working-doc-set-deslop](/dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md)
-  — **on demand**, audits a working documentation set through three
-  auditor slices and then fixes it, the edits left uncommitted for diff
-  review; invoke it as /working-doc-set-deslop
+- [doc-set-deslop](/dotfiles/dot-claude/skills/doc-set-deslop/SKILL.md)
+  — **on demand**, audits a documentation set, or a set and its child
+  sets, through auditor slices and then fixes it, the edits left
+  uncommitted for diff review; invoke it as /doc-set-deslop
 
 ## Adopt
 

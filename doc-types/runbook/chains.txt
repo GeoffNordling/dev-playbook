@@ -64,6 +64,20 @@
   ├─reports─► outcome: str    `outcome` `"done"`
   └ ╌ reports ╌ ► outcome: str    `outcome` `"escalated"` and the reason in `gist`    if you can't produce the review
 
+[doc-set-auditor] Agent · tools: Read, Grep, Glob, model: sonnet, effort: high
+  ├─never writes─►
+  ├─never commits─►
+  ├─reads───► launch prompt    the target directory, the slice's reach, the assigned standard sections, and the briefings
+  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    if the root is `ROOT.md`
+  └─reports─► outcome: str    the findings ranked by how much each would mislead a fresh session reading the set cold
+
+[doc-set-deslopper] Agent · model: inherit, effort: xhigh
+  ├─reads───► launch prompt    the target directory, whether it is one set or a set with child sets, and the briefings
+  ├─does────► [doc-set-deslopper] Agent    as a fork subagent for each set, parent and children, in one message, each told its target is one set with its facts settled
+  ├─does────► [doc-set-auditor] Agent    subagents in one message, one per slice the pass calls for, `model: sonnet`, `effort: high`
+  ├─never commits─►
+  └─reports─► outcome: str    when the audits are clean, one line saying so
+
 [open-pr] Agent · model: sonnet, effort: low
   ├─reads───► GitHub    the PR list for the branch
   ├ ╌ reports ╌ ► outcome: str    that PR    if it lists one
@@ -81,17 +95,6 @@
   ├─never commits─►
   ├ ╌ reports ╌ ► outcome: str    exactly `DONE` — nothing else    if you succeeded
   └ ╌ reports ╌ ► outcome: str    free text describing it    if you hit a problem
-
-[working-doc-set-auditor] Agent · tools: Read, Grep, Glob, model: sonnet, effort: high
-  ├─never writes─►
-  ├─never commits─►
-  ├─reads───► launch prompt    the assigned standard sections
-  └─reports─► outcome: str    the findings ranked by how much each would mislead a fresh session reading the set cold
-
-[working-doc-set-deslopper] Agent · model: inherit, effort: xhigh
-  ├─does────► [working-doc-set-auditor] Agent    three subagents in one message, `model: sonnet`, `effort: high`
-  ├─never commits─►
-  └─reports─► outcome: str    when the audits are clean, one line saying so
 
 [agent-view-overwatch] Skill · model: sonnet, effort: xhigh, allowed-tools: Bash(gh issue *) Bash(gh pr *) Bash(gh api *) Bash(git *)
   ├─reads───► software-factory.md
@@ -156,6 +159,11 @@
   ├ ╌ writes ╌ ► local file    a debug log at each boundary that distinguishes hypotheses    if a debugger or REPL isn't available
   ├ ╌ writes ╌ ► local file    the minimised repro as a failing test at that seam    if a correct seam exists
   └ ╌ does ╌ ► [improve-codebase-architecture] Skill    with the specifics    if the answer involves architectural change (no good test seam, tangled callers, hidden coupling)
+
+[doc-set-deslop] Skill · model: inherit, effort: high
+  ├─args────► set-hint
+  ├─does────► [doc-set-deslopper] Agent    as a fork subagent (`subagent_type: "fork"`)
+  └─never commits─►
 
 [document-remove-tics] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
@@ -360,11 +368,6 @@
   ├─reads───► GitHub    the full body of any related or closed ticket, on demand
   ├─writes──► GitHub    the resolution
   └─writes──► GitHub    newly-surfaced tickets, create-then-wire
-
-[working-doc-set-deslop] Skill · model: inherit, effort: high
-  ├─args────► set-hint
-  ├─does────► [working-doc-set-deslopper] Agent    as a fork subagent (`subagent_type: "fork"`)
-  └─never commits─►
 
 [working-doc-set-diagram] Skill · model: inherit, effort: medium
   └─reports─► outcome: str    the diagram

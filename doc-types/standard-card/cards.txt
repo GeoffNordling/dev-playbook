@@ -35,9 +35,9 @@ knowledge-organization  define   /standards/knowledge-organization/documentation
 knowledge-organization  audit    /scripts/okf-lint
 knowledge-organization  audit    /scripts/ref-lint
 knowledge-organization  audit    /scripts/repo-lint
-knowledge-organization  audit    /dotfiles/dot-claude/agents/working-doc-set-auditor.md
+knowledge-organization  audit    /dotfiles/dot-claude/agents/doc-set-auditor.md
 knowledge-organization  enforce  commit gate
-knowledge-organization  enforce  /dotfiles/dot-claude/skills/working-doc-set-deslop/SKILL.md
+knowledge-organization  enforce  /dotfiles/dot-claude/skills/doc-set-deslop/SKILL.md
 knowledge-organization  adopt    none
 modules                 define   /standards/modules/design.md
 modules                 audit    none

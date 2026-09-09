@@ -17,7 +17,7 @@ in-process work. What goes inside each file is
 [Knowledge Organization](/standards/knowledge-organization/card.md)'s and
 [Prose](/standards/prose/card.md)'s, which an agent reads before it writes one.
 Members typically carry `type: General-Sheet`, the registry's genre for a
-working document whose type is not yet settled. The working-doc-set-deslop
+working document whose type is not yet settled. The doc-set-deslop
 skill enforces the rules on demand
 ([Knowledge Organization](/standards/knowledge-organization/card.md#enforce)).
 
