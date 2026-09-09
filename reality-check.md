@@ -98,7 +98,15 @@ ways, not in the descriptions; definition/encoding "Where a Standard
 lives" is a real doc finding. 6 settled, uncommitted:
 child-inside-its-parent became `rows-inside-the-set`, binding every row,
 member or child, to the intro sentence; `cards.md:66` anchor updated.
-Next: commit, re-run the four auditors with the shared prompt.
+Committed in `d5103f8`; files renamed in `fdf8118`. Second audit
+(four Opus, same prompt) found five standard defects; rulings: A, a
+`CONTEXT.md` entry is a one-line view of the coining member's
+definition; B, a view is a medium other than prose, a second prose
+sentence is a duplicate even beside a link; C, Card Catalog's directory
+introduction rewritten, second sentence names non-Define members; D, the
+root set has no parent so rows-inside-the-set is silent there (prompt
+ruling, no clause); E dropped, `docs/` passes as loose. Next: commit,
+third audit run.
 
 ### 1. one-home: a restatement at a different grain reads as a second home
 

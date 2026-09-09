@@ -67,9 +67,12 @@ A fact, rule, or decision has one home, the member whose concern is the
 thing the fact binds and the most general such member where the fact
 still holds; every other document links there, whether it sits in the
 same set, another set, or another repo, and may restate the fact only as a
-view: in a new form its own concern needs.
+view: in a medium other than prose that its own concern needs, a table
+cell, a card cell, an index row, a contract field, a glossary entry.
 
-The same rule applies inside one document via Doc Conventions'
+A second prose sentence stating the fact is a duplicate, even beside a
+link to the home. The same rule applies inside one document via Doc
+Conventions'
 [one rule, one place](/standards/prose/conventions.md#one-rule-one-place).
 
 ## Distinct concerns
@@ -83,13 +86,14 @@ cannot be told apart are one concern written twice, and merge.
 
 ## Terms defined once
 
-A term is defined once, in the member whose concern it is; only a term
-used beyond the set that coins it is defined in the repo's `CONTEXT.md`
-instead
+A term is defined once, in the member whose concern it is; a term used
+beyond the set that coins it also has an entry in the repo's
+`CONTEXT.md`
 ([CONTEXT.md Content](/standards/knowledge-organization/context-content.md)),
-and every other use links the definition.
+one line that names it and links the definition; every other use links
+the definition.
 
 A definition is a fact like any other, so its home follows
-[one home](#one-home): the widest population the term still holds for.
-A term one set uses stays in that set; `CONTEXT.md` is for the rare term
-that crosses sets.
+[one home](#one-home) and the `CONTEXT.md` entry is its view. A term one
+set uses stays in that set; `CONTEXT.md` is for the rare term that
+crosses sets.
