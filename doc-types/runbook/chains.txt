@@ -112,12 +112,6 @@
   ├ ╌ writes ╌ ► local file    the promoted entries out of `CANDIDATES.md`    if intake reports the issue number
   └─reports─► outcome: str    the issue number and which entries were removed
 
-[clean-up-branch-worktree] Skill · model: sonnet, effort: low
-  ├ ╌ reports ╌ ► outcome: str    the output    if it prints anything
-  ├─reads───► GitHub    the merged PR for the branch, compared with the local `HEAD`
-  ├ ╌ reports ╌ ► outcome: str    both outputs    if the SHAs differ, or the PR list is empty
-  └─reports─► outcome: str    one line: worktree and branch removed, main at that commit
-
 [commit-off] Skill · model: inherit, effort: low
   └─never commits─►
 
@@ -164,6 +158,12 @@
   ├─args────► set-hint
   ├─does────► [doc-set-deslopper] Agent    as a fork subagent (`subagent_type: "fork"`)
   └─never commits─►
+
+[doc-set-diagram] Skill · model: inherit, effort: medium
+  ├─args────► set-hint
+  ├─reads───► `index.md`    at the set's root
+  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    § the-link-tree    if the set is a working set, the directory `<branch>-working-docs/`
+  └─reports─► outcome: str    the diagram
 
 [document-remove-tics] Skill · model: sonnet, effort: high
   ├─args────► doc-hint
@@ -275,10 +275,6 @@
   ├ ╌ writes ╌ ► git(~/workspace/mission-control: add, commit, push)    and push    if there is something to record
   └─reports─► outcome: str    one line with the entry's short name, and that the push landed
 
-[orchestrate] Skill · model: inherit, effort: xhigh
-  ├─reports─► outcome: str    a single line confirming Fable orchestration mode is on
-  └ ╌ reports ╌ ► outcome: str    that immediately    if you are not Fable
-
 [prototype] Skill · model: inherit, effort: xhigh
   ├ ╌ reads ╌ ► logic.md    if the question is whether this logic / state model feels right
   ├ ╌ reads ╌ ► ui.md    if the question is what this should look like
@@ -368,6 +364,3 @@
   ├─reads───► GitHub    the full body of any related or closed ticket, on demand
   ├─writes──► GitHub    the resolution
   └─writes──► GitHub    newly-surfaced tickets, create-then-wire
-
-[working-doc-set-diagram] Skill · model: inherit, effort: medium
-  └─reports─► outcome: str    the diagram
