@@ -24,7 +24,7 @@ BASE_BUNDLE: dict[str, str] = {
         "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
     ),
     "index.md": (
-        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
         "- [Root](/README.md) — Root readme desc\n\n"
         "## Directories\n\n"
         "- [standards/](/standards/index.md) — Cross-project standards\n"
@@ -41,10 +41,14 @@ BASE_BUNDLE: dict[str, str] = {
         "| `Guide` | teaching |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
     ),
-    "standards/index.md": (
-        "# standards/ — index\n\n"
-        "- [Standards](/standards/README.md) — Standards desc\n"
+    "standards/knowledge-organization/index.md": (
+        "# standards/knowledge-organization/ — index\n\nThe KO standards.\n\n"
         "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
+    ),
+    "standards/index.md": (
+        "# standards/ — index\n\nThe standards.\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     ),
 }
 
@@ -175,9 +179,9 @@ def test_missing_description_is_flagged(tmp_path: Path) -> None:
 def test_recipe_description_requires_resource(tmp_path: Path) -> None:
     recipe = "---\ntype: Recipe-Description\ntitle: Ralph\ndescription: A loop\n---\n\n# Ralph\n"
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
         "- [Ralph](/standards/ralph.md) — A loop\n"
     )
     repo = make_bundle(
@@ -194,7 +198,7 @@ def _root_index_listing(*extra: str) -> str:
     """The base root index with ``extra`` bullets added before the Directories section."""
     bullets = "".join(f"{line}\n" for line in extra)
     return (
-        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
         "- [Root](/README.md) — Root readme desc\n"
         f"{bullets}\n"
         "## Directories\n\n"
@@ -207,8 +211,8 @@ def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
     repo = make_bundle(
         tmp_path,
         {
-            "factory/ops.md": doc,
-            "index.md": _root_index_listing("- [Ops](/factory/ops.md) — How ops runs"),
+            "ops.md": doc,
+            "index.md": _root_index_listing("- [Ops](/ops.md) — How ops runs"),
         },
     )
 
@@ -216,17 +220,46 @@ def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "knowledge-organization.type-location" in result.stdout
-    assert "factory/ops.md" in result.stdout
+    assert "ops.md" in result.stdout
     assert "'Standard' lives under standards/" in result.stdout
 
 
 def test_standard_nested_under_standards_dir_is_clean(tmp_path: Path) -> None:
     doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
-    index = (
-        "# standards/ — index\n\n"
-        "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
+    factory_index = (
+        "# standards/factory/ — index\n\nThe factory.\n\n"
         "- [Ops](/standards/factory/ops.md) — How ops runs\n"
+    )
+    index = (
+        "# standards/ — index\n\nThe standards.\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [factory/](/standards/factory/index.md) — The factory\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {
+            "standards/factory/ops.md": doc,
+            "standards/factory/index.md": factory_index,
+            "standards/index.md": index,
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_directory_of_concept_docs_without_an_index_is_flagged(tmp_path: Path) -> None:
+    """A subdirectory holding concept documents carries an index.md of its own;
+    one without is a `knowledge-organization.index-present` finding on the
+    missing file, whatever the parent index lists."""
+    doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    index = (
+        "# standards/ — index\n\nThe standards.\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [Ops](/standards/factory/ops.md) — How ops runs\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_bundle(
         tmp_path, {"standards/factory/ops.md": doc, "standards/index.md": index}
@@ -234,7 +267,45 @@ def test_standard_nested_under_standards_dir_is_clean(tmp_path: Path) -> None:
 
     result = run_okf_lint(repo)
 
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode == 1
+    assert (
+        "standards/factory/index.md: knowledge-organization.index-present"
+        in result.stdout
+    )
+
+
+def test_index_without_an_introduction_is_flagged(tmp_path: Path) -> None:
+    """An index.md opens with prose between its H1 and its first entry; one that
+    goes straight to the listing is a `knowledge-organization.index-intro`
+    finding."""
+    index = (
+        "# standards/ — index\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: knowledge-organization.index-intro" in result.stdout
+
+
+def test_ordering_marker_alone_is_not_an_introduction(tmp_path: Path) -> None:
+    """The `Ordering:` marker is structure, not prose: an index whose only intro
+    line is the marker still has no introduction."""
+    index = (
+        "# standards/ — index\n\n"
+        "Ordering: by significance.\n\n"
+        "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
+    )
+    repo = make_bundle(tmp_path, {"standards/index.md": index})
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "standards/index.md: knowledge-organization.index-intro" in result.stdout
 
 
 def test_non_standard_type_outside_standards_dir_is_clean(tmp_path: Path) -> None:
@@ -243,8 +314,8 @@ def test_non_standard_type_outside_standards_dir_is_clean(tmp_path: Path) -> Non
     repo = make_bundle(
         tmp_path,
         {
-            "factory/ops.md": doc,
-            "index.md": _root_index_listing("- [Ops](/factory/ops.md) — How ops runs"),
+            "ops.md": doc,
+            "index.md": _root_index_listing("- [Ops](/ops.md) — How ops runs"),
         },
     )
 
@@ -254,11 +325,8 @@ def test_non_standard_type_outside_standards_dir_is_clean(tmp_path: Path) -> Non
 
 
 def test_index_omitting_a_concept_is_flagged(tmp_path: Path) -> None:
-    index = (
-        "# standards/ — index\n\n"
-        "- [Standards](/standards/README.md) — Standards desc\n"
-    )  # drops the document-types.md line
-    repo = make_bundle(tmp_path, {"standards/index.md": index})
+    index = "# standards/knowledge-organization/ — index\n\nThe KO standards.\n\n"  # drops the document-types.md line
+    repo = make_bundle(tmp_path, {"standards/knowledge-organization/index.md": index})
 
     result = run_okf_lint(repo)
 
@@ -282,9 +350,9 @@ def test_index_listing_missing_file_is_flagged(tmp_path: Path) -> None:
 
 def test_index_description_drift_is_flagged(tmp_path: Path) -> None:
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — WRONG description\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
@@ -296,7 +364,7 @@ def test_index_description_drift_is_flagged(tmp_path: Path) -> None:
 
 def test_root_index_missing_okf_version_is_flagged(tmp_path: Path) -> None:
     index = (
-        "# bundle index\n\n"
+        "# bundle index\n\nThe bundle.\n\n"
         "- [Root](/README.md) — Root readme desc\n\n"
         "## Directories\n\n"
         "- [standards/](/standards/index.md) — Cross-project standards\n"
@@ -311,7 +379,7 @@ def test_root_index_missing_okf_version_is_flagged(tmp_path: Path) -> None:
 
 def test_root_index_omitting_child_index_is_flagged(tmp_path: Path) -> None:
     index = (
-        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
         "- [Root](/README.md) — Root readme desc\n"
     )  # drops the standards/ child-index link
     repo = make_bundle(tmp_path, {"index.md": index})
@@ -347,9 +415,9 @@ def test_index_listing_non_concept_target_is_flagged(tmp_path: Path) -> None:
     """A bullet whose target is harness/excluded is neither a concept nor a
     child index — it is flagged, not silently dropped."""
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
         "- [Rules](/standards/rules/naming.md) — not a concept doc\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
@@ -365,10 +433,10 @@ def test_index_listing_a_concept_twice_is_flagged(tmp_path: Path) -> None:
     """A concept listed by two bullets is flagged; last-wins collapsing can no
     longer be used to hide a wrong description behind a correct duplicate."""
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Dupe](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_bundle(tmp_path, {"standards/index.md": index})
 
@@ -389,9 +457,9 @@ def test_bullet_inside_a_four_backtick_artifact_fence_is_not_read_as_an_entry(
     draws no index finding.
     """
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) — The document type registry\n\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n\n"
         "An index entry is written like this:\n\n"
         "````markdown\n"
         "```\n"
@@ -447,7 +515,7 @@ CONSUMER_BUNDLE: dict[str, str] = {
         "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
     ),
     "index.md": (
-        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
         "- [Root](/README.md) — Root readme desc\n"
     ),
 }
@@ -513,7 +581,7 @@ def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> Non
         "description: A landmark doc\n---\n\n# A Landmark\n"
     )
     index = (
-        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
         "- [Root](/README.md) — Root readme desc\n"
         "- [A Landmark](/landmark.md) — A landmark doc\n"
     )
@@ -544,7 +612,7 @@ CONSUMER_EXT_BUNDLE: dict[str, str] = {
         "---\ntype: README\ntitle: Root\ndescription: Root readme desc\n---\n\n# Root\n"
     ),
     "index.md": (
-        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\n'
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
         "- [Root](/README.md) — Root readme desc\n\n"
         "## Directories\n\n"
         "- [standards/](/standards/index.md) — Local standards\n"
@@ -554,8 +622,12 @@ CONSUMER_EXT_BUNDLE: dict[str, str] = {
         "# Standards\n"
     ),
     "standards/index.md": (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
+    ),
+    "standards/knowledge-organization/index.md": (
+        "# standards/knowledge-organization/ — index\n\nThe KO standards.\n\n"
         "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
     ),
     "standards/knowledge-organization/document-types.md": EXTENSION_DOC,
@@ -588,10 +660,10 @@ def test_consumer_extension_local_type_doc_is_accepted(tmp_path: Path) -> None:
         "---\ntype: Gizmo\ntitle: A Gizmo\ndescription: A gizmo doc\n---\n\n# A Gizmo\n"
     )
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [A Gizmo](/standards/gizmo.md) — A gizmo doc\n"
-        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_consumer_ext_bundle(
         tmp_path, {"standards/gizmo.md": gizmo, "standards/index.md": index}
@@ -609,10 +681,10 @@ def test_consumer_extension_bogus_type_still_flagged(tmp_path: Path) -> None:
         "---\ntype: Bogus\ntitle: A Bogus\ndescription: A bogus doc\n---\n\n# A Bogus\n"
     )
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [A Bogus](/standards/bogus.md) — A bogus doc\n"
-        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_consumer_ext_bundle(
         tmp_path, {"standards/bogus.md": bogus, "standards/index.md": index}
@@ -641,10 +713,10 @@ def test_consumer_extension_malformed_row_is_flagged_and_walk_continues(
     )
     nope = "---\ntype: Nope\ntitle: A Nope\ndescription: A nope doc\n---\n\n# A Nope\n"
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [A Nope](/standards/nope.md) — A nope doc\n"
-        "- [Local Types](/standards/knowledge-organization/document-types.md) — The local type extension\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_consumer_ext_bundle(
         tmp_path,
@@ -785,11 +857,10 @@ def test_consumer_extension_file_unlisted_in_index_is_flagged_by_index_rule(
 ) -> None:
     """The extension file is an ordinary concept doc: leaving it out of its owning
     index is caught by the existing index rule, no extension-specific code."""
-    index = (
-        "# standards/ — index\n\n"
-        "- [Standards](/standards/README.md) — Standards desc\n"
-    )  # drops the document-types.md line
-    repo = make_consumer_ext_bundle(tmp_path, {"standards/index.md": index})
+    index = "# standards/knowledge-organization/ — index\n\nThe KO standards.\n\n"  # drops the document-types.md line
+    repo = make_consumer_ext_bundle(
+        tmp_path, {"standards/knowledge-organization/index.md": index}
+    )
 
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
@@ -893,7 +964,7 @@ def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> No
     (README.md still leads) is still flagged."""
     guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Apple](/standards/apple.md) — apple guide\n"
@@ -926,10 +997,9 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
                 "description: Standards desc.\n---\n\n# Standards\n"
             ),
             "standards/index.md": (
-                "# standards/ — index\n\n"
+                "# standards/ — index\n\nThe standards.\n\n"
                 "- [Standards](/standards/README.md) — Standards desc.\n"
-                "- [Document Types](/standards/knowledge-organization/document-types.md) —"
-                " The document type registry\n"
+                "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
             ),
         },
     )
@@ -944,13 +1014,16 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
 
 def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
     """The README.md entry must head an index; here it trails a concept doc."""
+    guide = "---\ntype: Guide\ntitle: Zebra\ndescription: zebra guide\n---\n\n# Zebra\n"
     index = (
-        "# standards/ — index\n\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
-        " The document type registry\n"
+        "# standards/ — index\n\nThe standards.\n\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
-    repo = make_bundle(tmp_path, {"standards/index.md": index})
+    repo = make_bundle(
+        tmp_path, {"standards/zebra.md": guide, "standards/index.md": index}
+    )
 
     result = run_okf_lint(repo)
 
@@ -964,13 +1037,12 @@ def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
     marker excuses only the out-of-alphabetical concept order below."""
     guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "Ordering: by significance, not alphabetical.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Apple](/standards/apple.md) — apple guide\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
-        " The document type registry\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
     repo = make_bundle(
         tmp_path,
@@ -990,14 +1062,17 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
     """The `Ordering:` marker exempts only the alphabetical checks; the README.md
     entry must lead even under the marker, so a marked index that lists it
     non-first is still flagged."""
+    guide = "---\ntype: Guide\ntitle: Zebra\ndescription: zebra guide\n---\n\n# Zebra\n"
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "Ordering: by significance, not alphabetical.\n\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
-        " The document type registry\n"
+        "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
     )
-    repo = make_bundle(tmp_path, {"standards/index.md": index})
+    repo = make_bundle(
+        tmp_path, {"standards/zebra.md": guide, "standards/index.md": index}
+    )
 
     result = run_okf_lint(repo)
 
@@ -1011,10 +1086,9 @@ def test_concept_entries_out_of_alphabetical_order_are_flagged(
 ) -> None:
     guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
-        "# standards/ — index\n\n"
+        "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
-        "- [Document Types](/standards/knowledge-organization/document-types.md) —"
-        " The document type registry\n"
+        "- [knowledge-organization/](/standards/knowledge-organization/index.md) — The KO standards\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
         "- [Apple](/standards/apple.md) — apple guide\n"
     )

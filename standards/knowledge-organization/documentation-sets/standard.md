@@ -1,16 +1,15 @@
 ---
 type: Standard
 title: Documentation Sets
-description: How the concept documents one index.md owns relate as a set — a body inside its declared concern, a child set inside its parent, one home for every fact, distinct concerns, and terms defined once
+description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, a child set inside its parent, one home for every fact, distinct concerns, and terms defined once
 population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record among them"
 ---
 
 # Documentation Sets
 
 A **documentation set** is the concept documents one `index.md` owns: the
-documents in its directory, and in every subdirectory with no `index.md`
-of its own, which the nearest index above absorbs. A directory with its
-own `index.md` is a set of its own, nested in the parent's. The index is
+documents in its directory. A subdirectory carries an `index.md` of its
+own and is a set of its own, nested in the parent's. The index is
 the set's root and its listing is the set's membership
 ([Indexes](/standards/knowledge-organization/indexes.md)); a link never
 makes a file a member, since a link reaches any file in any set or repo
@@ -26,6 +25,17 @@ a set's concern is the sentence its index's introduction opens with
 ([Indexes](/standards/knowledge-organization/indexes.md#the-introduction)).
 The rules bind the set level, how the members relate to each other and
 to their concerns; what one member holds is [Prose](/standards/prose/card.md)'s.
+
+## An index in every directory
+
+A set's members sit in the directory of its index: a subdirectory
+holding concept documents carries an `index.md` of its own and is a
+child set, never absorbed into the parent's listing; okf-lint reports a
+directory without one (`knowledge-organization.index-present`).
+
+A set is then exactly one directory, so the tree a reader walks is the
+tree of sets, and every directory declares its concern in an
+introduction sentence of its own.
 
 ## Body inside its concern
 

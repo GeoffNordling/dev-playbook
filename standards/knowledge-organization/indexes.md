@@ -42,15 +42,20 @@ what a reader needs before the listing makes sense: a start-here
 pointer, where the governing concept is defined, or a structural fact
 the listing hides, such as half the directory's material living
 elsewhere. The `Ordering:` marker goes last, on its own line
-([Ordering](#ordering)).
+([Ordering](#ordering)). okf-lint checks only that the introduction is
+present (`knowledge-organization.index-intro`); what it says is a
+reviewer's judgment.
 
 ## The listing
 
 An `index.md` lists, for its own directory, the directory's `README.md`
 when present, then each concept document as a markdown link carrying
 the document's frontmatter `description` verbatim, then each child
-directory's own `index.md`; a subdirectory with no `index.md` of its
-own is recursed into inline.
+directory's own `index.md`.
+
+A subdirectory holding concept documents carries an `index.md` of its
+own and is listed as a child, never recursed into
+([An index in every directory](/standards/knowledge-organization/documentation-sets/standard.md#an-index-in-every-directory)).
 
 ## Ordering
 

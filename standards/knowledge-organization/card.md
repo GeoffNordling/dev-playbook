@@ -22,8 +22,8 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 
 ## Audit
 
-- [okf-lint](/scripts/okf-lint) — concept-doc frontmatter types and
-  `index.md` freshness
+- [okf-lint](/scripts/okf-lint) — concept-doc frontmatter types, and
+  `index.md` presence, introduction, and freshness
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
 - [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)

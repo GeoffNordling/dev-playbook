@@ -114,6 +114,7 @@ knowledge-organization  document-types               resource-present           
 knowledge-organization  document-types               title                                             —
 knowledge-organization  document-types               types                                             —
 knowledge-organization  document-types               under-standards                                   typed-standard
+knowledge-organization  documentation-sets/standard  an-index-in-every-directory                       —
 knowledge-organization  documentation-sets/standard  body-inside-its-concern                           —
 knowledge-organization  documentation-sets/standard  child-inside-its-parent                           —
 knowledge-organization  documentation-sets/standard  distinct-concerns                                 —
