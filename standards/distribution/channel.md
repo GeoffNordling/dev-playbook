@@ -16,7 +16,7 @@ and identical on CI, and the clone carries the
 [canonical artifacts](/standards/build/canonical.md) with it. A change to
 the standard, hook code, a canonical artifact, or a version pin, reaches a
 consumer only when its pinned `rev` moves; the release is the bump
-([Distribution](/standards/distribution.md)).
+([Distribution](/standards/distribution/card.md)).
 
 ## dev-playbook
 

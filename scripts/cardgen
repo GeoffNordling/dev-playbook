@@ -16,9 +16,9 @@ on demand it is the first link in the lead. A cell holding the single bullet
 
 Usage:
     cardgen            regenerate doc-types/standard-card/cards.txt — one
-                       row per pointer over every card under standards/,
-                       cards alphabetical, cells in card order, pointers
-                       in bullet order
+                       row per pointer over every standards/<name>/card.md,
+                       cards alphabetical by directory, cells in card
+                       order, pointers in bullet order
     cardgen --check    regenerate in memory and diff against cards.txt;
                        exit 1 on drift
 """
@@ -146,7 +146,7 @@ def rows_of(path):
     meta, body = split_frontmatter(text, path)
     if meta.get("type") != CARD_TYPE:
         raise LintError(f"{path}: type is {meta.get('type')!r}, want {CARD_TYPE!r}")
-    card = os.path.basename(path)[: -len(".md")]
+    card = os.path.basename(os.path.dirname(path))
     rows = []
     for cell, lines in cells_of(body, path).items():
         where = f"{path} § {cell}"
@@ -182,9 +182,8 @@ def render(rows):
 
 
 def all_cards(root):
-    """Every flat card under standards/, alphabetical by stem."""
-    paths = sorted(glob.glob(os.path.join(root, "standards", "*.md")))
-    return [p for p in paths if os.path.basename(p) not in ("README.md", "index.md")]
+    """Every card.md one level under standards/, alphabetical by directory."""
+    return sorted(glob.glob(os.path.join(root, "standards", "*", "card.md")))
 
 
 def main(argv):

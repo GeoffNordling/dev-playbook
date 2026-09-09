@@ -6,6 +6,9 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.scripts]
+cloa-viewer = "dev_playbook.cloa_viewer.cli:main"
+
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network
 # and no PyPI -- the single package is discovered at src/dev_playbook.
@@ -30,7 +33,20 @@ dev = [
     "pytest>=9.0",
     "pytest-xdist>=3.8",
     "ruff>=0.15.20",
+    "pytest-playwright>=0.6",
+    "httpx>=0.27",
 ]
+# cloa-viewer's server dependencies. A group rather than a project dependency
+# so a repo that depends on dev-playbook installs none of them.
+viewer = [
+    "starlette>=0.40",
+    "uvicorn>=0.30",
+    "watchfiles>=1.0",
+    "jsonschema>=4.23",
+]
+
+[tool.uv]
+default-groups = ["dev", "viewer"]
 
 [tool.ruff]
 target-version = "py314"

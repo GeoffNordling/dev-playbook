@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "refresh.schema.json",
+  "title": "Refresh record",
+  "description": "The outcome of the last refresh: when it ran, at which commit, and how every registered generator fared.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "started",
+    "finished",
+    "commit",
+    "generators"
+  ],
+  "properties": {
+    "started": {
+      "description": "When the refresh began, UTC RFC 3339 with a Z suffix.",
+      "type": "string"
+    },
+    "finished": {
+      "description": "When the refresh ended, UTC RFC 3339 with a Z suffix.",
+      "type": "string"
+    },
+    "commit": {
+      "description": "The checkout's HEAD when the refresh ran.",
+      "type": "string"
+    },
+    "generators": {
+      "description": "One entry per registered kind, in registry order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/generator"
+      }
+    }
+  },
+  "$defs": {
+    "generator": {
+      "description": "What one kind's generator did in this refresh.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "status",
+        "count",
+        "error"
+      ],
+      "properties": {
+        "kind": {
+          "description": "The registered kind name.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Whether the generator's files were published.",
+          "enum": [
+            "ok",
+            "failed"
+          ]
+        },
+        "count": {
+          "description": "The view files published, and 0 when the generator failed.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "error": {
+          "description": "The traceback when the generator failed, null when it succeeded.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

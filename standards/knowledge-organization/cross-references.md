@@ -18,7 +18,7 @@ or sample output, and ref-lint skips it. A numbered
 source, since a record frozen at merge goes stale as its referents
 move; references to a record are checked like any other. ref-lint is
 the authority
-([Knowledge Organization](/standards/knowledge-organization.md)).
+([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
 ## Fragment anchor matches the slug
 

@@ -13,21 +13,23 @@ export const meta = {
 //   checkCmd      the iteration check gate: a shell command meaning "green" (e.g. 'make check',
 //                 'make -C tools check', an && -chain); '' or whitespace-only means no gate
 //
-// NOTE (2026-06-25, re-probed 2026-07-31): the Workflow runtime's own docs are wrong here — they
-// say objects/arrays reach the script verbatim, but every args value actually arrives
-// JSON-serialized to a string (or undefined when omitted), so the contract is: the caller passes
-// an object, this script parses it. Re-verified directly against the runtime with a probe workflow
-// that reported `typeof args` for both a passed object ("string") and an omitted one ("undefined").
+// NOTE (2026-06-25, re-probed 2026-07-31 and 2026-09-08): how args reaches the script has changed
+// across runtime versions. Through 2026-07 every value arrived JSON-serialized to a string; on
+// 2026-09-08 the same launch arrived as the object itself (a string passed by the caller was
+// parsed by the tool before it reached the script). The contract is therefore: the caller passes
+// an object, and this script accepts either form and validates the result the same way.
 const ARG_TYPES = { model: 'string', maxIters: 'number', planFile: 'string', progressFile: 'string', checkCmd: 'string' }
 
 function parseArgs(raw) {
   if (raw == null)
     throw new Error(`ralph-loop: args is required — pass {${Object.keys(ARG_TYPES).join(', ')}}`)
-  if (typeof raw !== 'string')
-    throw new Error(`ralph-loop: args must be a JSON string, got ${typeof raw}`)
   let opts
-  try { opts = JSON.parse(raw) }
-  catch (e) { throw new Error(`ralph-loop: args is not valid JSON (${e.message})`) }
+  if (typeof raw === 'string') {
+    try { opts = JSON.parse(raw) }
+    catch (e) { throw new Error(`ralph-loop: args is not valid JSON (${e.message})`) }
+  } else {
+    opts = raw
+  }
   if (opts === null || typeof opts !== 'object' || Array.isArray(opts))
     throw new Error(`ralph-loop: args must decode to a JSON object`)
   for (const k of Object.keys(ARG_TYPES))

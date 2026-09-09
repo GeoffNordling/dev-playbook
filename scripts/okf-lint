@@ -24,10 +24,14 @@ that owns them, `knowledge-organization.*`:
   - **Index-staleness** — every `index.md` lists exactly the concept documents
     it owns (a concept document is owned by the nearest `index.md` at or above
     its directory), each with a `description` matching the child's frontmatter,
-    and links each child directory's own `index.md`. A directory with no
-    `index.md` is absorbed into its nearest ancestor index. The repository root
-    `index.md` additionally declares `okf_version`. The prose standard for
-    these rules lives in this repo's standards/ tree.
+    and links each child directory's own `index.md`. A directory holding
+    concept documents carries an `index.md` of its own
+    (`knowledge-organization.index-present`), and every `index.md` opens with
+    an introduction between its H1 and its first entry
+    (`knowledge-organization.index-intro`) — presence only; what it says is a
+    reviewer's judgment. The repository root `index.md` additionally declares
+    `okf_version`. The prose standard for these rules lives in this repo's
+    standards/ tree.
 
 The concept-document/harness-owned split comes from dev_playbook.md.classify. This hook
 asserts unconditionally and fails loud — there is no applicability skip.
@@ -94,6 +98,8 @@ DESCRIPTION_SHAPE = "knowledge-organization.description-shape"
 INDEX_ORDERING = "knowledge-organization.index-ordering"
 TYPE_SHADOWS_UPSTREAM = "knowledge-organization.type-shadows-upstream"
 TYPE_LOCATION = "knowledge-organization.type-location"
+INDEX_PRESENT = "knowledge-organization.index-present"
+INDEX_INTRO = "knowledge-organization.index-intro"
 
 RULES = (
     FRONTMATTER,
@@ -107,6 +113,8 @@ RULES = (
     INDEX_ORDERING,
     TYPE_SHADOWS_UPSTREAM,
     TYPE_LOCATION,
+    INDEX_PRESENT,
+    INDEX_INTRO,
 )
 
 REGISTRY_DOC = "standards/knowledge-organization/document-types.md"
@@ -478,9 +486,20 @@ def check_indexes(
     # Expected ownership: each concept doc belongs to its nearest index; each
     # non-root index is a child of its nearest ancestor index.
     owned_concepts: dict[Dir, set[str]] = {d: set() for d in index_dirs}
+    indexless: set[Dir] = set()
     for rel in concept_docs:
         owner = nearest_index(dir_of(rel), index_dirs, strict=False)
         owned_concepts[owner].add(rel)
+        if dir_of(rel) not in index_dirs:
+            indexless.add(dir_of(rel))
+    for d in sorted(indexless):
+        findings.append(
+            Finding(
+                "/".join((*d, "index.md")),
+                INDEX_PRESENT,
+                "directory holds concept documents but no index.md",
+            )
+        )
 
     owned_children: dict[Dir, set[Dir]] = {d: set() for d in index_dirs}
     for d in index_dirs:
@@ -563,6 +582,41 @@ def check_indexes(
         findings.append(
             Finding("index.md", INDEX, "root index.md must declare okf_version")
         )
+    return findings
+
+
+def check_index_intro(index_docs: list[str], repo_root: Path) -> list[Finding]:
+    """Flag an index with no introduction between its H1 and its first entry.
+
+    The introduction is prose: a non-empty line after the H1 (or from the top
+    when the file has none) and before the first listed entry that is neither a
+    heading nor the ``Ordering:`` marker. Only presence is checked; what the
+    sentence says is a reviewer's judgment.
+    """
+    findings: list[Finding] = []
+    for rel in index_docs:
+        _, body = md.parse_frontmatter((repo_root / rel).read_text(encoding="utf-8"))
+        prose: list[str] = []
+        for _, line in md.lines_outside_fences(body):
+            stripped = line.strip()
+            if INDEX_BULLET.match(line):
+                break
+            if stripped.startswith("# "):
+                prose = []  # the introduction starts after the H1
+            elif (
+                stripped
+                and not stripped.startswith("#")
+                and not stripped.startswith(ORDERING_MARKER)
+            ):
+                prose.append(stripped)
+        if not prose:
+            findings.append(
+                Finding(
+                    rel,
+                    INDEX_INTRO,
+                    "no introduction between the H1 and the first entry",
+                )
+            )
     return findings
 
 
@@ -690,6 +744,7 @@ def main(argv: list[str] | None = None) -> int:
 
     findings = check_types(concept_docs, repo_root, registry)
     findings.extend(check_indexes(concept_docs, index_docs, repo_root))
+    findings.extend(check_index_intro(index_docs, repo_root))
     findings.extend(check_index_ordering(index_docs, repo_root))
     findings.extend(registry_findings)
 

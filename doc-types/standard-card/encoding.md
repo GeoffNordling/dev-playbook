@@ -46,22 +46,27 @@ generator: a card that cannot be sliced cannot be viewed.
 
 ## Where a card lives
 
-A card is `standards/<name>.md`, flat, and every flat file there except
-`README.md` and `index.md` is a card; the tree's rule is flat = card,
-directory = content. The rule and its lint are
-[Flat layout](/standards/standard/cards.md#flat-layout).
+A card is `standards/<name>/card.md`, and every immediate subdirectory
+of `standards/` except `references/` holds one; the tree's rule is one
+directory, one standard, the card beside the Standards it points at. The
+rule and its lint are
+[Directory layout](/standards/standard/cards.md#directory-layout).
 Where a document typed `Standard` lives is the Standard doc-type's rule,
 in [definition.md](/doc-types/standard/definition.md#where-a-standard-lives).
 
 ## Naming
 
-A filename under `standards/`, card or contract document alike, is
+A filename under `standards/`, directory or contract document alike, is
 kebab-case and names its topic as a noun: a plain
-noun (`conventions.md`, `records.md`, `distribution.md`), a noun compound
+noun (`conventions.md`, `records.md`, `distribution/`), a noun compound
 (`cache-gate.md`, `context-content.md`), or a gerund compound
 (`linking-issues.md`) — never a bare verb
-(`skill-write.md`). When a directory has an established family prefix, a
-new sibling on the same subject keeps it.
+(`skill-write.md`). `card.md` and `index.md` are the fixed role names,
+named for what the file is in its directory rather than for a topic; a
+special-case directory's general Standard is named for its topic like
+any other (`documentation-sets/documentation-sets.md`), never
+`standard.md`, which would overload the word. When a directory has an
+established family prefix, a new sibling on the same subject keeps it.
 
 ## The catalog
 

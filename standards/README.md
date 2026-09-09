@@ -11,13 +11,14 @@ workspace.
 
 ## How this directory reads
 
-Every flat `.md` here (besides this README and `index.md`) is a **standard
-card**: the four-cell record — define, audit, enforce, adopt — locating one
-standard's contract, checkers, gates, and adoption helpers. Every directory
-holds content the cards point into: a standard's contract prose (`build/`
-behind `build.md`), templates, or vendored references. The rule is the
-tree: **flat = card, directory = content**. The contract behind the cards
-themselves is the Standard-Card doc-type
+Every directory here except `references/` is one standard. Its `card.md`
+is the **standard card**: the four-cell record — define, audit, enforce,
+adopt — locating the standard's contract, checkers, gates, and adoption
+helpers. Beside the card sit the Standards its Define cell points at
+(`build/skeleton.md` beside `build/card.md`), any templates, and the
+guides that serve them. The rule is the tree: **one directory, one
+standard**; `references/` holds vendored mirrors. The contract behind the
+cards themselves is the Standard-Card doc-type
 ([doc-types/standard-card/](/doc-types/standard-card/index.md)).
 
 ## Rules live here; their subjects live elsewhere

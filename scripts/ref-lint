@@ -41,7 +41,6 @@ Usage:
 # ///
 
 import argparse
-import re
 import sys
 from pathlib import Path
 
@@ -71,8 +70,6 @@ RULES = tuple(RULE_FOR.values())
 # forcing a conscious decision rather than a silent blanket exemption. The scope
 # is docs/decisions/, so standards/decisions/ (the contract) is still validated,
 # and references TO records are always validated.
-RECORDS_DIR = ("docs", "decisions")
-_RECORD_NAME = re.compile(r"^\d+-.+\.md$")
 _VALIDATED_RECORDS_FILES = frozenset({"index.md", "README.md"})
 
 
@@ -101,13 +98,13 @@ def source_files(repo_root: Path) -> list[Path]:
     other file under docs/decisions/ raises UnclassifiedRecordsFile so ref-lint
     stops rather than silently blanket-exempt it.
     """
-    depth = len(RECORDS_DIR)
+    depth = len(md.RECORDS_DIR)
     sources: list[Path] = []
     for p in md.find_md_files(repo_root):
         rel = p.relative_to(repo_root)
-        if rel.parts[:depth] != RECORDS_DIR:
+        if rel.parts[:depth] != md.RECORDS_DIR:
             sources.append(p)
-        elif _RECORD_NAME.match(rel.name):
+        elif md.is_decision_record(str(rel)):
             continue  # exempt: immutable record, accepted staleness
         elif rel.name in _VALIDATED_RECORDS_FILES:
             sources.append(p)  # validated: mutable, actively maintained
@@ -239,7 +236,7 @@ def main() -> None:
         md_files = source_files(repo_root)
     except UnclassifiedRecordsFile as err:
         print(
-            f"ref-lint: unclassifiable file under {'/'.join(RECORDS_DIR)}/: "
+            f"ref-lint: unclassifiable file under {'/'.join(md.RECORDS_DIR)}/: "
             f"{err.relpath} (expected a NNNN-slug.md record, index.md, or README.md)",
             file=sys.stderr,
         )

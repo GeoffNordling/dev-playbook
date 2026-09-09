@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "index-tree.schema.json",
+  "title": "index-tree payload",
+  "description": "Every tracked markdown file md.classify does not exclude, in two groups: the concept documents the index.md hierarchy arranges, plus the ones it never reaches, and the harness-owned files as a flat list.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "unindexed",
+    "harness"
+  ],
+  "properties": {
+    "root": {
+      "description": "The checkout root as a directory node; its identity is the empty string.",
+      "$ref": "#/$defs/directory"
+    },
+    "unindexed": {
+      "description": "The concept and index file nodes the walk never reached, sorted by identity.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "harness": {
+      "description": "The harness-owned file nodes the walk never reached, sorted by identity.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    }
+  },
+  "$defs": {
+    "directory": {
+      "description": "One directory row: the facts its index.md carries, and what it lists.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "title",
+        "description",
+        "children"
+      ],
+      "properties": {
+        "identity": {
+          "description": "The repo-relative path with a trailing slash, empty for the root.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The index's H1, or the directory name when the index is missing.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The first sentence of the index's introduction.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "children": {
+          "description": "The rows this directory holds, its own index.md first, then listing order.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/directory"
+              },
+              {
+                "$ref": "#/$defs/file"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "file": {
+      "description": "One file row: its frontmatter facts.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "type",
+        "title",
+        "description",
+        "exists"
+      ],
+      "properties": {
+        "identity": {
+          "description": "The repo-relative path.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The frontmatter type, null when the file carries none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
+          "description": "The frontmatter title, null when the file carries none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "description": "The frontmatter description, null when the file carries none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "exists": {
+          "description": "False when an index lists a file the checkout does not carry.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

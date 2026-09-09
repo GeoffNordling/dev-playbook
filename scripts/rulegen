@@ -6,8 +6,10 @@
 """rulegen — collapse every Standard to rows of two relations.
 
 Prototype implementing doc-types/standard/encoding.md's transform: slice,
-never interpret. A Standard is `standards/<card>/<standard>.md` typed
-`Standard`; its frontmatter `population` is one double-quoted phrase. An
+never interpret. A Standard is `standards/<card>/<standard>.md`, the
+standard part nesting where a Standard's special cases sit in a directory
+of its own stem, typed `Standard`; its frontmatter `population` is one
+double-quoted phrase. An
 H2 with no H3 beneath it is a rule that binds every member; an H2 with H3s
 beneath it is a condition, and each H3 is a rule bound under it. A rule's
 or a condition's id is its heading's GitHub slug, and its predicate is the
@@ -151,9 +153,9 @@ def rows_of(path, root):
     """One standards row and every rules row of one Standard."""
     rel = os.path.relpath(path, root)
     parts = rel.split(os.sep)
-    if len(parts) != 3:
+    if len(parts) < 3:
         raise LintError(f"{rel}: a Standard is standards/<card>/<standard>.md")
-    card, standard = parts[1], parts[2][: -len(".md")]
+    card, standard = parts[1], "/".join(parts[2:])[: -len(".md")]
     with open(path) as f:
         meta, body = split_frontmatter(f.read(), rel)
     population = population_of(meta, rel)

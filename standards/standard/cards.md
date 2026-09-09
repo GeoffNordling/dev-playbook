@@ -1,13 +1,13 @@
 ---
 type: Standard
 title: Card Catalog
-description: A repo's card catalog, the flat cards under standards/ and their index; the question sentence, what Define and Audit cite, no shadowing of an upstream card, and the catalog's order
-population: "a repo's card catalog: the flat standards/<name>.md cards and the standards/index.md that lists them"
+description: A repo's card catalog, the card directories under standards/ and the index that lists them — the directory layout, the question sentence, the directory's introduction, what Define and Audit cite, no shadowing of an upstream card, and the catalog's order
+population: "a repo's card catalog: the standards/<name>/ card directories and the standards/index.md that lists them"
 ---
 
 # Card Catalog
 
-A repo's card catalog: the flat `standards/<name>.md` cards and the
+A repo's card catalog: the `standards/<name>/` card directories and the
 `standards/index.md` that lists them. A card is the catalog record for
 one standard, named by the question it governs, and points at the files
 that define, audit, enforce, and adopt it. What a card is, its four
@@ -16,22 +16,27 @@ Standard-Card doc-type
 ([Standard-Card](/doc-types/standard-card/definition.md),
 [Card Cells](/doc-types/standard-card/contract-shape.md),
 [Card Cells Encoding](/doc-types/standard-card/encoding.md)). The rules
-below bind the catalog's state; standards-lint reports four of them, and
+below bind the catalog's state; standards-lint reports six of them, and
 the pre-commit suite stations it at the commit gate
-([Meta-Standard](/standards/standard.md#enforce)).
+([Meta-Standard](/standards/standard/card.md#enforce)).
 
-## Flat layout
+## Directory layout
 
-Every flat file under `standards/` except `README.md` and `index.md` is
-a card: typed `Standard-Card`, with Define, Audit, Enforce, and Adopt as
-its H2 sections, in that order, each once; standards-lint reports a
-departure (`standard.card-layout`).
+Every immediate subdirectory of `standards/` except `references/` is a
+card directory: it holds `card.md`, typed `Standard-Card`, with Define,
+Audit, Enforce, and Adopt as its H2 sections, in that order, each once,
+and the only flat files under `standards/` are `README.md` and
+`index.md`; standards-lint reports a departure (`standard.card-layout`).
 
-The tree's rule is flat = card, directory = content: a card's Standards
-live under `standards/<name>/`
-([Where a Standard lives](/doc-types/standard/definition.md#where-a-standard-lives)),
-and a filename on either level is a kebab-case noun
-([Naming](/doc-types/standard-card/encoding.md#naming)).
+The tree's rule is one directory, one standard: the card and the
+Standards it defines itself by sit together, one documentation set
+([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)),
+with the Standards at `standards/<name>/<standard>.md`
+([Where a Standard lives](/doc-types/standard/definition.md#where-a-standard-lives)).
+A filename on either level is a kebab-case noun, `card.md` and `index.md`
+the two fixed role names
+([Naming](/doc-types/standard-card/encoding.md#naming)). `references/`
+holds vendored mirrors and no card.
 
 ## The question sentence
 
@@ -45,17 +50,34 @@ the question its standard governs, so the name holds when the answer is
 swapped
 ([Named by the question](/doc-types/standard-card/definition.md#named-by-the-question)).
 
+## The directory's introduction
+
+A card directory's `index.md` opens with the card's title and its
+question sentence, names in a sentence of its own any member the Define
+cell does not point at, and lists the card first; standards-lint reports
+an index that does not open with its card (`standard.card-directory`).
+
+The introduction is the set's concern
+([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
+The card is a summary of its Standards, not a rival to them, so
+[distinct concerns](/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns)
+is judged among the Standards and never against the card.
+
 ## Define points only at Standards
 
-Every Define pointer targets a document typed `Standard`. A Guide is
-linked from a Standard's prose or from the Adopt cell; a tool from the
-Audit, Enforce, or Adopt cell; and a doc-type file from a Standard's
-prose or from a card's lead paragraph.
+Every Define pointer targets a document typed `Standard`, and a Define
+bullet is the link alone, with no ` — ` annotation; standards-lint
+reports an annotated bullet (`standard.card-layout`).
 
-No lint checks the target's type: cardgen slices the first link of a
-bullet and reads nothing of the file it names
-([Cells](/doc-types/standard-card/encoding.md#cells)). The field is
-`define: list[Pointer[Standard]]` in
+A Guide is linked from a Standard's prose or from the Adopt cell; a tool
+from the Audit, Enforce, or Adopt cell; and a doc-type file from a
+Standard's prose or from a card's lead paragraph. A Standard's one-line
+summary lives once, in the directory's index listing, which carries its
+`description` verbatim
+([one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home));
+cardgen reads only the link
+([Cells](/doc-types/standard-card/encoding.md#cells)). No lint checks the
+target's type. The field is `define: list[Pointer[Standard]]` in
 [Card Cells](/doc-types/standard-card/contract-shape.md#the-card).
 
 ## Audit cites a lint
@@ -73,20 +95,20 @@ visible.
 
 ## No shadowing
 
-A repo-scoped card's stem is one no card dev-playbook publishes carries;
-standards-lint reports the collision at the consumer's commit gate
-(`standard.card-shadows-upstream`).
+A repo-scoped card directory's name is one no card directory
+dev-playbook publishes carries; standards-lint reports the collision at
+the consumer's commit gate (`standard.card-shadows-upstream`).
 
-A consumer's `standards/<name>.md` on an upstream stem would silently
-override the workspace-scoped standard of that name. The two scopes are
-[Scope](/doc-types/standard-card/definition.md#scope).
+A consumer's `standards/<name>/card.md` on an upstream name would
+silently override the workspace-scoped standard of that name. The two
+scopes are [Scope](/doc-types/standard-card/definition.md#scope).
 
 ## The catalog
 
-A repo carrying cards has a `standards/index.md` listing every card,
-ordered `README.md` first, in dev-playbook the Meta-Standard card next,
-then the cards alphabetical by title, then the contract documents no
-child index lists alphabetical by title, then the directories;
-standards-lint reports the order (`standard.catalog-order`), and okf-lint
-the membership and each row's description
+A repo carrying cards has a `standards/index.md` listing `README.md`
+first and then every directory, in dev-playbook the Meta-Standard's
+`standard/` next, the rest alphabetical by name, each card directory's
+row carrying the card's `description` verbatim; standards-lint reports
+the order and a row's description (`standard.catalog-order`), and
+okf-lint the membership
 ([The listing](/standards/knowledge-organization/indexes.md#the-listing)).

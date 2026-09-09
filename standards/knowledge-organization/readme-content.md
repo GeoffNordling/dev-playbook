@@ -11,7 +11,7 @@ The `README.md` of a repo or a directory, the GitHub-rendered landing
 document. Its floor is fixed and its depth grows with the project:
 prerequisites, a quick-start, an architecture overview, and examples
 arrive as the project earns them. repo-lint checks the shape
-([Knowledge Organization](/standards/knowledge-organization.md)).
+([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
 ## OKF frontmatter
 

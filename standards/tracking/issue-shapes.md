@@ -150,7 +150,7 @@ states them (`tracking.issue-brief-shape`); `Out of scope` may read
 The body is written once and stays the brief: the plan, the open
 questions, and the decisions of the work live in a working documentation
 set on the branch
-([Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md)),
+([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)),
 and a worklist, an open question, or a running decision in the body is
 the defect.
 

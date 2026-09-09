@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "markdown-file.schema.json",
+  "title": "markdown-file payload",
+  "description": "One tracked markdown file: its frontmatter facts, its headings, the links either way, and its source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "title",
+    "description",
+    "headings",
+    "links_out",
+    "links_in",
+    "source"
+  ],
+  "properties": {
+    "type": {
+      "description": "The frontmatter type, null when the file carries none.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "title": {
+      "description": "The frontmatter title, null when the file carries none.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "description": {
+      "description": "The frontmatter description, null when the file carries none.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "headings": {
+      "description": "Every heading outside a fence, in document order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/heading"
+      }
+    },
+    "links_out": {
+      "description": "Every link the file makes, in reading order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/link"
+      }
+    },
+    "links_in": {
+      "description": "The sorted identities of the other markdown files that link here.",
+      "type": "array",
+      "items": {
+        "description": "A repo-relative path.",
+        "type": "string"
+      }
+    },
+    "source": {
+      "description": "The file as written, frontmatter included, for the page to render.",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "heading": {
+      "description": "One heading: its depth, its text, and the anchor slug GitHub gives it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "text",
+        "slug"
+      ],
+      "properties": {
+        "level": {
+          "description": "The number of hashes, 1 through 6.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "text": {
+          "description": "The heading text without its hashes.",
+          "type": "string"
+        },
+        "slug": {
+          "description": "The GitHub anchor slug for the heading text.",
+          "type": "string"
+        }
+      }
+    },
+    "link": {
+      "description": "One link the file makes, as written, with whether it resolves and what it names.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "status",
+        "identity"
+      ],
+      "properties": {
+        "target": {
+          "description": "The link target exactly as the document writes it.",
+          "type": "string"
+        },
+        "status": {
+          "description": "external for a link out of the checkout, citation for a ~/workspace/<repo>/ reference to another repo which is never checked here, ok when the target names a tracked file, decision-record when it names none and the file making the link is a numbered Decision Record whose staleness is accepted, broken otherwise.",
+          "enum": [
+            "external",
+            "citation",
+            "ok",
+            "decision-record",
+            "broken"
+          ]
+        },
+        "identity": {
+          "description": "The repo-relative path the target names, null for external and citation.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

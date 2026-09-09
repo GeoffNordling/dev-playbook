@@ -1,0 +1,402 @@
+/* The whole page's styles. No framework: the page is three regions, a tree,
+   and a stack of panels, and that is little enough to say plainly. */
+
+:root {
+  --ink: #1c1c1c;
+  --muted: #6b6b6b;
+  --line: #d8d8d8;
+  --ground: #ffffff;
+  --raised: #f6f6f4;
+  --bad: #b3261e;
+  --bad-ground: #fdf0ef;
+  --gutter: 12px;
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+}
+
+/* --- the three regions --- */
+
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
+.regions {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: 0;
+}
+
+.head {
+  border-bottom: 1px solid var(--line);
+}
+
+.tree {
+  border-right: 1px solid var(--line);
+  overflow: auto;
+  padding: var(--gutter);
+  background: var(--raised);
+}
+
+.center {
+  overflow: auto;
+  padding: var(--gutter);
+}
+
+/* --- the banner and the top bar --- */
+
+.banner {
+  background: var(--bad);
+  color: #ffffff;
+  padding: 6px var(--gutter);
+  font-weight: 600;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--gutter);
+  padding: 8px var(--gutter);
+}
+
+/* The same box as .button, so the toggle and the button sit at one height. */
+.topbar-checkout {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+  cursor: pointer;
+}
+
+.topbar-none {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.topbar-status {
+  color: var(--muted);
+  margin-left: auto;
+}
+
+button.topbar-status {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.topbar-status-failed {
+  color: var(--bad);
+  font-weight: 600;
+}
+
+.button {
+  font: inherit;
+  color: inherit;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+/* --- the tree --- */
+
+.tree-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-row {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: start;
+  gap: 4px;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 4px;
+  cursor: pointer;
+}
+
+.tree-row:hover {
+  background: var(--ground);
+}
+
+/* One box per open row, holding that row's children. The guide line down its
+   left edge is what tells a level from the next, so the tree needs no computed
+   indent at all: the boxes nest, and the steps in come with them. */
+.tree-children {
+  margin-left: 10px;
+  padding-left: 6px;
+  border-left: 1px solid var(--line);
+}
+
+/* A row that holds others is set heavier than the files inside it. */
+.tree-row-directory {
+  font-weight: 600;
+}
+
+.tree-row-directory .tree-description {
+  font-weight: 400;
+}
+
+.tree-twist {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.tree-text {
+  min-width: 0;
+}
+
+.tree-title {
+  display: block;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.tree-description {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.tree-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+/* The two group headers. Set small and quiet rather than large and loud: they
+   name the halves of the tree once, and the documents under them are what the
+   eye is meant to land on. */
+.tree-group {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The Not indexed row: okf-lint calls an unreached concept document a defect,
+   so the row that gathers them is drawn as one. */
+.tree-row-bad .tree-title {
+  color: var(--bad);
+}
+
+.tree-row-missing {
+  opacity: 0.5;
+}
+
+.tree-missing {
+  margin-left: 6px;
+  color: var(--bad);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* --- panels --- */
+
+.panels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--ground);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gutter);
+  border-bottom: 1px solid var(--line);
+  padding: 6px var(--gutter);
+  background: var(--raised);
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  margin-right: auto;
+}
+
+.panel-body {
+  padding: var(--gutter);
+}
+
+/* --- failure --- */
+
+.error {
+  border-left: 3px solid var(--bad);
+  background: var(--bad-ground);
+  padding: 8px var(--gutter);
+}
+
+.error-path {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--bad);
+}
+
+.error-text {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* --- the file panel --- */
+
+.file {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+.file-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter);
+}
+
+.file-fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.file-fact-name {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.file-fact-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.file-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 4px;
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.file-heading {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.file-link {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.badge {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 5px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.badge-ok {
+  border-color: #9bbf9b;
+  color: #2c6e2c;
+}
+
+.badge-broken {
+  border-color: var(--bad);
+  background: var(--bad-ground);
+  color: var(--bad);
+}
+
+.file-target {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+button.file-target-open {
+  color: #1a4fa0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.file-source {
+  border-top: 1px solid var(--line);
+  padding-top: var(--gutter);
+  overflow-wrap: anywhere;
+}
+
+.file-source :first-child {
+  margin-top: 0;
+}
+
+.file-source pre {
+  background: var(--raised);
+  border-radius: 4px;
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.file-frontmatter {
+  margin: 0 0 var(--gutter);
+  padding: 8px;
+  background: var(--raised);
+  border-radius: 4px;
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}

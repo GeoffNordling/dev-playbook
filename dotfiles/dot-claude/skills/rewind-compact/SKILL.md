@@ -1,6 +1,6 @@
 ---
 name: rewind-compact
-description: Prepare a limited conversation rewind, compressing the discarded turns into a Tangential compaction summary.
+description: Prepare a limited conversation rewind, compressing the discarded turns into a compaction summary to paste after /rewind.
 disable-model-invocation: true
 model: opus
 effort: medium
@@ -11,34 +11,50 @@ arguments: [target]
 
 ## Procedure
 
-1. **Confirm the rewind target** — the user-typed message the user wants
-   to return to, the turn that initiated the tangent. `/rewind` offers
-   only user-typed messages as checkpoints, and rewinds the conversation
-   to the state *just before* the chosen message was sent: the target and
-   everything after it are discarded. Scan backward for the turn `target`
-   describes.
+1. **Resolve the rewind target** to one user-typed message. `/rewind`
+   offers only user-typed messages as checkpoints, and rewinds the
+   conversation to the state *just before* the chosen message was sent:
+   the target and everything after it are discarded. `target` takes
+   two forms:
+   - A description of the message: scan backward for the turn it
+     describes, the one that initiated the tangent.
+   - A level number from a call stack the user ran with `/call-stack`
+     earlier in this conversation: the level to resume. The target is
+     the message that opened the level directly below it, so `2`
+     targets the message that opened level 3.
 
-2. {Run [/commit](~/.claude/skills/commit/SKILL.md)} and label the commit
-   as a /rewind-compact point.
+   Done when one user-typed message is the target.
 
-3. **Inventory state-on-disk changes** between the rewind target and now:
-   - Files written or edited (list paths).
-   - Commits made (note IDs and branches).
-   - Other persistent artifacts (GitHub issues, PRs).
+2. Check for uncommitted work:
 
-4. **Inventory in-conversation information** between the rewind target and
-   now:
-   - Instructions, decisions, side notes, insights, asides.
-   - Include only what can't be recovered by re-reading the committed
-     files.
-   - Prepare to summarize this information concisely, keeping the
-     important ideas and dropping the rest.
+   ```
+   git status --short
+   ```
 
-5. {Report the Tangential compaction summary; inside a fenced code block,
-   so the user can copy it verbatim and paste it after invoking
-   `/rewind`} and {Report the verbatim text of the rewind target;
-   labelled `**Your /rewind selection target:**` and presented as a
-   blockquote}.
+   {If the tree is dirty, {Run [/commit](~/.claude/skills/commit/SKILL.md)}
+   and label the commit as a /rewind-compact point}. Done when the tree
+   is clean.
+
+3. **Inventory state-on-disk changes** between the rewind target and
+   now: files written or edited (list paths), commits (IDs and
+   branches), other persistent artifacts (GitHub issues, PRs). Done
+   when every change since the target is listed.
+
+4. **Inventory in-conversation information** between the rewind target
+   and now: instructions, decisions, side notes, insights, asides. Only
+   what cannot be recovered by re-reading the committed files, kept
+   concise. When the target is a level, the call stack on screen
+   already holds this. Carry the stack down to the resumed level only:
+   the levels below it are the tangent, closed by the rewind, and never
+   appear as levels. Fold what each closed level settled, and each
+   change from step 3, onto the Settled line of the resumed level, one
+   bullet per ruling or commit, so past-self resumes on the outcome and
+   not the detour. Done when nothing that matters is left out.
+
+5. {Report the compaction summary; inside a fenced code block, so the
+   user can copy it verbatim and paste it after invoking `/rewind`} and
+   {Report the verbatim text of the rewind target; labelled
+   `**Your /rewind selection target:**` and presented as a blockquote}.
 
 ## Output format
 
@@ -53,7 +69,7 @@ The following commits landed during the tangent (not commits you authored):
    - <commit-id> on <branch>.
    - ...
 
-<Other in-conversation information, concisely stated. Omit this paragraph if everything was captured on disk.>
+<When the target was a level: "You are at level <N>: <focus>." followed by the call stack down to level <N>, the tangent's rulings and commits folded onto level <N>'s Settled line and no level below it. Otherwise the in-conversation information from step 4. Omit this paragraph if everything was captured on disk.>
 ```
 
 **Your /rewind selection target:**
@@ -63,7 +79,11 @@ The following commits landed during the tangent (not commits you authored):
 
 ## Notes
 
-- Give a rough turn count from a quick glance back — don't ask the user, and don't enumerate; precision doesn't matter.
-- "Re-read the file" instructions must use full paths so past-self knows exactly what to load.
-- Multiple files may have changed — list them all.
-- If past-self's prior work at the rewind target was substantive (a draft, a diagram, a decision), say "the current state is preferred" so they don't try to redo it.
+- Give a rough turn count from a quick glance back; don't ask the user,
+  and don't enumerate. Precision doesn't matter.
+- "Re-read the file" instructions must use full paths so past-self knows
+  exactly what to load.
+- Multiple files may have changed; list them all.
+- If past-self's prior work at the rewind target was substantive (a
+  draft, a diagram, a decision), say "the current state is preferred" so
+  they don't try to redo it.

@@ -15,4 +15,4 @@ intentions, and explorations — and the Decision Records.
 ## Directories
 
 - [decisions/](/docs/decisions/index.md) — The Decision Records directory — numbered, immutable records of decisions and their rationale
-- [writing-improvement-process/](/docs/writing-improvement-process/index.md) — The writing-improvement process's working files — the catalog of recurring problems in Claude's document writing
+- [writing-improvement-process/](/docs/writing-improvement-process/index.md) — The writing-improvement process's files — the catalog of recurring problems in Claude's document writing

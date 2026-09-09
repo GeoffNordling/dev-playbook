@@ -160,11 +160,14 @@ for a question-and-answer round), the `scripts/harness-files-lint` run (bare
 command, no link for a does edge), or the step-completion gates (no
 control-flow primitive).
 
-### working-doc-set-deslop
+### doc-set-deslop
 
 Could not express the pre-flight `git status` check (no on-disk link, so
-no `{Read}`) or the closing user verdict — accept-and-commit versus
-reject-and-restore-to-`HEAD` — which no primitive covers.
+no `{Read}`), the stop on a hint that names no set or two, the
+one-set-versus-child-sets decision it passes down (a condition on
+the tree, with no link for `{If}` to read), or the closing user
+verdict — accept-and-commit versus reject-and-restore-to-`HEAD` —
+which no primitive covers.
 
 ### doc-pr-review
 

@@ -77,10 +77,15 @@ concrete fact that stops a reader from undoing the rule.
 
 ## Where a Standard lives
 
-A Standard is `standards/<card>/<standard>.md`, typed `Standard`. The
-card column of the view is the directory, the standard column the stem,
-and the population the frontmatter. The label's rule and its lint are
-in
+A Standard is `standards/<card>/<standard>.md`, typed `Standard`, beside
+the `card.md` that points at it. A Standard with special cases, the
+Standards that add rules for one kind of its member, is a directory
+`standards/<card>/<standard>/` holding the general Standard as
+`standard.md` and one file per special case, the card pattern one level
+down. The card column of the view is the first directory, the standard
+column the path beneath it without `.md`, `documentation-sets/documentation-sets`
+and `documentation-sets/working-documentation-sets` for a nested pair, and the population
+the frontmatter. The label's rule and its lint are in
 [definition.md](/doc-types/standard/definition.md#where-a-standard-lives).
 A Standard's filename follows the card encoding's
 [naming rule](/doc-types/standard-card/encoding.md#naming).

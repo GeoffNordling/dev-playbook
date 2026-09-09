@@ -8,8 +8,8 @@ description: What a standard card is — the catalog record for one standard, na
 
 A **standard card** is the catalog record for one standard: it names the
 question the standard governs and points at the files that define,
-audit, enforce, and adopt it. The family is the population of cards, the
-flat files under `standards/`. A card points; it never restates. What a standard *is* — a population and the
+audit, enforce, and adopt it. The family is the population of cards, one
+`card.md` in each directory under `standards/`. A card points; it never restates. What a standard *is* — a population and the
 rules over it — belongs to the Standard doc-type,
 [doc-types/standard/](/doc-types/standard/index.md).
 
@@ -50,7 +50,8 @@ never an intermediate group. Deeper nesting is deliberately unsupported
 (YAGNI): no third scope is introduced until a real population sits between
 "one repo" and "every repo."
 
-**No shadowing.** A repo-scoped card's stem is one no workspace-scoped
-card carries, since a consumer's `standards/<name>.md` on an upstream stem
-would silently override the upstream standard of that name; the rule and
-its lint are [No shadowing](/standards/standard/cards.md#no-shadowing).
+**No shadowing.** A repo-scoped card directory's name is one no
+workspace-scoped card carries, since a consumer's `standards/<name>/card.md`
+on an upstream name would silently override the upstream standard of
+that name; the rule and its lint are
+[No shadowing](/standards/standard/cards.md#no-shadowing).
