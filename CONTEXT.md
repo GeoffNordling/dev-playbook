@@ -61,7 +61,7 @@ How concept documents group
 The concept documents one `index.md` owns, related as a set by the index's listing; a directory with its own `index.md` is a set nested in its parent's.
 
 **Concern**
-The one-line boundary a document or a set declares: a document's frontmatter `description`, a set's index introduction sentence. A body is judged against it.
+The boundary a document or a set declares: a document's frontmatter `description`, a set's index introduction. A body is judged against it.
 
 ### File roles
 

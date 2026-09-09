@@ -66,15 +66,13 @@ introduction is too narrow and is rewritten.
 A fact, rule, or decision has one home, the member whose concern is the
 thing the fact binds and the most general such member where the fact
 still holds; every other document links there, whether it sits in the
-same set, another set, or another repo, and may restate the fact only as a
-view: in a medium other than prose that its own concern needs, a table
-cell, a card cell, an index row, a contract field, a glossary entry.
+same set, another set, or another repo, and states the fact without its
+reason.
 
-A second prose statement of the fact is a duplicate, even beside a link
-to the home. A sentence that applies the fact is not a second statement:
-a step that follows it, or a lead that says which neighbour holds it,
-links the home and gives no reason of its own. The same rule applies
-inside one document via Doc Conventions'
+The reason is what drifts, so it is written once, at the home. A second
+place that argues the fact is a duplicate; a place that names it and
+links the home is not. The same rule applies inside one document via
+Doc Conventions'
 [one rule, one place](/standards/prose/conventions.md#one-rule-one-place).
 
 ## Distinct concerns
