@@ -70,14 +70,18 @@ and lists the others under `_Avoid_`.
 
 ## Tight definitions
 
-A definition is one or two sentences, and says what the term is, not
-what it does.
+A definition is one sentence that says what the term is; where a
+concept document defines the term, the sentence links it, and that
+document is the definition's home
+([terms defined once](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once)).
 
 ## Project terms only
 
 Every term is specific to the project's context; a general programming
 concept, a timeout, an error type, a utility pattern, has no entry,
-however heavily the project uses it.
+however heavily the project uses it; nor has a term one documentation
+set defines and uses within itself. This file holds the term that
+crosses sets.
 
 The test before adding a term: is this a concept unique to this context,
-or a general programming concept? Only the former belongs.
+and used beyond the set that defines it? Only then does it belong.

@@ -23,7 +23,7 @@ restates the context of its day and is never rewritten; so is a
 edited here. A member's **concern** is the one purpose its frontmatter
 `description` states
 ([Document Types](/standards/knowledge-organization/document-types.md#description));
-a set's concern is the sentence its index's introduction opens with
+a set's concern is its index's introduction
 ([Indexes](/standards/knowledge-organization/indexes.md#the-introduction)).
 The rules bind the set level, how the members relate to each other and
 to their concerns; what one member holds is [Prose](/standards/prose/card.md)'s.
@@ -70,9 +70,11 @@ same set, another set, or another repo, and may restate the fact only as a
 view: in a medium other than prose that its own concern needs, a table
 cell, a card cell, an index row, a contract field, a glossary entry.
 
-A second prose sentence stating the fact is a duplicate, even beside a
-link to the home. The same rule applies inside one document via Doc
-Conventions'
+A second prose statement of the fact is a duplicate, even beside a link
+to the home. A sentence that applies the fact is not a second statement:
+a step that follows it, or a lead that says which neighbour holds it,
+links the home and gives no reason of its own. The same rule applies
+inside one document via Doc Conventions'
 [one rule, one place](/standards/prose/conventions.md#one-rule-one-place).
 
 ## Distinct concerns
@@ -82,18 +84,19 @@ a reader at the index picks one.
 
 Two neighbouring concerns draw their boundary where there is room, in
 each lead paragraph, each linking the other. Two whose descriptions
-cannot be told apart are one concern written twice, and merge.
+cannot be told apart are one concern written twice, and merge. A child
+set whose introduction cannot be told apart from its parent's is the
+parent's concern written twice, and its members merge upwards.
 
 ## Terms defined once
 
-A term is defined once, in the member whose concern it is; a term used
-beyond the set that coins it also has an entry in the repo's
-`CONTEXT.md`
+A term is defined once, in the member whose concern it is, and every
+other use links the definition. A term used beyond the set that coins it
+also has an entry in the repo's `CONTEXT.md`
 ([CONTEXT.md Content](/standards/knowledge-organization/context-content.md)),
-one line that names it and links the definition; every other use links
-the definition.
+a one-sentence gloss that links the definition the way an index row
+links a member; what the gloss says is CONTEXT.md Content's
+([Tight definitions](/standards/knowledge-organization/context-content.md#tight-definitions)).
 
 A definition is a fact like any other, so its home follows
-[one home](#one-home) and the `CONTEXT.md` entry is its view. A term one
-set uses stays in that set; `CONTEXT.md` is for the rare term that
-crosses sets.
+[one home](#one-home).

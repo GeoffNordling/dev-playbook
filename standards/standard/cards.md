@@ -53,15 +53,13 @@ swapped
 ## The directory's introduction
 
 A card directory's `index.md` opens with the card's title and its
-question sentence, names in a second sentence any member the Define cell
-does not point at, and lists the card first; standards-lint reports an
-index that does not open with its card (`standard.card-directory`).
+question sentence, names in a sentence of its own any member the Define
+cell does not point at, and lists the card first; standards-lint reports
+an index that does not open with its card (`standard.card-directory`).
 
-The question sentence is the set's concern
+The introduction is the set's concern
 ([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
-It covers the Standards, which the card summarizes, and not a Guide
-beside them, which the second sentence covers. The card is a summary of
-its Standards, not a rival to them, so
+The card is a summary of its Standards, not a rival to them, so
 [distinct concerns](/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns)
 is judged among the Standards and never against the card.
 
