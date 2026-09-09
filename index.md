@@ -10,6 +10,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
+- [Documentation Sets Reality Check](/reality-check.md) — Session record of auditing the repo's documentation sets against the Documentation Sets standard — the six problems found, examples, and proposed rule changes; delete when the standard is settled
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories

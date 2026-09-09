@@ -58,16 +58,13 @@ is organized in markdown*, one part of `standards/`, *the catalog*.
 
 ## One home
 
-A fact, rule, or decision is stated in one member, the one whose concern
-is the most general where the fact still holds; every other document
-links there, whether it sits in the same set, another set, or another
-repo.
+A fact, rule, or decision has one home, the member whose concern is the
+thing the fact binds and the most general such member where the fact
+still holds; every other document links there, whether it sits in the
+same set, another set, or another repo, and may restate the fact only as a
+view: in a new form its own concern needs.
 
-The specific document links the general one: File Skeleton names
-`docs/decisions/` and links Decision Record Conventions for what a record
-holds, and story-forge links Doc Conventions for how its prose is written
-instead of restating it. Inside one document the same rule is Doc
-Conventions'
+The same rule applies inside one document via Doc Conventions'
 [one rule, one place](/standards/prose/conventions.md#one-rule-one-place).
 
 ## Distinct concerns
