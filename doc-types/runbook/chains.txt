@@ -68,7 +68,7 @@
   ├─never writes─►
   ├─never commits─►
   ├─reads───► launch prompt    the target directory, the slice's reach, the assigned standard sections, and the briefings
-  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    if the root is `ROOT.md`
+  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    if the directory holds `ROOT.md`
   └─reports─► outcome: str    the findings ranked by how much each would mislead a fresh session reading the set cold
 
 [doc-set-deslopper] Agent · model: inherit, effort: xhigh

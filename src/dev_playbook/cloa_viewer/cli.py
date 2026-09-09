@@ -3,8 +3,7 @@
 ``cloa-viewer [path ...] [--port N]`` is the only command the tool has. A path
 that is a checkout is shown as it is; a path that is not one, ``~/workspace/``
 being the case that matters, is scanned for the repos below it and their
-worktrees
-([Server](/worktree-cloa-viewer-tool-working-docs/server.md)).
+worktrees.
 The command refreshes each checkout it found, starts the server, and prints the
 address to open.
 

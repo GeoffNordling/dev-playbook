@@ -1,8 +1,7 @@
 """The server: the page, the view files, the schemas, and the event stream.
 
 Three of the server's five jobs live here, discover, serve, and watch the state
-directory
-([Server](/worktree-cloa-viewer-tool-working-docs/server.md)).
+directory.
 The routes under ``/api`` hand the page everything the contract puts on disk:
 the registered kinds, the schemas, the checkouts, each checkout's view files,
 and the refresh record. ``/`` and ``/assets`` serve the built page itself.

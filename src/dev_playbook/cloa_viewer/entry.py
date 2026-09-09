@@ -5,8 +5,7 @@ name them without importing the registry that lists it. The registry imports
 every kind module to build ``KINDS``; were a kind module to import the registry
 back, importing that kind first would re-enter a half-built registry and fail.
 ``registry`` re-exports both names, so a reader still finds them where the
-design puts them
-([Registry](/worktree-cloa-viewer-tool-working-docs/registry.md)).
+design puts them.
 """
 
 from collections.abc import Callable

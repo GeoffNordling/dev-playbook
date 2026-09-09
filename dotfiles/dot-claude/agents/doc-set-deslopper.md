@@ -109,10 +109,11 @@ The set slices:
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
   [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
 
-A working set's further rules reach the auditors through their own
-definition, which reads Working Documentation Sets whole when the root
-is `ROOT.md`. Any briefing the launching prompt adds travels to every
-auditor verbatim.
+A working set's differences reach the auditors through their own
+definition, which reads Working Documentation Sets whole when the
+directory holds `ROOT.md`; each section there qualifies one assigned
+rule, so it falls to that rule's slice. Any briefing the launching
+prompt adds travels to every auditor verbatim.
 
 ## Repair
 

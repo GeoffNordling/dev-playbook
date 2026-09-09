@@ -1,8 +1,7 @@
 """The state directory: where view files live, and the envelope they carry.
 
 The state directory is the whole interface between the server, which writes,
-and the viewer, which reads
-([Contract](/worktree-cloa-viewer-tool-working-docs/contract.md)). It sits at
+and the viewer, which reads. It sits at
 ``$XDG_STATE_HOME/cloa-viewer/`` and holds one subdirectory per checkout, named
 from that checkout's absolute path so a worktree and its main checkout never
 collide. Inside a checkout directory, ``checkout.json`` says which working copy

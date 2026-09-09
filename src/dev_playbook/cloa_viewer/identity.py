@@ -1,8 +1,7 @@
 """Turning a markdown link target into an identity, the way every kind must.
 
 An identity is a repo-relative path, and it is how two panels name the same
-thing without a lookup table
-([Contract](/worktree-cloa-viewer-tool-working-docs/contract.md)). The tree
+thing without a lookup table. The tree
 resolves the targets an ``index.md`` lists and the file panel resolves the
 targets a document links to, so the rule that turns ``/docs/beta.md`` or
 ``../beta.md`` into ``docs/beta.md`` is written once, here, for both.

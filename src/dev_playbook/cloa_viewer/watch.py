@@ -1,7 +1,6 @@
 """The checkout watcher: an edit in a checkout becomes a refresh.
 
-This is the second of the server's five jobs
-([Server](/worktree-cloa-viewer-tool-working-docs/server.md)):
+This is the second of the server's five jobs:
 on any change to a file in the checkout, wait a short settle time, then run
 every generator again. A refresh of this repo costs a fraction of a second, so
 a whole refresh on every batch is affordable and no change needs a rule of its

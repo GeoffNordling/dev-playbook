@@ -1,13 +1,11 @@
 """Discovery: the paths the command was given become the list of checkouts.
 
-This is the first of the server's five jobs
-([Server](/worktree-cloa-viewer-tool-working-docs/server.md)).
+This is the first of the server's five jobs.
 A path that is a checkout is shown as it is; a path that is not one,
 ``~/workspace/`` being the case that matters, is scanned for the repos directly
 below it and every linked worktree of each. One server then covers the whole
 workspace, and repo and branch are chosen on the page rather than on the
-command line
-([CLOA Viewer](/worktree-cloa-viewer-tool-working-docs/ROOT.md#constraints)).
+command line.
 
 Git answers which working copies a repo has. ``git worktree list`` knows about
 a worktree wherever it sits on disk, including one under the main checkout's

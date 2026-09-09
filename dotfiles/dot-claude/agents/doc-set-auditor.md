@@ -23,14 +23,11 @@ rule outside the assignment belongs to a sibling auditor.
 
 A set is the concept documents one `index.md` owns, the files in its
 directory
-([Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md));
-a working set is the root `ROOT.md` plus every member it links, plus
-any file in the set's directory the root fails to link — an unlinked
-member is itself a finding, never a reason to skip the file. {If the
-root is `ROOT.md`,
-{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)}}
-and apply its sections that fall under the assigned slice; it holds
-the whole of a working set's further rules. Read every
+([Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
+{If the directory holds `ROOT.md`,
+{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)}}:
+each section there is one difference stated against a general rule,
+and it falls to the slice that rule is assigned to. Read every
 member of the set in full before judging anything, and read the index
 one level up and each index one level down. No neighbour's body opens
 for a set slice. A fact slice reads farther, because one home and terms

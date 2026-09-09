@@ -1,7 +1,6 @@
 """Refresh: run every registered generator and rewrite one checkout's state.
 
-A refresh is the only path from a checkout to view files
-([Contract](/worktree-cloa-viewer-tool-working-docs/contract.md)). It writes
+A refresh is the only path from a checkout to view files. It writes
 ``checkout.json``, then walks the registry: each kind's views are validated
 against the envelope schema and the kind's own schema before any of them lands,
 staged inside the checkout directory, and moved into place in one step. The

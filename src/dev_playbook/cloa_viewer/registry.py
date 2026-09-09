@@ -1,8 +1,7 @@
 """The registry: the kinds the tool knows, and so the kinds it can show.
 
 Adding a view to the viewer is adding an entry here and nothing else, by the
-known kinds only principle
-([Registry](/worktree-cloa-viewer-tool-working-docs/registry.md)). A refresh
+known kinds only principle. A refresh
 walks ``KINDS`` to write the state directory, and the page asks the server for
 the same list, so a name on one side and not the other is visible rather than
 silent.

@@ -21,8 +21,7 @@ documentation set, a directory, its `index.md`, a card's name. Resolve
 it to the directory whose `index.md` is the set's root; the target is
 that set and every child set nested under it
 ([Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
-A working set is the directory `<branch>-working-docs/` whose root is
-`ROOT.md`
+A working set is the directory `<branch>-working-docs/`
 ([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)).
 A hint that names two unrelated sets, or no hint at all, stops the
 skill before anything runs: ask which set, since a run is one set and

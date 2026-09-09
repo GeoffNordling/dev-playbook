@@ -2,7 +2,8 @@
 
 The doc-set-deslopper agent divides two standards among six auditors
 by citing section anchors; the third, Working Documentation Sets, the
-auditor reads whole when the set's root is ROOT.md. Two drifts can
+auditor reads whole when the set's directory holds ROOT.md, filing each
+section under the slice of the general rule it cites. Two drifts can
 silently break the division:
 
   - a section added to a standard that no auditor is assigned — the new
@@ -113,3 +114,41 @@ def test_working_set_rules_are_read_whole() -> None:
         f"{AUDITOR.name} no longer reads {WORKING_SETS.name}; a working set's "
         "further rules reach no auditor"
     )
+
+
+def leaf_sections(standard: Path) -> dict[str, list[str]]:
+    """Each leaf heading's slug mapped to the lines of its section."""
+    leaves = leaf_slugs(standard)
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    for _, line in content_lines(standard):
+        if m := HEADING.match(line):
+            slug = github_slug(m.group(2))
+            current = slug if slug in leaves else None
+        elif current is not None:
+            sections[current].append(line)
+        if current is not None and current not in sections:
+            sections[current] = []
+    return sections
+
+
+def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
+    """The auditor routes a working-set section to the slice that owns the
+    general rule it qualifies, so every section must cite one such rule by
+    anchor, and that anchor must be one the deslopper assigns."""
+    assigned = {
+        "/" + str(standard.relative_to(REPO_ROOT)): assigned_slugs(standard)
+        for standard in EXEMPT
+    }
+    citation = re.compile(r"\((/standards/[^)#]+\.md)#([a-z0-9-]+)\)")
+    for slug, lines in leaf_sections(WORKING_SETS).items():
+        cited = {
+            (path, anchor)
+            for line in lines
+            for path, anchor in citation.findall(line)
+            if anchor in assigned.get(path, frozenset())
+        }
+        assert cited, (
+            f"{WORKING_SETS.name}#{slug} cites no rule the deslopper assigns; "
+            "an auditor has no slice to file it under"
+        )

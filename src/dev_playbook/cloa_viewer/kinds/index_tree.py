@@ -7,8 +7,7 @@ and follows every listing entry, so the tree on screen is the hierarchy the
 [Indexes](/standards/knowledge-organization/indexes.md) standard describes and
 nothing else. A concept document the walk never reaches lands in ``unindexed``,
 because total accounting is a principle: a file no index names is exactly the
-file the user needs to see
-([CLOA Viewer](/worktree-cloa-viewer-tool-working-docs/ROOT.md#principles)).
+file the user needs to see.
 The harness-owned files the walk never reaches land in ``harness``, a flat list.
 
 Which group a file belongs to is ``md.classify``, the one encoding of the
@@ -17,8 +16,7 @@ disagree about a file's role when they ask the same function. A file that
 function calls ``excluded`` gets no row at all.
 
 A row carries no size of any sort. How big or how complex a document is will
-be a kind of its own, designed on its own, and a summed count is not it
-([Registry](/worktree-cloa-viewer-tool-working-docs/registry.md#index-tree)).
+be a kind of its own, designed on its own, and a summed count is not it.
 """
 
 from pathlib import Path, PurePosixPath
