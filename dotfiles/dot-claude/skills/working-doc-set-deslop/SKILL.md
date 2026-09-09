@@ -16,7 +16,7 @@ in a fork subagent; the session dispatches and reviews.
 ## Target
 
 A set is the directory `<branch>-working-docs/` at the repo root
-([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/working-documentation-sets.md#where-a-set-lives)):
+([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working.md#where-a-set-lives)):
 its root file `ROOT.md` — the plan the work started from — plus the
 members it links. Audit the set `set-hint` names, or the current branch's
 set. Where neither directory exists, ask.

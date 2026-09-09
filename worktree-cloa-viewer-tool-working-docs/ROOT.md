@@ -11,7 +11,7 @@ the workspace, and this set is its plan. The set is speculative: it
 designs a tool still being built, a guess is written as a guess, and an
 open question sits beside its topic. The set lives on this branch alone
 and drains into permanent homes or is deleted before the branch merges
-([Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md)).
+([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working.md)).
 
 ## Goal
 

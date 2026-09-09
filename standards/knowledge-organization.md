@@ -1,14 +1,13 @@
 ---
 type: Standard-Card
 title: Knowledge Organization
-description: Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and working documentation sets
+description: Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and documentation sets
 ---
 
 # Knowledge Organization
 
 Governs how knowledge is organized in markdown — document types, indexes,
-the README and CONTEXT.md, cross-references, and working documentation
-sets.
+the README and CONTEXT.md, cross-references, and documentation sets.
 
 ## Define
 
@@ -27,8 +26,12 @@ sets.
 - [Cross-References](/standards/knowledge-organization/cross-references.md)
   — Links in-bundle, Citations across repos, the runbook forms, and
   fragment anchors
-- [Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md)
-  — how one work stream's in-process files relate as a set
+- [Documentation Sets](/standards/knowledge-organization/documentation-sets.md)
+  — how the concept documents one `index.md` owns relate as a set: the
+  concern each declares, one home for every fact, distinct concerns, terms
+  defined once
+- [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working.md)
+  — the further rules of one work stream's in-process files
 
 ## Audit
 

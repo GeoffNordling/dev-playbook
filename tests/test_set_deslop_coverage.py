@@ -30,7 +30,7 @@ DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/working-doc-set-deslopper.md
 # leaves out: covered by a written exemption or by a deterministic linter.
 EXEMPT: dict[Path, frozenset[str]] = {
     REPO_ROOT
-    / "standards/knowledge-organization/working-documentation-sets.md": frozenset(),
+    / "standards/knowledge-organization/documentation-sets/working.md": frozenset(),
     REPO_ROOT / "standards/prose/conventions.md": frozenset(
         {
             # Working sets are exempt by the speculative-voice section.

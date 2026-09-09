@@ -118,7 +118,7 @@ Standard that owns the content:
   ([Decision Record Conventions](/standards/decisions/records.md)).
 - `<branch>-working-docs/` — one work stream's working documentation set,
   on its branch alone
-  ([Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md#where-a-set-lives)).
+  ([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working.md#where-a-set-lives)).
 - `.claude/` — Claude Code files ([Harness Files](/standards/harness/index.md));
   `worktrees/` under it is gitignored.
 

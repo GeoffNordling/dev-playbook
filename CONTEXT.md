@@ -52,6 +52,17 @@ _Avoid_: venue (retired — say **gate**, or a rung name).
 What compels conformance, in one of two modes: an audit stationed at a gate, whose findings block the path to main there, or a tool invoked on demand, which rewrites the object into conformance.
 _Avoid_: audit, where the blocking or the rewriting is the point — an audit only reports, however it is run.
 
+### Documentation sets
+
+How concept documents group
+([Documentation Sets](/standards/knowledge-organization/documentation-sets.md)).
+
+**Documentation set**
+The concept documents one `index.md` owns, related as a set by the index's listing; a directory with its own `index.md` is a set nested in its parent's.
+
+**Concern**
+The one-line boundary a document or a set declares: a document's frontmatter `description`, a set's index introduction sentence. A body is judged against it.
+
 ### File roles
 
 The two axes a repository file sits on, its role and its content

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Working Documentation Sets
-description: How the in-process Markdown files of one work stream are organized as a set — the branch directory it lives in, root plan, member links, single-home facts, worklists, and local terms
+description: The further rules the in-process Markdown files of one work stream obey as a set — speculative voice, the branch directory, the root plan every member is reached from, worklists, buckets, terms in the root, and acronyms
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -9,9 +9,11 @@ population: "a working documentation set, the Markdown files one stream of in-pr
 
 A **working documentation set** is the group of Markdown files one stream of
 in-process work accumulates, plans, design notes, records, committed to the
-repo and drained into permanent homes or deleted when the work merges. The
-rules bind the set level, how the files relate to each other. What goes
-inside each file is
+repo and drained into permanent homes or deleted when the work merges. It
+is a
+[documentation set](/standards/knowledge-organization/documentation-sets.md),
+so every rule there binds it; the rules below are the further rules of
+in-process work. What goes inside each file is
 [Knowledge Organization](/standards/knowledge-organization.md)'s and
 [Prose](/standards/prose.md)'s, which an agent reads before it writes one.
 Members typically carry `type: General-Sheet`, the registry's genre for a
@@ -29,16 +31,17 @@ That is the whole exemption from the prose conventions'
 [Current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)
 still binds.
 
-## Shape
+## Reached from the root
 
-A set is a tree: one root file, and every other member reached from it by a
-path of links.
+Every member is reached from the root, `ROOT.md`, by a path of links; the
+root is the document the work started from, the plan holding the goal.
 
-- The root, `ROOT.md` ([where a set lives](#where-a-set-lives)), is the
-  document the work started from — the plan holding the goal.
-- A member links what it depends on: its parent, its children, the sibling
-  whose fact it defers to. The root need not link every member.
-- A working file no path from the root reaches is an orphan.
+The index still lists every member
+([Documentation Sets](/standards/knowledge-organization/documentation-sets.md));
+the link tree is the second structure, the one that says what depends on
+what. A member links what it depends on: its parent, its children, the
+sibling whose fact it defers to. The root need not link every member. A
+member no path from the root reaches is an orphan, listed or not.
 
 Links take the form
 [Cross-References](/standards/knowledge-organization/cross-references.md)
@@ -66,17 +69,11 @@ Put the lists where they make sense: one pair for the whole set, or a pair
 per strand where the work splits by level or by function. However it splits,
 a strand has one Planned and one Completed, in one file.
 
-## One home per fact
-
-Each fact, rule, and decision lives in exactly one member; every other
-member links. This extends the prose conventions'
-[one rule, one place](/standards/prose/conventions.md#one-rule-one-place)
-across the set.
-
 ## Buckets
 
-A bucket is a named section role a fact type files under — the single home
-above, made navigable. The list below is a menu: a set uses the buckets its
+A bucket is a named section role a fact type files under —
+[one home](/standards/knowledge-organization/documentation-sets.md#one-home),
+made navigable. The list below is a menu: a set uses the buckets its
 work needs, skips the rest, and coins its own where none fits. An audit
 judges placement against the sections the set actually uses; a bucket the set
 does not use is never a finding.
@@ -93,7 +90,12 @@ does not use is never a finding.
 ## Terms
 
 A term coined by the work and used in more than one member appears in the
-root's terms bucket with a one-line definition.
+root's Terms bucket with a one-line definition, in place of `CONTEXT.md`.
+
+The set is drained at merge, so a term of the work is not yet the repo's
+vocabulary; it reaches `CONTEXT.md` when the member that carries it lands
+in a permanent home
+([Terms defined once](/standards/knowledge-organization/documentation-sets.md#terms-defined-once)).
 
 ## Acronyms
 

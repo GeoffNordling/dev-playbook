@@ -13,4 +13,8 @@ Ordering: reading order.
 - [README Content](/standards/knowledge-organization/readme-content.md) — The README content floor — OKF frontmatter, an H1, and a one-line purpose, with no agent instructions, no decisions, and no roster of harness-injected files
 - [CONTEXT.md Content](/standards/knowledge-organization/context-content.md) — The CONTEXT.md vocabulary center — Vocabulary frontmatter, the Language section, the entry shape, and the rules that keep a glossary tight
 - [Cross-References](/standards/knowledge-organization/cross-references.md) — The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the runbook forms, and fragment anchors that match a heading's slug
-- [Working Documentation Sets](/standards/knowledge-organization/working-documentation-sets.md) — How the in-process Markdown files of one work stream are organized as a set — the branch directory it lives in, root plan, member links, single-home facts, worklists, and local terms
+- [Documentation Sets](/standards/knowledge-organization/documentation-sets.md) — How the concept documents one index.md owns relate as a set — a body inside its declared concern, a child set inside its parent, one home for every fact, distinct concerns, and terms defined once
+
+## Directories
+
+- [documentation-sets/](/standards/knowledge-organization/documentation-sets/index.md) — The special cases of a documentation set, each the further rules one kind of set obeys

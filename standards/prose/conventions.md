@@ -13,21 +13,13 @@ verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
 `.prose-lint-exempt` at its root, under a comment saying why.
 
-## One concern per document
-
-A document covers one concern. When a file accumulates several — distinct
-questions a reader might arrive with — it splits into a directory of
-single-concern documents with an `index.md`, per the
-[OKF SPEC](/standards/references/okf-spec.md). A reader crawling for one
-answer loads one small file.
-
-A subject with layers may split by layer, each file named for the layer it
-holds.
-
 ## One rule, one place
 
 Each rule lives in the lead sentence of its section. If the lead carries the
 rule, the section can stop there. Section size matches topic size.
+
+Across documents the same rule is Documentation Sets'
+[one home](/standards/knowledge-organization/documentation-sets.md#one-home).
 
 ## Current state and next steps only
 
@@ -89,7 +81,7 @@ runs or spans lines. The pairs:
 "The symlink is relative." Not "We make the symlink relative."
 
 A member of a
-[working documentation set](/standards/knowledge-organization/working-documentation-sets.md)
+[working documentation set](/standards/knowledge-organization/documentation-sets/working.md)
 may write a guess as a guess.
 
 ## Positive statement

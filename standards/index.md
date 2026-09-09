@@ -13,7 +13,7 @@ alphabetical; directories last.
 - [Decision Records](/standards/decisions.md) — Governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, immutability, and status vocabulary
 - [Distribution](/standards/distribution.md) — Governs how dev-playbook's checks reach the governed repos — the published hook, the roster, dogfooding, and the pinned rev
 - [Harness Files](/standards/harness.md) — Governs how the files Claude Code loads are written — a CLAUDE.md's content and a runbook's format
-- [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and working documentation sets
+- [Knowledge Organization](/standards/knowledge-organization.md) — Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and documentation sets
 - [Module Design](/standards/modules.md) — Governs how modules are designed — interfaces, depth, and seams
 - [Prose](/standards/prose.md) — Governs how prose is written in every workspace document — voice, structure, and brevity
 - [Python](/standards/python.md) — Governs how Python source is written — fail-loud code, docstrings, module layout, helpers, formatting, and type annotations
@@ -31,7 +31,7 @@ alphabetical; directories last.
 
 - [build/](/standards/build/index.md) — The build standard's Standards, one population each, and the guide to joining the workspace — the file skeleton, the canonical artifacts, the Python project, bootstrap
 - [harness/](/standards/harness/index.md) — The Harness Files card's two Standards, one object each — a CLAUDE.md and a runbook — and the two guides beside them: the registry of what Claude Code loads and the craft of writing for an agent
-- [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, working documentation sets
+- [knowledge-organization/](/standards/knowledge-organization/index.md) — The documentation-content standard, one concern per document — the OKF bundle, the document-type registry, per-file content docs, indexes, cross-references, documentation sets and working documentation sets
 - [prose/](/standards/prose/index.md) — The prose standard's contract, one concern per document — conventions and the slop-tics catalog
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
 - [standard/](/standards/standard/index.md) — The Meta-Standard card's three Standards, one object each (the card catalog, a gate, and a detector), and the guide to standing up a repo-scoped standard in a consumer repo

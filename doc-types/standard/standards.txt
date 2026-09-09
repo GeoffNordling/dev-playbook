@@ -10,10 +10,11 @@ harness                 runbook-conventions         a runbook: a skill bundle or
 knowledge-organization  context-content             a repo's CONTEXT.md
 knowledge-organization  cross-references            a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record
 knowledge-organization  document-types              a concept document
+knowledge-organization  documentation-sets          a documentation set, the concept documents one index.md owns
+knowledge-organization  documentation-sets/working  a working documentation set, the Markdown files one stream of in-process work accumulates
 knowledge-organization  indexes                     an index.md
 knowledge-organization  readme-content              a README.md
 knowledge-organization  type-registry               a document-type registry's Types table, the global one in dev-playbook or a consumer's local extension
-knowledge-organization  working-documentation-sets  a working documentation set, the Markdown files one stream of in-process work accumulates
 modules                 design                      a module in a governed repo's source: anything with an interface and an implementation
 prose                   conventions                 an authored document, except type: Reference and the paths in .prose-lint-exempt
 python                  style                       a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang
@@ -113,6 +114,18 @@ knowledge-organization  document-types              resource-present            
 knowledge-organization  document-types              title                                             —
 knowledge-organization  document-types              types                                             —
 knowledge-organization  document-types              under-standards                                   typed-standard
+knowledge-organization  documentation-sets          body-inside-its-concern                           —
+knowledge-organization  documentation-sets          child-inside-its-parent                           —
+knowledge-organization  documentation-sets          distinct-concerns                                 —
+knowledge-organization  documentation-sets          one-home                                          —
+knowledge-organization  documentation-sets          terms-defined-once                                —
+knowledge-organization  documentation-sets/working  acronyms                                          —
+knowledge-organization  documentation-sets/working  buckets                                           —
+knowledge-organization  documentation-sets/working  reached-from-the-root                             —
+knowledge-organization  documentation-sets/working  speculative-voice                                 —
+knowledge-organization  documentation-sets/working  terms                                             —
+knowledge-organization  documentation-sets/working  where-a-set-lives                                 —
+knowledge-organization  documentation-sets/working  worklist                                          —
 knowledge-organization  indexes                     authored-not-generated                            —
 knowledge-organization  indexes                     okf-version-declared                              the-root-index
 knowledge-organization  indexes                     ordering                                          —
@@ -127,14 +140,6 @@ knowledge-organization  type-registry               add-never-shadow            
 knowledge-organization  type-registry               alphabetical-order                                —
 knowledge-organization  type-registry               name-and-description-only                         local-extension
 knowledge-organization  type-registry               row-shape                                         —
-knowledge-organization  working-documentation-sets  acronyms                                          —
-knowledge-organization  working-documentation-sets  buckets                                           —
-knowledge-organization  working-documentation-sets  one-home-per-fact                                 —
-knowledge-organization  working-documentation-sets  shape                                             —
-knowledge-organization  working-documentation-sets  speculative-voice                                 —
-knowledge-organization  working-documentation-sets  terms                                             —
-knowledge-organization  working-documentation-sets  where-a-set-lives                                 —
-knowledge-organization  working-documentation-sets  worklist                                          —
 modules                 design                      a-port-at-a-process-boundary                      —
 modules                 design                      deep-not-shallow                                  —
 modules                 design                      dependencies-are-accepted-not-constructed         —
@@ -153,7 +158,6 @@ prose                   conventions                 imperative-and-second-person
 prose                   conventions                 lead-with-the-edge-case-when-reach-is-surprising  —
 prose                   conventions                 name-concepts-once-use-consistently               —
 prose                   conventions                 no-slop-tics                                      —
-prose                   conventions                 one-concern-per-document                          —
 prose                   conventions                 one-rule-one-place                                —
 prose                   conventions                 open-with-purpose                                 —
 prose                   conventions                 point-at-canonical-artifacts                      —
