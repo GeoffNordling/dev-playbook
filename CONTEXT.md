@@ -55,7 +55,7 @@ _Avoid_: audit, where the blocking or the rewriting is the point — an audit on
 ### Documentation sets
 
 How concept documents group
-([Documentation Sets](/standards/knowledge-organization/documentation-sets.md)).
+([Documentation Sets](/standards/knowledge-organization/documentation-sets/standard.md)).
 
 **Documentation set**
 The concept documents one `index.md` owns, related as a set by the index's listing; a directory with its own `index.md` is a set nested in its parent's.

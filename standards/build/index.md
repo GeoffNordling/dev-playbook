@@ -1,11 +1,12 @@
 # standards/build/ — index
 
-The build standard's Standards, one population each, and the guide to
-joining the workspace. Start at
+Build governs how a repository is laid out, built, and checked — the file
+skeleton, the canonical artifacts, and the Python project. Start at
 [File Skeleton](/standards/build/skeleton.md).
 
-Ordering: reading order.
+Ordering: the card, then reading order.
 
+- [Build](/standards/build/card.md) — Governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 - [File Skeleton](/standards/build/skeleton.md) — The tree a governed repo carries — the entries every repo requires, keeps at the root, and forbids, and the entries each layer adds, with worked trees
 - [Canonical Artifacts](/standards/build/canonical.md) — The files that live once under standards/build/canonical/ — how each governed repo's copy is compared, what the Makefile targets mean, and the one version set
 - [The Python Project](/standards/build/python.md) — The root Python project — the name mapping, what a Python file in scripts/ carries, and when an entry point is declared

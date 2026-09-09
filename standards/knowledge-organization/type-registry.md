@@ -17,7 +17,7 @@ document's `type` against the union of the two, and against the global
 table alone when the repo carries no extension. Declaring a local
 extension is one step of
 [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md). okf-lint is the
-authority ([Knowledge Organization](/standards/knowledge-organization.md)).
+authority ([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
 ## Row shape
 

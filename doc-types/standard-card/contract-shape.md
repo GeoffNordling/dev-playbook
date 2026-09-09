@@ -18,7 +18,7 @@ one hop.
 
 ## The card
 
-A card is a markdown file at `standards/<name>.md` with
+A card is a markdown file at `standards/<name>/card.md` with
 `type: Standard-Card` frontmatter: a heading, one sentence naming the
 governed question, then exactly four cells as sections. That sentence
 opens `Governs how`, names the territory its define cell covers, and runs
@@ -27,12 +27,14 @@ period, so the catalog row and the card state the same remit; the rule
 and its lint are
 [The question sentence](/standards/standard/cards.md#the-question-sentence).
 Each cell holds
-annotated pointers; an empty cell states an explicit "none" so gaps stay
+pointers, annotated where the annotation carries a fact nothing else
+holds; an empty cell states an explicit "none" so gaps stay
 visible. Cards are thin — often just a handful of pointers — and never
 restate the content of their targets.
 
 - **Define** — the Standards: documents typed `Standard`, each one
-  population and its rules
+  population and its rules, the link alone with no annotation, since the
+  directory's index carries each Standard's description
   ([Define points only at Standards](/standards/standard/cards.md#define-points-only-at-standards)).
 - **Audit** — read-only deviation detection: the detectors that report
   nonconformance without blocking anything. A formatter is a detector by
@@ -55,8 +57,8 @@ restate the content of their targets.
   Often "none": the generic path is an agent reading the define cell and
   fixing the repository.
 
-The cards themselves are the examples: [Build](/standards/build.md) and
-[Meta-Standard](/standards/standard.md) — the latter is the card of the
+The cards themselves are the examples: [Build](/standards/build/card.md) and
+[Meta-Standard](/standards/standard/card.md) — the latter is the card of the
 standard that governs cards, since the meta-standard is an instance of
 the format it defines. The shape in pseudocode:
 
@@ -73,7 +75,7 @@ class StandardCard(Object):
     adopt:   list[Pointer[Adoption]] | None
 
     # rules: each a predicate over one card's state
-    location    = path == f"standards/{name}.md"            # flat, never nested
+    location    = path == f"standards/{name}/card.md"       # beside its Standards
     frontmatter = type == "Standard-Card" and description == question
     layout      = h2s == ["Define", "Audit", "Enforce", "Adopt"]
 ```

@@ -11,9 +11,7 @@ hook, the roster, dogfooding, and the pinned rev.
 
 ## Define
 
-- [Distribution Channel](/standards/distribution/channel.md) — the one
-  published id, the roster, a publisher's local block, and a consumer's
-  pinned rev
+- [Distribution Channel](/standards/distribution/channel.md)
 
 ## Audit
 

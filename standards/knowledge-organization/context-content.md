@@ -12,7 +12,7 @@ several words compete for one concept, one is picked and the rest
 retired. It appears at the root or not at all
 ([File Skeleton](/standards/build/skeleton.md#root-only-files));
 repo-lint checks its shape
-([Knowledge Organization](/standards/knowledge-organization.md)).
+([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
 ## Glossary only
 

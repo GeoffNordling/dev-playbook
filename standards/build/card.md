@@ -11,14 +11,9 @@ skeleton, the canonical artifacts, and the Python project.
 
 ## Define
 
-- [File Skeleton](/standards/build/skeleton.md) — the tree: the entries
-  every repo requires, keeps at the root, and forbids, and what each layer
-  adds
-- [Canonical Artifacts](/standards/build/canonical.md) — the single-source
-  files under `standards/build/canonical/` and how each repo's copy is
-  compared
-- [The Python Project](/standards/build/python.md) — the name mapping,
-  scripts, and entry points
+- [File Skeleton](/standards/build/skeleton.md)
+- [Canonical Artifacts](/standards/build/canonical.md)
+- [The Python Project](/standards/build/python.md)
 
 ## Audit
 

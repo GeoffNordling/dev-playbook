@@ -12,26 +12,13 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 ## Define
 
 - [Document Types](/standards/knowledge-organization/document-types.md)
-  — the frontmatter profile every concept document carries, with the
-  global type registry as its table
 - [Type Registry](/standards/knowledge-organization/type-registry.md)
-  — the Types table's shape and the additive law a consumer's local
-  extension obeys
-- [Indexes](/standards/knowledge-organization/indexes.md) — the
-  `index.md` file: typeless, introduction, listing, ordering, authored
+- [Indexes](/standards/knowledge-organization/indexes.md)
 - [README Content](/standards/knowledge-organization/readme-content.md)
-  — the README floor and what it never holds
 - [CONTEXT.md Content](/standards/knowledge-organization/context-content.md)
-  — the vocabulary center's shape and its glossary rules
 - [Cross-References](/standards/knowledge-organization/cross-references.md)
-  — Links in-bundle, Citations across repos, the runbook forms, and
-  fragment anchors
-- [Documentation Sets](/standards/knowledge-organization/documentation-sets.md)
-  — how the concept documents one `index.md` owns relate as a set: the
-  concern each declares, one home for every fact, distinct concerns, terms
-  defined once
+- [Documentation Sets](/standards/knowledge-organization/documentation-sets/standard.md)
 - [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working.md)
-  — the further rules of one work stream's in-process files
 
 ## Audit
 

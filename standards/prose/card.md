@@ -11,9 +11,7 @@ structure, and brevity.
 
 ## Define
 
-- [prose/conventions.md](/standards/prose/conventions.md) — the contract:
-  declarative present tense, one rule one place, current-state only,
-  none of the named slop tics
+- [Doc Conventions](/standards/prose/conventions.md)
 
 ## Audit
 

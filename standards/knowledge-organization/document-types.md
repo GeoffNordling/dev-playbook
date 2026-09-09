@@ -19,7 +19,7 @@ no frontmatter; and `classify()` in [md.py](/src/dev_playbook/md.py)
 holds the boundary in code with its further exclusions, the transient
 `PLAN.md` and `PROGRESS.md` pair, the root `tmp/` tree, and every
 top-level `tests/` tree. okf-lint is the authority
-([Knowledge Organization](/standards/knowledge-organization.md)).
+([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
 ## Frontmatter block
 

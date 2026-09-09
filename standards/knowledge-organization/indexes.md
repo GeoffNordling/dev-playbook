@@ -16,7 +16,7 @@ bundle per the [OKF SPEC](/standards/references/okf-spec.md), the whole
 repository: an agent triages a document by its frontmatter and navigates
 between documents by the per-directory `index.md`, loading a body only
 when the document is relevant. okf-lint is the authority
-([Knowledge Organization](/standards/knowledge-organization.md)).
+([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
 ## Typeless
 
@@ -26,13 +26,16 @@ document.
 ## The introduction
 
 The prose between the H1 and the first listed entry is present and opens
-with a single sentence: a noun phrase naming what the directory holds, in
-that directory's own vocabulary.
+with a single sentence naming what the directory holds, in that
+directory's own vocabulary.
 
 Restating the path is not an introduction: "the files in `standards/`"
 tells a reader nothing the H1 did not. The live indexes name the thing:
-*the catalog*; *the layered repo standard, one concern per document*;
-*purpose-built artifact formats and their tooling*. Where the sole
+*the catalog*; *the documentation type system*; *Build governs how a
+repository is laid out, built, and checked*, the form a card directory
+fixes
+([The directory's introduction](/standards/standard/cards.md#the-directorys-introduction)).
+Where the sole
 entry's `description` already says what the directory holds, the
 sentence says what it is for instead. After that sentence comes only
 what a reader needs before the listing makes sense: a start-here

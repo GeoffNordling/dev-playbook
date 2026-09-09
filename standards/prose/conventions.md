@@ -19,7 +19,7 @@ Each rule lives in the lead sentence of its section. If the lead carries the
 rule, the section can stop there. Section size matches topic size.
 
 Across documents the same rule is Documentation Sets'
-[one home](/standards/knowledge-organization/documentation-sets.md#one-home).
+[one home](/standards/knowledge-organization/documentation-sets/standard.md#one-home).
 
 ## Current state and next steps only
 
@@ -98,7 +98,7 @@ A document commits none of the tics
 The catalog is the rule's content: each tic's definition, the action that
 removes it, and before-and-after examples. The document-remove-tics skill
 rewrites a document against it on demand
-([Prose](/standards/prose.md#enforce)).
+([Prose](/standards/prose/card.md#enforce)).
 
 ## Harness-loaded agent instructions
 

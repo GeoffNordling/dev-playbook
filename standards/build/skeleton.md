@@ -15,7 +15,7 @@ tree meets, inferred from facts on disk, never declared.
 `standards/build/canonical/` in dev-playbook is quoted material, the source
 of the [canonical artifacts](/standards/build/canonical.md), and no tree
 rule reads it. `repo-lint` is the authority on conformance
-([Build](/standards/build.md)).
+([Build](/standards/build/card.md)).
 
 ## Required files
 
@@ -51,7 +51,7 @@ Checked-in runnables, in any language, live in `scripts/`; no `bin/` or
 `tools/` directory exists at the root.
 
 Shell in `scripts/` is gated by shellcheck and shfmt
-([Shell](/standards/shell.md)); Python in `scripts/` is bound by
+([Shell](/standards/shell/card.md)); Python in `scripts/` is bound by
 [The Python Project](/standards/build/python.md#scripts).
 
 ## Dependencies live in pyproject.toml

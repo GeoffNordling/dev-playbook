@@ -13,19 +13,13 @@ what it does with each, is the registry
 document an agent consumes is
 [Writing for Agents](/standards/harness/writing-for-agents.md), read to
 write one. The voice every harness-loaded file speaks in is the
-[Prose](/standards/prose.md) card's. Claude Code is the only harness in
+[Prose](/standards/prose/card.md) card's. Claude Code is the only harness in
 use.
 
 ## Define
 
-- [CLAUDE.md Content](/standards/harness/claude-content.md) — a
-  `CLAUDE.md` at any scope: no frontmatter, operational content, one
-  scope per rule, and the two sections and required rules of the global
-  source in dev-playbook
-- [Runbook Conventions](/standards/harness/runbook-conventions.md) — a
-  skill bundle or an agent definition: location, front matter, the
-  description, model and effort, the H1, completion criteria, the chain,
-  and the rules each kind adds
+- [CLAUDE.md Content](/standards/harness/claude-content.md)
+- [Runbook Conventions](/standards/harness/runbook-conventions.md)
 
 ## Audit
 

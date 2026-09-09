@@ -16,17 +16,10 @@ lifecycle the phase labels name is
 
 ## Define
 
-- [Candidates](/standards/tracking/candidates.md) — the `CANDIDATES.md`
-  register: the only future-work file, entry shape, structure, and
-  promotion
-- [Issue Shapes](/standards/tracking/issue-shapes.md) — the five species
-  of issue, the labels and body headings each carries, and the rules
-  every body obeys
-- [Label Scheme](/standards/tracking/label-scheme.md) — the closed-world
-  label set, generated from the scheme data, and no blocked label
-- [Repository Settings](/standards/tracking/repo-settings.md) — a GitHub
-  origin, squash-only merges, and a default branch protected from
-  destructive operations
+- [Candidates](/standards/tracking/candidates.md)
+- [Issue Shapes](/standards/tracking/issue-shapes.md)
+- [Label Scheme](/standards/tracking/label-scheme.md)
+- [Repository Settings](/standards/tracking/repo-settings.md)
 
 ## Audit
 
@@ -46,7 +39,7 @@ lifecycle the phase labels name is
 
 A `CANDIDATES.md` carries `Candidate-List` frontmatter and an index entry like
 any concept doc; okf-lint checks both under the
-[knowledge-organization](/standards/knowledge-organization.md) card's rules, not
+[knowledge-organization](/standards/knowledge-organization/card.md) card's rules, not
 this one's.
 
 ## Enforce

@@ -18,15 +18,9 @@ below hold the rules.
 
 ## Define
 
-- [Card Catalog](/standards/standard/cards.md) — the flat cards under
-  `standards/`, the question sentence, what Define and Audit cite, no
-  shadowing of an upstream card, and the index that lists every card in
-  order
-- [Gates](/standards/standard/gates.md) — the three rungs an Enforce cell
-  names, the local two in every clone, the red CI rule, and skips
-- [Detectors](/standards/standard/detectors.md) — the detector contract:
-  read-only, wired throughout its scope, a formatter by its check mode,
-  and the rules a first-party script obeys
+- [Card Catalog](/standards/standard/cards.md)
+- [Gates](/standards/standard/gates.md)
+- [Detectors](/standards/standard/detectors.md)
 
 ## Audit
 

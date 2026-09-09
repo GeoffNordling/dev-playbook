@@ -11,9 +11,7 @@ layout, helpers, formatting, and type annotations.
 
 ## Define
 
-- [python/style.md](/standards/python/style.md) — the contract: a Python
-  file's initializers, docstrings, fail-loud values, statement order,
-  helpers, formatting, and annotations
+- [Python Style](/standards/python/style.md)
 
 ## Audit
 

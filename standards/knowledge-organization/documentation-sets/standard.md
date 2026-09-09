@@ -2,7 +2,7 @@
 type: Standard
 title: Documentation Sets
 description: How the concept documents one index.md owns relate as a set — a body inside its declared concern, a child set inside its parent, one home for every fact, distinct concerns, and terms defined once
-population: "a documentation set, the concept documents one index.md owns"
+population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record among them"
 ---
 
 # Documentation Sets
@@ -16,13 +16,16 @@ the set's root and its listing is the set's membership
 makes a file a member, since a link reaches any file in any set or repo
 in the forms
 [Cross-References](/standards/knowledge-organization/cross-references.md)
-gives. A member's **concern** is the one line its frontmatter
+gives. A numbered
+[Decision Record](/standards/decisions/records.md) is outside every rule
+here, as it is outside Cross-References: a record frozen at merge
+restates the context of its day and is never rewritten. A member's **concern** is the one line its frontmatter
 `description` states
 ([Document Types](/standards/knowledge-organization/document-types.md#description));
 a set's concern is the sentence its index's introduction opens with
 ([Indexes](/standards/knowledge-organization/indexes.md#the-introduction)).
 The rules bind the set level, how the members relate to each other and
-to their concerns; what one member holds is [Prose](/standards/prose.md)'s.
+to their concerns; what one member holds is [Prose](/standards/prose/card.md)'s.
 
 ## Body inside its concern
 

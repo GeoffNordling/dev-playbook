@@ -12,10 +12,7 @@ vocabulary.
 
 ## Define
 
-- [decisions/records.md](/standards/decisions/records.md) — the contract:
-  when a Decision Record is warranted, where it lives, its template,
-  dates, sequential numbering, immutability, the status vocabulary, and
-  the optional sections
+- [Decision Record Conventions](/standards/decisions/records.md)
 
 ## Audit
 

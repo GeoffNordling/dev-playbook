@@ -11,9 +11,7 @@ declared bash, and the shellcheck and shfmt bars every file clears.
 
 ## Define
 
-- [shell/conventions.md](/standards/shell/conventions.md) — a shell file:
-  the glue boundary, strict mode, declared bash, and the shellcheck and
-  shfmt bars
+- [Shell Conventions](/standards/shell/conventions.md)
 
 ## Audit
 

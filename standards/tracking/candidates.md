@@ -11,7 +11,7 @@ A repo's `CANDIDATES.md`, the register of the future work it has not
 committed to. Committed work lives in GitHub issues
 ([Issue Shapes](/standards/tracking/issue-shapes.md)); a
 **Candidate** is work described but not yet decided, and a unit of work
-has [one home](/standards/knowledge-organization/documentation-sets.md#one-home).
+has [one home](/standards/knowledge-organization/documentation-sets/standard.md#one-home).
 The file is optional, one per repo, at the root
 ([File Skeleton](/standards/build/skeleton.md#root-only-files)); its
 absence means nothing has been recorded yet. It carries `Candidate-List`

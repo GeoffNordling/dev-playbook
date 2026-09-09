@@ -35,7 +35,7 @@ one message, `model: sonnet`, `effort: high`}. Each prompt names the working dir
 the set's root file, and that auditor's assigned sections:
 
 - **Fact placement** —
-  [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets.md#one-home),
+  [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/standard.md#one-home),
   [one rule, one place](~/workspace/dev-playbook/standards/prose/conventions.md#one-rule-one-place),
   [point at canonical artifacts](~/workspace/dev-playbook/standards/prose/conventions.md#point-at-canonical-artifacts).
 - **Set shape** —
@@ -45,10 +45,10 @@ the set's root file, and that auditor's assigned sections:
   [buckets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working.md#buckets),
   [terms](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working.md#terms),
   [acronyms](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working.md#acronyms),
-  [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets.md#body-inside-its-concern).
+  [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/standard.md#body-inside-its-concern).
 - **Document prose** —
   [speculative voice](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working.md#speculative-voice),
-  [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets.md#body-inside-its-concern),
+  [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/standard.md#body-inside-its-concern),
   [declare before use](~/workspace/dev-playbook/standards/prose/conventions.md#declare-before-use),
   [current state and next steps only](~/workspace/dev-playbook/standards/prose/conventions.md#current-state-and-next-steps-only),
   [open with purpose](~/workspace/dev-playbook/standards/prose/conventions.md#open-with-purpose),

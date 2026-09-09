@@ -10,8 +10,7 @@ Governs how modules are designed — interfaces, depth, and seams.
 
 ## Define
 
-- [Module Design Conventions](/standards/modules/design.md) — the contract:
-  depth, the deletion test, the seam rules, and the port at a process boundary
+- [Module Design Conventions](/standards/modules/design.md)
 
 ## Audit
 

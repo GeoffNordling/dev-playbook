@@ -10,7 +10,7 @@ Most standards a repo runs are workspace-scoped: inherited from
 dev-playbook through its published hooks, governing every repo alike. A
 repo with a convention no other repo shares declares its own
 **repo-scoped** standard, the same card-and-detector machinery the
-[Meta-Standard](/standards/standard.md) card defines, hosted in the
+[Meta-Standard](/standards/standard/card.md) card defines, hosted in the
 consumer repo instead of dev-playbook. The recipe below is the order of
 operations; every rule a step meets is stated once, in the Standard the
 step links.
@@ -19,11 +19,13 @@ step links.
 
 If the repo has no `standards/` tree yet, create its landing doc first:
 `standards/README.md` (`type: README`) and `standards/index.md`, with
-the README listed first. Add the standard's **card** at
-`standards/<name>.md`, the four cells, and the **Standard** it points
-at under `standards/<name>/`, and register both in the index. The
-layout, the stem, and the index order are
-[Card Catalog](/standards/standard/cards.md): a stem no dev-playbook card
+the README listed first. Add the standard's directory
+`standards/<name>/`, holding its **card** at `card.md` with the four
+cells, the **Standard** the card points at, and an `index.md` that opens
+with the card's question sentence and lists the card first; register
+the directory in the catalog. The layout, the name, the directory's
+index, and the catalog order are
+[Card Catalog](/standards/standard/cards.md): a name no dev-playbook card
 carries ([No shadowing](/standards/standard/cards.md#no-shadowing)), and
 the README-first catalog
 ([The catalog](/standards/standard/cards.md#the-catalog)).
