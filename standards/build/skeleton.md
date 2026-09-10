@@ -112,6 +112,8 @@ canonical copy drifted.
 Entries a repo carries when it has the content, each governed by the
 Standard that owns the content:
 
+- `artifacts.mk` — the build products the gate needs that git does not
+  carry ([Canonical Artifacts](/standards/build/canonical.md#artifactsmk)).
 - `docs/` — guides and surveys that outgrow the README, each an OKF concept
   document.
 - `docs/decisions/` — Decision Records

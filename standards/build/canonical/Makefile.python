@@ -1,3 +1,6 @@
+# Build products the gate needs that git does not carry. A repo with any
+# writes artifacts.mk, which sets ARTIFACTS and builds each file.
+-include artifacts.mk
 .PHONY: format format-check lint typecheck test check
 format:
 	uv run ruff format .
@@ -7,7 +10,7 @@ lint:
 	uv run ruff check .
 typecheck:
 	uv run mypy <code-roots>
-test:
+test: $(ARTIFACTS)
 	uv run pytest
 check: format-check lint typecheck test
 	uvx pre-commit run --all-files
