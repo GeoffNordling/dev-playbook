@@ -113,7 +113,7 @@ segment │    task│  └───────────────┬─�
         │   │        agents/ralph-checkpointer.md                      │
         │   │                                                          │
         │   │   verify what landed ▸ take stock against the goal      │
-        │   │   ▸ re-plan the tasks ahead ▸ write PLAN                 │
+        │   │   ▸ adapt the tasks ahead ▸ write PLAN, log decisions   │
         │   │   ▸ [ ] → [x] on the marker ▸ commit                     │
         │   │   ▸ at the last checkpoint, also check                   │
         │   │     PLAN's ## Done when ▸ report ≤ 10 lines              │
@@ -137,7 +137,7 @@ still fits in one session: only ten lines come back from each review.
 | `/ralph-setup` | writes | writes | — | — |
 | runtime | — | — | — | none, by construction |
 | Ralph | read + check off | read + append | commits | none |
-| fork | read + write | read only | commits | inherits the session's |
+| fork | read + write | read + decisions | commits | inherits the session's |
 | session | — | — | — | owns it |
 
 A Workflow script has no filesystem access, which is why `tasksLeft` is
@@ -165,12 +165,21 @@ task would have to be checked off by an agent, which puts the loop's own state
 in an agent's hands. A marker is inert to Ralph and legible to the runtime.
 
 **Who owns the plan.** The fork does. Iterations check tasks off and never
-change the route; the plan ahead is rewritten only at a checkpoint, where
-something can see the whole run at once. The fork clarifies a task, adds or
-drops or reorders tasks, writes a fix task for work that has to be redone, and
-cuts an extra checkpoint in where the segment ran hot. Two things it may not
-touch: a task already checked off, and the `## Done when` criteria — a run that
-edits its own definition of success has stopped being checkable.
+change the route; the plan ahead is adapted only at a checkpoint, where
+something can see the whole run at once. Adapted, not rewritten — the plan the
+user approved is the trajectory, and every checkpoint that adjusts a little
+leaves a run that ends somewhere nobody agreed to. Clarifying a task or fixing
+an order is free. Adding or dropping a task, changing an approach, or moving a
+checkpoint costs a line in the ledger. Two things the fork may not touch: a task
+already checked off, and the `## Done when` criteria — a run that edits its own
+definition of success has stopped being checkable. Where the plan can no longer
+reach the goal at all, the fork says so and stops rather than routing around it.
+
+**Two ledgers, one file.** Iterations write judgment calls into the progress
+log for the fork to read at the next checkpoint. The fork writes decisions into
+that file's `## Decisions` section for the user to read at PR time. They share a
+file because they are one causal chain: the call raised at iteration 4 is what
+the decision at checkpoint 1 rules on.
 
 **Judgment calls.** An iteration that hits a point the plan does not settle
 records it in the progress log and carries on, rather than stopping. They are

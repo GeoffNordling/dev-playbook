@@ -113,8 +113,8 @@ surfaced under `## Working notes` (else leave it empty for the loop to fill);
 fill the placeholders, keep the structure, drop the authoring comments}, and
 {Write the progress file; instantiate
 [progress-skeleton.md](references/progress-skeleton.md) unchanged — it is fixed,
-and the loop appends to it}}. Run the gate once more; the two new files must
-leave it green, or the names are wrong.
+and the iterations and the checkpoint reviewer append to it}}. Run the gate once
+more; the two new files must leave it green, or the names are wrong.
 
 Then read back what was written and confirm three things before handing off.
 All three are invisible once the run starts, and each one turns a reviewed run
