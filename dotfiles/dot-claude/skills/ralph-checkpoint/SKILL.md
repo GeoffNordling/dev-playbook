@@ -66,15 +66,18 @@ next. Keep it to the fork's own length — this is a relay, not a second review.
 
 Then act on what the fork said:
 
-- **Tasks remain.** State the launch command for the next segment on one
-  line, ready to paste, and never run it yourself — the run is the user's to
-  continue, and a checkpoint that releases itself is not a checkpoint.
+- **Tasks remain.** Launch the next segment yourself, with the same
+  `Workflow` call that started the last one.
 - **The plan is complete.** Say so, and say what the whole run produced. The
   plan and progress files have done their work; whether they stay in the
   history or come out in a final commit is the user's call.
-- **A Verify clause failed, or a task was reverted.** Lead with that. The
-  fork has already written the fix task into the next segment, so the run
-  continues, but the user reads the failure first.
+- **A Verify clause failed, or a task was reverted.** Lead with that in the
+  report, then launch the next segment anyway — the fork has already written
+  the fix task at the front of it.
 
-The skill is complete when the user has the report and, where the run
-continues, the one command that starts the next segment.
+Stop and hand the run back to the user in two cases only: the plan is
+complete, or the loop cannot continue — a blocker, or a fork that reports the
+plan is no longer worth running. Anything short of that, keep going.
+
+The skill is complete when the plan is done, the run is blocked, or the next
+segment is running.

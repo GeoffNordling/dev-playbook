@@ -144,8 +144,9 @@ Workflow({ name: "ralph-loop", args: { model: "<model>", maxIters: <n>, planFile
 `maxIters` is a rail on one segment, not on the run: size it to the longest
 segment plus a little, not to the whole task list.
 
-Then say what happens at the first stop: the workflow returns at the checkpoint,
-and [/ralph-checkpoint](~/.claude/skills/ralph-checkpoint/SKILL.md) reviews the
-segment and hands back the command for the next one. The user runs that pair
-once per segment, the last time to review the finished plan. Naming it is all
-this skill does — the user invokes it, not you.
+Then say what happens after the user starts it: the run continues on its own
+to the end of the plan. At each checkpoint the workflow returns to this
+session, [/ralph-checkpoint](~/.claude/skills/ralph-checkpoint/SKILL.md)
+reviews the finished segment in a fork, and this session launches the next
+segment on what the fork found. The user hears from it when the plan is done,
+or when the loop is blocked and cannot go on.

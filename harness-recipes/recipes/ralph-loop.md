@@ -209,8 +209,10 @@ a sentence rather than a stack trace, because what reads it is a session
 deciding what to do next.
 
 `maxIters` rails one segment, not the run, so size it to the longest segment.
-Each stop is followed by
+At each stop the launching session runs
 [`/ralph-checkpoint`](/dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md),
-which forks the session to review the segment and hands back the command for
-the next one. That pair runs once per segment, the last time to review the
-finished plan against its `## Done when` criteria.
+which reviews the finished segment in a fork and launches the next segment on
+what the fork found. The session drives the whole plan this way without the
+user in between, and the last review checks the finished plan against its
+`## Done when` criteria. The user hears from the run when the plan is done or
+when a blocker stops it.
