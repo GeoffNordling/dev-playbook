@@ -32,8 +32,9 @@ eye, not by hunting for the triangle: a guide line runs down each level,
 and an index row is set heavier than a file row. Each entry shows its
 title and its description, nothing else. A concept document no index
 reaches sits at the end of the first group under a red `Not indexed`
-row, the tree's way of showing the defect okf-lint reports. The second
-group is a flat list by identity. Clicking a file
+row
+([index-tree](/worktree-cloa-viewer-tool-2-working-docs/registry.md#index-tree)).
+The second group is a flat list by identity. Clicking a file
 opens its CLOA panel: the Reference chain for a runbook, the rules for a
 Standard, the cells for a card. A file with no CLOA kind opens its
 `markdown-file` panel. A panel already open comes to the top of the
@@ -52,8 +53,9 @@ checkout.
 
 Every panel about a file lists the other view files with the same
 subject, as buttons. A CLOA panel offers the file's details, its
-`markdown-file` panel, as the exception for when the CLOA object is not
-enough; the details panel offers the CLOA panel back. A link in the
+`markdown-file` panel, one click further by the default face principle
+([CLOA Viewer](/worktree-cloa-viewer-tool-2-working-docs/ROOT.md#principles));
+the details panel offers the CLOA panel back. A link in the
 rendered source, or in the links-in and links-out lists, that points
 inside the checkout opens the target the way the tree does. This is the
 single identity scheme at work; the viewer needs no other

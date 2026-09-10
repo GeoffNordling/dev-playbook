@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Server
-description: The cloa-viewer command, the server's five jobs, and live update by one-way push
+description: The cloa-viewer command, the server's jobs, and live update by one-way push
 ---
 
 # Server
@@ -40,7 +40,7 @@ which runs the code of dev-playbook's main checkout over every checkout
 in the workspace. One server is enough: repo, branch, and worktree are
 chosen on the page, not on the command line.
 
-## The server's five jobs
+## The server's jobs
 
 - **Discover** — turn the paths it was given into the list of checkouts,
   and do it again each time the page asks for the list. A checkout that

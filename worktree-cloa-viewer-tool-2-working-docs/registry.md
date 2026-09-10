@@ -1,14 +1,13 @@
 ---
 type: General-Sheet
 title: Registry
-description: The registered kinds — what an entry consists of, the five v1 kinds and what each panel shows, and the kinds deferred
+description: The registered kinds — what an entry consists of, the v1 kinds and what each panel shows, and the kinds deferred
 ---
 
 # Registry
 
-The registry is the list of kinds the tool can show. v1 registers five.
-A kind outside the registry has no way onto the screen, by the known
-kinds only principle
+The registry is the list of kinds the tool can show. A kind outside the
+registry has no way onto the screen, by the known kinds only principle
 ([CLOA Viewer](/worktree-cloa-viewer-tool-2-working-docs/ROOT.md#principles)).
 Every view file a kind produces obeys the
 [Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md). What a
@@ -104,8 +103,9 @@ Kinds and writers outside v1, in the likely order of arrival:
 - **force-graph** — the checkout's link graph, for the connectivity
   questions the tree cannot answer. First to add.
 - **Every-runbook kinds** — one view of the whole runbook population,
-  grouped and measured, and the do-graph that relates runbooks to one
-  another. The ideas are in
+  grouped and measured, and the
+  [do-graph](/worktree-cloa-viewer-tool-2-working-docs/design.md#questions-of-the-runbook-system)
+  that relates runbooks to one another. The ideas are in
   [Design](/worktree-cloa-viewer-tool-2-working-docs/design.md); which of
   them become kinds is the runbook design session's to decide.
 - **mermaid** — a diagram rendered from mermaid source.

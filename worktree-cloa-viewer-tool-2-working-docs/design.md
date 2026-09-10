@@ -55,12 +55,13 @@ The questions a person asks, each answered by a term the
 
 The panel of one runbook, as the brainstorm left it:
 
-- A root block first: glyph, name, `Skill · in-process` or
-  `Agent · a subprocess`, the node data verbatim, then the signature on
-  one line, `args ──► name ──► reports`, then `WRITES` with its buckets
-  and `NEVER` with its bans.
-- Below it the chain, one row per edge in firing order: the operation,
-  the target, the condition, the annotation.
+- Root block. First, the node type as its glyph and word, the name,
+  `Skill · in-process` or `Agent · a subprocess`, the node data
+  verbatim, then the signature on one line,
+  `args ──► name ──► reports`, then `WRITES` with its buckets and
+  `NEVER` with its bans.
+- Chain. Below the root block, one row per edge in firing order: the
+  operation, the target, the condition, the annotation.
 - Channels. Hue carries the operation: reads, does, writes; args and
   reports in ink. A glyph carries the node type, always with its word
   beside it: ▤ Standard, ● Skill, ◆ Agent, ▪ Script, ⛁ bucket, and an
@@ -70,7 +71,7 @@ The panel of one runbook, as the brainstorm left it:
 - Stitching. A twist on a do-edge opens the target's chain in place,
   lazily, by identity. A Skill nests flush, because it runs in the
   caller's context. An Agent nests framed, because it is a subprocess.
-- Annotation muted, wrapping, after target and condition.
+- Annotation. Muted, wrapping, after target and condition.
 
 Open on this panel: whether the root's `WRITES` and `NEVER` are its own
 edges only or reach through its do-edges; whether a stitched chain shows
@@ -104,7 +105,7 @@ The word, heading, and file columns in the sketch are made up. The
 counts of runbooks, clusters, and edges are the facts below.
 
 Open: whether the first cut groups by cluster or hangs everything under
-its entry points as a tree; which measures earn a column; whether a
+its entry points as a tree; whether every measure earns a column; whether a
 rhythm strip, the chain's operations as a run of colored marks, belongs
 on each row; whether the table is one kind or the index-tree with a
 variable.

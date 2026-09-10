@@ -13,6 +13,40 @@ open question sits beside its topic. The set lives on this branch alone
 and drains into permanent homes or is deleted before the branch merges
 ([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)).
 
+## Terms
+
+- **CLOA object** — what a doc-type's contract shape defines for one
+  document, a runbook's Reference chain, a Standard's rules, a card's
+  cells; the thing a panel draws
+  ([Doc-Type](/doc-types/doc-type.md)).
+- **checkout** — one working copy of a repo, a main checkout or a
+  worktree; the unit the viewer shows.
+- **view file** — one JSON file the server writes and the viewer shows as
+  one panel; every view file has one kind
+  ([Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md)).
+- **kind** — a registered shape of view file
+  ([an entry](/worktree-cloa-viewer-tool-2-working-docs/registry.md#an-entry)).
+- **registry** — the list of kinds the tool can show
+  ([Registry](/worktree-cloa-viewer-tool-2-working-docs/registry.md)).
+- **panel** — one view file rendered on screen.
+- **state directory** — the directory outside every repo where view files
+  live
+  ([the state directory](/worktree-cloa-viewer-tool-2-working-docs/contract.md#the-state-directory)).
+- **identity** — how a view file names a thing in a checkout
+  ([identities](/worktree-cloa-viewer-tool-2-working-docs/contract.md#identities)).
+- **envelope** — the fixed top-level fields every view file carries
+  around its payload
+  ([the envelope](/worktree-cloa-viewer-tool-2-working-docs/contract.md#the-envelope)).
+- **stamp** — the envelope field that says which commit a view file
+  describes and what produced it
+  ([the envelope](/worktree-cloa-viewer-tool-2-working-docs/contract.md#the-envelope)).
+- **arrangement** — what the user has open, saved per checkout
+  ([the arrangement](/worktree-cloa-viewer-tool-2-working-docs/contract.md#the-arrangement)).
+- **refresh record** — the outcome of the last refresh for one checkout
+  ([the refresh record](/worktree-cloa-viewer-tool-2-working-docs/contract.md#the-refresh-record)).
+- **do-graph** — the runbooks' chains joined by their do-edges
+  ([Design](/worktree-cloa-viewer-tool-2-working-docs/design.md#questions-of-the-runbook-system)).
+
 ## Goal
 
 cloa-viewer puts a checkout's markdown on a browser screen at the
@@ -57,7 +91,7 @@ targets.
   screen, the generator changes. No layer converts one shape into
   another.
 - **Known kinds only.** The viewer shows registered kinds and nothing
-  else. Adding a view is adding a registry entry
+  else. Adding a kind is adding a registry entry
   ([Registry](/worktree-cloa-viewer-tool-2-working-docs/registry.md)).
 - **Deterministic and free of model tokens.** Every view file comes from
   code. An agent spends no output tokens to put something on screen.
@@ -91,7 +125,7 @@ targets.
   [Reference chain](/doc-types/runbook/contract-shape.md) does not. A
   panel that needs a primitive the shape lacks is a change to the object,
   a separate work stream agreed with the user before it starts. The
-  generated text files, `chains.txt` and its two siblings, were the proof
+  generated text files, `chains.txt` and its two siblings, are the proof
   of concept, the first prototype of this dashboard. They constrain
   nothing, and carrying them to the screen as they are is not the goal.
   How an object draws is the renderer's to decide, which the doc-type
@@ -158,39 +192,13 @@ design sessions, not the code.
 - As this becomes a long-lived project, the principles, constraints, and
   agreements here need firmer structure than one root file. How is open.
 
-## Terms
-
-- **view file** — one JSON file the server writes and the viewer shows as
-  one panel; every view file has one kind.
-- **kind** — a registered shape of view file: a schema, a generator, a
-  renderer, and a doc page under one name.
-- **registry** — the set of kinds the tool knows, and so the set of things
-  it can show.
-- **state directory** — the directory outside every repo where view files
-  live, one subdirectory per checkout.
-- **checkout** — one working copy of a repo, a main checkout or a
-  worktree; the unit the viewer shows.
-- **identity** — how a view file names a thing in a checkout: the
-  repo-relative path, with an optional heading slug.
-- **stamp** — the envelope fields that say which commit a view file
-  describes and what produced it.
-- **arrangement** — the saved record of what is open on screen for one
-  checkout.
-- **envelope** — the fixed top-level fields every view file carries
-  around its payload: the envelope version, the kind and its version,
-  the title, the subject, and the stamp.
-- **refresh record** — the outcome of the last refresh for one checkout:
-  when it ran, at which commit, and per kind whether its generator
-  succeeded.
-- **panel** — one view file rendered on screen.
-
 ## Members
 
 - [Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md) — the
   state directory, view file paths, identities, the envelope, the
   arrangement, the refresh record, and the failure rules.
 - [Registry](/worktree-cloa-viewer-tool-2-working-docs/registry.md) — what
-  a registry entry is, the five v1 kinds, and the kinds deferred.
+  a registry entry is, the v1 kinds, and the kinds deferred.
 - [Design](/worktree-cloa-viewer-tool-2-working-docs/design.md) — how a
   panel is designed: the design space, the questions a person asks of
   the system, and the ideas recorded for the runbook kind.
@@ -198,7 +206,7 @@ design sessions, not the code.
   in the browser: layout, tree, panels, toggle, refresh, and failure on
   screen.
 - [Server](/worktree-cloa-viewer-tool-2-working-docs/server.md) — the
-  command, the server's five jobs, and live update.
+  command, the server's jobs, and live update.
 - [Stack](/worktree-cloa-viewer-tool-2-working-docs/stack.md) — the two
   languages, the schema bridge, the package shape, and the checks.
 
