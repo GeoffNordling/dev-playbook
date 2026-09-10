@@ -1,21 +1,21 @@
 ---
 type: Standard
 title: Type Registry
-description: The document-type registry's Types table — Title-Case names in alphabetical order, and the additive law a consumer's local extension obeys
-population: "a document-type registry's Types table, the global one in dev-playbook or a consumer's local extension"
+description: The document-type vocabulary — dev-playbook's Types table and the additive okf_types a consumer declares in its root index
+population: "a document-type declaration: dev-playbook's `## Types` table, or a consumer's root-index `okf_types` mapping"
 ---
 
 # Type Registry
 
-The `## Types` table of a document-type registry. The global registry is
+Where a document type is declared. The global registry is the `## Types`
+table of
 [Document Types](/standards/knowledge-organization/document-types.md) in
 dev-playbook, the vocabulary every repo inherits. A consumer repo that
-carries a document type no other repo shares declares it in a local
-extension, its own `standards/knowledge-organization/document-types.md`
-holding a `## Types` table of the same shape; okf-lint resolves a
-document's `type` against the union of the two, and against the global
-table alone when the repo carries no extension. Declaring a local
-extension is one step of
+carries a document type no other repo shares declares it in the
+frontmatter of its own root `index.md`, an `okf_types` mapping beside
+`okf_version`; okf-lint resolves a document's `type` against the union of
+the two, and against the global table alone when the repo declares no
+`okf_types`. Declaring a local type is one step of
 [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md). okf-lint is the
 authority ([Knowledge Organization](/standards/knowledge-organization/card.md)).
 
@@ -30,15 +30,43 @@ what the type is.
 
 Rows are in alphabetical order by type name.
 
-## Local extension
+## Local declaration
 
-The Types table in a consumer's own
-`standards/knowledge-organization/document-types.md`.
+The `okf_types` mapping in a consumer's root `index.md` frontmatter, one
+entry per local type: the key its name, the value its description.
+
+```yaml
+---
+okf_version: "0.1"
+okf_types:
+  Resume: A resume markdown source, master or batch variant
+  Story: One work-experience story in SPAR form
+---
+```
+
+Frontmatter, not a document under the repo's own `standards/` tree. That
+tree is the meta-standard's population — standards-lint wants a card in
+every subdirectory of it
+([Directory layout](/standards/standard/cards.md#directory-layout))
+and forbids a card named for a dev-playbook one
+([No shadowing](/standards/standard/cards.md#no-shadowing)) — so a
+registry document at `standards/knowledge-organization/` could not pass,
+and a path that mirrors dev-playbook's own folder name breaks the moment
+that folder is renamed upstream.
+
+### Entry shape
+
+Each key has the [Row shape](#row-shape)'s name, and each value is a
+non-empty one-line description.
+
+### Alphabetical keys
+
+The keys are in alphabetical order by type name.
 
 ### Add, never shadow
 
-Every row names a new type: no row's name equals an upstream name, or
-an earlier row's name in the same table, compared case-insensitively.
+Every key names a new type: no key equals an upstream name, or an earlier
+key of the same mapping, compared case-insensitively.
 
 Membership stays exact-case; the case-insensitive test stops a consumer
 aliasing upstream `Guide` as a distinct `GUIDE`. A consumer never edits
@@ -49,7 +77,7 @@ sibling consumers.
 
 ### Name and description only
 
-A row carries the type's name and its cell, and nothing else: the
-per-type constraints upstream types impose, `resource` on
+An entry carries the type's name and its description, and nothing else:
+the per-type constraints upstream types impose, `resource` on
 `Recipe-Description` for one, stay hardcoded upstream, and a local type
 declares none.

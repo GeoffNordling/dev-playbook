@@ -80,14 +80,24 @@ moves, the tree is unpoliced by the meta-standard.
 ## 7. Register a local document type (only if the standard needs one)
 
 Skip this step unless the new standard governs a **document type** the
-global OKF registry does not carry. If it does, declare the type in a
-local extension, the repo's own
-`standards/knowledge-organization/document-types.md` holding a
-`## Types` table of the same shape as the
-[global registry](/standards/knowledge-organization/document-types.md);
-okf-lint unions its valid names onto the upstream registry. The table's
-rules, the row shape, alphabetical order, add-never-shadow, and name and
-description only, are
-[Type Registry](/standards/knowledge-organization/type-registry.md#local-extension),
-and the extension file is itself a concept document bound by
-[Document Types](/standards/knowledge-organization/document-types.md).
+global OKF registry does not carry. If it does, declare the type in the
+frontmatter of the repo's root `index.md`, an `okf_types` mapping beside
+`okf_version`:
+
+```yaml
+---
+okf_version: "0.1"
+okf_types:
+  Resume: A resume markdown source, master or batch variant
+  Story: One work-experience story in SPAR form
+---
+```
+
+okf-lint unions those names onto the
+[global registry](/standards/knowledge-organization/document-types.md).
+The mapping's rules, the entry shape, alphabetical keys,
+add-never-shadow, and name and description only, are
+[Type Registry](/standards/knowledge-organization/type-registry.md#local-declaration).
+Nothing goes under the repo's own `standards/` tree for this: that tree
+is the meta-standard's, and a registry document in it could not pass
+standards-lint.

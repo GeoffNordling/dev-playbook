@@ -27,9 +27,9 @@ A concept document opens with a YAML frontmatter block.
 
 ## Types
 
-`type` is present and names one row of the table below, or of the repo's
-own local extension of it
-([Type Registry](/standards/knowledge-organization/type-registry.md)).
+`type` is present and names one row of the table below, or one entry of
+the repo's own `okf_types` declaration
+([Type Registry](/standards/knowledge-organization/type-registry.md#local-declaration)).
 
 This table is the global registry, the vocabulary every repo inherits,
 and its shape is Type Registry's rule. Alphabetical by type name.
