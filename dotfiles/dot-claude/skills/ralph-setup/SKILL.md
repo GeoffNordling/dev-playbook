@@ -28,6 +28,14 @@ the files this skill writes}. Then say `READ: ralph-loop.md` and proceed.
 - If either file already exists, stop and ask before writing anything — the
   file on disk stands until the user says otherwise.
 
+Then agree two numbers with the user, before the interview so the chunking has
+a target:
+
+- **How many tasks**, roughly. One task is one fresh iteration.
+- **How many checkpoints**, at the recipe's floor of one or above. Suggest one
+  every three to six tasks, and fewer only where the tasks are mechanical and a
+  wrong turn is cheap to spot in the final diff.
+
 ## 2. Interview for intent
 
 {Run [/grilling](~/.claude/skills/grilling/SKILL.md)}, with
@@ -52,10 +60,26 @@ Break the work into an ordered task list where each task:
   done,
 - depends only on tasks above it — sequential, no forward references,
 - is self-contained: executable from the plan and progress log alone, without
-  re-deriving the higher-level plan.
+  re-deriving the higher-level plan,
+- carries a **Verify** clause: what proves it landed, stated as something to
+  check against the artifact rather than against the agent's word for it.
+  Name a command wherever a command settles it.
 
-Order so prerequisites come first. Present the chunked plan for explicit
-approval — a hard gate: nothing is written until the user approves.
+The Verify clause is what a checkpoint reviewer runs, so a vague one ("the code
+works") verifies nothing. It earns its place with the iteration agent too, where
+it tells it when the task is done.
+
+Order so prerequisites come first.
+
+Then place the agreed number of `<!-- [ ] checkpoint -->` lines, the last of them
+after the final task and counting toward that number. A segment is a stretch the
+user is willing to have go wrong before anyone looks; make the first one shorter
+than the rest, since that is where a plan is most likely to be wrong. Cut where
+the work has a reviewable result, never mid-way through a thing that only makes
+sense finished.
+
+Present the chunked plan, its Verify clauses, and its segment boundaries for
+explicit approval — a hard gate: nothing is written until the user approves.
 
 ## 5. Determine the check gate and verify loop-ready
 
@@ -82,20 +106,40 @@ green tree.
 {If the user approved the criteria and the plan, and the gate is green,
 {Write the plan file; instantiate
 [plan-skeleton.md](references/plan-skeleton.md) — the approved criteria under
-`## Done when`, the approved tasks as `- [ ]` checkboxes under `## Tasks`,
-and any durable facts the interview surfaced under `## Working notes` (else
-leave it empty for the loop to fill); fill the placeholders, keep the
-structure, drop the authoring comments}, and {Write the progress file; copy
-[progress-skeleton.md](references/progress-skeleton.md) unchanged — it is
-fixed, the loop appends to it}}. {Run the gate once more; the two new files
-must leave it green, or the names are wrong}.
+`## Done when`, the approved tasks as `- [ ]` checkboxes with their Verify
+clauses under `## Tasks`, the approved `<!-- [ ] checkpoint -->` markers
+between segments and after the last task, and any durable facts the interview
+surfaced under `## Working notes` (else leave it empty for the loop to fill);
+fill the placeholders, keep the structure, drop the authoring comments}, and
+{Write the progress file; instantiate
+[progress-skeleton.md](references/progress-skeleton.md) unchanged — it is fixed,
+and the loop appends to it}}. Run the gate once more; the two new files must
+leave it green, or the names are wrong.
+
+Then read back what was written and confirm three things before handing off.
+All three are invisible once the run starts, and each one turns a reviewed run
+into an unreviewed one:
+
+- every marker reads exactly `<!-- [ ] checkpoint -->`, character for
+  character — a near miss is a comment no parser sees,
+- at least one marker is present,
+- no unchecked task sits below the last marker.
 
 ## 7. Hand off the launch command
 
 {Report the full launch command for the user to run; never run it yourself}.
-`planFile`, `progressFile`, and the `checkCmd` gate are fixed by this setup;
-the user picks `model` and `maxIters` at launch:
+`planFile`, `progressFile`, and `checkCmd` are fixed by this setup; the user
+picks `model` and `maxIters` at launch:
 
 ```
 Workflow({ name: "ralph-loop", args: { model: "<model>", maxIters: <n>, planFile: "<planFile>", progressFile: "<progressFile>", checkCmd: "<gate, or \"\" for no checks>" } })
 ```
+
+`maxIters` is a rail on one segment, not on the run: size it to the longest
+segment plus a little, not to the whole task list.
+
+Then say what happens at the first stop: the workflow returns at the checkpoint,
+and [/ralph-checkpoint](~/.claude/skills/ralph-checkpoint/SKILL.md) reviews the
+segment and hands back the command for the next one. The user runs that pair
+once per segment, the last time to review the finished plan. Naming it is all
+this skill does — the user invokes it, not you.
