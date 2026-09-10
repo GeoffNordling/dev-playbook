@@ -69,6 +69,27 @@ prerequisites; in a Python repo `check: format-check lint typecheck test`.
 `.PHONY`. `check` is a strict superset of the CI gate, so a
 green local `check` guarantees a green cloud run.
 
+### artifacts.mk
+
+A repo whose gate needs a build product git does not carry — generated
+code, a compiled page, a fetched fixture — writes `artifacts.mk` at the
+root. It sets `ARTIFACTS` to those files and gives each one a rule that
+builds it. The fragment's `-include artifacts.mk` reads it where present
+and is silent where absent, so a repo with no build product writes no
+file.
+
+The gate's remedy is in the repo's own hands, so the gate applies it: a
+gitignored build product is absent in every fresh checkout and every fresh
+worktree, and a `check` that only reports it missing turns the pre-push
+hook into an obstacle to bypass. `ARTIFACTS` is a prerequisite of `test`
+in a Python repo, whose tests are what drive the product, and of `check`
+in a base repo, which has no `test` target.
+
+Each rule names a real file, never a `.PHONY` target: `make` then compares
+timestamps and rebuilds only what is stale, so the gate pays the build cost
+once per checkout and nothing on later runs. dev-playbook's own
+`artifacts.mk` builds the cloa-viewer page its end-to-end tests drive.
+
 ## pyproject.toml
 
 `pyproject.toml` matches every value the canonical

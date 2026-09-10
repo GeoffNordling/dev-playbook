@@ -1,3 +1,6 @@
+# Build products the gate needs that git does not carry. A repo with any
+# writes artifacts.mk, which sets ARTIFACTS and builds each file.
+-include artifacts.mk
 .PHONY: check
-check:
+check: $(ARTIFACTS)
 	uvx pre-commit run --all-files

@@ -33,6 +33,14 @@ title and body, and the merged branch is deleted: in **Settings → General
 | Allow rebase merging | off |
 | Automatically delete head branches | on |
 
+The branch's own commits do not survive the squash, so what the branch
+settled survives only in the tree it merges or in its message. Before
+merging, propose a [Decision Record](/standards/decisions/records.md) in
+the pull request body for a decision that is expensive to reverse and
+that the merged tree does not explain on its own. Most branches have
+none. Propose at most one; the user trims or rejects it, and what
+survives lands under `docs/decisions/` in that same pull request.
+
 ## Default branch protection
 
 The default branch carries a ruleset named `protect-main`, enforcement

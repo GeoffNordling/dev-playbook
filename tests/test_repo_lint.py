@@ -473,6 +473,23 @@ def test_makefile_extra_targets_allowed(tmp_path: Path) -> None:
     assert run(make_repo(tmp_path, files)).returncode == 0
 
 
+def test_artifacts_mk_is_a_free_addition(tmp_path: Path) -> None:
+    files = python_files()
+    files["artifacts.mk"] = "ARTIFACTS := build/page.html\nbuild/page.html:\n\ttrue\n"
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_makefile_dropped_artifacts_include_fails(tmp_path: Path) -> None:
+    # Without the include the gate cannot build what a repo declares, so the
+    # line is part of the canonical block rather than an optional courtesy.
+    files = python_files()
+    files["Makefile"] = files["Makefile"].replace("-include artifacts.mk\n", "")
+    result = run(make_repo(tmp_path, files))
+    assert result.returncode == 1
+    assert "Makefile: build.canonical-block" in result.stdout
+
+
 # --- scripts layer ---
 
 

@@ -12,13 +12,16 @@ No silent defensive skips, fallbacks, or "just in case" guards. If something is 
 
 ### Pitch it cold
 
-Every explanation lands on a reader who has read little of your immediate context and holds
-only a rough, intuitive picture of the work. Pitch it cold, every time,
-including inside a skill's structure, where the skill owns the beats and you
-own the words. Write in ASD-STE100 Simplified Technical English, in the
-project's own terms from `CONTEXT.md` wherever they apply, and carry each claim
-on a specific example — the actual file, name, line, or value — so the point is
-visible.
+Every explanation lands on a reader who holds far less of the conversation than
+you do and only a rough, intuitive picture of the work. Pitch it cold, every
+time. Reintroduce a term from several turns back in one clause on
+each mention. Communicate at the level of the plan, where its structure and
+deterministic steps show, and only escalate problems you cannot handle
+yourself.
+
+Write in ASD-STE100 Simplified Technical English, in the project's own
+terms from `CONTEXT.md` wherever they apply, and carry each claim on a specific
+example — the actual file, name, line, or value — so the point is visible.
 
 ## Behaviors
 

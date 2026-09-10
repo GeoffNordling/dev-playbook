@@ -81,8 +81,7 @@ The `index.md` at the repository root.
 
 ### OKF version declared
 
-The root index declares the bundle's OKF version in frontmatter, its
-only frontmatter key, per the
+The root index declares the bundle's OKF version in frontmatter, per the
 [OKF SPEC](/standards/references/okf-spec.md) Versioning section:
 
 ```yaml
@@ -90,3 +89,8 @@ only frontmatter key, per the
 okf_version: "0.1"
 ---
 ```
+
+`okf_version` is dev-playbook's whole root frontmatter. A consumer repo
+carries one key more, the `okf_types` mapping declaring the document
+types it holds that no other repo shares
+([Local declaration](/standards/knowledge-organization/type-registry.md#local-declaration)).
