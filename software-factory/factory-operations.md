@@ -327,6 +327,48 @@ rewriting from the recipe alone. In between, only the ledger moves —
 rework laps append its entries by spec; a full message rewritten mid-traverse
 is authored against a diff still moving.
 
+### Draining a working documentation set
+
+A
+[working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+lives on its branch alone, and the squash merge deletes that branch with the
+set inside it. Nothing of the set reaches `main` unless the pull request that
+deletes it also promotes what is worth keeping, so the drain runs inside that
+same pull request, before the final review:
+
+1. **Inventory.** The set's documents are listed, every file under the branch
+   directory, while the classification can still be argued.
+2. **Classify.** A document earns promotion when it answers a question the
+   merged repository cannot answer itself. A target state does not: the tree is
+   the answer. A specification does not: the code and the standards are the
+   answer. An acceptance checklist does not: its findings are recorded solved.
+   A decision does: nothing in the repository says why a choice went one way
+   when another was open. So does a fact the run proved about a shared tool,
+   recipe, or standard, which no document states yet because this run is what
+   discovered it.
+3. **Distill, do not copy.** The
+   [Decision Record bar](/standards/decisions/records.md#the-bar) still binds
+   what is promoted. Fifty small rulings do not become fifty records; they
+   become one record that clears the bar, carrying the rulings as its context.
+   A drain that promotes everything has not been done.
+4. **Promote.** Each surviving item goes to one of two destinations, chosen per
+   item. A decision about the repo the work governs becomes a record in that
+   repo's `docs/decisions/`, numbered and shaped per
+   [Decision Records](/standards/decisions/records.md) and dated by the day the
+   decision was made rather than the day it was written. A fact the run proved
+   about a shared tool, recipe, standard, or the factory itself is promoted by
+   editing that document where it lives, usually in dev-playbook: it is a
+   correction, not a record. The second destination is the one a drain most
+   often misses, because the finding does not look like it belongs to the repo
+   the work was done in, so it is deleted with the set. Promotion is not always
+   additive: where the run proved an existing document wrong, the drain fixes
+   that document rather than recording the contradiction somewhere new.
+5. **Delete.** The set directory goes in the same pull request, so one squashed
+   commit on `main` carries the promotion and the removal together.
+6. **Record.** `## Summary` names what was promoted and what was dropped, one
+   line each, so the user can challenge the classification at the final review
+   while the branch still exists to be recovered from.
+
 ## The review stop
 
 `pr_review` is a loop `traverse-issue` runs, and the user is not in it. Each

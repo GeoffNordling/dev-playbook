@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Working Documentation Sets
-description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, the branch directory, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
+description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, the branch directory that drains into Decision Records, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -53,6 +53,18 @@ makes a set, here named and placed. The branch `fix-index-drift` keeps
 its set in `fix-index-drift-working-docs/`. `main` carries no such
 directory, and a set under `docs/` is the defect: `docs/` holds
 permanent documents.
+
+A permanent home is one of two: a numbered record under the
+`docs/decisions/` of the repo the work governs, written to the
+[Decision Records](/standards/decisions/records.md) bar and scope, or the
+shared document the run proved wrong or incomplete, corrected where that
+document already lives. The set itself reaches no branch but its own. A
+repo merges squash-only with the
+head branch deleted
+([Repository Settings](/standards/tracking/repo-settings.md#squash-only-merges)),
+so a file that lived on the branch alone leaves no trace in `main`'s
+history and appears in no fresh clone. A set whose lasting content is
+deleted rather than promoted is content destroyed, not content archived.
 
 ## Worklist
 

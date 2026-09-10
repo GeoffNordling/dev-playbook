@@ -90,13 +90,24 @@ factory asks the user for nothing.
 
 The last checkpoint, and the only one where the user reads the diff. It is
 reached only when the issue is **100% done**: the merge message regenerated
-from the whole PR record, every commit on origin, and a closing brief on what
-shipped and what the review loop settled on the way.
+from the whole PR record, every commit on origin, any
+[working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+drained and deleted, and a closing brief on what shipped and what the review
+loop settled on the way.
 
 Nothing is outstanding at the pause but the read and the merge. Anything still
 pending — a red gate, an unrefreshed message, an unpushed commit, an open
 question — means the issue has not reached it yet, and presenting it as though
 it had spends the user's one full read on work that is still moving.
+
+An undrained set is outstanding, and the diff hides it in plain sight: the
+set's files read as ordinary additions, indistinguishable from the ones that
+land on `main`, and nothing in the diff says the squash merge is about to
+delete them all. So the closing brief carries the drain's own line, the
+promoted and the dropped from
+[Draining a working documentation set](/software-factory/factory-operations.md#draining-a-working-documentation-set),
+and an issue that ran a set and promoted nothing from it says that
+explicitly.
 
 ## The issue-review verdict
 
