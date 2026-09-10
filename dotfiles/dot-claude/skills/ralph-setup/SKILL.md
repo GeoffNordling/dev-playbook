@@ -20,8 +20,11 @@ the files this skill writes}. Then say `READ: ralph-loop.md` and proceed.
 - Confirm the cwd is the repo or worktree where the loop will run — agents
   inherit it, so the plan and progress files must live here and be named with
   relative paths. Ask if it isn't obvious.
-- Choose the plan and progress filenames (default `PLAN.md` and
-  `PROGRESS.md`); these become the loop's `planFile` and `progressFile`.
+- Keep the default filenames, `PLAN.md` and `PROGRESS.md`; these become
+  the loop's `planFile` and `progressFile`. okf-lint excludes a file with
+  exactly either name from the bundle, in any directory, so the pair
+  needs no frontmatter and no index row. Any other name makes them
+  concept documents, and the gate then demands both.
 - If either file already exists, stop and ask before writing anything — the
   file on disk stands until the user says otherwise.
 
@@ -84,7 +87,8 @@ and any durable facts the interview surfaced under `## Working notes` (else
 leave it empty for the loop to fill); fill the placeholders, keep the
 structure, drop the authoring comments}, and {Write the progress file; copy
 [progress-skeleton.md](references/progress-skeleton.md) unchanged — it is
-fixed, the loop appends to it}}.
+fixed, the loop appends to it}}. {Run the gate once more; the two new files
+must leave it green, or the names are wrong}.
 
 ## 7. Hand off the launch command
 
