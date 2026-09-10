@@ -91,7 +91,11 @@ Could not express telling the two reports apart — both render
 
 Could not express the report's name (`launch_command` rides only in
 annotation) or the mid-run `READ:` acknowledgment, which targets the
-conversation, not the invoker.
+conversation, not the invoker. Could not express the gate runs of §5 and §6 —
+a bare command in the target repo, with no on-disk link for a does edge — the
+read-back of the checkpoint markers it just wrote, which inspects the file's
+own text rather than firing an edge — or the `/ralph-checkpoint` mention in
+§7, which names a skill the user invokes and this one never runs.
 
 ### commit
 
@@ -325,6 +329,20 @@ section — both are resolved from map content at runtime, not a link to one
 fixed runbook. Could not express the research-branch write
 (`research/<name>`) — writes—git bucket needs a fixed `-C` command block,
 and the branch name is chosen per ticket.
+
+### ralph-checkpoint
+
+Could not express the ban on launching the next segment itself — the Never
+vocabulary carries no verb for running one. Could not express the
+blocker-versus-checkpoint branch on the workflow's return value, which is
+runtime data with no link for `{If}` to read.
+
+### ralph-checkpointer
+
+Could not express running each task's Verify clause — the clause names a
+command or artifact chosen per task, so there is no fixed target. Could not
+express the accepted/reverted/deferred ruling itself, which is a decision with
+no primitive.
 
 ### prototype
 
