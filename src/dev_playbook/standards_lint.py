@@ -970,7 +970,7 @@ def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
             capture_output=True,
             text=True,
             cwd=root,
-            timeout=10,
+            timeout=30,
             env=gitrepo.no_git_env(),
         )
     except OSError as err:
