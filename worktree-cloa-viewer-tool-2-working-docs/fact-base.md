@@ -80,6 +80,28 @@ in this workspace and held there by lints. The judgment was paid at
 authoring time. That is why the view can be deterministic: the
 declarations are.
 
+## The record is not the behavior
+
+A fact in the fact base says what a file declares or what a parser
+found. It does not say the behavior happens. A `reads` edge from a
+runbook says the runbook's text instructs an agent to read a file; it
+does not say the text is clear enough that an agent will, and it does
+not say the agent obeyed. Two separate limits, held apart on purpose:
+
+- **Declaration is not instruction.** Whether the declared chain
+  matches what the runbook's prose actually tells an agent to do is an
+  empirical question. At some point a person or an agent signs off that
+  the runbook really instructs the read. That sign-off is focused
+  agentic verification, and no view replaces it.
+- **Instruction is not compliance.** Every runbook is a soft
+  instruction to a model, and a model may ignore it on any run. That is
+  the stochasticity System Legibility fences with deterministic
+  backpressure, and it is outside the fact base's reach entirely.
+
+The fact base is under no illusion about either. It records the
+declarations exactly, so that the verification has something exact to
+verify against.
+
 ## Extractors
 
 An extractor reads one artifact and yields rows. Each names what it
@@ -155,6 +177,24 @@ then it is one primitive declared in one place. The same name with two
 meanings is a collision in the schema and is not allowed. The one
 sharing today: the runbook's node type Standard is the Standard
 doc-type itself.
+
+## Across the workspace
+
+The fact base follows the workspace's one methodology: dev-playbook
+declares the broad and general thing, and a consumer repo imports it
+and adds its special cases. So dev-playbook owns the schema, the
+bedrock extractors, and the extractors of every doc-type it declares.
+A consumer repo imports all of that unchanged and adds what its purpose
+needs: a node type for its own kind of artifact, an extractor for its
+own file format, a doc-type of its own with that doc-type's extractor.
+A consumer repo's fact base is one file, like any other checkout's, and
+its schema is dev-playbook's schema plus the consumer's additions,
+never a replacement.
+
+The rule against collision holds across the boundary: a consumer may
+not redefine a primitive dev-playbook owns. Which layer owns a residual
+raised in a consumer repo is not settled
+([Open questions](#open-questions)).
 
 ## The build loop runs over every object
 
@@ -281,6 +321,51 @@ Parked, in the order raised.
   expression fits which primitive is not yet discussed.
 - **The user as a node.** Whether the handoffs a person performs between
   objects belong in the fact base at all, and by what extractor.
+- **Residual ownership across repos.** When a consumer repo's
+  simulation raises a residual, whether the M-step runs in the consumer,
+  adding a local primitive, or in dev-playbook, changing the shared
+  schema. The likely answer is that the consumer adds locally and
+  dev-playbook absorbs a primitive only when a second consumer raises
+  the same one, but that is not decided.
+- **The ontology solver.** System Legibility reserves the word
+  ontology for a deterministic inventory of declared abstractions with
+  a solver that validates or invalidates operations among them. Whether
+  that idea is orthogonal to the fact base, complementary, or a part of
+  it is a dedicated session. The sharper framing now available: if it
+  fits, the solver is a set of rules in this page's sense, functions
+  from rows to rows that derive violations, and the fact base is the
+  inventory it runs over.
+
+## Next steps
+
+Not started. In the order they should run, because each one produces
+what the next one needs.
+
+1. **Prove the concept by simulation.** Enumerate the use cases, the
+   questions a person asks of the system. Each use case names a
+   subsystem. Each subsystem gets a hand-written fact base like the
+   Ralph one, in the viewer's envelope, with every row carrying a
+   receipt. Each simulation firms the seven views, adds extractors, and
+   writes residuals. The schema is what remains after enough residuals
+   have been ruled on, and it is connected to the residuals by that
+   ruling and nothing else. One simulation is a consumer-repo
+   subsystem, so the workspace question above gets its first data
+   point. No code is written until the simulations cover the expected
+   use cases.
+2. **Move the simulation into a loop.** The second simulation is
+   already repeatable work, and the third is a loop, not a session. An
+   agent runs the E-step, writes the fact base and the residuals, and
+   proposes primitives; the user accepts or rejects and justifies
+   neither. The same loop later generates extractors and rules. The
+   user designs from scratch only at a beginning, the way this page was
+   designed.
+3. **Reconcile with what exists.** One table, one row per existing
+   piece, one ruling per row: complements, superseded, conflicts, or
+   overlaps. The rows are the CLOA objects and their machinery, the
+   doc-types, `chains.txt` and its siblings, the registry kinds, and
+   every page of this set, `ROOT.md` first. A superseded piece is
+   marked and kept, never deleted, because where this goes is not yet
+   known. Duplication stands until the table is complete.
 
 ## Standing in this set
 
@@ -289,14 +374,20 @@ so that the set's earlier framing did not shape it. Known tension: the
 Registry and Design pages describe kinds as panels designed one at a
 time, each with its own generator; this page puts one fact base under
 every kind and makes each kind a selection. Where the two disagree,
-this page wins. Reconciling the set is a separate step and is not
-started.
+this page wins. Reconciling the set is the third of the
+[Next steps](#next-steps) and is not started.
 
-This page claims two words on their merits, and the older uses move
-when reconciliation comes. **Extractor** and **rule** are defined in
-Terms. The repo today uses "rule" for a predicate on a Standard or on a
-runbook's state; that use is not this page's, and it is the one that
-will need a new word.
+**This page has unrestricted rights over vocabulary.** It chooses each
+word on the word's merits alone, and it may claim any word the repo,
+its doc-types, its standards, or the consumer repos already use. When
+it claims a word, the older use is the one that moves, everywhere, and
+this page never bends a choice to avoid a collision. The reason is that
+this concept is the one meant to supersede the rest, and a vocabulary
+shaped around what came before would carry the old framing into the
+new. Two words are claimed so far: **extractor** and **rule**, defined
+in Terms. The repo today uses "rule" for a predicate on a Standard or
+on a runbook's state; that use is not this page's, and it is the one
+that will need a new word.
 
 ## Acronyms
 
