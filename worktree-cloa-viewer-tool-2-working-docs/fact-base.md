@@ -307,6 +307,20 @@ improvised here: the extractable-versus-declared split, the exact row
 shape, buckets and directories as nodes, and the extractor names. None of
 those choices is load-bearing.
 
+A competitive research pass on 2026-09-11
+([full report](https://claude.ai/chat/255df4d9-27b8-4a11-9a3e-f6cb54b04ff6))
+found no direct competitor. Roughly thirty candidates were checked, and
+each covers one to three of the fact base's four load-bearing ideas,
+never all four: one typed graph over both code and agent-instruction
+prose, a receipt on every row, views as pure selections, and contracts
+declared inside the instruction markdown itself. The nearest neighbors
+are 2026 research prototypes built for agent systems, AgentFlow's Agent
+Dependency Graph and the Repository Intelligence Graph, but both extract
+from source code, not markdown, and neither carries receipts. The
+nearest markdown-side precedent for the chain's span grammar is Gherkin,
+a controlled natural language parsed deterministically to an AST; no
+tool combines that with graph extraction.
+
 ## Open questions
 
 Parked, in the order raised.
