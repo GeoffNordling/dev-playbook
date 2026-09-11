@@ -154,8 +154,10 @@ Facts the question needs that the fact base cannot hold.
 3. **The iteration agent.** Its behavior is a prompt string inside
    `ralph-loop.js`, lines 80–105: it reads the plan and progress files,
    commits by invoking `/commit`, and reports a count. No doc-type extractor
-   reaches inside a string in code. This is the bedrock boundary inside
-   this one subsystem.
+   reaches inside a string in code. The move that closes it is named
+   under code carries no prose in
+   [Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#code-carries-no-prose):
+   the string becomes an Agent runbook the workflow refers to by path.
 4. **The user as the connector.** Every handoff between the three
    runbooks and the workflow passes through the user. The recipe's own
    drawing at `harness-recipes/recipes/ralph-loop.md` line 60 puts USER

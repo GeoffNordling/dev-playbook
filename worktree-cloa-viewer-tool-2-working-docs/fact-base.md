@@ -192,21 +192,39 @@ two different things, so nothing is imported for free. The loop is
 easier below the bedrock because the candidates are enumerable, and it
 offers fewer options for the same reason.
 
-## The bedrock runs through files
+## Code carries no prose
 
 A Claude Code workflow is deterministic code and gets no doc-type; a
-doc-type is for natural language an LLM interprets. But `ralph-loop.js`
-holds both. Its loop, its exit on `tasksLeft === 0`, and its blocker
-return are deterministic and fully extractable. Each `agent(PROMPT, …)`
-call inside it is a stochastic node, and the prompt string is natural
-language an LLM interprets: doc-type territory embedded in code. The
-iteration agent's reads, writes, and its call to `/commit` live in that
-string, and no doc-type extractor reaches them.
+doc-type is for natural language an LLM interprets. The two meet where
+code hands a prompt to a model, and the principle for that meeting is:
+**code carries no prose.** Every natural-language string an LLM
+interprets lives in a file of a declared doc-type, and code refers to
+it by path. The fact base expresses known prompts, never arbitrary
+ones, and a prompt becomes known by being admitted as a doc-type
+instance with its own chain and its own residual. This is the converse
+of "every natural language file is a doc-type", and the two together
+close the loop.
 
-How the fact base describes such mixtures is the next question, not yet
-discussed. The first thing to settle is whether a prompt carried by
-deterministic code is an instance of a doc-type, with its own chain and
-its own residual.
+The worked case is `ralph-loop.js`. Its loop, its exit on
+`tasksLeft === 0`, and its blocker return are deterministic and fully
+extractable. Its iteration prompt, lines 80 to 105, is a string literal
+that says: run the check gate, read the plan and progress files, do the
+next task, write the check-off and a progress line, do `/commit`,
+report `{tasksLeft, blocker, summary}`. That is a Reference chain with
+args, reads, does, writes, and a typed report, and `${PLAN}` and
+`${CHECK}` are its args. The only thing wrong with it is where it
+lives. As a string in JavaScript no doc-type extractor reaches it, so
+the iteration agent's every read and write is invisible.
+
+The fix is structural, not descriptive. The prompt becomes
+`dotfiles/dot-claude/agents/ralph-iteration.md`, an Agent runbook like
+any other; the workflow reads that file and passes the args; and the
+`agent()` call becomes a `does` edge from the Workflow node to the
+Agent node, yielded by an extractor that finds `agent()` calls whose
+prompt is a file reference. The bedrock then runs between files, never
+through one. A workflow, a hook, a script, or a package under `src/`
+that inlines a prompt is a residual, and the ledger entry names the
+move.
 
 ## Evidence
 
@@ -227,10 +245,14 @@ simulation found:
   question needs.
 - Containment does not gather the subsystem. Six parts sit in four
   directories, and only the word "ralph" in each filename joins them.
-- Two gaps are one-line declaration fixes in the runbooks. One gap, the
-  prompt inside the workflow, is the bedrock.
+- Two gaps are one-line declaration fixes in the runbooks.
 - The runbook residual ledger already recorded two of the five gaps
   from the porting side, which is the loop and the fact base agreeing.
+- The iteration prompt inside `ralph-loop.js` is a runbook in the wrong
+  place. Moving it to `dotfiles/dot-claude/agents/ralph-iteration.md`
+  is the first application of code carries no prose, and it turns the
+  workflow from an opaque box into a Workflow node with one `does`
+  edge.
 
 ## Precedent
 
@@ -254,8 +276,6 @@ Parked, in the order raised.
   the freedom to insert deterministic structure wherever it helps. First
   data point: the file tree does not supply subsystems, so rollup needs
   a declared one.
-- **Mixtures.** How the fact base describes deterministic code that
-  carries stochastic content, `agent(PROMPT)` above all.
 - **Primitives as code.** A primitive can be expressed in deterministic
   code, a script, a workflow, a hook, a package under `src/`. Which
   expression fits which primitive is not yet discussed.
