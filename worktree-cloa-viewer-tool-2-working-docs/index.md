@@ -12,3 +12,5 @@ Ordering: reading order.
 - [Viewer](/worktree-cloa-viewer-tool-2-working-docs/viewer.md) — The page in the browser — its fixed regions, the tree, panels and the arrangement, everything about one file, the checkout toggle, refresh, and how failure shows
 - [Server](/worktree-cloa-viewer-tool-2-working-docs/server.md) — The cloa-viewer command, the server's jobs, and live update by one-way push
 - [Stack](/worktree-cloa-viewer-tool-2-working-docs/stack.md) — The Python and TypeScript stack, JSON Schema as the bridge between them, the package shape, and how checks run
+- [Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md) — The fact base — one deterministic object of nodes and edges extracted from a checkout, every view a selection from it, and how the doc-type build loop and its residuals apply to every object it holds
+- [Ralph Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base-ralph.md) — The definitions behind the simulated fact base for the Ralph loop subsystem — its terms, the extractors that yield each fact, the views selected from it, and the facts no extractor reaches
