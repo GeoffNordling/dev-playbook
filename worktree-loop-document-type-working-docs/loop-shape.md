@@ -17,8 +17,7 @@ to the pattern of
 
 ## The shape
 
-- **Act.** A prescribed action: a pointer at a runbook, a skill or an
-  agent definition, with a condition. The act reads the findings the
+- **Act.** A prescribed action: a pointer at a runbook, with a condition. The act reads the findings the
   last iteration's checks returned; that is how direction reaches it.
 - **Check.** A prescribed standard: a pointer at `Standard.audit`, the
   auditors a card's audit cell locates, never the Standard document and
@@ -30,8 +29,9 @@ to the pattern of
   resumable: control comes back to the same point with the receiver's
   answer.
 - **Condition.** What must hold for an act or check to fire, or for a
-  yield to be taken. The word is Runbook's and Standard's already; a
-  condition of `None` fires every iteration.
+  yield to be taken. Runbook and Standard already name this part
+  *condition*, an edge's and a rule's; Loop reuses the word rather than
+  adding a third. A condition of `None` fires every iteration.
 
 The composition rule: any number of acts and checks, ordered by the
 iteration, and a set of yield conditions, unordered, the loop yielding
@@ -82,20 +82,15 @@ visualization, tracking, and resuming. The same shape drawn that way:
 the three verbs are the nodes, the conditions are the edges.
 
 ```
-                ┌─────┐
-        ┌──────►│ act │◄────────────────┐
-        │       └──┬──┘                 │
-        │          ▼                    │ findings
-        │       ┌───────┐               │
-        │       │ check ├───────────────┘
-        │       └──┬────┘
-        │          ▼
-        │    ┌───────────┐   none met
-        └────┤  yield?   ├────────────► (next iteration)
-             └─────┬─────┘
-                   │ a condition met
-                   ▼
-              receiver ──── resumes ────► act
+        ┌───────────────────────────────────────────┐
+        │                                 none met  │
+        ▼                                           │
+     ┌─────┐          ┌───────┐  findings  ┌────────┴─┐
+     │ act ├─────────►│ check ├───────────►│  yield?  │
+     └─────┘          └───────┘            └────┬─────┘
+        ▲                                       │ a condition met
+        │                                       ▼
+        └────────────── resumes ─────────── receiver
 ```
 
 The doc-type document carries both forms, the pseudocode for the
