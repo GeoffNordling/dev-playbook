@@ -47,7 +47,7 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 | Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | any number of acts and checks, ordered by the iteration; a set of yield conditions |
 | Grain | instance-level | instance-level | instance-level |
 | Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | open |
-| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen` → `loops.txt` |
+| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen --check` → the Mermaid block in each instance |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
 | Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | open |
 
@@ -136,7 +136,10 @@ say, so far:
   iteration, and a set of yield conditions.
 - **No target operation.** A target state is "this population passes
   these checks", so the checks carry it and population is already
-  Standard's word. The findings an audit returns are the distance and
+  Standard's word. The description an acting agent needs is the
+  standard's definition, the same standard whose audit the check runs:
+  define tells the act what the target looks like, audit tells the
+  check how far off it is. The findings an audit returns are the distance and
   the direction: each names a member and the rule it fails. This holds
   for indefinite targets too: an ideation loop's check is a model-judge
   standard with a rubric, and its findings are still findings.

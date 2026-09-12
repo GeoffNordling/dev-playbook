@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Loop Shape
-description: Loop's contract shape — acts, checks, and a set of yield conditions, iterated — in prose, one screen of pseudocode, and the three tables every Loop collapses to
+description: Loop's contract shape — acts, checks, and a set of yield conditions, iterated — in prose, one screen of pseudocode, and the Mermaid graph every Loop is drawn as
 ---
 
 # Loop Shape
@@ -17,13 +17,16 @@ to the pattern of
 
 ## The shape
 
-- **Act.** A prescribed action: a pointer at a runbook, with a condition. The act reads the findings the
-  last iteration's checks returned; that is how direction reaches it.
+- **Act.** A prescribed action: a pointer at a runbook, with a
+  condition. The act reads the findings the last iteration's checks
+  returned; that is how direction reaches it.
 - **Check.** A prescribed standard: a pointer at `Standard.audit`, the
   auditors a card's audit cell locates, never the Standard document and
-  never its gate, with a condition. A check returns
-  findings, each naming a member and the rule it fails. Zero findings
-  from every check is the target state, so no target is written.
+  never its gate, with a condition. A check returns findings, each
+  naming a member and the rule it fails. Zero findings from every check
+  is the target state. The target is written once, in the standards:
+  an act reads a standard's definition to know what the target looks
+  like, a check runs its audit to measure the distance.
 - **Yield.** A programmed exit: a condition and a receiver, another
   loop or the user. The instance writes "yields when …". A yield is
   resumable: control comes back to the same point with the receiver's
@@ -98,37 +101,28 @@ contract and the graph for the reader. An instance pivots to the graph:
 its acts, checks, and yields drawn as nodes and edges, so the shape on
 screen is the whole procedure and the position in it is data.
 
-A loop carries no target field and no runtime: the checks are the
-target, and whatever runs the loop, a workflow script, a skill, a
-person at a terminal, is a JS file or a skill or a person, not a loop.
+A loop carries no target field and no runtime: the standards the
+checks point at describe the target, and whatever runs the loop is the
+substrate, not the loop.
 
 ## The view
 
-Every Loop in the tree collapses to rows of three relations, `acts`,
-`checks`, and `yields`, in one file. `scripts/loopgen` writes the whole
-tree to `doc-types/loop/loops.txt` and, with `--check`, fails on drift:
+The view is the graph itself. A loop instance's source of truth is a
+fenced Mermaid block: its nodes are the acts, checks, and yields, its
+edge labels the conditions, and GitHub renders it. Around the block
+sit frontmatter, one paragraph saying what state the loop drives and
+toward what, and three sections headed by the verbs, **Acts**,
+**Checks**, **Yields**, each a list with one entry per node: the
+node's id, the pointer the Mermaid label cannot carry (a runbook, a
+`Standard.audit`), and the condition or the "yields when …" in full.
 
-```
-acts
-loop                     act        runbook                     when
-doc-type-system-checker  survey     doc-type-survey             —
-doc-type-system-checker  ideate     doc-type-ideate             findings
-
-checks
-loop                     check         standard                       when
-doc-type-system-checker  consistency   doc-types/verbs-and-composition —
-
-yields
-loop                     yield      when
-doc-type-system-checker  round      every K rounds
-```
-
-Rows as the first instance might produce them; nothing generated yet.
-
-The runbook and standard columns join on the existing `chains.txt` and
-`standards.txt`, so the view may stitch a loop's full picture from the
-other two views. Rows sort by loop, then act, check, or yield, so the
-file diffs stably.
+`scripts/loopgen --check` is a checker of the embedded graph, not an
+extractor into a table: every node id in the Mermaid appears once under
+the matching verb heading, every entry under a heading is a node in the
+Mermaid, every pointer resolves, and the three-verb shape holds, acts
+to checks, checks to yields, yields back or out. This is a different
+kind of generator from `chaingen` and `rulegen`; peers share the
+bundle, not the file format.
 
 ## Acronyms
 
