@@ -54,9 +54,10 @@ where the source lives, so in dev-playbook only.
 
 ### Two sections
 
-The H2 headings are exactly `## Principles` then `## Behaviors`, in
+The H2 headings are exactly `## Behaviors` then `## Principles`, in
 that order, headings inside fenced blocks excluded
-(`harness.global-claude-shape`).
+(`harness.global-claude-shape`). Behaviors leads because
+`### Read the standards` must be the first heading in the file.
 
 `## Principles` holds dispositional stances, how the agent carries
 itself; `## Behaviors` holds operating rules for named situations, what

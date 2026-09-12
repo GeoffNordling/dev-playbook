@@ -135,7 +135,7 @@ BODY_MAX_LINES = 500
 GLOBAL_CLAUDE = "dotfiles/dot-claude/CLAUDE.md"
 # The global file's two buckets, in order: dispositional stances, then
 # operating rules for named situations.
-GLOBAL_CLAUDE_SECTIONS = ("## Principles", "## Behaviors")
+GLOBAL_CLAUDE_SECTIONS = ("## Behaviors", "## Principles")
 # The workspace-wide rules the global file carries for every session, since no
 # repo's own CLAUDE.md restates them (claude-content.md — The global file).
 GLOBAL_CLAUDE_REQUIRED_RULES = ("### Read the standards", "### Navigate docs by index")
@@ -525,8 +525,8 @@ def audit_agent(agent_md: Path, repo_root: Path) -> list[Finding]:
 def check_global_claude(repo_root: Path) -> list[Finding]:
     """Audit the global CLAUDE.md source's section shape and required rules.
 
-    The global file buckets its rules under exactly two H2s, '## Principles'
-    then '## Behaviors', and carries the workspace-wide rules every session
+    The global file buckets its rules under exactly two H2s, '## Behaviors'
+    then '## Principles', and carries the workspace-wide rules every session
     needs (claude-content.md — The global file). Gated on the source file's
     presence, so it runs only in the repo that owns it; other repos have no
     global file. Headings inside fenced blocks do not count, so a worked example
