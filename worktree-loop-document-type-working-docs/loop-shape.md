@@ -20,8 +20,9 @@ to the pattern of
 - **Act.** A prescribed action: a pointer at a runbook, a skill or an
   agent definition, with a condition. The act reads the findings the
   last iteration's checks returned; that is how direction reaches it.
-- **Check.** A prescribed standard: a pointer at a Standard, its audit
-  cell only, never its gate, with a condition. A check returns
+- **Check.** A prescribed standard: a pointer at `Standard.audit`, the
+  auditors a card's audit cell locates, never the Standard document and
+  never its gate, with a condition. A check returns
   findings, each naming a member and the rule it fails. Zero findings
   from every check is the target state, so no target is written.
 - **Yield.** A programmed exit: a condition and a receiver, another
@@ -65,7 +66,7 @@ class Act:
     condition: Condition | None     # None fires every iteration
 
 class Check:
-    standard:  Standard             # its audit cell; never its gate
+    standard:  Standard             # composed as standard.audit; never its gate
     condition: Condition | None
 
 class Yield:

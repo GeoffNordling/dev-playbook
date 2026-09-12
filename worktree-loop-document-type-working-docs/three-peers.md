@@ -76,6 +76,14 @@ items in Stale Findings and fixed as part of this work or right after.
   repo into compliance, is a loop by another name, rarely used because
   the system had no loop primitive. Once Loop exists, adopt should point
   at a Loop instance or leave the card.
+- **The card's cells are two kinds of pointer.** Define and audit
+  point inside the doc-type system, at the Standard and its auditors.
+  Enforce points outside it, at a harness position, the hooks registry
+  in `standards/harness/files.md`, where an audit runs as a gate;
+  pre-commit and CI are runtimes, not loops, the way a workflow script
+  is a JS file. Adopt points at a Loop instance when one exists and is
+  empty otherwise. No Gate primitive is needed. A candidate for the
+  checker loop, not a decision.
 - **`Object` is a base nobody defines.** Every contract-shape
   pseudocode block writes `class Runbook(Object)`, `class
   Standard(Object)`, `class StandardCard(Object)`, and now `class
@@ -123,7 +131,7 @@ say, so far:
   instance.
 - **Three verbs.** Loop's operations are read off its sentence: *act*,
   a prescribed action, a pointer at a runbook; *check*, a prescribed
-  standard, a pointer at a Standard's audit cell; *yield*, a programmed
+  standard, a pointer at `Standard.audit`; *yield*, a programmed
   exit. Composition: any number of acts and checks, ordered by the
   iteration, and a set of yield conditions.
 - **No target operation.** A target state is "this population passes
@@ -132,18 +140,22 @@ say, so far:
   the direction: each names a member and the rule it fails. This holds
   for indefinite targets too: an ideation loop's check is a model-judge
   standard with a rubric, and its findings are still findings.
-- **A loop composes a standard's audit, never its enforce.** A card's
-  four cells are separable and a loop points at the one it needs. A
-  standard that is defined and audited but not gated is aspirational,
-  which is what most loop targets are; a loop is out of standard until
-  its last step, and many never get there.
-- **Loop composes the other two peers.** *Prescribed actions* are what
-  runbooks are; *prescribed standards* are what Standards are. A runbook
-  is one move, a standard is one measurement, a loop is moves and
-  measurements iterated toward a target. This is the seed of the shape,
-  and a guess about the encoding: an instance may be written largely as
-  pointers, the way a card is, and the generator may stitch its view
-  from the existing chains and rules tables.
+- **A check composes `Standard.audit`, not the Standard.** A card's
+  four cells are separable, and what a check points at is the audit
+  cell: the auditors that measure a population against the Standard's
+  rules and return findings. A check never points at the Standard
+  document, which only defines, and never at the enforce cell, which
+  gates. So a standard that is defined and audited but not gated is
+  aspirational, which is what most loop targets are; a loop is out of
+  standard until its last step, and many never get there.
+- **Loop composes the other two peers, by pointer.** An act points at
+  a runbook, whole: a runbook is one move. A check points at a
+  standard's audit, `Standard.audit`, the one cell of the four: an audit
+  is one measurement. A loop is moves and measurements iterated toward
+  a target. This is the seed of the shape, and a guess about the
+  encoding: an instance may be written largely as pointers, the way a
+  card is, and the generator may stitch its view from the existing
+  chains and rules tables.
 - **A Loop instance is a document, not code.** A `.js` workflow file is
   a JS file. The Loop doc-type sits one level of abstraction above any
   runtime. When the `.claude/workflows/*.js` row of the registry is
@@ -189,11 +201,19 @@ hand. Not the software factory: as specified today it needs a loop to
 clean it up, which is a different loop from the one that runs it, and
 either is too big for a first test.
 
-## Open questions
+## Prior art
 
-- Prior art: where industry's loop vocabulary (control loops,
-  reconciliation, evaluator-optimizer, generator yield) agrees with
-  act, check, yield, conform; where it does not, say why.
+Act and check are industry-standard under other names: control loops
+and Kubernetes reconciliation (desired state, observed state, a
+controller closing the gap; desired state written as a spec, which
+agrees with dropping target), evaluator-optimizer and generator-critic
+patterns, PDCA, OODA, red-green-refactor. Yield is where the field has
+no consensus (interrupt, checkpoint, a person in the loop); the generator
+sense, hand control out and resume at the same point, is the most
+precise word available. One difference on purpose: industry loops are
+code; a Loop instance is a document that points at runbooks and
+standards, and the runtime is whatever runs it. From memory, not a
+fresh search.
 
 ## Acronyms
 
