@@ -77,10 +77,37 @@ items in Stale Findings and fixed as part of this work or right after.
   repo into compliance, is a loop by another name, rarely used because
   the system had no loop primitive. Once Loop exists, adopt should point
   at a Loop instance or leave the card.
+- **`Object` is a base nobody defines.** Every contract-shape
+  pseudocode block writes `class Runbook(Object)`, `class
+  Standard(Object)`, `class StandardCard(Object)`, and now `class
+  Loop(Object)`, and no file defines `Object`. The pseudocode is one
+  view of the system and must agree with itself across every bundle.
+- **The doctrine's yield is "cannot judge".** The loop pseudocode and
+  graph in [Working in Loops](/docs/working-in-loops.md#a-loop-is-a-graph)
+  yield "what nobody can judge"; the Loop doc-type yields when
+  programmed. The doctrine needs the doc-type's sentence.
 - **"Contract" is overloaded.** [Doc-Type](/doc-types/doc-type.md#contract)
   defines a contract as "everything a caller of an instance may rely
   on", yet a Standard is never called and a Loop is driven, not called.
   Either the word is widened or it is Runbook's word only.
+
+## The first instance's standard
+
+The doc-type system checker needs a standard for the target state of
+the doc-type system, aspirational, audited, not gated. What it must
+say, so far:
+
+- **Minimal verbs.** The system is expressed in the fewest verbs and
+  operations that suffice. Every doc-type added makes the system less
+  comprehensible; the loop's job is to find the minimum set.
+- **Two views that agree.** The simple verbs are one view of the world
+  and the contract-shape pseudocode is another. They need not match one
+  to one, but every pseudocode object across every bundle must make
+  sense when put together, one `Object`, one `Condition`, one set of
+  pointers between them.
+- **Both forms in the doc-type, the graph in the instance.** A loop's
+  bundle carries pseudocode and graph; a loop instance is drawn as a
+  graph.
 
 ## What is settled about Loop
 

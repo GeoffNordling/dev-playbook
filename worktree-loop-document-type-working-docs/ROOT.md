@@ -47,7 +47,9 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   one-sentence definition; the shape carries its parts.
 - **Target state** — what the loop drives toward. Its definiteness varies
   by instance: a mergeable PR is definite; a vision of the repo is not.
-- **Yield** — the fourth operation: a loop's programmed exit to
+- **Findings** — what a check returns: each names a member and the
+  rule it fails. The loop's working state; acts read them.
+- **Yield** — the third operation: a loop's programmed exit to
   something outside it, another loop or the user. An instance writes
   "yields when …"; the when is the instance's.
 
@@ -60,6 +62,9 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 - **Registry and roster.** The `Loop` kind in the Types table of
   `document-types.md` with its location rule, the rulings row and the
   roster entry in `doc-type-system.md`, and the empty `loops/` tree.
+- **The target-state standard.** The aspirational standard the first
+  instance checks against, per
+  [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md#the-first-instances-standard).
 - **Obligation.** The Standard card that binds instances to carry their
   contract, the way `harness/runbook-conventions` does for Runbook.
 
