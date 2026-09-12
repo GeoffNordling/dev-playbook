@@ -41,7 +41,7 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 
 | | Runbook | Standard | Loop |
 |---|---|---|---|
-| Family | every skill and agent definition | files typed `Standard` under `standards/` | open |
+| Family | every skill and agent definition | files typed `Standard` under `standards/` | files typed `Loop` under `loops/` |
 | Definition | `definition.md` | `definition.md` | `definition.md` |
 | Shape | the Reference chain: nodes and labeled edges | one population and its rules | open |
 | Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | open |
@@ -75,6 +75,18 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 - **A Loop instance is a document, not code.** A `.js` workflow file is
   a JS file. The Loop doc-type sits one level of abstraction above any
   runtime.
+- **The family mirrors Standard's.** Instances are files typed `Loop`
+  under a reserved root tree, `loops/`, flat until an instance needs a
+  directory. Three edits register it, and they must agree: a `Loop`
+  row in the Types table of
+  [Document Types](/standards/knowledge-organization/document-types.md),
+  a "Typed Loop → Under loops/" rule beside the Standard one, and a
+  `Loop | loops` row in the rulings table of
+  [Doc-Type System](/doc-types/doc-type-system.md#registry-rulings).
+  A reserved root tree is not the general rule for doc-types; it is
+  earned only when consumer repos reach for the instances by path, as
+  they do for standards. Consumers keep their own `loops/` the way they
+  keep their own `standards/`.
 
 ## Example instances
 
@@ -89,6 +101,12 @@ Held to test the shape, not to build:
 - An ideation loop: seeded with a vision, generate and self-evaluate
   ideas, yield to the user periodically, resume on their feedback.
 
+The first instance, built after the doc-type, is a small Markdown
+complexity loop: deterministic and model-judge detectors, run to clean
+up this repo's Markdown. Not the software factory: as specified today it
+needs a loop to clean it up, which is a different loop from the one that
+runs it, and either is too big for a first test.
+
 Only the definiteness of the target state varies across them, and that
 sets the rest: the kind of check and the yield policy. The autonomy
 scale of [Working in Loops](/docs/working-in-loops.md#the-autonomy-scale)
@@ -96,8 +114,6 @@ falls out of one property of the instance.
 
 ## Open questions
 
-- What is the family: which documents are Loop instances, and where do
-  they live?
 - What are Loop's operations, and what is its composition rule?
 - Is "contract" the right word for what a Loop instance carries? See
   [Stale Findings](/worktree-loop-document-type-working-docs/stale-findings.md).

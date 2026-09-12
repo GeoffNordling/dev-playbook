@@ -50,16 +50,15 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Family.** Decide what counts as a Loop instance and name it in
-  `definition.md`.
 - **Operations and composition rule.** Fix them, and from them the
   shape, in prose and one screen of pseudocode.
 - **Encoding.** How an instance file is written so a generator slices
   it.
 - **View and generator.** `scripts/loopgen --check` and the view file.
 - **Residual ledger.** Seeded empty.
-- **Registry and roster.** The row and the roster entry in
-  `doc-type-system.md`.
+- **Registry and roster.** The `Loop` kind in the Types table of
+  `document-types.md` with its location rule, the rulings row and the
+  roster entry in `doc-type-system.md`, and the empty `loops/` tree.
 - **Obligation.** The Standard card that binds instances to carry their
   contract, the way `harness/runbook-conventions` does for Runbook.
 
@@ -67,6 +66,8 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 - **One-sentence definition.** Settled; recorded in Terms and in
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
+- **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
+  Recorded in Three Peers.
 
 ## Acronyms
 
