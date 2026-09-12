@@ -53,8 +53,6 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Shape.** From the three verbs and the composition rule, the shape in
-  prose and one screen of pseudocode.
 - **Encoding.** How an instance file is written so a generator slices
   it.
 - **View and generator.** `scripts/loopgen --check` and the view file.
@@ -71,6 +69,9 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
   Recorded in Three Peers.
+- **Shape.** Drafted in
+  [Loop Shape](/worktree-loop-document-type-working-docs/loop-shape.md);
+  awaiting the user's reaction.
 - **Operations and composition rule.** Three verbs, act, check, yield;
   target dropped, since the checks carry it. Recorded in Three Peers.
 

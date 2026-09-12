@@ -44,11 +44,11 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 | Family | every skill and agent definition | files typed `Standard` under `standards/` | files typed `Loop` under `loops/` |
 | Definition | `definition.md` | `definition.md` | `definition.md` |
 | Operations | read, write, do, override, never, args, report | population, rule | act, check, yield |
-| Shape | the Reference chain: nodes and labeled edges | one population and its rules | open |
+| Shape | the Reference chain: nodes and labeled edges | one population and its rules | acts, checks, and yields, iterated |
 | Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | any number of acts and checks, ordered by the iteration; a set of yield conditions |
-| Grain | instance-level | instance-level | open |
+| Grain | instance-level | instance-level | instance-level |
 | Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | open |
-| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen` → open |
+| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen` → `loops.txt` |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
 | Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | open |
 
@@ -168,8 +168,6 @@ either is too big for a first test.
 
 ## Open questions
 
-- The shape: the three verbs and the composition rule in prose and one
-  screen of pseudocode.
 - Prior art: where industry's loop vocabulary (control loops,
   reconciliation, evaluator-optimizer, generator yield) agrees with
   act, check, yield, conform; where it does not, say why.
