@@ -69,11 +69,17 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 - **Registry and roster.** The `Loop` kind in the Types table of
   `document-types.md` with its location rule, the rulings row and the
   roster entry in `doc-type-system.md`, and the empty `loops/` tree.
-- **The target-state standard.** The aspirational standard the first
-  instance checks against, per
+- **Obligation.** The doc-type binds nobody. A small Standard,
+  population "files typed `Loop`", rules the encoding rules, auditor
+  `loopgen --check`, is what makes every Loop file carry its shape at
+  commit time, the way `harness/runbook-conventions` and the chain
+  drift check do for Runbook.
+- **First instance.** The doc-type system improver: a loop that drives
+  the doc-type system toward the target state in
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md#the-first-instances-standard).
-- **Obligation.** The Standard card that binds instances to carry their
-  contract, the way `harness/runbook-conventions` does for Runbook.
+  Its checks need a Standard for that target state, aspirational,
+  audited, never gated, written first. Whether its acts include a
+  deterministic ontology solver is open; not discussed yet.
 
 ## Completed
 
