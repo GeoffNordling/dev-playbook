@@ -9,8 +9,7 @@ description: Runbook, Standard, and Loop as peer doc-types — their one-sentenc
 Runbook, Standard, and Loop are three doc-types under one kind,
 [Doc-Type](/doc-types/doc-type.md): operations plus a composition rule,
 fixing a shape every instance fills. This member records the parallel
-between them and what the Loop design has settled, so the work survives a
-context reset. It is speculative, per
+between them. It is speculative, per
 [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md).
 
 ## The three sentences
@@ -82,10 +81,6 @@ items in Stale Findings and fixed as part of this work or right after.
   Standard(Object)`, `class StandardCard(Object)`, and now `class
   Loop(Object)`, and no file defines `Object`. The pseudocode is one
   view of the system and must agree with itself across every bundle.
-- **The doctrine's yield is "cannot judge".** The loop pseudocode and
-  graph in [Working in Loops](/docs/working-in-loops.md#a-loop-is-a-graph)
-  yield "what nobody can judge"; the Loop doc-type yields when
-  programmed. The doctrine needs the doc-type's sentence.
 - **"Contract" is overloaded.** [Doc-Type](/doc-types/doc-type.md#contract)
   defines a contract as "everything a caller of an instance may rely
   on", yet a Standard is never called and a Loop is driven, not called.

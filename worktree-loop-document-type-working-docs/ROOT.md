@@ -47,6 +47,7 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   one-sentence definition; the shape carries its parts.
 - **Target state** — what the loop drives toward. Its definiteness varies
   by instance: a mergeable PR is definite; a vision of the repo is not.
+  Both are valid target states.
 - **Findings** — what a check returns: each names a member and the
   rule it fails. The loop's working state; acts read them.
 - **Yield** — the third operation: a loop's programmed exit to

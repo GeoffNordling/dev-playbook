@@ -51,7 +51,7 @@ until the goal is met:
     the step obeys the constraints        the contract, the standards
     the work is checked                   a predicate, a reviewer, or the user
     a failed check goes back to the worker
-    what nobody in the loop can judge is yielded
+    the loop yields where it is programmed to
 ```
 
 Who the worker is and who checks are the loop's two free choices, and
@@ -109,9 +109,10 @@ yields, at any position on the scale.
 ## Yielding
 
 Yielding is a property of every loop; the question is what a loop yields
-to. A loop yields when its goal is met, and before that when a unit
-needs judgment its predicates cannot give. It yields more often as the
-risk or cost of a wrong decision rises.
+to. A loop yields where its author put the yield: when its goal is met,
+at a fixed point in the iteration, every turn, or when a unit needs a
+judgment its predicates cannot give. Its author puts the yields more
+often as the risk or cost of a wrong decision rises.
 
 A loop can yield to another loop: a model, which carries its own
 responsibility and its own cost. Or a loop can yield to the user, who
@@ -160,9 +161,9 @@ choice of what runs next is an edge. The same loop, written both ways:
      the work is checked                  │         └──┬───┘        │
      a failed check goes back             │            ▼            │
          to the worker                    │         ┌───────┐ fail  │
-     what nobody can judge                │  yield ◄┤ check ├───────┘
-         is yielded                       │  cannot └──┬────┘
-                                          │  judge     │ pass
+     the loop yields where                │  yield ◄┤ check ├───────┘
+         it is programmed to              │  as     └──┬────┘
+                                          │  written   │ pass
                                           │            ▼
                                           │       ┌───────────┐
                                           └──no───┤ goal met? │
