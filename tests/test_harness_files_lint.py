@@ -453,12 +453,12 @@ def test_agent_without_tools_field_is_clean(tmp_path: Path) -> None:
 # workspace-wide rules.
 GLOBAL_VALID = (
     "# Global\n\n"
-    "## Principles\n\n"
-    "### Be terse\n\nBe terse.\n\n"
     "## Behaviors\n\n"
     "### Read the standards\n\nRead the catalog first.\n\n"
     "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
-    "### Teach unfamiliar terms\n\nExplain the unfamiliar term.\n"
+    "### Teach unfamiliar terms\n\nExplain the unfamiliar term.\n\n"
+    "## Principles\n\n"
+    "### Be terse\n\nBe terse.\n"
 )
 
 
@@ -490,11 +490,11 @@ def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
     repo = make_global_claude(
         tmp_path,
         "# Global\n\n"
+        "## Principles\n\n"
+        "### Be terse\n\nBe terse.\n\n"
         "## Behaviors\n\n"
         "### Read the standards\n\nRead the catalog first.\n\n"
-        "### Navigate docs by index\n\nWalk the index descriptions.\n\n"
-        "## Principles\n\n"
-        "### Be terse\n\nBe terse.\n",
+        "### Navigate docs by index\n\nWalk the index descriptions.\n",
     )
 
     result = run(repo)
