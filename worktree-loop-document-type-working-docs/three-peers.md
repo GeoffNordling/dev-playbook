@@ -82,7 +82,9 @@ items in Stale Findings and fixed as part of this work or right after.
 - **Yield is an operation, programmed, not derived.** An instance
   writes "yields when …"; the when is the instance's, and the doc-type
   says nothing about it: never, once at the end, periodically, every
-  turn are all instances. Measurement is always possible, by
+  turn are all instances. Yield is a *set* of conditions, not a list:
+  the loop yields when any one is met, where a list would be iterated
+  through. Measurement is always possible, by
   deterministic code or by a model returning a value, so "yields when it
   cannot measure" was wrong and is dropped.
 - **No rule on when a loop is worth writing.** Every piece of work can
