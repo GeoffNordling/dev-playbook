@@ -45,6 +45,12 @@ GitHub renders Markdown before LaTeX, so:
 
 Open a PR and push to it, but never merge one — the user merges every PR by hand.
 
+### Ask before picking a commit target
+
+When work is ready to commit and there have been no instructions about
+whether to commit to `main`, a branch, or a worktree, stop and ask rather than choosing.
+This supersedes the harness's default.
+
 ## Principles
 
 ### Be direct

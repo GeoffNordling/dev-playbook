@@ -6,157 +6,179 @@ description: The doctrine — agents work in loops, and the user works on the lo
 
 # Working in Loops
 
-How work gets done in the workspace: agents work in loops, and the user
-works on the loops. This sheet says what a loop is, where it sits relative
-to the harness, where the user sits inside it, and how the user improves
-it.
+How we think about loops in the workspace.
 
 ## The goal
 
-Linear work — one session, the user and one agent, one task at a time,
-powering through — is unsustainable. It built this repository, and the
-backlog grew faster than the sessions drained it. The user has less free
-time and the models are stronger every month; a way of working that spends
-the scarce resource one result at a time does not survive that.
+Computation is abundant and the user's attention is scarce. Loops
+maximize the work done per unit of the user's attention.
 
-The user's time goes into loops, contracts, and detectors. A loop runs
-without the user. A detector catches its class of slop before it bubbles up.
+The user delegates more of their own work to agentic loops, and tracks
+every instantiated loop in one parsimonious place, so that all of them
+stay legible at once. We strive for all repeatable work
+to live in asynchronous loops.
 
-## Why linear work fails
+The user should spend most of their time helping
+build and improve loops. Loops run without the user.
+Detectors catch slop before it bubbles up.
 
-A shape is defined and agents are dispatched. The output comes back in
-the right shape and full of slop: comments through the prose, claims the
-user cannot tell from inventions. The user fixes it in the loop, turn by
-turn. The fix is consumed once, and the next dispatch makes the same
-slop. The shape was a contract and the agents obeyed it; nothing
-verified what the shape did not say.
+## Linear work
 
-## What a loop stands on
+Linear work is one session: the user and one agent, one task at a time,
+powering through. The user is in the loop on every turn, and the user's
+turn is the most expensive resource there is, so linear work is the
+least effective way to work. It built this repository, and the backlog
+grew faster than the sessions drained it. The user has less free time and the models
+are stronger every month; a way of working that spends the scarce
+resource one result at a time does not survive that.
 
-Improvement needs verification. Verification needs measurement.
-Measurement needs expression: a property written as a programmable
-operation over the object's state. Each layer stands on the one below.
+Linear work fails like this: a shape is defined and agents are
+dispatched. The output comes back in the right shape and full of slop:
+comments through the prose, claims the user cannot tell from inventions.
+The user fixes it in the session, turn by turn. The fix is consumed
+once, and the next dispatch makes the same slop.
 
-Verification reads the object's state after the run and treats the
-agent's own report of what it did as feedback for the next attempt. The user
-leaves a loop at the moment the predicate that replaces the user is
-written; a loop without that predicate still has the user in it.
+## A loop
 
-## The harness is the innermost loop
+A **loop** is a worker pursuing a goal under constraints, with something
+checking the work. The worker is a model or the user. The constraints
+are a contract, the standards, and the detectors. The check is a
+predicate, a reviewer, or the user.
 
-Every loop in the workspace has Claude Code as its innermost loop: the
-model plans, acts through a tool, observes the result, and repeats until
-it has an answer or runs out of turns. The workspace writes no
-model-and-tool loop of its own, because API billing is out of scope
-([Headless Operation, Billing](/docs/headless.md#billing)).
-
-A linear session yields: the loop suspends, the user types, and the
-loop resumes with the same context. A headless run (`claude -p`) returns:
-the process exits, its context is gone, and only stdout and the disk
-survive.
-
-## Loops
-
-A **loop** is a named, registered procedure: it dispatches agents over a
-population against a contract, verifies the output, and stops at an exit
-condition. It runs without the user, and stops at the end or at a named
-wait where the user decides.
-
-In code, with `claude(prompt)` standing for one headless run that returns
-its stdout:
-
-```python
-def batch(
-    work_items: list[str],
-    task: Callable[[str], str],
-    ok: Callable[[str], bool],
-    max_retries: int = 2,
-) -> list[str]:
-    """Run every item through the harness and return the ones that need the user."""
-    parked: list[str] = []
-    for work_item in work_items:
-        prompt = task(work_item)
-        for _ in range(max_retries):
-            out = claude(prompt)
-            if ok(work_item):
-                break
-            prompt += f"\n\nLast attempt failed verification:\n{out}"
-        else:
-            parked.append(work_item)
-    return parked
+```
+until the goal is met:
+    a worker takes the next step          a model, or the user
+    the step obeys the constraints        the contract, the standards
+    the work is checked                   a predicate, a reviewer, or the user
+    a failed check goes back to the worker
+    what nobody in the loop can judge is yielded
 ```
 
-The population is `work_items`, one independent unit of work each. The
-contract is `task(work_item)`, the prompt, and it states what `ok` checks,
-because the model cannot see
-`ok`. Verification is `ok(work_item)`. The exit condition is the end of
-`work_items`; `parked` is what the user reads.
+Who the worker is and who checks are the loop's two free choices, and
+every kind of loop is one assignment of them. A linear session assigns
+both to the user on every turn. A headless run assigns the worker to a
+model and the check to a predicate.
 
-Each `claude(prompt)` starts with an empty context, so the population can
-be large.
-
-A loop is described in markdown, so Loop is a doc-type; its shape is
-found the way every doc-type's is, by running the loop on the family
-([Doc-Type](/doc-types/doc-type.md)). The registry of loops is its
-generated view — one place lists every loop.
-
-## A loop is a graph
-
-Every loop is a graph, and every graph is run by a loop. Written out, a
-**node** is a function that reads and writes a shared state object and
-returns either the next node or a stop; an **edge** is that returned
-choice. Each branch of the loop body becomes a node, each `return` becomes
-a stop, and the driver that walks the nodes is a `while`.
-
-What the graph form buys: the position in the loop becomes data, so a run
-can stop at a node, save the state, and resume later — which a wait on the
-user needs, because the wait can be days. The diagram is derived from the
-node table, so it cannot go stale. Fan-out and join are native.
-
-The loop form is the debugging angle: one function, one stack, one
-breakpoint. The graph form is the altitude angle: the shape on screen is
-the whole procedure, legible to a reader who knows the primitives. The
-graph form is the intended default, with the loop underneath it: agents
-make the boilerplate cheap.
-
-## Where a loop lives
-
-The user is in the loop when the harness can yield the user a turn: a
-linear session. A headless run cannot, so a loop that runs without the
-user lives either inside the harness or outside it.
-
-Inside the harness, the loop is prose in the task: the model executes it
-by reading it, so a step can be skipped or the loop stopped early, and
-its state is the context window. Outside the harness, the loop is code:
-`claude -p` is one tool inside it, and the `for` terminates.
-
-Whether the predicate can be written decides where a loop waits for the
-user: a node that needs the user's judgment waits, and so does an
-irreversible action. Whether the loop has to be code decides whether it
-lives inside the harness or outside.
-
-## The user's position
-
-The user reads a run's outputs and looks below them often, as a
-scientist samples and a manager checks in. Looking below is
-what earns the claim of understanding. At the end of a run the user
-reads the diff.
-
-The agent cooks; the user checks back later. When the user does not
-like the result, the user changes the loop — a contract, a detector, a
-standard — and runs it again. The user does not fix the output by hand.
-The aim is a flywheel of autonomy: user time is never spent on work a
-loop could do.
-
-A linear session is for work that does not repeat: a foundational
-document, a decision. Work that repeats gets a loop.
-
-Whether work repeats depends on the level one thinks at. This specific
-document is written once, but many documents are written every week. Ask
-the question one level up, then one level again, until the repetition
-shows.
-
-## How a loop improves
+The worker is told what the check looks for, because the worker cannot
+see the check. The check reads the work's state after the step and
+treats the worker's own report of what it did as feedback for the next
+attempt. A check needs measurement, and measurement needs expression: a
+property written as a programmable operation over the work's state. The
+user leaves a loop at the moment the predicate that replaces the user is
+written; a loop without that predicate still has the user in it.
 
 A loop improves by error analysis: the user reads what the review caught
 and the detectors missed, and the most common kind gets a detector.
+
+Every loop has Claude Code as its innermost loop: the model plans, acts
+through a tool, observes the result, and repeats until it has an answer
+or runs out of turns.
+
+## The autonomy scale
+
+Every loop sits on one continuous scale: how much of its contract a
+predicate checks instead of the user. At the left end is headless
+operation, where every check is a predicate and the loop runs to its
+exit without the user. At the right end is the linear session, where the
+harness yields to the user every turn and the user is the only verifier.
+
+```
+ every check a predicate                            the user checks every turn
+ ◄──────────────────────────────────────────────────────────────────────►
+ headless run        review with a stop        design session        linear session
+                                                            constructing a constraint
+
+ ◄── more definition, more verifiers, smaller scope
+                          inventing what future loops will be checked against ──►
+```
+
+Better definition and more verifiers move a loop left: a verifier can
+be written only for work defined well enough to state a predicate over.
+Scope is the lever, since a unit small enough to define is a unit a
+predicate can check.
+
+Constructing a constraint — a standard, a doc-type, a detector — sits
+at the far right, because it invents the thing future predicates will
+check. Every constraint built there moves other work left. The user's
+time is spent at the right end, making things that move work to the
+left.
+
+The higher the risk or cost of a wrong decision, the more often a loop
+yields, at any position on the scale.
+
+## Yielding
+
+Yielding is a property of every loop; the question is what a loop yields
+to. A loop yields when its goal is met, and before that when a unit
+needs judgment its predicates cannot give. It yields more often as the
+risk or cost of a wrong decision rises.
+
+A loop can yield to another loop: a model, which carries its own
+responsibility and its own cost. Or a loop can yield to the user, who
+holds the final responsibility and is the most expensive thing a loop
+can yield to.
+
+The agent cooks; the user checks back later. The user reads a run's
+outputs and samples below them, as a scientist samples and a manager
+checks in, and at the end of a run reads the diff. When the user does
+not like the result, the user changes the loop — a contract, a detector,
+a standard — and runs it again. The user does not fix the output by
+hand, because that is linear work; their time is better spent improving
+the loop.
+
+## Work that repeats
+
+A linear session is for work that does not repeat: a foundational
+document, a decision. Work that repeats gets a loop. Whether work
+repeats depends on the level one thinks at. One chunk of work is done
+once. How that kind of work is done is written once and followed every
+time. A check that the work was done that way runs every time. Ask the
+question one level up, then one level again, until the repetition
+shows.
+
+```
+ running the work and the check without the user   the loop        ◄── stop here
+   ▲
+ writing down a check that the work was done        the process
+ the way it was written down
+   ▲
+ writing down how that kind of work is done         the contract
+   ▲
+ doing one chunk of work                            the work        ◄── start here
+```
+
+## A loop is a graph
+
+Every loop is a graph: each branch of the body is a node, and each
+choice of what runs next is an edge. The same loop, written both ways:
+
+```
+ loop                                        graph
+
+ until the goal is met:                             ┌──────┐
+     the worker takes a step              ┌────────►│ step │◄───────┐
+     the work is checked                  │         └──┬───┘        │
+     a failed check goes back             │            ▼            │
+         to the worker                    │         ┌───────┐ fail  │
+     what nobody can judge                │  yield ◄┤ check ├───────┘
+         is yielded                       │  cannot └──┬────┘
+                                          │  judge     │ pass
+                                          │            ▼
+                                          │       ┌───────────┐
+                                          └──no───┤ goal met? │
+                                                  └─────┬─────┘
+                                                        │ yes
+                                                        ▼
+                                                      done
+```
+
+The graph form is the one used for visualization, tracking, and
+communication, because the shape on screen is the whole procedure,
+legible to a reader who knows the primitives. The position in the loop
+becomes data, so a run can stop at a node, save its state, and resume
+after a wait on the user that lasts days.
+
+As the work behind a step grows more complex, the loop becomes worth
+building; the graph the loop is drawn as does not grow with it. More
+branches and more checks add nodes and edges, never a deeper nesting a
+reader has to hold in their head.
