@@ -47,13 +47,14 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   one-sentence definition; the shape carries its parts.
 - **Target state** — what the loop drives toward. Its definiteness varies
   by instance: a mergeable PR is definite; a vision of the repo is not.
-- **Yield** — a loop's programmed exit to something outside it, another
-  loop or the user. A property of the shape, not of the definition.
+- **Yield** — the fourth operation: a loop's programmed exit to
+  something outside it, another loop or the user. An instance writes
+  "yields when …"; the when is the instance's.
 
 ## Planned
 
 - **Shape.** From the four verbs and the composition rule, the shape in
-  prose and one screen of pseudocode; settle where yield sits.
+  prose and one screen of pseudocode.
 - **Encoding.** How an instance file is written so a generator slices
   it.
 - **View and generator.** `scripts/loopgen --check` and the view file.

@@ -79,9 +79,10 @@ items in Stale Findings and fixed as part of this work or right after.
 - **The definition** is the sentence above. Shorter is better; the
   definition carries the kind, the shape carries the parts. Runbook's
   sentence names no reports or effects for the same reason.
-- **Yield is programmed, not derived.** A loop yields where its author
-  put the yield: never, once at the end, periodically, every turn. The
-  doc-type does not say when. Measurement is always possible, by
+- **Yield is an operation, programmed, not derived.** An instance
+  writes "yields when …"; the when is the instance's, and the doc-type
+  says nothing about it: never, once at the end, periodically, every
+  turn are all instances. Measurement is always possible, by
   deterministic code or by a model returning a value, so "yields when it
   cannot measure" was wrong and is dropped.
 - **No rule on when a loop is worth writing.** Every piece of work can
@@ -142,9 +143,8 @@ falls out of one property of the instance.
 
 ## Open questions
 
-- Is yield an operation, or a property of an act or a check? Where does
-  the yield sit in the Markdown loop: after a check fails N times, or at
-  a fixed point in the iteration?
+- The shape: the four verbs and the composition rule in prose and one
+  screen of pseudocode.
 
 ## Acronyms
 
