@@ -53,7 +53,7 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Shape.** From the four verbs and the composition rule, the shape in
+- **Shape.** From the three verbs and the composition rule, the shape in
   prose and one screen of pseudocode.
 - **Encoding.** How an instance file is written so a generator slices
   it.
@@ -71,8 +71,8 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
   Recorded in Three Peers.
-- **Operations and composition rule.** Four verbs, target, act, check,
-  yield; one target, many of the rest. Recorded in Three Peers.
+- **Operations and composition rule.** Three verbs, act, check, yield;
+  target dropped, since the checks carry it. Recorded in Three Peers.
 
 ## Acronyms
 

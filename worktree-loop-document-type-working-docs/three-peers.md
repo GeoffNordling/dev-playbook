@@ -43,9 +43,9 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 |---|---|---|---|
 | Family | every skill and agent definition | files typed `Standard` under `standards/` | files typed `Loop` under `loops/` |
 | Definition | `definition.md` | `definition.md` | `definition.md` |
-| Operations | read, write, do, override, never, args, report | population, rule | target, act, check, yield |
+| Operations | read, write, do, override, never, args, report | population, rule | act, check, yield |
 | Shape | the Reference chain: nodes and labeled edges | one population and its rules | open |
-| Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | one target, any number of acts, checks, and yields, ordered by the iteration |
+| Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | any number of acts and checks, ordered by the iteration; a set of yield conditions |
 | Grain | instance-level | instance-level | open |
 | Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | open |
 | Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen` → open |
@@ -69,6 +69,14 @@ items in Stale Findings and fixed as part of this work or right after.
   specific thing is done*, lives nowhere; the "question" idea sits only
   on [Standard-Card](/doc-types/standard-card/definition.md#named-by-the-question).
   Add the sentence and let population-and-rules be the shape's sentence.
+- **Audit and enforce are fused in practice.** Every auditor runs at
+  pre-commit and every failure blocks, so no standard is aspirational
+  today. A loop needs the audit cell without the gate; unfusing them is
+  what makes "compose with standards" right.
+- **Adopt is a loop.** The card's adopt cell, the helpers that bring a
+  repo into compliance, is a loop by another name, rarely used because
+  the system had no loop primitive. Once Loop exists, adopt should point
+  at a Loop instance or leave the card.
 - **"Contract" is overloaded.** [Doc-Type](/doc-types/doc-type.md#contract)
   defines a contract as "everything a caller of an instance may rely
   on", yet a Standard is never called and a Loop is driven, not called.
@@ -91,11 +99,22 @@ items in Stale Findings and fixed as part of this work or right after.
   repeat; the user decides which loops to build. This conversation is a
   loop that yields every turn and will not run again, so it is not an
   instance.
-- **Four verbs.** Loop's operations are read off its sentence: *target*,
-  the state driven toward, one per loop; *act*, a prescribed action, a
-  pointer at a runbook; *check*, a prescribed standard, a pointer at a
-  Standard; *yield*, a programmed exit. Composition: one target, any
-  number of acts, checks, and yields, ordered by the iteration.
+- **Three verbs.** Loop's operations are read off its sentence: *act*,
+  a prescribed action, a pointer at a runbook; *check*, a prescribed
+  standard, a pointer at a Standard's audit cell; *yield*, a programmed
+  exit. Composition: any number of acts and checks, ordered by the
+  iteration, and a set of yield conditions.
+- **No target operation.** A target state is "this population passes
+  these checks", so the checks carry it and population is already
+  Standard's word. The findings an audit returns are the distance and
+  the direction: each names a member and the rule it fails. This holds
+  for indefinite targets too: an ideation loop's check is a model-judge
+  standard with a rubric, and its findings are still findings.
+- **A loop composes a standard's audit, never its enforce.** A card's
+  four cells are separable and a loop points at the one it needs. A
+  standard that is defined and audited but not gated is aspirational,
+  which is what most loop targets are; a loop is out of standard until
+  its last step, and many never get there.
 - **Loop composes the other two peers.** *Prescribed actions* are what
   runbooks are; *prescribed standards* are what Standards are. A runbook
   is one move, a standard is one measurement, a loop is moves and
@@ -145,8 +164,11 @@ falls out of one property of the instance.
 
 ## Open questions
 
-- The shape: the four verbs and the composition rule in prose and one
+- The shape: the three verbs and the composition rule in prose and one
   screen of pseudocode.
+- Prior art: where industry's loop vocabulary (control loops,
+  reconciliation, evaluator-optimizer, generator yield) agrees with
+  act, check, yield, conform; where it does not, say why.
 
 ## Acronyms
 
