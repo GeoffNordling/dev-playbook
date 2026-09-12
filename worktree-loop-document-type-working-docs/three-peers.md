@@ -146,7 +146,8 @@ say, so far:
   from the existing chains and rules tables.
 - **A Loop instance is a document, not code.** A `.js` workflow file is
   a JS file. The Loop doc-type sits one level of abstraction above any
-  runtime.
+  runtime. When the `.claude/workflows/*.js` row of the registry is
+  ruled, it is a runtime that runs loops, not the Loop family.
 - **The family mirrors Standard's.** Instances are files typed `Loop`
   under a reserved root tree, `loops/`, flat until an instance needs a
   directory. Three edits register it, and they must agree: a `Loop`
