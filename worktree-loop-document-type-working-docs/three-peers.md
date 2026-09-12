@@ -151,16 +151,20 @@ Held to test the shape, not to build:
 - An ideation loop: seeded with a vision, generate and self-evaluate
   ideas, yield to the user periodically, resume on their feedback.
 
-The first instance, built after the doc-type, is a small Markdown
-complexity loop: deterministic and model-judge detectors, run to clean
-up this repo's Markdown. Not the software factory: as specified today it
-needs a loop to clean it up, which is a different loop from the one that
-runs it, and either is too big for a first test.
-
-Only the definiteness of the target state varies across them, and that
-sets the rest: the kind of check and the yield policy. The autonomy
-scale of [Working in Loops](/docs/working-in-loops.md#the-autonomy-scale)
-falls out of one property of the instance.
+The first instance, built after the doc-type, is a **doc-type system
+checker**. It describes the intended world, every doc-type as a few
+simple verbs plus a composition rule, and checks that world against the
+one we live in, dev-playbook and its workspace. Through the three verbs:
+act is sending out agents to find inconsistencies, the kind the peer
+section above already holds, and ideating fixes; check is a
+self-consistency standard applied by the loop's own judgment; yield is
+{every K rounds}, to the user, resuming on their feedback. Its goal at
+this level is not to transform the system but to align with the user on
+a self-consistent target end state. Chosen over a Markdown complexity
+loop because that would open a new front; this one stays on the work at
+hand. Not the software factory: as specified today it needs a loop to
+clean it up, which is a different loop from the one that runs it, and
+either is too big for a first test.
 
 ## Open questions
 
