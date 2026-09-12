@@ -43,13 +43,36 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 |---|---|---|---|
 | Family | every skill and agent definition | files typed `Standard` under `standards/` | files typed `Loop` under `loops/` |
 | Definition | `definition.md` | `definition.md` | `definition.md` |
+| Operations | read, write, do, override, never, args, report | population, rule | target, act, check, yield |
 | Shape | the Reference chain: nodes and labeled edges | one population and its rules | open |
-| Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | open |
+| Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | one target, any number of acts, checks, and yields, ordered by the iteration |
 | Grain | instance-level | instance-level | open |
 | Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | open |
 | Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen` → open |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
 | Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | open |
+
+## Where the peers are not yet parallel
+
+Findings about the peers themselves, more important than the parked
+items in Stale Findings and fixed as part of this work or right after.
+
+- **Standard's operations are nouns.** Runbook's operations are seven
+  verbs, Standard-Card's are four (define, audit, enforce, adopt), and
+  Loop's are four (target, act, check, yield). Standard's are two nouns,
+  population and rule. Every doc-type should be defined by a short list
+  of simple verbs; overlap between doc-types is allowed.
+- **Standard has no self-standing definition.**
+  [standard/definition.md](/doc-types/standard/definition.md) opens by
+  deferring to the card ("the kind a card's Define cell points at").
+  The intended sentence, *a standard answers a question about how a
+  specific thing is done*, lives nowhere; the "question" idea sits only
+  on [Standard-Card](/doc-types/standard-card/definition.md#named-by-the-question).
+  Add the sentence and let population-and-rules be the shape's sentence.
+- **"Contract" is overloaded.** [Doc-Type](/doc-types/doc-type.md#contract)
+  defines a contract as "everything a caller of an instance may rely
+  on", yet a Standard is never called and a Loop is driven, not called.
+  Either the word is widened or it is Runbook's word only.
 
 ## What is settled about Loop
 
@@ -65,6 +88,11 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
   repeat; the user decides which loops to build. This conversation is a
   loop that yields every turn and will not run again, so it is not an
   instance.
+- **Four verbs.** Loop's operations are read off its sentence: *target*,
+  the state driven toward, one per loop; *act*, a prescribed action, a
+  pointer at a runbook; *check*, a prescribed standard, a pointer at a
+  Standard; *yield*, a programmed exit. Composition: one target, any
+  number of acts, checks, and yields, ordered by the iteration.
 - **Loop composes the other two peers.** *Prescribed actions* are what
   runbooks are; *prescribed standards* are what Standards are. A runbook
   is one move, a standard is one measurement, a loop is moves and
@@ -114,9 +142,9 @@ falls out of one property of the instance.
 
 ## Open questions
 
-- What are Loop's operations, and what is its composition rule?
-- Is "contract" the right word for what a Loop instance carries? See
-  [Stale Findings](/worktree-loop-document-type-working-docs/stale-findings.md).
+- Is yield an operation, or a property of an act or a check? Where does
+  the yield sit in the Markdown loop: after a check fails N times, or at
+  a fixed point in the iteration?
 
 ## Acronyms
 

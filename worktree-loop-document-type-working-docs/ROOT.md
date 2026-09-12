@@ -27,6 +27,8 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   the three doc-types parallel.
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md)
   holds the parallel structure.
+- **Verbs.** Each doc-type is defined by a short list of simple verbs,
+  its operations. Overlap between doc-types is allowed.
 - **The meta object, not an instance.** The work is the doc-type; no
   specific loop is built here. Specific loops are examples that test the
   shape.
@@ -50,8 +52,8 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Operations and composition rule.** Fix them, and from them the
-  shape, in prose and one screen of pseudocode.
+- **Shape.** From the four verbs and the composition rule, the shape in
+  prose and one screen of pseudocode; settle where yield sits.
 - **Encoding.** How an instance file is written so a generator slices
   it.
 - **View and generator.** `scripts/loopgen --check` and the view file.
@@ -68,6 +70,8 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
   Recorded in Three Peers.
+- **Operations and composition rule.** Four verbs, target, act, check,
+  yield; one target, many of the rest. Recorded in Three Peers.
 
 ## Acronyms
 

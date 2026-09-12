@@ -6,8 +6,10 @@ description: Incorrect, stale, or broken things found while designing the Loop d
 
 # Stale Findings
 
-Things found wrong on the way to the Loop doc-type. Each is a record and
-a guess at the fix; none is acted on in this set. The set's root is
+Things found wrong on the way to the Loop doc-type, unrelated to the
+peers themselves; findings about the peers live in
+[Three Peers](/worktree-loop-document-type-working-docs/three-peers.md#where-the-peers-are-not-yet-parallel).
+Each is a record and a guess at the fix; none is acted on in this set. The set's root is
 [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md).
 
 ## Findings
@@ -24,18 +26,6 @@ a guess at the fix; none is acted on in this set. The set's root is
   row `.claude/workflows/*.js | workflows | Pending`. A workflow script
   is a JS file, not a loop; the Loop doc-type sits above any runtime.
   The row is a category error and needs re-ruling.
-- **"Contract" is overloaded.** [Doc-Type](/doc-types/doc-type.md#contract)
-  defines a contract as "everything a caller of an instance may rely
-  on", yet a Standard is never called. Either the word is widened or a
-  Standard's population-and-rules is not a contract.
-- **Standard has no self-standing definition.**
-  [standard/definition.md](/doc-types/standard/definition.md) opens by
-  deferring to the card ("the kind a card's Define cell points at").
-  The intended sentence, *a standard answers a question about how a
-  specific thing is done*, lives nowhere; the "question" idea sits only
-  on [Standard-Card](/doc-types/standard-card/definition.md#named-by-the-question).
-  Add the sentence to `standard/definition.md` and let
-  population-and-rules be the shape's sentence.
 - **Doc-type import is prose only.**
   [Doc-Type System](/doc-types/doc-type-system.md#the-import-surface)
   says a consumer writes its own doc-type-system file; no consumer repo
