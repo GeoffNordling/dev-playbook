@@ -1,17 +1,23 @@
 ---
 type: General-Sheet
 title: Standard
-description: What a Standard is — one class of object as its population, plus named rules over one member's state — the family it serves, and where it lives
+description: What a Standard is — a description of a state, one class of object as its population plus named rules over one member's state, in prose and in checkers — the family it serves, and where it lives
 ---
 
 # Standard
 
-A **Standard** is the kind a card's Define cell points at
-([Standard-Card](/doc-types/standard-card/definition.md)): one class of
-object as its population, plus named rules, each a predicate over one
-member's state. A reviewer or a lint cites a rule to reject work; the
-rejection is about the state of one object at one moment, never about
-the process that produced it.
+A **Standard** describes a state: one class of object as its
+population, plus named rules, each a predicate over one member's
+state. It describes that state twice. Its own text is the prose form,
+what a writer reads to know what to make; the checkers its card's
+Audit cell locates, deterministic or a model returning a value, are
+the checkable form, what says whether one member is in the state
+([Standard-Card](/doc-types/standard-card/definition.md)). A reviewer
+or a lint cites a rule to reject work; the rejection is about the
+state of one object at one moment, never about the process that
+produced it. A Standard has no notion of moving toward the state, only
+of being in or out of it; driving toward it is
+[Loop](/doc-types/loop/definition.md)'s.
 
 The family is the documents typed `Standard` under the card
 directories: `standards/prose/conventions.md` binds an authored

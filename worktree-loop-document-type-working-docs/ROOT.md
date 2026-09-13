@@ -56,16 +56,10 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Bundle.** `contract-shape.md`, `encoding.md`, `residual-ledger.md`
-  in `doc-types/loop/`, from the drafts in this set. `definition.md` is
-  written.
-- **Encoding.** A Mermaid block as the source of truth; frontmatter, one
-  paragraph, and three verb sections around it.
 - **Generator.** `scripts/loopgen --check`, a checker of the embedded
   graph against the verb sections and the pointers.
 - **Location rule.** The okf-lint `type-location` check extended to
   `Loop` under `loops/`.
-- **Residual ledger.** Seeded empty.
 - **Registry and roster.** The `Loop` kind in the Types table of
   `document-types.md` with its location rule, the rulings row and the
   roster entry in `doc-type-system.md`, and the empty `loops/` tree.
@@ -87,9 +81,11 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
   Recorded in Three Peers.
-- **Shape.** Drafted in
-  [Loop Shape](/worktree-loop-document-type-working-docs/loop-shape.md);
-  awaiting the user's reaction.
+- **Shape, bundle, encoding, residual ledger.** Written to
+  `doc-types/loop/`: [Acts, Checks, and Yields](/doc-types/loop/contract-shape.md),
+  its [encoding](/doc-types/loop/encoding.md), and the
+  [ledger](/doc-types/loop/residual-ledger.md), seeded empty. The
+  working draft, Loop Shape, is retired; the bundle is the record.
 - **Operations and composition rule.** Three verbs, act, check, yield;
   target dropped, since the checks carry it. Recorded in Three Peers.
 

@@ -1,19 +1,16 @@
 ---
 type: General-Sheet
-title: Loop Shape
-description: Loop's contract shape — acts, checks, and a set of yield conditions, iterated — in prose, one screen of pseudocode, and the Mermaid graph every Loop is drawn as
+title: Acts, Checks, and Yields
+description: Loop's contract shape — acts, checks, and a set of yield conditions, iterated — in prose, one screen of pseudocode, and the graph every Loop is drawn as
 ---
 
-# Loop Shape
+# Acts, Checks, and Yields
 
 Acts, checks, and yields are Loop's contract shape
 ([Doc-Type](/doc-types/doc-type.md)): the form every Loop's contract
 takes. A loop drives a state toward a target state by iteratively
-taking prescribed actions and validating against prescribed standards.
-This member is a draft, speculative per
-[ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md), written
-to the pattern of
-[Population and Rules](/doc-types/standard/contract-shape.md).
+taking prescribed actions and validating against prescribed standards
+([Loop](/doc-types/loop/definition.md)).
 
 ## The shape
 
@@ -21,8 +18,7 @@ to the pattern of
   condition. The act reads the findings the last iteration's checks
   returned; that is how direction reaches it.
 - **Check.** A prescribed standard: a pointer at `Standard.audit`, the
-  auditors a card's audit cell locates, never the Standard document and
-  never its gate, with a condition. A check returns findings, each
+  auditors a card's audit cell locates, with a condition. A check returns findings, each
   naming a member and the rule it fails. Zero findings from every check
   is the target state. The target is written once, in the standards:
   an act reads a standard's definition to know what the target looks
@@ -77,53 +73,39 @@ class Yield:
     receiver:  Loop | User          # who takes control, and hands it back
 ```
 
+A loop carries no target field and no runtime: the standards the
+checks point at describe the target, and whatever runs the loop is the
+substrate, not the loop
+([System Legibility](/docs/system-legibility.md#standing-principles)).
+
 ## The graph
 
 [Working in Loops](/docs/working-in-loops.md#a-loop-is-a-graph) says
 every loop is a graph, and the graph form is the one used for
 visualization, tracking, and resuming. The same shape drawn that way:
-the three verbs are the nodes, the conditions are the edges.
+the three verbs and the receiver are the nodes, the conditions are the
+edges.
 
-```
-        ┌───────────────────────────────────────────┐
-        │                                 none met  │
-        ▼                                           │
-     ┌─────┐          ┌───────┐  findings  ┌────────┴─┐
-     │ act ├─────────►│ check ├───────────►│  yield?  │
-     └─────┘          └───────┘            └────┬─────┘
-        ▲                                       │ a condition met
-        │                                       ▼
-        └────────────── resumes ─────────── receiver
+```mermaid
+flowchart LR
+    act[act] -->|condition| check[check]
+    check -->|findings| yield{yield?}
+    yield -->|none met| act
+    yield -->|a condition met| receiver([receiver])
+    receiver -->|resumes| act
 ```
 
-The doc-type document carries both forms, the pseudocode for the
-contract and the graph for the reader. An instance pivots to the graph:
-its acts, checks, and yields drawn as nodes and edges, so the shape on
-screen is the whole procedure and the position in it is data.
-
-A loop carries no target field and no runtime: the standards the
-checks point at describe the target, and whatever runs the loop is the
-substrate, not the loop.
+The doc-type carries both forms, the pseudocode for the contract and
+the graph for the reader. An instance pivots to the graph: its acts,
+checks, and yields drawn as nodes and edges, so the shape on screen is
+the whole procedure and the position in it is data.
 
 ## The view
 
-The view is the graph itself. A loop instance's source of truth is a
-fenced Mermaid block: its nodes are the acts, checks, and yields, its
-edge labels the conditions, and GitHub renders it. Around the block
-sit frontmatter, one paragraph saying what state the loop drives and
-toward what, and three sections headed by the verbs, **Acts**,
-**Checks**, **Yields**, each a list with one entry per node: the
-node's id, the pointer the Mermaid label cannot carry (a runbook, a
-`Standard.audit`), and the condition or the "yields when …" in full.
-
-`scripts/loopgen --check` is a checker of the embedded graph, not an
-extractor into a table: every node id in the Mermaid appears once under
-the matching verb heading, every entry under a heading is a node in the
-Mermaid, every pointer resolves, and the three-verb shape holds, acts
-to checks, checks to yields, yields back or out. This is a different
-kind of generator from `chaingen` and `rulegen`; peers share the
-bundle, not the file format.
-
-## Acronyms
-
-None.
+The view is the graph itself. A Loop instance's source of truth is one
+fenced Mermaid block, and GitHub renders it; there is no generated
+table. `scripts/loopgen --check` reads every instance and fails when
+the graph and the prose around it disagree, as
+[the encoding](/doc-types/loop/encoding.md) lays out. This is a
+different kind of generator from `chaingen` and `rulegen`: the peers
+share the bundle, not the file format.

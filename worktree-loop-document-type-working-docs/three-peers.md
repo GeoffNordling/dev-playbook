@@ -20,18 +20,17 @@ their bundles carry today; Loop's is new.
 > A **runbook** is an invocable command written as documentation: a
 > skill or an agent definition.
 
-> A **Standard** is the kind a card's Define cell points at: one class
-> of object as its population, plus named rules, each a predicate over
-> one member's state.
+> A **Standard** describes a state: one class of object as its
+> population, plus named rules, each a predicate over one member's
+> state.
 
 > A **loop** drives a state toward a target state by iteratively taking
 > prescribed actions and validating against prescribed standards.
 
-The verbs are the contrast: a runbook is *invoked*, a standard *binds*
-(or, in the intended sentence, *answers*), a loop *drives*. Standard's
-sentence is the weak one: it defers to the card instead of standing
-alone; see
-[Stale Findings](/worktree-loop-document-type-working-docs/stale-findings.md).
+The verbs are the contrast: a runbook is *invoked*, a standard
+*describes*, a loop *drives*. A standard describes its state twice, in
+prose and in checkers, and has no notion of moving toward it; that is
+what a loop's check composes.
 
 ## The idealized parallel
 
@@ -46,8 +45,8 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 | Shape | the Reference chain: nodes and labeled edges | one population and its rules | acts, checks, and yields, iterated |
 | Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | any number of acts and checks, ordered by the iteration; a set of yield conditions |
 | Grain | instance-level | instance-level | instance-level |
-| Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | open |
-| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen --check` → the Mermaid block in each instance |
+| Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | one Mermaid block; H2 Acts, Checks, Yields, one entry per node |
+| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen --check` → no file; the Mermaid block in each instance |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
 | Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | open |
 
@@ -61,13 +60,12 @@ items in Stale Findings and fixed as part of this work or right after.
   Loop's are four (target, act, check, yield). Standard's are two nouns,
   population and rule. Every doc-type should be defined by a short list
   of simple verbs; overlap between doc-types is allowed.
-- **Standard has no self-standing definition.**
-  [standard/definition.md](/doc-types/standard/definition.md) opens by
-  deferring to the card ("the kind a card's Define cell points at").
-  The intended sentence, *a standard answers a question about how a
-  specific thing is done*, lives nowhere; the "question" idea sits only
-  on [Standard-Card](/doc-types/standard-card/definition.md#named-by-the-question).
-  Add the sentence and let population-and-rules be the shape's sentence.
+- **Standard has no self-standing definition.** Fixed:
+  [standard/definition.md](/doc-types/standard/definition.md) now opens
+  with *a Standard describes a state*, in prose and in checkers, and
+  the card pointer follows. The "question" idea still sits only on
+  [Standard-Card](/doc-types/standard-card/definition.md#named-by-the-question),
+  which is the card's concern, not the Standard's.
 - **Audit and enforce are fused in practice.** Every auditor runs at
   pre-commit and every failure blocks, so no standard is aspirational
   today. A loop needs the audit cell without the gate; unfusing them is
