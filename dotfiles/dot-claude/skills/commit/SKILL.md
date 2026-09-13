@@ -4,7 +4,7 @@ description: Commit staged work with a clean message, then push it. Use when the
 disable-model-invocation: false
 model: sonnet
 effort: low
-arguments: [fast]
+arguments: [target]
 allowed-tools: Bash(git *)
 ---
 
@@ -16,11 +16,13 @@ A commit isn't done until it's on origin: after committing, `git push`.
 
 ## Args
 
-Recognized keyword:
+`target` is free text on where to commit — `main`, `on main`, `new branch`, `current worktree`, anything. Any phrasing counts as an instruction and satisfies the global "ask before picking a commit target" rule for the rest of the session — no target keyword ever needed again this session.
 
-- `fast` — staging shortcut: `git add -A`, then build a one-line message from `git diff --cached --stat`.
+No target given, and none stated yet this session: stop and ask which target, per that global rule.
 
-### Without `fast` (default staging)
+Target given or already on record, but it doesn't match the branch actually checked out: fail loud, surface the mismatch, don't commit.
+
+## Staging
 
 1. `git status` and `git diff --stat`
 2. Stage the files carrying the work you did in this conversation, and leave the rest — other agents may own those changes
