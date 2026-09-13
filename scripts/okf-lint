@@ -7,8 +7,9 @@ that owns them, `knowledge-organization.*`:
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the type registry, plus `title` and `description`. `resource`
     is optional in general and required on a `Recipe-Description`, and a
-    document typed `Standard` lives under `standards/` — the tree reserved for
-    normative conformance targets (`knowledge-organization.type-location`). The registry
+    document typed `Standard` lives under `standards/` and one typed `Loop`
+    under `loops/` — each the tree reserved for its label
+    (`knowledge-organization.type-location`). The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
     own `## Types` table (`REGISTRY_DOC`), read and shape-checked there as the
@@ -141,11 +142,12 @@ LEGACY_REGISTRY_DOCS = (REGISTRY_DOC, "standards/docs/document-types.md")
 # src/dev_playbook/standards_lint.py).
 CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
-# The type reserved to one tree, and that tree. A normative conformance target
-# lives under standards/ and nothing else claims the label, so a Standard found
-# elsewhere is either misfiled or mistyped — see doc-types/standard/encoding.md.
-LOCATION_BOUND_TYPE = "Standard"
-STANDARDS_DIR = "standards/"
+# The types reserved to one tree each, and those trees. A normative
+# conformance target lives under standards/ and a loop under loops/, and
+# nothing else claims either label, so a Standard or a Loop found elsewhere is
+# either misfiled or mistyped — see doc-types/standard/definition.md and
+# doc-types/loop/definition.md, each's "Where a ... lives".
+LOCATION_BOUND_TYPES = {"Standard": "standards/", "Loop": "loops/"}
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # A type name of the shape the Type Registry's Row shape rule declares: Title
 # Case, hyphen-joined for a multi-word name, acronyms upper.
@@ -459,13 +461,10 @@ def check_types(
             findings.append(
                 Finding(rel, RESOURCE, f"'{doctype}' requires a 'resource'")
             )
-        if doctype == LOCATION_BOUND_TYPE and not rel.startswith(STANDARDS_DIR):
+        bound_dir = LOCATION_BOUND_TYPES.get(doctype)
+        if bound_dir is not None and not rel.startswith(bound_dir):
             findings.append(
-                Finding(
-                    rel,
-                    TYPE_LOCATION,
-                    f"'{LOCATION_BOUND_TYPE}' lives under {STANDARDS_DIR}",
-                )
+                Finding(rel, TYPE_LOCATION, f"'{doctype}' lives under {bound_dir}")
             )
     return findings
 

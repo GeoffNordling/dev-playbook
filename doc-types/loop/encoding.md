@@ -38,8 +38,10 @@ cannot carry:
 - **An act** links the runbook it points at, a skill or an agent
   definition, then states its condition: `fires when …`, or `fires
   every iteration`.
-- **A check** links the Standard whose audit it runs, then states its
-  condition the same way. The link is to the audit cell of a Standard's file.
+- **A check** links the Audit cell of the card whose standard it
+  measures against, `standards/<card>/card.md#audit`, then states its
+  condition the same way. The cell composed is the audit, never the
+  gate ([Standard-Card](/doc-types/standard-card/encoding.md#cells)).
 - **A yield** names its receiver, the user or a linked Loop, then
   states its condition: `yields when …`.
 
@@ -59,7 +61,7 @@ lint are in
 
 `scripts/loopgen --check` reads every file typed `Loop` under `loops/`
 and fails on the first disagreement between graph and prose: a node
-with no entry, an entry with no node, an entry under the wrong verb
-for its edges, a pointer that does not resolve, or an edge the shape
-does not allow. It writes nothing: the view is the graph GitHub already
-renders.
+with no entry that no yield leads to, an entry with no node, an entry
+whose link does not resolve or resolves to the wrong type, an entry
+with no condition, or an edge the shape does not allow. It writes
+nothing: the view is the graph GitHub already renders.

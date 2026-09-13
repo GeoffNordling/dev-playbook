@@ -40,7 +40,7 @@ BASE_BUNDLE: dict[str, str] = {
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
-        "| `Guide` | teaching |\n| `README` | landing |\n"
+        "| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
     ),
     "standards/knowledge-organization/index.md": (
@@ -224,6 +224,49 @@ def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
     assert "knowledge-organization.type-location" in result.stdout
     assert "ops.md" in result.stdout
     assert "'Standard' lives under standards/" in result.stdout
+
+
+def test_loop_outside_loops_dir_is_flagged(tmp_path: Path) -> None:
+    doc = "---\ntype: Loop\ntitle: Tidy\ndescription: Drives the tree tidy\n---\n\n# Tidy\n"
+    repo = make_bundle(
+        tmp_path,
+        {
+            "tidy.md": doc,
+            "index.md": _root_index_listing(
+                "- [Tidy](/tidy.md) — Drives the tree tidy"
+            ),
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "knowledge-organization.type-location" in result.stdout
+    assert "tidy.md" in result.stdout
+    assert "'Loop' lives under loops/" in result.stdout
+
+
+def test_loop_under_loops_dir_is_clean(tmp_path: Path) -> None:
+    doc = "---\ntype: Loop\ntitle: Tidy\ndescription: Drives the tree tidy\n---\n\n# Tidy\n"
+    loops_index = (
+        "# loops/ — index\n\nThe loops.\n\n"
+        "- [Tidy](/loops/tidy.md) — Drives the tree tidy\n"
+    )
+    root_index = (
+        '---\nokf_version: "0.1"\n---\n\n# bundle index\n\nThe bundle.\n\n'
+        "- [Root](/README.md) — Root readme desc\n\n"
+        "## Directories\n\n"
+        "- [loops/](/loops/index.md) — The loops\n"
+        "- [standards/](/standards/index.md) — Cross-project standards\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {"loops/tidy.md": doc, "loops/index.md": loops_index, "index.md": root_index},
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_standard_nested_under_standards_dir_is_clean(tmp_path: Path) -> None:

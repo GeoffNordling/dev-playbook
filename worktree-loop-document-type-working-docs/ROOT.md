@@ -56,13 +56,6 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Generator.** `scripts/loopgen --check`, a checker of the embedded
-  graph against the verb sections and the pointers.
-- **Location rule.** The okf-lint `type-location` check extended to
-  `Loop` under `loops/`.
-- **Registry and roster.** The `Loop` kind in the Types table of
-  `document-types.md` with its location rule, the rulings row and the
-  roster entry in `doc-type-system.md`, and the empty `loops/` tree.
 - **Obligation.** The doc-type binds nobody. A small Standard,
   population "files typed `Loop`", rules the encoding rules, auditor
   `loopgen --check`, is what makes every Loop file carry its shape at
@@ -88,6 +81,13 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   working draft, Loop Shape, is retired; the bundle is the record.
 - **Operations and composition rule.** Three verbs, act, check, yield;
   target dropped, since the checks carry it. Recorded in Three Peers.
+- **Location rule and registry.** okf-lint's `type-location` check
+  holds a map of two bound types, `Standard` and `Loop`; the `Loop` row
+  and the Typed Loop rule are in `document-types.md`; the rulings row
+  and the roster entry are in `doc-type-system.md`; `loops/` exists
+  with an empty index.
+- **Generator.** `scripts/loopgen --check`, unwired, with tests in
+  `tests/test_loopgen.py` over a fixture Loop. It writes no file.
 
 ## Acronyms
 

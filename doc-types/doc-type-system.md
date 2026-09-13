@@ -35,6 +35,7 @@ rows with one or two files last.
 | General-Sheet | — | Pending; its replacement is an open question ([Candidates](/CANDIDATES.md)) |
 | Guide | guides | Important; no doc-type built yet |
 | Log | logs | Pending; the user's to rule |
+| Loop | loops | The [Loop](/doc-types/loop/definition.md) doc-type |
 | README | readmes | Pending |
 | Recipe-Description | recipes | Pending |
 | Reference | references | Pending |
@@ -51,8 +52,6 @@ rows with one or two files last.
 | `.claude/workflows/*.js` | workflows | Pending |
 
 ## The roster
-
-Three doc-types: Standard-Card sparse, Runbook and Standard deep.
 
 **Standard-Card** — a card is the catalog record for one standard,
 named by the question the standard governs
@@ -76,9 +75,9 @@ Standard-Card
            └─ … one per card in the catalog
 ```
 
-**Standard** — a Standard is the kind a card's Define cell points at:
-one class of object as its population, plus named rules over one
-member's state ([definition](/doc-types/standard/definition.md)). It
+**Standard** — a Standard describes a state: one class of object as
+its population, plus named rules over one member's state, in prose and
+in checkers ([definition](/doc-types/standard/definition.md)). It
 carries instance-level grain: every Standard owns a distinct rule set.
 Its shape is one population and its rules, and `scripts/rulegen`
 collapses every Standard to two tables, `card, standard, population`
@@ -105,6 +104,27 @@ Runbook
            └─ … one per runbook
 ```
 
+**Loop** — a loop drives a state toward a target state by iteratively
+taking prescribed actions and validating against prescribed standards
+([definition](/doc-types/loop/definition.md)). It carries
+instance-level grain: every loop owns its own acts, checks, and yields.
+Its shape is acts, checks, and yields, iterated, and its view is the
+Mermaid graph in each instance, which `scripts/loopgen --check` checks
+against the prose around it and writes nowhere. It composes the other
+two peers by pointer: an act points at a runbook, a check at a
+standard's audit.
+
+```
+Loop
+  operations:   act check yield
+  composition:  any number of acts and checks, in iteration
+                order; a set of yield conditions
+    │
+    └──► shape: the graph — acts, checks, yields, and receivers
+           │
+           └─ … one per loop; none written yet
+```
+
 A card is to Standard-Card what `/intake` is to Runbook: one instance,
 one filled shape, one contract. The detail files under a card sit below
 its contract the way a runbook's prose body sits below its chain.
@@ -124,7 +144,8 @@ object every instance collapses to.
 are written so deterministic code generates the view, the primitive
 map of [Doc-Type](/doc-types/doc-type.md#layers-and-the-primitive-map)
 written down. A generator under `scripts/` writes the view to one
-file in the directory and fails on drift with `--check`.
+file in the directory and fails on drift with `--check`, or, where the
+view is a graph inside each instance, checks the instance in place.
 `residual-ledger.md` records what the shape cannot express, one entry
 per instance that has one. Each file holds its own layer and the
 directory's `index.md` is the map between them.

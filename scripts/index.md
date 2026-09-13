@@ -12,5 +12,7 @@ same for `doc-types/standard-card/cards.txt` — every standard card's
 cells as rows of `card, cell, pointer`. `rulegen` does the same for
 `doc-types/standard/standards.txt` — every Standard's population and
 rules as two tables, `card, standard, population` and
-`card, standard, rule, when`. `labelgen` does the same for the label table in
+`card, standard, rule, when`. `loopgen --check` writes no file: it checks
+every Loop's Mermaid graph against the verb sections around it and fails
+on the first disagreement. `labelgen` does the same for the label table in
 `standards/tracking/label-scheme.md`, rendered from `label_scheme.json`.
