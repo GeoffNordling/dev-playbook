@@ -15,7 +15,7 @@ SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "loop-lint"
 
 RUNBOOK = "---\nname: tidy\ndescription: Tidies\n---\n\nTidy the tree.\n"
 STANDARD = (
-    "---\ntype: Standard\ntitle: Tidy Tree\ndescription: A tidy tree\n"
+    "---\ntype: Standard-Ruleset\ntitle: Tidy Tree\ndescription: A tidy tree\n"
     'population: "a tree"\n---\n\n# Tidy Tree\n\n## Flat\n\nNo nesting.\n'
 )
 CARD = (

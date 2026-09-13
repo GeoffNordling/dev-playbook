@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Documentation Sets
 description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, every row inside the set, one home for every fact, distinct concerns, and terms defined once
 population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Reference mirror among them"

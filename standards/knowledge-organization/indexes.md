@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Indexes
 description: The index.md file — typeless, an introduction naming what the directory holds, a listing of every concept document with its description, alphabetical unless declared otherwise, authored not generated
 population: "an index.md"

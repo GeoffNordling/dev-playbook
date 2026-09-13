@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Loop Conventions
 description: The form a document typed Loop takes — one paragraph, one Mermaid graph, and the Acts, Checks, and Yields sections that agree with it
 population: "a document typed Loop"
@@ -67,4 +67,4 @@ a check, `yields when …` for a yield
 A link is root-absolute or relative to the Loop's file, and it resolves
 to a file in the repo. A check links the card's Audit cell and never the
 Standard's own file: the cell composed is the audit, never the gate
-([Standard-Card](/doc-types/standard-card/encoding.md#cells)).
+([Standard](/doc-types/standard/encoding.md#cells)).

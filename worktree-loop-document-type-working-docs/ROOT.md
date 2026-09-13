@@ -77,7 +77,8 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 - **Operations and composition rule.** Three verbs, act, check, yield;
   target dropped, since the checks carry it. Recorded in Three Peers.
 - **Location rule and registry.** okf-lint's `type-location` check
-  holds a map of two bound types, `Standard` and `Loop`; the `Loop` row
+  holds a map of three bound types, `Standard-Card`, `Standard-Ruleset`,
+  and `Loop`; the `Loop` row
   and the Typed Loop rule are in `document-types.md`; the rulings row
   and the roster entry are in `doc-type-system.md`; `loops/` exists
   with an empty index.
@@ -87,6 +88,12 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   `playbook-lint` roster, so a bad Loop file cannot be committed. Logic in
   `src/dev_playbook/loop_lint.py`, tests beside it. Loop has no generator
   and no `.txt` view, by decision: the Mermaid graph is the view.
+- **Standard is one object.** Standard-Card folded into
+  [doc-types/standard/](/doc-types/standard/index.md): one doc-type,
+  four verbs, two file kinds, `Standard-Card` and `Standard-Ruleset`.
+  Grain dropped, `Object` defined, and Contract redefined by the cut in
+  [Doc-Type](/doc-types/doc-type.md). The record is in
+  [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md#where-the-peers-are-not-yet-parallel).
 
 ## Acronyms
 

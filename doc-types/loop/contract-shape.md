@@ -41,6 +41,8 @@ own acts, checks, and yields. The shape in pseudocode:
 class Loop(Object):
     """Acts, checks, and yields, iterated. Drives state, never binds it."""
 
+    operations = {act, check, yield}                                # one list each, below
+
     acts:   list[Act]               # any number, in iteration order
     checks: list[Check]             # any number, in iteration order
     yields: set[Yield]              # any number; yield when any is met
@@ -54,7 +56,7 @@ class Loop(Object):
                 if act.condition(state):   state = act.runbook(state, findings)
             findings = [f for check in self.checks
                           if check.condition(state)
-                          for f in check.standard.audit(state)]
+                          for f in check.standard.audit(state)]   # runs the Audit cell's detectors
             for y in self.yields:
                 if y.condition(state, findings):
                     findings = yield_to(y.receiver, findings)   # resumes here

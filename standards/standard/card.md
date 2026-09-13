@@ -8,12 +8,9 @@ description: Governs how the workspace's standards themselves are declared, foun
 
 Governs how the workspace's standards themselves are declared, found, and
 kept honest — the card, the catalog, the detectors, and the gates. What a
-card is, its four cells, and the view every card collapses to are the
-Standard-Card doc-type
-([doc-types/standard-card/](/doc-types/standard-card/index.md)); what a
-Standard is, its population and rules, and the view every Standard
-collapses to are the Standard doc-type
-([doc-types/standard/](/doc-types/standard/index.md)). The Standards
+Standard is, its card's four cells, its rulesets' populations and rules,
+and the views they collapse to are the Standard doc-type
+([doc-types/standard/](/doc-types/standard/index.md)). The rulesets
 below hold the rules.
 
 ## Define

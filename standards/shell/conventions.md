@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Shell Conventions
 description: How a shell file is written — the glue boundary, strict mode, declared bash, the shellcheck and shfmt bars, and what a sourced fragment carries
 population: "a shell file in a governed repo"

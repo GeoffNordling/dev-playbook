@@ -20,16 +20,15 @@ their bundles carry today; Loop's is new.
 > A **runbook** is an invocable command written as documentation: a
 > skill or an agent definition.
 
-> A **Standard** describes a state: one class of object as its
-> population, plus named rules, each a predicate over one member's
-> state.
+> A **Standard** is a normative target: a state some class of object
+> is held to, that a reviewer or a lint could cite to reject work.
 
 > A **loop** drives a state toward a target state by iteratively taking
 > prescribed actions and validating against prescribed standards.
 
-The verbs are the contrast: a runbook is *invoked*, a standard
-*describes*, a loop *drives*. A standard describes its state twice, in
-prose and in checkers, and has no notion of moving toward it; that is
+The verbs are the contrast: a runbook is *invoked*, a standard is
+*held to*, a loop *drives*. A standard is defined, audited, enforced,
+and adopted, and has no notion of moving toward its state; its audit is
 what a loop's check composes.
 
 ## The idealized parallel
@@ -39,58 +38,39 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 
 | | Runbook | Standard | Loop |
 |---|---|---|---|
-| Family | every skill and agent definition | files typed `Standard` under `standards/` | files typed `Loop` under `loops/` |
+| Family | every skill and agent definition | one directory per Standard under `standards/` | files typed `Loop` under `loops/` |
 | Definition | `definition.md` | `definition.md` | `definition.md` |
-| Operations | read, write, do, override, never, args, report | population, rule | act, check, yield |
-| Shape | the Reference chain: nodes and labeled edges | one population and its rules | acts, checks, and yields, iterated |
-| Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | any number of acts and checks, ordered by the iteration; a set of yield conditions |
-| Grain | instance-level | instance-level | instance-level |
-| Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | one Mermaid block; H2 Acts, Checks, Yields, one entry per node |
-| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | none; the Mermaid block in each instance is the view |
+| Kinds | Skill, Agent definition | Standard-Card, Standard-Ruleset | Loop |
+| Operations | read, write, do, override, never, args, report | define, audit, enforce, adopt | act, check, yield |
+| Shape | the Reference chain: nodes and labeled edges | four cells; under Define, one population and its rules | acts, checks, and yields, iterated |
+| Composition rule | any number of edges, coarsely ordered | one cell each, any number of pointers; one population, any number of rules per ruleset | any number of acts and checks, ordered by the iteration; a set of yield conditions |
+| Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | card: H2 per cell, one pointer per bullet; ruleset: frontmatter `population`, H2 rule, H2+H3 condition | one Mermaid block; H2 Acts, Checks, Yields, one entry per node |
+| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/cardgen` → `cards.txt`; `scripts/rulegen` → `standards.txt` | none; the Mermaid block in each instance is the view |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
-| Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | `knowledge-organization/loop-conventions` |
+| Obligation card | `harness/runbook-conventions` | `standard/`, the Meta-Standard | `knowledge-organization/loop-conventions` |
 
 ## Where the peers are not yet parallel
 
-Findings about the peers themselves, more important than the parked
-items in Stale Findings and fixed as part of this work or right after.
+Open findings about the peers themselves, more important than the
+parked items in Stale Findings. A resolved finding is deleted.
 
-- **Standard's operations are nouns.** Runbook's operations are seven
-  verbs, Standard-Card's are four (define, audit, enforce, adopt), and
-  Loop's are four (target, act, check, yield). Standard's are two nouns,
-  population and rule. Every doc-type should be defined by a short list
-  of simple verbs; overlap between doc-types is allowed.
-- **Standard has no self-standing definition.** Fixed:
-  [standard/definition.md](/doc-types/standard/definition.md) now opens
-  with *a Standard describes a state*, in prose and in checkers, and
-  the card pointer follows. The "question" idea still sits only on
-  [Standard-Card](/doc-types/standard-card/definition.md#named-by-the-question),
-  which is the card's concern, not the Standard's.
 - **Audit and enforce are fused in practice.** Every auditor runs at
   pre-commit and every failure blocks, so no standard is aspirational
   today. A loop needs the audit cell without the gate; unfusing them is
-  what makes "compose with standards" right.
-- **Adopt is a loop.** The card's adopt cell, the helpers that bring a
-  repo into compliance, is a loop by another name, rarely used because
-  the system had no loop primitive. Once Loop exists, adopt should point
-  at a Loop instance or leave the card.
+  what makes "compose with standards" right. First-loop material.
 - **The card's cells are two kinds of pointer.** Define and audit
-  point inside the doc-type system, at the Standard and its auditors.
+  point inside the doc-type system, at the rulesets and the detectors.
   Enforce points outside it, at a harness position, the hooks registry
   in `standards/harness/files.md`, where an audit runs as a gate;
   pre-commit and CI are runtimes, not loops, the way a workflow script
   is a JS file. Adopt points at a Loop instance when one exists and is
   empty otherwise. No Gate primitive is needed. A candidate for the
   checker loop, not a decision.
-- **`Object` is a base nobody defines.** Every contract-shape
-  pseudocode block writes `class Runbook(Object)`, `class
-  Standard(Object)`, `class StandardCard(Object)`, and now `class
-  Loop(Object)`, and no file defines `Object`. The pseudocode is one
-  view of the system and must agree with itself across every bundle.
-- **"Contract" is overloaded.** [Doc-Type](/doc-types/doc-type.md#contract)
-  defines a contract as "everything a caller of an instance may rely
-  on", yet a Standard is never called and a Loop is driven, not called.
-  Either the word is widened or it is Runbook's word only.
+- **Adopt is a loop. Tabled, last.** The card's Adopt cell, the helpers
+  that bring a repo into compliance, is a loop by another name, rarely
+  used because the system had no loop primitive. Pointing each Adopt at
+  a Loop means instantiating one per current usage, so it waits until
+  the first loop runs.
 
 ## The first instance's standard
 

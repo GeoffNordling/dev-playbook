@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Detectors
 description: The detector contract behind every Audit cell; read-only, wired throughout its scope, a formatter by its check mode, and the shim, git-environment, hosting, rule-id, output, and exit-code rules a first-party script obeys
 population: "a detector: a read-only check an Audit cell cites, first-party at scripts/<name> or third-party by its pin"
@@ -14,7 +14,7 @@ which is Enforcement ([Vocabulary](/CONTEXT.md#governance),
 [Gates](/standards/standard/gates.md)). A first-party detector is a
 script the audited repo hosts at `scripts/<name>`; a third-party one,
 `ruff`, `shellcheck`, `shfmt`, is cited by its bare name and pin
-([Cells](/doc-types/standard-card/encoding.md#cells)). What an Audit cell
+([Cells](/doc-types/standard/encoding.md#cells)). What an Audit cell
 cites, and how, is
 [Card Catalog](/standards/standard/cards.md#audit-cites-a-lint).
 

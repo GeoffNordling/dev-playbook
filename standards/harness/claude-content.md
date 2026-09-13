@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: CLAUDE.md Content
 description: What a CLAUDE.md carries — no frontmatter, operational content at one scope, and the two sections and required rules of the global source in dev-playbook
 population: "a CLAUDE.md: a repo's root file, a nested <dir>/CLAUDE.md, or in dev-playbook the global source dotfiles/dot-claude/CLAUDE.md"

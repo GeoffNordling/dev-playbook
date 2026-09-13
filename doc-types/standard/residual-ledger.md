@@ -1,25 +1,30 @@
 ---
 type: General-Sheet
 title: Standard Residual Ledger
-description: Standard's residual record — what one population and its rules cannot express, one entry per Standard that has one
+description: Standard's residual record — what four cells and a ruleset cannot express, one entry per card or ruleset that has one
 ---
 
 # Standard Residual Ledger
 
 Standard's residual record: what
-[one population and its rules](/doc-types/standard/contract-shape.md)
+[four cells and a ruleset](/doc-types/standard/contract-shape.md)
 cannot express. That is all an entry is — a record.
 
-## Standards
+## Cards
 
-Per Standard ported to the encoding: what the rewrite could not
-express, recognized and written down at the moment of porting. Entries
-name populations, rules, and conditions in the vocabulary
+Empty: every card in the catalog fits the four cells whole, and that is
+a record, not an omission.
+
+## Rulesets
+
+Per ruleset ported to the encoding: what the rewrite could not express,
+recognized and written down at the moment of porting. Entries name
+populations, rules, and conditions in the vocabulary
 [encoding.md](/doc-types/standard/encoding.md) declares.
 
 An entry is a couple of sentences, hard limit: name each specific thing
 the file could not express and why the shape cannot say it, nothing
-else. A Standard with nothing to record has no entry.
+else. A ruleset with nothing to record has no entry.
 
 ### build/skeleton
 

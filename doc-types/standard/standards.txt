@@ -115,7 +115,7 @@ knowledge-organization  document-types                                 resource-
 knowledge-organization  document-types                                 title                                             —
 knowledge-organization  document-types                                 types                                             —
 knowledge-organization  document-types                                 under-loops                                       typed-loop
-knowledge-organization  document-types                                 under-standards                                   typed-standard
+knowledge-organization  document-types                                 under-standards                                   typed-standard-card-or-standard-ruleset
 knowledge-organization  documentation-sets/documentation-sets          an-index-in-every-directory                       —
 knowledge-organization  documentation-sets/documentation-sets          body-inside-its-concern                           —
 knowledge-organization  documentation-sets/documentation-sets          distinct-concerns                                 —
@@ -194,7 +194,7 @@ shell                   conventions                                    no-sheban
 shell                   conventions                                    shellcheck-clean                                  —
 shell                   conventions                                    strict-mode                                       executable-scripts
 standard                cards                                          audit-cites-a-lint                                —
-standard                cards                                          define-points-only-at-standards                   —
+standard                cards                                          define-points-only-at-rulesets                    —
 standard                cards                                          directory-layout                                  —
 standard                cards                                          no-shadowing                                      —
 standard                cards                                          the-catalog                                       —

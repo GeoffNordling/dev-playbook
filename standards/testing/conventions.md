@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Testing Conventions
 description: How a repo's Python test suite is written — the pytest framework, mirror layout, test structure, behavioral focus, doubles, and fixtures
 population: "a governed repo's Python test suite: the test_*.py files anywhere in its tree, and the conftest.py and fake modules under tests/"

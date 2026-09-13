@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Doc Conventions
 description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics
 population: "an authored document, except type: Reference and the paths in .prose-lint-exempt"

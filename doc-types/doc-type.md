@@ -14,8 +14,8 @@ are built when their benefits justify the costs. Serves
 ## The kind
 
 A doc-type is **operations** plus a **composition rule**. An
-**instance** is one member of the family (one runbook, one card,
-etc.).
+**instance** is one member of the family (one runbook, one standard,
+one loop).
 
 - An **operation** is an action instances of the family support
   (define, audit, enforce, adopt; read, write, do; etc.).
@@ -31,24 +31,47 @@ family ──doc-type build loop──► doc-type = operations + composition ru
                                   └──► shape ──filled per instance──► contract
 ```
 
-An instance *has* a contract; it is not one. Grain is an axis of
-the kind:
-
-- **Type-level grain** — one contract serves every instance. Every
-  Standard card answers different questions through the same four
-  operations.
-- **Instance-level grain** — each instance fills the shape its own
-  way. Every runbook owns a distinct chain.
+An instance *has* a contract; it is not one. A doc-type may serve
+more than one file kind of the
+[document-type registry](/standards/knowledge-organization/document-types.md):
+Runbook serves Skill and Agent definition, Standard serves
+Standard-Card and Standard-Ruleset. The doc-type is the object; a kind
+is a file the object is written across.
 
 ## Contract
 
-A contract is everything a caller of an instance may rely on. The
-**signature** — args in, results out — is its machine-checkable
-core; what else it carries is fixed by the family's shape (a
-runbook's chain adds effects in coarse order). A contract is a
-parsimonious collapse of the instance engineered to help the user
-efficiently scan the instance's important functionality
-at the CLOA: the detail it drops stays in the instance's body.
+A contract is the shape filled with one instance's detail: everything
+about the instance that its shape carries, and so everything that can
+be known of it without reading its body. Whatever the shape drops stays
+in the body. For a runbook the contract is its chain, args in, results
+out, effects in coarse order; for a standard, its four cells; for a
+loop, its graph. A contract is a parsimonious collapse of the instance,
+the instance's important functionality at the CLOA.
+
+## Object
+
+Every contract shape is written once as pseudocode, one screen, and
+every class in that pseudocode extends `Object`, the base class of the
+doc-type system. `Object` carries what every instance of every doc-type
+has, its operations and a file at a path with frontmatter, and nothing
+more:
+
+```python
+class Object:
+    """The base of the doc-type system. Any class extending it is pseudocode of this system."""
+
+    operations:  set[str]       # the doc-type's verbs; the composition rule says how each appears below
+    location:    str            # the path rule its doc-type declares
+    frontmatter: dict           # the keys its doc-type declares
+```
+
+Every subclass fills `operations` on its first line, so the verb list
+is a literal line of each contract shape and the two views of a
+doc-type, its verbs and its pseudocode, agree by construction.
+
+The name marks scope. A class that extends `Object` is one view of this
+system and must agree with every other class that does, across every
+bundle; a class that does not is some other system's.
 
 ## Composition rule and machinery
 

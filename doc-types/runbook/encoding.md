@@ -1,13 +1,13 @@
 ---
 type: General-Sheet
-title: Reference Chain Encoding
+title: Nodes and Edges Encoding
 description: The layer below the contract shape — the spec a writer follows to encode chain edges in runbook prose
 ---
 
-# Reference Chain Encoding
+# Nodes and Edges Encoding
 
-The layer below the
-[Reference chain](/doc-types/runbook/contract-shape.md):
+The layer below
+[the shape](/doc-types/runbook/contract-shape.md), the Reference chain:
 how chain edges are written inside runbook prose, so deterministic
 code can generate every chain. This file is the spec for the writer of
 that prose. The primitive map below is the join between the two

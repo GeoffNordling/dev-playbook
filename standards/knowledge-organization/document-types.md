@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Document Types
 description: The frontmatter profile every concept document carries — a registered type, a title, a one-breath description, and a resource where an asset backs the document
 population: "a concept document"
@@ -45,8 +45,8 @@ and its shape is Type Registry's rule. Alphabetical by type name.
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `Standard` | A normative conformance target: rules a repo, doc, or agent must follow, that a reviewer or linter could cite to reject work; lives under `standards/`, the one tree reserved for it (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
-| `Standard-Card` | The thin catalog record for one standard — pointer cells (define, audit, enforce, adopt) locating the standard's contract, checkers, gates, and adoption helpers. |
+| `Standard-Card` | The record of one Standard's four verbs — cells (define, audit, enforce, adopt) pointing at its rulesets, detectors, gates, and adoption helpers; `standards/<name>/card.md`, one per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
+| `Standard-Ruleset` | One population and its rules, what a Standard's Define cell points at: a normative target a reviewer or linter could cite to reject work; lives beside its card under `standards/`, the one tree reserved for it (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
@@ -85,13 +85,13 @@ is to describe a backing `.js`.
 
 A companion skill is linked in the body, not in `resource`.
 
-## Typed Standard
+## Typed Standard-Card or Standard-Ruleset
 
-A concept document whose `type` is `Standard`.
+A concept document whose `type` is `Standard-Card` or `Standard-Ruleset`.
 
 ### Under standards/
 
-The file lives under `standards/`, the one tree reserved for the label
+The file lives under `standards/`, the one tree reserved for the two labels
 ([Standard](/doc-types/standard/definition.md#where-a-standard-lives)).
 
 ## Typed Loop

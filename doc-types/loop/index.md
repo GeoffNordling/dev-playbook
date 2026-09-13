@@ -11,5 +11,5 @@ own file.
 
 - [Acts, Checks, and Yields](/doc-types/loop/contract-shape.md) — Loop's contract shape — acts, checks, and a set of yield conditions, iterated — in prose, one screen of pseudocode, and the graph every Loop is drawn as
 - [Acts, Checks, and Yields Encoding](/doc-types/loop/encoding.md) — The layer below the shape — how a Loop's file writes its graph, its acts, its checks, and its yields so a lint can read them, and where the file sits
-- [Loop](/doc-types/loop/definition.md) — What a loop is — a document that drives a state toward a target state by iteratively taking prescribed actions and validating against prescribed standards — the family it serves, and where it lives
+- [Loop](/doc-types/loop/definition.md) — What a loop is — a document that drives a state toward a target state by iteratively taking prescribed actions and validating against prescribed standards — its three verbs, the family it serves, and where it lives
 - [Loop Residual Ledger](/doc-types/loop/residual-ledger.md) — Loop's residual record — what acts, checks, and yields cannot express, one entry per Loop that has one

@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Decision Record Conventions
 description: How a Decision Record is written, from the bar that warrants one and the directory that holds it to its scope, template, date, numbering, immutability, status vocabulary, optional sections, and the pin on an external-convention evaluation
 population: "a Decision Record: a numbered NNNN-slug.md file under a repo's docs/decisions/, except that directory's index.md and README.md"

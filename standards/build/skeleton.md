@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: File Skeleton
 description: The tree a governed repo carries — the entries every repo requires, keeps at the root, and forbids, and the entries each layer adds, with worked trees
 population: "a governed repo's tree, except standards/build/canonical/ in dev-playbook"

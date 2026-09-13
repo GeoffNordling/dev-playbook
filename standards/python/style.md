@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Python Style
 description: How a Python file is written — empty initializers, docstrings, fail-loud values, statement order, banned future imports, helper shape, formatting, and annotations
 population: "a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang"

@@ -7,8 +7,8 @@ that owns them, `knowledge-organization.*`:
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the type registry, plus `title` and `description`. `resource`
     is optional in general and required on a `Recipe-Description`, and a
-    document typed `Standard` lives under `standards/` and one typed `Loop`
-    under `loops/` — each the tree reserved for its label
+    document typed `Standard-Card` or `Standard-Ruleset` lives under `standards/`
+    and one typed `Loop` under `loops/` — each the tree reserved for its label
     (`knowledge-organization.type-location`). The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
@@ -147,7 +147,11 @@ RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # nothing else claims either label, so a Standard or a Loop found elsewhere is
 # either misfiled or mistyped — see doc-types/standard/definition.md and
 # doc-types/loop/definition.md, each's "Where a ... lives".
-LOCATION_BOUND_TYPES = {"Standard": "standards/", "Loop": "loops/"}
+LOCATION_BOUND_TYPES = {
+    "Standard-Card": "standards/",
+    "Standard-Ruleset": "standards/",
+    "Loop": "loops/",
+}
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # A type name of the shape the Type Registry's Row shape rule declares: Title
 # Case, hyphen-joined for a multi-word name, acronyms upper.

@@ -1,38 +1,48 @@
 ---
 type: General-Sheet
-title: Reference Chain
-description: The Reference chain — Runbook's contract shape, declared as nodes and edges
+title: Nodes and Edges
+description: Runbook's contract shape — nodes joined by labeled edges, the Reference chain, rooted at one runbook — in prose, one screen of pseudocode, and the view every runbook collapses to
 ---
 
-# Reference Chain
+# Nodes and Edges
 
-The **Reference chain** is Runbook's contract shape
-([Doc-Type](/doc-types/doc-type.md)): the
-form every runbook's contract takes. This file declares the shape —
-its nodes and its edges.
+Nodes joined by labeled edges, the **Reference chain**, are Runbook's
+contract shape ([Doc-Type](/doc-types/doc-type.md)): the form every
+runbook's contract takes. A runbook is an invocable command written as
+documentation ([Runbook](/doc-types/runbook/definition.md)).
 
-## The chain
+## The shape
 
-A Reference chain is **nodes** joined by labeled **edges**, rooted
-at one runbook
-([definition.md](/doc-types/runbook/definition.md)).
-It is the contract written down: the signature — args in, reports
-out — plus the effects, in the coarse order they fire. The chain is
-a collapse of the runbook's program: the fine-grained sequencing it
-drops stays below the CLOA, in the instance's body. The shape in
-pseudocode:
+- **Node.** An abstraction an edge lands on: a Standard, an agent, a
+  skill, a script, or an imported name such as GitHub or a file path.
+- **Edge.** One of Runbook's operations, applied: a verb connecting the
+  runbook to a node, rooted at the runbook whose text declares it.
+- **Condition.** What must hold for an edge to fire; an edge with no
+  condition fires always. The word is shared with Standard, where it is
+  what must hold of a member for a rule to bind it, and with Loop,
+  where it is what must hold for an act or check to fire.
+
+The composition rule: any number of edges, coarsely ordered, rooted at
+one runbook. The chain is the contract written down: the signature —
+args in, reports out — plus the effects, in the coarse order they
+fire. It is a collapse of the runbook's program: the fine-grained
+sequencing it drops stays below the CLOA, in the instance's body. The
+shape in pseudocode:
 
 ```python
 class Runbook(Object):
     """One invocable command. Its chain is its contract, written as spans in its own prose."""
+
+    operations = {read, write, do, override, never, args, report}   # one per Edge, below
 
     summary: str                        # frontmatter description
     args:    list[str]                  # frontmatter arguments, names only
     chain:   list[Edge]                 # any number, coarsely ordered, rooted here
 
     # rules: each a predicate over one runbook's state
-    location = path == f"skills/{name}/SKILL.md" or path == f"agents/{name}.md"
-    rooted   = every edge in chain is declared in this file's own body   # no file describes another's behavior
+    location    = path == f"skills/{name}/SKILL.md" or path == f"agents/{name}.md"
+    frontmatter = name and description are present      # a Skill's or an Agent definition's; no type key
+    rooted      = every edge in chain is declared in this file's own body   # no file describes another's behavior
 
 
 class Edge:
@@ -109,6 +119,24 @@ use; its written form is an edit to
 Any edge may carry a **condition** — what must hold for it to fire.
 A conditional edge draws dashed; an unconditional edge draws solid.
 The condition never changes the edge's operation.
+
+## The view
+
+Every runbook collapses to its chain drawn as text: the runbook's node
+at the root, one line per edge, the verb inflected and the target
+named. `scripts/chaingen` writes every runbook's chain to
+`doc-types/runbook/chains.txt` and, with `--check`, fails on drift:
+
+```
+[adjudicator] Agent · tools: Read, Bash, model: opus, effort: xhigh
+  ├─reads───► review contract
+  ├─reads───► GitHub    every thread on the pull request
+  ├─writes──► GitHub    one reply, then the resolve
+```
+
+Rows of the generated file, excerpted. A conditional edge draws
+dashed. The prose an edge was cut from stays below the collapse, in
+the runbook.
 
 ## Acronyms
 

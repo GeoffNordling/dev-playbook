@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Label Scheme
 description: The closed-world label set a governed repo's tracker mints — every label with its description, generated from the scheme data — and the blocked-label ban
 population: "a governed repo's GitHub labels"

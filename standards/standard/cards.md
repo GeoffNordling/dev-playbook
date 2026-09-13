@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Card Catalog
 description: A repo's card catalog, the card directories under standards/ and the index that lists them — the directory layout, the question sentence, the directory's introduction, what Define and Audit cite, no shadowing of an upstream card, and the catalog's order
 population: "a repo's card catalog: the standards/<name>/ card directories and the standards/index.md that lists them"
@@ -12,10 +12,10 @@ A repo's card catalog: the `standards/<name>/` card directories and the
 one standard, named by the question it governs, and points at the files
 that define, audit, enforce, and adopt it. What a card is, its four
 cells, and the view `scripts/cardgen` collapses it to are the
-Standard-Card doc-type
-([Standard-Card](/doc-types/standard-card/definition.md),
-[Card Cells](/doc-types/standard-card/contract-shape.md),
-[Card Cells Encoding](/doc-types/standard-card/encoding.md)). The rules
+Standard doc-type
+([Standard](/doc-types/standard/definition.md),
+[Cells and Rulesets](/doc-types/standard/contract-shape.md),
+[Cells and Rulesets Encoding](/doc-types/standard/encoding.md)). The rules
 below bind the catalog's state; standards-lint reports six of them, and
 the pre-commit suite stations it at the commit gate
 ([Meta-Standard](/standards/standard/card.md#enforce)).
@@ -35,7 +35,7 @@ with the Standards at `standards/<name>/<standard>.md`
 ([Where a Standard lives](/doc-types/standard/definition.md#where-a-standard-lives)).
 A filename on either level is a kebab-case noun, `card.md` and `index.md`
 the two fixed role names
-([Naming](/doc-types/standard-card/encoding.md#naming)). `references/`
+([Naming](/doc-types/standard/encoding.md#naming)). `references/`
 holds vendored mirrors and no card.
 
 ## The question sentence
@@ -48,7 +48,7 @@ apart (`standard.card-question`).
 The catalog row and the card then state one remit. A card is named by
 the question its standard governs, so the name holds when the answer is
 swapped
-([Named by the question](/doc-types/standard-card/definition.md#named-by-the-question)).
+([Named by the question](/doc-types/standard/definition.md#named-by-the-question)).
 
 ## The directory's introduction
 
@@ -63,9 +63,9 @@ The card is a summary of its Standards, not a rival to them, so
 [distinct concerns](/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns)
 is judged among the Standards and never against the card.
 
-## Define points only at Standards
+## Define points only at rulesets
 
-Every Define pointer targets a document typed `Standard`, and a Define
+Every Define pointer targets a document typed `Standard-Ruleset`, and a Define
 bullet is the link alone, with no ` — ` annotation; standards-lint
 reports an annotated bullet (`standard.card-layout`).
 
@@ -76,9 +76,9 @@ summary lives once, in the directory's index listing, which carries its
 `description` verbatim
 ([one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home));
 cardgen reads only the link
-([Cells](/doc-types/standard-card/encoding.md#cells)). No lint checks the
-target's type. The field is `define: list[Pointer[Standard]]` in
-[Card Cells](/doc-types/standard-card/contract-shape.md#the-card).
+([Cells](/doc-types/standard/encoding.md#cells)). No lint checks the
+target's type. The field is `define: list[Pointer[Ruleset]]` in
+[Cells and Rulesets](/doc-types/standard/contract-shape.md#the-card).
 
 ## Audit cites a lint
 
@@ -101,7 +101,7 @@ the consumer's commit gate (`standard.card-shadows-upstream`).
 
 A consumer's `standards/<name>/card.md` on an upstream name would
 silently override the workspace-scoped standard of that name. The two
-scopes are [Scope](/doc-types/standard-card/definition.md#scope).
+scopes are [Scope](/doc-types/standard/definition.md#scope).
 
 ## The catalog
 

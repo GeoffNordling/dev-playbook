@@ -39,8 +39,8 @@ rows with one or two files last.
 | README | readmes | Pending |
 | Recipe-Description | recipes | Pending |
 | Reference | references | Pending |
-| Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
-| Standard-Card | cards | The [Standard-Card](/doc-types/standard-card/definition.md) doc-type |
+| Standard-Card | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
+| Standard-Ruleset | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
 | Survey | surveys | Pending; the user's to rule |
 | Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |
 | Skill | runbooks | The [Runbook](/doc-types/runbook/contract-shape.md) doc-type |
@@ -53,35 +53,31 @@ rows with one or two files last.
 
 ## The roster
 
-**Standard-Card** — a card is the catalog record for one standard,
-named by the question the standard governs
-([definition](/doc-types/standard-card/definition.md)). It carries
-type-level grain: one contract serves every card. Its shape is the
-four cells, and `scripts/cardgen` collapses every card to rows of
-`card, cell, pointer`.
-Its fixed composition rule keeps the machinery sparse: headings suffice,
-and its determinism lives in the audit linters and enforcement gates its
-cards point at.
+**Standard** — a Standard is a normative target that is defined,
+audited, enforced, and adopted
+([definition](/doc-types/standard/definition.md)). It is written across
+two file kinds: the card, `Standard-Card`, the record of its four verbs,
+one cell each; and its rulesets, `Standard-Ruleset`, one population and
+its rules, what the Define cell points at. Its shape is the four cells
+and the ruleset beneath Define. `scripts/cardgen` collapses every card
+to rows of `card, cell, pointer`; `scripts/rulegen` collapses every
+ruleset to two tables, `card, standard, population` and
+`card, standard, rule, when`. The card's fixed composition keeps its
+machinery sparse: headings suffice, and its determinism lives in the
+detectors and gates its cells point at.
 
 ```
-Standard-Card
+Standard
   operations:   define audit enforce adopt
-  composition:  one of each
+  composition:  one cell each, any number of pointers; under Define,
+                one population and any number of rules per ruleset
     │
-    └──► shape: the struct
+    └──► shape: the card, four cells; the rulesets it defines by
            │
-           ├─ the harness card — its four sections filled
-           ├─ the build card — its four sections filled
-           └─ … one per card in the catalog
+           ├─ the harness Standard — its card and rulesets
+           ├─ the build Standard — its card and rulesets
+           └─ … one per directory under standards/
 ```
-
-**Standard** — a Standard describes a state: one class of object as
-its population, plus named rules over one member's state, in prose and
-in checkers ([definition](/doc-types/standard/definition.md)). It
-carries instance-level grain: every Standard owns a distinct rule set.
-Its shape is one population and its rules, and `scripts/rulegen`
-collapses every Standard to two tables, `card, standard, population`
-and `card, standard, rule, when`.
 
 **Runbook** — a runbook is an invocable command: a skill or an
 agent definition
@@ -124,9 +120,10 @@ Loop
            └─ … one per loop; none written yet
 ```
 
-A card is to Standard-Card what `/intake` is to Runbook: one instance,
-one filled shape, one contract. The detail files under a card sit below
-its contract the way a runbook's prose body sits below its chain.
+A directory under `standards/` is to Standard what `/intake` is to
+Runbook: one instance, one filled shape, one contract. The rulesets
+under a card sit below its contract the way a runbook's prose body sits
+below its chain.
 
 Instances never live in the doc-type tree — they stay with their
 populations, and a contract rides inside its instance file.
@@ -158,14 +155,15 @@ obligation rides
 [runbook-conventions](/standards/harness/runbook-conventions.md),
 audited by the chain drift check; Loop's rides
 [loop-conventions](/standards/knowledge-organization/loop-conventions.md),
-audited by `scripts/loop-lint` at the commit gate. The shape is never
-itself a Standard, so Standard-Card and Runbook remain peers in this
-roster.
+audited by `scripts/loop-lint` at the commit gate; Standard's rides the
+Meta-Standard, [standards/standard/](/standards/standard/card.md),
+audited by `scripts/standards-lint`. The shape is never itself a
+Standard, so Standard, Runbook, and Loop remain peers in this roster.
 
 ## The import surface
 
 A consumer repo writes its own doc-type-system file: an import
-declaration — Runbook and Standard-Card, from dev-playbook — plus its
+declaration — Runbook, Standard, and Loop, from dev-playbook — plus its
 local rulings, and a doc-type of its own only when it declares one.
 It never copies the kind definition or a shape. This is the
 workspace's general pattern: dev-playbook declares a system once,

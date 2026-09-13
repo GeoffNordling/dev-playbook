@@ -43,7 +43,7 @@ cannot carry:
 - **A check** links the Audit cell of the card whose standard it
   measures against, `standards/<card>/card.md#audit`, then states its
   condition the same way. The cell composed is the audit, never the
-  gate ([Standard-Card](/doc-types/standard-card/encoding.md#cells)).
+  gate ([Standard](/doc-types/standard/encoding.md#cells)).
 - **A yield** names its receiver, the user or a linked Loop, then
   states its condition: `yields when …`.
 

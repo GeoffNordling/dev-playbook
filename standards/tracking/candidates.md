@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Candidates
 description: The CANDIDATES.md register of uncommitted future work — the only future-work file, entry shape, structure, and promotion to an issue
 population: "a repo's CANDIDATES.md"

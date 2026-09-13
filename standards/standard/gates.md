@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Gates
 description: The three gates on the path to main — what each runs, the local two in every clone, the red CI rule, and when a detector is skipped
 population: "a gate: an automatic, unmanned blocking point on the path to main"
@@ -12,7 +12,7 @@ stop the path to main there ([Vocabulary](/CONTEXT.md#governance)); the
 other mode, a tool invoked on demand, is no gate. This Standard fixes
 the gates: what each is, where it blocks, and what may be skipped at one.
 A card's Enforce cell names a gate by its rung name
-([Card Cells Encoding](/doc-types/standard-card/encoding.md#cells)).
+([Cells and Rulesets Encoding](/doc-types/standard/encoding.md#cells)).
 
 ## Three rungs
 

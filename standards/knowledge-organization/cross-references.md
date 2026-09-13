@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Cross-References
 description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the runbook forms, and fragment anchors that match a heading's slug
 population: "a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record"

@@ -8,14 +8,14 @@
 Prototype implementing doc-types/standard/encoding.md's transform: slice,
 never interpret. A Standard is `standards/<card>/<standard>.md`, the
 standard part nesting where a Standard's special cases sit in a directory
-of its own stem, typed `Standard`; its frontmatter `population` is one
+of its own stem, typed `Standard-Ruleset`; its frontmatter `population` is one
 double-quoted phrase. An
 H2 with no H3 beneath it is a rule that binds every member; an H2 with H3s
 beneath it is a condition, and each H3 is a rule bound under it. A rule's
 or a condition's id is its heading's GitHub slug, and its predicate is the
 first paragraph beneath the heading. Everything else is opaque.
 
-A file typed `Standard` with no `population` key fails the generator.
+A file typed `Standard-Ruleset` with no `population` key fails the generator.
 
 Usage:
     rulegen            regenerate doc-types/standard/standards.txt — the
@@ -32,7 +32,7 @@ import os
 import re
 import sys
 
-STANDARD_TYPE = "Standard"
+STANDARD_TYPE = "Standard-Ruleset"
 UNCONDITIONED = "—"
 GUTTER = "  "
 

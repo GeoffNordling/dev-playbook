@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Canonical Artifacts
 description: The files that live once under standards/build/canonical/ — how each governed repo's copy is compared, what the Makefile targets mean, and the one version set
 population: "a canonical artifact: its source under standards/build/canonical/ and each governed repo's copy"
