@@ -56,11 +56,6 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
 
 ## Planned
 
-- **Obligation.** The doc-type binds nobody. A small Standard,
-  population "files typed `Loop`", rules the encoding rules, auditor
-  `loopgen --check`, is what makes every Loop file carry its shape at
-  commit time, the way `harness/runbook-conventions` and the chain
-  drift check do for Runbook.
 - **First instance.** The doc-type system improver: a loop that drives
   the doc-type system toward the target state in
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md#the-first-instances-standard).
@@ -86,8 +81,12 @@ roster of [Doc-Type System](/doc-types/doc-type-system.md).
   and the Typed Loop rule are in `document-types.md`; the rulings row
   and the roster entry are in `doc-type-system.md`; `loops/` exists
   with an empty index.
-- **Generator.** `scripts/loopgen --check`, unwired, with tests in
-  `tests/test_loopgen.py` over a fixture Loop. It writes no file.
+- **Obligation.** `scripts/loop-lint` is the detector behind
+  [Loop Conventions](/standards/knowledge-organization/loop-conventions.md),
+  the Standard that binds a `Loop` file to the encoding; enrolled in the
+  `playbook-lint` roster, so a bad Loop file cannot be committed. Logic in
+  `src/dev_playbook/loop_lint.py`, tests beside it. Loop has no generator
+  and no `.txt` view, by decision: the Mermaid graph is the view.
 
 ## Acronyms
 

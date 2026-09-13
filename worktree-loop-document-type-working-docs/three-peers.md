@@ -46,9 +46,9 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 | Composition rule | any number of edges, coarsely ordered | one population, any number of rules, unordered | any number of acts and checks, ordered by the iteration; a set of yield conditions |
 | Grain | instance-level | instance-level | instance-level |
 | Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule, H2+H3 condition | one Mermaid block; H2 Acts, Checks, Yields, one entry per node |
-| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | `scripts/loopgen --check` → no file; the Mermaid block in each instance |
+| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/rulegen` → `standards.txt` | none; the Mermaid block in each instance is the view |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
-| Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | open |
+| Obligation card | `harness/runbook-conventions` | the Standard-Card catalog | `knowledge-organization/loop-conventions` |
 
 ## Where the peers are not yet parallel
 

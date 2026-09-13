@@ -104,8 +104,6 @@ the whole procedure and the position in it is data.
 
 The view is the graph itself. A Loop instance's source of truth is one
 fenced Mermaid block, and GitHub renders it; there is no generated
-table. `scripts/loopgen --check` reads every instance and fails when
-the graph and the prose around it disagree, as
-[the encoding](/doc-types/loop/encoding.md) lays out. This is a
-different kind of generator from `chaingen` and `rulegen`: the peers
-share the bundle, not the file format.
+table and no generator. That the graph and the prose around it agree
+is a lint's job, as [the encoding](/doc-types/loop/encoding.md) lays
+out; the peers share the bundle, not the file format.

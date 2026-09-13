@@ -109,10 +109,9 @@ taking prescribed actions and validating against prescribed standards
 ([definition](/doc-types/loop/definition.md)). It carries
 instance-level grain: every loop owns its own acts, checks, and yields.
 Its shape is acts, checks, and yields, iterated, and its view is the
-Mermaid graph in each instance, which `scripts/loopgen --check` checks
-against the prose around it and writes nowhere. It composes the other
-two peers by pointer: an act points at a runbook, a check at a
-standard's audit.
+Mermaid graph in each instance; it has no generator and no generated
+file. It composes the other two peers by pointer: an act points at a
+runbook, a check at a standard's audit.
 
 ```
 Loop
@@ -144,8 +143,8 @@ object every instance collapses to.
 are written so deterministic code generates the view, the primitive
 map of [Doc-Type](/doc-types/doc-type.md#layers-and-the-primitive-map)
 written down. A generator under `scripts/` writes the view to one
-file in the directory and fails on drift with `--check`, or, where the
-view is a graph inside each instance, checks the instance in place.
+file in the directory and fails on drift with `--check`; a doc-type
+whose view is a graph inside each instance has none.
 `residual-ledger.md` records what the shape cannot express, one entry
 per instance that has one. Each file holds its own layer and the
 directory's `index.md` is the map between them.
@@ -157,8 +156,11 @@ anyone to use it. The binding rule — every instance in the family
 must carry its contract — is a Standard card's job: Runbook's
 obligation rides
 [runbook-conventions](/standards/harness/runbook-conventions.md),
-audited by the chain drift check. The shape is never itself a
-Standard, so Standard-Card and Runbook remain peers in this roster.
+audited by the chain drift check; Loop's rides
+[loop-conventions](/standards/knowledge-organization/loop-conventions.md),
+audited by `scripts/loop-lint` at the commit gate. The shape is never
+itself a Standard, so Standard-Card and Runbook remain peers in this
+roster.
 
 ## The import surface
 

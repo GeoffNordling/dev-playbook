@@ -13,8 +13,9 @@ knowledge-organization  document-types                                 a concept
 knowledge-organization  documentation-sets/documentation-sets          a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Reference mirror among them
 knowledge-organization  documentation-sets/working-documentation-sets  a working documentation set, the Markdown files one stream of in-process work accumulates
 knowledge-organization  indexes                                        an index.md
+knowledge-organization  loop-conventions                               a document typed Loop
 knowledge-organization  readme-content                                 a README.md
-knowledge-organization  type-registry                                  a document-type registry's Types table, the global one in dev-playbook or a consumer's local extension
+knowledge-organization  type-registry                                  a document-type declaration: dev-playbook's `## Types` table, or a consumer's root-index `okf_types` mapping
 modules                 design                                         a module in a governed repo's source: anything with an interface and an implementation
 prose                   conventions                                    an authored document, except type: Reference and the paths in .prose-lint-exempt
 python                  style                                          a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang
@@ -30,9 +31,9 @@ tracking                repo-settings                                  a governe
 
 rules
 card                    standard                                       rule                                              when
+build                   canonical                                      artifactsmk                                       makefile
 build                   canonical                                      ciyml                                             —
 build                   canonical                                      gitignore                                         —
-build                   canonical                                      makefile                                          —
 build                   canonical                                      one-version-set                                   —
 build                   canonical                                      pre-commit-configyaml                             —
 build                   canonical                                      pyprojecttoml                                     —
@@ -113,6 +114,7 @@ knowledge-organization  document-types                                 resource 
 knowledge-organization  document-types                                 resource-present                                  recipe-description
 knowledge-organization  document-types                                 title                                             —
 knowledge-organization  document-types                                 types                                             —
+knowledge-organization  document-types                                 under-loops                                       typed-loop
 knowledge-organization  document-types                                 under-standards                                   typed-standard
 knowledge-organization  documentation-sets/documentation-sets          an-index-in-every-directory                       —
 knowledge-organization  documentation-sets/documentation-sets          body-inside-its-concern                           —
@@ -133,13 +135,20 @@ knowledge-organization  indexes                                        ordering 
 knowledge-organization  indexes                                        the-introduction                                  —
 knowledge-organization  indexes                                        the-listing                                       —
 knowledge-organization  indexes                                        typeless                                          —
+knowledge-organization  loop-conventions                               edges-follow-the-shape                            —
+knowledge-organization  loop-conventions                               entries-point-and-condition                       —
+knowledge-organization  loop-conventions                               nodes-and-entries-agree                           —
+knowledge-organization  loop-conventions                               one-graph                                         —
+knowledge-organization  loop-conventions                               three-verb-sections                               —
 knowledge-organization  readme-content                                 h1-and-purpose                                    —
 knowledge-organization  readme-content                                 no-agent-instructions-or-decisions                —
 knowledge-organization  readme-content                                 no-roster-of-harness-injected-files               —
 knowledge-organization  readme-content                                 okf-frontmatter                                   —
-knowledge-organization  type-registry                                  add-never-shadow                                  local-extension
+knowledge-organization  type-registry                                  add-never-shadow                                  local-declaration
+knowledge-organization  type-registry                                  alphabetical-keys                                 local-declaration
 knowledge-organization  type-registry                                  alphabetical-order                                —
-knowledge-organization  type-registry                                  name-and-description-only                         local-extension
+knowledge-organization  type-registry                                  entry-shape                                       local-declaration
+knowledge-organization  type-registry                                  name-and-description-only                         local-declaration
 knowledge-organization  type-registry                                  row-shape                                         —
 modules                 design                                         a-port-at-a-process-boundary                      —
 modules                 design                                         deep-not-shallow                                  —

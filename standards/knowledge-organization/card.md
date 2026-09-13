@@ -19,6 +19,7 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 - [Cross-References](/standards/knowledge-organization/cross-references.md)
 - [Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)
 - [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+- [Loop Conventions](/standards/knowledge-organization/loop-conventions.md)
 
 ## Audit
 
@@ -27,6 +28,9 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
 - [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
   (`knowledge-organization.doc-shape`)
+- [loop-lint](/scripts/loop-lint) — every document typed `Loop` under
+  `loops/`: its Mermaid graph agrees with the Acts, Checks, and Yields
+  sections around it (`knowledge-organization.loop-*`)
 - [doc-set-auditor](/dotfiles/dot-claude/agents/doc-set-auditor.md)
   — the LLM judge over one documentation set, one slice of the
   Standards per launch, reporting and editing nothing
@@ -35,8 +39,9 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 
 - the canonical
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
-  — okf-lint, ref-lint, and repo-lint at the **commit gate** in every
-  repo's suite, all three dispatched by the published `playbook-lint` hook
+  — okf-lint, ref-lint, repo-lint, and loop-lint at the **commit gate** in
+  every repo's suite, all four dispatched by the published `playbook-lint`
+  hook; loop-lint no-ops where a repo has no `loops/` tree
 - [doc-set-deslop](/dotfiles/dot-claude/skills/doc-set-deslop/SKILL.md)
   — **on demand**, audits a documentation set, or a set and its child
   sets, through auditor slices and then fixes it, the edits left
