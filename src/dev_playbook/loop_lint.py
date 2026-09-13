@@ -19,9 +19,8 @@ to. Five rules:
     id, each id once.
   - **loop-nodes** — every entry is a node of the graph; every node has an
     entry or is a receiver some yield leads to.
-  - **loop-edges** — an act leads to an act or a check, a check to a check
-    or a yield, a yield back to an act or out to a receiver, a receiver
-    back to an act.
+  - **loop-edges** — a step leads to a step; only a yield leads to a
+    receiver; a receiver leads to a step.
   - **loop-entries** — an act links a file; a check links a card's Audit
     cell, ``standards/<card>/card.md#audit``; a yield names the user or
     links a Loop; every entry states its condition.
@@ -70,11 +69,12 @@ VERBS = ("Acts", "Checks", "Yields")
 VERB_OF = {"Acts": "act", "Checks": "check", "Yields": "yield"}
 RECEIVER = "receiver"
 # What each kind of node may lead to. A receiver is a node under no heading.
+STEPS = {"act", "check", "yield"}
 MAY_LEAD_TO = {
-    "act": {"act", "check"},
-    "check": {"check", "yield"},
-    "yield": {"act", RECEIVER},
-    RECEIVER: {"act"},
+    "act": STEPS,
+    "check": STEPS,
+    "yield": STEPS | {RECEIVER},
+    RECEIVER: STEPS,
 }
 CONDITION_OF = {
     "act": ("fires when", "fires every iteration"),

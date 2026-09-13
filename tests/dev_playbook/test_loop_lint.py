@@ -122,14 +122,14 @@ def test_an_entry_with_no_node_fails(tmp_path: Path) -> None:
 def test_an_edge_the_shape_does_not_allow_fails(tmp_path: Path) -> None:
     loop = LOOP.replace(
         "    flat -->|findings| ask{ask?}\n",
-        "    flat -->|findings| ask{ask?}\n    flat --> tidy\n",
+        "    flat -->|findings| ask{ask?}\n    flat --> user\n",
     )
 
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-edges edge `flat` → `tidy` is check → act"
+        "knowledge-organization.loop-edges edge `flat` → `user` is check → receiver"
         in result.stdout
     )
 

@@ -112,8 +112,8 @@ runbook, a check at a standard's audit.
 ```
 Loop
   operations:   act check yield
-  composition:  any number of acts and checks, in iteration
-                order; a set of yield conditions
+  composition:  any number of acts, checks, and yields, in
+                iteration order
     │
     └──► shape: the graph — acts, checks, yields, and receivers
            │

@@ -47,13 +47,12 @@ leads to (`knowledge-organization.loop-nodes`).
 
 ## Edges follow the shape
 
-An act leads to an act or a check; a check leads to a check or a yield;
-a yield leads back to an act or out to a receiver; a receiver leads back
-to an act (`knowledge-organization.loop-edges`).
+A step leads to a step. Only a yield leads to a receiver, and a
+receiver leads to a step (`knowledge-organization.loop-edges`).
 
 This is the shape [Acts, Checks, and Yields](/doc-types/loop/contract-shape.md#the-graph)
-draws: moves, then measurements, then the programmed exits, and control
-coming back to the top.
+draws: steps in iteration order, a programmed exit where its author put
+it, and control coming back.
 
 ## Entries point and condition
 

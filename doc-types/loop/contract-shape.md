@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Acts, Checks, and Yields
-description: Loop's contract shape — acts, checks, and a set of yield conditions, iterated — in prose, one screen of pseudocode, and the graph every Loop is drawn as
+description: Loop's contract shape — acts, checks, and yields, one ordered list of steps, iterated — in prose, one screen of pseudocode, and the graph every Loop is drawn as
 ---
 
 # Acts, Checks, and Yields
@@ -15,51 +15,46 @@ taking prescribed actions and validating against prescribed standards
 ## The shape
 
 - **Act.** A prescribed action: a pointer at a runbook, with a
-  condition. The act reads the findings the last iteration's checks
-  returned; that is how direction reaches it.
+  condition. The act reads the findings the checks before it returned;
+  that is how direction reaches it.
 - **Check.** A prescribed standard: a pointer at `Standard.audit`, the
   auditors a card's audit cell locates, with a condition. A check returns findings, each
   naming a member and the rule it fails. Zero findings from every check
-  is the target state. The target is written once, in the standards:
-  an act reads a standard's definition to know what the target looks
-  like, a check runs its audit to measure the distance.
+  is the target state. The target is written once, in the standards,
+  and a check runs the audit to measure the distance.
 - **Yield.** A programmed exit: a condition and a receiver, another
   loop or the user. The instance writes "yields when …". A yield is
-  resumable: control comes back to the same point with the receiver's
+  resumable: control comes back to the same step with the receiver's
   answer.
-- **Condition.** What must hold for an act or check to fire, or for a
-  yield to be taken. Runbook and Standard already name this part
+- **Condition.** What must hold for a step to fire. Runbook and Standard already name this part
   *condition*, an edge's and a rule's; Loop reuses the word rather than
   adding a third. A condition of `None` fires every iteration.
 
-The composition rule: any number of acts and checks, ordered by the
-iteration, and a set of yield conditions, unordered, the loop yielding
-when any one is met. The grain is instance-level: every loop owns its
-own acts, checks, and yields. The shape in pseudocode:
+The composition rule: any number of acts, checks, and yields, in
+iteration order. Each is a step; a step whose condition holds fires,
+and a yield that fires hands control out at its place in the iteration.
+The shape in pseudocode:
 
 ```python
 class Loop(Object):
     """Acts, checks, and yields, iterated. Drives state, never binds it."""
 
-    operations = {act, check, yield}                                # one list each, below
+    operations = {act, check, yield}                                # the kinds of step, below
 
-    acts:   list[Act]               # any number, in iteration order
-    checks: list[Check]             # any number, in iteration order
-    yields: set[Yield]              # any number; yield when any is met
+    steps: list[Act | Check | Yield]    # any number, in iteration order
 
     location    = path == f"loops/{name}.md"
     frontmatter = type == "Loop"
 
     def drive(self, state, findings=()):
         while True:
-            for act in self.acts:
-                if act.condition(state):   state = act.runbook(state, findings)
-            findings = [f for check in self.checks
-                          if check.condition(state)
-                          for f in check.standard.audit(state)]   # runs the Audit cell's detectors
-            for y in self.yields:
-                if y.condition(state, findings):
-                    findings = yield_to(y.receiver, findings)   # resumes here
+            for step in self.steps:
+                if not step.condition(state, findings):
+                    continue
+                match step:
+                    case Act():    state = step.runbook(state, findings)
+                    case Check():  findings = step.standard.audit(state)    # runs the Audit cell's detectors
+                    case Yield():  findings = yield_to(step.receiver, findings)   # resumes here
 
 
 class Act:
@@ -71,8 +66,8 @@ class Check:
     condition: Condition | None
 
 class Yield:
-    condition: str                  # "yields when …", English or code
     receiver:  Loop | User          # who takes control, and hands it back
+    condition: Condition | None     # "yields when …"
 ```
 
 A loop carries no target field and no runtime: the standards the
@@ -92,14 +87,14 @@ edges.
 flowchart LR
     act[act] -->|condition| check[check]
     check -->|findings| yield{yield?}
-    yield -->|none met| act
-    yield -->|a condition met| receiver([receiver])
+    yield -->|condition false| act
+    yield -->|condition true| receiver([receiver])
     receiver -->|resumes| act
 ```
 
 The doc-type carries both forms, the pseudocode for the contract and
-the graph for the reader. An instance pivots to the graph: its acts,
-checks, and yields drawn as nodes and edges, so the shape on screen is
+the graph for the reader. An instance pivots to the graph: its steps
+drawn as nodes and edges in iteration order, so the shape on screen is
 the whole procedure and the position in it is data.
 
 ## The view

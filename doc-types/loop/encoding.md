@@ -25,9 +25,9 @@ verb heading carries it in full. Node ids are free-form and unique
 within the file; which verb a node is comes from the heading its entry
 sits under, not from its id or its shape.
 
-The edges follow the shape: an act leads to an act or a check, a check
-leads to a check or a yield, a yield leads back to an act or out to a
-receiver, and a receiver leads back to an act, where the loop resumes.
+The edges follow the shape: a step leads to the next step; a yield
+also leads out to its receiver, and only a yield does; a receiver leads
+back to the step where the loop resumes.
 
 ## The verb sections
 

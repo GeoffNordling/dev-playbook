@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Three Peers
-description: Runbook, Standard, and Loop as peer doc-types — their one-sentence definitions, the parallel structure between them, and what is settled about Loop so far
+description: Runbook, Standard, and Loop as peer doc-types — their one-sentence definitions, the parallel between them today, and where Loop stands
 ---
 
 # Three Peers
@@ -20,7 +20,7 @@ their bundles carry today; Loop's is new.
 > A **runbook** is an invocable command written as documentation: a
 > skill or an agent definition.
 
-> A **Standard** is a normative target: a state some class of object
+> A **standard** is a normative target: a state some class of object
 > is held to, that a reviewer or a lint could cite to reject work.
 
 > A **loop** drives a state toward a target state by iteratively taking
@@ -31,10 +31,9 @@ The verbs are the contrast: a runbook is *invoked*, a standard is
 and adopted, and has no notion of moving toward its state; its audit is
 what a loop's check composes.
 
-## The idealized parallel
+## The parallel today
 
-What each peer looks like when fully built, from the two existing
-bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
+What each peer looks like on disk, from the three bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 
 | | Runbook | Standard | Loop |
 |---|---|---|---|
@@ -43,44 +42,20 @@ bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 | Kinds | Skill, Agent definition | Standard-Card, Standard-Ruleset | Loop |
 | Operations | read, write, do, override, never, args, report | define, audit, enforce, adopt | act, check, yield |
 | Shape | the Reference chain: nodes and labeled edges | four cells; under Define, one population and its rules | acts, checks, and yields, iterated |
-| Composition rule | any number of edges, coarsely ordered | one cell each, any number of pointers; one population, any number of rules per ruleset | any number of acts and checks, ordered by the iteration; a set of yield conditions |
+| Composition rule | any number of edges, coarsely ordered | one cell each, any number of pointers; one population, any number of rules per ruleset | any number of acts, checks, and yields, in iteration order |
 | Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | card: H2 per cell, one pointer per bullet; ruleset: frontmatter `population`, H2 rule, H2+H3 condition | one Mermaid block; H2 Acts, Checks, Yields, one entry per node |
 | Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/cardgen` → `cards.txt`; `scripts/rulegen` → `standards.txt` | none; the Mermaid block in each instance is the view |
 | Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
 | Obligation card | `harness/runbook-conventions` | `standard/`, the Meta-Standard | `knowledge-organization/loop-conventions` |
 
-## Where the peers are not yet parallel
-
-Open findings about the peers themselves, more important than the
-parked items in Stale Findings. A resolved finding is deleted.
-
-- **Audit and enforce are fused in practice.** Every auditor runs at
-  pre-commit and every failure blocks, so no standard is aspirational
-  today. A loop needs the audit cell without the gate; unfusing them is
-  what makes "compose with standards" right. First-loop material.
-- **The card's cells are two kinds of pointer.** Define and audit
-  point inside the doc-type system, at the rulesets and the detectors.
-  Enforce points outside it, at a harness position, the hooks registry
-  in `standards/harness/files.md`, where an audit runs as a gate;
-  pre-commit and CI are runtimes, not loops, the way a workflow script
-  is a JS file. Adopt points at a Loop instance when one exists and is
-  empty otherwise. No Gate primitive is needed. A candidate for the
-  checker loop, not a decision.
-- **Adopt is a loop. Tabled, last.** The card's Adopt cell, the helpers
-  that bring a repo into compliance, is a loop by another name, rarely
-  used because the system had no loop primitive. Pointing each Adopt at
-  a Loop means instantiating one per current usage, so it waits until
-  the first loop runs.
-
 ## The first instance's standard
 
-The doc-type system checker needs a standard for the target state of
+The first instance needs a standard for the target state of
 the doc-type system, aspirational, audited, not gated. What it must
 say, so far:
 
-- **Minimal verbs.** The system is expressed in the fewest verbs and
-  operations that suffice. Every doc-type added makes the system less
-  comprehensible; the loop's job is to find the minimum set.
+- **Minimal verbs.** An objective, not a predicate: the fewest verbs
+  and operations that suffice, descended one accepted merge at a time.
 - **Two views that agree.** The simple verbs are one view of the world
   and the contract-shape pseudocode is another. They need not match one
   to one, but every pseudocode object across every bundle must make
@@ -90,7 +65,7 @@ say, so far:
   bundle carries pseudocode and graph; a loop instance is drawn as a
   graph.
 
-## What is settled about Loop
+## Loop today
 
 - **The definition** is the sentence above. Shorter is better; the
   definition carries the kind, the shape carries the parts. Runbook's
@@ -98,11 +73,8 @@ say, so far:
 - **Yield is an operation, programmed, not derived.** An instance
   writes "yields when …"; the when is the instance's, and the doc-type
   says nothing about it: never, once at the end, periodically, every
-  turn are all instances. Yield is a *set* of conditions, not a list:
-  the loop yields when any one is met, where a list would be iterated
-  through. Measurement is always possible, by
-  deterministic code or by a model returning a value, so "yields when it
-  cannot measure" was wrong and is dropped.
+  turn are all instances. Measurement is always possible, by
+  deterministic code or by a model returning a value.
 - **No rule on when a loop is worth writing.** Every piece of work can
   repeat; the user decides which loops to build. This conversation is a
   loop that yields every turn and will not run again, so it is not an
@@ -110,17 +82,13 @@ say, so far:
 - **Three verbs.** Loop's operations are read off its sentence: *act*,
   a prescribed action, a pointer at a runbook; *check*, a prescribed
   standard, a pointer at `Standard.audit`; *yield*, a programmed
-  exit. Composition: any number of acts and checks, ordered by the
-  iteration, and a set of yield conditions.
+  exit. Composition: any number of acts, checks, and yields, in
+  iteration order.
 - **No target operation.** A target state is "this population passes
-  these checks", so the checks carry it and population is already
-  Standard's word. The description an acting agent needs is the
-  standard's definition, the same standard whose audit the check runs:
-  define tells the act what the target looks like, audit tells the
-  check how far off it is. The findings an audit returns are the distance and
-  the direction: each names a member and the rule it fails. This holds
-  for indefinite targets too: an ideation loop's check is a model-judge
-  standard with a rubric, and its findings are still findings.
+  these checks", so the checks carry it. The findings an audit returns
+  are the distance and the direction: each names a member and the rule
+  it fails, and the applying act reads nothing else
+  ([Specifying a Loop](/worktree-loop-document-type-working-docs/specifying-a-loop.md#the-loop-that-proposes)).
 - **A check composes `Standard.audit`, not the Standard.** A card's
   four cells are separable, and what a check points at is the audit
   cell: the auditors that measure a population against the Standard's
@@ -133,26 +101,17 @@ say, so far:
   a runbook, whole: a runbook is one move. A check points at a
   standard's audit, `Standard.audit`, the one cell of the four: an audit
   is one measurement. A loop is moves and measurements iterated toward
-  a target. This is the seed of the shape, and a guess about the
-  encoding: an instance may be written largely as pointers, the way a
-  card is, and the generator may stitch its view from the existing
-  chains and rules tables.
+  a target.
 - **A Loop instance is a document, not code.** A `.js` workflow file is
   a JS file. The Loop doc-type sits one level of abstraction above any
   runtime. When the `.claude/workflows/*.js` row of the registry is
   ruled, it is a runtime that runs loops, not the Loop family.
 - **The family mirrors Standard's.** Instances are files typed `Loop`
-  under a reserved root tree, `loops/`, flat until an instance needs a
-  directory. Three edits register it, and they must agree: a `Loop`
-  row in the Types table of
-  [Document Types](/standards/knowledge-organization/document-types.md),
-  a "Typed Loop → Under loops/" rule beside the Standard one, and a
-  `Loop | loops` row in the rulings table of
-  [Doc-Type System](/doc-types/doc-type-system.md#registry-rulings).
-  A reserved root tree is not the general rule for doc-types; it is
-  earned only when consumer repos reach for the instances by path, as
-  they do for standards. Consumers keep their own `loops/` the way they
-  keep their own `standards/`.
+  under `loops/`, registered in
+  [Document Types](/standards/knowledge-organization/document-types.md)
+  and [Doc-Type System](/doc-types/doc-type-system.md#registry-rulings).
+  Consumers keep their own `loops/` the way they keep their own
+  `standards/`.
 
 ## Example instances
 
@@ -164,23 +123,9 @@ Held to test the shape, not to build:
   one-concern, well-linked files; yield when the verifiers pass.
 - A code-quality loop: drive modules toward a complexity bound checked
   by deterministic counts or stochastic agents.
-- An ideation loop: seeded with a vision, generate and self-evaluate
-  ideas, yield to the user periodically, resume on their feedback.
 
-The first instance, built after the doc-type, is a **doc-type system
-checker**. It describes the intended world, every doc-type as a few
-simple verbs plus a composition rule, and checks that world against the
-one we live in, dev-playbook and its workspace. Through the three verbs:
-act is sending out agents to find inconsistencies, the kind the peer
-section above already holds, and ideating fixes; check is a
-self-consistency standard applied by the loop's own judgment; yield is
-{every K rounds}, to the user, resuming on their feedback. Its goal at
-this level is not to transform the system but to align with the user on
-a self-consistent target end state. Chosen over a Markdown complexity
-loop because that would open a new front; this one stays on the work at
-hand. Not the software factory: as specified today it needs a loop to
-clean it up, which is a different loop from the one that runs it, and
-either is too big for a first test.
+The first instance is a loop over the doc-type system; its design is
+[ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md#planned).
 
 ## Prior art
 
