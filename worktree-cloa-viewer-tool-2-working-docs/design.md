@@ -46,14 +46,24 @@ runbook, as the brainstorm left them:
   operation, the target, the condition, the annotation.
 - Channels. Hue carries the operation: reads, does, writes; args and
   reports in ink. A glyph carries the node type, always with its word
-  beside it: ▤ Standard, ● Skill, ◆ Agent, ▪ Script, ⛁ bucket, and an
-  imported node as plain text. The edge line is dashed when conditional
-  and solid otherwise. Vertical position is firing order. A ban mark ⊘
-  marks never. Red stays for defects.
+  beside it, per the legend below. The edge line is dashed when
+  conditional and solid otherwise. Vertical position is firing order. A
+  ban mark ⊘ marks never. Red stays for defects.
 - Stitching. A twist on a do-edge opens the target's chain in place,
   lazily, by identity. A Skill nests flush, because it runs in the
   caller's context. An Agent nests framed, because it is a subprocess.
 - Annotation. Muted, wrapping, after target and condition.
+
+The glyph legend:
+
+| Glyph | Node type |
+| ----- | --------- |
+| ▤ | Standard |
+| ● | Skill |
+| ◆ | Agent |
+| ▪ | Script |
+| ⛁ | bucket |
+| plain text | imported node |
 
 Open on this panel: whether the root's `WRITES` and `NEVER` are its own
 edges only or reach through its do-edges; whether a stitched chain shows

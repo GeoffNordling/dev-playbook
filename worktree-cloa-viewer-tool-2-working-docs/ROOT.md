@@ -18,26 +18,26 @@ The set holds two concerns. The
 the theory: how deterministic code produces one precise object of what
 a checkout is doing. The viewer, the rest of this set, is the delivery:
 how that object reaches a browser screen. Where the two disagree, the
-fact base has priority.
+fact base has priority
+([Standing](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#standing-in-this-set)).
 
 ## Terms
 
-- **fact base** — the one object underneath every view: a set of nodes
-  and a set of edges, written by code to one file per checkout
+- **fact base** — the one object underneath every view
   ([Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#terms)).
 - **CLOA object** — what a doc-type's contract shape defines for one
   document, a runbook's Reference chain, a Standard's rules, a card's
   cells ([Doc-Type](/doc-types/doc-type.md)). In the fact base it is
   the nodes and edges that document's doc-type extractor yields.
-- **view** — a selection of nodes and edges from the fact base, plus a
-  renderer. A view drops rows; it never adds or converts one.
+- **view** — a selection from the fact base plus a renderer
+  ([Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#terms)).
 - **checkout** — one working copy of a repo, a main checkout or a
   worktree; the unit the viewer shows.
 - **view file** — one JSON file the server writes and the viewer shows as
   one panel; every view file has one kind
   ([Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md)).
-- **kind** — a registered view: a selection and a renderer under one
-  name ([an entry](/worktree-cloa-viewer-tool-2-working-docs/registry.md#an-entry)).
+- **kind** — a registered view: a selection, a renderer, and a doc page
+  under one name ([an entry](/worktree-cloa-viewer-tool-2-working-docs/registry.md#an-entry)).
 - **registry** — the list of kinds the tool can show
   ([Registry](/worktree-cloa-viewer-tool-2-working-docs/registry.md)).
 - **panel** — one view file rendered on screen.
@@ -99,10 +99,11 @@ targets.
   ([Reference Chain Encoding](/doc-types/runbook/encoding.md)), so the
   drawing rules are stated here, in the kind's registry entry, and the
   meaning they draw is the doc-type's.
-- **A view drops; it never adds or converts.** Every panel is a
-  selection from the fact base. When a panel needs a shape the fact base
-  lacks, the extractor or a rule changes, upstream of every view. No
-  layer converts one view into another.
+- **A view drops; it never adds or converts**
+  ([Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#terms)).
+  When a panel needs a shape the fact base lacks, the extractor or a
+  rule changes, upstream of every view. No layer converts one view into
+  another.
 - **Known kinds only.** The viewer shows registered kinds and nothing
   else. Adding a kind is adding a registry entry
   ([Registry](/worktree-cloa-viewer-tool-2-working-docs/registry.md)).
@@ -251,6 +252,8 @@ coded; the viewer's next kinds are selections from it.
 
 ## Acronyms
 
-CLOA — Correct Level of Abstraction. IDE — Integrated Development
-Environment. JSON — JavaScript Object Notation. SVG — Scalable Vector
-Graphics. HTML — Hypertext Markup Language.
+- **CLOA** — Correct Level of Abstraction.
+- **IDE** — Integrated Development Environment.
+- **JSON** — JavaScript Object Notation.
+- **SVG** — Scalable Vector Graphics.
+- **HTML** — Hypertext Markup Language.

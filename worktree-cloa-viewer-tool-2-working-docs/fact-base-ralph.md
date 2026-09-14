@@ -20,21 +20,10 @@ where the extractors run out.
 
 ## Terms
 
-- **fact base** — the one object underneath every view: a set of nodes
-  and a set of edges.
-- **node** — one thing with an identity, a node type, a provenance, and
-  attributes. An identity is a repo-relative path, per the
-  [Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md#identities);
-  an imported node has a name instead, and a bucket is named
-  `bucket:<name>`.
-- **edge** — one relation from a source node to a target node, with a
-  relation type, and, where the source declares them, an order, a
-  condition, and a detail quoted from the source.
-- **extractor** — a deterministic function from one artifact to rows.
-  A bedrock extractor parses; a doc-type extractor reads a contract
-  shape. Every row in the data file names its extractor.
-- **view** — a selection of nodes and edges from the fact base, plus a
-  renderer. A view drops; it never adds or converts.
+Every term here, fact base, node, edge, extractor, receipt, and view,
+is defined once in
+[Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#terms).
+This page adds none.
 
 ## The data file
 

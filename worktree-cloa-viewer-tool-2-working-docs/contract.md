@@ -36,7 +36,7 @@ A checkout directory holds:
   the subject's path: `markdown-file/docs/working-in-loops.md.json`,
   `runbook-chain/dotfiles/dot-claude/agents/adjudicator.md.json`.
 
-A view file's identity is its path under the checkout directory. Writing
+A view file is named by its path under the checkout directory. Writing
 the same path again replaces the panel in place, which is what live
 update needs.
 
@@ -116,5 +116,6 @@ kind with it.
 
 ## Acronyms
 
-XDG — Cross-Desktop Group. UTC — Coordinated Universal Time. RFC —
-Request for Comments.
+- **XDG** — Cross-Desktop Group.
+- **UTC** — Coordinated Universal Time.
+- **RFC** — Request for Comments.

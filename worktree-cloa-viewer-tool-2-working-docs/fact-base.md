@@ -37,10 +37,13 @@ fast, and identical until the checkout changes.
 - **node** — one thing with an identity, a node type, a provenance, and
   attributes. An identity is a repo-relative path
   ([Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md#identities));
-  an imported node has a name instead.
+  an imported node has a name instead, and a bucket is named
+  `bucket:<name>`.
 - **edge** — one relation from a source node to a target node, with a
   relation type, and, where the source declares them, an order, a
-  condition, and a detail quoted from the source.
+  condition, and a detail quoted from the source. The detail is what
+  the runbook encoding calls annotation
+  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)).
 - **receipt** — the extractor and the line that yielded a row. Every
   row carries one, so every fact can be checked against its file and
   every missing fact shows where a declaration would have to be.
@@ -147,7 +150,7 @@ needs a second data structure.
 | control flow | what happens in what order | `chain` edges, keeping order and condition |
 | data flow | what is produced and consumed | `reads` and `writes` edges and the nodes they touch |
 | cross-reference matrix | which X take part in which Y | `does` edges laid out as a grid |
-| interface card | how do I use this one thing | one node and every edge leaving it |
+| interface card | how one thing is used | one node and every edge leaving it |
 
 Control flow is a selection only because the Reference chain already
 declares order and condition on its edges. Where nothing declares
@@ -343,8 +346,8 @@ Parked, in the order raised.
   dev-playbook absorbs a primitive only when a second consumer raises
   the same one, but that is not decided.
 - **The ontology solver.** System Legibility reserves the word
-  ontology for a deterministic inventory of declared abstractions with
-  a solver that validates or invalidates operations among them. Whether
+  ontology
+  ([Ambitions](/docs/system-legibility.md#ambitions)). Whether
   that idea is orthogonal to the fact base, complementary, or a part of
   it is a dedicated session. The sharper framing now available: if it
   fits, the solver is a set of rules in this page's sense, functions
@@ -387,13 +390,9 @@ what the next one needs.
 
 ## Standing in this set
 
-This page was written before being read against the rest of the set,
-so that the set's earlier framing did not shape it. The set was
-reconciled to it on 2026-09-14: the viewer pages now describe every
-kind as a selection from one fact base, and what they said before about
-per-kind generators was deleted. The viewer and the fact base remain
-two concerns, delivery and theory, and where they disagree this page
-has priority.
+The viewer and the fact base are two concerns, delivery and theory.
+Every kind in the viewer pages is a selection from one fact base, and
+where those pages disagree with this page, this page has priority.
 
 **This page has unrestricted rights over vocabulary.** It chooses each
 word on the word's merits alone, and it may claim any word the repo,
