@@ -15,7 +15,7 @@ between them. It is speculative, per
 ## The three sentences
 
 Each doc-type is one sentence. Runbook's and Standard's are the ones
-their bundles carry today; Loop's is new.
+their directories carry today; Loop's is new.
 
 > A **runbook** is an invocable command written as documentation: a
 > skill or an agent definition.
@@ -33,7 +33,7 @@ what a loop's check composes.
 
 ## The parallel today
 
-What each peer looks like on disk, from the three bundles ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
+What each peer looks like on disk, from the three directories ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
 
 | | Runbook | Standard | Loop |
 |---|---|---|---|
@@ -58,11 +58,11 @@ say, so far:
   and operations that suffice, descended one accepted merge at a time.
 - **Two views that agree.** The simple verbs are one view of the world
   and the contract-shape pseudocode is another. They need not match one
-  to one, but every pseudocode object across every bundle must make
+  to one, but every pseudocode object across every directory must make
   sense when put together, one `Object`, one `Condition`, one set of
   pointers between them.
 - **Both forms in the doc-type, the graph in the instance.** A loop's
-  bundle carries pseudocode and graph; a loop instance is drawn as a
+  directory carries pseudocode and graph; a loop instance is drawn as a
   graph.
 
 ## Loop today

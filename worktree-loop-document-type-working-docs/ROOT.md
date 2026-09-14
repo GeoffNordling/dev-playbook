@@ -8,7 +8,7 @@ description: The set's root — goal, principles, terms, and the worklist for bu
 
 This set is speculative: its members write guesses as guesses, and every
 member inherits that voice. The work builds the **Loop** doc-type, a
-third bundle under `doc-types/` beside
+third directory under `doc-types/` beside
 [runbook/](/doc-types/runbook/index.md) and
 [standard/](/doc-types/standard/index.md), and then its first instance.
 
@@ -16,7 +16,7 @@ third bundle under `doc-types/` beside
 
 A Loop doc-type that is a full peer of Runbook and Standard under
 [Doc-Type](/doc-types/doc-type.md): operations, a composition rule, a
-shape, an encoding, and a residual ledger, in one bundle, with its row
+shape, an encoding, and a residual ledger, in one directory, with its row
 in the registry table and its entry in the roster of
 [Doc-Type System](/doc-types/doc-type-system.md). Then one loop that
 uses it.
@@ -44,6 +44,9 @@ uses it.
   is the picture. Both use the words of
   [Glossary](/worktree-loop-document-type-working-docs/glossary.md),
   one meaning each.
+- **Predicates are written one way.**
+  [Writing Predicates](/worktree-loop-document-type-working-docs/writing-predicates.md)
+  is how; it may become the Standard that governs it.
 - **Park, do not divert.** A stale or broken thing found on the way is
   recorded in
   [Stale Findings](/worktree-loop-document-type-working-docs/stale-findings.md)
@@ -73,7 +76,7 @@ uses it.
 - **The system.** Three DocTypes, ten verbs, in
   [Reference Model](/worktree-loop-document-type-working-docs/reference-model.md):
   the picture of the target state;
-  [Specification](/worktree-loop-document-type-working-docs/specification.md)
+  [Doc-Type Specification](/worktree-loop-document-type-working-docs/specification/doc-type.md)
   is the set. The refactor of Standard and Runbook toward them comes
   next, and before the first instance: no loop binds to the Standard
   as it is today.
@@ -103,7 +106,7 @@ uses it.
   [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
   Recorded in Three Peers.
-- **Shape, bundle, encoding, residual ledger.** Written to
+- **Shape, directory, encoding, residual ledger.** Written to
   `doc-types/loop/`: [Acts, Checks, and Yields](/doc-types/loop/contract-shape.md),
   its [encoding](/doc-types/loop/encoding.md), and the
   [ledger](/doc-types/loop/residual-ledger.md), seeded empty.

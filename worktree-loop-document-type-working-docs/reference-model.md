@@ -10,7 +10,7 @@ The target state of the doc-type system, drawn as a reference model:
 one picture of the system as it should be, in pseudocode. It is
 speculative, per
 [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md).
-[Specification](/worktree-loop-document-type-working-docs/specification.md)
+[Doc-Type Specification](/worktree-loop-document-type-working-docs/specification/doc-type.md)
 holds the predicates that define the set this is one member of.
 
 A markdown file is code in a fuzzy form, and the model that reads it
