@@ -3,7 +3,7 @@
 Renders every base-layer (and, with the python flag, python-layer) file for a
 new workspace repository from the canonical artifacts under
 ``standards/build/canonical/``, then runs the local setup steps: ``git init``,
-``uv lock``, staging, pre-commit hook installation, and a ``repo-lint``
+``uv lock``, staging, pre-commit hook installation, and a ``playbook-lint``
 self-check. The GitHub-side tail of the procedure is prose, not code:
 ``standards/build/bootstrap.md``.
 """
@@ -126,9 +126,11 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
 
     Steps: render and write the tree, ``git init -b main``, ``uv lock``
     (python layer only), stage everything, install both pre-commit stages,
-    then run ``repo-lint`` over the result. Raises ``RepoInitError`` if the
-    target already exists or the self-check reports findings; subprocess
-    failures propagate as ``CalledProcessError``.
+    then run ``playbook-lint`` over the result. The self-check is the whole
+    published hook, not one detector: the scaffold installs that hook, so a
+    narrower check could ship a tree its own first commit rejects. Raises
+    ``RepoInitError`` if the target already exists or the self-check reports
+    findings; subprocess failures propagate as ``CalledProcessError``.
     """
     target = parent / spec.name
     if target.exists():
@@ -140,12 +142,12 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
     _run(["git", "add", "-A"], target)
     _run(["uvx", "pre-commit", "install"], target)
     lint = subprocess.run(
-        [str(PLAYBOOK_ROOT / "scripts" / "repo-lint"), str(target)],
+        [str(PLAYBOOK_ROOT / "scripts" / "playbook-lint"), str(target)],
         cwd=target,
         check=False,
     )
     if lint.returncode != 0:
-        raise RepoInitError("repo-lint reported findings on the fresh scaffold")
+        raise RepoInitError("playbook-lint reported findings on the fresh scaffold")
     return target
 
 
@@ -221,6 +223,9 @@ def _bundle_index(spec: RepoSpec) -> str:
         "---\n"
         "\n"
         f"# {spec.name} — bundle index\n"
+        "\n"
+        f"Start here: the README states what {spec.name} is for, and each\n"
+        "directory of documents added later is listed below it.\n"
         "\n"
         f"- [{spec.name}](/README.md) — {spec.description}\n"
     )

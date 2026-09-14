@@ -22,9 +22,10 @@ It renders the [skeleton](/standards/build/skeleton.md) from the
 [canonical artifacts](/standards/build/canonical.md), pinning the hook
 `rev` at dev-playbook's `origin/main` as of init time, then runs
 `git init -b main` and `uv lock`, stages everything, installs both
-pre-commit stages, and self-checks the result with `repo-lint`. It fails
-loud when the target directory already exists or the self-check reports
-findings.
+pre-commit stages, and self-checks the result with `playbook-lint` — the
+same hook it just installed, so a scaffold that would fail its own first
+commit never reaches you. It fails loud when the target directory already
+exists or the self-check reports findings.
 
 The first commit is yours to make after review; the commit gate runs on it.
 

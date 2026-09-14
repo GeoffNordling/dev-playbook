@@ -7,7 +7,8 @@ skeleton — README.md, CLAUDE.md, index.md, .gitignore, the canonical
 CI — and, with --python, the python layer: canonical pyproject.toml,
 .python-version, src/<package>/ with an empty __init__.py, tests/, and a
 uv.lock. Then runs git init -b main, stages everything, installs both
-pre-commit stages, and self-checks the result with repo-lint. The remaining
+pre-commit stages, and self-checks the result with playbook-lint — the same
+hook it just installed. The remaining
 GitHub-side steps are the bootstrap procedure
 (standards/build/bootstrap.md). pyyaml is declared below because the module
 imports dev_playbook.prose_lint, which parses frontmatter.
