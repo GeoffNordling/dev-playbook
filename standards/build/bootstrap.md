@@ -64,8 +64,14 @@ commit gate at the new pin is the verification.
 
 Both paths finish on GitHub, in order:
 
-1. Fresh repo only: `gh repo create <owner>/<name> --source=. --push` —
-   pick the visibility flag deliberately.
+1. Fresh repo only: create the repository in the browser — pick the
+   visibility deliberately, and add no README, `.gitignore`, or license, so
+   the remote starts empty. Then `git remote add origin <url>` and push.
+   `gh repo create` is not the route: `createRepository` sits outside a
+   fine-grained PAT's reach ("Resource not accessible by personal access
+   token"). The PAT must carry the `workflow` scope, because the scaffold
+   ships `.github/workflows/ci.yml` and a push that adds a workflow file is
+   rejected without it.
 2. `~/workspace/dev-playbook/scripts/bootstrap-labels` — enforce the
    canonical label scheme.
 3. Set the merge settings and the default-branch protection ruleset by hand,
