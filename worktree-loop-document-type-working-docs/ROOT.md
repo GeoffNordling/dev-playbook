@@ -38,10 +38,12 @@ uses it.
   [Specifying a Loop](/worktree-loop-document-type-working-docs/specifying-a-loop.md)
   holds the forms.
 - **Both forms.** A target state is written twice: as a reference
-  model, the picture the user thinks in, and as predicates, which
-  describe the whole distribution and not one point in it.
+  model, the picture the user thinks in, and as a specification,
+  predicates that describe the whole set and not one member of it.
   [Reference Model](/worktree-loop-document-type-working-docs/reference-model.md)
-  is the picture.
+  is the picture. Both use the words of
+  [Glossary](/worktree-loop-document-type-working-docs/glossary.md),
+  one meaning each.
 - **Park, do not divert.** A stale or broken thing found on the way is
   recorded in
   [Stale Findings](/worktree-loop-document-type-working-docs/stale-findings.md)
@@ -52,9 +54,10 @@ uses it.
 - **Loop** — drives a state toward a target state by iteratively taking
   prescribed actions and validating against prescribed standards. The
   one-sentence definition; the shape carries its parts.
-- **Target state** — the ruleset a loop's checks measure against. What
-  the user wants beyond the ruleset is not a target state; it reaches
-  the loop only as guidance to an act that proposes predicates.
+- **Target state** — the set of states that satisfy the spec a loop's
+  checks measure against. What the user wants beyond the spec is not a
+  target state; it reaches the loop only as guidance to an act that
+  proposes predicates.
 - **Findings** — what a check returns: each names a member and the
   rule it fails. The loop's working state; acts read them.
 - **Yield** — the third operation: a loop's programmed exit to
