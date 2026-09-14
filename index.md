@@ -10,6 +10,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
+- [Synthesis Notes](/SYNTHESIS-2026-09-14.md) — The record of one synthesis session across the loop and cloa branches — the branches are one theory, ontology solvers against pseudocode, and deterministic separation of stochastic chains — with what was decided and what was left open
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories
