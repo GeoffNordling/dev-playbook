@@ -37,6 +37,11 @@ uses it.
   an instruction.
   [Specifying a Loop](/worktree-loop-document-type-working-docs/specifying-a-loop.md)
   holds the forms.
+- **Both forms.** A target state is written twice: as a reference
+  model, the picture the user thinks in, and as predicates, which
+  describe the whole distribution and not one point in it.
+  [Reference Model](/worktree-loop-document-type-working-docs/reference-model.md)
+  is the picture.
 - **Park, do not divert.** A stale or broken thing found on the way is
   recorded in
   [Stale Findings](/worktree-loop-document-type-working-docs/stale-findings.md)
@@ -62,6 +67,10 @@ uses it.
 
 ## Planned
 
+- **The system.** Three DocTypes, ten verbs, in
+  [Reference Model](/worktree-loop-document-type-working-docs/reference-model.md):
+  the picture of the target state. Its predicates are next; the
+  refactor of Standard and Runbook toward it comes after both.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
   system. Its checks point at the Audit cell of a standard for the
   system's target state, aspirational, audited, never gated, that does
