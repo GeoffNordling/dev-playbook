@@ -68,12 +68,16 @@ predicates.
   distribution.
 - **Sample** — one state an act did leave behind: one draw from its
   distribution.
-- **Loop** — a trajectory of samples that ends when one lands in the
-  set or when a yield's condition holds first. Each sample starts from the last, with its findings in the
-  prompt, so the samples are not independent: the trajectory is a
-  path through state space. Check audits the
-  sample, act draws the next one, yield exits to the user or another
-  loop.
+- **Loop** — drives a state toward a target state by iteratively
+  taking prescribed actions and validating against prescribed
+  standards, the one sentence of
+  [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md#terms).
+  In this vocabulary: a trajectory of samples that ends when one lands
+  in the set or when a yield's condition holds first. Each sample
+  starts from the last, with its findings in the prompt, so the
+  samples are not independent: the trajectory is a path through state
+  space. Check audits the sample, act draws the next one, yield exits
+  to the user or another loop.
 
 The two vocabularies meet at one seam. Predicates define a set, with
 no probabilities attached. An act is a draw from a distribution over

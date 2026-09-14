@@ -1,13 +1,13 @@
 ---
 type: General-Sheet
 title: Writing Predicates
-description: How to write a rule so a verifier can decide it — one member, one moment, one bool, the file it reads named, no enforcement, no new nouns, and the questions to ask before accepting one
+description: How to write a rule so a verifier can decide it — one member, one moment, one bool, the property not the witness, the file it reads named, what not how, the future not the past, no new nouns, the trailer, and what is not a predicate
 ---
 
 # Writing Predicates
 
-A predicate is a statement about one member of a population at one
-moment that is true or false of it. A specification is a set of them,
+A predicate, per [Glossary](/worktree-loop-document-type-working-docs/glossary.md), is a statement about one member at
+one moment that is true or false of it. A specification is a set of them,
 and a state satisfies the specification when every predicate holds.
 This guide is how to write one so that a script or a judge can decide
 it, learned from the corrections made while writing the doc-type

@@ -130,7 +130,7 @@ the standard's.
 
 What the picture has no place for, and where each thing goes:
 
-- **Standard-Card and its four cells.** Define is the ruleset files
+- **Standard-Card and its four cells.** Define is the Standard files
   themselves, listed by the directory index. Audit is the verifier
   table. Enforce is each boundary's list of rule ids, read from
   config. Adopt is not a primitive; its pointers today are build's
@@ -139,7 +139,8 @@ What the picture has no place for, and where each thing goes:
   runbooks that were never adoptions and stay runbooks with no pointer
   from the standard; and `consuming.md`, a guide that stays a guide,
   listed by its directory index.
-- **Ruleset as a second object.** The Standard file is the ruleset.
+- **Ruleset as a second object.** There is one object; the Standard
+  file holds the rules.
 - **Condition as its own type.** A rule another rule is under.
 - **`args` and `never` as verbs.** `accept` is the verb for args; a
   ban is a polarity on a write edge.
