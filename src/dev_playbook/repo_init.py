@@ -3,7 +3,7 @@
 Renders every base-layer (and, with the python flag, python-layer) file for a
 new workspace repository from the canonical artifacts under
 ``standards/build/canonical/``, then runs the local setup steps: ``git init``,
-``uv lock``, staging, pre-commit hook installation, and a ``repo-lint``
+``uv lock``, staging, pre-commit hook installation, and a ``playbook-lint``
 self-check. The GitHub-side tail of the procedure is prose, not code:
 ``standards/build/bootstrap.md``.
 """
@@ -103,9 +103,11 @@ def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
         )
         tree[".python-version"] = canonical(".python-version")
         tree[f"src/{spec.package}/__init__.py"] = ""
-        # tests/ must be non-empty once src/ exists; conftest.py is the one
-        # pytest file exempt from the mirror-layout rule.
-        tree["tests/conftest.py"] = ""
+        # tests/ must be non-empty once src/ exists, and `make check` runs
+        # pytest, which exits 5 on a suite with no tests — so the scaffold
+        # ships one real test rather than an empty conftest.py. Its stem names
+        # no src module, so mirror-layout does not govern its placement.
+        tree["tests/test_package.py"] = _package_test(spec)
     else:
         tree["Makefile"] = canonical("Makefile.base")
     return tree
@@ -124,9 +126,11 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
 
     Steps: render and write the tree, ``git init -b main``, ``uv lock``
     (python layer only), stage everything, install both pre-commit stages,
-    then run ``repo-lint`` over the result. Raises ``RepoInitError`` if the
-    target already exists or the self-check reports findings; subprocess
-    failures propagate as ``CalledProcessError``.
+    then run ``playbook-lint`` over the result. The self-check is the whole
+    published hook, not one detector: the scaffold installs that hook, so a
+    narrower check could ship a tree its own first commit rejects. Raises
+    ``RepoInitError`` if the target already exists or the self-check reports
+    findings; subprocess failures propagate as ``CalledProcessError``.
     """
     target = parent / spec.name
     if target.exists():
@@ -138,12 +142,12 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
     _run(["git", "add", "-A"], target)
     _run(["uvx", "pre-commit", "install"], target)
     lint = subprocess.run(
-        [str(PLAYBOOK_ROOT / "scripts" / "repo-lint"), str(target)],
+        [str(PLAYBOOK_ROOT / "scripts" / "playbook-lint"), str(target)],
         cwd=target,
         check=False,
     )
     if lint.returncode != 0:
-        raise RepoInitError("repo-lint reported findings on the fresh scaffold")
+        raise RepoInitError("playbook-lint reported findings on the fresh scaffold")
     return target
 
 
@@ -202,6 +206,16 @@ def _readme(spec: RepoSpec) -> str:
     )
 
 
+def _package_test(spec: RepoSpec) -> str:
+    return (
+        f"import {spec.package}\n"
+        "\n"
+        "\n"
+        "def test_package_imports() -> None:\n"
+        f'    assert {spec.package}.__name__ == "{spec.package}"\n'
+    )
+
+
 def _bundle_index(spec: RepoSpec) -> str:
     return (
         "---\n"
@@ -209,6 +223,9 @@ def _bundle_index(spec: RepoSpec) -> str:
         "---\n"
         "\n"
         f"# {spec.name} — bundle index\n"
+        "\n"
+        f"Start here: the README states what {spec.name} is for, and each\n"
+        "directory of documents added later is listed below it.\n"
         "\n"
         f"- [{spec.name}](/README.md) — {spec.description}\n"
     )

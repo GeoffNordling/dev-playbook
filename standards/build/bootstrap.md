@@ -22,9 +22,10 @@ It renders the [skeleton](/standards/build/skeleton.md) from the
 [canonical artifacts](/standards/build/canonical.md), pinning the hook
 `rev` at dev-playbook's `origin/main` as of init time, then runs
 `git init -b main` and `uv lock`, stages everything, installs both
-pre-commit stages, and self-checks the result with `repo-lint`. It fails
-loud when the target directory already exists or the self-check reports
-findings.
+pre-commit stages, and self-checks the result with `playbook-lint` — the
+same hook it just installed, so a scaffold that would fail its own first
+commit never reaches you. It fails loud when the target directory already
+exists or the self-check reports findings.
 
 The first commit is yours to make after review; the commit gate runs on it.
 
@@ -63,8 +64,14 @@ commit gate at the new pin is the verification.
 
 Both paths finish on GitHub, in order:
 
-1. Fresh repo only: `gh repo create <owner>/<name> --source=. --push` —
-   pick the visibility flag deliberately.
+1. Fresh repo only: create the repository in the browser — pick the
+   visibility deliberately, and add no README, `.gitignore`, or license, so
+   the remote starts empty. Then `git remote add origin <url>` and push.
+   `gh repo create` is not the route: `createRepository` sits outside a
+   fine-grained PAT's reach ("Resource not accessible by personal access
+   token"). The PAT must carry the `workflow` scope, because the scaffold
+   ships `.github/workflows/ci.yml` and a push that adds a workflow file is
+   rejected without it.
 2. `~/workspace/dev-playbook/scripts/bootstrap-labels` — enforce the
    canonical label scheme.
 3. Set the merge settings and the default-branch protection ruleset by hand,
