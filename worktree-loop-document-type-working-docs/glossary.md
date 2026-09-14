@@ -29,9 +29,9 @@ predicates.
   predicate text, and an optional condition. A rule is about one
   member; the Standard lifts it to the state: every member of the
   population satisfies it.
-- **Condition** — a rule used as a guard. Where the guard is false the
-  guarded rule is not evaluated, so its set widens to include those
-  states.
+- **Condition** — a rule another rule is under. Where the condition is
+  false the rule under it is not evaluated, so its set widens to
+  include those states. The word is condition, never guard.
 - **Population** — the class of targets a Standard's rules range over.
 - **Specification** — a set of predicates taken together. It defines
   the intersection of their sets. A Standard is a spec written as a
@@ -69,8 +69,8 @@ predicates.
 - **Sample** — one state an act did leave behind: one draw from its
   distribution.
 - **Loop** — a trajectory of samples that ends when one lands in the
-  set or when a yield's condition holds first. Each sample starts from the last and is conditioned on its
-  findings, so the samples are not independent: the trajectory is a
+  set or when a yield's condition holds first. Each sample starts from the last, with its findings in the
+  prompt, so the samples are not independent: the trajectory is a
   path through state space. Check audits the
   sample, act draws the next one, yield exits to the user or another
   loop.
@@ -78,7 +78,7 @@ predicates.
 The two vocabularies meet at one seam. Predicates define a set, with
 no probabilities attached. An act is a draw from a distribution over
 states, and the draw lands in the set or outside it. A loop does not
-change the LLM; it changes what the next draw is conditioned on:
+change the LLM; it changes what the next draw is given:
 check finds where the last sample fell outside, act draws again with
 those findings in the prompt, so successive samples land in the set
 more often. Deterministic rules decide membership exactly; stochastic

@@ -72,8 +72,11 @@ uses it.
 
 - **The system.** Three DocTypes, ten verbs, in
   [Reference Model](/worktree-loop-document-type-working-docs/reference-model.md):
-  the picture of the target state. Its predicates are next; the
-  refactor of Standard and Runbook toward it comes after both.
+  the picture of the target state;
+  [Specification](/worktree-loop-document-type-working-docs/specification.md)
+  is the set. The refactor of Standard and Runbook toward them comes
+  next, and before the first instance: no loop binds to the Standard
+  as it is today.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
   system. Its checks point at the Audit cell of a standard for the
   system's target state, aspirational, audited, never gated, that does
@@ -89,6 +92,10 @@ uses it.
 - **The standard.** Written before the loop, by the user and the
   agent, one predicate at a time; the loop grows it after. A predicate
   lands in a ruleset as a rule: a name, a condition, and the predicate.
+- **Ban the word guard.** A second entry in
+  prose-lint's banned-word rule, so the agent's habit is caught at the
+  commit boundary rather than by the user. The glossary's Condition
+  entry is the rule; the detector comes with the implementation plan.
 
 ## Completed
 
