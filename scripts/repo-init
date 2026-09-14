@@ -9,10 +9,12 @@ CI — and, with --python, the python layer: canonical pyproject.toml,
 uv.lock. Then runs git init -b main, stages everything, installs both
 pre-commit stages, and self-checks the result with repo-lint. The remaining
 GitHub-side steps are the bootstrap procedure
-(standards/build/bootstrap.md).
+(standards/build/bootstrap.md). pyyaml is declared below because the module
+imports dev_playbook.prose_lint, which parses frontmatter.
 """
 # /// script
 # requires-python = ">=3.14"
+# dependencies = ["pyyaml>=6.0"]
 # ///
 
 import sys
