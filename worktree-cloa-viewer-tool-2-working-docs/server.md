@@ -10,7 +10,9 @@ The server is the one program that makes the page exist: it generates
 the view files, watches them, and serves the page that shows them. The
 files it writes are the
 [Contract](/worktree-cloa-viewer-tool-2-working-docs/contract.md) and the
-generators it runs are the
+extractors it runs are the
+[Fact Base](/worktree-cloa-viewer-tool-2-working-docs/fact-base.md#extractors)
+and the kinds it selects are the
 [Registry](/worktree-cloa-viewer-tool-2-working-docs/registry.md). What
 it is built with is the
 [Stack](/worktree-cloa-viewer-tool-2-working-docs/stack.md). The parent is
@@ -46,11 +48,12 @@ chosen on the page, not on the command line.
   and do it again each time the page asks for the list. A checkout that
   appeared is refreshed and watched; one that vanished is dropped, its
   watcher stopped, and its state directory removed.
-- **Refresh** — run every registered generator for a checkout, validate
-  each view file against the envelope and its kind schema before writing
-  it, and write the refresh record.
+- **Refresh** — run the extractors and rules to write the checkout's
+  fact base, then every registered kind's selection, validating each
+  view file against the envelope and its kind schema before writing it,
+  and write the refresh record.
 - **Watch the checkout** — on any change to a tracked file, wait a short
-  settle time, then refresh. Each current generator runs in under a
+  settle time, then refresh. Each current extractor runs in under a
   tenth of a second on this repo, so a full refresh on every change is
   affordable. A checkout that lies inside another, a worktree
   under the main checkout's `.claude/worktrees/`, is watched on its own

@@ -94,10 +94,12 @@ writes it. It has a schema like any other file here.
 ## The refresh record
 
 `refresh.json` is the outcome of the last refresh: when it ran, at which
-commit, and for each registered kind whether its generator succeeded,
-how many view files it wrote, and the error text when it failed. On
-success a generator's output replaces its kind's files whole; on failure
-those files stay as they were and the record carries the error.
+commit, whether the fact base was written, and for each registered
+kind whether its selection succeeded, how many view files it wrote, and
+the error text when it failed. On success a kind's output replaces its
+files whole; on failure those files stay as they were and the record
+carries the error. A failed extractor fails the fact base, and every
+kind with it.
 
 ## Failure rules
 
@@ -109,8 +111,8 @@ those files stay as they were and the record carries the error.
   a stale badge showing both commits. The server reports HEAD; the
   viewer compares.
 - A lost connection to the server shows a banner until it returns.
-- A failed generator turns the refresh status red, with the error text
-  one click away.
+- A failed extractor or kind turns the refresh status red, with the
+  error text one click away.
 
 ## Acronyms
 

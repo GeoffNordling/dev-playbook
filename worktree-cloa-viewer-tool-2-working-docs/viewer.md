@@ -18,7 +18,8 @@ the panels it can draw are the
 Three fixed regions, none movable in v1:
 
 - **Top bar** — the checkout toggle, the refresh button, and the status:
-  connection, last refresh time and commit, and failed generators.
+  connection, last refresh time and commit, and failed extractors or
+  kinds.
 - **Left** — the tree.
 - **Center** — a vertical stack of open panels. Each panel has its title,
   its stale badge when stale, a pin, and a close.
@@ -82,7 +83,7 @@ checkout the server was not given this run stay on disk and off screen.
 Refresh is automatic: the server refreshes a checkout when a tracked
 file in it changes. The button forces one. The status shows the last
 refresh's time and commit and turns red when the refresh record has a
-failed generator; clicking it shows the error text.
+failed extractor or kind; clicking it shows the error text.
 
 ## Failure on screen
 
@@ -90,7 +91,7 @@ The failure rules in the Contract look like this on screen: a red panel
 in the place of a view file that failed validation, naming the file and
 the field; a banner across the top while the connection is lost; a badge
 on a panel whose commit is behind the checkout's HEAD, showing both; a
-red refresh status for a failed generator; and a red `Not indexed` row
+red refresh status for a failed extractor or kind; and a red `Not indexed` row
 in the tree. A link badge reading `decision-record` is not a failure and
 is not red: it says the source is immutable and its target has moved on.
 

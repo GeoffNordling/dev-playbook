@@ -19,7 +19,7 @@ slugs, and the tracked file list. The server's own dependencies stay out
 of what a repo that depends on dev-playbook installs.
 
 TypeScript and React on the page side, built once into static files the
-server serves. A graph library arrives with the force-graph kind, not
+server serves. A graph library arrives with the dependency graph view, not
 before.
 
 JSON Schema is the bridge: the server validates before it writes, the
@@ -27,9 +27,9 @@ page validates before it renders, both against the same files.
 
 ## Package shape
 
-The guess: one module per kind under
-`src/dev_playbook/cloa_viewer/kinds/`, the schemas in one `schemas/`
-directory beside them, and the page under `web/` inside the package with
+The guess: one module per extractor under
+`src/dev_playbook/cloa_viewer/extractors/`, one module per kind under
+`kinds/`, the schemas in one `schemas/` directory beside them, and the page under `web/` inside the package with
 one renderer directory per kind. Library choices are made at the
 first build, not here.
 
