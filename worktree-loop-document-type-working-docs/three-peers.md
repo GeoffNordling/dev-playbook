@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Three Peers
-description: Runbook, Standard, and Loop as peer doc-types — their one-sentence definitions, the parallel between them today, and where Loop stands
+description: Runbook, Standard, and Loop as peer doc-types — their one-sentence definitions, the parallel between them in the target state, and where Loop stands
 ---
 
 # Three Peers
@@ -27,43 +27,35 @@ their directories carry today; Loop's is new.
 > prescribed actions and validating against prescribed standards.
 
 The verbs are the contrast: a runbook is *invoked*, a standard is
-*held to*, a loop *drives*. A standard is defined, audited, enforced,
-and adopted, and has no notion of moving toward its state; its audit is
-what a loop's check composes.
+*held to*, a loop *drives*. A standard holds and has no notion of
+moving toward its state; a loop's check audits against it.
 
-## The parallel today
+## The parallel
 
-What each peer looks like on disk, from the three directories ([Doc-Type System](/doc-types/doc-type-system.md#the-bundle)):
+What each peer looks like on disk in the target state, per
+[Reference Model](/worktree-loop-document-type-working-docs/reference-model.md),
+each directory laid out as
+[Doc-Type System](/doc-types/doc-type-system.md) says:
 
 | | Runbook | Standard | Loop |
 |---|---|---|---|
-| Family | every skill and agent definition | one directory per Standard under `standards/` | files typed `Loop` under `loops/` |
-| Definition | `definition.md` | `definition.md` | `definition.md` |
-| Kinds | Skill, Agent definition | Standard-Card, Standard-Ruleset | Loop |
-| Operations | read, write, do, override, never, args, report | define, audit, enforce, adopt | act, check, yield |
-| Shape | the Reference chain: nodes and labeled edges | four cells; under Define, one population and its rules | acts, checks, and yields, iterated |
-| Composition rule | any number of edges, coarsely ordered | one cell each, any number of pointers; one population, any number of rules per ruleset | any number of acts, checks, and yields, in iteration order |
-| Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | card: H2 per cell, one pointer per bullet; ruleset: frontmatter `population`, H2 rule, H2+H3 condition | one Mermaid block; H2 Acts, Checks, Yields, one entry per node |
-| Generator and view | `scripts/chaingen` → `chains.txt` | `scripts/cardgen` → `cards.txt`; `scripts/rulegen` → `standards.txt` | none; the Mermaid block in each instance is the view |
-| Residual ledger | `residual-ledger.md` | `residual-ledger.md` | `residual-ledger.md` |
-| Obligation card | `harness/runbook-conventions` | `standard/`, the Meta-Standard | `knowledge-organization/loop-conventions` |
+| Family | `skills/<name>/SKILL.md`, `agents/<name>.md` | `standards/<name>/<topic>.md` | `loops/<name>.md` |
+| Operations | read, write, do, override, accept, report | hold | act, check, yield |
+| Parts | Edge: operation, target, condition, banned | Rule: id, kind, predicate, condition | Act, Check, Yield: pointer, condition |
+| Composition rule | any number of edges, coarsely ordered | one population, any number of rules | any number of steps, in iteration order |
+| Encoding | `{Read …}` `{Run …}` `{If …, {…}}` spans in prose | frontmatter `population`; H2 rule; H3 rule under its condition; id and kind after the predicate | one Mermaid block; H2 Acts, Checks, Yields, one entry per step |
+| Conventions Standard | `harness/runbook-conventions` | `standard/`, the Meta-Standard | `knowledge-organization/loop-conventions` |
 
 ## The first instance's standard
 
-The first instance needs a standard for the target state of
-the doc-type system, aspirational, audited, not gated. What it must
-say, so far:
-
-- **Minimal verbs.** An objective, not a predicate: the fewest verbs
-  and operations that suffice, descended one accepted merge at a time.
-- **Two views that agree.** The simple verbs are one view of the world
-  and the contract-shape pseudocode is another. They need not match one
-  to one, but every pseudocode object across every directory must make
-  sense when put together, one `Object`, one `Condition`, one set of
-  pointers between them.
-- **Both forms in the doc-type, the graph in the instance.** A loop's
-  directory carries pseudocode and graph; a loop instance is drawn as a
-  graph.
+The
+[specification](/worktree-loop-document-type-working-docs/specification/index.md)
+is the first instance's standard, written as working-set members
+until Standard has its new shape. What it does not hold, because a
+spec is predicates only: the objective, complexity minimized, the
+fewest doc-types, the fewest verbs, the fewest shared verbs, descended
+one accepted step at a time. Where an objective lives in a Loop is
+open, in [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md#planned).
 
 ## Loop today
 
@@ -81,7 +73,7 @@ say, so far:
   instance.
 - **Three verbs.** Loop's operations are read off its sentence: *act*,
   a prescribed action, a pointer at a runbook; *check*, a prescribed
-  standard, a pointer at `Standard.audit`; *yield*, a programmed
+  standard, a pointer at a Standard; *yield*, a programmed
   exit. Composition: any number of acts, checks, and yields, in
   iteration order.
 - **No target operation.** A target state is "this population passes
@@ -89,19 +81,16 @@ say, so far:
   are the distance and the direction: each names a member and the rule
   it fails, and the applying act reads nothing else
   ([Specifying a Loop](/worktree-loop-document-type-working-docs/specifying-a-loop.md#the-loop-that-proposes)).
-- **A check composes `Standard.audit`, not the Standard.** A card's
-  four cells are separable, and what a check points at is the audit
-  cell: the auditors that measure a population against the Standard's
-  rules and return findings. A check never points at the Standard
-  document, which only defines, and never at the enforce cell, which
-  gates. So a standard that is defined and audited but not gated is
-  aspirational, which is what most loop targets are; a loop is out of
-  standard until its last step, and many never get there.
+- **A check points at a Standard; the toolchain audits.** The Standard
+  holds the rules; `audit` is the toolchain's, and it routes each rule
+  id to its verifier and returns findings. Which boundaries also run
+  those ids is the boundaries' wiring, so a Standard no repo boundary
+  runs is aspirational, which is what most loop targets are; a loop is
+  out of standard until its last step, and many never get there.
 - **Loop composes the other two peers, by pointer.** An act points at
   a runbook, whole: a runbook is one move. A check points at a
-  standard's audit, `Standard.audit`, the one cell of the four: an audit
-  is one measurement. A loop is moves and measurements iterated toward
-  a target.
+  Standard, whole: an audit is one measurement. A loop is moves and
+  measurements iterated toward a target.
 - **A Loop instance is a document, not code.** A `.js` workflow file is
   a JS file. The Loop doc-type sits one level of abstraction above any
   runtime. When the `.claude/workflows/*.js` row of the registry is

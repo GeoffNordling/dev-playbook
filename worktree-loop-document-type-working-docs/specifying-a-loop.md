@@ -21,10 +21,11 @@ A predicate says what is true of a member. It does not say why, which
 is the rule's reason, and it does not say how to fix it, which is a
 runbook's.
 
-The evaluator may be deterministic code or a model returning a value.
-A model judge over one member is still a predicate; it cannot hold a
-gate, but a loop's check composes a standard's Audit cell, never its
-gate.
+The verifier is a script or a judge; a rule a judge decides is
+stochastic and still a predicate. A loop's check audits it like any
+other; whether a repo boundary also runs it is that boundary's wiring.
+[Writing Predicates](/worktree-loop-document-type-working-docs/writing-predicates.md)
+is how one is written.
 
 ## The three written forms
 
@@ -35,7 +36,7 @@ takes one of three forms:
 | Form | Lifetime | Home | Example |
 |---|---|---|---|
 | **Goal** | one issue | an issue with acceptance criteria | write `loops/doc-type-system.md` |
-| **Predicate** | standing | a rule in a ruleset | every `definition.md` has a verbs list |
+| **Predicate** | standing | a rule in a Standard | every `definition.md` has a verbs list |
 | **Objective** | standing | a scalar pushed down under the predicates | the fewest verbs across the roster |
 
 Acceptance criteria are predicates with a lifetime of one issue. An
@@ -51,16 +52,16 @@ an agent does it later.
 
 ## The loop that proposes
 
-The user's intent is never handed to a loop. The ruleset is its written
-approximation, grown one predicate at a time, and the loop has two
-motions against it:
+The user's intent is never handed to a loop. The Standard is its
+written approximation, grown one predicate at a time, and the loop has
+two motions against it:
 
 ```
                        the user's intent
                               │ approximated, one predicate at a time
                               ▼
         ┌──────────────────────────────────────────────┐
-        │  RULESET   the accepted predicates, as rules │
+        │  STANDARD  the accepted predicates, as rules │
         └──────┬───────────────────────────▲───────────┘
                │ checks read               │ an accepted predicate lands
    ┌───────────┼───────────────────────────┼─────────────┐
@@ -76,7 +77,7 @@ motions against it:
    └───────────────────────────┼───────────┼─────────────┘
                                ▼           │
                         the user: yes ─────┘
-                                  no ────► rulings, never re-proposed
+                                  no ────► kept with its reason, never re-proposed
 ```
 
 - **Soft guidance and hard predicates go to different acts.** Words such
@@ -85,11 +86,13 @@ motions against it:
 - **Proposals are predicates, never edits.** Rejecting a predicate
   costs the user five lines; rejecting a diff costs an hour. The loop
   cannot change the system without a predicate authorizing it.
-- **Two buckets.** A cited proposal names where the predicate is
+- **Two kinds.** A cited proposal names where the predicate is
   already stated or implied. An invented one says so. The user triages them at
   different speeds.
-- **A no is recorded.** Rejected proposals live in a rulings list so
-  the loop's memory is the ruleset and the rulings, never a transcript.
+- **A no is a predicate waiting to be written.** A rejected proposal
+  is kept with its reason, and the reason is itself a candidate
+  predicate, about the ideas rather than the files. The loop's memory
+  is the Standard and the rejections, never a transcript.
 - **One loop.** Propose and apply share a loop until the applying act is
   large enough to run unattended for hours; then it is its own loop.
 - **The residue.** Intent that resists every form stays the user's. The

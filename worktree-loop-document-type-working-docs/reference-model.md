@@ -22,7 +22,7 @@ from structure embedded in the files.
 ## The system
 
 The doc-types are the language; the toolchain is the code that
-parses, verifies, gates, and views them. Both halves are the system.
+parses, verifies, and gates them. Both halves are the system.
 
 ### The language
 
@@ -102,7 +102,6 @@ Target = DocType | File | Issue | PullRequest | External   # what an edge lands 
 verifiers: dict[RuleId, Script | Judge]      # the one sync point: every rule id has a verifier
 def audit(standard, state) -> list[Finding]  # parse the file, route each id, skip where the condition fails, collect failures
 boundary: commit hook | make check | CI | a loop's check     # each names the rule ids it runs
-views: chains.txt (runbook edges), rules.txt (rule id, kind, verifier, boundaries), a loop's own graph
 ```
 
 Runbook is invoked, Standard is held to, Loop drives. Ten verbs
@@ -133,7 +132,7 @@ What the picture has no place for, and where each thing goes:
 
 - **Standard-Card and its four cells.** Define is the ruleset files
   themselves, listed by the directory index. Audit is the verifier
-  table. Enforce is the boundary column of the rules view, read from
+  table. Enforce is each boundary's list of rule ids, read from
   config. Adopt is not a primitive; its pointers today are build's
   bootstrap guide and skill, a runbook that stays where it is and is
   reached from the directory index; harness's and modules's pointers,
@@ -143,8 +142,7 @@ What the picture has no place for, and where each thing goes:
 - **Ruleset as a second object.** The Standard file is the ruleset.
 - **Condition as its own type.** A rule another rule is under.
 - **`args` and `never` as verbs.** `accept` is the verb for args; a
-  ban is a polarity on a write edge, drawn in the chain view as it is
-  today.
+  ban is a polarity on a write edge.
 - **`Object`.** Renamed `DocType`, which is what it was.
 - **Spec, Deviation, Predicate as objects.** A standard written for
   one run, a finding an act left standing, and the first paragraph of
