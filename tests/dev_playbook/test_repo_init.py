@@ -79,8 +79,21 @@ def test_python_layer_adds_the_project_and_package_files() -> None:
 
     assert 'name = "sample-lib"' in tree["pyproject.toml"]
     assert "src/sample_lib/__init__.py" in tree
-    assert "tests/conftest.py" in tree
     assert ".python-version" in tree
+
+
+def test_python_layer_ships_a_test_that_imports_the_package() -> None:
+    # `make check` runs pytest, which exits 5 when no test is collected, so a
+    # suite with no tests cannot pass the gate the scaffold installs.
+    tree = render_tree(PY_SPEC, REV)
+
+    assert tree["tests/test_package.py"] == (
+        "import sample_lib\n"
+        "\n"
+        "\n"
+        "def test_package_imports() -> None:\n"
+        '    assert sample_lib.__name__ == "sample_lib"\n'
+    )
 
 
 def test_base_layer_omits_the_python_project() -> None:

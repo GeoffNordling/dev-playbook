@@ -103,9 +103,11 @@ def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
         )
         tree[".python-version"] = canonical(".python-version")
         tree[f"src/{spec.package}/__init__.py"] = ""
-        # tests/ must be non-empty once src/ exists; conftest.py is the one
-        # pytest file exempt from the mirror-layout rule.
-        tree["tests/conftest.py"] = ""
+        # tests/ must be non-empty once src/ exists, and `make check` runs
+        # pytest, which exits 5 on a suite with no tests — so the scaffold
+        # ships one real test rather than an empty conftest.py. Its stem names
+        # no src module, so mirror-layout does not govern its placement.
+        tree["tests/test_package.py"] = _package_test(spec)
     else:
         tree["Makefile"] = canonical("Makefile.base")
     return tree
@@ -199,6 +201,16 @@ def _readme(spec: RepoSpec) -> str:
         f"# {spec.name}\n"
         "\n"
         f"{spec.description}\n"
+    )
+
+
+def _package_test(spec: RepoSpec) -> str:
+    return (
+        f"import {spec.package}\n"
+        "\n"
+        "\n"
+        "def test_package_imports() -> None:\n"
+        f'    assert {spec.package}.__name__ == "{spec.package}"\n'
     )
 
 
