@@ -14,8 +14,10 @@ between them. It is speculative, per
 
 ## The three sentences
 
-Each doc-type is one sentence. Runbook's and Standard's are the ones
-their directories carry today; Loop's is new.
+Each doc-type is one sentence, quoted from its directory:
+[Runbook](/doc-types/runbook/definition.md),
+[Standard](/doc-types/standard/definition.md),
+[Loop](/doc-types/loop/definition.md).
 
 > A **runbook** is an invocable command written as documentation: a
 > skill or an agent definition.
@@ -52,14 +54,14 @@ The
 [specification](/worktree-loop-document-type-working-docs/specification/index.md)
 is the first instance's standard, written as working-set members
 until Standard has its new shape. What it does not hold, because a
-spec is predicates only: the objective, complexity minimized, the
-fewest doc-types, the fewest verbs, the fewest shared verbs, descended
-one accepted step at a time. Where an objective lives in a Loop is
-open, in [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md#planned).
+spec is predicates only: the objective, complexity minimized,
+lexicographic, residuals then doc-types then verbs then shared verbs.
+Whether Loop gains a part for it is open, in
+[ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md#planned).
 
 ## Loop today
 
-- **The definition** is the sentence above. Shorter is better; the
+- **The definition is the sentence above.** Shorter is better; the
   definition carries the kind, the shape carries the parts. Runbook's
   sentence names no reports or effects for the same reason.
 - **Yield is an operation, programmed, not derived.** An instance

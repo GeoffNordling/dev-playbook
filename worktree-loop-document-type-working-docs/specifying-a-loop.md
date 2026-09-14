@@ -11,12 +11,9 @@ How work reaches a loop when the user is not there. Speculative, per
 
 ## The predicate
 
-A **predicate**, per [Glossary](/worktree-loop-document-type-working-docs/glossary.md), is a statement about one member
-at one moment that is true or false of it: one member, one moment, one
-bool. The litmus is
-whether it can be written `def rule(member) -> bool` with no taste, no
-comparison to other members, and no history. If two careful reviewers
-could disagree, it is not yet a predicate.
+A **predicate** is defined in [Glossary](/worktree-loop-document-type-working-docs/glossary.md), and
+[Writing Predicates](/worktree-loop-document-type-working-docs/writing-predicates.md#the-litmus) holds the
+litmus a candidate passes before it is one.
 
 A predicate says what is true of a member. It does not say why, which
 is the rule's reason, and it does not say how to fix it, which is a

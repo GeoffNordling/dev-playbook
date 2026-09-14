@@ -11,6 +11,8 @@ member inherits that voice. The work builds the **Loop** doc-type, a
 third directory under `doc-types/` beside
 [runbook/](/doc-types/runbook/index.md) and
 [standard/](/doc-types/standard/index.md), and then its first instance.
+The user's own words on the work are kept verbatim in
+[Personal Notes](/worktree-loop-document-type-working-docs/personal-notes.md) for use outside the set.
 
 ## Goal
 
@@ -54,21 +56,16 @@ uses it.
 
 ## Terms
 
-- **Loop** — drives a state toward a target state by iteratively taking
-  prescribed actions and validating against prescribed standards. The
-  one-sentence definition; the shape carries its parts.
-- **Target state** — the set of states that satisfy the spec a loop's
-  checks measure against. What the user wants beyond the spec is not a
-  target state; it reaches the loop only as guidance to an act that
-  proposes predicates.
-- **Findings** — what a check returns: each names a member and the
-  rule it fails. The loop's working state; acts read them.
+- **Loop** — the one sentence of [Loop](/doc-types/loop/definition.md); the shape carries its
+  parts.
+- **Target state** — per [Glossary](/worktree-loop-document-type-working-docs/glossary.md): the set a loop's checks
+  measure against.
+- **Finding** — per [Glossary](/worktree-loop-document-type-working-docs/glossary.md): what a check returns and an act
+  reads.
 - **Yield** — the third operation: a loop's programmed exit to
   something outside it, another loop or the user. An instance writes
   "yields when …"; the when is the instance's.
-- **Predicate** — a statement about one member at one moment that is
-  true or false of it, per
-  [Glossary](/worktree-loop-document-type-working-docs/glossary.md).
+- **Predicate** — per [Glossary](/worktree-loop-document-type-working-docs/glossary.md).
   [Specifying a Loop](/worktree-loop-document-type-working-docs/specifying-a-loop.md#the-three-written-forms)
   holds the three written forms, goal, predicate, and objective;
   [Writing Predicates](/worktree-loop-document-type-working-docs/writing-predicates.md)
@@ -172,8 +169,7 @@ uses it.
 
 ## Completed
 
-- **One-sentence definition.** Settled; recorded in Terms and in
-  [Three Peers](/worktree-loop-document-type-working-docs/three-peers.md).
+- **One-sentence definition.** Settled; it opens [Loop](/doc-types/loop/definition.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
   Recorded in Three Peers.
 - **Shape, directory, encoding, residual ledger.** Written to

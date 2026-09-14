@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Reference Model
-description: The doc-type system's target state as a reference model — three DocTypes, ten verbs, the parts each composes, and how they fit, in pseudocode
+description: The doc-type system's target state as a reference model — three DocTypes, ten verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
 ---
 
 # Reference Model
@@ -117,8 +117,11 @@ Loop ─act───▶ Runbook ─do────▶ Runbook | Script
   ├─check─▶ audit(Standard) ─▶ Findings ─▶ the next act, or a yield
   └─yield─▶ User | Loop
 
-Gate = a boundary that runs audit on its rule ids and blocks on findings
+Gate = a boundary on the path to main that blocks on the findings of its audit
 ```
+
+Audit and gate are the words of [CONTEXT.md](/CONTEXT.md#governance);
+a loop's check audits and never gates.
 
 A loop points at the other two and contains neither. Nothing points
 at a loop except another loop's yield. A stochastic rule certifies at

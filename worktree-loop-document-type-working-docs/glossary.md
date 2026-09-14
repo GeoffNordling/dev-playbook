@@ -54,10 +54,14 @@ predicates.
   noisy classifier of membership. This is the one place statistics
   enters the logic.
 - **Finding** — one member and the rule it fails. Evidence that the
-  state is outside the set.
-- **Audit** — evaluate a spec against a state. Returns the findings.
+  state is outside the set. A loop's working state: a check returns
+  findings and the acts read them.
+- **Audit** — per [CONTEXT.md](/CONTEXT.md#governance): here, an
+  evaluation of a spec against a state that returns the findings.
   Zero findings means the state is in the set, up to judge error.
-- **Gate** — an audit at a repo boundary that blocks on findings.
+- **Gate** — per [CONTEXT.md](/CONTEXT.md#governance): a boundary on
+  the path to main that blocks on an audit's findings. A loop's check
+  audits and never gates.
 
 ## Statistics
 
@@ -68,11 +72,7 @@ predicates.
   distribution.
 - **Sample** — one state an act did leave behind: one draw from its
   distribution.
-- **Loop** — drives a state toward a target state by iteratively
-  taking prescribed actions and validating against prescribed
-  standards, the one sentence of
-  [ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md#terms).
-  In this vocabulary: a trajectory of samples that ends when one lands
+- **Loop** — the one sentence of [Loop](/doc-types/loop/definition.md). In this vocabulary: a trajectory of samples that ends when one lands
   in the set or when a yield's condition holds first. Each sample
   starts from the last, with its findings in the prompt, so the
   samples are not independent: the trajectory is a path through state

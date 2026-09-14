@@ -6,9 +6,7 @@ description: How to write a rule so a verifier can decide it — one member, one
 
 # Writing Predicates
 
-A predicate, per [Glossary](/worktree-loop-document-type-working-docs/glossary.md), is a statement about one member at
-one moment that is true or false of it. A specification is a set of them,
-and a state satisfies the specification when every predicate holds.
+A predicate and a specification are defined in [Glossary](/worktree-loop-document-type-working-docs/glossary.md).
 This guide is how to write one so that a script or a judge can decide
 it, learned from the corrections made while writing the doc-type
 system's own specification. Speculative, per
