@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Type Registry
 description: The document-type vocabulary — dev-playbook's Types table and the additive okf_types a consumer declares in its root index
 population: "a document-type declaration: dev-playbook's `## Types` table, or a consumer's root-index `okf_types` mapping"

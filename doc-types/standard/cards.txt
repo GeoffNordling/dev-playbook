@@ -32,9 +32,11 @@ knowledge-organization  define   /standards/knowledge-organization/context-conte
 knowledge-organization  define   /standards/knowledge-organization/cross-references.md
 knowledge-organization  define   /standards/knowledge-organization/documentation-sets/documentation-sets.md
 knowledge-organization  define   /standards/knowledge-organization/documentation-sets/working-documentation-sets.md
+knowledge-organization  define   /standards/knowledge-organization/loop-conventions.md
 knowledge-organization  audit    /scripts/okf-lint
 knowledge-organization  audit    /scripts/ref-lint
 knowledge-organization  audit    /scripts/repo-lint
+knowledge-organization  audit    /scripts/loop-lint
 knowledge-organization  audit    /dotfiles/dot-claude/agents/doc-set-auditor.md
 knowledge-organization  enforce  commit gate
 knowledge-organization  enforce  /dotfiles/dot-claude/skills/doc-set-deslop/SKILL.md

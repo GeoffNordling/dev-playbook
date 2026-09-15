@@ -1,7 +1,7 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Working Documentation Sets
-description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, the branch directory and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
+description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, a directory per line of work under `working-docs/` and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -9,9 +9,9 @@ population: "a working documentation set, the Markdown files one stream of in-pr
 
 A **working documentation set** is the
 [documentation set](/standards/knowledge-organization/documentation-sets/documentation-sets.md)
-one stream of in-process work accumulates on its branch, plans, design
-notes, records, drained into permanent homes or deleted when the work
-merges. Every rule of Documentation Sets and of
+one line of in-process work accumulates, plans, design notes, records,
+kept as long as the work runs and drained into permanent homes or
+deleted when it ends. Every rule of Documentation Sets and of
 [Doc Conventions](/standards/prose/conventions.md) binds it; each section
 below is the one difference the set adds, stated against the general rule
 it qualifies, and a member is otherwise judged as any member is. A member
@@ -46,22 +46,28 @@ what. `ROOT.md` need not link every member. A member no path from
 
 ## Where a set lives
 
-A set is one directory at the repo root, `<branch>-working-docs/`, named
-for the branch the work runs on; it holds the set's `index.md`, its
-`ROOT.md`, and its members under lowercase kebab-case names, flat or
-in subdirectories, and it exists on that branch alone, drained into
-permanent homes or deleted before the branch merges.
+A set is one directory under `working-docs/` at the repo root,
+`working-docs/<work>/`, named for the work and not for a branch; it
+holds the set's `index.md`, its `ROOT.md`, and its members under
+lowercase kebab-case names, flat or in subdirectories, and it lives as
+long as the work does, on every branch the work touches and on `main`
+between them.
 
-The directory is the one
+`working-docs/` is a plain parent: its `index.md` lists the sets, one
+row each, and it holds no `ROOT.md` and no members of its own. Each set
+under it is the one
 [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes a set, here named and placed. The branch `fix-index-drift` keeps
-its set in `fix-index-drift-working-docs/`. A subdirectory of the set
-is a child set as anywhere, and it is inside the work: one that holds a
+makes a set, here named and placed. A subdirectory of the set is a
+child set as anywhere, and it is inside the work: one that holds a
 `ROOT.md` is a strand, and one that holds none is governed by the
 nearest `ROOT.md` above it, so a strand may hold a subdirectory of
-members with no root of their own. `main` carries no such directory,
-and a set under `docs/` is the defect: `docs/` holds permanent
-documents.
+members with no root of their own.
+
+A set stands on `main` because the speculative voice lets it: a reader
+meets a guess marked as a guess, and the worklist shows where the work
+is. The work ends when its Planned bucket is empty; then the set is
+drained or deleted, and an empty `working-docs/` stays. A set under
+`docs/` is the defect: `docs/` holds permanent documents.
 
 ## Worklist
 
@@ -106,7 +112,7 @@ puts in the repo's `CONTEXT.md`.
 
 `CONTEXT.md` holds the term that crosses sets
 ([project terms only](/standards/knowledge-organization/context-content.md#project-terms-only)),
-and a term of the work crosses none until the set drains at merge, a
+and a term of the work crosses none until the set drains, a
 strand being inside the set and not beside it; it
 earns its entry when the member that carries it lands in a permanent
 home and a second set uses it.

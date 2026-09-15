@@ -68,13 +68,14 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `harness-files-lint` | [runbook-conventions.md](/standards/harness/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
 | `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
 | `standards-lint` | [standard.md](/standards/standard/card.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
+| `loop-lint` | [loop-conventions.md](/standards/knowledge-organization/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
 `decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
-not skip themselves when a target kind is absent. `harness-files-lint` and
-`standards-lint` are optional-surface: each exits 0 silently when its audited
-surface is absent — no runbooks, no `standards/` tree — and asserts only over a
-surface that is present. Run
+not skip themselves when a target kind is absent. `harness-files-lint`,
+`standards-lint`, and `loop-lint` are optional-surface: each exits 0 silently when
+its audited surface is absent — no runbooks, no `standards/` tree, no `loops/`
+tree — and asserts only over a surface that is present. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 

@@ -23,6 +23,10 @@ Standards and tools for djinn wrangling across a multi-repo workspace.
 - Formal standards governing the workspace
 - Agent configuration (skills, rules, settings)
 - CLI tools and shared libraries for workspace automation
+- Working documentation sets under [working-docs/](/working-docs/index.md),
+  the plans and design notes of work in progress, each written as a
+  guess and kept until its work ends
+  ([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md))
 
 ## What does NOT belong here
 

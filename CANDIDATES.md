@@ -49,7 +49,7 @@ description: Uncommitted future work — described, not yet promoted to issues
 - **The doc-type family's own type** — the files under `doc-types/` carry
   `General-Sheet` today; decide what type they carry.
 - **Guide as the procedure kind** — decide whether Guide is the kind a
-  procedure carries. The two `consuming.md` are typed `Standard` and
+  procedure carries. The two `consuming.md` are typed `Standard-Ruleset` and
   describe themselves as recipes; Bootstrap and Tracker Operations, the
   same shape, are typed `Guide`.
 - **Where exclusions are written** — decide whether a population's

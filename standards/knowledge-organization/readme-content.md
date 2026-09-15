@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: README Content
 description: The README content floor — OKF frontmatter, an H1, and a one-line purpose, with no agent instructions, no decisions, and no roster of harness-injected files
 population: "a README.md"

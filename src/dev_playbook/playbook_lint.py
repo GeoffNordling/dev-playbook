@@ -48,6 +48,7 @@ DETECTORS = (
     "harness-files-lint",
     "prose-lint",
     "standards-lint",
+    "loop-lint",
 )
 
 # Audit scripts a card's Audit cell may cite that deliberately run outside the

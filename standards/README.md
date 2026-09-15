@@ -18,8 +18,8 @@ helpers. Beside the card sit the Standards its Define cell points at
 (`build/skeleton.md` beside `build/card.md`), any templates, and the
 guides that serve them. The rule is the tree: **one directory, one
 standard**; `references/` holds vendored mirrors. The contract behind the
-cards themselves is the Standard-Card doc-type
-([doc-types/standard-card/](/doc-types/standard-card/index.md)).
+cards and the rulesets is the Standard doc-type
+([doc-types/standard/](/doc-types/standard/index.md)).
 
 ## Rules live here; their subjects live elsewhere
 

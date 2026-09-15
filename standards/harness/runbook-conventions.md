@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: Runbook Conventions
 description: The format a runbook takes — location, front matter, the description, model and effort, the H1, completion criteria, the chain, and the rules a skill bundle and an agent definition each add
 population: "a runbook: a skill bundle or an agent definition under a governed repo's .claude/ or dev-playbook's dotfiles/dot-claude/"
@@ -118,7 +118,7 @@ that tells the agent the work is done.
 Every edge of the runbook's contract is declared in the runbook's own
 file: args by the front matter `arguments` list, and each read, write,
 do, override, never, and report as a span in the body that the
-[Reference Chain Encoding](/doc-types/runbook/encoding.md) parses; the
+[Nodes and Edges Encoding](/doc-types/runbook/encoding.md) parses; the
 runbook's chain in `doc-types/runbook/chains.txt` is the one
 `scripts/chaingen` writes from them.
 

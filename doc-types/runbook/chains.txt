@@ -68,12 +68,12 @@
   ├─never writes─►
   ├─never commits─►
   ├─reads───► launch prompt    the target directory, the slice's reach, the assigned standard sections, and the briefings
-  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    if the directory holds `ROOT.md`
+  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    if the directory, or a directory above it up to the repo root, holds `ROOT.md`
   └─reports─► outcome: str    the findings ranked by how much each would mislead a fresh session reading the set cold
 
 [doc-set-deslopper] Agent · model: inherit, effort: xhigh
   ├─reads───► launch prompt    the target directory, whether it is one set or a set with child sets, and the briefings
-  ├─does────► [doc-set-deslopper] Agent    as a typed subagent for each set, parent and children, in one message, each told its target is one set with its facts settled
+  ├─does────► [doc-set-deslopper] Agent    as a typed subagent for each set, the parent and every set nested under it at any depth, in one message, each told its target is one set with its facts settled
   ├─does────► [doc-set-auditor] Agent    subagents in one message, one per slice the pass calls for, `model: sonnet`, `effort: high`
   ├─never commits─►
   └─reports─► outcome: str    when the audits are clean, one line saying so
@@ -132,7 +132,7 @@
   └─never commits─►
 
 [commit] Skill · model: sonnet, effort: low, allowed-tools: Bash(git *)
-  ├─args────► fast
+  ├─args────► target
   └─reports─► outcome: str    tree clean or which files remain uncommitted, and that the push landed
 
 [compact-prep] Skill · model: inherit, effort: xhigh
@@ -178,7 +178,7 @@
 [doc-set-diagram] Skill · model: inherit, effort: medium
   ├─args────► set-hint
   ├─reads───► `index.md`    at the set's root
-  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    § the-link-tree    if the set is a working set, the directory `<branch>-working-docs/`
+  ├ ╌ reads ╌ ► [working-documentation-sets] Standard    § the-link-tree    if the set is a working set, a directory under `working-docs/`
   └─reports─► outcome: str    the diagram
 
 [document-remove-tics] Skill · model: sonnet, effort: high

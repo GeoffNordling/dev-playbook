@@ -1,0 +1,26 @@
+#!/usr/bin/env -S uv run --script
+"""loop-lint — the detector behind Loop Conventions: every Loop's graph agrees with its prose.
+
+Thin shim over dev_playbook.loop_lint.main: it puts the checkout's ``src/``
+on ``sys.path`` and calls the module, which walks the repo's ``loops/`` files
+typed ``Loop`` and applies the five Loop Conventions rules (loop-graph,
+loop-sections, loop-nodes, loop-edges, loop-entries), printing each finding
+to stdout as a GNU finding line (``file: knowledge-organization.rule
+message``) and exiting nonzero if any. ``--list-rules`` prints the rule ids
+and exits 0. pyyaml is declared below because the module parses
+frontmatter. See dev_playbook.loop_lint for the logic and its tests.
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml>=6.0"]
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.loop_lint import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())

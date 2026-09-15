@@ -64,7 +64,7 @@ repo-lint's `distribution.dogfood` checks the mirror.
 
 The local-block wiring runs the detector at the **commit gate**. Record
 that rung in the card's Enforce cell
-([Cells](/doc-types/standard-card/encoding.md#cells)), so the card names
+([Cells](/doc-types/standard/encoding.md#cells)), so the card names
 where nonconformance blocks the path to main
 ([Gates](/standards/standard/gates.md#three-rungs)).
 

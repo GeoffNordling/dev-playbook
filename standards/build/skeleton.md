@@ -1,5 +1,5 @@
 ---
-type: Standard
+type: Standard-Ruleset
 title: File Skeleton
 description: The tree a governed repo carries — the entries every repo requires, keeps at the root, and forbids, and the entries each layer adds, with worked trees
 population: "a governed repo's tree, except standards/build/canonical/ in dev-playbook"
@@ -118,8 +118,8 @@ Standard that owns the content:
   document.
 - `docs/decisions/` — Decision Records
   ([Decision Record Conventions](/standards/decisions/records.md)).
-- `<branch>-working-docs/` — one work stream's working documentation set,
-  on its branch alone
+- `working-docs/` — the working documentation sets, one directory per
+  line of work, each kept as long as its work runs
   ([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)).
 - `.claude/` — Claude Code files ([Harness Files](/standards/harness/index.md));
   `worktrees/` under it is gitignored.
