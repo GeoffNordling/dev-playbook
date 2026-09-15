@@ -22,4 +22,4 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
 - [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its user checkpoints
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace
-- [worktree-synthesis-notes-working-docs/](/worktree-synthesis-notes-working-docs/index.md) — The working documentation set for the synthesis of the doc-type system, Loop, the fact base, and the viewer — four strands under one root, with the glossary they share
+- [working-docs/](/working-docs/index.md) — The working documentation sets, one directory per line of in-process work, each kept as long as its work runs
