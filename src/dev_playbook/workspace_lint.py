@@ -150,10 +150,6 @@ CANONICAL_CONFIG = (
 # workspace root. Inclusion is the decision: a repo absent from this tuple is
 # simply not governed, and the audit says nothing about it. That is what keeps
 # the roster a record of intent instead of a chore that fires on every clone.
-#
-# The default of the ``--repos`` option, exactly as ``~/workspace`` is the
-# default of ``--workspace``: both are facts about a machine's layout, not about
-# the standard, and both are overridable for a one-off run.
 GOVERNED = (
     "dev-playbook",
     "story-forge",

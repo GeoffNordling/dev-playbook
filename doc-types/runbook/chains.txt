@@ -330,13 +330,18 @@
 
 [update-standards-pin] Skill · model: opus, effort: xhigh
   ├─reads───► [channel] Standard
-  ├─reads───► GitHub    main's head sha
-  ├ ╌ reports ╌ ► outcome: str    that the release is unpushed    if the two values are unequal
   ├─reads───► [workspace_lint.py] Script    for the `GOVERNED` roster
-  ├─does────► [bump-pins] Script    `--dry-run` first to see what would move, then run it again for real
-  ├ ╌ reports ╌ ► outcome: str    the abort as the fault it is    if the script raises `the gate could not run`
-  ├ ╌ writes ╌ ► local file    the retired requirement's adaptation and deletions out of the consumer repo    if the bump already reports green
-  └─reports─► outcome: str    per-repo results — bumped, needs work, skipped, or faulted
+  ├ ╌ reports ╌ ► outcome: str    that it is ungoverned, and that /enable-repo-governance is what adopts it    if the roster omits this repo
+  ├ ╌ reports ╌ ► outcome: str    which files are uncommitted    if the working tree is dirty
+  ├─does────► [bump-pin] Script    `--check`
+  ├ ╌ reports ╌ ► outcome: str    the refusal it printed, as the fault it is    if the probe exits 2
+  ├─does────► [bump-pin] Script    `--write`
+  ├─reports─► outcome: str    the sha the pin moved from and to, and that the commit is pushed
+  ├─does────► [bump-pin] Script    `--write`
+  ├─reads───► [index] Standard
+  ├─writes──► local file    the retired requirement's adaptation out of the repo
+  ├─reports─► outcome: str    the remainder as one list of concrete choices
+  └─reports─► outcome: str    the PR's URL, the sha move, and every escalation still open
 
 [usage-report] Skill · model: sonnet, effort: low, allowed-tools: Bash(bash *usage-report/scripts/report.sh)
   └─does────► [report.sh] Script    from this skill's base directory
