@@ -10,7 +10,6 @@ work them are configured. Start at [dev-playbook](/README.md).
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, the software factory definition, agent configuration, CLI tools, and reusable harness patterns
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
-- [Synthesis Notes](/SYNTHESIS-2026-09-14.md) — The record of one synthesis session across the loop and cloa branches — the branches are one theory, ontology solvers against pseudocode, and deterministic separation of stochastic chains — with what was decided and what was left open
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories
@@ -23,5 +22,4 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
 - [software-factory/](/software-factory/index.md) — What the software-factory/ directory holds — the two-region state machine, the factory's operating contract, and its user checkpoints
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace
-- [worktree-cloa-viewer-tool-2-working-docs/](/worktree-cloa-viewer-tool-2-working-docs/index.md) — The working documentation set for cloa-viewer, the local visual IDE that shows a checkout's fact base in the browser
-- [worktree-loop-document-type-working-docs/](/worktree-loop-document-type-working-docs/index.md) — The working documentation set for the Loop doc-type — the design as it stands, and the stale things found along the way
+- [worktree-synthesis-notes-working-docs/](/worktree-synthesis-notes-working-docs/index.md) — The working documentation set for the synthesis of the doc-type system, Loop, the fact base, and the viewer — four strands under one root, with the glossary they share
