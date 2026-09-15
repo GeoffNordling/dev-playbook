@@ -1,0 +1,82 @@
+{
+  "envelope": 1,
+  "kind": "fact-base",
+  "kind_version": 0,
+  "title": "fact-base, slice: paths matching *ralph* and the nodes their edges touch",
+  "subject": null,
+  "stamp": {
+    "commit": "b5d5d1290b8ca397840ef507aa1eba871b85fb0c",
+    "generated_at": "2026-09-10T22:37:41Z",
+    "generator": "simulated by hand; no module exists"
+  },
+  "payload": {
+    "nodes": [
+      {"id": "dotfiles/dot-claude/skills/ralph-setup/", "type": "Directory", "provenance": "declared", "extractor": "fs", "line": null, "attrs": {}},
+      {"id": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "type": "Skill", "provenance": "declared", "extractor": "frontmatter+location", "line": 1, "attrs": {"name": "ralph-setup", "description": "Scaffolds a Ralph loop — the plan and progress files a memoryless agent grinds through one task at a time. Use when the user asks to set up or scaffold a ralph loop.", "arguments": ["goal"], "model": "inherit", "effort": "xhigh"}},
+      {"id": "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md", "type": "File", "provenance": "declared", "extractor": "fs", "line": 1, "attrs": {"first_line": "# Plan: <one-line goal>"}},
+      {"id": "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md", "type": "File", "provenance": "declared", "extractor": "fs", "line": 1, "attrs": {"first_line": "# Progress log"}},
+      {"id": "dotfiles/dot-claude/skills/ralph-checkpoint/", "type": "Directory", "provenance": "declared", "extractor": "fs", "line": null, "attrs": {}},
+      {"id": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "type": "Skill", "provenance": "declared", "extractor": "frontmatter+location", "line": 1, "attrs": {"name": "ralph-checkpoint", "description": "Reviews a finished segment of a Ralph loop through a fork of this session, then relays what it found and what the next segment holds. Use when a ralph-loop run returns at a checkpoint and the next segment is waiting on a review.", "arguments": ["run-hint"], "model": "inherit", "effort": "high"}},
+      {"id": "dotfiles/dot-claude/agents/", "type": "Directory", "provenance": "declared", "extractor": "fs", "line": null, "attrs": {}},
+      {"id": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "type": "Agent", "provenance": "declared", "extractor": "frontmatter+location", "line": 1, "attrs": {"name": "ralph-checkpointer", "description": "Owns the plan of a Ralph loop at a checkpoint — verifying what the segment landed, taking stock against the goal, and revising the tasks ahead before releasing the next segment. Use when the ralph-checkpoint skill dispatches its fork at a segment boundary.", "arguments": [], "model": "inherit", "effort": "xhigh"}},
+      {"id": "dotfiles/dot-claude/workflows/", "type": "Directory", "provenance": "declared", "extractor": "fs", "line": null, "attrs": {}},
+      {"id": "dotfiles/dot-claude/workflows/ralph-loop.js", "type": "Workflow", "provenance": "declared", "extractor": "js-meta", "line": 1, "attrs": {"name": "ralph-loop", "description": "Ralph loop: boot a fresh agent each iteration to work a plan to done. Disk (the plan file, the progress file, git) is the only memory; loop control lives in this runtime, not in any context window. The run stops at the first unreviewed checkpoint marker in the plan, or at the end of the plan when it carries none.", "args": {"model": "string", "maxIters": "number", "planFile": "string", "progressFile": "string", "checkCmd": "string"}, "returns": ["iterations", "blocker"]}},
+      {"id": "harness-recipes/recipes/", "type": "Directory", "provenance": "declared", "extractor": "fs", "line": null, "attrs": {}},
+      {"id": "harness-recipes/recipes/ralph-loop.md", "type": "Recipe-Description", "provenance": "declared", "extractor": "frontmatter", "line": 1, "attrs": {"title": "Ralph loop", "description": "Grinding a large task to done by booting a fresh agent each iteration, with plan and progress carried on disk and a reviewing fork at every checkpoint", "resource": "/dotfiles/dot-claude/workflows/ralph-loop.js"}},
+      {"id": "dotfiles/dot-claude/skills/grilling/SKILL.md", "type": "Skill", "provenance": "declared", "extractor": "frontmatter+location", "line": 1, "attrs": {"name": "grilling"}},
+      {"id": "dotfiles/dot-claude/skills/domain-modeling/SKILL.md", "type": "Skill", "provenance": "declared", "extractor": "frontmatter+location", "line": 1, "attrs": {"name": "domain-modeling"}},
+      {"id": "PLAN.md", "type": "local file", "provenance": "imported", "extractor": "chain", "line": null, "attrs": {}},
+      {"id": "PROGRESS.md", "type": "local file", "provenance": "imported", "extractor": "chain", "line": null, "attrs": {}},
+      {"id": "bucket:launch-prompt", "type": "read bucket", "provenance": "imported", "extractor": "chain", "line": null, "attrs": {}},
+      {"id": "bucket:local-file", "type": "write bucket", "provenance": "imported", "extractor": "chain", "line": null, "attrs": {}},
+      {"id": "bucket:git", "type": "write bucket", "provenance": "imported", "extractor": "chain", "line": null, "attrs": {}}
+    ],
+    "edges": [
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/", "relation": "contains", "target": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/", "relation": "contains", "target": "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/", "relation": "contains", "target": "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+      {"source": "dotfiles/dot-claude/skills/ralph-checkpoint/", "relation": "contains", "target": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+      {"source": "dotfiles/dot-claude/agents/", "relation": "contains", "target": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+      {"source": "dotfiles/dot-claude/workflows/", "relation": "contains", "target": "dotfiles/dot-claude/workflows/ralph-loop.js", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+      {"source": "harness-recipes/recipes/", "relation": "contains", "target": "harness-recipes/recipes/ralph-loop.md", "order": null, "condition": null, "detail": null, "extractor": "fs", "line": null},
+
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "links-to", "target": "harness-recipes/recipes/ralph-loop.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 14},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/skills/grilling/SKILL.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 41},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/skills/domain-modeling/SKILL.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 42},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/skills/ralph-setup/references/plan-skeleton.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 108},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/skills/ralph-setup/references/progress-skeleton.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 115},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 142},
+      {"source": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 40},
+      {"source": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "relation": "links-to", "target": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "order": null, "condition": null, "detail": null, "extractor": "mdlink", "line": 52},
+      {"source": "harness-recipes/recipes/ralph-loop.md", "relation": "resource", "target": "dotfiles/dot-claude/workflows/ralph-loop.js", "order": null, "condition": null, "detail": null, "extractor": "frontmatter", "line": 5},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "launches", "target": "dotfiles/dot-claude/workflows/ralph-loop.js", "order": null, "condition": null, "detail": "Workflow({ name: \"ralph-loop\", args: { model, maxIters, planFile, progressFile, checkCmd } })", "extractor": "launch-literal (proposed)", "line": 135},
+
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "args", "target": "goal", "order": 1, "condition": null, "detail": null, "extractor": "chain", "line": 7},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "reads", "target": "harness-recipes/recipes/ralph-loop.md", "order": 2, "condition": null, "detail": "end-to-end, before anything else", "extractor": "chain", "line": 14},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "does", "target": "dotfiles/dot-claude/skills/grilling/SKILL.md", "order": 3, "condition": null, "detail": null, "extractor": "chain", "line": 41},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "does", "target": "dotfiles/dot-claude/skills/domain-modeling/SKILL.md", "order": 4, "condition": null, "detail": "active throughout", "extractor": "chain", "line": 42},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "writes", "target": "bucket:local-file", "order": 5, "condition": "the user approved the criteria and the plan, and the gate is green", "detail": "the plan file", "extractor": "chain", "line": 107},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "writes", "target": "bucket:local-file", "order": 6, "condition": "the user approved the criteria and the plan, and the gate is green", "detail": "the progress file", "extractor": "chain", "line": 114},
+      {"source": "dotfiles/dot-claude/skills/ralph-setup/SKILL.md", "relation": "reports", "target": "outcome: str", "order": 7, "condition": null, "detail": "the full launch command for the user to run", "extractor": "chain", "line": 130},
+
+      {"source": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "relation": "args", "target": "run-hint", "order": 1, "condition": null, "detail": null, "extractor": "chain", "line": 7},
+      {"source": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "relation": "does", "target": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "order": 2, "condition": null, "detail": "as a fork subagent (`subagent_type: \"fork\"`)", "extractor": "chain", "line": 40},
+      {"source": "dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md", "relation": "reports", "target": "outcome: str", "order": 3, "condition": null, "detail": "the fork's findings to the user", "extractor": "chain", "line": 63},
+
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "reads", "target": "bucket:launch-prompt", "order": 1, "condition": null, "detail": "the plan file, the progress file, the check gate, and the working directory", "extractor": "chain", "line": 23},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "reads", "target": "PLAN.md", "order": 2, "condition": null, "detail": null, "extractor": "chain", "line": 26},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "reads", "target": "PROGRESS.md", "order": 3, "condition": null, "detail": null, "extractor": "chain", "line": 32},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 4, "condition": null, "detail": "a task's wording or its Verify clause into a form a cold, memoryless agent executes without guessing", "extractor": "chain", "line": 90},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 5, "condition": null, "detail": "a fix task at the front of the next segment", "extractor": "chain", "line": 93},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 6, "condition": null, "detail": "into the plan's Working notes the fact they need", "extractor": "chain", "line": 96},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 7, "condition": null, "detail": "a step the work revealed into the tasks ahead", "extractor": "chain", "line": 105},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 8, "condition": null, "detail": "an extra `<!-- [ ] checkpoint -->` line into the tasks ahead", "extractor": "chain", "line": 109},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "never-writes", "target": "bucket:local-file", "order": 9, "condition": null, "detail": "over a task the loop has already checked off", "extractor": "chain", "line": 118},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "never-writes", "target": "bucket:local-file", "order": 10, "condition": null, "detail": "a change into the plan's Done when criteria", "extractor": "chain", "line": 119},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 11, "condition": null, "detail": "one line for each into the progress file's Decisions section", "extractor": "chain", "line": 133},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:local-file", "order": 12, "condition": null, "detail": "the checked-off marker", "extractor": "chain", "line": 145},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "writes", "target": "bucket:git", "order": 13, "condition": null, "detail": "<working-directory>: add, commit — the checkpoint's edits to the plan and the progress file", "extractor": "chain", "line": 150},
+      {"source": "dotfiles/dot-claude/agents/ralph-checkpointer.md", "relation": "reports", "target": "outcome: str", "order": 14, "condition": null, "detail": "to the launching session in at most ten lines", "extractor": "chain", "line": 162}
+    ]
+  }
+}
