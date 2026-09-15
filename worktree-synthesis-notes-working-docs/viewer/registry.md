@@ -84,7 +84,10 @@ annotation
 ([Reference Chain](/doc-types/runbook/contract-shape.md),
 [Reference Chain Encoding](/doc-types/runbook/encoding.md)); for a
 Standard, its population and its rules with their conditions
-([Population and Rules Encoding](/doc-types/standard/encoding.md)). A
+([Population and Rules Encoding](/doc-types/standard/encoding.md));
+for a loop, its acts, checks, and yields, read from the Mermaid block
+([Acts, Checks, and Yields](/doc-types/loop/contract-shape.md),
+[encoding](/doc-types/loop/encoding.md)). A
 runbook also has a control flow view, the same edges with order and
 condition kept.
 

@@ -37,7 +37,8 @@ row
 ([index-tree](/worktree-synthesis-notes-working-docs/viewer/registry.md#index-tree)).
 The second group is a flat list by identity. Clicking a file
 opens its CLOA panel: the Reference chain for a runbook, the rules for a
-Standard, the cells for a card. A file with no CLOA kind opens its
+Standard, the acts, checks, and yields for a loop. A file with no CLOA
+kind opens its
 `markdown-file` panel. A panel already open comes to the top of the
 stack instead.
 

@@ -64,10 +64,14 @@ In order; each produces what the next needs.
   [Next steps](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#next-steps).
   No code is written until the simulations cover the expected use
   cases.
+- **The simulation as a loop.** The third simulation is a loop, not a
+  session, per the second of the fact base's
+  [Next steps](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#next-steps).
 - **Extractors.** [chaingen](/scripts/chaingen) and
   [rulegen](/scripts/rulegen), the scripts that write the text files
   today, move into the package as the `chain` and `standard`
-  extractors, alongside the bedrock extractors, and a `loop` extractor
+  extractors, the scripts and their text files deleted with the move
+  and their logic kept, alongside the bedrock extractors, and a `loop` extractor
   reads a Loop document's Mermaid block
   ([Decided](/worktree-synthesis-notes-working-docs/loop/ROOT.md#decided));
   one refresh writes one fact base per checkout; `chains.txt`, its
@@ -80,6 +84,8 @@ In order; each produces what the next needs.
   to verifier map, step 2 of the doc-type system's refactor, and the
   rule id to boundary map, step 3, are declared data in a fixed shape
   with an extractor, wherever they live, so a solver can read them.
+  The fact base extracts declared files and bedrock only, so a map
+  that is not declared data is not in it.
   Where they are declared is open.
 - **Findings as a stamped artifact.** The artifact the first Decided
   item names: its shape, its stamp of commit, judge, and time, and how
@@ -89,9 +95,6 @@ In order; each produces what the next needs.
   as a view: for each rule id, which stochastic nodes lie between its
   last verifier and the end. Whether it is a view in the registry's
   sense or a query beside the fact base is open.
-- **The simulation as a loop.** The third simulation is a loop, not a
-  session, per the second of the fact base's
-  [Next steps](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#next-steps).
 
 ## Open
 

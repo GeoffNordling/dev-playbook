@@ -54,7 +54,9 @@ in the registry table and its entry in the roster of
 ## Decided
 
 - **Every loop gets a Loop document.** Shape is orthogonal to
-  stochasticity: a fully deterministic loop, even one a workflow runs,
+  stochasticity, a ruling general over doc-types
+  ([Decided](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#decided)):
+  a fully deterministic loop, even one a workflow runs,
   still gets a Loop document, because the document is the legible
   form. The one requirement that follows is a drift check between the
   Loop document and its substrate, the same deterministic rule

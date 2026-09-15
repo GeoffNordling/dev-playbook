@@ -58,6 +58,13 @@ specification.
   [System Legibility](/docs/system-legibility.md)'s sentence that
   documentation is the stochastic thing and code the deterministic one
   is imprecise and needs one clause to say this.
+- **Shape is orthogonal to stochasticity.** A fully deterministic
+  runbook or loop still gets its doc-type document, because the
+  document is the legible form. The one requirement that follows is
+  a drift check between the document and its substrate, the same
+  deterministic rule chaingen applies to a runbook and its chain. The
+  loop half is filed in the Loop strand
+  ([Decided](/worktree-synthesis-notes-working-docs/loop/ROOT.md#decided)).
 - **An encoding defines an extractor; it is not a spec.** Under the
   glossary a spec is a set of predicates. An `encoding.md` is mostly a
   function, the primitive map from written form to rows, which is the
@@ -117,7 +124,10 @@ specification.
      out of scope for this work.
      [Reference Model](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md#what-goes-where)
      lists each disposition. The fact base's extractors item strikes
-     the card extractor for this reason.
+     the card extractor for this reason. `rulegen` goes as a script
+     with its `.txt` view; its logic moves into the package as the
+     `standard` extractor, per that item
+     ([Planned](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#planned)).
   5. *`Object` becomes `DocType`, and the one-module lint.* Rename
      across `doc-type.md` and the three `contract-shape.md` files, nest
      each part inside its doc-type's class, and add the linter that
@@ -189,3 +199,4 @@ specification.
 
 - **CI** — Continuous Integration.
 - **LLM** — Large Language Model.
+- **PR** — Pull Request.
