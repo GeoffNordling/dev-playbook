@@ -31,8 +31,11 @@ specification.
 
 - **Peers first.** Wherever a choice is open, pick the one that keeps
   the three doc-types parallel.
-  [Three Peers](/worktree-synthesis-notes-working-docs/doc-type-system/three-peers.md)
-  holds the parallel structure.
+  [Reference Model](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md)
+  holds the parallel structure, and each peer has its conventions
+  Standard: `harness/runbook-conventions` for Runbook, the
+  Meta-Standard under `standard/` for Standard, and
+  `knowledge-organization/loop-conventions` for Loop.
 - **Verbs.** Each doc-type is defined by a short list of simple verbs,
   its operations. Overlap between doc-types is allowed.
 - **Both forms.** A target state is written twice: as a reference

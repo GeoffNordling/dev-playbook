@@ -49,7 +49,7 @@ rows with one or two files last.
 | `rules/*.md` | context files | Pending |
 | `settings.json`, `settings.local.json` | configuration | Pending |
 | `hooks/` | hooks | Pending |
-| `.claude/workflows/*.js` | workflows | Pending |
+| `.claude/workflows/*.js` | workflows | Pending; a runtime that runs loops, not the [Loop](/doc-types/loop/definition.md) family |
 
 ## The roster
 

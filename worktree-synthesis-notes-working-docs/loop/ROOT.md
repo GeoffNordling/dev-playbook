@@ -13,9 +13,7 @@ The strand that builds the **Loop** doc-type, a third directory under
 Loop is one of the doc-type system's three doc-types
 ([Doc-Type System](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md)):
 its predicates are
-[Loop Specification](/worktree-synthesis-notes-working-docs/doc-type-system/specification/loop.md),
-and where it stands among its peers is
-[Three Peers](/worktree-synthesis-notes-working-docs/doc-type-system/three-peers.md).
+[Loop Specification](/worktree-synthesis-notes-working-docs/doc-type-system/specification/loop.md).
 Loop is a leaf: no strand's plan waits on it except by use. The
 doc-type system's first instance and the fact base's simulation loop
 are both loops.
@@ -42,11 +40,10 @@ in the registry table and its entry in the roster of
   stochasticity, general over doc-types
   ([Principles](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#principles)):
   a fully deterministic loop, even one a workflow runs, still gets a
-  Loop document, because the document is the legible form. Three
-  Peers states it as the instance's sentence, a Loop instance is a
-  document and code that runs it is its substrate, with the drift
-  check that binds the two
-  ([Three Peers](/worktree-synthesis-notes-working-docs/doc-type-system/three-peers.md#loop-today)).
+  Loop document, because the document is the legible form. A Loop
+  instance is a document and code that runs it is its substrate; a
+  drift check binds the two, the same deterministic rule chaingen
+  applies to a runbook and its chain.
 
 ## Terms
 
@@ -59,6 +56,20 @@ in the registry table and its entry in the roster of
   [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms).
   [Specifying a Loop](/worktree-synthesis-notes-working-docs/loop/specifying-a-loop.md#the-three-written-forms)
   holds the three written forms, goal, predicate, and objective.
+
+## Prior art
+
+Act and check are industry-standard under other names: control loops
+and Kubernetes reconciliation (desired state, observed state, a
+controller closing the gap; desired state written as a spec, which
+agrees with having no target operation), evaluator-optimizer and
+generator-critic patterns, PDCA, OODA, red-green-refactor. Yield is
+where the field has no consensus (interrupt, checkpoint, a person in
+the loop); the generator sense, hand control out and resume at the
+same point, is the most precise word available. One difference on
+purpose: industry loops are code; a Loop instance is a document that
+points at runbooks and standards, and the runtime is whatever runs it.
+From memory, not a fresh search.
 
 ## Planned
 
@@ -85,13 +96,13 @@ in the registry table and its entry in the roster of
 - **One-sentence definition.** Settled; it opens
   [Loop](/doc-types/loop/definition.md).
 - **Family.** Files typed `Loop` under `loops/`, mirroring Standard.
-  Recorded in Three Peers.
+  Recorded in [Loop](/doc-types/loop/definition.md).
 - **Shape, directory, encoding, residual ledger.** Written to
   `doc-types/loop/`: [Acts, Checks, and Yields](/doc-types/loop/contract-shape.md),
   its [encoding](/doc-types/loop/encoding.md), and the
   [ledger](/doc-types/loop/residual-ledger.md), seeded empty.
 - **Operations and composition rule.** Three verbs, act, check, yield;
-  the checks carry the target. Recorded in Three Peers.
+  the checks carry the target. Recorded in [Loop](/doc-types/loop/definition.md).
 - **Location rule and registry.** okf-lint's `type-location` check
   binds `Loop` to `loops/`; the `Loop` row and the Typed Loop rule are
   in `document-types.md`; the registry ruling and the roster entry are

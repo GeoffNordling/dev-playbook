@@ -46,7 +46,6 @@ view the viewer draws is a selection of the fact base. Loop is a leaf.
   │  picture ······· reference-model.md                            │
   │  predicates ···· specification/ doc-type · runbook · standard  │
   │  method ········ writing-predicates.md                         │
-  │  parallel ······ three-peers.md                                │
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │
@@ -62,7 +61,7 @@ view the viewer draws is a selection of the fact base. Loop is a leaf.
   │                 /loop.md   │   │  theory ····· fact-base.md   │
   │  how it is told            │   │  evidence ··· fact-base-     │
   │     · specifying-a-loop.md │   │      ralph.md · ralph.json   │
-  │  standing · three-peers.md │   │  planned view                │
+  │                            │   │  planned view                │
   │  drained · doc-types/loop/ │   │     · deterministic-         │
   │     · loop-lint · loops/   │   │       separation.md          │
   │  plan: the objective part, │   │  plan: simulations by hand · │
