@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Reference Model
-description: The doc-type system's target state as a reference model — three DocTypes, ten verbs, the parts each composes, and how they fit, in pseudocode
+description: The doc-type system's target state as a reference model — three DocTypes, ten verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
 ---
 
 # Reference Model
@@ -9,9 +9,9 @@ description: The doc-type system's target state as a reference model — three D
 The target state of the doc-type system, drawn as a reference model:
 one picture of the system as it should be, in pseudocode. It is
 speculative, per
-[ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md). The
-predicates that describe the same state generally are a later member;
-this one is the picture the user thinks in.
+[ROOT.md](/worktree-loop-document-type-working-docs/ROOT.md).
+[Doc-Type Specification](/worktree-loop-document-type-working-docs/specification/doc-type.md)
+holds the predicates that define the set this is one member of.
 
 A markdown file is code in a fuzzy form, and the model that reads it
 is its stochastic compiler. A doc-type gives such a file what code
@@ -22,7 +22,7 @@ from structure embedded in the files.
 ## The system
 
 The doc-types are the language; the toolchain is the code that
-parses, verifies, gates, and views them. Both halves are the system.
+parses, verifies, and gates them. Both halves are the system.
 
 ### The language
 
@@ -56,11 +56,11 @@ class Standard(DocType):         # standards/<name>/<topic>.md
     """One population held to its rules. Held to."""
     operations = {hold}
 
-    class Rule:                  # a part: an H2, or an H3 under a guard
+    class Rule:                  # a part: an H2, or an H3 under a condition
         id:        RuleId
         kind:      deterministic | stochastic
         predicate: str           # first paragraph, the check whole; a stochastic rule's judge prompt
-        condition: "Rule | None" # another rule used as a guard; None binds every member
+        condition: "Rule | None" # the rule this one is under; None binds every member
 
     population: type[Target]     # frontmatter, one phrase naming the class and its exclusions
     rules: list[Rule]            # in file order
@@ -100,9 +100,8 @@ Target = DocType | File | Issue | PullRequest | External   # what an edge lands 
 
 ```python
 verifiers: dict[RuleId, Script | Judge]      # the one sync point: every rule id has a verifier
-def audit(standard, state) -> list[Finding]  # parse the file, route each id, guard by condition, collect failures
+def audit(standard, state) -> list[Finding]  # parse the file, route each id, skip where the condition fails, collect failures
 boundary: commit hook | make check | CI | a loop's check     # each names the rule ids it runs
-views: chains.txt (runbook edges), rules.txt (rule id, kind, verifier, boundaries), a loop's own graph
 ```
 
 Runbook is invoked, Standard is held to, Loop drives. Ten verbs
@@ -118,8 +117,11 @@ Loop ─act───▶ Runbook ─do────▶ Runbook | Script
   ├─check─▶ audit(Standard) ─▶ Findings ─▶ the next act, or a yield
   └─yield─▶ User | Loop
 
-Gate = a boundary that runs audit on its rule ids and blocks on findings
+Gate = a boundary on the path to main that blocks on the findings of its audit
 ```
+
+Audit and gate are the words of [CONTEXT.md](/CONTEXT.md#governance);
+a loop's check audits and never gates.
 
 A loop points at the other two and contains neither. Nothing points
 at a loop except another loop's yield. A stochastic rule certifies at
@@ -131,20 +133,20 @@ the standard's.
 
 What the picture has no place for, and where each thing goes:
 
-- **Standard-Card and its four cells.** Define is the ruleset files
+- **Standard-Card and its four cells.** Define is the Standard files
   themselves, listed by the directory index. Audit is the verifier
-  table. Enforce is the boundary column of the rules view, read from
+  table. Enforce is each boundary's list of rule ids, read from
   config. Adopt is not a primitive; its pointers today are build's
   bootstrap guide and skill, a runbook that stays where it is and is
   reached from the directory index; harness's and modules's pointers,
   runbooks that were never adoptions and stay runbooks with no pointer
   from the standard; and `consuming.md`, a guide that stays a guide,
   listed by its directory index.
-- **Ruleset as a second object.** The Standard file is the ruleset.
-- **Condition as its own type.** A rule used as a guard.
+- **Ruleset as a second object.** There is one object; the Standard
+  file holds the rules.
+- **Condition as its own type.** A rule another rule is under.
 - **`args` and `never` as verbs.** `accept` is the verb for args; a
-  ban is a polarity on a write edge, drawn in the chain view as it is
-  today.
+  ban is a polarity on a write edge.
 - **`Object`.** Renamed `DocType`, which is what it was.
 - **Spec, Deviation, Predicate as objects.** A standard written for
   one run, a finding an act left standing, and the first paragraph of
