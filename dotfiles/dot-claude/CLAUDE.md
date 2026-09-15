@@ -47,9 +47,9 @@ Open a PR and push to it, but never merge one — the user merges every PR by ha
 
 ### Ask before picking a commit target
 
-When work is ready to commit and there have been no instructions about
-whether to commit to `main`, a branch, or a worktree, stop and ask rather than choosing.
-This supersedes the harness's default.
+When work is ready to commit on `main` and there have been no instructions
+about where, stop and ask rather than choosing. On a branch or worktree,
+commit there. This supersedes the harness's default.
 
 ## Principles
 

@@ -16,11 +16,13 @@ A commit isn't done until it's on origin: after committing, `git push`.
 
 ## Args
 
-`target` is free text on where to commit — `main`, `on main`, `new branch`, `current worktree`, anything. Any phrasing counts as an instruction and satisfies the global "ask before picking a commit target" rule for the rest of the session — no target keyword ever needed again this session.
+`target` is free text on where to commit — `main`, `new branch`, `current worktree`, anything. Any phrasing counts as an instruction for the rest of the session.
 
-No target given, and none stated yet this session: stop and ask which target, per that global rule.
+Off `main`: commit to the branch checked out.
 
-Target given or already on record, but it doesn't match the branch actually checked out: fail loud, surface the mismatch, don't commit.
+On `main`, no target: stop and ask, per the global rule.
+
+Target given that doesn't match the branch checked out: fail loud, don't commit.
 
 ## Staging
 
