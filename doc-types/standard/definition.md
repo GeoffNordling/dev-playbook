@@ -63,12 +63,6 @@ name is a standard's.
   not a partition of it — pointers, not directory placement, say what
   belongs to what.
 
-## What a standard is not
-
-Not everything normative is a standard. A device built to serve a
-purpose — an artifact format, a tool, a template — is an answer, so it
-belongs inside a cell rather than in the catalog.
-
 ## Scope
 
 Every standard has a **scope** — the population it governs:
@@ -82,10 +76,8 @@ Every standard has a **scope** — the population it governs:
   shares; the recipe is
   [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
 
-Exactly two levels — a standard governs the whole workspace or a single
-repo, never an intermediate group. Deeper nesting is deliberately
-unsupported (YAGNI): no third scope is introduced until a real
-population sits between "one repo" and "every repo."
+Exactly two levels: a standard governs the whole workspace or a single
+repo, never an intermediate group.
 
 **No shadowing.** A repo-scoped standard's directory name is one no
 workspace-scoped standard carries, since a consumer's

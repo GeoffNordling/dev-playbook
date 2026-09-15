@@ -1,21 +1,18 @@
 ---
 type: General-Sheet
 title: Cells and Rulesets
-description: Standard's contract shape — four cells, one per verb, each a pointer list, with the ruleset a Define pointer reaches, one population and its rules — in prose, one screen of pseudocode, and the relations every Standard collapses to
+description: Standard's contract shape — four cells, one per verb, each a pointer list, with the ruleset a Define pointer reaches, one population and its rules — in prose, and the relations every Standard collapses to
 ---
 
 # Cells and Rulesets
 
 Four cells and the rulesets they point at are Standard's contract shape
 ([Doc-Type](/doc-types/doc-type.md)): the form every Standard's
-contract takes. Returning to a topic months later should not require
-re-deriving shared understanding over several turns of conversation.
-Each Standard therefore has a **card**: a small fixed-format record
-that tells a user or agent where to look, one cell per verb, so a
-thought that originates at the abstract level ("how do we do X here?")
-resolves to concrete files in one hop. Below the card sit its
-**rulesets**, the files that describe the state the Standard holds its
-population to.
+contract takes. Each Standard has a **card**, a small fixed-format
+record with one cell per verb, so a question at the abstract level
+("how do we do X here?") resolves to concrete files in one hop. Below
+the card sit its **rulesets**, the files that describe the state the
+Standard holds its population to.
 
 ## The shape
 
@@ -92,51 +89,15 @@ A ruleset is a markdown file at `standards/<name>/<topic>.md` with
   fire.
 
 The composition rule at the ruleset: exactly one population, any number
-of rules, unordered. A ruleset is a collection, so its shape is a
-relation, and every ruleset owns a distinct rule set. A ruleset carries
-no pointer to its card and no rationale field: the path names the card,
-and rationale is another document's thing
+of rules, unordered. A ruleset carries no pointer to its card and no
+rationale field: the path names the card, and rationale is another
+document's thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)).
 
-The whole shape in pseudocode:
+The shape's pseudocode is no longer kept here: the target state's is
+[Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language),
+which is speculative and ahead of what the encoding below implements.
 
-```python
-class Standard(Object):
-    """One card and its rulesets. Defined, audited, enforced, adopted; binds state, never process."""
-
-    operations = {define, audit, enforce, adopt}                    # one cell each, below
-
-    question: str                       # "Governs how ..." — one breath
-
-    # four cells, one per verb; a cell is a list of pointers, or the literal word "none"
-    define:  list[Pointer[Ruleset]]                 # required, at least one
-    audit:   list[Pointer[Detector]] | None         # what a Loop's check composes
-    enforce: list[Pointer[Gate | OnDemand]] | None  # Gate = commit | push | CI; OnDemand = a tool that rewrites
-    adopt:   list[Pointer[Runbook | Loop]] | None
-
-    # rules: each a predicate over one card's state
-    location    = path == f"standards/{name}/card.md"       # beside its rulesets
-    frontmatter = type == "Standard-Card" and description == question
-    layout      = h2s == ["Define", "Audit", "Enforce", "Adopt"]
-
-
-class Ruleset(Object):
-    """One population and its rules. What a Define pointer reaches."""
-
-    operations = Standard.operations                                # a file kind of Standard, not a doc-type
-
-    population: ObjectClass         # one class, exclusions included
-    rules: set[Rule]                # any number, unordered
-
-    location    = path == f"standards/{card}/{topic}.md"    # beside its card
-    frontmatter = type == "Standard-Ruleset" and population is not None
-
-
-class Rule:
-    name:      str                  # unique within its ruleset
-    condition: Condition | None     # a named subset of the population; None binds every member
-    predicate: str                  # English or a lint, checked against one member at one moment
-```
 
 ## The view
 
@@ -189,5 +150,4 @@ directory, never a pointer in the file. A rule with no condition shows
 
 The three relations join on the card column: which Standards exist,
 which rulesets and detectors each points at, which rules each ruleset
-holds. Every other question is a grep. A fourth table, rule to lint,
-joins on the rule column later, and drift is a set difference.
+holds.

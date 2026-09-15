@@ -11,8 +11,7 @@ The layer below
 takes so a lint reads every act, check, yield, and condition
 deterministically, and where the file sits. The graph is the source of
 truth; the prose around it carries only what a Mermaid label cannot,
-the pointers and the conditions in full. Loop has no generator and no
-generated view: the graph GitHub renders is the view. What checks that
+the pointers and the conditions in full. Loop has no generated view: the graph GitHub renders is the view. What checks that
 graph and prose agree is a lint, and the Standard that stations it is
 [Loop Conventions](/standards/knowledge-organization/loop-conventions.md).
 

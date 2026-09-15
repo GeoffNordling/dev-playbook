@@ -4,11 +4,13 @@ okf_version: "0.1"
 
 # doc-types/ — index
 
-The documentation type system: what a doc-type is, this repo's
-instantiation, and one directory per built doc-type.
+The documentation type system as built: what a doc-type is, this
+repo's instantiation, and one directory per built doc-type. The theory
+and the target state are the working set's
+([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)).
 
-- [Doc-Type](/doc-types/doc-type.md) — The doc-type kind — operations plus a composition rule, fixing a contract shape — and the doc-type build loop that produces one from a documentation family
-- [Doc-Type System](/doc-types/doc-type-system.md) — This repo's doc-type instantiation — the registry rulings, the roster of built doc-types, and the import surface for consumer repos
+- [Doc-Type](/doc-types/doc-type.md) — What a doc-type is in one sentence, where the theory of the doc-type system now lives, and the residual every built doc-type records
+- [Doc-Type System](/doc-types/doc-type-system.md) — This repo's doc-type instantiation — the registry rulings, the three built doc-types, what each directory holds, and the Standard that binds each one
 
 ## Directories
 
