@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Doc-Type System
-description: The root of the doc-type system strand — the language of doc-types, verbs, and predicates, its principles, the rulings filed here, and the worklist from the Standard's new shape through the first instance and the vocabulary pass
+description: The root of the doc-type system strand — the language of doc-types, verbs, and predicates, its principles and terms, and the worklist from the Standard's new shape through the first instance
 ---
 
 # Doc-Type System
@@ -41,37 +41,33 @@ specification.
   of it, never as a linear description plus actions. The reference
   model is the witness; the predicates are the spec; both are kept.
   Both use the words of
-  [Glossary](/worktree-synthesis-notes-working-docs/glossary.md), one
+  [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms), one
   meaning each.
 - **Predicates are written one way.**
   [Writing Predicates](/worktree-synthesis-notes-working-docs/doc-type-system/writing-predicates.md)
   is how; it may become the Standard that governs it.
-
-## Decided
-
 - **Stochasticity is a continuous scale per file.** A markdown file
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
   lies outside its declared structure, which is what the doc-type
   build loop already calls the residual. The bedrock of determinism is
   a threshold on content, not a line between file kinds.
-  [System Legibility](/docs/system-legibility.md)'s sentence that
-  documentation is the stochastic thing and code the deterministic one
-  is imprecise and needs one clause to say this.
 - **Shape is orthogonal to stochasticity.** A fully deterministic
   runbook or loop still gets its doc-type document, because the
   document is the legible form. The one requirement that follows is
   a drift check between the document and its substrate, the same
   deterministic rule chaingen applies to a runbook and its chain. The
-  loop half is filed in the Loop strand
-  ([Decided](/worktree-synthesis-notes-working-docs/loop/ROOT.md#decided)).
-- **An encoding defines an extractor; it is not a spec.** Under the
-  glossary a spec is a set of predicates. An `encoding.md` is mostly a
-  function, the primitive map from written form to rows, which is the
-  extractor's definition. The well-formedness predicates buried in it,
-  a span nests at most two deep, one link names a target, belong in
-  the Standard whose verifier is the drift check, or in the one coarse
-  rule every grammar induces: the file parses.
+  loop half is in the Loop strand
+  ([Principles](/worktree-synthesis-notes-working-docs/loop/ROOT.md#principles)).
+
+## Terms
+
+- **DocType** — the base class of
+  [Reference Model](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md):
+  a class extends it when its instance is one markdown file of that
+  type. `Object`, its earlier name, is retired.
+- **Part** — a class nested inside a DocType: an Edge, a Rule, an
+  Act, a Check, a Yield. A part has no verbs.
 
 ## Open
 
@@ -117,7 +113,7 @@ specification.
      shape as declared data is the same fact base item as step 2's.
   4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
      Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
-     views, and bind the type `Standard` to `standards/<name>/<topic>.md`.
+     files, and bind the type `Standard` to `standards/<name>/<topic>.md`.
      Reason: the reference model places every cell elsewhere, Define is
      the Standard file, Audit is the verifier table, Enforce is the
      boundary config, and Adopt was never a primitive; and viewing is
@@ -125,7 +121,7 @@ specification.
      [Reference Model](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md#what-goes-where)
      lists each disposition. The fact base's extractors item strikes
      the card extractor for this reason. `rulegen` goes as a script
-     with its `.txt` view; its logic moves into the package as the
+     with its `.txt` file; its logic moves into the package as the
      `standard` extractor, per that item
      ([Planned](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#planned)).
   5. *`Object` becomes `DocType`, and the one-module lint.* Rename
@@ -146,7 +142,7 @@ specification.
      under `standards/` in the shape step 1 produces, bound to no repo
      boundary. Reason: the first loop's checks point at it, and a loop
      must not bind to the Standard shape that step 4 deletes.
-  8. *Ban the word guard.* See the vocabulary pass below.
+  8. *Ban the word guard.* See the banned words below.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
   system, after step 7: its checks point at the specification as a
   Standard, and the loop grows it. In iteration order: an act drafts
@@ -163,32 +159,27 @@ specification.
   [Writing Predicates](/worktree-synthesis-notes-working-docs/doc-type-system/writing-predicates.md);
   after the guide settles. Also improve writing-predicates.md; it's
   a rough first draft user does not endorse it yet.
-- **One meaning per word, one home per word.** A pass over every
-  word the four strands use, in
-  [Glossary](/worktree-synthesis-notes-working-docs/glossary.md),
-  the reference model, the specification, the three doc-type
-  directories, the fact base and viewer pages, and `CONTEXT.md`, that
-  ends with every term defined once, in one place, in a sentence a
-  verifier could read, and every other use linking to it. Reason: the
-  same word carried two senses more than once in this work, guard
-  beside condition, evaluator beside verifier, bundle beside
-  directory, and each cost a round of correction; a loop reading these
-  files cannot ask which sense was meant. What the pass produces: a
-  list of every term with its one home; a merge or a rename for every
-  overlap, duplication, or conflict found; and a banned-word entry in
-  prose-lint for each word retired on the way, guard first, so a habit
-  in the model's weights is caught at the commit boundary rather than
-  by the user. The merge of the two branches found these collisions
-  for the pass to rule on, one at a time with the user: rule, a
-  Standard's predicate against the fact base's rows-to-rows function;
-  kind, a view file's, a registry entry's, and `Rule.kind`; registry,
-  the doc-type roster against the viewer's list of kinds; view;
-  condition; extractor beside generator and encoding; `Object` beside
-  `DocType`; adopt. The fact base page's claim to rule vocabulary on
-  its own is withdrawn in favor of this pass.
+- **Banned words in prose-lint.** One entry for each retired word,
+  guard, generator, and adopt, each message naming the word to use
+  instead, so a habit in the model's weights is caught at the commit
+  boundary rather than by the user. The three doc-type directories
+  and `CONTEXT.md` take the set's terms when the strand drains.
+- **One clause in System Legibility.** Its sentence that
+  documentation is the stochastic thing and code the deterministic
+  one is imprecise; one clause says that stochasticity is a scale per
+  file ([Principles](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#principles)).
 
 ## Completed
 
+- **One meaning per word, one home per word, 2026-09-15.** Every
+  word the four strands use is defined once, in the Terms bucket of
+  the set's root where more than one strand uses it and of a strand's
+  root where one does, and every other use links to it. Reason: the
+  same word carried two senses more than once in this work, guard
+  beside condition, evaluator beside verifier, bundle beside
+  directory, and each cost a round of correction; a loop reading these
+  files cannot ask which sense was meant. The words are in the set's
+  [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms).
 - **Standard is one doc-type.** Merged into one directory,
   [doc-types/standard/](/doc-types/standard/index.md), with Contract
   defined by the cut in [Doc-Type](/doc-types/doc-type.md). The shape
@@ -198,5 +189,4 @@ specification.
 ## Acronyms
 
 - **CI** — Continuous Integration.
-- **LLM** — Large Language Model.
 - **PR** — Pull Request.

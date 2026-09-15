@@ -38,7 +38,7 @@ doc-type system writes defines an extractor of the fact base; every
 view the viewer draws is a selection of the fact base. Loop is a leaf.
 
 ```
-                             glossary.md
+                            ROOT.md#terms
                       one meaning per word, all four
                                   │
   ┌───────────────────────────────┴────────────────────────────────┐
@@ -50,7 +50,7 @@ view the viewer draws is a selection of the fact base. Loop is a leaf.
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │
-  │  plan: refactor steps 1–8 · vocabulary pass · /write-predicates│
+  │  plan: refactor steps 1–8 · banned words · /write-predicates  │
   │        · first instance, a loop that proposes predicates       │
   └────────────┬──────────────────────────────────┬────────────────┘
   Loop is one  │                                  │  each encoding
@@ -91,24 +91,124 @@ view the viewer draws is a selection of the fact base. Loop is a leaf.
 
 ## Terms
 
-Every strand uses the words of
-[Glossary](/worktree-synthesis-notes-working-docs/glossary.md), one
-meaning each. A word a strand coins for itself is in that strand's
-root.
+The words of the set, one meaning each, used in these senses by every
+strand. This is the conceptual model, what domain-driven design calls
+the ubiquitous language: the level above the pseudocode of
+[Reference Model](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md)
+and above the predicates that describe the same target. Three levels,
+top down: these terms are the words; the reference model is one
+witness in pseudocode; the specification is the predicates. A word
+one strand coins for itself is in that strand's root. The entries are
+the seed of the system's eventual context file.
 
-## Decided
+### Logic
 
-- **The two branches are one theory.** The loop branch is the
-  language: doc-types, verbs, rules as predicates, encodings as
-  grammar. The cloa branch is what the language compiles to:
-  extractors are the parsers, the fact base is the symbol table, views
-  are selections over it. The reference model says the CLOA is a view
-  derived deterministically from structure embedded in the files; the
-  fact base says every view is a selection from the fact base. Two
-  sessions that never saw each other wrote the same sentence. What the
-  reading found was vocabulary drift and gaps left by work not yet
-  done, no fundamental incompatibility. Each gap is filed in one
-  strand's root, under Decided, Open, or Planned.
+- **State** — everything a predicate may read at one moment: the repo
+  tree and the targets outside it.
+- **Predicate** — a statement about one member at one moment that is
+  true or false. It defines a set: the states where it holds.
+- **Rule** — a predicate as it lives in a Standard: an id, a kind, the
+  predicate text, and an optional condition. A rule is about one
+  member; the Standard lifts it to the state: every member of the
+  population satisfies it.
+- **Kind** — a rule's, deterministic or stochastic: which verifier
+  decides it.
+- **Condition** — the predicate under which a part applies: for a
+  rule, the rule it is under; for a runbook edge or a loop step, when
+  it fires. Where the condition is false the part is not evaluated,
+  so a rule's set widens to include those states. The word is
+  condition, never guard.
+- **Population** — the class of targets a Standard's rules range over.
+- **Specification** — a set of predicates taken together. It defines
+  the intersection of their sets. A Standard is a spec written as a
+  file over a population. Short form: spec.
+- **Target state** — the set of states that satisfy a spec. Not one
+  state; a set.
+- **Reference model** — one state that satisfies the spec, drawn out.
+  A witness. Model checking writes the relation as M ⊨ φ: the model
+  satisfies the formula. Property-based testing calls the same pair
+  example and property. Model and spec are the two written forms of
+  one target.
+
+### Verification
+
+- **Verifier** — what decides a rule for a member. A script for a
+  deterministic rule, a judge for a stochastic one.
+- **Deterministic rule** — its verifier is a function. Same input,
+  same answer. Hard set membership.
+- **Stochastic rule** — its verifier is a judge with an error rate. A
+  noisy classifier of membership. This is the one place statistics
+  enters the logic.
+- **Finding** — one member and the rule it fails. Evidence that the
+  state is outside the set. A loop's working state: a check returns
+  findings and the acts read them.
+- **Audit** — per [CONTEXT.md](/CONTEXT.md#governance): here, an
+  evaluation of a spec against a state that returns the findings.
+  Zero findings means the state is in the set, up to judge error.
+- **Gate** — per [CONTEXT.md](/CONTEXT.md#governance): a boundary on
+  the path to main that blocks on an audit's findings. A loop's check
+  audits and never gates.
+
+### Extraction
+
+- **Encoding** — a doc-type's map from written form to rows: which
+  marks in a file of that type carry which primitives. It defines
+  the doc-type's extractor and is not a spec: the well-formedness
+  predicates in it, a span nests at most two deep, one link names a
+  target, belong in a Standard whose verifier is the drift check, or
+  in the one coarse rule every grammar induces, the file parses.
+- **Extractor** — a deterministic function from one artifact to rows.
+  It reads a file and yields nodes and edges. A bedrock extractor
+  parses a format someone else fixed; a doc-type extractor is the
+  function that doc-type's encoding defines. The word is extractor,
+  never generator.
+- **Fact base** — the one object underneath every view: a set of nodes
+  and a set of edges, written by code to one file per checkout.
+- **Node** — one thing with an identity, a node type, a provenance, and
+  attributes. An identity is a repo-relative path
+  ([Contract](/worktree-synthesis-notes-working-docs/viewer/contract.md#identities));
+  an imported node has a name instead, and a bucket is named
+  `bucket:<name>`.
+- **Edge** — one relation from a source node to a target node, with a
+  relation type, and, where the source declares them, an order, a
+  condition, and a detail quoted from the source. The detail is what
+  the runbook encoding calls annotation
+  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)).
+- **Derivation** — a deterministic function from rows to rows. It
+  reads the fact base and derives new rows from existing ones, with
+  no judgment, and never touches a file. Not a rule: a rule is a
+  Standard's.
+- **View** — a selection of nodes and edges from the fact base, plus a
+  renderer. A view drops rows; it never adds or converts one.
+- **Residual** — what a doc-type's selected primitives cannot express
+  about one of its documents, recorded in that doc-type's ledger
+  ([Doc-Type](/doc-types/doc-type.md#the-doc-type-build-loop)).
+
+### Statistics
+
+- **Distribution** — the states an act could leave behind, each
+  weighted by how likely it is, given the state it starts from and the
+  prompt it is given. Some of the weight falls inside the target set,
+  some outside. A distribution is not a set and a set is not a
+  distribution.
+- **Sample** — one state an act did leave behind: one draw from its
+  distribution.
+- **Loop** — the one sentence of [Loop](/doc-types/loop/definition.md).
+  In these terms: a trajectory of samples that ends when one lands
+  in the set or when a yield's condition holds first. Each sample
+  starts from the last, with its findings in the prompt, so the
+  samples are not independent: the trajectory is a path through state
+  space. Check audits the sample, act draws the next one, yield exits
+  to the user or another loop.
+
+Logic and statistics meet at one seam. Predicates define a set, with
+no probabilities attached. An act is a draw from a distribution over
+states, and the draw lands in the set or outside it. A loop does not
+change the LLM; it changes what the next draw is given:
+check finds where the last sample fell outside, act draws again with
+those findings in the prompt, so successive samples land in the set
+more often. Deterministic rules decide membership exactly; stochastic
+rules decide it with an error rate. Everything else is logic.
 
 ## Open
 
@@ -136,3 +236,4 @@ from it.
 
 - **CLOA** — Correct Level of Abstraction.
 - **IDE** — Integrated Development Environment.
+- **LLM** — Large Language Model.

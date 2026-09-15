@@ -20,9 +20,11 @@ where the extractors run out.
 
 ## Terms
 
-Every term here, fact base, node, edge, extractor, receipt, and view,
-is defined once in
-[Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms).
+Every term here is defined once: fact base, node, edge, extractor,
+and view in the set's
+[Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms),
+receipt in the strand's
+[Terms](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#terms).
 This page adds none.
 
 ## The data file

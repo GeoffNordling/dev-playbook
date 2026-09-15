@@ -11,7 +11,7 @@ How work reaches a loop when the user is not there. Speculative, per
 
 ## The predicate
 
-A **predicate** is defined in [Glossary](/worktree-synthesis-notes-working-docs/glossary.md), and
+A **predicate** is defined in [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms), and
 [Writing Predicates](/worktree-synthesis-notes-working-docs/doc-type-system/writing-predicates.md#the-litmus) holds the
 litmus a candidate passes before it is one.
 

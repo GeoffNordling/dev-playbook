@@ -33,39 +33,12 @@ fast, and identical until the checkout changes.
 
 ## Terms
 
-- **fact base** — the one object underneath every view: a set of nodes
-  and a set of edges, written by code to one file per checkout.
-- **node** — one thing with an identity, a node type, a provenance, and
-  attributes. An identity is a repo-relative path
-  ([Contract](/worktree-synthesis-notes-working-docs/viewer/contract.md#identities));
-  an imported node has a name instead, and a bucket is named
-  `bucket:<name>`.
-- **edge** — one relation from a source node to a target node, with a
-  relation type, and, where the source declares them, an order, a
-  condition, and a detail quoted from the source. The detail is what
-  the runbook encoding calls annotation
-  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)).
-- **receipt** — the extractor and the line that yielded a row. Every
-  row carries one, so every fact can be checked against its file and
-  every missing fact shows where a declaration would have to be.
-- **extractor** — a deterministic function from one artifact to rows.
-  It reads a file and yields nodes and edges. A bedrock extractor
-  parses a format someone else fixed; a doc-type extractor reads a
-  contract shape this repo declared.
-- **rule** — a deterministic function from rows to rows. It reads the
-  fact base and derives new rows from existing ones, and never touches
-  a file.
-- **view** — a selection of nodes and edges from the fact base, plus a
-  renderer. A view drops rows; it never adds or converts one.
-- **primitive** — one named element of a vocabulary: `reads`,
-  `bucket:git`, `contains`.
-- **vocabulary** — the closed set of primitives one doc-type owns
-  ([Reference Chain](/doc-types/runbook/contract-shape.md#edges)).
-- **schema** — the fact base's set of node types and relation types:
-  the union of every vocabulary plus the bedrock relations. The fact
-  base has a schema and no vocabulary of its own.
-- **residual** — what a selected set of primitives cannot express about
-  an object ([Doc-Type](/doc-types/doc-type.md#the-doc-type-build-loop)).
+Fact base, node, edge, extractor, derivation, view, and residual are
+the set's words
+([Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms));
+receipt, primitive, vocabulary, and schema are the strand's
+([Terms](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#terms)).
+This page defines none.
 
 ## Two kinds of fact
 
@@ -126,16 +99,17 @@ An extractor is either bedrock, a parser over a format someone else
 fixed, or a doc-type's own reader over a contract shape this repo
 declared. Extractors are the only code that touches a file.
 
-## Rules
+## Derivations
 
-A rule reads rows and derives rows. It never touches a file, so it
-carries no line in its receipt; its receipt names the rule and the rows
-it derived from. The Ralph simulation used no rule: every row in it
-came from an extractor. Rules are where rollup lives. "A directory
-contains everything its children contain" is a rule. "A subsystem does
-what its members do" is a rule, once something declares a subsystem.
-Whether a rule's output is stored in the fact base or computed by a
-view at selection time is not decided.
+A derivation reads rows and derives rows. It never touches a file, so
+it carries no line in its receipt; its receipt names the derivation
+and the rows it derived from. The Ralph simulation used no derivation:
+every row in it came from an extractor. Derivations are where rollup
+lives. "A directory contains everything its children contain" is a
+derivation. "A subsystem does what its members do" is a derivation,
+once something declares a subsystem. Whether a derivation's output is
+stored in the fact base or computed by a view at selection time is not
+decided.
 
 ## Views are selections
 
@@ -277,7 +251,7 @@ One subsystem was simulated by hand, the Ralph loop, before any code:
 [Ralph Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.md)
 defines it and
 [fact-base-ralph.json](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.json)
-is the data as a generator would write it, in the viewer's envelope.
+is the data as an extractor would write it, in the viewer's envelope.
 Nineteen nodes, forty-one edges, every row with a receipt. The
 simulation found:
 
@@ -386,7 +360,7 @@ what the next one needs.
    already repeatable work, and the third is a loop, not a session. An
    agent runs the E-step, writes the fact base and the residuals, and
    proposes primitives; the user accepts or rejects and justifies
-   neither. The same loop later generates extractors and rules. The
+   neither. The same loop later writes extractors and derivations. The
    user designs from scratch only at a beginning, the way this page was
    designed.
 
@@ -396,13 +370,8 @@ The viewer and the fact base are two concerns, delivery and theory.
 Every kind in the viewer pages is a selection from one fact base, and
 where those pages disagree with this page, this page has priority.
 
-This page's claim to rule vocabulary on its own is withdrawn. The two
-words it claimed, **extractor** and **rule**, go to the doc-type
-system's vocabulary pass with every other collision the merge of the
-two branches found
-([Planned](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#planned)),
-and the pass rules on each with the user. Until it does, each word
-keeps the meaning Terms gives it here, and no other page moves.
+This page defines no word
+([Terms](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms)).
 
 ## Acronyms
 

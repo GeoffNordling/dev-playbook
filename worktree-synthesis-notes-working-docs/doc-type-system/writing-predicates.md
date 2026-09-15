@@ -6,7 +6,7 @@ description: How to write a rule so a verifier can decide it — one member, one
 
 # Writing Predicates
 
-A predicate and a specification are defined in [Glossary](/worktree-synthesis-notes-working-docs/glossary.md).
+A predicate and a specification are defined in [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms).
 This guide is how to write one so that a script or a judge can decide
 it, learned from the corrections made while writing the doc-type
 system's own specification. Speculative, per
@@ -84,7 +84,7 @@ the path, `doc-types/<name>/`, to a coined name for it. Prefer the
 industry term to a local one: condition, verifier, specification.
 One meaning per word: the word used for a rule's guard is condition,
 and the same word is never used in a second sense in the same
-document. Where a term is needed, define it once, in the glossary,
+document. Where a term is needed, define it once, in Terms,
 and link to the definition everywhere else.
 
 ## The trailer

@@ -93,10 +93,13 @@ Whether Loop gains a part for it is open, in
   a runbook, whole: a runbook is one move. A check points at a
   Standard, whole: an audit is one measurement. A loop is moves and
   measurements iterated toward a target.
-- **A Loop instance is a document, not code.** A `.js` workflow file is
-  a JS file. The Loop doc-type sits one level of abstraction above any
-  runtime. When the `.claude/workflows/*.js` row of the registry is
-  ruled, it is a runtime that runs loops, not the Loop family.
+- **A Loop instance is a document; code that runs it is its
+  substrate.** A `.js` workflow file is a JS file. The Loop doc-type
+  sits one level of abstraction above any runtime, and a drift check
+  binds the document to its substrate, the same deterministic rule
+  chaingen applies to a runbook and its chain. When the
+  `.claude/workflows/*.js` row of the registry is ruled, it is a
+  runtime that runs loops, not the Loop family.
 - **The family mirrors Standard's.** Instances are files typed `Loop`
   under `loops/`, registered in
   [Document Types](/standards/knowledge-organization/document-types.md)

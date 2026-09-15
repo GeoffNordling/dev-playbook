@@ -8,7 +8,7 @@ population: "a doc-type: its directory doc-types/<name>/ in dev-playbook, every 
 # Doc-Type Specification
 
 The target state as a set of predicates, in the words of
-[Glossary](/worktree-synthesis-notes-working-docs/glossary.md) and
+[Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms) and
 the form of a Standard: a rule is an H2, its predicate is the first
 paragraph, and an H2 with H3s is the condition of each of them. This
 file holds what any doc-type satisfies; each file beside it, one per

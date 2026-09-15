@@ -23,14 +23,12 @@ disagree, the fact base has priority
 
 ## Terms
 
-- **fact base** — the one object underneath every view
-  ([Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms)).
+- **fact base**, **view**, **extractor** — the set's words
+  ([Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms)).
 - **CLOA object** — what a doc-type's contract shape defines for one
   document, a runbook's Reference chain, a Standard's rules
   ([Doc-Type](/doc-types/doc-type.md)). In the fact base it is
   the nodes and edges that document's doc-type extractor yields.
-- **view** — a selection from the fact base plus a renderer
-  ([Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms)).
 - **checkout** — one working copy of a repo, a main checkout or a
   worktree; the unit the viewer shows.
 - **view file** — one JSON file the server writes and the viewer shows as
@@ -38,8 +36,14 @@ disagree, the fact base has priority
   ([Contract](/worktree-synthesis-notes-working-docs/viewer/contract.md)).
 - **kind** — a registered view: a selection, a renderer, and a doc page
   under one name ([an entry](/worktree-synthesis-notes-working-docs/viewer/registry.md#an-entry)).
+  The set's word for it is view; the pages and the code keep kind
+  until the rename lands
+  ([Planned](/worktree-synthesis-notes-working-docs/viewer/ROOT.md#planned)).
 - **registry** — the list of kinds the tool can show
   ([Registry](/worktree-synthesis-notes-working-docs/viewer/registry.md)).
+  Goes with kind: registry is the doc-type registry of
+  [Document Types](/standards/knowledge-organization/document-types.md),
+  and this list becomes the views in the same rename.
 - **panel** — one view file rendered on screen.
 - **state directory** — the directory outside every repo where view files
   live
@@ -100,7 +104,7 @@ targets.
   drawing rules are stated here, in the kind's registry entry, and the
   meaning they draw is the doc-type's.
 - **A view drops; it never adds or converts**
-  ([Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms)).
+  ([Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms)).
   When a panel needs a shape the fact base lacks, the extractor or a
   rule changes, upstream of every view. No layer converts one view into
   another.
@@ -220,6 +224,12 @@ each waits on it.
 - **Pinning and the arrangement** — pin, close others, and the
   arrangement saved and restored per checkout.
 - **Stale badge** — the badge on a panel whose commit is behind HEAD.
+- **Kind becomes view** — kind and view are one thing under two
+  words ([Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms)):
+  the envelope's `kind` field becomes `view`, the `kinds` package
+  becomes `views`, the registry becomes the views and its page
+  `views.md`, and every page of this strand follows, in one change
+  so the pages never describe a field the code does not have.
 
 ## Completed
 

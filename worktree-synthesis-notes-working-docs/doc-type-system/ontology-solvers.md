@@ -77,8 +77,8 @@ remainder; the block sits at zero.
 Check: extract the fact base, run the solver, findings are
 inconsistencies and violations. Act: fix what a finding names. Yield:
 when a finding needs a judgment. Which thing the act fixes is the
-fork: the repo, which is the adopt loop with the ontology as its
-Standard; or the pseudocode, which is the doc-type build loop with the
+fork: the repo, which is the loop that brings a repo to a Standard,
+with the ontology as that Standard; or the pseudocode, which is the doc-type build loop with the
 findings the user rules the model's fault as its residual. The solver
 never reports a missing class. That comes from residuals, as today.
 
@@ -102,13 +102,6 @@ checks both over one fact base per checkout. The case for the engine
 at the domain layer: schema as data, existing vocabularies such as
 schema.org's `JobPosting` and `Organization`, and open-world fit for
 partial domain knowledge.
-
-## Decided
-
-Nothing. The user is not convinced two solvers, mypy and an engine,
-are needed, and the question stays open
-([Open](/worktree-synthesis-notes-working-docs/ROOT.md#open)). Whether
-the fenced pseudocode becomes real Python is open in this strand's root.
 
 ## Acronyms
 

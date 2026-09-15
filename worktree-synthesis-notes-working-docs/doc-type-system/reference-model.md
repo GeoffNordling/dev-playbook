@@ -100,6 +100,7 @@ Target = DocType | File | Issue | PullRequest | External   # what an edge lands 
 
 ```python
 verifiers: dict[RuleId, Script | Judge]      # the one sync point: every rule id has a verifier
+extractors: dict[type[DocType], Extractor]   # each encoding defines one: written form to rows
 def audit(standard, state) -> list[Finding]  # parse the file, route each id, skip where the condition fails, collect failures
 boundary: commit hook | make check | CI | a loop's check     # each names the rule ids it runs
 ```

@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Fact Base Strand
-description: The root of the fact base strand — the one deterministic object under every view, its standing over the viewer, the rulings filed here, the worklist from hand simulations through extractors, declared data, and a stamped findings artifact, and what is done
+description: The root of the fact base strand — the one deterministic object under every view, its standing over the viewer, its principle and terms, the worklist from hand simulations through extractors, declared data, and a stamped findings artifact, and what is done
 ---
 
 # Fact Base Strand
@@ -32,27 +32,36 @@ the viewer's next kinds are selections from it.
 
 Where the viewer pages, or anything elsewhere in the repo, disagree
 with [Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md),
-that page has priority. Its claim to rule vocabulary on its own is
-withdrawn: words are settled by the doc-type system's vocabulary pass,
-one meaning per word across all four strands
-([Planned](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#planned)).
+that page has priority. It defines no word: the words the strand
+shares are the set's, and its own are below.
 
-## Terms
-
-The fact base's terms are in
-[Terms](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms).
-
-## Decided
+## Principles
 
 - **The fact base holds declarations and state, never findings.**
   Findings are a separate stamped artifact. Deterministic ones are
   recomputable from the fact base; stochastic ones are cached with
-  commit, judge, and time. This is the seam the glossary draws between
-  a set and a distribution.
-- **"Rule" splits.** The fact base's rows-to-rows function with no
-  judgment is a derivation. Its rows-to-violations function is a
-  verifier keyed by rule id. Standard keeps "rule". The rename runs in
-  the vocabulary pass.
+  commit, judge, and time. This is the seam Terms draws between a set
+  and a distribution.
+
+## Terms
+
+Fact base, node, edge, extractor, derivation, view, and residual are
+defined in the set's
+[Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms). The
+strand's own:
+
+- **Receipt** — the extractor and the line that yielded a row. Every
+  row carries one, so every fact can be checked against its file and
+  every missing fact shows where a declaration would have to be. A
+  derived row's receipt names the derivation and the rows it derived
+  from.
+- **Primitive** — one named element of a vocabulary: `reads`,
+  `bucket:git`, `contains`.
+- **Vocabulary** — the closed set of primitives one doc-type owns
+  ([Reference Chain](/doc-types/runbook/contract-shape.md#edges)).
+- **Schema** — the fact base's set of node types and relation types:
+  the union of every vocabulary plus the bedrock relations. The fact
+  base has a schema and no vocabulary of its own.
 
 ## Planned
 
@@ -73,7 +82,7 @@ In order; each produces what the next needs.
   extractors, the scripts and their text files deleted with the move
   and their logic kept, alongside the bedrock extractors, and a `loop` extractor
   reads a Loop document's Mermaid block
-  ([Decided](/worktree-synthesis-notes-working-docs/loop/ROOT.md#decided));
+  ([Planned](/worktree-synthesis-notes-working-docs/loop/ROOT.md#planned));
   one refresh writes one fact base per checkout; `chains.txt`, its
   siblings, and the shims go. The `card` extractor and `cardgen` are
   struck: the doc-type system retires Standard-Card, step 4 of
@@ -87,8 +96,8 @@ In order; each produces what the next needs.
   The fact base extracts declared files and bedrock only, so a map
   that is not declared data is not in it.
   Where they are declared is open.
-- **Findings as a stamped artifact.** The artifact the first Decided
-  item names: its shape, its stamp of commit, judge, and time, and how
+- **Findings as a stamped artifact.** The artifact Principles
+  names: its shape, its stamp of commit, judge, and time, and how
   a deterministic finding is recomputed from the fact base.
 - **The per-predicate tail query.**
   [Deterministic Separation](/worktree-synthesis-notes-working-docs/fact-base/deterministic-separation.md)
