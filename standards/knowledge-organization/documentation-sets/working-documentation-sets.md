@@ -1,7 +1,7 @@
 ---
 type: Standard-Ruleset
 title: Working Documentation Sets
-description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, the branch directory, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
+description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, the branch directory and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -17,6 +17,11 @@ below is the one difference the set adds, stated against the general rule
 it qualifies, and a member is otherwise judged as any member is. A member
 whose type is not yet settled carries `type: General-Sheet`
 ([Document Types](/standards/knowledge-organization/document-types.md#types)).
+
+The work may split into **strands**, each one line of it with its own
+worklist, held in one member or in one subdirectory with its own
+`ROOT.md`. Below, `ROOT.md` is the nearest root above the member, and
+the set is the whole tree, strands included.
 
 ## Speculative voice
 
@@ -43,16 +48,20 @@ what. `ROOT.md` need not link every member. A member no path from
 
 A set is one directory at the repo root, `<branch>-working-docs/`, named
 for the branch the work runs on; it holds the set's `index.md`, its
-`ROOT.md`, and its members under lowercase kebab-case names, and it
-exists on that branch alone, drained into permanent homes or deleted
-before the branch merges.
+`ROOT.md`, and its members under lowercase kebab-case names, flat or
+in subdirectories, and it exists on that branch alone, drained into
+permanent homes or deleted before the branch merges.
 
 The directory is the one
 [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
 makes a set, here named and placed. The branch `fix-index-drift` keeps
-its set in `fix-index-drift-working-docs/`. `main` carries no such
-directory, and a set under `docs/` is the defect: `docs/` holds
-permanent documents.
+its set in `fix-index-drift-working-docs/`. A subdirectory of the set
+is a child set as anywhere, and it is inside the work: one that holds a
+`ROOT.md` is a strand, and one that holds none is governed by the
+nearest `ROOT.md` above it, so a strand may hold a subdirectory of
+members with no root of their own. `main` carries no such directory,
+and a set under `docs/` is the defect: `docs/` holds permanent
+documents.
 
 ## Worklist
 
@@ -64,7 +73,8 @@ Completed is the one past state a member records
 ([current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
 Put the pair where it makes sense: one for the whole set, or one per
 strand where the work splits by level or by function. However it
-splits, a strand has one Planned and one Completed, in one file.
+splits, a strand has one Planned and one Completed, in one file, its
+`ROOT.md` where it is a directory.
 
 ## Buckets
 
@@ -88,13 +98,16 @@ bucket the set does not use is never a finding. The menu:
 ## Terms
 
 A term coined by the work and used in more than one member is defined in
-the Terms bucket of `ROOT.md`, in place of the entry
+the Terms bucket of `ROOT.md`, the root of the smallest strand that
+holds every member using it and the set's own root where it crosses
+strands, in place of the entry
 [terms defined once](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once)
 puts in the repo's `CONTEXT.md`.
 
 `CONTEXT.md` holds the term that crosses sets
 ([project terms only](/standards/knowledge-organization/context-content.md#project-terms-only)),
-and a term of the work crosses none until the set drains at merge; it
+and a term of the work crosses none until the set drains at merge, a
+strand being inside the set and not beside it; it
 earns its entry when the member that carries it lands in a permanent
 home and a second set uses it.
 
