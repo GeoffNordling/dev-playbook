@@ -171,6 +171,13 @@ specification.
   documentation is the stochastic thing and code the deterministic
   one is imprecise; one clause says that stochasticity is a scale per
   file ([Principles](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#principles)).
+- **One frontmatter line after the merge.** Minor.
+  [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+  went to `main` ahead of this branch, with the doc-set skills and
+  agents, on a branch that carried its frontmatter as `type: Standard`
+  because `main` has no `Standard-Ruleset` yet. When this branch
+  merges, that line must read `type: Standard-Ruleset` like every other
+  Standard; check it after the merge.
 
 ## Completed
 
