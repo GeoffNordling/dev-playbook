@@ -24,10 +24,12 @@ rule outside the assignment belongs to a sibling auditor.
 A set is the concept documents one `index.md` owns, the files in its
 directory
 ([Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
-{If the directory holds `ROOT.md`,
+{If the directory, or a directory above it up to the repo root, holds
+`ROOT.md`,
 {Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)}}:
 each section there is one difference stated against a general rule,
-and it falls to the slice that rule is assigned to. Read every
+and it falls to the slice that rule is assigned to; the nearest
+`ROOT.md` above a member is the root that standard means. Read every
 member of the set in full before judging anything, and read the index
 one level up and each index one level down. No neighbour's body opens
 for a set slice. A fact slice reads farther, because one home and terms
