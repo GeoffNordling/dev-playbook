@@ -48,7 +48,8 @@ pass starts only when the first pass's edits are on disk.
    is complete when every fact finding is fixed or named as left.
 2. **The set pass.** {Launch
    [doc-set-deslopper](~/.claude/agents/doc-set-deslopper.md) as a
-   typed subagent for each set, parent and children, in one message,
+   typed subagent for each set, the parent and every set nested under
+   it at any depth, in one message,
    each told its target is one set with its facts settled; its
    definition's `model: inherit` takes the session model}. A fork
    cannot launch a fork, and none is needed: shape, body, and prose
@@ -111,7 +112,7 @@ The set slices:
 
 A working set's differences reach the auditors through their own
 definition, which reads Working Documentation Sets whole when the
-directory holds `ROOT.md`; each section there qualifies one assigned
+directory or one above it holds `ROOT.md`; each section there qualifies one assigned
 rule, so it falls to that rule's slice. Any briefing the launching
 prompt adds travels to every auditor verbatim.
 
