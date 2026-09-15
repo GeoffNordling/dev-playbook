@@ -1,15 +1,17 @@
 ---
 type: General-Sheet
 title: Ontology Solvers
-description: Ontology solvers against the doc-type system — the fact base as an ABox, the doc-types as a TBox, a Standard's rules as shapes, a type checker as the same solver over program text, and the route from the fenced pseudocode to real Python, none of it decided
+description: Ontology solvers against the doc-type system — the fact base as an ABox, the doc-types as a TBox, a Standard's rules as shapes, a type checker as the same solver over program text, the route from the fenced pseudocode to real Python, and the document and domain ontologies another repository splits into, none of it decided
 ---
 
 # Ontology Solvers
 
 The record of one topic from a synthesis session on 2026-09-14: what
 an ontology solver is in industry terms, how the doc-type system and
-the fact base map onto one, and the route that turns the reference
-model's pseudocode into something a solver reads. Speculative, per
+the fact base map onto one, the route that turns the reference
+model's pseudocode into something a solver reads, and the two
+ontologies, document and domain, that extending the system to another
+repository shows. Speculative, per
 [Doc-Type System](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md).
 Nothing here is decided; the one question it raises is in the top
 root's [Open](/worktree-synthesis-notes-working-docs/ROOT.md#open).
@@ -78,9 +80,11 @@ Check: extract the fact base, run the solver, findings are
 inconsistencies and violations. Act: fix what a finding names. Yield:
 when a finding needs a judgment. Which thing the act fixes is the
 fork: the repo, which is the loop that brings a repo to a Standard,
-with the ontology as that Standard; or the pseudocode, which is the doc-type build loop with the
-findings the user rules the model's fault as its residual. The solver
-never reports a missing class. That comes from residuals, as today.
+with the ontology as that Standard; or the pseudocode, which is
+[the doc-type build loop](/doc-types/doc-type.md#the-doc-type-build-loop)
+with the findings the user rules the model's fault as its residual.
+The solver never reports a missing class. That comes from residuals,
+as today.
 
 ## Two ontologies
 
@@ -106,7 +110,6 @@ partial domain knowledge.
 ## Acronyms
 
 - **ABox** — Assertion box: the facts of a knowledge base.
-- **JSON** — JavaScript Object Notation.
 - **MIP** — Mixed-Integer Programming.
 - **OWL** — Web Ontology Language.
 - **RDFS** — Resource Description Framework Schema.

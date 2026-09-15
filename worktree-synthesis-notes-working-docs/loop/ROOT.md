@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Loop
-description: The root of the Loop strand — the third doc-type as a peer of Runbook and Standard, its principles and terms, the two planned items, and what is built
+description: The root of the Loop strand — the third doc-type as a peer of Runbook and Standard, its terms, principles, and prior art, the two planned items, and what is built
 ---
 
 # Loop
@@ -26,36 +26,35 @@ shape, an encoding, and a residual ledger, in one directory, with its row
 in the registry table and its entry in the roster of
 [Doc-Type System](/doc-types/doc-type-system.md).
 
+## Terms
+
+- **Loop** — per
+  [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms); the
+  shape carries its parts.
+- **Yield** — the third operation: a loop's programmed exit to
+  something outside it, another loop or the user. An instance writes
+  "yields when …"; the when is the instance's.
+- **Target state**, **finding**, **predicate**, **objective** — per
+  [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms).
+  [Specifying a Loop](/worktree-synthesis-notes-working-docs/loop/specifying-a-loop.md#the-three-written-forms)
+  holds the three written forms, goal, predicate, and objective.
+
 ## Principles
 
 - **Simple and composable.** The definition carries no policy. Yield is
-  where a loop is programmed to yield; the doc-type does not rule when a
-  loop is worth writing. The user decides that.
+  where a loop is programmed to yield; the user decides when a loop is
+  worth writing.
 - **Predicates, not fixes.** An idea about the doc-type system is
   written as a goal, a predicate, or an objective, never carried out as
   an instruction.
   [Specifying a Loop](/worktree-synthesis-notes-working-docs/loop/specifying-a-loop.md)
   holds the forms.
-- **Every loop gets a Loop document.** Shape is orthogonal to
-  stochasticity, general over doc-types
-  ([Principles](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#principles)):
-  a fully deterministic loop, even one a workflow runs, still gets a
-  Loop document, because the document is the legible form. A Loop
-  instance is a document and code that runs it is its substrate; a
-  drift check binds the two, the same deterministic rule chaingen
-  applies to a runbook and its chain.
-
-## Terms
-
-- **Loop** — the one sentence of [Loop](/doc-types/loop/definition.md);
-  the shape carries its parts.
-- **Yield** — the third operation: a loop's programmed exit to
-  something outside it, another loop or the user. An instance writes
-  "yields when …"; the when is the instance's.
-- **Target state**, **finding**, **predicate** — per
-  [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms).
-  [Specifying a Loop](/worktree-synthesis-notes-working-docs/loop/specifying-a-loop.md#the-three-written-forms)
-  holds the three written forms, goal, predicate, and objective.
+- **A Loop document for every loop.** Shape is orthogonal to
+  stochasticity
+  ([Principles](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#principles)),
+  so a fully deterministic loop, even one a workflow runs, still gets
+  a Loop document. For a loop the substrate is the code that runs it,
+  and the drift check binds the document to that code.
 
 ## Prior art
 
@@ -83,7 +82,7 @@ From memory, not a fresh search.
   Then Loop is used as it stands by that instance and by the fact
   base's simulation loop
   ([Planned](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#planned)).
-- **The Mermaid block is encoding.** A loop extractor reads it, and
+- **The Mermaid block as encoding.** A loop extractor reads it, and
   the view is drawn from rows, so the contract shape's "no generated
   table and no generator"
   ([Acts, Checks, and Yields](/doc-types/loop/contract-shape.md))
@@ -115,4 +114,5 @@ From memory, not a fresh search.
 
 ## Acronyms
 
-None.
+- **PDCA** — Plan-Do-Check-Act.
+- **OODA** — Observe-Orient-Decide-Act.

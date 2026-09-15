@@ -155,4 +155,4 @@ What the picture has no place for, and where each thing goes:
 
 ## Acronyms
 
-- **CLOA** — Correct Level of Abstraction.
+None.

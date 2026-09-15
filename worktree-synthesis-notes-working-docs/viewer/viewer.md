@@ -15,7 +15,7 @@ the panels it can draw are the
 
 ## Layout
 
-Three fixed regions, none movable in v1:
+Fixed regions, none movable in v1:
 
 - **Top bar** — the checkout toggle, the refresh button, and the status:
   connection, last refresh time and commit, and failed extractors or

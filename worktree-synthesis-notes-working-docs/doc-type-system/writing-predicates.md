@@ -95,7 +95,8 @@ carries both too.
 
 ## What is not a predicate
 
-- **An objective** is a scalar to minimize, "the fewest verbs". It
+- **An objective**
+  ([Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms))
   ranks states that satisfy the predicates; it is never one of them.
 - **A goal** is a predicate with the lifetime of one issue; it lives
   in the issue.

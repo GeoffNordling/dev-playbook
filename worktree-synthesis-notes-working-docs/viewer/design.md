@@ -22,7 +22,7 @@ the fact base
 The space of possible screens is the set of selections the schema
 admits, and it is walked by the questions a person asks of the system,
 the use cases the fact base simulations enumerate
-([Next steps](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#next-steps)).
+([Planned](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#planned)).
 Design is filtering it: which selection answers which question at a
 glance. A selection that answers no question is not drawn.
 

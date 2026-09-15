@@ -18,7 +18,7 @@ payload holds is stated here in words; the schemas come with the build.
 
 ## An entry
 
-A registry entry is three things under one lowercase kebab-case name:
+A registry entry holds, under one lowercase kebab-case name:
 
 - a selection, the nodes and edges the kind keeps from the fact base,
   and the payload schema that is the shape of that selection;

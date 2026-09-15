@@ -20,8 +20,9 @@ The operations are read, write, do, override, accept, report.
 
 ## Every edge lands
 
-Every edge carries one of the six and lands on a Target; a ban is a
-polarity on a write; accept and report carry no target and sit at the
+Every edge carries one of the six and lands on a
+[Target](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md#the-language);
+a ban is a polarity on a write; accept and report carry no target and sit at the
 root.
 
 `doc-type-system.runbook.edges` · deterministic

@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Synthesis Working Root
-description: The root of the unified working set — four strands, doc-type system, Loop, fact base, and viewer, the plan-dependency edges between them, the cross-strand decisions and open questions, and the order the strands run in
+description: The root of the unified working set — four strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
 ---
 
 # Synthesis Working Root
@@ -9,9 +9,8 @@ description: The root of the unified working set — four strands, doc-type syst
 This set is speculative: every member writes a guess as a guess, and
 every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
-`worktree-cloa-viewer-tool-2`, which one reading found to be one
-theory. The set is four strands, each with its own root and its own
-worklist
+`worktree-cloa-viewer-tool-2`, which describe one theory. The set is
+four strands, each with its own root and its own worklist
 ([Worklist](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#worklist)).
 This root holds only what crosses strands.
 
@@ -31,11 +30,11 @@ This root holds only what crosses strands.
 
 ## The four strands
 
-An edge is a plan dependency, what one strand's plan needs from
-another's, never a runtime data flow. There are three: the doc-type
-system defines Loop, one of its three doc-types; each encoding the
-doc-type system writes defines an extractor of the fact base; every
-view the viewer draws is a selection of the fact base. Loop is a leaf.
+A dependency is what one strand's plan needs from another's, never a
+runtime data flow. There are three: the doc-type system defines Loop,
+one of its three doc-types; each encoding the doc-type system writes
+defines an extractor of the fact base; every view the viewer draws is
+a selection of the fact base. Loop is a leaf.
 
 ```
                             ROOT.md#terms
@@ -65,11 +64,11 @@ view the viewer draws is a selection of the fact base. Loop is a leaf.
   │  drained · doc-types/loop/ │   │     · deterministic-         │
   │     · loop-lint · loops/   │   │       separation.md          │
   │  plan: the objective part, │   │  plan: simulations by hand · │
-  │        if any · then it is │   │   extractors chain, standard,│
-  │        used by the two     │   │   loop · verifier table and  │
-  │        loops above and     │   │   boundary config as declared│
-  │        right               │   │   data · findings as a       │
-  └────────────────────────────┘   │   stamped artifact · the     │
+  │        if any · its use by │   │   extractors chain, standard,│
+  │        the two loops above │   │   loop · verifier table and  │
+  │        and right           │   │   boundary config as declared│
+  └────────────────────────────┘   │   data · findings as a       │
+                                   │   stamped artifact · the     │
                                    │   simulation as a loop       │
                                    └──────────────┬───────────────┘
                                                   │  a selection
@@ -110,8 +109,6 @@ the seed of the system's eventual context file.
   predicate text, and an optional condition. A rule is about one
   member; the Standard lifts it to the state: every member of the
   population satisfies it.
-- **Kind** — a rule's, deterministic or stochastic: which verifier
-  decides it.
 - **Condition** — the predicate under which a part applies: for a
   rule, the rule it is under; for a runbook edge or a loop step, when
   it fires. Where the condition is false the part is not evaluated,
@@ -123,6 +120,10 @@ the seed of the system's eventual context file.
   file over a population. Short form: spec.
 - **Target state** — the set of states that satisfy a spec. Not one
   state; a set.
+- **Objective** — a scalar to minimize, "the fewest verbs". It ranks
+  the states that satisfy the predicates; it is never one of them, and
+  it is descended one proposed step at a time, each accepted or
+  vetoed by the user.
 - **Reference model** — one state that satisfies the spec, drawn out.
   A witness. Model checking writes the relation as M ⊨ φ: the model
   satisfies the formula. Property-based testing calls the same pair
@@ -138,8 +139,11 @@ the seed of the system's eventual context file.
 - **Stochastic rule** — its verifier is a judge with an error rate. A
   noisy classifier of membership. This is the one place statistics
   enters the logic.
+- **Kind** — a rule's, deterministic or stochastic: which verifier
+  decides it.
 - **Finding** — one member and the rule it fails. Evidence that the
-  state is outside the set. A loop's working state: a check returns
+  state is outside the set. What a loop carries from one step to the
+  next: a check ([Loop](/doc-types/loop/definition.md)) returns
   findings and the acts read them.
 - **Audit** — per [CONTEXT.md](/CONTEXT.md#governance): here, an
   evaluation of a spec against a state that returns the findings.
@@ -207,7 +211,7 @@ change the LLM; it changes what the next draw is given:
 check finds where the last sample fell outside, act draws again with
 those findings in the prompt, so successive samples land in the set
 more often. Deterministic rules decide membership exactly; stochastic
-rules decide it with an error rate. Everything else is logic.
+rules decide it with an error rate.
 
 ## Open
 
@@ -225,14 +229,15 @@ rules decide it with an error rate. Everything else is logic.
 
 ## Order
 
-The edges give the order. The doc-type system's refactor runs first,
-because Loop's predicates and the fact base's extractors bind to what
-it produces. Loop and the fact base then run beside each other. The
-viewer's next kinds wait on the fact base, since each is a selection
-from it.
+The dependencies give the order. The doc-type system's refactor runs
+first, because Loop's predicates and the fact base's extractors bind
+to what it produces. Loop and the fact base then run beside each
+other. The viewer's next kinds wait on the fact base, since each is a
+selection from it.
 
 ## Acronyms
 
 - **CLOA** — Correct Level of Abstraction.
 - **IDE** — Integrated Development Environment.
+- **JSON** — JavaScript Object Notation.
 - **LLM** — Large Language Model.

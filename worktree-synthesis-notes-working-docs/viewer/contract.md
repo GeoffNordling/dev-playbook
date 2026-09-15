@@ -32,8 +32,9 @@ A checkout directory holds:
 - `arrangement.json` — the arrangement.
 - `<kind>.json` — the one view file of a per-checkout kind, such as
   `index-tree.json`.
-- `<kind>/<subject>.json` — a view file of a per-subject kind, mirroring
-  the subject's path: `markdown-file/docs/working-in-loops.md.json`,
+- `<kind>/<subject>.json` — a view file of a per-subject kind, the
+  subject being the thing in the checkout the file is about, at the
+  subject's path: `markdown-file/docs/working-in-loops.md.json`,
   `runbook-chain/dotfiles/dot-claude/agents/adjudicator.md.json`.
 
 A view file is named by its path under the checkout directory. Writing

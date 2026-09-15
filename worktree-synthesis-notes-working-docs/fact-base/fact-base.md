@@ -14,7 +14,13 @@ the viewer strand, from
 [CLOA Viewer](/worktree-synthesis-notes-working-docs/viewer/ROOT.md) down,
 is the delivery. **Where the viewer pages, or anything elsewhere in
 the repo, disagree with this page, this page has priority**
-([Standing](#standing-in-this-set)).
+([Standing](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md#standing)).
+One subsystem, the Ralph loop, was simulated by hand before any code:
+[Ralph Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.md)
+defines it, and
+[fact-base-ralph.json](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.json)
+is the data as an extractor would write it, in the viewer's envelope:
+nineteen nodes, forty-one edges, every row with a receipt.
 
 ## Goal
 
@@ -83,7 +89,7 @@ verify against.
 ## Extractors
 
 An extractor reads one artifact and yields rows. Each names what it
-reads and what it yields. The seven the Ralph simulation needed:
+reads and what it yields. The extractors the Ralph simulation needed:
 
 | Extractor | Reads | Yields | Exists today |
 | --------- | ----- | ------ | ------------ |
@@ -179,20 +185,24 @@ raised in a consumer repo is not settled
 
 The doc-type build loop
 ([Doc-Type](/doc-types/doc-type.md#the-doc-type-build-loop)) is an
-expectation-maximization procedure: re-express the target in the
+expectation-maximization (EM) procedure: re-express the target in the
 current primitives, record what will not fit as the residual, propose a
 primitive that shrinks it. The fact base is that loop with the target
 widened from one family to the whole checkout. The "What no extractor
 reaches" section of
 [Ralph Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.md)
-is a residual ledger entry in all but name.
+is a residual ledger entry in all but name, and the runbook's own
+residual ledger already records two of its five gaps from the porting
+side, the loop and the fact base agreeing.
 
 The loop runs over deterministic objects too, and the residual is
 relative to the selection there as everywhere: choose every primitive a
 module has and the residual is zero, choose the useful few and it is
 not. The goal is useful views and not full description, so the subset
 is the normal case. There is an inflection point in primitives against
-residuals, as in choosing k for k-means, and the loop stops there.
+residuals, as in choosing k for k-means, and the loop stops there. The
+schema is what remains after enough residuals have been ruled on, and
+it is connected to the residuals by that ruling and nothing else.
 
 What changes at the bedrock is only where the M-step's candidates come
 from:
@@ -245,61 +255,6 @@ through one. A workflow, a hook, a script, or a package under `src/`
 that inlines a prompt is a residual, and the ledger entry names the
 move.
 
-## Evidence
-
-One subsystem was simulated by hand, the Ralph loop, before any code:
-[Ralph Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.md)
-defines it and
-[fact-base-ralph.json](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.json)
-is the data as an extractor would write it, in the viewer's envelope.
-Nineteen nodes, forty-one edges, every row with a receipt. The
-simulation found:
-
-- The seven views are pure selections, and control flow needed only
-  the order and condition the chain already carries.
-- The user is the connector between the three runbooks and the
-  workflow, and no extractor produces a USER node. The recipe's hand drawing
-  at `harness-recipes/recipes/ralph-loop.md` line 60 puts USER at the
-  top; this is the largest gap between what code draws and what the
-  question needs.
-- Containment does not gather the subsystem. Six parts sit in four
-  directories, and only the word "ralph" in each filename joins them.
-- Two gaps are one-line declaration fixes in the runbooks.
-- The runbook residual ledger already recorded two of the five gaps
-  from the porting side, which is the loop and the fact base agreeing.
-- The iteration prompt inside `ralph-loop.js` is a runbook in the wrong
-  place. Moving it to `dotfiles/dot-claude/agents/ralph-iteration.md`
-  is the first application of code carries no prose, and it turns the
-  workflow from an opaque box into a Workflow node with one `does`
-  edge.
-
-## Precedent
-
-The shape is established: a typed property graph, facts extracted by
-parsers with a source anchor on each fact, views that are only queries.
-Holt's Tuple-Attribute language and Rigi in the 1990s, Kythe and Glean
-today, C4 and Structurizr for the model-then-views discipline. The
-theory applies; the software does not. Those indexers feed on compiler
-output for compiled languages at monorepo scale, and this fact base is
-a few hundred markdown files with a schema this repo owns. What was
-improvised here: the extractable-versus-declared split, the exact row
-shape, buckets and directories as nodes, and the extractor names. None of
-those choices is load-bearing.
-
-A competitive research pass on 2026-09-11
-([full report](https://claude.ai/chat/255df4d9-27b8-4a11-9a3e-f6cb54b04ff6))
-found no direct competitor. Roughly thirty candidates were checked, and
-each covers one to three of the fact base's four load-bearing ideas,
-never all four: one typed graph over both code and agent-instruction
-prose, a receipt on every row, views as pure selections, and contracts
-declared inside the instruction markdown itself. The nearest neighbors
-are 2026 research prototypes built for agent systems, AgentFlow's Agent
-Dependency Graph and the Repository Intelligence Graph, but both extract
-from source code, not markdown, and neither carries receipts. The
-nearest markdown-side precedent for the chain's span grammar is Gherkin,
-a controlled natural language parsed deterministically to an AST; no
-tool combines that with graph extraction.
-
 ## Open questions
 
 Parked, in the order raised.
@@ -330,53 +285,7 @@ Parked, in the order raised.
   whether one solver or two, in the top root's
   [Open](/worktree-synthesis-notes-working-docs/ROOT.md#open).
 
-## Next steps
-
-Not started. In the order they should run, because each one produces
-what the next one needs.
-
-1. **Prove the concept by simulation.** Enumerate the use cases, the
-   questions a person asks of the system. Six were recorded for the
-   runbook population in the first design session: what is there, split
-   Agent and Skill; where the user enters, the runbooks no other runbook
-   does, and their complement the leaves; who does whom, the `does`
-   edges and their connected clusters; what each can touch, the writes
-   buckets and the never bans; what the fleet runs on, model, effort,
-   and tools per Agent; and how heavy each is, counted from the object
-   and from the file. One subject is already named: the software
-   factory, whose agents are singletons in the `does` graph because the
-   factory's own graph lives in `software-factory.md`, which
-   issue-overwatch reads as a bare imported node. Each use case names a
-   subsystem. Each subsystem gets a hand-written fact base like the
-   Ralph one, in the viewer's envelope, with every row carrying a
-   receipt. Each simulation firms the seven views, adds extractors, and
-   writes residuals. The schema is what remains after enough residuals
-   have been ruled on, and it is connected to the residuals by that
-   ruling and nothing else. One simulation is a consumer-repo
-   subsystem, so the workspace question above gets its first data
-   point. No code is written until the simulations cover the expected
-   use cases.
-2. **Move the simulation into a loop.** The second simulation is
-   already repeatable work, and the third is a loop, not a session. An
-   agent runs the E-step, writes the fact base and the residuals, and
-   proposes primitives; the user accepts or rejects and justifies
-   neither. The same loop later writes extractors and derivations. The
-   user designs from scratch only at a beginning, the way this page was
-   designed.
-
-## Standing in this set
-
-The viewer and the fact base are two concerns, delivery and theory.
-Every kind in the viewer pages is a selection from one fact base, and
-where those pages disagree with this page, this page has priority.
-
-This page defines no word
-([Terms](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#terms)).
-
 ## Acronyms
 
-- **CLOA** — Correct Level of Abstraction.
 - **EM** — Expectation-Maximization.
-- **JSON** — JavaScript Object Notation.
-- **LLM** — Large Language Model.
 - **YAML** — YAML Ain't Markup Language.

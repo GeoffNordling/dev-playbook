@@ -12,7 +12,7 @@ and this strand is its plan. Speculative, per
 it designs a tool still being built, a guess is written as a guess, and
 an open question sits beside its topic.
 
-Every kind the viewer draws is a selection of the fact base, which is
+Everything the viewer draws is a selection of the fact base, which is
 its own strand
 ([Fact Base Strand](/worktree-synthesis-notes-working-docs/fact-base/ROOT.md)):
 the fact base is the theory, how deterministic code produces one
@@ -34,6 +34,8 @@ disagree, the fact base has priority
 - **view file** — one JSON file the server writes and the viewer shows as
   one panel; every view file has one kind
   ([Contract](/worktree-synthesis-notes-working-docs/viewer/contract.md)).
+- **subject** — the thing in the checkout a view file is about, named
+  by its identity; a per-subject kind writes one view file per subject.
 - **kind** — a registered view: a selection, a renderer, and a doc page
   under one name ([an entry](/worktree-synthesis-notes-working-docs/viewer/registry.md#an-entry)).
   The set's word for it is view; the pages and the code keep kind
@@ -220,7 +222,8 @@ each waits on it.
   [CLOA views](/worktree-synthesis-notes-working-docs/viewer/registry.md#cloa-views):
   a name, a selection from the fact base, and drawing rules for each of
   the runbook, the Standard, and the loop. A Standard-Card kind is not
-  among them: the doc-type system retires the card.
+  among them: the doc-type system retires the card, step 4 of
+  [Planned](/worktree-synthesis-notes-working-docs/doc-type-system/ROOT.md#planned).
 - **Pinning and the arrangement** — pin, close others, and the
   arrangement saved and restored per checkout.
 - **Stale badge** — the badge on a panel whose commit is behind HEAD.
@@ -249,6 +252,5 @@ each waits on it.
 
 ## Acronyms
 
-- **JSON** — JavaScript Object Notation.
 - **SVG** — Scalable Vector Graphics.
 - **HTML** — Hypertext Markup Language.

@@ -52,9 +52,10 @@ specification.
 - **Stochasticity is a continuous scale per file.** A markdown file
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
-  lies outside its declared structure, which is what the doc-type
-  build loop already calls the residual. The bedrock of determinism is
-  a threshold on content, not a line between file kinds.
+  lies outside its declared structure, which is what
+  [the doc-type build loop](/doc-types/doc-type.md#the-doc-type-build-loop)
+  already calls the residual. The bedrock of determinism is a
+  threshold on content, not a line between file kinds.
 - **Shape is orthogonal to stochasticity.** A fully deterministic
   runbook or loop still gets its doc-type document, because the
   document is the legible form. The one requirement that follows is
@@ -190,7 +191,7 @@ specification.
   directory, and each cost a round of correction; a loop reading these
   files cannot ask which sense was meant. The words are in the set's
   [Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms).
-- **Standard is one doc-type.** Merged into one directory,
+- **One doc-type for Standard.** Merged into one directory,
   [doc-types/standard/](/doc-types/standard/index.md), with Contract
   defined by the cut in [Doc-Type](/doc-types/doc-type.md). The shape
   it carries there is the one the refactor replaces with

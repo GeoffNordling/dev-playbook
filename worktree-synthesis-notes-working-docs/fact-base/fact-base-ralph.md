@@ -60,6 +60,9 @@ runbook's closed vocabulary does not hold.
 
 ## Views selected from it
 
+The seven views are pure selections, and control flow needed only the
+order and condition the chain already carries.
+
 ### Dependency graph
 
 Selection: every node except directories and buckets; relations
@@ -133,15 +136,17 @@ USER runs [ralph-checkpoint]                               ← prose
 
 ## What no extractor reaches
 
-Facts the question needs that the fact base cannot hold.
+Facts the question needs that the fact base cannot hold. Two are
+one-line declaration fixes in the runbooks.
 
-1. **Who launches the workflow.** ralph-setup ends at a report whose
+1. **The launch of the workflow.** ralph-setup ends at a report whose
    text is a launch command; the user runs it. No chain edge touches
    `ralph-loop.js`. The runbook's closed vocabulary has no operation for
    "hands a command to the user".
-2. **ralph-checkpoint reads the workflow's return.** Lines 23–30 say so
-   in prose with no span. One `{Read …}` span would fix it; the fact
-   base makes the missing declaration visible.
+2. **The checkpoint's read of the workflow's return.** Lines 23–30 of
+   ralph-checkpoint state the read in prose with no span. One
+   `{Read …}` span would fix it; the fact base makes the missing
+   declaration visible.
 3. **The iteration agent.** Its behavior is a prompt string inside
    `ralph-loop.js`, lines 80–105: it reads the plan and progress files,
    commits by invoking `/commit`, and reports a count. No doc-type extractor
@@ -152,13 +157,12 @@ Facts the question needs that the fact base cannot hold.
 4. **The user as the connector.** Every handoff between the three
    runbooks and the workflow passes through the user. The recipe's own
    drawing at `harness-recipes/recipes/ralph-loop.md` line 60 puts USER
-   at the top; no extractor produces that node.
+   at the top; no extractor produces that node. This is the largest gap
+   between what code draws and what the question needs.
 5. **The subsystem itself.** Nothing declares that these six files are
    one thing. The name "Ralph" appears in each filename, and that is the
    only fact that gathers them.
 
 ## Acronyms
 
-- **CLOA** — Correct Level of Abstraction.
-- **JSON** — JavaScript Object Notation.
-- **YAML** — YAML Ain't Markup Language.
+None.

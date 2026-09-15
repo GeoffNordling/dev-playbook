@@ -38,9 +38,10 @@ takes one of three forms:
 | **Objective** | standing | a scalar pushed down under the predicates | the fewest verbs across the roster |
 
 Acceptance criteria are predicates with a lifetime of one issue. An
-objective is descended by proposing a step, a merge of two verbs, that
-the user accepts or vetoes; the predicates and the veto are what
-"suffice" means. The software factory runs on goals plus predicates.
+objective ([Terms](/worktree-synthesis-notes-working-docs/ROOT.md#terms))
+is descended here by proposing a merge of two verbs that the user
+accepts or vetoes; the predicates and the veto are what "suffice"
+means. The software factory runs on goals plus predicates.
 The doc-type system so far has neither written, and the standing kind
 is the one it is short on.
 
@@ -84,17 +85,18 @@ two motions against it:
 - **Proposals are predicates, never edits.** Rejecting a predicate
   costs the user five lines; rejecting a diff costs an hour. The loop
   cannot change the system without a predicate authorizing it.
-- **Two kinds.** A cited proposal names where the predicate is
-  already stated or implied. An invented one says so. The user triages them at
-  different speeds.
+- **A proposal is cited or invented.** A cited one names where the
+  predicate is already stated or implied; an invented one says so. The
+  user triages them at different speeds.
 - **A no is a predicate waiting to be written.** A rejected proposal
   is kept with its reason, and the reason is itself a candidate
   predicate, about the ideas rather than the files. The loop's memory
   is the Standard and the rejections, never a transcript.
-- **One loop.** Propose and apply share a loop until the applying act is
-  large enough to run unattended for hours; then it is its own loop.
-- **The residue.** Intent that resists every form stays the user's. The
-  loop surfaces it as a question rather than guessing.
+- **Propose and apply share one loop.** They share it until the
+  applying act is large enough to run unattended for hours; then the
+  applying act is its own loop.
+- **The residue stays the user's.** Intent that resists every form is
+  the residue; the loop surfaces it as a question rather than guessing.
 
 ## Acronyms
 

@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Standard Specification
-description: What the Standard doc-type satisfies beyond Doc-Type Specification — one verb, every rule identified and decidable, one verifier per id, boundaries that name ids, and an audit that returns findings
+description: What the Standard doc-type satisfies beyond Doc-Type Specification — one verb, every rule identified and decidable, a population naming a class, one verifier per id, boundaries that name ids, and an audit that returns findings
 population: "the Standard doc-type: its directory doc-types/standard/ in dev-playbook, every Standard in a governed repo, and the toolchain entries that read them"
 ---
 
@@ -36,8 +36,9 @@ follows it says why, never how to fix.
 
 ## Population names a class
 
-The population is one phrase naming a class of Target and its
-exclusions.
+The population is one phrase naming a class of
+[Target](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md#the-language)
+and its exclusions.
 
 `doc-type-system.standard.population` · stochastic
 

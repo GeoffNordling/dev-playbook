@@ -28,8 +28,10 @@ is the implementation plan's call.
 
 ## Registered
 
-The doc-type has a name, a row in the type registry, and a directory
-`doc-types/<name>/` listed by the doc-types index.
+The doc-type has a name, a row in the
+[type registry](/standards/knowledge-organization/type-registry.md), and
+a directory `doc-types/<name>/` listed by the
+[doc-types index](/doc-types/index.md).
 
 `doc-type-system.registered` · deterministic
 
@@ -53,7 +55,9 @@ no operations.
 ## One module
 
 Every doc-type's `contract-shape.md` pseudocode, concatenated, parse as one
-Python module in which `DocType`, `Target`, and `Finding` are defined
+Python module in which `DocType`,
+[`Target`](/worktree-synthesis-notes-working-docs/doc-type-system/reference-model.md#the-language),
+and `Finding` are defined
 once and every name used is defined once.
 
 `doc-type-system.one-module` · deterministic
@@ -73,7 +77,7 @@ lands on a thing that exists.
 
 `doc-type-system.composition` · deterministic
 
-## Parses
+## An encoding
 
 `encoding.md` maps each markdown construct an instance may
 use, a heading, a first paragraph, a keyword span, a fenced graph, to

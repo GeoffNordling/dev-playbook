@@ -11,7 +11,9 @@ nodes and edges extracted from a checkout, every view a selection from
 it. Speculative, per
 [Synthesis Working Root](/worktree-synthesis-notes-working-docs/ROOT.md).
 The theory is
-[Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md);
+[Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md),
+with its prior art in
+[Precedent](/worktree-synthesis-notes-working-docs/fact-base/precedent.md);
 the first simulation by hand is
 [Ralph Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base-ralph.md),
 with its rows in `fact-base-ralph.json`; and
@@ -67,15 +69,35 @@ strand's own:
 
 In order; each produces what the next needs.
 
-- **Simulations by hand.** Enumerate the use cases and hand-write a
-  fact base per subsystem, in the viewer's envelope, every row with a
-  receipt, per the first of the fact base's
-  [Next steps](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#next-steps).
+- **Simulations by hand.** Enumerate the use cases, the questions a
+  person asks of the system, and hand-write a fact base per subsystem
+  like the Ralph one, in the viewer's envelope, every row with a
+  receipt. The use cases recorded for the runbook population in the
+  first design session: what is there, split Agent and Skill; where the
+  user enters, the runbooks no other runbook does, and their complement
+  the leaves; who does whom, the `does` edges and their connected
+  clusters; what each can touch, the writes buckets and the never bans;
+  what the fleet runs on, model, effort, and tools per Agent; and how
+  heavy each is, counted from the object and from the file. One subject
+  is already named: the software factory, whose agents are singletons
+  in the `does` graph because the factory's own graph lives in
+  `software-factory.md`, which issue-overwatch reads as a bare imported
+  node. Each use case names a subsystem; each simulation firms the
+  seven views, adds extractors, and writes residuals; and one
+  simulation is a consumer-repo subsystem, the first data point for
+  residual ownership across repos
+  ([Open questions](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#open-questions)).
   No code is written until the simulations cover the expected use
   cases.
-- **The simulation as a loop.** The third simulation is a loop, not a
-  session, per the second of the fact base's
-  [Next steps](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md#next-steps).
+- **The simulation as a loop.** The second simulation is already
+  repeatable work, and the third is a loop, not a session: an agent
+  re-expresses the subsystem in the current primitives, writes the fact
+  base and the residuals, and proposes primitives; the user accepts or
+  rejects and justifies neither. The same loop later writes extractors
+  and derivations. The user designs from scratch only at a beginning,
+  the way
+  [Fact Base](/worktree-synthesis-notes-working-docs/fact-base/fact-base.md)
+  was designed.
 - **Extractors.** [chaingen](/scripts/chaingen) and
   [rulegen](/scripts/rulegen), the scripts that write the text files
   today, move into the package as the `chain` and `standard`
