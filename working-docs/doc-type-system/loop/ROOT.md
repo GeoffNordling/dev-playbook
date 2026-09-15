@@ -84,7 +84,7 @@ From memory, not a fresh search.
   ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
 - **The Mermaid block as encoding.** A loop extractor reads it, and
   the view is drawn from rows, so the contract shape's "no generated
-  table and no generator"
+  file"
   ([Acts, Checks, and Yields](/doc-types/loop/contract-shape.md))
   gives way; the clause is rewritten when the fact base's `loop`
   extractor lands

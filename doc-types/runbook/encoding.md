@@ -9,19 +9,14 @@ description: The layer below the contract shape — the spec a writer follows to
 The layer below
 [the shape](/doc-types/runbook/contract-shape.md), the Reference chain:
 how chain edges are written inside runbook prose, so deterministic
-code can generate every chain. This file is the spec for the writer of
-that prose. The primitive map below is the join between the two
-layers — one lower expression per higher primitive. The parser is
-`scripts/chaingen`, which writes every chain to `doc-types/runbook/chains.txt`
-and fails on drift via `--check`; everything the writer does not
-need — how an edge draws, how a name resolves — lives in that code and
-nowhere else.
-
-Inspiration only: doctest (fenced blocks inside prose are legitimate
-deterministic parse targets) and CNL (constrain the sentence, never embed
-notation). STE is loose style inspiration, unenforced. What binds 100% is
-the small grammar below, to be specified as a standard card and enforced
-by a lint.
+code reads every chain. This file is the spec for the writer of that
+prose; the primitive map below gives each primitive of the shape its
+written form. The parser is `scripts/chaingen`, which writes every
+chain to `doc-types/runbook/chains.txt` and fails on drift via
+`--check`; everything the writer does not need — how an edge draws,
+how a name resolves — lives in that code and nowhere else. The
+Standard that binds a runbook to this grammar is
+[Runbook Conventions](/standards/harness/runbook-conventions.md).
 
 ## From prose to chain
 
@@ -183,11 +178,3 @@ runbook's report is prose — with the payload as annotation.
 ```
 
 The edge is `outcome: str`; the whole payload rides as annotation.
-
-## Acronyms
-
-- **CNL** — Controlled Natural Language: an engineered subset of a
-  natural language with restricted vocabulary and grammar so machines
-  can parse what a reader reads.
-- **STE** — ASD-STE100 Simplified Technical English: one specific CNL
-  from aerospace, aimed at readers rather than machines.

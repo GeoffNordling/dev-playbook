@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Nodes and Edges
-description: Runbook's contract shape — nodes joined by labeled edges, the Reference chain, rooted at one runbook — in prose, one screen of pseudocode, and the view every runbook collapses to
+description: Runbook's contract shape — nodes joined by labeled edges, the Reference chain, rooted at one runbook — in prose, and the view every runbook collapses to
 ---
 
 # Nodes and Edges
@@ -25,37 +25,13 @@ documentation ([Runbook](/doc-types/runbook/definition.md)).
 The composition rule: any number of edges, coarsely ordered, rooted at
 one runbook. The chain is the contract written down: the signature —
 args in, reports out — plus the effects, in the coarse order they
-fire. It is a collapse of the runbook's program: the fine-grained
-sequencing it drops stays below the CLOA, in the instance's body. The
-shape in pseudocode:
+fire. The fine-grained sequencing it drops stays in the instance's
+body.
 
-```python
-class Runbook(Object):
-    """One invocable command. Its chain is its contract, written as spans in its own prose."""
+The shape's pseudocode is no longer kept here: the target state's is
+[Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language),
+which is speculative and ahead of what the encoding below implements.
 
-    operations = {read, write, do, override, never, args, report}   # one per Edge, below
-
-    summary: str                        # frontmatter description
-    args:    list[str]                  # frontmatter arguments, names only
-    chain:   list[Edge]                 # any number, coarsely ordered, rooted here
-
-    # rules: each a predicate over one runbook's state
-    location    = path == f"skills/{name}/SKILL.md" or path == f"agents/{name}.md"
-    frontmatter = name and description are present      # a Skill's or an Agent definition's; no type key
-    rooted      = every edge in chain is declared in this file's own body   # no file describes another's behavior
-
-
-class Edge:
-    operation: read | write | do | override | never | args | report
-    target:    Node | Bucket            # Bucket = git | GitHub | local file | scratch, for writes and targetless reads
-    condition: str | None               # what must hold for the edge to fire; None fires always
-
-
-class Node:
-    name: str
-    type: Standard | Agent | Skill | Script | None   # None is imported: named where the edge touches it
-    data: dict                          # permission expression, model pin, verbatim
-```
 
 ## Nodes
 
@@ -137,7 +113,3 @@ named. `scripts/chaingen` writes every runbook's chain to
 Rows of the generated file, excerpted. A conditional edge draws
 dashed. The prose an edge was cut from stays below the collapse, in
 the runbook.
-
-## Acronyms
-
-- **CLOA** — Correct Level of Abstraction.

@@ -11,7 +11,7 @@ form a card's cells take so `scripts/cardgen` reads every pointer
 deterministically, the form a ruleset takes so `scripts/rulegen` reads
 the population, every rule, and every condition the same way, where
 each file sits, what it is named, and the catalog that lists every
-Standard. Both generators slice; neither interprets. The cut points are
+Standard. Both scripts slice; neither interprets. The cut points are
 the bullet marker, the spaced em dash, the first link, a bold mode
 name, one frontmatter key, the heading levels, and the first paragraph
 under a heading. Doc Conventions'
@@ -28,7 +28,7 @@ bold mode name.
 
 - **The lead.** A bullet's text up to its first ` — ` is the lead.
   Everything after the dash is annotation: carried in the card, never
-  read by the generator.
+  read by the script.
 - **Define, Audit, Adopt.** The pointer is the target of the first link
   in the lead. A lead with no link is the pointer verbatim — the form
   for a third-party detector cited by its pin (`ruff`, `mypy`,
@@ -50,7 +50,7 @@ bold mode name.
 
 A bullet that breaks the form — a Define bullet with no link, an
 Enforce bullet naming no mode or two, or on demand with no link, a
-`none` beside other bullets — fails the generator: a card that cannot
+`none` beside other bullets — fails the script: a card that cannot
 be sliced cannot be viewed.
 
 ## The population
@@ -155,7 +155,7 @@ Each repo that carries Standards has its own catalog at
 [standards/index.md](/standards/index.md). Its membership and order are
 [The catalog](/standards/standard/cards.md#the-catalog).
 
-## The generators
+## The scripts
 
 `scripts/cardgen` reads every file typed `Standard-Card` under
 `standards/` and writes the `card, cell, pointer` relation to

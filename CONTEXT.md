@@ -18,15 +18,6 @@ The words the user and the AI meet on
 **Slop**
 Output that diverges from the user's intent, or that the user cannot read.
 
-**CLOA**
-Correct Level of Abstraction: the best-effort shared level where the user and the AI communicate in exactly the same terminology — the highest level the user can trust the AI at, and the lowest the AI needs the user at.
-
-**Doc-type**
-Operations plus a composition rule, handing one documentation family a contract shape ([Doc-Type](/doc-types/doc-type.md)).
-
-**Contract**
-Everything a caller of an instance may rely on; its machine-checkable core is the signature — args in, results out ([Doc-Type](/doc-types/doc-type.md#contract)).
-
 ### Governance
 
 Five words once swirled around one idea — the thing that inspects the
@@ -73,9 +64,6 @@ Prose a reader loads to understand something. It carries OKF frontmatter, and ok
 
 **Harness-owned file**
 A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the harness-files registry enumerates. It carries no OKF frontmatter.
-
-**Rule**
-A rule of the system: a contract, a state and the moves out of it, a format, what one part owes another. It binds every actor who touches the thing, whatever job that actor is doing.
 
 **Procedure**
 The steps of one job: its trigger, its target, the order of the steps, the conditions it branches on, the commands it issues, when it stops, what it reports. It binds one actor for the length of one run.
