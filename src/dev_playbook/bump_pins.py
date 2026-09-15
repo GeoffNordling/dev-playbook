@@ -1,58 +1,64 @@
-"""Move the dev-playbook pin across the governed consumer repos.
+"""Move one consumer repo's dev-playbook pin, or check whether it can move.
 
-The library behind the ``bump-pins`` shim — the release step of
+The mechanical half of the release described by
 [Distribution Channel](/standards/distribution/channel.md), where *the rev bump
-is the release*. A consumer runs the standard as of its pinned ``rev`` and nothing
-else: a detector added upstream, a rule tightened, a canonical artifact
-changed, none of it reaches that repo until its pin moves. Moving the pin is
-therefore the whole delivery mechanism, and it is mechanical.
+is the release*. A consumer runs the standard as of its pinned ``rev`` and
+nothing else: a detector added upstream, a rule tightened, a canonical artifact
+changed, none of it reaches that repo until its pin moves.
 
 The fallout is not mechanical. A bump can newly redden a repo — a detector that
 never ran there before now runs, a canonical artifact it copies has changed —
-and deciding what each finding means is a judgment call per repo. So this tool
-owns the mechanical half end to end and stops at the report: it resolves the
-target sha, refuses one GitHub has never seen, rewrites each pin, and re-runs
-each consumer's commit gate. Fixing what the gate says belongs to whoever reads
-the output.
+and deciding what each finding means is a judgment call. So this tool answers
+one question and makes one edit, and stops there:
 
-Per repo, in order, with the refusal each step carries:
+  ``--check``   Can this repo's pin move to the published head without going red?
+  ``--write``   Move it.
 
-  - **preflight** — the repo sits on ``main`` with a clean working tree. A dirty
-    tree holds someone else's uncommitted work, and this tool would bury its own
-    one-line change inside it.
-  - **baseline** — the commit gate is already green at the *current* pin.
-    Bumping a red repo makes the new findings indistinguishable from the ones
-    that were already there, so a red baseline is reported and the pin is left
-    alone.
-  - **bump** — rewrite the one ``rev:`` line. Nothing else in the config moves.
-  - **verify** — run the commit gate again. pre-commit clones the new rev during
-    this run, so this is both the moment the new standard takes effect in that
-    repo and the only step that touches the network. A gate that dies rather
-    than judging aborts the run and puts that repo's config back: an
-    unverifiable bump is worse than no bump, and "could not check" reported as
-    "needs work" would name a repo for a problem it does not have.
+``--check`` is a probe: it runs the gate at the current pin, rewrites the pin,
+runs the gate again, and puts the config back however that second run went.
+Restoring is what lets the caller choose where the durable edit lands — a green
+probe can be committed straight to ``main``, while a red one belongs on a branch
+where the findings can be worked, and neither choice is made here. The steps,
+with the refusal each one carries:
 
-Nothing is committed and nothing is pushed. The bumped config and whatever the
-gate found are left in the working tree for review.
+  - **preflight** — the repo is a consumer carrying a dev-playbook pin, sits on
+    ``main`` with a clean working tree, and its ``main`` matches ``origin/main``.
+    A dirty tree makes the baseline meaningless, and a ``main`` behind the remote
+    probes a tree the caller is not about to branch from.
+  - **baseline** — the gate is already green at the *current* pin. Bumping a red
+    repo makes the new findings indistinguishable from the ones that were
+    already there, so a red baseline refuses rather than reporting a verdict
+    this release has not earned.
+  - **verify** — rewrite the pin and run the gate again. pre-commit clones the
+    new rev during this run, so this is both the moment the new standard takes
+    effect in that repo and the only step that touches the network. A gate that
+    dies rather than judging refuses too: "could not check" reported as "needs
+    work" would name a repo for a problem it does not have.
 
-The audited population is ``workspace_lint.GOVERNED``, read from there rather
-than restated, so the roster stays declared in exactly one place.
+``--write`` makes the durable edit — the one ``rev:`` line, nothing else — and
+runs no gate. It asks only for a clean working tree, so it serves the worktree
+a caller cuts after a red probe as readily as ``main`` after a green one.
+
+The target is always the hook repo's ``main`` as GitHub has it. pre-commit
+installs a pin by fetching that object from the hook repo's URL, so the
+published head is the only sha a consumer can pin at all; reading it from the
+remote is what makes the pin installable rather than merely recent.
+
+Nothing is committed and nothing is pushed.
 
 Output:
-    stdout — one ``repo: status`` line per repo, then each red repo's gate output.
-    stderr — per-repo progress and one summary line.
-    exit   — 0 every repo green at the new pin, 1 some repo needs work,
-             2 cannot run.
+    stdout — the verdict line, then the gate output when the repo goes red.
+    stderr — progress, and the refusal when the run cannot proceed.
+    exit   — 0 green, written, or already current; 1 needs work; 2 cannot run.
 """
 
 import argparse
 import subprocess
 import sys
-from dataclasses import dataclass, field
 from pathlib import Path
 
 from dev_playbook import gitrepo, workspace_lint
-from dev_playbook.workspace_lint import GOVERNED, HOOK_REPO_ROOT, ToolError
+from dev_playbook.workspace_lint import HOOK_REPO_ROOT, ToolError
 
 # The consumer's commit gate, verbatim as the canonical Makefile's `check`
 # target spells it. This is the surface the pin controls: every dev-playbook
@@ -75,36 +81,6 @@ GATE_ERROR_BANNERS = ("An error has occurred:", "An unexpected error has occurre
 CLEAN = "green"
 NEEDS_WORK = "needs work"
 CURRENT = "already current"
-DIRTY = "skipped — uncommitted changes"
-OFF_MAIN = "skipped — not on main"
-RED_BASELINE = "skipped — already red at its current pin"
-NO_PIN = "skipped — no dev-playbook pin"
-
-
-@dataclass(frozen=True)
-class Outcome:
-    """What happened to one consumer repo."""
-
-    repo: str
-    status: str
-    detail: str = ""
-    gate_output: str = ""
-    # Whether this repo ends the run needing the user or an agent to act on it.
-    open_work: bool = False
-
-    def render(self) -> str:
-        """The one-line verdict, ``repo: status`` with any detail appended."""
-        suffix = f" ({self.detail})" if self.detail else ""
-        return f"{self.repo}: {self.status}{suffix}"
-
-
-@dataclass
-class Plan:
-    """The resolved inputs one run operates on."""
-
-    sha: str
-    url: str
-    repos: list[Path] = field(default_factory=list)
 
 
 def git_out(repo: Path, *args: str) -> str:
@@ -153,8 +129,8 @@ def run_gate(repo: Path) -> tuple[bool, str]:
     a pre-commit that died before judging the repo all raise instead, because
     "the gate could not run" and "the gate found something" are different facts
     and reporting the first as the second names a repo for a problem it does not
-    have. The first gate run at a *new* pin is the one most likely to hit this:
-    it is where pre-commit clones the rev, so it is the only step that needs the
+    have. The verify run at a *new* pin is the one most likely to hit this: it is
+    where pre-commit clones the rev, so it is the only step that needs the
     network.
     """
     try:
@@ -183,141 +159,160 @@ def run_gate(repo: Path) -> tuple[bool, str]:
     return result.returncode == 0, output
 
 
-def resolve(workspace: Path, roster: tuple[str, ...], sha: str | None) -> Plan:
-    """The target sha, the hook-repo URL, and the consumer repos to visit.
+def published_head() -> str:
+    """The hook repo's ``main`` head sha, as GitHub has it.
 
-    The sha must exist on the remote before anything downstream can use it:
-    pre-commit installs a pin by fetching that object from the hook repo's URL,
-    so a pin at a local-only commit is not stale, it is uninstallable. Checking
-    it here turns a confusing fetch failure inside pre-commit into one refusal
-    naming the cause.
+    Read from the remote rather than from the publisher's disk. pre-commit
+    installs a pin by fetching that object, so a sha the remote has never seen is
+    not stale, it is uninstallable; and a consumer's release should not depend on
+    what happens to be checked out elsewhere on the machine.
     """
-    url = workspace_lint.hook_repo_url()
-    target = sha or workspace_lint.hook_repo_main()
     slug = workspace_lint.origin_slug(HOOK_REPO_ROOT)
     if slug is None:
-        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}; cannot verify {target}")
-    if workspace_lint.gh_api(f"repos/{slug}/commits/{target}") is None:
-        raise ToolError(
-            f"{target} is not on {slug}; push dev-playbook before bumping consumers"
-        )
-    repos = [
-        repo
-        for repo in workspace_lint.workspace_repos(workspace, roster)
-        if repo.resolve() != HOOK_REPO_ROOT
-    ]
-    return Plan(sha=target, url=url, repos=repos)
+        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}")
+    match workspace_lint.gh_api(f"repos/{slug}/branches/main"):
+        case {"commit": {"sha": str(sha)}}:
+            return sha
+    raise ToolError(f"cannot read main's head sha from {slug}")
 
 
-def preflight(repo: Path, url: str, sha: str) -> Outcome | None:
-    """The reason this repo is not bumpable, or None when it is.
+def consumer_root(start: Path) -> Path:
+    """The git root holding ``start``, refusing the hook repo itself.
 
-    Every refusal is a skip rather than an abort: one repo mid-review must not
-    cost the sweep the repos that are ready.
+    dev-playbook runs the published hook from its own working tree through its
+    ``repo: local`` block, so it carries no pin and there is nothing here to
+    move. Identity is the test, exactly as it is in the audit.
     """
-    name = repo.name
-    branch = git_out(repo, "branch", "--show-current")
-    if branch != "main":
-        return Outcome(name, OFF_MAIN, f"on {branch}")
-    if git_out(repo, "status", "--porcelain"):
-        return Outcome(name, DIRTY)
+    root = Path(git_out(start, "rev-parse", "--show-toplevel"))
+    if root.resolve() == HOOK_REPO_ROOT:
+        raise ToolError("dev-playbook dogfoods from its working tree and pins nothing")
+    return root
+
+
+def pinned(repo: Path, url: str) -> str:
+    """The dev-playbook rev ``repo`` currently pins."""
     config = repo / ".pre-commit-config.yaml"
     if not config.is_file():
-        return Outcome(name, NO_PIN, "no .pre-commit-config.yaml", open_work=True)
-    pinned = workspace_lint.pinned_rev(config.read_text(encoding="utf-8"), url)
-    if pinned is None:
-        return Outcome(name, NO_PIN, open_work=True)
-    if pinned == sha:
-        return Outcome(name, CURRENT)
-    return None
+        raise ToolError(f"no .pre-commit-config.yaml in {repo}")
+    rev = workspace_lint.pinned_rev(config.read_text(encoding="utf-8"), url)
+    if rev is None:
+        raise ToolError(f"no {url} pin in {repo}; wiring one is adoption, not a bump")
+    return rev
 
 
-def bump(repo: Path, plan: Plan, *, dry_run: bool) -> Outcome:
-    """One consumer repo through the whole sequence, reported as one outcome."""
-    name = repo.name
-    skip = preflight(repo, plan.url, plan.sha)
-    if skip is not None:
-        return skip
+def require_clean(repo: Path) -> None:
+    """Refuse a repo whose working tree already holds someone's changes."""
+    if git_out(repo, "status", "--porcelain"):
+        raise ToolError(f"uncommitted changes in {repo}")
+
+
+def require_fresh_main(repo: Path) -> None:
+    """Refuse a repo not sitting on a ``main`` that matches the remote.
+
+    Both halves serve the probe. Off ``main``, or behind it, the gate judges a
+    tree that is not the one the caller will commit to or branch from, so a
+    verdict about this release would be a verdict about something else.
+    """
+    branch = git_out(repo, "branch", "--show-current")
+    if branch != "main":
+        raise ToolError(f"{repo} is on {branch}; the baseline is only honest on main")
+    if git_out(repo, "rev-parse", "main") != git_out(repo, "rev-parse", "origin/main"):
+        raise ToolError(f"main in {repo} is not at origin/main; fast-forward it first")
+
+
+def check(repo: Path, url: str, sha: str) -> int:
+    """Probe the bump and restore the config; the exit code is the verdict."""
+    require_fresh_main(repo)
+    require_clean(repo)
+    old = pinned(repo, url)
+    if old == sha:
+        print(f"{repo.name}: {CURRENT} ({sha[:12]})")
+        return 0
 
     config = repo / ".pre-commit-config.yaml"
     text = config.read_text(encoding="utf-8")
-    updated, old = rewritten(text, plan.url, plan.sha)
-    move = f"{old[:12]} -> {plan.sha[:12]}"
-    if dry_run:
-        return Outcome(name, "would bump", move)
-
-    print(f"bump-pins: {name}: checking baseline at {old[:12]}", file=sys.stderr)
+    print(f"bump-pin: {repo.name}: checking baseline at {old[:12]}", file=sys.stderr)
     baseline_ok, baseline_output = run_gate(repo)
     if not baseline_ok:
-        return Outcome(name, RED_BASELINE, old[:12], baseline_output, open_work=True)
+        raise ToolError(
+            f"{repo.name} is already red at its current pin ({old[:12]}), so these "
+            f"findings are not this release's:\n{baseline_output}"
+        )
 
+    updated, _ = rewritten(text, url, sha)
     config.write_text(updated, encoding="utf-8")
-    print(f"bump-pins: {name}: {move}, verifying", file=sys.stderr)
+    print(
+        f"bump-pin: {repo.name}: {old[:12]} -> {sha[:12]}, verifying", file=sys.stderr
+    )
     try:
         passed, output = run_gate(repo)
-    except ToolError:
-        # A bump nothing has checked is worse than no bump: put the repo back
-        # exactly as it was found rather than leave an unverified pin behind.
+    finally:
+        # However the verify run went — verdict, crash, interrupt — the tree goes
+        # back exactly as found. The caller has yet to decide where the durable
+        # edit lands, and an uncommitted pin sitting in main is not a tree anyone
+        # can branch cleanly from.
         config.write_text(text, encoding="utf-8")
-        raise
+
     if passed:
-        return Outcome(name, CLEAN, move)
-    return Outcome(name, NEEDS_WORK, move, output, open_work=True)
+        print(f"{repo.name}: {CLEAN} at {sha[:12]}")
+        return 0
+    print(f"{repo.name}: {NEEDS_WORK} at {sha[:12]}\n\n{output}")
+    return 1
+
+
+def write(repo: Path, url: str, sha: str) -> int:
+    """Move the pin for real, running no gate."""
+    require_clean(repo)
+    old = pinned(repo, url)
+    if old == sha:
+        print(f"{repo.name}: {CURRENT} ({sha[:12]})")
+        return 0
+    config = repo / ".pre-commit-config.yaml"
+    updated, _ = rewritten(config.read_text(encoding="utf-8"), url, sha)
+    config.write_text(updated, encoding="utf-8")
+    print(f"{repo.name}: pinned {old[:12]} -> {sha[:12]}")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
-    """The ``bump-pins`` command-line entry point.
+    """The ``bump-pin`` command-line entry point.
 
-    Returns the process exit code: 0 every repo green at the new pin, 1 some
-    repo needs work, 2 cannot run.
+    Returns the process exit code: 0 green, written, or already current; 1 the
+    repo needs work at the new pin; 2 the run could not reach a verdict.
     """
     parser = argparse.ArgumentParser(
-        prog="bump-pins",
+        prog="bump-pin",
         description=(
-            "Move the dev-playbook rev pin in each governed consumer repo and "
-            "re-run its commit gate. Commits nothing."
+            "Check whether one consumer repo's dev-playbook pin can move to the "
+            "published head, or move it. Commits nothing."
         ),
     )
-    parser.add_argument(
-        "--workspace",
-        type=Path,
-        default=Path.home() / "workspace",
-        help="workspace root holding the repos (default: ~/workspace)",
-    )
-    parser.add_argument(
-        "--repos",
-        type=lambda value: tuple(name for name in value.split(",") if name),
-        default=GOVERNED,
-        help="comma-separated repo names to bump (default: the governed roster)",
-    )
-    parser.add_argument(
-        "--sha",
-        help="the rev to pin (default: the hook repo's local main)",
-    )
-    parser.add_argument(
-        "--dry-run",
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument(
+        "--check",
         action="store_true",
-        help="report the moves and skips without writing or running any gate",
+        help="probe the bump, restore the config, and report the verdict",
+    )
+    mode.add_argument(
+        "--write",
+        action="store_true",
+        help="rewrite the rev line, running no gate",
+    )
+    parser.add_argument(
+        "repo",
+        nargs="?",
+        type=Path,
+        default=Path.cwd(),
+        help="the consumer repo (default: the repo the working directory sits in)",
     )
     args = parser.parse_args(argv)
 
     try:
-        plan = resolve(args.workspace.resolve(), args.repos, args.sha)
-        print(f"bump-pins: target {plan.sha}", file=sys.stderr)
-        outcomes = [bump(repo, plan, dry_run=args.dry_run) for repo in plan.repos]
+        repo = consumer_root(args.repo)
+        url = workspace_lint.hook_repo_url()
+        sha = published_head()
+        print(f"bump-pin: target {sha}", file=sys.stderr)
+        return check(repo, url, sha) if args.check else write(repo, url, sha)
     except ToolError as err:
-        print(f"bump-pins: {err}", file=sys.stderr)
+        print(f"bump-pin: {err}", file=sys.stderr)
         return 2
-
-    for outcome in outcomes:
-        print(outcome.render())
-    for outcome in outcomes:
-        if outcome.gate_output:
-            print(f"\n--- {outcome.repo} ---\n{outcome.gate_output}")
-
-    open_work = sum(1 for outcome in outcomes if outcome.open_work)
-    print(
-        f"bump-pins: {len(outcomes)} consumer(s), {open_work} needing work",
-        file=sys.stderr,
-    )
-    return 1 if open_work else 0

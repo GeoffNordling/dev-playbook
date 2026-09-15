@@ -26,12 +26,12 @@ hook, the roster, dogfooding, and the pinned rev.
   [.pre-commit-config.yaml](/standards/build/canonical/.pre-commit-config.yaml)
   — repo-lint's dogfood check at the **commit gate**, through the
   published `playbook-lint` hook
-- [bump-pins](/scripts/bump-pins) — **on demand**, moves the dev-playbook
-  `rev` across the governed consumers and re-runs each one's commit gate;
-  commits nothing
+- [bump-pin](/scripts/bump-pin) — **on demand**, probes or moves one
+  consumer's dev-playbook `rev` against the published head; commits nothing
 - [update-standards-pin](/dotfiles/dot-claude/skills/update-standards-pin/SKILL.md)
-  — **on demand**, the release runbook that carries the bump through to
-  each consumer's commit; invoke it as /update-standards-pin
+  — **on demand**, the release runbook run from inside the consumer, which
+  carries a green bump to a commit on `main` and a red one to a PR; invoke
+  it as /update-standards-pin
 
 The pin sits outside every gate: a stale pin blocks nothing, and
 workspace-lint only reports it.

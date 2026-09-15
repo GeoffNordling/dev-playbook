@@ -271,14 +271,14 @@ alternate reports all collapse to `outcome: str`.
 
 ### update-standards-pin
 
-Could not express the report-format table in § Read the report (a table
-has no sentence for the grammar to span, so its `/enable-repo-governance`
-mention stays unencoded too). Could not express the ambient dev-playbook
-commit for a release-defect fix or the per-consumer commit/push — the
-writes—git bucket needs a fenced command with a fixed `-C`, and neither the
-ambient nor the runtime-chosen consumer repo carries an honest one — or the
-`pre-commit gc` cleanup, a bare command with no on-disk link for a does
-edge.
+Could not express the exit-code routing table in § Probe the bump (a table
+has no sentence for the grammar to span). Could not express the
+`EnterWorktree` call that cuts the branch after a red probe, or the
+`--no-verify` commits, the landing commit, and the push — the writes—git
+bucket needs a fenced command with a fixed `-C`, and the runtime-chosen
+consumer repo carries no honest one. Could not express `pre-commit gc` or
+the PR the run ends on: a bare command and a `gh` call, neither with an
+on-disk link for a does edge.
 
 ### issue-review-simulation
 
