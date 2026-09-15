@@ -104,8 +104,12 @@ child-set/
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-A child set of a working set is a set like any other, so it takes the
-bordered index-row form even though its parent takes the link tree.
+A child set of a working set that holds its own `ROOT.md` is a strand
+([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)),
+and takes the link tree form inside its border, its `index.md` at the
+top with one edge to its `ROOT.md`. A child set with no `ROOT.md` is a
+set like any other, so it takes the bordered index-row form even
+though its parent takes the link tree.
 
 ASCII box characters only, 78 columns wide, one annotation column every
 label aligns to, fragments rather than sentences. Where two nodes stand
