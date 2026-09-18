@@ -31,6 +31,11 @@ inner loop, the user holds every seam between laps.
 - A front's scope is set before the lap starts, not discovered during it.
 - Between two and four fronts. Below two the shape has no purpose; above
   four the user cannot hold the merge in their head.
+- Every front reads dev-playbook at published state, whichever repository
+  it is assigned to change, and a front may be assigned to change a
+  dev-playbook branch at the same time. Both facts hold together, and
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md) is where the
+  arrangement that serves them is worked out.
 
 ## Terms
 
@@ -71,11 +76,18 @@ integrator is a judgment and is not.
 - **What drives the laps.** [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
   is one candidate. Whether it earns its weight against a smaller script is
   the question that member exists to inform.
+- **Whether the fence holds.** The arrangement in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md) is read from
+  Sandcastle's source and has not been run. That member carries its own
+  Open bucket, and every item in it is a guess awaiting a test.
 
 ## Planned
 
-- **The user's caveat.** The user holds a constraint on this shape that is
-  not yet written down. It lands in Constraints or in Open once discussed.
+- **Experiment one: the clone round-trip.** Find out where a front's
+  commits land when Sandcastle runs against a throwaway clone, and whether
+  the host can move them into the real repository afterwards. Runs on a
+  scratch repository with one front and no container, so a failure points
+  at the git model rather than at the fence.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
 - **Decide the driver.** Choose between Sandcastle and a smaller script,
@@ -85,6 +97,9 @@ integrator is a judgment and is not.
 
 - **Survey Sandcastle.** What the tool offers this shape is recorded in
   [Sandcastle](/working-docs/parallel-fronts/sandcastle.md).
+- **State the sandbox requirement.** What a front's container must reach,
+  and where Sandcastle collides with it, is recorded in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md).
 
 ## Acronyms
 
