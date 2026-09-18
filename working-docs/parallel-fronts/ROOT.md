@@ -88,12 +88,6 @@ integrator is a judgment and is not.
   the host can move them into the real repository afterwards. Runs on a
   scratch repository with one front and no container, so a failure points
   at the git model rather than at the fence.
-- **Assert this device holds no metered credential.** A detector over the
-  three surfaces named in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md), refusing rather
-  than reporting, in the commit gate and again before a lap launches. Its
-  logic gets a unit test; the device assertion does not, because a test of
-  it passes wherever there is no device.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
 - **Decide the driver.** Choose between Sandcastle and a smaller script,
@@ -106,6 +100,11 @@ integrator is a judgment and is not.
 - **State the sandbox requirement.** What a front's container must reach,
   and where Sandcastle collides with it, is recorded in
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md).
+- **Assert this device holds no metered credential.** `billing-lint` reads
+  four surfaces and refuses rather than reports, and the
+  [Billing](/standards/billing/card.md) card stations it at the commit
+  gate. The same assertion immediately before a container launches waits on
+  the driver, since there is nothing yet to carry it.
 
 ## Acronyms
 
