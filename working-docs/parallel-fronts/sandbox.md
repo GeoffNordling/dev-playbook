@@ -22,6 +22,26 @@ assigned to change a dev-playbook branch as well, at the same time. The
 set wants every combination of those two facts to work, and wants the
 combination to be arranged once rather than reasoned about per front.
 
+## Constraints
+
+Two bounds are accepted and settled. They are recorded here so the work
+does not reopen them.
+
+**The config source is dev-playbook at published `main`, for every front.**
+A front assigned to change a dev-playbook branch therefore reads the
+standards as published while it writes their replacement; its own edits are
+invisible to it and reach a later lap instead. The alternatives — refreshing
+the config source between laps, or letting such a front read its own branch
+as config source — are known and declined. The user accepts this as current
+state.
+
+**No front reaches GitHub.** The container is handed no GitHub credential,
+so inside it `push`, `fetch`, `pull`, and cloning from a URL all fail, and
+only local git works: `commit`, `branch`, `diff`, `log`, `reset`,
+`checkout`. A front cannot open its own pull request. Its commits leave
+through the work checkout window, and whatever pushes them does so outside
+the container.
+
 ## Why every front reads dev-playbook
 
 Two separate readers need it, and neither is optional.
