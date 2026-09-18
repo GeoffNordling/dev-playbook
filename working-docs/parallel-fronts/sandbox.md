@@ -24,8 +24,21 @@ combination to be arranged once rather than reasoned about per front.
 
 ## Constraints
 
-Two bounds are accepted and settled. They are recorded here so the work
-does not reopen them.
+Three bounds are settled — two limitations the user accepts, and one rule
+the work may not break. They are recorded here so the work does not reopen
+them.
+
+**No window may point at a real file.** Every window opens onto a copy made
+for the lap and deleted after it: a fresh clone of the work repository, a
+copy of the config source, a copy of the credential. The reason is the
+SELinux restamp described below, which changes the host file's security
+label permanently and cannot be prevented by opening the window read-only.
+The prototype met this as a real fault, recorded at `NOTES.md:43-51`: a
+host program that expects the old label is denied its own file afterwards.
+`restorecon -RvF <path>` repairs a file that has been restamped, but this
+rule exists so that no repair is needed. A design that hands the container
+a window onto anything under `~/workspace/` or onto a real `.git` is wrong
+on this ground alone, whatever else recommends it.
 
 **The config source is dev-playbook at published `main`, for every front.**
 A front assigned to change a dev-playbook branch therefore reads the
