@@ -1,0 +1,81 @@
+---
+type: Survey
+title: Sandcastle
+description: What Sandcastle offers the parallel-fronts shape — the driver primitives it supplies, what it leaves to the user, and what it does not cover
+---
+
+# Sandcastle
+
+Sandcastle is one candidate for the driver
+([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms)).
+This member records what the tool supplies to the shape and what it leaves
+undone, so the choice between it and a smaller script rests on something
+written rather than on first impressions. The findings come from the
+project's own documentation at <https://github.com/mattpocock/sandcastle>.
+
+## What it is
+
+A TypeScript library, not a command-line tool driven by hand. Its own
+README describes a programmatic `run()` function "for use in scripts, CI
+pipelines, or custom tooling", and each agent invocation is a function call
+inside a program the user writes. The consequence for this set is that a
+lap is ordinary code: a list of fronts, a fan-out, a wait, a merge step.
+The driver is a file, and it is read and revised like any other file.
+
+The library takes no position on the work itself. Its README states that
+the user writes the prompt "and the engine executes it — no opinions about
+workflow, task management, or context sources are imposed."
+
+## What it gives the shape
+
+Four of its primitives map onto terms this set already has.
+
+**A branch per front.** A run is configured with a branch strategy, and
+the named-branch strategy puts a front's commits on a branch the caller
+chooses. The fronts of one lap are then a list of names the driver holds.
+
+**A fan-out that the language already supplies.** Because a run is a
+function call that returns a value, running the fronts at once is the
+standard JavaScript idiom for "do these together and wait for all". No
+feature of the library is involved, which is a point in its favor: the
+concurrency is the language's and is therefore familiar and debuggable.
+
+**A typed handoff between agents.** A run can be told to extract a
+schema-validated payload from the agent's output. This is what lets one
+agent's answer become the next step's input without the user reading it in
+between. A planning agent that emits a list of fronts, and a driver that
+fans out over that list, is the library's own worked example.
+
+**A commit count per front.** A run returns the commits it produced, so
+the driver can tell a front that did work from one that did not, and give
+the integrator only the branches worth merging.
+
+## What it leaves to the user
+
+The library has no notion of a checkpoint. A driver program runs to
+completion and exits; it cannot stop and ask the user a question. For this
+set that is close to a feature rather than a gap, because the checkpoint is
+the user's own session between two runs of the driver, and the exit is what
+makes the seam visible. The guess is that this matches the shape well, and
+it is the first thing a hand-run lap should test.
+
+It also has no notion of a front's plan surviving a lap. Revising what a
+front works on next is outside the library entirely.
+
+## What does not apply
+
+The library's headline concern is sandbox isolation: it runs each agent in
+a container and merges the commits back out. That is not what this set
+wants from it, and the tool does not force it — a no-sandbox provider runs
+the agent directly on the host, accepted everywhere a container provider
+is. The project's own decision record for that change names the reason:
+users on a subscription plan, or already inside an isolated environment,
+"had no path to AFK orchestration" while the restriction stood.
+
+The weight to judge is therefore the library's, minus the part of it this
+set will not use.
+
+## Acronyms
+
+- **AFK** — Away From Keyboard.
+- **CI** — Continuous Integration.
