@@ -100,7 +100,9 @@ async def watch_state() -> None:
     # The server can start before any refresh has made the directory, and
     # awatch raises on a path that is not there.
     root.mkdir(parents=True, exist_ok=True)
-    async for changes in watchfiles.awatch(root, debounce=STATE_DEBOUNCE_MS):
+    async for changes in watchfiles.awatch(
+        root, debounce=STATE_DEBOUNCE_MS, force_polling=watch.FORCE_POLLING
+    ):
         # One refresh reaches this loop as a directory event and as the stale
         # per-file events the rename left behind, so the same view file is named
         # several times in one batch and the page would fetch it several times.
