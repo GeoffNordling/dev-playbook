@@ -27,6 +27,15 @@ GIT_DIR = ".git"
 # batch, short enough to leave most of the two-second budget to the refresh and
 # the push that follow.
 CHECKOUT_DEBOUNCE_MS = 300
+# watchfiles polls for changes instead of listening for them whenever the
+# kernel name holds "microsoft-standard", which every WSL kernel does. That
+# rule was written for WSL 1, where a checkout on the Windows filesystem
+# announced nothing. WSL 2 announces every change, and polling is what misses
+# them: a view file lands beside its target and is moved into place in one
+# step, and a poll that falls either side of that move sees nothing happen.
+# Every checkout this tool watches is on the Linux filesystem, so both watchers
+# listen on every platform and WSL behaves as Linux does.
+FORCE_POLLING = False
 
 
 def outside_git(change: watchfiles.Change, path: str) -> bool:
@@ -74,5 +83,6 @@ async def watch_checkout(
         debounce=debounce_ms,
         stop_event=stop,
         watch_filter=watch_filter(ignore),
+        force_polling=FORCE_POLLING,
     ):
         await asyncio.to_thread(refresh.refresh, checkout)
