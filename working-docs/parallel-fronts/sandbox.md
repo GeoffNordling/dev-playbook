@@ -24,9 +24,19 @@ combination to be arranged once rather than reasoned about per front.
 
 ## Constraints
 
-Three bounds are settled — two limitations the user accepts, and one rule
+Four bounds are settled — two limitations the user accepts, and two rules
 the work may not break. They are recorded here so the work does not reopen
 them.
+
+**This device holds no metered credential, and something checks.** Every
+lap bills the subscription. A billing mistake is the quietest failure in
+the set, because the run succeeds and the cost arrives later, so the
+absence of a metered credential is asserted rather than assumed. Three
+surfaces carry one: the live environment, the shell startup files, and
+`~/.claude/settings.json`. The check runs on this device, before a lap
+launches, and refuses to launch rather than reporting a finding. A check
+that runs where there is no device passes without asserting anything,
+which is the failure it exists to prevent.
 
 **No window may point at a real file.** Every window opens onto a copy made
 for the lap and deleted after it: a fresh clone of the work repository, a
