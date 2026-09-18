@@ -83,15 +83,18 @@ integrator is a judgment and is not.
 
 ## Planned
 
-- **Experiment one: the clone round-trip.** Find out where a front's
-  commits land when Sandcastle runs against a throwaway clone, and whether
-  the host can move them into the real repository afterwards. Runs on a
-  scratch repository with one front and no container, so a failure points
-  at the git model rather than at the fence.
+- **Two windows, one container.** Open dev-playbook twice for one front —
+  read-only as the config source, read-write as the work checkout — and
+  confirm an edit in one does not appear in the other and the front still
+  loads its skills. This is the case where a front is assigned to change
+  dev-playbook itself, which the prototype specified and never ran.
+- **Sandcastle against a clone.** Point the driver at a throwaway clone and
+  watch where it opens its windows: whether it stays inside the clone, and
+  whether the restamp stays off the real repository.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
 - **Decide the driver.** Choose between Sandcastle and a smaller script,
-  against what the hand-run lap shows.
+  against what the runs above show.
 
 ## Completed
 
@@ -105,6 +108,12 @@ integrator is a judgment and is not.
   [Billing](/standards/billing/card.md) card stations it at the commit
   gate. The same assertion immediately before a container launches waits on
   the driver, since there is nothing yet to carry it.
+- **Experiment one: the clone round-trip.** A front's commits are made in a
+  throwaway clone and reach the real repository at the same SHA, or the lap
+  stops. [`front-clone`](/scripts/front-clone) is the plumbing, and
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records the four
+  things the run settled. It used no container and no driver, so what it
+  settled is git's behavior alone.
 
 ## Acronyms
 

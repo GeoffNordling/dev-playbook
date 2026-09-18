@@ -188,15 +188,42 @@ real repository through that sharing.
 
 This is a guess. It is read from Sandcastle's source and has not been run.
 
+## What the round trip settled
+
+The first experiment ran the clone half of the resolution with no container
+and no driver, so that a failure would point at git rather than at anything
+else. [`front-clone`](/scripts/front-clone) is the plumbing it produced, and
+`tests/dev_playbook/test_front_clone.py` holds its assertions. Four things
+are now known rather than guessed.
+
+**The commits travel by fetch, and the real repository pulls them.** Git
+refuses a push into a branch that is checked out, so the clone cannot push.
+The real repository fetches `branch:branch` from the clone instead, without
+force, which means a branch something else moved meanwhile is rejected as a
+non-fast-forward rather than overwritten.
+
+**The sharing is real and the flag prevents it.** A default local clone of
+dev-playbook shares 318 object files with its source — one file on disk under
+two names, which is how the SELinux restamp would reach the real repository.
+The same clone taken with `--no-hardlinks` shares none. The plumbing verifies
+this by comparing inodes after every clone, because the flag being passed and
+the sharing being absent are two different claims.
+
+**The front's branch exists only in the clone until the commits arrive.** A
+lap that never finishes leaves nothing half-started in the real repository.
+
+**Uncommitted work is the one loss git cannot undo.** Everything else the
+round trip moves is a commit, and a commit transfers with its whole ancestor
+closure or not at all. So a clone holding any uncommitted change is refused
+and left on disk to be read, rather than closed and deleted.
+
 ## Open
 
-- **Whether commits come back out of the clone.** The resolution puts the
-  front's commits in a throwaway directory, and something has to move them
-  into the real repository afterwards. Sandcastle also fast-forwards a
-  branch from `origin` where it judges that safe, and in a clone `origin`
-  is the real repository rather than GitHub. What it does there is unknown.
-  This is the first thing to test, and it can be tested with no container
-  at all.
+- **What Sandcastle does inside a clone.** The round trip above was driven by
+  hand. Sandcastle fast-forwards a branch from `origin` where it judges that
+  safe, and in a clone `origin` is the real repository rather than GitHub.
+  What it does there is still unknown, and only a run with Sandcastle in the
+  loop answers it.
 - **Whether the image survives the move.** The eight symlinks are baked at
   image build time and point at an absolute path that Sandcastle fixes
   differently. Changing it is mechanical; the failure mode if it is wrong
