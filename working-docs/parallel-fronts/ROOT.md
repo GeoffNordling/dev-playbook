@@ -83,6 +83,11 @@ integrator is a judgment and is not.
 
 ## Planned
 
+All three runs below need a container, so all three happen on the Fedora
+machine. The WSL machine this set was written on has no container runtime and
+is not a target, which
+[The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
+
 - **Two windows, one container.** Open dev-playbook twice for one front —
   read-only as the config source, read-write as the work checkout — and
   confirm an edit in one does not appear in the other and the front still
