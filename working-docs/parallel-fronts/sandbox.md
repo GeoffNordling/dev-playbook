@@ -24,9 +24,17 @@ combination to be arranged once rather than reasoned about per front.
 
 ## Constraints
 
-Four bounds are settled — two limitations the user accepts, and two rules
+Five bounds are settled — three limitations the user accepts, and two rules
 the work may not break. They are recorded here so the work does not reopen
 them.
+
+**Laps run on Fedora, and nowhere else.** The container, the image it starts
+from, and the `claude` binary inside it are all Fedora, and that binary reads
+`/etc/os-release` and refuses to run elsewhere. This set is developed on a WSL
+Ubuntu machine because that is where the user happens to work, and that
+machine has no container runtime at all. It is not a target. Nothing here is
+expected to work there, a result measured there does not count, and no effort
+is spent making it portable.
 
 **This device holds no metered credential, and something checks.** Every
 lap bills the subscription. A billing mistake is the quietest failure in
