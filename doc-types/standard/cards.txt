@@ -1,4 +1,8 @@
 card                    cell     pointer
+billing                 define   /standards/billing/credentials.md
+billing                 audit    /scripts/billing-lint
+billing                 enforce  commit gate
+billing                 adopt    none
 build                   define   /standards/build/skeleton.md
 build                   define   /standards/build/canonical.md
 build                   define   /standards/build/python.md
@@ -16,7 +20,7 @@ distribution            define   /standards/distribution/channel.md
 distribution            audit    /scripts/workspace-lint
 distribution            audit    /scripts/repo-lint
 distribution            enforce  commit gate
-distribution            enforce  /scripts/bump-pins
+distribution            enforce  /scripts/bump-pin
 distribution            enforce  /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
 distribution            adopt    none
 harness                 define   /standards/harness/claude-content.md

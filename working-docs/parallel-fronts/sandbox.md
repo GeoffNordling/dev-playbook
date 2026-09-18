@@ -143,7 +143,7 @@ machine's measurement store instead of dying with the container.
 The directory holding the work checkout is named for its repository, not
 for the front. `canonical_repo_name` derives a repository's name from the
 directory holding `.git`, and same-repo resolution
-([Cross-References](/standards/knowledge-organization/cross-references.md#same-repo-resolution))
+([Same-Repo Resolution](/docs/decisions/0009-same-repo-resolution.md))
 compares a citation's first segment against that name. A checkout at a
 directory named for the front would silently break every same-repo citation
 inside it.

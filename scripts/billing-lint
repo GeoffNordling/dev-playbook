@@ -1,0 +1,27 @@
+#!/usr/bin/env -S uv run --script
+"""billing-lint — pre-commit validator for metered-billing credentials.
+
+Thin shim over dev_playbook.billing_lint.main: it puts the checkout's ``src/``
+on ``sys.path`` and calls the module, which reads four surfaces — the live
+environment, the shell startup files, the machine's Claude settings, and the
+repo's own — and applies the billing-card rules (no-metered-env,
+no-metered-shell-config, no-credential-settings), printing each finding to
+stdout as a GNU finding line (``location:line: billing.rule message``) and
+exiting nonzero if any. ``--list-rules`` prints the rule ids and exits 0. This
+is the one detector that reads the machine as well as the repository, because
+a metered credential does not live in a repository. See
+dev_playbook.billing_lint for the logic and its tests.
+"""
+# /// script
+# requires-python = ">=3.14"
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.billing_lint import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())

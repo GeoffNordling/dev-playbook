@@ -59,6 +59,7 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 
 | Script | Standard | Purpose |
 |--------|----------|---------|
+| `billing-lint` | [billing/credentials.md](/standards/billing/credentials.md) | Metered-billing credentials over four surfaces — the live environment, the shell startup files, and the Claude settings files of both the machine and the repo; the one detector that reads the machine |
 | `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape, the dogfood mirror |
 | `python-lint` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
 | `testing-lint` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |

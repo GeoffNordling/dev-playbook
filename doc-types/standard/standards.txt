@@ -1,5 +1,6 @@
 standards
 card                    standard                                       population
+billing                 credentials                                    a machine that runs Claude, and every repository worked on it
 build                   canonical                                      a canonical artifact: its source under standards/build/canonical/ and each governed repo's copy
 build                   python                                         a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/
 build                   skeleton                                       a governed repo's tree, except standards/build/canonical/ in dev-playbook
@@ -31,6 +32,11 @@ tracking                repo-settings                                  a governe
 
 rules
 card                    standard                                       rule                                              when
+billing                 credentials                                    a-surface-that-cannot-be-read-is-a-tool-error     —
+billing                 credentials                                    acronyms                                          —
+billing                 credentials                                    no-credential-in-a-claude-settings-file           —
+billing                 credentials                                    no-metered-variable-in-a-shell-startup-file       —
+billing                 credentials                                    no-metered-variable-in-the-environment            —
 build                   canonical                                      artifactsmk                                       makefile
 build                   canonical                                      ciyml                                             —
 build                   canonical                                      gitignore                                         —

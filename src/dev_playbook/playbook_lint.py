@@ -39,6 +39,9 @@ SCRIPTS_DIR = HOOK_REPO_ROOT / "scripts"
 # order. Each name is an executable ``scripts/<name>`` in this clone. Adding a
 # detector here IS enrolling it workspace-wide — there is no per-consumer step.
 DETECTORS = (
+    # First in output order on purpose: it is the only detector whose finding
+    # costs money, and the only one that reads the machine rather than the repo.
+    "billing-lint",
     "repo-lint",
     "python-lint",
     "testing-lint",
