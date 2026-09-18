@@ -159,6 +159,7 @@ GOVERNED = (
     "personal-trainer",
     "idea-tree",
     "dwarf-flow",
+    "lunch",
 )
 
 # Expected GitHub settings, under the REST field names. The audit only reads;
