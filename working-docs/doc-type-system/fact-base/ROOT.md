@@ -107,7 +107,7 @@ In order; each produces what the next needs.
   ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned));
   one refresh writes one fact base per checkout; `chains.txt`, its
   siblings, and the shims go. The `card` extractor and `cardgen` are
-  struck: the doc-type system retires Standard-Card, step 4 of
+  struck: the doc-type system retires Standard-Card, Retire the card in
   [Planned](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned).
 - **Docs follow the moves.** The `doc-types/` indexes and pages that
   name the text files and the shims, and `scripts/index.md`.
