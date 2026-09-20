@@ -1,7 +1,7 @@
 ---
 type: Standard-Ruleset
 title: Cross-References
-description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the runbook forms, and fragment anchors that match a heading's slug
+description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, and fragment anchors that match a heading's slug
 population: "a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record"
 ---
 
@@ -13,103 +13,90 @@ another, and on whether the referencing file has a fixed repo root, a
 single repo it is always read from. Both link forms are inline; there
 is no separate citations section. A fenced code block, triple backticks
 or `~~~`, may hold `~/workspace/` and `/`-root paths in shell examples
-or sample output, and ref-lint skips it. A numbered
+or sample output, and a reference inside it is out of scope. A numbered
 [Decision Record](/standards/decisions/records.md) is exempt as a
 source, since a record frozen at merge goes stale as its referents
-move; references to a record are checked like any other. ref-lint is
-the authority
-([Knowledge Organization](/standards/knowledge-organization/card.md)).
+move; references to a record are checked like any other.
+
+## Reference resolves
+
+A reference names a file or a directory that exists. A root-absolute
+target resolves against the repository root of the checkout the
+referencing file is read in; a `~/workspace/<repo>/` target naming that
+same repository resolves against that checkout too, and a
+`~/workspace/<repo>/` target naming any other repository resolves at
+its absolute path under `~/workspace/`.
+
+`knowledge-organization.reference-resolves` · deterministic
 
 ## Fragment anchor matches the slug
 
-A reference that appends `#anchor` names the target heading's GitHub
-slug.
+A reference that appends `#anchor` to a markdown file names in that
+anchor the GitHub slug of a heading the file carries.
 
-ref-lint computes and validates the slug, so a stale or misspelled
-anchor fails the commit.
+`knowledge-organization.fragment-anchor-matches-the-slug` · deterministic
 
 ## Stable named anchor
 
-An anchor names a heading by a stable slug, never by a position: no
-numbered fragment, `#223-revision`, and no in-prose heading number,
-`§2.10`.
+A reference's `#anchor` names its target heading by the words of the
+heading and carries no number that is the heading's position in the
+file. Where the target numbers every heading by position and carries no
+other anchor, the reference drops the anchor and names the concept the
+heading carries in the link text.
 
-A positional anchor breaks silently the moment its target is renumbered
-or reordered. Where the target numbers every heading positionally and
-exposes no stable anchor, the reference names the concept the heading
-carries and drops the number, so a reader finds it by name.
+`knowledge-organization.stable-named-anchor` · deterministic
+
+## Citation, another repo
+
+A reference to a file or directory in a repository other than the
+referencing file's own is an inline link whose target is the full
+workspace path, beginning `~/workspace/<repo>/`.
+
+`knowledge-organization.citation-another-repo` · deterministic
 
 ## Fixed repo root
 
-A reference from a file with a fixed repo root: a concept document, or
-a repo's own `CLAUDE.md`, which Claude Code loads only when the session
-is already inside that repo.
+The referencing file has a fixed repo root: no segment of its path
+inside the repository is `skills`, `rules`, or `agents`.
+
+`knowledge-organization.fixed-repo-root` · deterministic
 
 ### Link, same bundle
 
-A reference to a document in the same repo is a root-absolute path, a
-target beginning with `/`, resolved against the bundle root, the repo
-root.
+A reference to a file or directory in the referencing file's own
+repository is an inline link whose target is a root-absolute path,
+beginning `/` and naming the path from the repository root.
 
-```markdown
-[prose/conventions.md](/standards/prose/conventions.md)
-```
-
-A root-absolute link resolves against the reader's own checkout root,
-the current working directory's repo, so it points at the copy that
-matches the checkout the reader is in, main checkout or per-issue
-worktree. A same-repo reference written `~/workspace/<this-repo>/…`
-fails ref-lint as `wrong-form`, whether or not the target exists: from
-inside a worktree that path jumps to the main checkout, a different and
-possibly stale copy.
-
-### Citation, another repo
-
-A reference to a document in a different repo is its full workspace
-path, beginning with `~/workspace/`.
-
-```markdown
-[Friction log](~/workspace/mission-control/friction/log.md)
-```
-
-A cross-repo citation resolves to that repo's main checkout, its
-published state. `~/workspace/<repo>` is self-describing: the repo name
-is in the path, so no external convention is needed to interpret it.
+`knowledge-organization.link-same-bundle` · deterministic
 
 ## No fixed repo root
 
-A reference from a
-[runbook](/standards/harness/runbook-conventions.md), a skill bundle or
-agent definition, or from global `~/.claude/` configuration such as
-`rules/`: files loaded across arbitrary repos, with no root for `/` to
-resolve against.
+The referencing file has no fixed repo root: a segment of its path
+inside the repository is `skills`, `rules`, or `agents`.
+
+`knowledge-organization.no-fixed-repo-root` · deterministic
 
 ### Workspace path for a stable location
 
-A reference to a file at a stable workspace location is an inline link
-with its full `~/workspace/<repo>/<path>` path, even when that file is
-in the same repo.
+A reference to a file at a stable location in the referencing file's
+own repository is an inline link whose target is the full
+`~/workspace/<repo>/<path>` path, unless the target is inside the
+referencing file's own skill bundle.
 
-The same-repo case resolves against the reader's own checkout,
-worktree included
-([Resolve same-repo paths](/dotfiles/dot-claude/CLAUDE.md#resolve-same-repo-paths)).
+`knowledge-organization.workspace-path-for-a-stable-location` · deterministic
 
 ### Relative path inside the bundle
 
-A reference to a file inside the same skill bundle, a sibling,
-`references/`, or the parent, is an inline link with a relative path:
-`[ui.md](references/ui.md)`.
+A reference to a file inside the referencing file's own skill bundle, a
+sibling, a file under `references/`, or the parent, is an inline link
+whose target is a path relative to the referencing file.
+
+`knowledge-organization.relative-path-inside-the-bundle` · deterministic
 
 ### Inline code for a varying location
 
-A reference to a file in the user's repo whose location varies,
-`CLAUDE.md`, `CONTEXT.md`, `specs/design.md`, `Makefile`, or to a
+A reference to a file whose path varies between repositories,
+`CLAUDE.md`, `CONTEXT.md`, `specs/design.md`, or `Makefile`, or to a
 directory, `docs/decisions/`, is inline code.
 
-### Bare skill invocation
-
-A slash-skill invocation is bare, `/<skill-name>`, with no markup.
-
-The wrapper records intent: an inline link means "go open this"; inline
-code means "this file exists conceptually". ref-lint treats inline code
-and a bare invocation as prose.
+`knowledge-organization.inline-code-for-a-varying-location` · stochastic

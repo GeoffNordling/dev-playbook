@@ -16,68 +16,66 @@ frontmatter of its own root `index.md`, an `okf_types` mapping beside
 `okf_version`; okf-lint resolves a document's `type` against the union of
 the two, and against the global table alone when the repo declares no
 `okf_types`. Declaring a local type is one step of
-[Adopting a Repo-Scoped Standard](/standards/standard/consuming.md). okf-lint is the
-authority ([Knowledge Organization](/standards/knowledge-organization/card.md)).
+[Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
 
-## Row shape
+## Global table
 
-Each row's first cell is one backticked type name in Title Case,
-hyphen-joined for a multi-word name with acronyms upper,
-`Decision-Record`, `Standard-Card`, `README`, and its second cell says
-what the type is.
+The declaration is the `## Types` table of
+`standards/knowledge-organization/document-types.md`, in the repo that
+carries `standards/build/canonical/`.
 
-## Alphabetical order
+`knowledge-organization.global-table` · deterministic
 
-Rows are in alphabetical order by type name.
+### Row shape
+
+Every row of the `## Types` table below its header holds, in its first
+cell, one backticked type name in Title Case, hyphen-joined for a
+multi-word name: `Decision-Record`, `Standard-Card`, `README`.
+
+`knowledge-organization.row-shape` · deterministic
+
+### Row description
+
+Every row of the `## Types` table below its header holds, in its second
+cell, a non-empty one-line description of what the type is.
+
+`knowledge-organization.row-description` · deterministic
+
+### Alphabetical order
+
+The rows of the `## Types` table are in alphabetical order by type name,
+compared case-insensitively.
+
+`knowledge-organization.alphabetical-order` · deterministic
 
 ## Local declaration
 
-The `okf_types` mapping in a consumer's root `index.md` frontmatter, one
-entry per local type: the key its name, the value its description.
+The declaration is the `okf_types` mapping in the frontmatter of the
+root `index.md` of a repo that does not carry
+`standards/build/canonical/`, one entry per document type the repo
+declares for itself.
 
-```yaml
----
-okf_version: "0.1"
-okf_types:
-  Resume: A resume markdown source, master or batch variant
-  Story: One work-experience story in SPAR form
----
-```
-
-Frontmatter, not a document under the repo's own `standards/` tree. That
-tree is the meta-standard's population — standards-lint wants a card in
-every subdirectory of it
-([Directory layout](/standards/standard/cards.md#directory-layout))
-and forbids a card named for a dev-playbook one
-([No shadowing](/standards/standard/cards.md#no-shadowing)) — so a
-registry document at `standards/knowledge-organization/` could not pass,
-and a path that mirrors dev-playbook's own folder name breaks the moment
-that folder is renamed upstream.
+`knowledge-organization.local-declaration` · deterministic
 
 ### Entry shape
 
-Each key has the [Row shape](#row-shape)'s name, and each value is a
-non-empty one-line description.
+Each entry's key is a type name in Title Case, hyphen-joined for a
+multi-word name, and its value is a non-empty one-line description of
+the type.
+
+`knowledge-organization.entry-shape` · deterministic
 
 ### Alphabetical keys
 
-The keys are in alphabetical order by type name.
+The keys of the `okf_types` mapping are in alphabetical order by type
+name, compared case-insensitively.
+
+`knowledge-organization.alphabetical-keys` · deterministic
 
 ### Add, never shadow
 
-Every key names a new type: no key equals an upstream name, or an earlier
-key of the same mapping, compared case-insensitively.
+No key of the `okf_types` mapping equals a type name of the `## Types`
+table, or an earlier key of the same mapping, compared
+case-insensitively.
 
-Membership stays exact-case; the case-insensitive test stops a consumer
-aliasing upstream `Guide` as a distinct `GUIDE`. A consumer never edits
-the global table, so it can neither loosen nor drop an upstream type. A
-local type is legal only in the repo that declares it and any repo
-downstream of it, invisible uphill to dev-playbook and sideways to
-sibling consumers.
-
-### Name and description only
-
-An entry carries the type's name and its description, and nothing else:
-the per-type constraints upstream types impose, `resource` on
-`Recipe-Description` for one, stay hardcoded upstream, and a local type
-declares none.
+`knowledge-organization.add-never-shadow` · deterministic

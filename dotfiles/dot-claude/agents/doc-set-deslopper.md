@@ -79,6 +79,7 @@ The fact slices:
   [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
 - **Terms** —
   [terms defined once](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once),
+  [terms that cross sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets),
   [tight definitions](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#tight-definitions),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only).
 - **Placement** —
@@ -91,6 +92,7 @@ The set slices:
   [an index in every directory](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory),
   [rows inside the set](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-set),
   [distinct concerns](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns),
+  [distinct from the parent](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-from-the-parent),
   [the introduction](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#the-introduction).
 - **Body** —
   [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#body-inside-its-concern).

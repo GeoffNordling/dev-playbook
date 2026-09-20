@@ -1,7 +1,7 @@
 ---
 type: Standard-Ruleset
 title: Document Types
-description: The frontmatter profile every concept document carries — a registered type, a title, a one-breath description, and a resource where an asset backs the document
+description: The frontmatter profile every concept document carries — a registered type, a title, a description, and a resource where an asset backs the document
 population: "a concept document"
 ---
 
@@ -18,21 +18,21 @@ tool consumes them as configuration or runs them as code, and they carry
 no frontmatter; and `classify()` in [md.py](/src/dev_playbook/md.py)
 holds the boundary in code with its further exclusions, the transient
 `PLAN.md` and `PROGRESS.md` pair, the root `tmp/` tree, and every
-top-level `tests/` tree. okf-lint is the authority
-([Knowledge Organization](/standards/knowledge-organization/card.md)).
+top-level `tests/` tree.
 
 ## Frontmatter block
 
-A concept document opens with a YAML frontmatter block.
+A concept document opens with a `---`-delimited frontmatter block whose
+YAML is a mapping.
+
+`knowledge-organization.frontmatter-block` · deterministic
 
 ## Types
 
-`type` is present and names one row of the table below, or one entry of
-the repo's own `okf_types` declaration
+A concept document's frontmatter has a `type` key whose value names one
+row of the table below, or one entry of the `okf_types` mapping in the
+frontmatter of the repo's own root `index.md`
 ([Type Registry](/standards/knowledge-organization/type-registry.md#local-declaration)).
-
-This table is the global registry, the vocabulary every repo inherits,
-and its shape is Type Registry's rule. Alphabetical by type name.
 
 | Type | What it is |
 |------|------------|
@@ -50,55 +50,66 @@ and its shape is Type Registry's rule. Alphabetical by type name.
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
+`knowledge-organization.types` · deterministic
+
 ## Title
 
-`title` is present and holds the readable title.
+A concept document's frontmatter has a `title` key with a non-empty
+value.
+
+`knowledge-organization.title` · deterministic
 
 ## Description
 
-`description` is present and holds a one-line summary: a sentence
-fragment naming what the document is or what it governs, present tense,
-no trailing period, leading with what distinguishes it, roughly one
-breath, twenty words as a soft limit.
+A concept document's frontmatter has a `description` key whose value is
+non-empty and does not end with a period.
 
-The description powers triage and the authored `index.md` listings
-([Indexes](/standards/knowledge-organization/indexes.md)).
+`knowledge-organization.description` · deterministic
+
+## Description voice
+
+A concept document's `description` is a sentence fragment in the present
+tense that names what the document is or what it governs.
+
+`knowledge-organization.description-voice` · stochastic
 
 ## resource
 
-`resource`, when present, holds a repo-root path or an external URI to
-the asset the document describes:
-`/dotfiles/dot-claude/workflows/ralph-loop.js`.
+A concept document's `resource`, where present, is a repo-root path
+beginning with `/` or an external URI.
+
+`knowledge-organization.resource` · deterministic
+
+## resource names the asset
+
+A concept document's `resource`, where present, names the asset the
+document describes, never a companion file that only supports it.
+
+`knowledge-organization.resource-names-the-asset` · stochastic
 
 ## No tags or timestamp
 
-`tags` and `timestamp`, the OKF spec's optional keys, are absent.
+A concept document's frontmatter has no `tags` key and no `timestamp`
+key.
+
+`knowledge-organization.no-tags-or-timestamp` · deterministic
 
 ## Recipe-Description
 
-A concept document whose `type` is `Recipe-Description`, whose whole job
-is to describe a backing `.js`.
+A concept document typed `Recipe-Description` has a `resource` key with
+a non-empty value.
 
-### resource present
-
-`resource` is present and names the backing file.
-
-A companion skill is linked in the body, not in `resource`.
+`knowledge-organization.recipe-description` · deterministic
 
 ## Typed Standard-Card or Standard-Ruleset
 
-A concept document whose `type` is `Standard-Card` or `Standard-Ruleset`.
+A concept document typed `Standard-Card` or `Standard-Ruleset` lives
+under `standards/`.
 
-### Under standards/
-
-The file lives under `standards/`, the one tree reserved for the two labels
-([Standard](/doc-types/standard/definition.md#where-a-standard-lives)).
+`knowledge-organization.typed-standard-card-or-standard-ruleset` · deterministic
 
 ## Typed Loop
 
-A concept document whose `type` is `Loop`.
+A concept document typed `Loop` lives under `loops/`.
 
-### Under loops/
-
-The file lives under `loops/`, the one tree reserved for the label
-([Loop](/doc-types/loop/definition.md#where-a-loop-lives)).
+`knowledge-organization.typed-loop` · deterministic

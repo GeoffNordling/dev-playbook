@@ -135,6 +135,10 @@ specification.
      work, and a loop that begins with 232 findings across 29 files has
      no small first move; this is the first instance run by hand, an
      act that drafts, a yield per rule, an act that applies.
+     To do when every ruleset is drained: one quick holistic pass over
+     all 29, generating the two tables of steps 2 and 3, the verifiers
+     and the gates, and reading them across Standards for overlap and
+     duplication before step 2 begins.
   2. *The verifier table and `audit`.* One table maps every rule id to
      a script, a judge, or null, one row per id, keyed by id; dev-playbook
      holds the rows for its own rules and a consumer repo holds rows for

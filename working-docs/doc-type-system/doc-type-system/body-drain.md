@@ -122,6 +122,20 @@ Further checks, learned from earlier runs:
 - A sentence that gives the reason for a rule is deleted even when the
   reason names a further constraint, "Behaviors leads because Read the
   standards must come first". A reason is not split into a rule.
+- A split rule earns its place only where a script or a judge gets a
+  crisp answer. A sentence of craft or taste, "holds only what a reader
+  needs before the listing makes sense", "is named for the work, not a
+  branch", is not split; it goes.
+- The repo that hosts the canonical files is named by a property, "the
+  repo that carries `standards/build/canonical/`", and every other repo
+  by its negation, never as "dev-playbook" or "a consumer repo".
+- A pointer this file's own tests hold to, not just a reader's cross
+  reference, is not a reason: `tests/test_set_deslop_coverage.py` binds
+  `working-documentation-sets.md`'s sections to
+  `doc-set-deslopper.md`'s slice assignments by anchor, so cutting one
+  of those citations as a reason breaks a test outside `standards/`.
+  Run `uv run pytest tests/test_set_deslop_coverage.py` after draining
+  that file, and keep every citation the test parses.
 
 ## The edit
 

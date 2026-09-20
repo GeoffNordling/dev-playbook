@@ -13,57 +13,69 @@ The [Loop doc-type](/doc-types/loop/index.md) declares what a loop is and
 the encoding its file takes,
 [Acts, Checks, and Yields Encoding](/doc-types/loop/encoding.md); a
 doc-type binds nobody, so this Standard is what binds the file to that
-encoding. Every rule here is checked by `scripts/loop-lint`, and a rule
-names the `knowledge-organization.*` id that checks it. The detector stops
-at a file's first disagreement, since each rule reads the cut the one
-before it made.
+encoding.
 
 ## One graph
 
-The body is an H1, one paragraph, and one fenced `mermaid` block
-holding a `flowchart`, in that order, with nothing else before the
-fence (`knowledge-organization.loop-graph`).
+A document typed `Loop` holds one H1, then one paragraph, then one
+fenced `mermaid` block, in that order and with nothing else before the
+fence. The block is a flowchart, opening `flowchart` or `graph`, whose
+statements are Mermaid directives, nodes, and edges between nodes, with
+no `&` fan-out.
 
-The graph is the source of truth; the paragraph says what state the
-loop drives and toward what. A second paragraph, a heading, or a
-second graph before the verb sections fails the rule, as does a graph
-the detector cannot read: a statement that is neither a node, an edge,
-nor a Mermaid directive, or an `&` fan-out.
+`knowledge-organization.one-graph` · deterministic
+
+## What the paragraph says
+
+In a document typed `Loop`, the paragraph before the graph names the
+state the loop drives and the target state it drives that state toward.
+
+`knowledge-organization.what-the-paragraph-says` · stochastic
 
 ## Three verb sections
 
-After the graph come three H2s, `Acts`, `Checks`, `Yields`, in that
-order and no others, each holding one list whose every line is an
-entry, the node id in backticks, an em dash, then the entry's text, each
-id once (`knowledge-organization.loop-sections`).
+After the graph, a document typed `Loop` holds three H2s, `Acts`,
+`Checks`, and `Yields`, in that order and no others, with nothing
+between the graph and the first of them. Each H2 holds one list whose
+every line is an entry, the node id in backticks, an em dash, then the
+entry's text, or is a line indented under an entry, which continues it;
+and no node id carries two entries.
 
-An indented line continues the entry above it.
+`knowledge-organization.three-verb-sections` · deterministic
 
 ## Nodes and entries agree
 
-Every entry names a node of the graph, and every node of the graph has
-an entry or is a receiver, a node under no heading that some yield
-leads to (`knowledge-organization.loop-nodes`).
+Every entry of a document typed `Loop` names a node of its graph, and
+every node of the graph carries an entry or is a receiver, a node with
+no entry that an edge out of a yield leads to.
+
+`knowledge-organization.nodes-and-entries-agree` · deterministic
 
 ## Edges follow the shape
 
-A step leads to a step. Only a yield leads to a receiver, and a
-receiver leads to a step (`knowledge-organization.loop-edges`).
+In a document typed `Loop`, every edge of the graph leads to a step, a
+node whose entry is an act, a check, or a yield, except an edge out of a
+yield, which leads to a step or to a receiver, a node with no entry.
 
-This is the shape [Acts, Checks, and Yields](/doc-types/loop/contract-shape.md#the-graph)
-draws: steps in iteration order, a programmed exit where its author put
-it, and control coming back.
+`knowledge-organization.edges-follow-the-shape` · deterministic
 
 ## Entries point and condition
 
-An act's entry links the runbook it runs; a check's entry links the
-Audit cell of a card, `standards/<card>/card.md#audit`; a yield's entry
-names the user or links a document typed `Loop`; and every entry states
-its condition, `fires when …` or `fires every iteration` for an act or
-a check, `yields when …` for a yield
-(`knowledge-organization.loop-entries`).
+Every entry of a document typed `Loop` states its condition, `fires
+when …` or `fires every iteration` for an act or a check and `yields
+when …` for a yield. An act's entry holds at least one link; a check's
+entry links a document typed `Standard-Card` at its `audit` fragment; a
+yield's entry holds a link or the words `the user`, and every link it
+holds names a document typed `Loop`. Every link in an entry is
+root-absolute or relative to the document, and it resolves to a file in
+the repo.
 
-A link is root-absolute or relative to the Loop's file, and it resolves
-to a file in the repo. A check links the card's Audit cell and never the
-Standard's own file: the cell composed is the audit, never the gate
-([Standard](/doc-types/standard/encoding.md#cells)).
+`knowledge-organization.entries-point-and-condition` · deterministic
+
+## An act links a runbook
+
+The link an act's entry holds names a runbook, a skill bundle's
+`SKILL.md` or an agent definition
+([Runbook Conventions](/standards/harness/runbook-conventions.md#location)).
+
+`knowledge-organization.an-act-links-a-runbook` · deterministic

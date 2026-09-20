@@ -25,104 +25,100 @@ the set is the whole tree, strands included.
 
 ## Speculative voice
 
-A member writes a guess as a guess and sets an open question beside its
-topic; `ROOT.md` declares the set speculative, and the members inherit
-it.
-
-That is the whole exemption from
+Every member of a working documentation set writes a guess as a guess
+and sets an open question beside its topic, and the set's `ROOT.md`
+declares the set speculative. This is the whole exemption from
 [declarative present tense](/standards/prose/conventions.md#declarative-present-tense).
+
+`knowledge-organization.speculative-voice` · stochastic
 
 ## The link tree
 
-Every member is reached from `ROOT.md`, the document the work started
-from, by a path of links: a member links what it depends on, its parent,
-its children, the sibling whose fact it defers to.
+Every member of a working documentation set is reached from the set's
+`ROOT.md` by a path of links, a second structure over
+[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)'s
+tree of sets. A row of an `index.md` that lists the member is not such a
+link.
 
-The tree a reader walks is the tree of sets
-([an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory));
-the link tree is the second structure, the one that says what depends on
-what. `ROOT.md` need not link every member. A member no path from
-`ROOT.md` reaches is an orphan, listed or not.
+`knowledge-organization.the-link-tree` · deterministic
 
 ## Where a set lives
 
-A set is one directory under `working-docs/` at the repo root,
-`working-docs/<work>/`, named for the work and not for a branch; it
-holds the set's `index.md`, its `ROOT.md`, and its members under
-lowercase kebab-case names, flat or in subdirectories, and it lives as
-long as the work does, on every branch the work touches and on `main`
-between them.
-
-`working-docs/` is a plain parent: its `index.md` lists the sets, one
-row each, and it holds no `ROOT.md` and no members of its own. Each set
-under it is the one
+A working documentation set is one directory under `working-docs/` at
+the repo root, `working-docs/<work>/`, holding the set's `index.md`, its
+`ROOT.md`, and its members under lowercase kebab-case names, flat or in
+subdirectories — the one
 [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes a set, here named and placed. A subdirectory of the set is a
-child set as anywhere, and it is inside the work: one that holds a
-`ROOT.md` is a strand, and one that holds none is governed by the
-nearest `ROOT.md` above it, so a strand may hold a subdirectory of
-members with no root of their own.
+makes a set, here named and placed.
 
-A set stands on `main` because the speculative voice lets it: a reader
-meets a guess marked as a guess, and the worklist shows where the work
-is. The work ends when its Planned bucket is empty; then the set is
-drained or deleted, and an empty `working-docs/` stays. A set under
-`docs/` is the defect: `docs/` holds permanent documents.
+`knowledge-organization.where-a-set-lives` · deterministic
+
+## A set stands on main
+
+A working documentation set, the one
+[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+makes a set, is present on `main`.
+
+`knowledge-organization.a-set-stands-on-main` · deterministic
+
+## `working-docs/` holds only sets
+
+`working-docs/` at the repo root, a plain parent to the sets
+[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+makes, holds its own `index.md` and the directories of the sets, and
+nothing else.
+
+`knowledge-organization.working-docs-holds-only-sets` · deterministic
 
 ## Worklist
 
-Work is one list of items, each a bold name and a short body; an item's
-state is which section it sits in, Planned or Completed, and a completed
-item keeps its shape and moves.
-
-Completed is the one past state a member records
+The work of a working documentation set is one list of items, each item
+a bold name and a body beneath it, and an item's state is the section it
+sits in, `Planned` or `Completed`, the one past state a member records
 ([current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
-Put the pair where it makes sense: one for the whole set, or one per
-strand where the work splits by level or by function. However it
-splits, a strand has one Planned and one Completed, in one file, its
-`ROOT.md` where it is a directory.
+One `Planned` section and one `Completed` section sit together in one
+file: the set's `ROOT.md`, or, where the work splits into strands, the
+`ROOT.md` of each strand.
+
+`knowledge-organization.worklist` · deterministic
 
 ## Buckets
 
-A bucket is a named section role a fact type files under,
-[one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
-made navigable; a set uses the buckets its work needs, skips the rest,
-and coins its own where none fits.
-
-An audit judges placement against the sections the set actually uses; a
-bucket the set does not use is never a finding. The menu:
+Every fact in a member of a working documentation set sits under a named
+section, its bucket
+([one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
+made navigable), and a bucket holds facts of its own type only. A
+bucket is one of the buckets below, or one the member coins where none
+of them fits; material awaiting triage sits under `Unfiled`. The named
+buckets:
 
 - **Goal** — what the work is for.
 - **Principles** — the judgment calls that guide choices.
 - **Constraints** — the hard bounds the work operates under, distinct from
   principles.
-- **Terms** — see below.
-- **Planned** and **Completed** — the worklist above.
-- **Unfiled** — the escape valve: material fitting no bucket lands here
-  explicitly, awaiting triage, instead of being force-fitted or scattered.
+- **Terms** — the terms the work coins ([Terms](#terms)).
+- **Planned** and **Completed** — the worklist ([Worklist](#worklist)).
+- **Unfiled** — material awaiting triage.
+
+`knowledge-organization.buckets` · stochastic
 
 ## Terms
 
-A term coined by the work and used in more than one member is defined in
-the Terms bucket of `ROOT.md`, the root of the smallest strand that
-holds every member using it and the set's own root where it crosses
-strands, in place of the entry
-[terms defined once](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once)
+A term coined by the work and used in more than one member of a working
+documentation set is defined in the `Terms` bucket of one `ROOT.md`: the
+root of the smallest strand that holds every member using the term, and
+the set's own root where the term crosses strands, in place of the entry
+[terms that cross sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets)
 puts in the repo's `CONTEXT.md`.
 
-`CONTEXT.md` holds the term that crosses sets
-([project terms only](/standards/knowledge-organization/context-content.md#project-terms-only)),
-and a term of the work crosses none until the set drains, a
-strand being inside the set and not beside it; it
-earns its entry when the member that carries it lands in a permanent
-home and a second set uses it.
+`knowledge-organization.terms` · stochastic
 
 ## Acronyms
 
-Each member ends with an Acronyms appendix, bare `None.` where the
-member uses none; an acronym is defined once in the set, in the appendix
-of the highest member that uses it, and members below use it undefined.
-
-The appendix is where a member declares its acronyms, in place of a
-definition above first use
+Every member of a working documentation set ends with an `Acronyms`
+appendix, holding a bare `None.` where the member uses no acronym, and
+an acronym is defined in the appendix of the highest member that uses
+it and in no other member's, in place of a definition above first use
 ([declare before use](/standards/prose/conventions.md#declare-before-use)).
+
+`knowledge-organization.acronyms` · stochastic
