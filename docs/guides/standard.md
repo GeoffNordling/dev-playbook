@@ -67,17 +67,20 @@ The test suite clears the same set before every test, because under an
 ambient `GIT_DIR` a bare `git init` silently does nothing
 ([Git runs against the given root](/standards/standard/detectors.md#git-runs-against-the-given-root)).
 
-### One rule id, one card
+### One rule id, one check
 
-A rule id is `<card>.<rule>`, named by the question the card governs and
-not by the tool that checks it. Question and mechanism cross-cut: one
-card is checked by several detectors, and one detector checks for
-several cards. The one-to-one fact sits at the rule: every id belongs to
-exactly one card
-([Card-namespaced rule ids](/standards/standard/detectors.md#card-namespaced-rule-ids)).
-`--list-rules` prints the ids a detector can emit, so the set a detector
-claims is the set standards-lint joins on
-([List rules](/standards/standard/detectors.md#list-rules)).
+A rule id is `<name>.<slug>`, the heading of the rule that declares it,
+named by the question the Standard governs and not by the tool that
+checks it. Question and mechanism cross-cut: one Standard is checked by
+several detectors, and one detector checks for several Standards. The
+one-to-one fact sits at the rule: every id is decided by at most one
+check, and the verifier table is where that fact is written down. Nothing
+maintains the table by hand; a generator derives it from the rule
+headings, each detector's `--list-rules`, and the dependency map, and the
+same derivation is the lint, so the table cannot drift from either side
+([The verifier table](/standards/standard/detectors.md#the-verifier-table),
+[List rules](/standards/standard/detectors.md#list-rules)). A null row is
+an honest one: the rule is stated and nothing decides it yet.
 
 ### Verbatim mirrors
 

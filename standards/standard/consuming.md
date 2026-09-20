@@ -35,8 +35,8 @@ the README-first catalog
 Back the card's Audit cell with a detector, a `scripts/<name>` shim over
 the repo's own reusable modules, obeying the first-party rules in
 [Detectors](/standards/standard/detectors.md#a-first-party-detector):
-read-only, one finding per line in GNU format with card-namespaced rule
-ids, answering `--list-rules`, exit 0 clean, 1 findings, 2 cannot run.
+read-only, one finding per line in GNU format with rule-heading ids,
+answering `--list-rules`, exit 0 clean, 1 findings, 2 cannot run.
 The one clause invisible until a hook runs is
 [Git runs against the given root](/standards/standard/detectors.md#git-runs-against-the-given-root):
 the commit gate is a git hook, and from a linked worktree it exports an

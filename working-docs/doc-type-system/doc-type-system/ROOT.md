@@ -103,51 +103,8 @@ specification.
   drift apart.
   1. *Standard takes its new shape.* Done 2026-09-20; the entry is in
      [Completed](#completed).
-  2. *The verifier table.* A generator writes the table and is the lint.
-     - The table is a map: one row per rule id, and the address of the
-       thing that decides it, a homegrown script by path, a dependency
-       by its pinned pre-commit hook id, a judge by its file, or null.
-     - The generator reads the rule headings under `standards/<name>/`,
-       asks each check which ids it emits, and writes the table; it
-       fails on an emitted id that is no rule heading, on an address
-       that does not exist, and on a consumer row that names a
-       dev-playbook rule.
-     - Null is allowed: for a stochastic rule, and for the seventy-one
-       deterministic rules no script has ever checked. No step writes
-       those scripts; a rule unchecked before this plan stays unchecked.
-     - dev-playbook's table ships in the package; a consumer's generator
-       adds rows only for the rules that repo declares, the way the
-       type registry unions.
-     - The generated table is committed, and the commit gate regenerates
-       it and fails on a difference.
-     - The checks change the ids they emit to the rule headings: seventy
-       of seventy-nine differ today, listed in the Emitted ids table of
-       [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#emitted-ids).
-       Where one id covers several rules the check splits it; where
-       several ids are one rule the check merges them.
-     - Four ids get a decision, not a rename: `prose.banned-word` gets
-       a deterministic rule in `prose/conventions.md`, which needs
-       prose-lint to allow the one mention that states it;
-       `knowledge-organization.doc-shape` splits into README Content's
-       `h1` and CONTEXT.md Content's `the-language-section`;
-       `tracking.no-blocked-label` retires into `tracking.valid-labels`;
-       `registry-location` is kept under `local-declaration` or dropped.
-     - `standard/detectors.md` is rewritten: its population is "a check
-       the table names", and its id rule is what the generator
-       enforces, replacing standards-lint's `rule-matrix`.
-     - No `audit()` function; a judge, when one is built, reads the table.
-     - Progress, 2026-09-20: the renames and splits are done across all
-       eleven detectors and green, uncommitted. Reading the code showed
-       the worksheet overclaimed six rules no check decides, so they stay
-       null: `an-act-links-a-runbook`, `harness.tool-fields`,
-       `row-description`, `resource`, `ticket-parentage`, and
-       `epic-headings`. `registry-location` is kept under
-       `local-declaration`; an unreachable issues read is filed under
-       `tracking.build-labels`. Still to do: the generator and its table,
-       the gate wiring, the `detectors.md` rewrite, deleting `rule-matrix`,
-       and correcting the worksheet's Emitted ids table.
-     Reason: the table is the one place the Standard files and the
-     checks meet, and a generator that fails cannot drift from either.
+  2. *The verifier table.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
   3. *Boundaries read ids from config.* A second table, one per repo and
      never inherited, names the rule ids each boundary runs: the commit
      hook, `make check`, CI, and a loop's check. Every id it names
@@ -182,6 +139,10 @@ specification.
      neither in the playbook-lint roster nor a registered ungated audit,
      under `standard.the-hosting-pattern`; this step moves it to the
      boundary table.
+     [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md)
+     is step 1's worksheet, kept only until both tables are real; this
+     step deletes it once the boundary table lands, moving any finding
+     it still holds to the step that owns it.
   4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
      Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
      files, retire `Standard-Ruleset`, and bind the type `Standard` to
@@ -206,9 +167,9 @@ specification.
      `docs/references/okf-spec.md`, since a vendored upstream spec is
      supporting material a Standard cites and not a Standard; the
      citation in `knowledge-organization/indexes.md` and the row in
-     `standards/index.md` move with it. Six of standards-lint's seven
-     rules go with the card; `rule-matrix` is superseded by step 2's
-     table lint. Reason: the reference model places every cell elsewhere,
+     `standards/index.md` move with it. Six of standards-lint's eight
+     rules, the Card Catalog's six, go with the card, and
+     `standard.audit-cites-a-lint` with them; the hosting pair stays. Reason: the reference model places every cell elsewhere,
      Define is the Standard file, Audit is the verifier table, Enforce is
      the boundary config, and Adopt was never a primitive; and viewing is
      out of scope for this work.
@@ -360,6 +321,50 @@ specification.
   each deferral also named at the step that owns it. Reason: a loop
   cannot route a rule without an id and a kind, and text no verifier
   reads is text the state is not held to.
+- **The verifier table, 2026-09-20.** Step 2 of The system. The table
+  is `standards/verifiers.yaml`, one row per rule id declared under
+  `standards/`, mapped to the address of the one check that decides it
+  or null: a first-party detector by path, `scripts/repo-lint`; a
+  dependency by its pre-commit hook id, `ruff-format`, `ruff-check`,
+  `shellcheck`, `shfmt`; or a dependency by its `pyproject.toml` name
+  and subcommand, `mypy`, `pre-commit validate-manifest`, since those
+  two run outside pre-commit. `scripts/verifier-table`
+  (`src/dev_playbook/verifier_table.py`) derives it from the rule
+  trailers, each detector's `--list-rules`, and a six-entry dependency
+  map, writes it with `--write`, and is the lint otherwise; it sits in
+  the playbook-lint roster, so the commit gate regenerates and compares
+  on every commit. It fails loud in four ways, each a rule of the
+  rewritten `standard/detectors.md`: `the-verifier-table` when the
+  committed file differs from a fresh write; `an-emitted-id-is-a-rule-heading`
+  when a check claims an id no heading declares deterministic, or two
+  checks claim one id; `an-address-exists` when a dependency address
+  is no hook id and no dependency of the repo; and
+  `a-consumer-adds-only-its-own-rules` when a repo other than
+  dev-playbook declares an id the shipped table carries. A trailer that
+  disagrees with its heading, has none, or repeats an id is exit 2. In
+  a consumer the checks asked are its own `scripts/` hooks, and its
+  table holds only its rules; the union is read from the pinned clone.
+  At first write the table has 262 rows: 103 decided, 83 stochastic
+  null, and 76 deterministic null, the rules no script has ever
+  checked, which stay unchecked. All eleven detectors emit rule-heading
+  ids, with splits and merges as the corrected Emitted ids table of
+  [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#emitted-ids)
+  lists; six rules the step-1 read overclaimed are null
+  (`an-act-links-a-runbook`, `harness.tool-fields`, `row-description`,
+  `resource`, `ticket-parentage`, `epic-headings`). The four decisions:
+  `prose.the-banned-word` is a deterministic rule of
+  `prose/conventions.md`, its three naming files exempt through
+  `.prose-lint-exempt`; `doc-shape` split into `h1` and
+  `the-language-section`; `no-blocked-label` retired into
+  `valid-labels`; `registry-location` kept under `local-declaration`.
+  `standard/cards.md` got trailers so standards-lint's six card rules
+  are headings (`directory-layout`, `define-points-only-at-rulesets`,
+  `the-question-sentence`, `the-directorys-introduction`,
+  `the-catalog`, `no-shadowing`); `audit-cites-a-lint` is null;
+  `rule-matrix` and `card-namespaced-rule-ids` are deleted. No
+  `audit()` function exists; a judge, when one is built, reads the
+  table. Reason: the table is the one place the Standard files and the
+  checks meet, and a generator that fails cannot drift from either.
 
 ## Acronyms
 

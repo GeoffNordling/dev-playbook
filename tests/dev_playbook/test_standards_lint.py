@@ -4,14 +4,11 @@ standards-lint is a published hook: it audits the ``standards/`` tree of any
 repo, in dev-playbook mode (keyed by the canonical consumer template) or
 consumer mode (everything else). Each check function takes a repo root and
 returns findings; discovery goes through ``git ls-files``, so every fixture is
-a git repo. The
-rule-matrix check's ``--list-rules`` boundary is injected as a plain callable,
-and consumer-mode fixtures pass a synthetic upstream root, so both are exercised
-without subprocessing real detectors.
+a git repo. Consumer-mode fixtures pass a synthetic upstream root, so the shadow rule is
+exercised without a second checkout.
 """
 
 import subprocess
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -49,7 +46,7 @@ def card(
     """A standard card with the given title, type, and cell sections.
 
     The question sentence and the description default to the same text, as
-    ``standard.card-question`` requires; either can be overridden to break the
+    ``standard.the-question-sentence`` requires; either can be overridden to break the
     pairing, and ``body`` replaces the opening paragraph outright. ``define``
     is the Define cell's bullet text when that cell is present.
     """
@@ -91,7 +88,7 @@ def readme() -> str:
     return "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
 
 
-# --- standard.card-layout ---------------------------------------------------
+# --- standard.directory-layout ---------------------------------------------------
 
 
 def test_well_formed_card_passes_card_layout(tmp_path: Path) -> None:
@@ -107,7 +104,7 @@ def test_flat_standards_file_is_flagged_as_a_stray(tmp_path: Path) -> None:
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
     assert findings[0].file == "standards/build.md"
     assert "flat" in findings[0].message
 
@@ -119,7 +116,7 @@ def test_card_without_card_type_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
     assert findings[0].file == "standards/build/card.md"
 
 
@@ -135,7 +132,7 @@ def test_card_missing_a_cell_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
     assert "Adopt" in findings[0].message
 
 
@@ -151,7 +148,7 @@ def test_card_with_cells_out_of_order_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
 
 
 def test_card_with_a_duplicated_cell_is_flagged_as_duplicate(tmp_path: Path) -> None:
@@ -168,7 +165,7 @@ def test_card_with_a_duplicated_cell_is_flagged_as_duplicate(tmp_path: Path) -> 
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
     assert "duplicate" in findings[0].message.lower()
 
 
@@ -198,7 +195,7 @@ def test_directory_without_a_card_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
     assert findings[0].file == "standards/build"
     assert "card.md" in findings[0].message
 
@@ -225,7 +222,7 @@ def test_define_bullet_with_an_annotation_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_layout(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_LAYOUT]
+    assert [f.rule for f in findings] == [sa.DEFINE_POINTS_ONLY_AT_RULESETS]
     assert "annotation" in findings[0].message
 
 
@@ -242,7 +239,7 @@ def test_define_bullet_that_is_a_bare_link_passes(tmp_path: Path) -> None:
     assert sa.check_card_layout(repo) == []
 
 
-# --- standard.card-question -------------------------------------------------
+# --- standard.the-question-sentence -------------------------------------------------
 
 
 def test_matching_question_and_description_pass(tmp_path: Path) -> None:
@@ -263,7 +260,7 @@ def test_description_differing_from_the_question_is_flagged(tmp_path: Path) -> N
 
     findings = sa.check_card_question(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert [f.rule for f in findings] == [sa.THE_QUESTION_SENTENCE]
     assert "verbatim" in findings[0].message
 
 
@@ -281,7 +278,7 @@ def test_description_keeping_the_period_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_question(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert [f.rule for f in findings] == [sa.THE_QUESTION_SENTENCE]
 
 
 def test_question_not_opening_governs_how_is_flagged(tmp_path: Path) -> None:
@@ -296,7 +293,7 @@ def test_question_not_opening_governs_how_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_question(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert [f.rule for f in findings] == [sa.THE_QUESTION_SENTENCE]
     assert "Governs how" in findings[0].message
 
 
@@ -363,7 +360,7 @@ def test_card_with_no_paragraph_after_its_h1_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_question(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_QUESTION]
+    assert [f.rule for f in findings] == [sa.THE_QUESTION_SENTENCE]
     assert "no question sentence" in findings[0].message
 
 
@@ -375,7 +372,7 @@ def test_mistyped_card_is_left_to_card_layout(tmp_path: Path) -> None:
     assert sa.check_card_question(repo) == []
 
 
-# --- standard.card-directory ------------------------------------------------
+# --- standard.the-directorys-introduction ------------------------------------------------
 
 
 def test_index_opening_with_the_card_passes(tmp_path: Path) -> None:
@@ -403,7 +400,7 @@ def test_index_not_opening_with_the_card_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_directory(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_DIRECTORY]
+    assert [f.rule for f in findings] == [sa.THE_DIRECTORYS_INTRODUCTION]
     assert findings[0].file == "standards/build/index.md"
     assert "Build governs how Build is done" in findings[0].message
 
@@ -419,7 +416,7 @@ def test_index_not_listing_the_card_first_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_directory(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_DIRECTORY]
+    assert [f.rule for f in findings] == [sa.THE_DIRECTORYS_INTRODUCTION]
     assert "first" in findings[0].message
 
 
@@ -428,7 +425,7 @@ def test_card_directory_without_an_index_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_card_directory(repo)
 
-    assert [f.rule for f in findings] == [sa.CARD_DIRECTORY]
+    assert [f.rule for f in findings] == [sa.THE_DIRECTORYS_INTRODUCTION]
     assert findings[0].file == "standards/build/index.md"
 
 
@@ -440,7 +437,7 @@ def test_mistyped_card_draws_no_directory_finding(tmp_path: Path) -> None:
     assert sa.check_card_directory(repo) == []
 
 
-# --- standard.catalog-order -------------------------------------------------
+# --- standard.the-catalog -------------------------------------------------
 
 
 def catalog(dir_bullets: list[str], *, readme_first: bool = True) -> str:
@@ -512,7 +509,7 @@ def test_readme_not_first_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
-    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+    assert [f.rule for f in findings] == [sa.THE_CATALOG]
 
 
 def test_directories_out_of_alphabetical_order_flagged(tmp_path: Path) -> None:
@@ -528,7 +525,7 @@ def test_directories_out_of_alphabetical_order_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
-    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+    assert [f.rule for f in findings] == [sa.THE_CATALOG]
 
 
 def test_meta_standard_not_leading_is_flagged(tmp_path: Path) -> None:
@@ -544,7 +541,7 @@ def test_meta_standard_not_leading_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
-    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+    assert [f.rule for f in findings] == [sa.THE_CATALOG]
 
 
 def test_document_row_in_the_catalog_is_flagged(tmp_path: Path) -> None:
@@ -570,7 +567,7 @@ def test_document_row_in_the_catalog_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
-    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+    assert [f.rule for f in findings] == [sa.THE_CATALOG]
     assert "cards.md" in findings[0].message
 
 
@@ -587,7 +584,7 @@ def test_row_not_carrying_the_card_description_is_flagged(tmp_path: Path) -> Non
 
     findings = sa.check_catalog_order(repo, dev_playbook_mode=True)
 
-    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
+    assert [f.rule for f in findings] == [sa.THE_CATALOG]
     assert "verbatim" in findings[0].message
     assert "build/" in findings[0].message
 
@@ -646,10 +643,7 @@ def test_consumer_catalog_cards_out_of_order_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_catalog_order(repo, dev_playbook_mode=False)
 
-    assert [f.rule for f in findings] == [sa.CATALOG_ORDER]
-
-
-# --- standard.rule-matrix ---------------------------------------------------
+    assert [f.rule for f in findings] == [sa.THE_CATALOG]
 
 
 def card_citing(title: str, audit: list[str]) -> str:
@@ -673,119 +667,6 @@ def card_citing(title: str, audit: list[str]) -> str:
 def cite(name: str) -> str:
     """An Audit-cell bullet citing a first-party detector by its scripts/ link."""
     return f"- [{name}](/scripts/{name}) — a detector"
-
-
-def fake_list_rules(
-    mapping: dict[str, list[str]],
-) -> Callable[[str, Path], list[str]]:
-    """A --list-rules stand-in; an absent name models a script that won't answer."""
-
-    def _list(name: str, root: Path) -> list[str]:
-        if name not in mapping:
-            raise sa.CannotRun(f"scripts/{name} does not answer --list-rules")
-        return mapping[name]
-
-    return _list
-
-
-def test_consistent_matrix_passes(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {"standards/build/card.md": card_citing("Build", [cite("repo-lint")])},
-    )
-
-    findings = sa.check_rule_matrix(repo, fake_list_rules({"repo-lint": ["build.x"]}))
-
-    assert findings == []
-
-
-def test_uncited_emitted_prefix_fails_direction_one(tmp_path: Path) -> None:
-    # repo-lint emits knowledge-organization.y, but that card does not cite
-    # repo-lint.
-    repo = make_repo(
-        tmp_path,
-        {
-            "standards/build/card.md": card_citing("Build", [cite("repo-lint")]),
-            "standards/knowledge-organization/card.md": card_citing(
-                "Knowledge Organization", ["- none"]
-            ),
-        },
-    )
-
-    findings = sa.check_rule_matrix(
-        repo, fake_list_rules({"repo-lint": ["build.x", "knowledge-organization.y"]})
-    )
-
-    assert [f.rule for f in findings] == [sa.RULE_MATRIX]
-    assert findings[0].file == "standards/knowledge-organization/card.md"
-
-
-def test_unbacked_citation_fails_direction_two(tmp_path: Path) -> None:
-    # The build card cites repo-lint, but repo-lint emits no build.* rule --
-    # only knowledge-organization.*, which that card legitimately cites.
-    repo = make_repo(
-        tmp_path,
-        {
-            "standards/build/card.md": card_citing("Build", [cite("repo-lint")]),
-            "standards/knowledge-organization/card.md": card_citing(
-                "Knowledge Organization", [cite("repo-lint")]
-            ),
-        },
-    )
-
-    findings = sa.check_rule_matrix(
-        repo, fake_list_rules({"repo-lint": ["knowledge-organization.y"]})
-    )
-
-    assert [f.rule for f in findings] == [sa.RULE_MATRIX]
-    assert findings[0].file == "standards/build/card.md"
-
-
-def test_emitted_prefix_with_no_card_names_the_missing_slot(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {"standards/build/card.md": card_citing("Build", [cite("repo-lint")])},
-    )
-
-    findings = sa.check_rule_matrix(
-        repo, fake_list_rules({"repo-lint": ["build.x", "ghost.y"]})
-    )
-
-    assert [f.rule for f in findings] == [sa.RULE_MATRIX]
-    assert "standards/ghost/card.md" in findings[0].message
-
-
-def test_cited_detector_without_list_rules_fails_membership(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {"standards/build/card.md": card_citing("Build", [cite("repo-lint")])},
-    )
-
-    findings = sa.check_rule_matrix(repo, fake_list_rules({}))
-
-    assert [f.rule for f in findings] == [sa.RULE_MATRIX]
-    assert "--list-rules" in findings[0].message
-
-
-def test_third_party_and_non_script_pointers_are_outside_the_matrix(
-    tmp_path: Path,
-) -> None:
-    # ruff (name + pin, no scripts/ link) and a pointer into another tree are
-    # not detector citations, so an empty rule map still passes.
-    repo = make_repo(
-        tmp_path,
-        {
-            "standards/shell/card.md": card_citing(
-                "Shell",
-                [
-                    "- shellcheck — third-party lint",
-                    "- [contract](/standards/shell/style.md) — the contract",
-                ],
-            )
-        },
-    )
-
-    assert sa.check_rule_matrix(repo, fake_list_rules({})) == []
 
 
 # --- standard.the-hosting-pattern -------------------------------------------------
@@ -1192,10 +1073,10 @@ def test_publisher_less_consumer_passes_clean(tmp_path: Path) -> None:
         ),
     )
 
-    assert sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream) == []
+    assert sa.audit(consumer, hook_repo_root=upstream) == []
 
 
-# --- standard.card-shadows-upstream -----------------------------------------
+# --- standard.no-shadowing -----------------------------------------
 
 
 def test_local_card_shadowing_an_upstream_card_is_flagged(tmp_path: Path) -> None:
@@ -1206,7 +1087,7 @@ def test_local_card_shadowing_an_upstream_card_is_flagged(tmp_path: Path) -> Non
 
     findings = sa.check_card_shadows_upstream(consumer, upstream)
 
-    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert [f.rule for f in findings] == [sa.NO_SHADOWING]
     assert findings[0].file == "standards/build/card.md"
 
 
@@ -1237,7 +1118,7 @@ def test_audit_non_git_root_cannot_run(tmp_path: Path) -> None:
     non_git.mkdir()
 
     with pytest.raises(sa.CannotRun):
-        sa.audit(non_git, fake_list_rules({}))
+        sa.audit(non_git)
 
 
 def _clean_bundle(tmp_path: Path, *, dev_playbook_mode: bool) -> Path:
@@ -1269,9 +1150,9 @@ def test_consumer_mode_audit_flags_a_shadowing_card(tmp_path: Path) -> None:
     upstream = make_repo(tmp_path / "up", {"standards/build/card.md": card("Build")})
     consumer = _clean_bundle(tmp_path, dev_playbook_mode=False)
 
-    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+    findings = sa.audit(consumer, hook_repo_root=upstream)
 
-    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert [f.rule for f in findings] == [sa.NO_SHADOWING]
 
 
 def test_dev_playbook_mode_audit_never_runs_the_shadow_rule(tmp_path: Path) -> None:
@@ -1282,9 +1163,7 @@ def test_dev_playbook_mode_audit_never_runs_the_shadow_rule(tmp_path: Path) -> N
 
     # roster=() keeps the fixture self-contained: the bundle's cards cite no
     # detectors, so the real playbook-lint roster would read as unenrolled.
-    findings = sa.audit(
-        devrepo, fake_list_rules({}), hook_repo_root=upstream, roster=()
-    )
+    findings = sa.audit(devrepo, hook_repo_root=upstream, roster=())
 
     assert findings == []
 
@@ -1316,9 +1195,9 @@ def test_consumer_card_named_standard_is_flagged_as_a_shadow(tmp_path: Path) -> 
     )
     consumer = _consumer_card_bundle(tmp_path, name="standard")
 
-    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+    findings = sa.audit(consumer, hook_repo_root=upstream)
 
-    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert [f.rule for f in findings] == [sa.NO_SHADOWING]
     assert findings[0].file == "standards/standard/card.md"
 
 
@@ -1345,9 +1224,9 @@ def test_consumer_card_named_standard_draws_no_catalog_order_finding(
         },
     )
 
-    findings = sa.audit(consumer, fake_list_rules({}), hook_repo_root=upstream)
+    findings = sa.audit(consumer, hook_repo_root=upstream)
 
-    assert [f.rule for f in findings] == [sa.CARD_SHADOWS]
+    assert [f.rule for f in findings] == [sa.NO_SHADOWING]
 
 
 def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
@@ -1368,9 +1247,7 @@ def test_canonical_template_alone_puts_repo_in_dev_playbook_mode(
     )
 
     # roster=() as in the shadow-rule walk test: the fixture cites no detectors.
-    findings = sa.audit(
-        devrepo, fake_list_rules({}), hook_repo_root=upstream, roster=()
-    )
+    findings = sa.audit(devrepo, hook_repo_root=upstream, roster=())
 
     assert findings == []
 
@@ -1381,7 +1258,7 @@ def test_list_rules_prints_every_rule(capsys: pytest.CaptureFixture[str]) -> Non
     lines = [line for line in capsys.readouterr().out.splitlines() if line.strip()]
 
     assert sorted(lines) == sorted(sa.RULES)
-    assert sa.CARD_SHADOWS in lines
+    assert sa.NO_SHADOWING in lines
 
 
 def test_dev_playbook_scans_itself_clean(capsys: pytest.CaptureFixture[str]) -> None:
@@ -1465,78 +1342,3 @@ def test_main_exits_two_on_a_dangling_catalog_link(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, files)
 
     assert sa.main([str(repo)]) == 2
-
-
-# --- the subprocess boundary ------------------------------------------------
-
-
-def _detector_repo_files(script: str) -> dict[str, str]:
-    """A dev-playbook-mode repo whose ``foo`` card cites a ``scripts/foo`` detector.
-
-    Empty, agreeing hook surfaces so hook-surfaces produces no findings and
-    does not mask whatever the matrix reports about ``foo``.
-    """
-    files = ordered_repo_files({})
-    files["standards/foo/card.md"] = card_citing("Foo", [cite("foo")])
-    files["standards/foo/index.md"] = card_index(
-        "foo", "Foo", intro="Foo card for the Foo standard."
-    )
-    files["standards/index.md"] = catalog(
-        [
-            dir_bullet("standard", "Meta-Standard"),
-            dir_bullet("build", "Build"),
-            dir_bullet("foo", "Foo", description="Card for the Foo standard"),
-            dir_bullet("python", "Python"),
-        ]
-    )
-    files["scripts/foo"] = script
-    files[".pre-commit-hooks.yaml"] = _manifest([])
-    files[".pre-commit-config.yaml"] = _local_block([])
-    files["standards/build/canonical/.pre-commit-config.yaml"] = _canonical([])
-    files["scripts/README.md"] = _readme_table([])
-    return files
-
-
-def test_a_spawned_detector_does_not_inherit_the_hook_ambient_git_dir(
-    tmp_path: Path, ambient_git_dir: Callable[[str], Path]
-) -> None:
-    # standards-lint runs at a git gate and can inherit an absolute GIT_DIR the
-    # hook exports; a consumer detector it spawns must not receive it, or the
-    # detector's own git calls answer for the hook's repo instead of the audited
-    # one. A cited detector records the git dir it resolves to; with the
-    # redirecting variables scrubbed it names the audited root, not the decoy the
-    # ambient GIT_DIR points at.
-    files = _detector_repo_files(
-        "#!/usr/bin/env bash\ngit rev-parse --absolute-git-dir > git-dir-seen\n"
-    )
-    repo = make_repo(tmp_path, files)
-    (repo / "scripts" / "foo").chmod(0o755)
-    decoy = ambient_git_dir("leaked.txt")
-
-    sa.main([str(repo)])
-
-    seen = Path((repo / "git-dir-seen").read_text().strip()).resolve()
-    assert seen == (repo / ".git").resolve()
-    assert seen != (decoy / ".git").resolve()
-
-
-def test_a_hung_detector_fails_the_gate_loudly_without_hanging(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    # A detector that hangs on --list-rules must fail the commit gate loudly,
-    # not block it forever: the timeout converts to a CannotRun the matrix
-    # surfaces as a "does not answer --list-rules" finding.
-    repo = make_repo(tmp_path, _detector_repo_files("#!/usr/bin/env bash\n"))
-
-    real_run = subprocess.run
-
-    def hang(cmd: Any, *args: Any, **kwargs: Any) -> Any:
-        # Only the detector's --list-rules call hangs; git ls-files runs for real.
-        if "--list-rules" in cmd:
-            raise subprocess.TimeoutExpired(cmd=cmd, timeout=10)
-        return real_run(cmd, *args, **kwargs)
-
-    monkeypatch.setattr(sa.subprocess, "run", hang)
-
-    assert sa.main([str(repo)]) == 1
-    assert "--list-rules" in capsys.readouterr().out

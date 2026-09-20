@@ -11,8 +11,11 @@ The output of step 1's holistic pass in
 the two tables steps 2 and 3 build for real, drawn once by hand from the
 drained rulesets and the detectors as they stand, and what reading them
 across Standards found. The tables are a snapshot, not a source: step 2
-replaces the first with data the table lint checks, and step 3 replaces
-the second with config the boundaries read.
+replaced the first with `standards/verifiers.yaml`, which
+`scripts/verifier-table` writes and lints, and step 3 replaces the second
+with config the boundaries read. The Verifier table and Counts below are
+the step-1 snapshot and are not maintained; the Emitted ids table was
+corrected when step 2 landed. This sheet retires when step 3 lands.
 
 ## Counts
 
@@ -412,8 +415,9 @@ builds, so its row is null here by construction.
 
 ## Emitted ids
 
-One row per id a detector emits today, with the rule heading it maps to
-at step 2. A blank rule is an orphan check; its note says what happens.
+One row per id a detector emitted before step 2, with the rule heading
+its check emits since. Where the step-1 read claimed a rule the code does
+not decide, the note says so; that rule's row in the live table is null.
 
 | Emitted id | Detector | Rule at step 2 | Note |
 |---|---|---|---|
@@ -436,10 +440,10 @@ at step 2. A blank rule is an orphan check; its note says what happens.
 | `harness.parse` | harness-files-lint | `harness.front-matter` |  |
 | `harness.references-depth` | harness-files-lint | `harness.references-one-level-deep` |  |
 | `harness.required-field` | harness-files-lint | `harness.front-matter` |  |
-| `harness.tools-format` | harness-files-lint | `harness.tool-fields`, `harness.tools` |  |
+| `harness.tools-format` | harness-files-lint | `harness.tools` | the code checks an agent's `tools` only; `harness.tool-fields` is null |
 | `harness.unknown-field` | harness-files-lint | `harness.front-matter` |  |
 | `knowledge-organization.loop-edges` | loop-lint | `knowledge-organization.edges-follow-the-shape` |  |
-| `knowledge-organization.loop-entries` | loop-lint | `knowledge-organization.entries-point-and-condition`, `knowledge-organization.an-act-links-a-runbook` |  |
+| `knowledge-organization.loop-entries` | loop-lint | `knowledge-organization.entries-point-and-condition` | the code does not read an Act's link; `an-act-links-a-runbook` is null |
 | `knowledge-organization.loop-graph` | loop-lint | `knowledge-organization.one-graph` |  |
 | `knowledge-organization.loop-nodes` | loop-lint | `knowledge-organization.nodes-and-entries-agree` |  |
 | `knowledge-organization.loop-sections` | loop-lint | `knowledge-organization.three-verb-sections` |  |
@@ -450,14 +454,14 @@ at step 2. A blank rule is an orphan check; its note says what happens.
 | `knowledge-organization.index-intro` | okf-lint | `knowledge-organization.the-introduction` |  |
 | `knowledge-organization.index-ordering` | okf-lint | `knowledge-organization.ordering` |  |
 | `knowledge-organization.index-present` | okf-lint | `knowledge-organization.an-index-in-every-directory` |  |
-| `knowledge-organization.registry-location` | okf-lint | `knowledge-organization.local-declaration` | a migration check on a legacy registry document; step 2 decides whether it stays |
-| `knowledge-organization.registry-row` | okf-lint | `knowledge-organization.row-shape`, `knowledge-organization.row-description`, `knowledge-organization.alphabetical-order`, `knowledge-organization.mapping-entry-shape`, `knowledge-organization.alphabetical-keys`, `knowledge-organization.add-never-shadow` | one id over six rules; the split is read from the code at step 2 |
-| `knowledge-organization.resource` | okf-lint | `knowledge-organization.resource`, `knowledge-organization.recipe-description` |  |
+| `knowledge-organization.registry-location` | okf-lint | `knowledge-organization.local-declaration` | kept: a legacy registry document is a declaration outside the root index |
+| `knowledge-organization.registry-row` | okf-lint | `knowledge-organization.row-shape`, `knowledge-organization.alphabetical-order`, `knowledge-organization.mapping-entry-shape`, `knowledge-organization.alphabetical-keys`, `knowledge-organization.add-never-shadow` | split five ways; the code does not check a row's description, so `row-description` is null |
+| `knowledge-organization.resource` | okf-lint | `knowledge-organization.recipe-description` | the code checks only that a Recipe carries the field; `resource`'s form is null |
 | `knowledge-organization.title` | okf-lint | `knowledge-organization.title` |  |
 | `knowledge-organization.type` | okf-lint | `knowledge-organization.types` |  |
 | `knowledge-organization.type-location` | okf-lint | `knowledge-organization.typed-standard-card-or-standard-ruleset`, `knowledge-organization.typed-loop` |  |
 | `prose.agent-facing-voice` | prose-lint | `prose.no-first-person` |  |
-| `prose.banned-word` | prose-lint | `prose.terminology-the-person-is-the-user` | decides one word of a stochastic rule, and scans code and config beyond the prose population; step 2 gives it its own heading |
+| `prose.banned-word` | prose-lint | `prose.the-banned-word` | its own deterministic rule since step 2; the three files that must name the word are exempt through `.prose-lint-exempt` |
 | `prose.judgment-spelling` | prose-lint | `prose.spelling` |  |
 | `python.empty-init` | python-lint | `python.empty-init` |  |
 | `python.no-future-annotations` | python-lint | `python.no-future-annotations` |  |
@@ -475,36 +479,36 @@ at step 2. A blank rule is an orphan check; its note says what happens.
 | `distribution.dogfood` | repo-lint | `distribution.a-publisher-dogfoods-its-manifest` |  |
 | `knowledge-organization.doc-shape` | repo-lint | `knowledge-organization.h1`, `knowledge-organization.the-language-section` | one id, two rules in two rulesets; splits at step 2 |
 | `tracking.rogue-future-work-file` | repo-lint | `build.no-other-future-work-file` | the rule is build's, not tracking's; renamed at step 2 |
-| `standard.card-directory` | standards-lint |  | cards.md, undrained; retires at step 4 |
-| `standard.card-layout` | standards-lint |  | cards.md, undrained; retires at step 4 |
-| `standard.card-question` | standards-lint |  | cards.md, undrained; retires at step 4 |
-| `standard.card-shadows-upstream` | standards-lint |  | cards.md, undrained; retires at step 4 |
-| `standard.catalog-order` | standards-lint |  | cards.md, undrained; retires at step 4 |
+| `standard.card-directory` | standards-lint | `standard.the-directorys-introduction` | cards.md got trailers at step 2 so the generator has headings; retires at step 4 |
+| `standard.card-layout` | standards-lint | `standard.directory-layout`, `standard.define-points-only-at-rulesets` | split; cards.md, retires at step 4 |
+| `standard.card-question` | standards-lint | `standard.the-question-sentence` | cards.md, retires at step 4 |
+| `standard.card-shadows-upstream` | standards-lint | `standard.no-shadowing` | cards.md, retires at step 4 |
+| `standard.catalog-order` | standards-lint | `standard.the-catalog` | cards.md, retires at step 4 |
 | `standard.hook-surfaces` | standards-lint | `standard.the-hosting-pattern`, `standard.offered-by-the-canonical-template` | the closure leg moves to the boundary table at step 3 |
-| `standard.rule-matrix` | standards-lint | `standard.card-namespaced-rule-ids` | superseded by the table lint at step 2 |
+| `standard.rule-matrix` | standards-lint |  | deleted at step 2; `scripts/verifier-table` emits `standard.the-verifier-table`, `standard.an-emitted-id-is-a-rule-heading`, `standard.an-address-exists`, and `standard.a-consumer-adds-only-its-own-rules` in its place, and `standard.audit-cites-a-lint` is null |
 | `testing.mirror-layout` | testing-lint | `testing.mirror-source-structure` |  |
 | `testing.no-logic` | testing-lint | `testing.no-logic-in-tests` |  |
 | `testing.no-private-access` | testing-lint | `testing.access-only-public-names` |  |
 | `distribution.pin` | workspace-lint | `distribution.a-pinned-rev` |  |
 | `tracking.branch-protection` | workspace-lint | `tracking.default-branch-protection` |  |
-| `tracking.epic-shape` | workspace-lint | `tracking.category-only`, `tracking.epic-headings` |  |
+| `tracking.epic-shape` | workspace-lint | `tracking.category-only` | the code checks an epic's labels only; `epic-headings` is null |
 | `tracking.issue-brief-shape` | workspace-lint | `tracking.build-headings`, `tracking.spike-headings`, `tracking.session-headings` |  |
 | `tracking.label-scheme` | workspace-lint | `tracking.valid-labels` |  |
-| `tracking.no-blocked-label` | workspace-lint |  | no rule; subsumed by `tracking.valid-labels` (the scheme has no blocked label); retires at step 2 |
+| `tracking.no-blocked-label` | workspace-lint |  | deleted at step 2; `tracking.valid-labels` covers it, since the scheme has no blocked label |
 | `tracking.remote` | workspace-lint | `tracking.github-origin` |  |
 | `tracking.session-shape` | workspace-lint | `tracking.session-labels` |  |
 | `tracking.settings` | workspace-lint | `tracking.squash-only-merges` |  |
-| `tracking.tuple-valid` | workspace-lint | `tracking.build-labels`, `tracking.spike-labels` |  |
-| `tracking.wayfinder-shape` | workspace-lint | `tracking.wayfinder-labels`, `tracking.wayfinder-body`, `tracking.ticket-parentage` |  |
+| `tracking.tuple-valid` | workspace-lint | `tracking.build-labels`, `tracking.spike-labels` | an unreachable issues read is also filed under `build-labels` |
+| `tracking.wayfinder-shape` | workspace-lint | `tracking.wayfinder-labels`, `tracking.wayfinder-body` | the code does not read a ticket's parent; `ticket-parentage` is null |
 
-| Tool | Rule | Where it runs |
-|---|---|---|
-| ruff format | `python.formatted-by-ruff-format` | pre-commit hook `ruff-format`; `make format-check` at pre-push |
-| ruff check | `python.docstrings` through the `D` family | pre-commit hook `ruff-check`; `make lint` at pre-push |
-| mypy | `python.annotated-signatures` | `make typecheck` at pre-push only |
-| shellcheck | `shell.shellcheck-clean` | pre-commit hook |
-| shfmt | `shell.formatting` | pre-commit hook |
-| pre-commit validate-manifest | `distribution.a-valid-manifest` | inside playbook-lint, where the repo has a manifest |
+| Tool | Rule | Address in the live table | Where it runs |
+|---|---|---|---|
+| ruff format | `python.formatted-by-ruff-format` | `ruff-format` | pre-commit hook `ruff-format`; `make format-check` at pre-push |
+| ruff check | `python.docstrings` through the `D` family | `ruff-check` | pre-commit hook `ruff-check`; `make lint` at pre-push |
+| mypy | `python.annotated-signatures` | `mypy` | `make typecheck` at pre-push only |
+| shellcheck | `shell.shellcheck-clean` | `shellcheck` | pre-commit hook |
+| shfmt | `shell.formatting` | `shfmt` | pre-commit hook |
+| pre-commit validate-manifest | `distribution.a-valid-manifest` | `pre-commit validate-manifest` | inside playbook-lint, where the repo has a manifest |
 
 ## Boundary table
 

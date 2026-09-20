@@ -21,8 +21,12 @@ below hold the rules.
 
 ## Audit
 
-- [standards-lint](/scripts/standards-lint) — the meta-standard's
-  deterministic rules; `--list-rules` is the registry
+- [standards-lint](/scripts/standards-lint) — the Card Catalog's
+  deterministic rules and the hosting pattern
+- [verifier-table](/scripts/verifier-table) — writes
+  [the verifier table](/standards/verifiers.yaml) and fails where the
+  committed table, a detector's `--list-rules`, or a dependency's address
+  disagrees with the rule headings under `standards/`
 
 ## Enforce
 

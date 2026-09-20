@@ -49,6 +49,7 @@ DETECTORS = (
     "prose-lint",
     "standards-lint",
     "loop-lint",
+    "verifier-table",
 )
 
 # Audit scripts a card's Audit cell may cite that deliberately run outside the

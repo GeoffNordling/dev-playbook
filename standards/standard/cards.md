@@ -26,7 +26,9 @@ Every immediate subdirectory of `standards/` except `references/` is a
 card directory: it holds `card.md`, typed `Standard-Card`, with Define,
 Audit, Enforce, and Adopt as its H2 sections, in that order, each once,
 and the only flat files under `standards/` are `README.md` and
-`index.md`; standards-lint reports a departure (`standard.card-layout`).
+`index.md`; standards-lint reports a departure.
+
+`standard.directory-layout` · deterministic
 
 The tree's rule is one directory, one standard: the card and the
 Standards it defines itself by sit together, one documentation set
@@ -43,7 +45,9 @@ holds vendored mirrors and no card.
 The sentence after a card's H1 opens `Governs how`, names the governed
 territory in one breath, and is repeated verbatim less the period by the
 frontmatter `description`; standards-lint reports a pair that has come
-apart (`standard.card-question`).
+apart.
+
+`standard.the-question-sentence` · deterministic
 
 The catalog row and the card then state one remit. A card is named by
 the question its standard governs, so the name holds when the answer is
@@ -55,7 +59,9 @@ swapped
 A card directory's `index.md` opens with the card's title and its
 question sentence, names in a sentence of its own any member the Define
 cell does not point at, and lists the card first; standards-lint reports
-an index that does not open with its card (`standard.card-directory`).
+an index that does not open with its card.
+
+`standard.the-directorys-introduction` · deterministic
 
 The introduction is the set's concern
 ([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
@@ -67,7 +73,9 @@ is judged among the Standards and never against the card.
 
 Every Define pointer targets a document typed `Standard-Ruleset`, and a Define
 bullet is the link alone, with no ` — ` annotation; standards-lint
-reports an annotated bullet (`standard.card-layout`).
+reports an annotated bullet.
+
+`standard.define-points-only-at-rulesets` · deterministic
 
 A Guide is linked from a Standard's prose or from the Adopt cell; a tool
 from the Audit, Enforce, or Adopt cell; and a doc-type file from a
@@ -86,18 +94,22 @@ An Audit bullet cites a first-party lint by a `/scripts/` link; a
 third-party detector by its bare name and pin; and a cell with no checker
 holds the one bullet `none`.
 
+`standard.audit-cites-a-lint` · deterministic
+
 A lint is a deterministic detector held to the `--list-rules` contract
 ([Detectors](/standards/standard/detectors.md#a-first-party-detector)).
-standards-lint's rule matrix collects only the `/scripts/` links
-(`standard.rule-matrix`), so a bare name sits outside it by construction.
-A card audits `none` when no automatic check exists, so the gap stays
-visible.
+Which rule each lint decides is the verifier table
+([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
+not the citation. A card audits `none` when no automatic check exists, so
+the gap stays visible.
 
 ## No shadowing
 
 A repo-scoped card directory's name is one no card directory
 dev-playbook publishes carries; standards-lint reports the collision at
-the consumer's commit gate (`standard.card-shadows-upstream`).
+the consumer's commit gate.
+
+`standard.no-shadowing` · deterministic
 
 A consumer's `standards/<name>/card.md` on an upstream name would
 silently override the workspace-scoped standard of that name. The two
@@ -109,6 +121,7 @@ A repo carrying cards has a `standards/index.md` listing `README.md`
 first and then every directory, in dev-playbook the Meta-Standard's
 `standard/` next, the rest alphabetical by name, each card directory's
 row carrying the card's `description` verbatim; standards-lint reports
-the order and a row's description (`standard.catalog-order`), and
-okf-lint the membership
+the order and a row's description, and okf-lint the membership
 ([The listing](/standards/knowledge-organization/indexes.md#the-listing)).
+
+`standard.the-catalog` · deterministic

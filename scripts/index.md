@@ -14,3 +14,5 @@ cells as rows of `card, cell, pointer`. `rulegen` does the same for
 rules as two tables, `card, standard, population` and
 `card, standard, rule, when`. `labelgen` does the same for the label table in
 `standards/tracking/label-scheme.md`, rendered from `label_scheme.json`.
+`verifier-table` does the same for `standards/verifiers.yaml`, the map from
+every rule id to the check that decides it, and runs in the commit gate.

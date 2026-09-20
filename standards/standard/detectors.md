@@ -1,23 +1,24 @@
 ---
 type: Standard-Ruleset
 title: Detectors
-description: The detector contract behind every Audit cell — read-only, clean on an absent surface, and the shim, git-root, hosting, rule-id, output, and exit-code rules a first-party script obeys
-population: "a detector: a read-only check an Audit cell cites, first-party at scripts/<name> or third-party by its pin"
+description: The check contract behind the verifier table — the table itself, read-only, clean on an absent surface, and the shim, git-root, hosting, rule-id, output, and exit-code rules a first-party script obeys
+population: "a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the table itself at standards/verifiers.yaml"
 ---
 
 # Detectors
 
-A **detector** is the read-only check behind an Audit cell: it inspects
+A **detector** is a read-only check the verifier table names: it inspects
 the repository against one or more Standards and emits findings, and by
 itself it blocks nothing; its run at a gate is the audit stationed there,
 which is Enforcement ([Vocabulary](/CONTEXT.md#governance),
-[Gates](/standards/standard/gates.md)). A first-party detector is a
-script the audited repo hosts at `scripts/<name>`; a third-party one,
-`ruff`, `shellcheck`, `shfmt`, is cited by its bare name and pin
-([Cells](/doc-types/standard/encoding.md#cells)). What an Audit cell
-cites, and how, is
-[Card Catalog](/standards/standard/cards.md#audit-cites-a-lint). The
-reasoning behind the rules is the
+[Gates](/standards/standard/gates.md)). The **verifier table**,
+`standards/verifiers.yaml`, maps every rule id declared under `standards/`
+to the address of the one check that decides it, or to null where no check
+does: a first-party detector by its path, `scripts/repo-lint`; a
+dependency by its pinned pre-commit hook id, `ruff-format`; or a dependency
+by its `pyproject.toml` name and the subcommand it runs, `mypy`,
+`pre-commit validate-manifest`. `scripts/verifier-table` writes the table
+and is its lint. The reasoning behind the rules is the
 [Standard Guide](/docs/guides/standard.md).
 
 ## Read-only
@@ -33,6 +34,39 @@ A detector whose surface is optional, a `skills/`, `standards/`, or
 surface.
 
 `standard.an-absent-surface-is-clean` · deterministic
+
+## The verifier table
+
+A repo that declares a rule under `standards/` carries
+`standards/verifiers.yaml`, byte-identical to what `scripts/verifier-table`
+writes: one row per declared rule id, sorted, each carrying the address of
+the one check that decides it or null.
+
+`standard.the-verifier-table` · deterministic
+
+### An emitted id is a rule heading
+
+Every id a check claims, a first-party detector under `--list-rules` or a
+dependency in the generator's dependency map, is the id of a rule
+declared deterministic under `standards/`, and no two checks claim the
+same id.
+
+`standard.an-emitted-id-is-a-rule-heading` · deterministic
+
+### An address exists
+
+Every dependency address the table names resolves in the repo: a hook id
+of its `.pre-commit-config.yaml`, or a dependency its `pyproject.toml`
+declares, or `pre-commit` itself where that config file exists.
+
+`standard.an-address-exists` · deterministic
+
+### A consumer adds only its own rules
+
+In a repo other than dev-playbook, no row of the table names a rule
+dev-playbook's shipped table carries; the two tables union at read time.
+
+`standard.a-consumer-adds-only-its-own-rules` · deterministic
 
 ## A first-party detector
 
@@ -71,15 +105,6 @@ A first-party detector in the repo that carries
 `.pre-commit-config.yaml`'s pinned block.
 
 `standard.offered-by-the-canonical-template` · deterministic
-
-### Card-namespaced rule ids
-
-Every rule id a first-party detector emits has the form `<card>.<rule>`,
-where `<card>` names a card whose Audit cell cites the detector, and
-every card whose Audit cell cites the detector has at least one emitted
-id with its prefix.
-
-`standard.card-namespaced-rule-ids` · deterministic
 
 ### List rules
 

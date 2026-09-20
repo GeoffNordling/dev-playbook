@@ -8,37 +8,40 @@ fixture simulating it), detected by the canonical consumer template
 repo hosts; and **consumer mode**, every other repo, which is policed from this
 hook's own pinned clone. A repo carrying no standards/ surface
 -- neither a catalog nor a card -- is clean by construction. The rules,
-each namespaced under the meta card (``standard.*``):
+each the id of its heading in standards/standard/cards.md:
 
-  - **card-layout** — every immediate subdirectory of ``standards/`` except
-    ``references/`` is a card directory holding ``card.md``: ``type:
+  - **directory-layout** — every immediate subdirectory of ``standards/``
+    except ``references/`` is a card directory holding ``card.md``: ``type:
     Standard-Card`` frontmatter and the four cells (Define, Audit, Enforce,
-    Adopt) as ``##`` sections, in that order, with every Define bullet a bare
-    link. The only flat files under ``standards/`` are README.md and index.md.
-  - **card-directory** — a card directory's ``index.md`` opens with the
-    card's title and question sentence (``Build governs how ...``) and lists
-    the card first.
-  - **catalog-order** — ``standards/index.md`` follows its declared ordering:
+    Adopt) as ``##`` sections, in that order. The only flat files under
+    ``standards/`` are README.md and index.md.
+  - **define-points-only-at-rulesets** — a Define bullet is the link alone.
+  - **the-question-sentence** — the sentence after a card's H1 opens ``Governs
+    how`` and the frontmatter description repeats it less the period.
+  - **the-directorys-introduction** — a card directory's ``index.md`` opens
+    with the card's title and question sentence and lists the card first.
+  - **the-catalog** — ``standards/index.md`` follows its declared ordering:
     README first, then only directories -- (in dev-playbook mode) the
     meta-standard's ``standard/`` when the tree carries it, the rest
     alphabetical by name -- each card directory's row carrying the card's
     description verbatim.
-  - **rule-matrix** — the bidirectional card<->rule check between each card's
-    Audit-cell detector citations and the rule prefixes those detectors emit
-    (``--list-rules`` is the trusted ground truth).
-  - **hook-surfaces** — the detector-hook id sets agree between the published
-    manifest and the local block; in dev-playbook mode the canonical consumer
-    template's pinned block offers exactly what the manifest publishes. Every
-    detector must be cited by a card and carry a scripts/README.md
-    validation-table row when that file is present — "every detector" meaning
-    the playbook-lint roster in dev-playbook mode (consumers wire one
-    aggregate hook, so the roster, not the config, enumerates what runs) and
-    the local detector hooks in consumer mode. In dev-playbook mode the
-    reverse also holds: a script cited by a card's Audit cell that is neither
-    in the roster nor a registered ungated audit is an enrollment hole.
-  - **card-shadows-upstream** — in consumer mode, no local card directory may
-    reuse an upstream card directory's name drawn from this hook's own pinned
-    clone.
+  - **the-hosting-pattern** and **offered-by-the-canonical-template** — the
+    detector-hook id sets agree between the published manifest and the local
+    block; in dev-playbook mode the canonical consumer template's pinned block
+    offers exactly what the manifest publishes. Every detector must be cited
+    by a card and carry a scripts/README.md validation-table row when that
+    file is present — "every detector" meaning the playbook-lint roster in
+    dev-playbook mode (consumers wire one aggregate hook, so the roster, not
+    the config, enumerates what runs) and the local detector hooks in consumer
+    mode. In dev-playbook mode the reverse also holds: a script cited by a
+    card's Audit cell that is neither in the roster nor a registered ungated
+    audit is an enrollment hole.
+  - **no-shadowing** — in consumer mode, no local card directory may reuse an
+    upstream card directory's name drawn from this hook's own pinned clone.
+
+Which check decides which rule is the verifier table,
+``standards/verifiers.yaml``; ``scripts/verifier-table`` writes it from this
+module's ``--list-rules`` and lints it.
 
 Output:
     stdout — one finding per line, ``file:line: standard.rule message``.
@@ -54,11 +57,10 @@ import argparse
 import re
 import subprocess
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
-from dev_playbook import gitrepo, md
+from dev_playbook import md
 from dev_playbook.findings import print_rules, render
 from dev_playbook.playbook_lint import DETECTORS, UNGATED_AUDITS
 
@@ -73,24 +75,24 @@ HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 # question it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-CARD_LAYOUT = "standard.card-layout"
-CATALOG_ORDER = "standard.catalog-order"
-RULE_MATRIX = "standard.rule-matrix"
+DIRECTORY_LAYOUT = "standard.directory-layout"
+DEFINE_POINTS_ONLY_AT_RULESETS = "standard.define-points-only-at-rulesets"
+THE_QUESTION_SENTENCE = "standard.the-question-sentence"
+THE_DIRECTORYS_INTRODUCTION = "standard.the-directorys-introduction"
+THE_CATALOG = "standard.the-catalog"
+NO_SHADOWING = "standard.no-shadowing"
 THE_HOSTING_PATTERN = "standard.the-hosting-pattern"
 OFFERED_BY_THE_CANONICAL_TEMPLATE = "standard.offered-by-the-canonical-template"
-CARD_SHADOWS = "standard.card-shadows-upstream"
-CARD_QUESTION = "standard.card-question"
-CARD_DIRECTORY = "standard.card-directory"
 
 RULES = (
-    CARD_LAYOUT,
-    CATALOG_ORDER,
-    RULE_MATRIX,
+    DIRECTORY_LAYOUT,
+    DEFINE_POINTS_ONLY_AT_RULESETS,
+    THE_QUESTION_SENTENCE,
+    THE_DIRECTORYS_INTRODUCTION,
+    THE_CATALOG,
+    NO_SHADOWING,
     THE_HOSTING_PATTERN,
     OFFERED_BY_THE_CANONICAL_TEMPLATE,
-    CARD_SHADOWS,
-    CARD_QUESTION,
-    CARD_DIRECTORY,
 )
 
 CARD_TYPE = "Standard-Card"
@@ -259,7 +261,7 @@ def _dev_playbook_mode(root: Path) -> bool:
     return (root / CANONICAL_CONFIG).is_file()
 
 
-# --- standard.card-layout ---------------------------------------------------
+# --- standard.directory-layout ----------------------------------------------
 
 
 def check_card_layout(root: Path) -> list[Finding]:
@@ -270,7 +272,7 @@ def check_card_layout(root: Path) -> list[Finding]:
             Finding(
                 rel,
                 None,
-                CARD_LAYOUT,
+                DIRECTORY_LAYOUT,
                 f"flat file under {STANDARDS}/; a card is {_card_path('<name>')}",
             )
         )
@@ -281,7 +283,7 @@ def check_card_layout(root: Path) -> list[Finding]:
                 Finding(
                     f"{STANDARDS}/{name}",
                     None,
-                    CARD_LAYOUT,
+                    DIRECTORY_LAYOUT,
                     f"card directory has no {CARD_FILE}",
                 )
             )
@@ -290,7 +292,9 @@ def check_card_layout(root: Path) -> list[Finding]:
         front = _frontmatter(path)
         if not front or front.get("type") != CARD_TYPE:
             findings.append(
-                Finding(rel, None, CARD_LAYOUT, f"card must be typed '{CARD_TYPE}'")
+                Finding(
+                    rel, None, DIRECTORY_LAYOUT, f"card must be typed '{CARD_TYPE}'"
+                )
             )
             continue
         for line in _section_lines(path, "Define"):
@@ -299,7 +303,7 @@ def check_card_layout(root: Path) -> list[Finding]:
                     Finding(
                         rel,
                         None,
-                        CARD_LAYOUT,
+                        DEFINE_POINTS_ONLY_AT_RULESETS,
                         "Define bullet carries an annotation; a Define bullet is "
                         "the link alone",
                     )
@@ -312,7 +316,7 @@ def check_card_layout(root: Path) -> list[Finding]:
                 Finding(
                     rel,
                     None,
-                    CARD_LAYOUT,
+                    DIRECTORY_LAYOUT,
                     f"card is missing the cell(s): {', '.join(missing)}",
                 )
             )
@@ -323,7 +327,7 @@ def check_card_layout(root: Path) -> list[Finding]:
                 Finding(
                     rel,
                     None,
-                    CARD_LAYOUT,
+                    DIRECTORY_LAYOUT,
                     f"card has duplicate cell(s): {', '.join(duplicates)}",
                 )
             )
@@ -332,14 +336,14 @@ def check_card_layout(root: Path) -> list[Finding]:
                 Finding(
                     rel,
                     None,
-                    CARD_LAYOUT,
+                    DIRECTORY_LAYOUT,
                     f"card cells are out of order (want {', '.join(CELLS)})",
                 )
             )
     return findings
 
 
-# --- standard.card-question -------------------------------------------------
+# --- standard.the-question-sentence -----------------------------------------
 
 
 def _opening_sentence(path: Path) -> tuple[int, str] | None:
@@ -390,7 +394,9 @@ def check_card_question(root: Path) -> list[Finding]:
         opening = _opening_sentence(path)
         if opening is None:
             findings.append(
-                Finding(rel, None, CARD_QUESTION, "card states no question sentence")
+                Finding(
+                    rel, None, THE_QUESTION_SENTENCE, "card states no question sentence"
+                )
             )
             continue
         line, sentence = opening
@@ -399,7 +405,7 @@ def check_card_question(root: Path) -> list[Finding]:
                 Finding(
                     rel,
                     line,
-                    CARD_QUESTION,
+                    THE_QUESTION_SENTENCE,
                     f"question sentence must open '{QUESTION_LEAD}'",
                 )
             )
@@ -409,7 +415,7 @@ def check_card_question(root: Path) -> list[Finding]:
                 Finding(
                     rel,
                     line,
-                    CARD_QUESTION,
+                    THE_QUESTION_SENTENCE,
                     "description must repeat the question sentence verbatim, "
                     f"less its period: {sentence!r}",
                 )
@@ -417,7 +423,7 @@ def check_card_question(root: Path) -> list[Finding]:
     return findings
 
 
-# --- standard.card-directory ------------------------------------------------
+# --- standard.the-directorys-introduction -----------------------------------
 
 
 def _expected_intro(front: dict) -> str:
@@ -447,7 +453,12 @@ def check_card_directory(root: Path) -> list[Finding]:
         index = f"{STANDARDS}/{_card_name(rel)}/index.md"
         if not (root / index).is_file():
             findings.append(
-                Finding(index, None, CARD_DIRECTORY, "card directory has no index.md")
+                Finding(
+                    index,
+                    None,
+                    THE_DIRECTORYS_INTRODUCTION,
+                    "card directory has no index.md",
+                )
             )
             continue
         expected = _expected_intro(front)
@@ -457,7 +468,7 @@ def check_card_directory(root: Path) -> list[Finding]:
                 Finding(
                     index,
                     opening[0] if opening else None,
-                    CARD_DIRECTORY,
+                    THE_DIRECTORYS_INTRODUCTION,
                     "index must open with the card's title and question sentence: "
                     f"{expected!r}",
                 )
@@ -465,12 +476,17 @@ def check_card_directory(root: Path) -> list[Finding]:
         bullets = _index_bullets(root / index)
         if not bullets or bullets[0][1] != rel:
             findings.append(
-                Finding(index, None, CARD_DIRECTORY, f"index must list {rel} first")
+                Finding(
+                    index,
+                    None,
+                    THE_DIRECTORYS_INTRODUCTION,
+                    f"index must list {rel} first",
+                )
             )
     return findings
 
 
-# --- standard.catalog-order -------------------------------------------------
+# --- standard.the-catalog ---------------------------------------------------
 
 
 def _index_bullets(path: Path) -> list[tuple[str, str, str | None]]:
@@ -524,7 +540,7 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
             Finding(
                 CATALOG,
                 None,
-                CATALOG_ORDER,
+                THE_CATALOG,
                 f"the catalog lists README.md and directories only; found {strays[0]}",
             )
         ]
@@ -546,7 +562,7 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
             Finding(
                 CATALOG,
                 None,
-                CATALOG_ORDER,
+                THE_CATALOG,
                 "entries are out of the declared order (README, meta-standard, "
                 f"directories by name); first out of place: {offender}",
             )
@@ -566,14 +582,14 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
                 Finding(
                     CATALOG,
                     None,
-                    CATALOG_ORDER,
+                    THE_CATALOG,
                     f"row for {target} must carry the card's description verbatim",
                 )
             )
     return findings
 
 
-# --- standard.rule-matrix ---------------------------------------------------
+# --- the card's cells -------------------------------------------------------
 
 
 def _section_lines(path: Path, heading: str) -> list[str]:
@@ -604,85 +620,6 @@ def _audit_citations(path: Path) -> list[str]:
             if clean.startswith("/scripts/"):
                 names.append(PurePosixPath(clean).name)
     return names
-
-
-def _prefix(rule: str) -> str:
-    """The card prefix of a ``card.rule`` id -- everything before the first dot."""
-    return rule.partition(".")[0]
-
-
-def check_rule_matrix(
-    root: Path, list_rules: Callable[[str, Path], list[str]]
-) -> list[Finding]:
-    """The bidirectional card<->rule check between cards and their detectors.
-
-    Membership: every Audit-cell ``/scripts/`` pointer is a detector citation,
-    and each cited detector must answer ``--list-rules``. Direction 1: every
-    ``card.*`` prefix a detector emits belongs to a card whose Audit cell cites
-    that detector. Direction 2: every detector citation is backed by at least
-    one rule carrying the citing card's prefix.
-    """
-    card_prefixes = {_card_name(rel) for rel in _card_paths(root)}
-    cited_by: dict[str, list[str]] = {}  # detector -> card prefixes citing it
-    for rel in _card_paths(root):
-        for name in _audit_citations(root / rel):
-            cited_by.setdefault(name, []).append(_card_name(rel))
-
-    findings: list[Finding] = []
-    prefixes_of: dict[str, set[str]] = {}
-    for name, citing_prefixes in sorted(cited_by.items()):
-        try:
-            rules = list_rules(name, root)
-        except CannotRun:
-            for prefix in citing_prefixes:
-                findings.append(
-                    Finding(
-                        _card_path(prefix),
-                        None,
-                        RULE_MATRIX,
-                        f"Audit cell cites scripts/{name}, which does not answer "
-                        "--list-rules",
-                    )
-                )
-            continue
-        prefixes_of[name] = {_prefix(r) for r in rules}
-        # Direction 2: each citing card's prefix must be one this detector emits.
-        for prefix in citing_prefixes:
-            if prefix not in prefixes_of[name]:
-                findings.append(
-                    Finding(
-                        _card_path(prefix),
-                        None,
-                        RULE_MATRIX,
-                        f"Audit cell cites scripts/{name}, but it emits no "
-                        f"{prefix}.* rule",
-                    )
-                )
-
-    # Direction 1: every emitted prefix belongs to a card that cites the detector.
-    for name, prefixes in sorted(prefixes_of.items()):
-        for prefix in sorted(prefixes):
-            if prefix not in card_prefixes:
-                findings.append(
-                    Finding(
-                        f"scripts/{name}",
-                        None,
-                        RULE_MATRIX,
-                        f"emits {prefix}.* rules, but there is no card "
-                        f"{_card_path(prefix)}",
-                    )
-                )
-            elif prefix not in cited_by[name]:
-                findings.append(
-                    Finding(
-                        _card_path(prefix),
-                        None,
-                        RULE_MATRIX,
-                        f"scripts/{name} emits {prefix}.* rules, but this card's "
-                        "Audit cell does not cite it",
-                    )
-                )
-    return findings
 
 
 # --- standard.hook-surfaces -------------------------------------------------
@@ -887,7 +824,7 @@ def check_hook_surfaces(
     return findings
 
 
-# --- standard.card-shadows-upstream -----------------------------------------
+# --- standard.no-shadowing --------------------------------------------------
 
 
 def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Finding]:
@@ -910,7 +847,7 @@ def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Findin
         Finding(
             rel,
             None,
-            CARD_SHADOWS,
+            NO_SHADOWING,
             f"local card shadows the upstream {_card_path(name)} card",
         )
         for rel in _card_paths(root)
@@ -923,7 +860,6 @@ def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Findin
 
 def audit(
     root: Path,
-    list_rules: Callable[[str, Path], list[str]],
     *,
     hook_repo_root: Path = HOOK_REPO_ROOT,
     roster: tuple[str, ...] = DETECTORS,
@@ -948,45 +884,10 @@ def audit(
     findings.extend(check_card_question(root))
     findings.extend(check_card_directory(root))
     findings.extend(check_catalog_order(root, dev_playbook_mode))
-    findings.extend(check_rule_matrix(root, list_rules))
     findings.extend(check_hook_surfaces(root, dev_playbook_mode, roster, ungated))
     if not dev_playbook_mode:
         findings.extend(check_card_shadows_upstream(root, hook_repo_root))
     return findings
-
-
-def _list_rules_via_subprocess(name: str, root: Path) -> list[str]:
-    """Run ``scripts/<name> --list-rules`` and return its printed rule ids.
-
-    The detector's own ``uv run --script`` shebang resolves its dependencies, so
-    this is the trusted ground truth standards/standard/detectors.md
-    (``--list-rules``) fixes. Raises
-    ``CannotRun`` when the script is absent or does not answer the flag.
-
-    standards-lint runs at a git gate and can inherit an absolute ``GIT_DIR`` the
-    hook exports; passing ``env=gitrepo.no_git_env()`` scrubs the redirecting
-    variables so a spawned detector's own git calls answer for the repo it names,
-    not the hook's.
-    """
-    script = root / "scripts" / name
-    if not script.is_file():
-        raise CannotRun(f"cited detector has no scripts/{name}")
-    try:
-        result = subprocess.run(
-            [str(script), "--list-rules"],
-            capture_output=True,
-            text=True,
-            cwd=root,
-            timeout=30,
-            env=gitrepo.no_git_env(),
-        )
-    except OSError as err:
-        raise CannotRun(f"scripts/{name} --list-rules failed: {err}") from err
-    except subprocess.TimeoutExpired as err:
-        raise CannotRun(f"scripts/{name} --list-rules timed out") from err
-    if result.returncode != 0:
-        raise CannotRun(f"scripts/{name} does not answer --list-rules")
-    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1012,7 +913,7 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.directory).resolve()
 
     try:
-        findings = audit(root, _list_rules_via_subprocess)
+        findings = audit(root)
     except CannotRun as err:
         print(f"standards-lint: cannot run: {err}", file=sys.stderr)
         return 2

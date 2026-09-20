@@ -16,7 +16,7 @@ distribution            define   /standards/distribution/channel.md
 distribution            audit    /scripts/workspace-lint
 distribution            audit    /scripts/repo-lint
 distribution            enforce  commit gate
-distribution            enforce  /scripts/bump-pins
+distribution            enforce  /scripts/bump-pin
 distribution            enforce  /dotfiles/dot-claude/skills/update-standards-pin/SKILL.md
 distribution            adopt    none
 harness                 define   /standards/harness/claude-content.md
@@ -66,18 +66,17 @@ standard                define   /standards/standard/cards.md
 standard                define   /standards/standard/gates.md
 standard                define   /standards/standard/detectors.md
 standard                audit    /scripts/standards-lint
+standard                audit    /scripts/verifier-table
 standard                enforce  commit gate
 standard                adopt    /standards/standard/consuming.md
 testing                 define   /standards/testing/conventions.md
 testing                 audit    /scripts/testing-lint
 testing                 enforce  commit gate
 testing                 adopt    none
-tracking                define   /standards/tracking/candidates.md
 tracking                define   /standards/tracking/issue-shapes.md
 tracking                define   /standards/tracking/label-scheme.md
 tracking                define   /standards/tracking/repo-settings.md
 tracking                audit    /scripts/workspace-lint
-tracking                audit    /scripts/repo-lint
 tracking                enforce  commit gate
 tracking                enforce  /scripts/bootstrap-labels
 tracking                adopt    none
