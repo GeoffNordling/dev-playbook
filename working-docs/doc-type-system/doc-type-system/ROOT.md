@@ -122,11 +122,16 @@ specification.
      rubric: enforcement wiring, a pointer to another Standard, or a
      reason is deleted; an exemption or definition that changes what
      passes is folded into the predicate; a body sentence that is
-     itself a constraint is split into a rule of its own; anything a
-     detector that emits the rule's id already honors is folded, never
-     deleted, so prose and code stay in step. The user answers yes or
-     no per row before the file is edited, and a no is kept with its
-     reason. Reason: a rule tagged and left with its body is orphaned
+     itself a constraint is split into a rule of its own; a rule
+     another rule in the same directory already decides is redundant
+     and goes; anything a detector that emits the rule's id already
+     honors is folded, never deleted, and any clause the detector does
+     not decide is cut or split into a rule with no verifier yet, so a
+     deterministic predicate says exactly what its script decides. The
+     session decides every row and puts only the ambiguous ones to the
+     user, each with its pick, and a no is kept with its reason. The
+     prompt is [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md).
+     Reason: a rule tagged and left with its body is orphaned
      work, and a loop that begins with 232 findings across 29 files has
      no small first move; this is the first instance run by hand, an
      act that drafts, a yield per rule, an act that applies.
