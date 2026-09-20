@@ -17,195 +17,169 @@ contract, the Reference chain; this Standard binds the file: where it
 sits, its front matter, its body's shape, and what each kind adds. The
 craft of the body, the two loads, the information hierarchy, and
 pruning, is [Writing for Agents](/standards/harness/writing-for-agents.md),
-read to write one; this Standard wins where the two collide. A rule
-that names a `harness.*` id is checked by harness-files-lint.
+read to write one; this Standard wins where the two collide.
 
 ## Location
 
 A skill is `<skills root>/<name>/SKILL.md` and an agent is
 `<agents root>/<name>.md`, the roots being `.claude/skills/` and
-`.claude/agents/` in a governed repo and `dotfiles/dot-claude/skills/`
-and `dotfiles/dot-claude/agents/` in dev-playbook.
+`.claude/agents/`, and `dotfiles/dot-claude/skills/` and
+`dotfiles/dot-claude/agents/` where those directories exist.
 
-```
-.claude/skills/<skill-name>/
-  SKILL.md          # required
-  references/       # optional: docs the skill loads on demand
-  scripts/          # optional: helper scripts the skill invokes
-.claude/agents/<agent-name>.md
-```
-
-dev-playbook's roots are Stow-linked into `~/.claude/`.
-harness-files-lint discovers runbooks at these roots and stops on a
-directory under a skills root with no `SKILL.md`.
+`harness.location` · deterministic
 
 ## Front matter
 
-The file opens with a YAML block between `---` lines holding exactly
+A runbook opens with a YAML block between `---` lines holding exactly
 its kind's vocabulary: a skill's `name`, `description`,
 `disable-model-invocation`, `model`, and `effort`, with
 `allowed-tools`, `disallowed-tools`, and `arguments` optional; an
 agent's `name`, `description`, `model`, and `effort`, with `tools`
-optional (`harness.parse`, `harness.front-matter`,
-`harness.required-field`, `harness.unknown-field`).
+optional.
 
-A skill's block:
-
-```yaml
----
-name: <skill-name>
-description: <what it does. Use when …>
-disable-model-invocation: <true|false>
-model: <haiku|sonnet|opus|fable|inherit>
-effort: <low|medium|high|xhigh>
-allowed-tools: <tool spec>          # optional
-disallowed-tools: <tool spec>       # optional
-arguments: [<name>, ...]            # optional
----
-```
-
-An agent's block:
-
-```yaml
----
-name: <agent-name>
-description: <what it does. Use when …>
-model: <haiku|sonnet|opus|fable|inherit>
-effort: <low|medium|high|xhigh>
-tools: <Tool, Tool, ...>            # optional
----
-```
+`harness.front-matter` · deterministic
 
 ## Name matches its home
 
-`name` equals the bundle directory for a skill and the file stem for an
-agent (`harness.name-match`).
+A runbook's `name` equals the bundle directory for a skill and the file
+stem for an agent.
+
+`harness.name-matches-its-home` · deterministic
 
 ## Kebab-case name
 
-`name` is kebab-case (`harness.name-format`).
+A runbook's `name` is kebab-case.
+
+`harness.kebab-case-name` · deterministic
 
 ## Description
 
-`description` is a string of at most 1024 characters; for an agent, or
-a skill with `disable-model-invocation: false`, it is exactly two
-sentences, the first stating what the runbook does and the second
-opening with the literal words `Use when` and naming the trigger
-keywords, contexts, or file types; for a skill with
-`disable-model-invocation: true` it is exactly one sentence, the
-summary the user reads in the slash-command list
-(`harness.description-type`, `harness.description-length`,
-`harness.description-sentences`, `harness.description-trigger`).
+A runbook's `description` is a string of at most 1024 characters. For
+an agent, or a skill whose `disable-model-invocation` is not `true`, it
+is exactly two sentences and the second opens with the literal words
+`Use when`. For a skill with `disable-model-invocation: true` it is
+exactly one sentence.
+
+`harness.description` · deterministic
+
+## Description states what and when
+
+The first sentence of a runbook's `description` states what the runbook
+does. Where that `description` has a second sentence, the second
+sentence names the keywords, contexts, or file types under which the
+runbook is invoked.
+
+`harness.description-states-what-and-when` · stochastic
 
 ## Model and effort
 
-`model` is one of `haiku`, `sonnet`, `opus`, `fable`, or `inherit`, and
-`effort` is one of `low`, `medium`, `high`, or `xhigh`
-(`harness.model-value`, `harness.effort-value`).
+A runbook's `model` is one of `haiku`, `sonnet`, `opus`, `fable`, or
+`inherit`, and its `effort` is one of `low`, `medium`, `high`, or
+`xhigh`.
+
+`harness.model-and-effort` · deterministic
 
 ## Body opens with an H1
 
-The body's first non-blank line after the front matter is an H1
-(`harness.body-h1`).
+The first non-blank line of a runbook's body, after the front matter,
+is an H1.
+
+`harness.body-opens-with-an-h1` · deterministic
 
 ## Steps end on a completion criterion
 
-Every step of the body ends on a completion criterion: the condition
-that tells the agent the work is done.
+Every step of a runbook's body ends on a completion criterion: the
+condition that tells the agent the work is done.
+
+`harness.steps-end-on-a-completion-criterion` · stochastic
 
 ## Carries its chain
 
-Every edge of the runbook's contract is declared in the runbook's own
+Every edge of a runbook's contract is declared in the runbook's own
 file: args by the front matter `arguments` list, and each read, write,
-do, override, never, and report as a span in the body that the
-[Nodes and Edges Encoding](/doc-types/runbook/encoding.md) parses; the
-runbook's chain in `doc-types/runbook/chains.txt` is the one
-`scripts/chaingen` writes from them.
+do, override, never, and report as a span in the body that
+[encoding.md](/doc-types/runbook/encoding.md) parses, except a ban the
+span vocabulary cannot carry, which stays plain prose in the body and
+is listed in
+[residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 
-A ban the span vocabulary cannot carry stays plain prose, recorded in
-the [runbook residual ledger](/doc-types/runbook/residual-ledger.md).
+`harness.carries-its-chain` · stochastic
 
 ## Skill
 
-A bundle `<skills root>/<name>/` holding `SKILL.md`, and optionally
-`references/` and `scripts/`.
+The runbook is a skill.
+
+`harness.skill` · deterministic
 
 ### Bundle layout
 
-`SKILL.md` sits at the bundle root; docs the skill loads on demand sit
-in `references/`, linked from `SKILL.md`; helper scripts sit in
-`scripts/`, invoked from `SKILL.md`.
+Every file in a skill's `references/` is linked from its `SKILL.md`,
+and every file in its `scripts/` is invoked from its `SKILL.md`.
 
-A helper script holds a deterministic operation, repeated logic, or a
-step where token cost or reliability matters. Distinct sub-domains and
-rarely-needed material spill into `references/`.
+`harness.bundle-layout` · deterministic
 
 ### Model invocation flag
 
-`disable-model-invocation` is present and boolean (`harness.dmi-type`).
+A skill's `disable-model-invocation` is boolean.
 
-Under `false` the agent fires the skill on its own and other skills
-reach it; under `true` only the user typing its name invokes it.
+`harness.model-invocation-flag` · deterministic
 
 ### Interactive skills inherit
 
 A skill that runs several turns with the user carries `model: inherit`.
 
-A pinned model governs only the turn that loads the skill.
+`harness.interactive-skills-inherit` · stochastic
 
 ### Tool fields
 
-`allowed-tools` and `disallowed-tools`, when present, are
-space-separated tool specs, as in `Bash(git *) Bash(gh *)`, and
-`disallowed-tools` restates no denial `settings.json` already makes.
+A skill's `allowed-tools` and `disallowed-tools`, when present, are
+space-separated tool specs, as in `Bash(git *) Bash(gh *)`.
 
-`allowed-tools` pre-approves the listed calls to run without prompting;
-`disallowed-tools` denies outright.
+`harness.tool-fields` · deterministic
+
+### Disallowed tools restate nothing
+
+A skill's `disallowed-tools`, when present, names no tool or call that
+a `settings.json` beside its skills root already denies.
+
+`harness.disallowed-tools-restate-nothing` · deterministic
 
 ### Arguments
 
-`arguments`, when present, is a non-empty list of bare kebab-case names,
-as in `arguments: [subject]`, and the body carries no `$ARGUMENTS` or
-`$0` placeholder (`harness.arguments-format`, the list only).
+A skill's `arguments`, when present, is a non-empty list of bare
+kebab-case names, as in `arguments: [subject]`.
 
-The harness appends the input after the body as `ARGUMENTS: <text>`,
-whole and unsplit, and the executing agent never sees the argument's
-name. Every argument is a string.
+`harness.arguments` · deterministic
+
+### No argument placeholder
+
+A skill's body carries no `$ARGUMENTS` placeholder and no `$0`
+placeholder.
+
+`harness.no-argument-placeholder` · deterministic
 
 ### References one level deep
 
-No file in `references/` links to another file in `references/`
-(`harness.references-depth`).
+No `.md` file in a skill's `references/` links to another `.md` file
+in that `references/`.
 
-### SKILL.md under 500 lines
+`harness.references-one-level-deep` · deterministic
 
-`SKILL.md` is under 500 lines.
+### SKILL.md at most 500 lines
 
-harness-files-lint prints an advisory on a longer one, with no rule id.
-Material past the bound spills into `references/` under
-[Bundle layout](#bundle-layout).
+A skill's `SKILL.md` body is at most 500 lines.
+
+`harness.skillmd-at-most-500-lines` · deterministic
 
 ## Agent
 
-One flat file `<agents root>/<name>.md`.
+The runbook is an agent.
+
+`harness.agent` · deterministic
 
 ### tools
 
-`tools`, when present, is a non-empty comma-separated string of tool
-names, and the launched agent's toolset is exactly that list
-(`harness.tools-format`).
+An agent's `tools`, when present, is a non-empty comma-separated string
+of tool names.
 
-An agent without the field has the full toolset. `tools` is no cognate
-of a skill's `allowed-tools`: that pre-approves calls inside the
-caller's permission flow, while a tool absent from `tools` does not
-exist for the agent.
-
-### No arguments
-
-The front matter declares no `arguments`; the agent's input is the
-launching prompt, whole (`harness.unknown-field`).
-
-An agent's body is the launched subagent's system prompt, set at spawn:
-it addresses the agent that runs it, and nothing else reaches that
-agent except the launching prompt. The report travels back as the
-subagent's final message.
+`harness.tools` · deterministic

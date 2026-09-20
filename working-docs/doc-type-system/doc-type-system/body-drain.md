@@ -103,7 +103,7 @@ Redundant wins over every other verdict. Judge every rule with fresh
 eyes: the tree is months old, and a rule earns its place only by
 deciding something no other rule decides.
 
-Three further checks, learned from earlier runs:
+Further checks, learned from earlier runs:
 
 - A clause another rule already decides, in this file or a sibling, is
   cut from a folded predicate, not restated. One fact, one rule.
@@ -119,6 +119,9 @@ Three further checks, learned from earlier runs:
   repo is the hook repository", never a condition that selects one repo
   by identity. A rule that only describes one repo's own configuration
   is not a Standard's rule; delete it.
+- A sentence that gives the reason for a rule is deleted even when the
+  reason names a further constraint, "Behaviors leads because Read the
+  standards must come first". A reason is not split into a rule.
 
 ## The edit
 
