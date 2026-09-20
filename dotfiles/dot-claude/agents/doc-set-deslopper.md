@@ -101,13 +101,12 @@ The set slices:
   [declare before use](~/workspace/dev-playbook/standards/prose/conventions.md#declare-before-use),
   [current state and next steps only](~/workspace/dev-playbook/standards/prose/conventions.md#current-state-and-next-steps-only),
   [open with purpose](~/workspace/dev-playbook/standards/prose/conventions.md#open-with-purpose),
-  [lead with the edge case](~/workspace/dev-playbook/standards/prose/conventions.md#lead-with-the-edge-case-when-reach-is-surprising),
   [block form](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
   [positive statement](~/workspace/dev-playbook/standards/prose/conventions.md#positive-statement),
   [no slop tics](~/workspace/dev-playbook/standards/prose/conventions.md#no-slop-tics),
   [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person)
   — a set member is always a declarative document, never harness-loaded,
-  so imperative and second person never binds it,
+  so no first person never binds it,
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
   [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).

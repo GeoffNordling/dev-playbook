@@ -17,7 +17,7 @@ session inside `<repo>/<dir>/` receives the nested file, the root file,
 and the global file at once. The registry of every file the harness
 loads is [Claude Code Files](/standards/harness/files.md); the voice a
 `CLAUDE.md` speaks in is Doc Conventions'
-[Imperative and second person](/standards/prose/conventions.md#imperative-and-second-person).
+[No first person](/standards/prose/conventions.md#no-first-person).
 
 ## No frontmatter
 

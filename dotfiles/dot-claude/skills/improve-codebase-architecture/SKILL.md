@@ -12,7 +12,7 @@ Surface architectural friction and propose **deepening opportunities** — refac
 
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
-- {Read [module design](~/workspace/dev-playbook/standards/modules/design.md) for the architecture vocabulary and its principles, loaded first; `module`, `interface`, `depth`, `seam`, `adapter`, `leverage`, `locality` — the deletion test, "the interface is the test surface," "one adapter = hypothetical seam, two = real"}. Use these terms exactly in every suggestion — don't drift into "component," "service," "API," or "boundary."
+- {Read the [module design guide](~/workspace/dev-playbook/docs/design.md) for the architecture vocabulary and its principles, loaded first; `module`, `interface`, `depth`, `seam`, `adapter`, `leverage`, `locality` — the deletion test, "the interface is the test surface," "one adapter = hypothetical seam, two = real"}. Use these terms exactly in every suggestion — don't drift into "component," "service," "API," or "boundary."
 - The domain language in `CONTEXT.md` gives names to good seams; Decision Records in `docs/decisions/` record decisions this command should not re-litigate.
 
 ## Process

@@ -159,7 +159,7 @@ A real database in a temp directory, an in-process HTTP server, and a real
 parser over fixture files are all cheap and deterministic. A dependency
 reached over the network gets a **port** built for it first, and the
 double then sits at that seam
-([Module Design](/standards/modules/design.md) covers when a seam earns
+([Module Design Guide](/docs/design.md) covers when a seam earns
 its keep).
 
 ## Fakes for stateful dependencies

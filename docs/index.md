@@ -7,6 +7,7 @@ intentions, and explorations — and the Decision Records.
 - [Headless Operation](/docs/headless.md) — Running Claude Code headless on subscription
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
+- [Module Design Guide](/docs/design.md) — The thinking behind the module-design rules — depth and the deletion test, seams and adapters, ports at a process boundary, and the diagrams and examples that teach them
 - [Sandboxing Claude agents](/docs/sandboxing.md) — The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached has a working prototype, not yet integrated
 - [System Legibility](/docs/system-legibility.md) — The doctrine — the user understands the systems they own without reading all of them — and the principles and ambitions that serve it
 - [Working in Loops](/docs/working-in-loops.md) — The doctrine — agents work in loops, and the user works on the loops

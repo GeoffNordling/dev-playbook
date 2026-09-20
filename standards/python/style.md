@@ -18,63 +18,52 @@ that invoke ruff and mypy are
 conventions are
 [Testing Conventions](/standards/testing/conventions.md).
 
-## Package initializers
+## Empty init
 
-A file named `__init__.py`.
+A file named `__init__.py` holds no character other than whitespace: no
+docstring, no import, no re-export, no `__all__` declaration, and no
+other code.
 
-### Empty
-
-The file holds no docstring and no code, ideally zero bytes; every import,
-re-export, and `__all__` declaration sits in a named module instead.
-python-lint reports one that does not (`python.empty-init`).
-
-Callers import from the specific submodule, `from pkg.sub import thing`,
-rather than from the package root. A package's overview belongs in its
-primary named module or in a README.
+`python.empty-init` · deterministic
 
 ## Docstrings
 
-Every module, class, function, and method carries a docstring saying in
-plain English what it does, except an `__init__.py`, which stays empty,
-and a pytest test function, whose name carries the behavior. One short
-sentence is enough when the behavior is simple, longer when it is not.
+Every module, class, function, and method in the file carries a
+docstring, except a file named `__init__.py` and a pytest test function,
+whose name begins with `test_`.
 
-A pytest test function follows a `test_<behavior>` naming convention
-literal enough that a docstring restates the name. A test module's own
-helpers, meaning the factories and fixtures defined as plain functions,
-carry docstrings: their names are not similarly load-bearing.
+`python.docstrings` · deterministic
+
+## Docstring content
+
+A docstring in the file says in plain English what the module, class,
+function, or method it documents does.
+
+`python.docstring-content` · stochastic
 
 ## Fail loudly
 
-A value the code requires is read directly, so a missing one raises; a
-fallback for a state that is genuinely runtime carries an inline comment
-giving the reason. These are the shapes that quietly hide a missing value:
+A value the code requires is read directly, so a missing one raises. A
+fallback stands only where the missing value is a real runtime state
+rather than a programming error, and it carries an inline comment giving
+that reason. Each of these shapes, over a value that always exists, is a
+fallback that hides the missing value:
 
-- `dict.get(key, default)` where `key` is always present. `dict[key]`
-  raises `KeyError` instead.
+- `dict.get(key, default)` where `key` is always present.
 - `if x is None: return default`, or `x or default`, conditioning a value
   that always exists.
 - `try: ... except Exception: return default`, swallowing the error into a
   sentinel.
 - `getattr(obj, "attr", default)` for an attribute the object is required
-  to have. `obj.attr` raises instead.
+  to have.
 - A default parameter value papering over state the caller always
   supplies.
 
-A legitimate fallback is one where the missing value is a real runtime
-state rather than a programming error. Its inline comment is the signal
-that the author weighed it.
-
-A fallback that hides a bug delays the failure to a place far from the
-cause, where it is much harder to diagnose. Failing at the point of the
-missing value points straight at the defect.
+`python.fail-loudly` · stochastic
 
 ## Module layout
 
-A module's top-level statements run in one order: the module docstring,
-the imports, the plain-literal constants, then the definitions
-interleaved with the derived constants, each derived constant placed
-directly after what it derives from.
+A module's top-level statements run in one order:
 
 1. The module docstring.
 2. `import` and `from ... import` statements.
@@ -84,72 +73,60 @@ directly after what it derives from.
 4. Type aliases, dataclasses, classes, and functions, interleaved with
    *derived* constants: module-level `UPPER_SNAKE_CASE` names whose values
    depend on a class, function, or enum defined in the file. A derived
-   constant sits immediately after the things it derives from, in a
-   labeled section.
+   constant sits immediately after the definitions it derives from.
 
-A single-use constant sits at the top with the rest, or, when it is
-derived, in its grouped section near its dependencies, never beside its
-one user mid-file.
+`python.module-layout` · deterministic
 
 ## No future annotations
 
-`from __future__ import annotations` does not appear in the file.
+`from __future__ import annotations` does not appear in the file, unless
+one of the file's parent directories is named `build`, `dist`, or
+`deprecated`.
 
-python-lint rejects the import (`python.no-future-annotations`).
-
-Python 3.11+ already provides every motivation for it: PEP 604 unions
-(`X | Y`), builtin generics (`list[int]`), and string-quoted forward
-references.
+`python.no-future-annotations` · deterministic
 
 ## Helper justification
 
-Every helper function is multi-use, substantial in body, a distinct
-concern at another abstraction level, or an entry in a dispatch table,
-registry, or strategy map.
+Every helper function in the file is multi-use, substantial in body, a
+distinct concern at another abstraction level, or an entry in a dispatch
+table, registry, or strategy map:
 
-- **Multi-use**: called from two or more sites. De-duplication is the
-  clearest justification.
+- **Multi-use**: called from two or more sites.
 - **Substantial body**: the logic is long or intricate enough that lifting
   it out makes the caller readable. A one-line or two-line helper called
-  once is pure relocation, and belongs inline.
+  once is pure relocation.
 - **Distinct concern at another abstraction level**: the helper's job
   belongs to a different layer than its caller, such as a regex-based
-  enforcement check inside a high-level dispatch loop. The name then
-  documents the layer boundary.
+  enforcement check inside a high-level dispatch loop.
 - **Architectural pluggability**: an entry in a dispatch table, registry,
-  or strategy map. These look single-use by static call count and are
+  or strategy map, which looks single-use by static call count and is
   pluggable by design.
 
-These do not justify a helper:
+Symmetry with siblings, prior existence, and speculative reuse justify no
+helper: a trivial single-use function beside two siblings of the same
+shape is still trivial, the bar is the same for a new helper and for one
+inherited from earlier work, and extraction waits for the second caller.
 
-- **Symmetry with siblings**: a trivial single-use function beside two
-  siblings of the same shape is still trivial. Each helper stands on its
-  own merits.
-- **Prior existence**: the bar is the same for a new helper and for one
-  inherited from earlier work.
-- **Speculative reuse**: extraction waits for the second caller.
+`python.helper-justification` · stochastic
 
 ## Helper placement
 
-A justified helper sits directly beneath the function that uses it, or in
-a `# ---` banner section when several callers share it.
+A helper function sits directly beneath the function that uses it, or,
+where two or more functions use it, in a `# ---` banner section.
 
-The banner sections let a reader navigate a file by concern rather than by
-call graph.
+`python.helper-placement` · deterministic
 
 ## Formatted by ruff format
 
-The file is byte-identical to `ruff format`'s output under the canonical
-`line-length`.
+The file is byte-identical to the output of `ruff format` run under the
+`line-length` that the canonical
+[pyproject.toml](/standards/build/canonical/pyproject.toml) pins.
 
-`line-length` is pinned by the canonical
-[pyproject.toml](/standards/build/canonical/pyproject.toml).
+`python.formatted-by-ruff-format` · deterministic
 
 ## Annotated signatures
 
-Every function and method annotates each parameter and its return, so the
-file passes mypy under the canonical `[tool.mypy]` keys.
+Every function and method in the file annotates each parameter, except a
+`self` or `cls` first parameter, and its return.
 
-[Canonical Artifacts](/standards/build/canonical.md#pyprojecttoml) pins
-those keys: `disallow_untyped_defs` and `disallow_incomplete_defs`
-together make a partly annotated signature an error.
+`python.annotated-signatures` · deterministic

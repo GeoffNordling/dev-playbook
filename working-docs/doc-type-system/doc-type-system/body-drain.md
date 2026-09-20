@@ -129,13 +129,6 @@ Further checks, learned from earlier runs:
 - The repo that hosts the canonical files is named by a property, "the
   repo that carries `standards/build/canonical/`", and every other repo
   by its negation, never as "dev-playbook" or "a consumer repo".
-- A pointer this file's own tests hold to, not just a reader's cross
-  reference, is not a reason: `tests/test_set_deslop_coverage.py` binds
-  `working-documentation-sets.md`'s sections to
-  `doc-set-deslopper.md`'s slice assignments by anchor, so cutting one
-  of those citations as a reason breaks a test outside `standards/`.
-  Run `uv run pytest tests/test_set_deslop_coverage.py` after draining
-  that file, and keep every citation the test parses.
 
 ## The edit
 

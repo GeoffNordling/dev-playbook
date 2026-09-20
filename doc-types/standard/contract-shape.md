@@ -137,7 +137,7 @@ build  skeleton     required-files                 —
 build  skeleton     tests-present                  python-source
 build  skeleton     uvlock-and-python-version      python
 prose  conventions  declarative-present-tense      —
-prose  conventions  imperative-and-second-person   harness-loaded-agent-instructions
+prose  conventions  no-first-person                harness-loaded-agent-instructions
 ```
 
 Rows of the generated files, excerpted.

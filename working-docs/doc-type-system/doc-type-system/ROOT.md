@@ -143,7 +143,14 @@ specification.
      To do when every ruleset is drained: one quick holistic pass over
      all 29, generating the two tables of steps 2 and 3, the verifiers
      and the gates, and reading them across Standards for overlap and
-     duplication before step 2 begins.
+     duplication before step 2 begins. The same pass asks of every
+     ruleset whether its drained bodies were rules or teaching: where
+     a body carried the vocabulary, diagrams, and reasoning behind the
+     rules, that material is restored as a guide under `docs/`, the
+     way `standards/modules/design.md` split into the seven-rule
+     ruleset and `docs/design.md`; prose `block-form-fits-its-content`
+     and python `fail-loudly` and `helper-justification` are the
+     candidates already seen.
   2. *The verifier table and `audit`.* One table maps every rule id to
      a script, a judge, or null, one row per id, keyed by id; dev-playbook
      holds the rows for its own rules and a consumer repo holds rows for
@@ -183,10 +190,12 @@ specification.
      `harness/writing-for-agents.md`, and
      `knowledge-organization/file-roles.md`, leave the tree, each one
      converted to a runbook where it is a procedure, deleted where a
-     runbook already covers it, or moved where it is neither; `docs/` is
-     not a destination, since it holds the high-level intentional
-     documents, and the rule for where such a file goes is decided case
-     by case at this step, not before. Six of standards-lint's seven
+     runbook already covers it, or moved where it is neither. `docs/`
+     is the destination for a guide that is teaching, the reasoning and
+     vocabulary behind a Standard, as `docs/design.md` is for modules;
+     a guide that is a procedure becomes a runbook; the rule for where
+     each of the six goes is decided case by case at this step, not
+     before. Six of standards-lint's seven
      rules go with the card; `rule-matrix` is superseded by step 2's
      table lint. Reason: the reference model places every cell elsewhere,
      Define is the Standard file, Audit is the verifier table, Enforce is

@@ -2,7 +2,7 @@
 
 When the user wants to explore alternative interfaces for a chosen deepening candidate, use this parallel sub-agent pattern. Based on "Design It Twice" (Ousterhout) — your first idea is unlikely to be the best.
 
-Uses the vocabulary of the [module-design standard](~/workspace/dev-playbook/standards/modules/design.md) — **module**, **interface**, **seam**, **adapter**, **leverage** — and the dependency categories below.
+Uses the vocabulary of the [module design guide](~/workspace/dev-playbook/docs/design.md) — **module**, **interface**, **seam**, **adapter**, **leverage** — and the dependency categories below.
 
 ## Dependency categories
 

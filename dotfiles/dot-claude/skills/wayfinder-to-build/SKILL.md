@@ -23,11 +23,11 @@ Before doing anything else:
   end-to-end}.
 - {Read [software factory](~/workspace/dev-playbook/software-factory/software-factory.md)
   end-to-end}.
-- {Read [module design](~/workspace/dev-playbook/standards/modules/design.md); the
+- {Read the [module design guide](~/workspace/dev-playbook/docs/design.md); the
   qualities a good slice boundary preserves}.
 
 Then report: `READ: issue-shapes.md, software-factory.md,
-modules/design.md`. Proceed only after.
+docs/design.md`. Proceed only after.
 
 ## Standalone, with provenance
 
