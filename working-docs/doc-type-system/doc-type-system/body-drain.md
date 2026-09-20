@@ -1,14 +1,15 @@
 ---
 type: General-Sheet
 title: Body Drain
-description: The prompt one agent loads to drain one ruleset — the target shape of a rule, the id and kind it proposes, the five-verdict rubric for the body, the detector check, the exactness a deterministic predicate keeps, and the rows it returns
+description: The prompt one agent loads to drain one ruleset — the target shape of a rule, the id and kind it proposes, the five-verdict rubric for the body, the detector check, the exactness a deterministic predicate keeps, the edit it makes, and the report it returns
 ---
 
 # Body Drain
 
 The prompt for step 1 of the doc-type system's refactor: one agent
 owns one ruleset, reads it, its sibling rulesets, and the detector that
-checks it, and returns one row per rule. It edits nothing.
+checks it, rewrites that one file in place, and returns a short report.
+It edits no other file and never stages or commits.
 
 ## Your input
 
@@ -85,7 +86,7 @@ for the rule is what the body as a whole needs.
   detector decides. You write the whole new predicate.
 - **split** — a body sentence, or a clause the detector check cut, is
   itself a constraint on the member with its own truth value. It becomes
-  a rule of its own, and you write its heading, predicate, and trailer.
+  a rule of its own with a heading, a predicate, and a trailer.
 - **redundant** — another rule already decides everything this one
   decides, in this file or a sibling in `standards/<name>/`. The rule
   goes, and you name the rule that covers it.
@@ -97,28 +98,33 @@ Redundant wins over every other verdict. Judge every rule with fresh
 eyes: the tree is months old, and a rule earns its place only by
 deciding something no other rule decides.
 
-## The rows
+## The edit
 
-Return rows and nothing else: no preamble, no summary, no advice. One
-block per rule in file order, and a condition's block before its
-rules':
+Rewrite your one file in place so every rule is in the target shape.
+Apply your verdicts: a deleted body goes, a folded predicate replaces
+the old one, a split rule is inserted after the rule it came from, a
+redundant rule goes whole, and a rule that fails the litmus goes whole
+with no replacement. Keep the frontmatter and the intro as they are,
+except that a frontmatter `description` that names something you
+removed is shortened to match, and one sentence of enforcement wiring
+in the intro (which script, which gate is the authority) is cut. Touch
+no other file: not the directory's `index.md`, not a sibling, not a
+script. Do not stage and do not commit; the diff is the review.
+
+## The report
+
+Return a short report and nothing else: no preamble, no summary, no
+advice. First, one line per rule whose verdict was fold, split,
+redundant, or fails-litmus, in file order, saying why in one sentence:
 
 ```
-### <name>.<slug> · <kind> · <verdict>
-<for fold: the complete new predicate, heading excluded>
-<for split: the new heading, then the predicate, then the trailer>
-<for redundant: the id of the rule that covers it>
-<for delete or keep: nothing>
+<name>.<slug> · <verdict> · <one sentence>
 ```
 
-Then one closing block:
+A plain delete or keep gets no line. Then one closing block:
 
 ```
 ### detector ids
 <detector id> → <name>.<slug>     one line per id the detector emits for a rule in this file
 <detector id> → none              one line per id with prefix <name> that matches no rule here
 ```
-
-A predicate that fails the litmus gets the verdict `fails-litmus` and
-one sentence saying which of the three tests it fails. Propose no
-rewrite for it.
