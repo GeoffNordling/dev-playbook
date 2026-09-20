@@ -10,6 +10,7 @@ intentions, and explorations — and the Decision Records.
 - [Module Design Guide](/docs/design.md) — The thinking behind the module-design rules — depth and the deletion test, seams and adapters, ports at a process boundary, and the diagrams and examples that teach them
 - [Sandboxing Claude agents](/docs/sandboxing.md) — The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached has a working prototype, not yet integrated
 - [System Legibility](/docs/system-legibility.md) — The doctrine — the user understands the systems they own without reading all of them — and the principles and ambitions that serve it
+- [Test Design Guide](/docs/testing.md) — The thinking behind the testing rules — what a test verifies, the tautological test, the non-deterministic boundary, the ladder of doubles, what a fake is, where a mock stands, and why layered coverage is waste
 - [Working in Loops](/docs/working-in-loops.md) — The doctrine — agents work in loops, and the user works on the loops
 - [Writing Improvement Process](/docs/writing-improvement-process.md) — The document-writing problem, the intention to improve it iteratively, and the capture step that records what goes wrong each time a document is written
 

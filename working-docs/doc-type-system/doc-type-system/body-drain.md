@@ -129,6 +129,16 @@ Further checks, learned from earlier runs:
 - The repo that hosts the canonical files is named by a property, "the
   repo that carries `standards/build/canonical/`", and every other repo
   by its negation, never as "dev-playbook" or "a consumer repo".
+- An exemption the predicate already implies is not restated: a rule
+  whose member is "a file under `tests/`" needs no clause that a file
+  outside `tests/` is exempt, and a rule whose member is "a file whose
+  name matches a module" needs no clause about a file whose name matches
+  none.
+- A fold never narrows a rule past what its body allowed. Where the body
+  said a header comment between two lines satisfies the rule, the new
+  predicate does not forbid the blank line the body never mentioned;
+  state the property, "its first command is X", and the allowance
+  follows.
 
 ## The edit
 
@@ -153,10 +163,20 @@ redundant, or fails-litmus, in file order, saying why in one sentence:
 <name>.<slug> · <verdict> · <one sentence>
 ```
 
-A plain delete or keep gets no line. Then one closing block:
+A plain delete or keep gets no line. Then two closing blocks:
 
 ```
 ### detector ids
 <detector id> → <name>.<slug>     one line per id the detector emits for a rule in this file
 <detector id> → none              one line per id with prefix <name> that matches no rule here
+
+### teaching
+<name>.<slug> · <what the deleted body taught, in a few words>
 ```
+
+The teaching block names each rule whose deleted body was not wiring or
+a reason but the material that makes the rule intelligible: a
+definition of a term the rules use, a diagram, a worked example, the
+reasoning behind a design choice. You delete it from the ruleset all
+the same; the session decides whether it is restored as a guide
+elsewhere. `none` where no body was teaching.

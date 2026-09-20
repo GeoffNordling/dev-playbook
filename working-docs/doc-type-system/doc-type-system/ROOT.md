@@ -195,7 +195,12 @@ specification.
      vocabulary behind a Standard, as `docs/design.md` is for modules;
      a guide that is a procedure becomes a runbook; the rule for where
      each of the six goes is decided case by case at this step, not
-     before. Six of standards-lint's seven
+     before. `standards/references/okf-spec.md`, the one `type: Reference`
+     mirror under the tree, and its `index.md` leave with them, to
+     `docs/references/okf-spec.md`, since a vendored upstream spec is
+     supporting material a Standard cites and not a Standard; the
+     citation in `knowledge-organization/indexes.md` and the row in
+     `standards/index.md` move with it. Six of standards-lint's seven
      rules go with the card; `rule-matrix` is superseded by step 2's
      table lint. Reason: the reference model places every cell elsewhere,
      Define is the Standard file, Audit is the verifier table, Enforce is
