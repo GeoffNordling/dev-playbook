@@ -131,6 +131,11 @@ specification.
      session decides every row and puts only the ambiguous ones to the
      user, each with its pick, and a no is kept with its reason. The
      prompt is [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md).
+     Two rulesets are left undrained on purpose: every rule in
+     `standard/cards.md` binds the card or the catalog, which step 4
+     deletes, and every rule in `standard/gates.md` binds a gate,
+     which step 3 turns into the boundary table; each retires at its
+     step, where its teaching joins `docs/guides/standard.md`.
      Reason: a rule tagged and left with its body is orphaned
      work, and a loop that begins with 232 findings across 29 files has
      no small first move; this is the first instance run by hand, an
@@ -168,6 +173,12 @@ specification.
      id is a lint failure, not a silent gap. The table's shape as declared
      data the fact base extracts is the fact base strand's item
      ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
+     `standard/detectors.md` is rewritten at this step: its
+     population becomes "a script the verifier table names", and
+     `standard.card-namespaced-rule-ids` becomes "every id a script
+     emits is `<name>.<slug>`, a rule heading of a Standard in
+     `standards/<name>/`, and a row of the table", which is the
+     table lint that supersedes standards-lint's `rule-matrix`.
   3. *Boundaries read ids from config.* A second table, one per repo and
      never inherited, names the rule ids each boundary runs: the commit
      hook, `make check`, CI, and a loop's check. Every id it names
@@ -179,7 +190,19 @@ specification.
      owners, the verifier map workspace-wide and the boundary map one
      repo's; both live under `standards/` as plain data, format decided
      when step 2 is built. The config's shape as declared data is the
-     same fact base item as step 2's.
+     same fact base item as step 2's. `standard/gates.md` retires at
+     this step: its Three rungs is the table's own schema, with a
+     loop's check the fourth boundary the file today denies; its Skips
+     is a per-machine entry of that table; its Installed in every
+     clone is already `build/bootstrap.md`'s step 4; and its A red CI
+     run is never merged binds the user, not a gate, and moves to
+     `docs/guides/standard.md`, repointing `docs/guides/tracking.md`,
+     `docs/machines.md`, and the comment in `playbook_lint.py`. The
+     closure standards-lint's `hook-surfaces` checks today, that every
+     detector a card cites is in the commit gate's roster or
+     registered ungated, becomes the table's rule: every rule id with
+     a verifier is named by some boundary or listed as ungated on
+     purpose.
   4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
      Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
      files, retire `Standard-Ruleset`, and bind the type `Standard` to
@@ -217,7 +240,18 @@ specification.
      `standard` extractor, per that item
      ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
      A consumer repo's cards, story-forge's five among them, are deleted
-     by that repo at its next pin bump.
+     by that repo at its next pin bump. `standard/cards.md` retires
+     with the card, and the rules that outlive it are written as the
+     successor Standard, population "a repo's `standards/` tree":
+     one directory per Standard at `standards/<name>/<topic>.md`, the
+     directory index carrying the description, the catalog order, no
+     shadowing of an upstream directory name, and the rule shape
+     itself, an H2 with a predicate and a `<name>.<slug> · kind`
+     trailer and H3s only under a condition, which no Standard states
+     today. `standard/consuming.md` is rewritten as the post-card
+     recipe, not moved, since its steps name cards, Audit cells, and
+     standards-lint's consumer mode. `standard/detectors.md`'s
+     `the-hosting-pattern` loses its Audit-cell leg here.
   5. *`Object` becomes `DocType`, and the one-module lint.* The
      pseudocode left the three `contract-shape.md` files in PR #491 and
      sits whole in
@@ -260,6 +294,23 @@ specification.
      deleted. Reason: step 1 sent everything a drain displaced to
      `docs/` as a holding place, and the PR merges only once each file
      under `docs/` is where it belongs, never in a temporary home.
+  10. *Verify every predicate.* After step 2, every rule in every
+     Standard is run against this repo once, and the outcome is
+     recorded, never assumed: a rule with a script verifier by running
+     the script; a rule with a null row by hand or by an agent reading
+     the population with the predicate; a stochastic rule by a judge
+     over a sample of members. A predicate that is not true of the
+     repo today is either fixed in this PR where the fix is small or
+     becomes an issue that names the rule id and the failing members,
+     `standard.thin-shims` and the five detectors that hold their own
+     logic, `okf-lint`, `repo-lint`, `harness-files-lint`, `ref-lint`,
+     and `python-lint`, being the first. A predicate that turns out
+     undecidable as written is rewritten or deleted. Reason: step 1's
+     kind tags are aspirational, deterministic meaning a script could
+     decide the rule and not that one does, and the drains were
+     verified only against the detector code that exists; a Standard
+     that states what the repo does not do, with no issue that says
+     so, is the slop this work exists to remove.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
   system, after step 7: its checks point at the specification as a
   Standard, and the loop grows it. In iteration order: an act drafts

@@ -8,5 +8,6 @@ is in its Standard.
 Ordering: alphabetical by title.
 
 - [Module Design Guide](/docs/guides/modules.md) — The thinking behind the module-design rules — depth and the deletion test, seams and adapters, ports at a process boundary, and the diagrams and examples that teach them
+- [Standard Guide](/docs/guides/standard.md) — The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, and why a detector must ignore the GIT_DIR a git hook exports
 - [Test Design Guide](/docs/guides/testing.md) — The thinking behind the testing rules — what a test verifies, the tautological test, the non-deterministic boundary, the ladder of doubles, what a fake is, where a mock stands, and why layered coverage is waste
 - [Tracking Guide](/docs/guides/tracking.md) — The thinking behind the tracking rules — what a Candidate is and how it becomes an issue, the roles and relationships an issue has, the five species, what the labels mean, and why the repository settings are what they are, with the hand-set ruleset spelled out

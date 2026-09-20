@@ -38,7 +38,7 @@ the repo's own reusable modules, obeying the first-party rules in
 read-only, one finding per line in GNU format with card-namespaced rule
 ids, answering `--list-rules`, exit 0 clean, 1 findings, 2 cannot run.
 The one clause invisible until a hook runs is
-[Explicit roots outrank the hook environment](/standards/standard/detectors.md#explicit-roots-outrank-the-hook-environment):
+[Git runs against the given root](/standards/standard/detectors.md#git-runs-against-the-given-root):
 the commit gate is a git hook, and from a linked worktree it exports an
 absolute `GIT_DIR`, so anyone working the way this workspace does meets
 the clause immediately.
