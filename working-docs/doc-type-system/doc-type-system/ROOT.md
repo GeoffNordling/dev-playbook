@@ -135,6 +135,11 @@ specification.
      work, and a loop that begins with 232 findings across 29 files has
      no small first move; this is the first instance run by hand, an
      act that drafts, a yield per rule, an act that applies.
+     The session, never an agent, runs the gates once the agents of a
+     standard return, `scripts/playbook-lint` and `uv run pytest -q`
+     both, since a test outside `standards/` can parse a ruleset's
+     citations; agents share one tree and cannot tell whose failure
+     they see.
      To do when every ruleset is drained: one quick holistic pass over
      all 29, generating the two tables of steps 2 and 3, the verifiers
      and the gates, and reading them across Standards for overlap and
