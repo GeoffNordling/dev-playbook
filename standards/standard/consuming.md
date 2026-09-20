@@ -65,8 +65,10 @@ repo-lint's `distribution.a-publisher-dogfoods-its-manifest` checks the mirror.
 The local-block wiring runs the detector at the **commit gate**. Record
 that rung in the card's Enforce cell
 ([Cells](/doc-types/standard/encoding.md#cells)), so the card names
-where nonconformance blocks the path to main
-([Gates](/standards/standard/gates.md#three-rungs)).
+where nonconformance blocks the path to main. Then
+`scripts/boundary-table --write` records the same in
+`standards/boundaries.yaml`, read from the wiring
+([The boundary table](/standards/standard/detectors.md#the-boundary-table)).
 
 ## 6. Turn the meta-standard's own policing on
 

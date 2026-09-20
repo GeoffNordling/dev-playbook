@@ -21,8 +21,7 @@ prose                   conventions                                    an author
 python                  style                                          a Python file a governed repo tracks: a .py file, or an extensionless file with a Python shebang
 shell                   conventions                                    a shell file in a governed repo
 standard                cards                                          a repo's card catalog: the standards/<name>/ card directories and the standards/index.md that lists them
-standard                detectors                                      a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the table itself at standards/verifiers.yaml
-standard                gates                                          a gate: an automatic, unmanned blocking point on the path to main
+standard                detectors                                      a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the two tables at standards/verifiers.yaml and standards/boundaries.yaml
 testing                 conventions                                    a governed repo's Python test suite: the test_*.py files anywhere in its tree, and the conftest.py and fake modules under tests/
 tracking                issue-shapes                                   a GitHub issue in a governed repo
 tracking                label-scheme                                   a governed repo's GitHub labels
@@ -212,6 +211,7 @@ standard                detectors                                      a-consume
 standard                detectors                                      an-absent-surface-is-clean                  —
 standard                detectors                                      an-address-exists                           the-verifier-table
 standard                detectors                                      an-emitted-id-is-a-rule-heading             the-verifier-table
+standard                detectors                                      every-address-runs-somewhere                the-boundary-table
 standard                detectors                                      exit-codes                                  a-first-party-detector
 standard                detectors                                      finding-format                              a-first-party-detector
 standard                detectors                                      git-runs-against-the-given-root             a-first-party-detector
@@ -220,10 +220,6 @@ standard                detectors                                      offered-b
 standard                detectors                                      read-only                                   —
 standard                detectors                                      the-hosting-pattern                         a-first-party-detector
 standard                detectors                                      thin-shims                                  a-first-party-detector
-standard                gates                                          a-red-ci-run-is-never-merged                —
-standard                gates                                          installed-in-every-clone                    —
-standard                gates                                          skips                                       —
-standard                gates                                          three-rungs                                 —
 testing                 conventions                                    access-only-public-names                    —
 testing                 conventions                                    arrange-act-assert                          —
 testing                 conventions                                    assert-on-observable-outputs                —

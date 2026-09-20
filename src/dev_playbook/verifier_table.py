@@ -208,17 +208,17 @@ def roster(root: Path) -> tuple[str, ...]:
     """
     if dev_playbook_mode(root):
         return tuple(sorted({*DETECTORS, *UNGATED_AUDITS}))
-    return tuple(sorted(_local_detectors(root)))
+    return tuple(sorted(local_detectors(root)))
 
 
-def _local_detectors(root: Path) -> set[str]:
+def local_detectors(root: Path) -> set[str]:
     """Hook ids of the repo's own config whose entry is a ``scripts/`` path."""
     config = root / LOCAL_CONFIG
     if not config.is_file():
         return set()
     return {
         str(hook["id"])
-        for hook in _hooks(config)
+        for hook in hooks_of(config)
         if str(hook.get("entry", "")).startswith("scripts/")
     }
 
@@ -228,14 +228,14 @@ def _hook_ids(root: Path) -> set[str]:
     config = root / LOCAL_CONFIG
     if not config.is_file():
         return set()
-    return {str(hook["id"]) for hook in _hooks(config)}
+    return {str(hook["id"]) for hook in hooks_of(config)}
 
 
-def _hooks(config: Path) -> list[dict]:
+def hooks_of(config: Path) -> list[dict]:
     """Every hook mapping of a pre-commit config that carries an id."""
     return [
         hook
-        for repo in _yaml_mapping(config).get("repos") or []
+        for repo in yaml_mapping(config).get("repos") or []
         if isinstance(repo, dict)
         for hook in repo.get("hooks") or []
         if isinstance(hook, dict) and "id" in hook
@@ -258,7 +258,8 @@ def _dependency_names(root: Path) -> set[str]:
     return names
 
 
-def _yaml_mapping(path: Path) -> dict:
+def yaml_mapping(path: Path) -> dict:
+    """The YAML file as a mapping; anything else cannot be read."""
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise CannotRun(f"{path.name} is not a YAML mapping")
@@ -406,7 +407,7 @@ def _shipped_table(upstream_root: Path) -> dict[str, str | None]:
     path = upstream_root / TABLE
     if not path.is_file():
         raise CannotRun(f"the hook repo at {upstream_root} carries no {TABLE}")
-    return _yaml_mapping(path)
+    return yaml_mapping(path)
 
 
 def render_table(rows: Mapping[str, str | None]) -> str:

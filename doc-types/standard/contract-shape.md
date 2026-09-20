@@ -45,12 +45,12 @@ restate the content of their targets.
   ([Loop](/doc-types/loop/contract-shape.md)), never the gate.
 - **Enforce.** What compels conformance, in one of two modes. At a
   gate: the rung where nonconformance stops the path to main, cited by
-  fixed name (**commit gate**, **push gate**, **CI gate**), defined in
-  [Gates](/standards/standard/gates.md). A cell cites the single rung
-  where the detector is stationed — where its wiring lives (pre-commit
-  hooks → the commit gate; tools that run only inside `make check` →
-  the push gate); the hook pattern in Gates implies the echoes at the
-  other rungs. On demand: a script or skill the user, a schedule, or a
+  fixed name (**commit gate**, **push gate**, **CI gate**), the gates
+  of [the boundary table](/standards/standard/detectors.md#the-boundary-table).
+  A cell cites the single rung where the detector is stationed — where
+  its wiring lives (pre-commit hooks → the commit gate; tools that run
+  only inside `make check` → the push gate); the boundary table lists
+  every rung a check reaches. On demand: a script or skill the user, a schedule, or a
   process step invokes, which rewrites the object into conformance and
   leaves the result for review, marked **on demand** beside its link. A
   code review is a one-time checkpoint, never an Enforce pointer.

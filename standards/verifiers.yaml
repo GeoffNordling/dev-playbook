@@ -199,6 +199,7 @@ standard.an-emitted-id-is-a-rule-heading: scripts/verifier-table
 standard.audit-cites-a-lint: null
 standard.define-points-only-at-rulesets: scripts/standards-lint
 standard.directory-layout: scripts/standards-lint
+standard.every-address-runs-somewhere: scripts/boundary-table
 standard.exit-codes: null
 standard.finding-format: null
 standard.git-runs-against-the-given-root: null
@@ -206,6 +207,7 @@ standard.list-rules: null
 standard.no-shadowing: scripts/standards-lint
 standard.offered-by-the-canonical-template: scripts/standards-lint
 standard.read-only: null
+standard.the-boundary-table: scripts/boundary-table
 standard.the-catalog: scripts/standards-lint
 standard.the-directorys-introduction: scripts/standards-lint
 standard.the-hosting-pattern: scripts/standards-lint

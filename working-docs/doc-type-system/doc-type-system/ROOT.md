@@ -105,53 +105,8 @@ specification.
      [Completed](#completed).
   2. *The verifier table.* Done 2026-09-20; the entry is in
      [Completed](#completed).
-  3. *Boundaries: where each check runs.* One derived file per repo,
-     `standards/boundaries.yaml`, beside the verifier table, says at
-     which gates each check runs. After this step no Standard says
-     where it runs.
-     - **The file.** One row per address the verifier table names,
-       valued by a list drawn from `commit`, `push`, `ci`, and
-       `on-demand`: `scripts/ref-lint: [commit, push]`, `mypy: [push]`,
-       `scripts/workspace-lint: [on-demand]`. Which rules run at a gate
-       is a join: the rows carrying that gate, looked up in the
-       verifier table.
-     - **Derived, never authored.** `scripts/boundary-table` reads the
-       real wiring, `.pre-commit-config.yaml` with its pre-push stage,
-       the Makefile's `check` target, `ci.yml` with its `SKIP`, and
-       playbook-lint's ungated set, writes the file with `--write`, and
-       is the lint otherwise, in the playbook-lint roster, failing when
-       the committed file differs. Format, shim, and tests follow
-       `scripts/verifier-table` exactly.
-     - **Its rules**, written into `standard/detectors.md` beside the
-       verifier table's: the file matches a fresh derivation, and every
-       address runs somewhere, a gate or `on-demand`. The second is
-       the closure standards-lint's hosting rule checks today, that a
-       cited detector is in the commit roster or registered ungated;
-       that leg leaves standards-lint here.
-     - **`standard/gates.md` retires.** Its Three rungs is the file's
-       column set; its Installed in every clone is already
-       `build/bootstrap.md`'s step 4; its A red CI run is never merged
-       binds the user, not a gate, and moves to
-       `docs/guides/standard.md`; its Skips stays where the skips are
-       recorded, `docs/machines.md`, since a committed file cannot hold
-       per-machine state. Repoint `docs/guides/tracking.md`,
-       `docs/machines.md`, `doc-types/standard/encoding.md`,
-       `doc-types/standard/contract-shape.md`, `standard/consuming.md`,
-       `standard/card.md`, `standard/index.md`, `standard/detectors.md`,
-       and the comments in `playbook_lint.py` and `standards_lint.py`.
-     - **Two facts from the worksheet** land in the derivation: the
-       canonical `ci.yml`'s `SKIP` removes `ref-lint` from CI in every
-       governed repo, which the file states as that row's gates; the
-       same `SKIP` names `web-typecheck`, a hook only dev-playbook has,
-       which leaves the canonical file.
-     - **The worksheet retires.**
-       [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md)
-       is deleted once the file lands; any finding it still holds moves
-       to the step that owns it.
-     Reason: which gate runs a check is wiring, and a Standard that
-     states its own enforcement cannot be audited by a loop without
-     also being gated; a file derived from the wiring cannot lie about
-     it. Decided 2026-09-20.
+  3. *Boundaries: where each check runs.* Done 2026-09-20; the entry is
+     in [Completed](#completed).
   4. *Where guides live.* Decide, with the user, the rule for teaching
      prose before the card step moves any more of it. Undecided today.
      - **The state.** Twelve guides sit at `docs/guides/<name>.md`, one
@@ -352,14 +307,14 @@ specification.
   a trailer `` `<name>.<slug>` · deterministic|stochastic ``, 251 rules
   in all, drained one ruleset at a time by the
   [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md)
-  rubric; `standard/cards.md` and `standard/gates.md` stay undrained
-  for the card and boundary steps. Teaching the drains displaced is a guide at
+  rubric; `standard/cards.md` stayed undrained for the card step, and
+  `standard/gates.md` for the boundary step, which retired it. Teaching the drains displaced is a guide at
   `docs/guides/<name>.md`, twelve in all, one per Standard directory.
   The closing pass drew the verifier and boundary tables by hand,
   read the rulesets across each other, and left its findings and
-  every deferral in
-  [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md),
-  each deferral also named at the step that owns it. Reason: a loop
+  every deferral in a worksheet, Verifiers and Boundaries, each
+  deferral also named at the step that owns it; the worksheet was
+  deleted at the boundary step once both tables were real. Reason: a loop
   cannot route a rule without an id and a kind, and text no verifier
   reads is text the state is not held to.
 - **The verifier table, 2026-09-20.** Step 2 of The system. The table
@@ -388,9 +343,8 @@ specification.
   At first write the table has 262 rows: 103 decided, 83 stochastic
   null, and 76 deterministic null, the rules no script has ever
   checked, which stay unchecked. All eleven detectors emit rule-heading
-  ids, with splits and merges as the corrected Emitted ids table of
-  [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#emitted-ids)
-  lists; six rules the step-1 read overclaimed are null
+  ids, with splits and merges as the step-1 worksheet's corrected
+  Emitted ids table listed, before the boundary step deleted it; six rules the step-1 read overclaimed are null
   (`an-act-links-a-runbook`, `harness.tool-fields`, `row-description`,
   `resource`, `ticket-parentage`, `epic-headings`). The four decisions:
   `prose.the-banned-word` is a deterministic rule of
@@ -406,6 +360,44 @@ specification.
   `audit()` function exists; a judge, when one is built, reads the
   table. Reason: the table is the one place the Standard files and the
   checks meet, and a generator that fails cannot drift from either.
+- **Boundaries: where each check runs, 2026-09-20.** Step 3 of The
+  system. The file is `standards/boundaries.yaml`, one row per address
+  the verifier table names, valued by the gates that run it in order
+  from `commit`, `push`, `ci`, `on-demand`: at first write nineteen rows,
+  sixteen at all three gates, `scripts/ref-lint` at `[commit, push]`,
+  `mypy` at `[push]`, `scripts/workspace-lint` at `[on-demand]`.
+  `scripts/boundary-table` (`src/dev_playbook/boundary_table.py`)
+  derives it from the wiring, never from prose: each hook of
+  `.pre-commit-config.yaml` by its stages, `playbook-lint` expanded to
+  its roster and the manifest check, the pre-push hook's `make check`
+  read through `make -n`, each workflow's `run` steps under their
+  `SKIP`, and playbook-lint's `UNGATED_AUDITS` for `on-demand`. It
+  writes with `--write`, is the lint otherwise, and sits in the
+  playbook-lint roster. Its two rules are in `standard/detectors.md`:
+  `standard.the-boundary-table`, the committed file equals a fresh
+  write; and `standard.every-address-runs-somewhere`, every address is
+  at a gate or registered ungated, and no registered audit is at a
+  gate. The second is the closure leg standards-lint's hosting rule
+  carried, which left standards-lint with its two tests; the verifier
+  table gained the two rows. `standard/gates.md` is deleted: its three
+  rungs are the file's columns, defined in the boundary rule; its
+  installed-in-every-clone fact was already bootstrap's step 4; its red
+  CI rule, its skips rule, and the teaching about where a check runs
+  are three sections of `docs/guides/standard.md`; the per-machine
+  skips stay in `docs/machines.md`. Its readers repointed:
+  `doc-types/standard/encoding.md`, `contract-shape.md`,
+  `residual-ledger.md` (its gates entry deleted), `docs/guides/tracking.md`,
+  `docs/machines.md`, `standard/consuming.md`, `card.md`, `index.md`,
+  `detectors.md`, and the comments in `playbook_lint.py` and
+  `standards_lint.py`; the Meta-Standard's description now ends "and
+  the boundaries", in the card, its index, and the catalog. The
+  canonical `ci.yml` and dev-playbook's own now read `SKIP: ref-lint`:
+  `web-typecheck` is a hook only dev-playbook has, so its name leaves
+  the file every governed repo copies, and dev-playbook's own CI now
+  runs it. The step-1 worksheet, Verifiers and Boundaries, is deleted;
+  every deferral it held was already named at its step. Reason: which
+  gate runs a check is wiring, and a file derived from the wiring
+  cannot lie about it.
 
 ## Acronyms
 

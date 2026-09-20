@@ -1,13 +1,13 @@
 ---
 type: Standard-Card
 title: Meta-Standard
-description: Governs how the workspace's standards themselves are declared, found, and kept honest — the card, the catalog, the detectors, and the gates
+description: Governs how the workspace's standards themselves are declared, found, and kept honest — the card, the catalog, the detectors, and the boundaries
 ---
 
 # Meta-Standard
 
 Governs how the workspace's standards themselves are declared, found, and
-kept honest — the card, the catalog, the detectors, and the gates. What a
+kept honest — the card, the catalog, the detectors, and the boundaries. What a
 Standard is, its card's four cells, its rulesets' populations and rules,
 and the views they collapse to are the Standard doc-type
 ([doc-types/standard/](/doc-types/standard/index.md)). The rulesets
@@ -16,7 +16,6 @@ below hold the rules.
 ## Define
 
 - [Card Catalog](/standards/standard/cards.md)
-- [Gates](/standards/standard/gates.md)
 - [Detectors](/standards/standard/detectors.md)
 
 ## Audit
@@ -27,6 +26,10 @@ below hold the rules.
   [the verifier table](/standards/verifiers.yaml) and fails where the
   committed table, a detector's `--list-rules`, or a dependency's address
   disagrees with the rule headings under `standards/`
+- [boundary-table](/scripts/boundary-table) — writes
+  [the boundary table](/standards/boundaries.yaml), the gates that run
+  each address of the verifier table, and fails where the committed table
+  differs from the wiring or an address runs nowhere
 
 ## Enforce
 

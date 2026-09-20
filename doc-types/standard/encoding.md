@@ -36,8 +36,9 @@ bold mode name.
   repository.
 - **Enforce.** A bullet names its mode in bold, exactly one per bullet,
   wherever it sits: a gate, `**commit gate**`, `**push gate**`, or
-  `**CI gate**`, the three names fixed by
-  [Gates](/standards/standard/gates.md#three-rungs), or `**on demand**`.
+  `**CI gate**`, the three gates of
+  [the boundary table](/standards/standard/detectors.md#the-boundary-table),
+  or `**on demand**`.
   At a gate the pointer is the gate name. On demand the pointer is the
   target of the first link in the lead, the tool invoked.
 - **none.** A cell with nothing to point at holds the one bullet

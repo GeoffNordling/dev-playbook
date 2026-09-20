@@ -16,3 +16,5 @@ rules as two tables, `card, standard, population` and
 `standards/tracking/label-scheme.md`, rendered from `label_scheme.json`.
 `verifier-table` does the same for `standards/verifiers.yaml`, the map from
 every rule id to the check that decides it, and runs in the commit gate.
+`boundary-table` does the same for `standards/boundaries.yaml`, the gates
+that run each of those checks, read from the wiring itself.

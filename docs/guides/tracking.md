@@ -227,6 +227,6 @@ force on the default branch, so a ruleset that is inactive or aimed
 elsewhere supplies no rule and fails the check by its absence.
 
 This is deliberately not
-[branch protection with required status checks](/standards/standard/gates.md#a-red-ci-run-is-never-merged):
+[branch protection with required status checks](/docs/guides/standard.md#a-red-ci-run-is-never-merged):
 nothing here makes CI a merge precondition, which stays the user's
 standing rule.

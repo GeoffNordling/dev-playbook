@@ -1,8 +1,8 @@
 ---
 type: Standard-Ruleset
 title: Detectors
-description: The check contract behind the verifier table — the table itself, read-only, clean on an absent surface, and the shim, git-root, hosting, rule-id, output, and exit-code rules a first-party script obeys
-population: "a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the table itself at standards/verifiers.yaml"
+description: The check contract behind the verifier and boundary tables — the two tables, read-only, clean on an absent surface, and the shim, git-root, hosting, rule-id, output, and exit-code rules a first-party script obeys
+population: "a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the two tables at standards/verifiers.yaml and standards/boundaries.yaml"
 ---
 
 # Detectors
@@ -10,16 +10,19 @@ population: "a check the verifier table names, first-party at scripts/<name> or 
 A **detector** is a read-only check the verifier table names: it inspects
 the repository against one or more Standards and emits findings, and by
 itself it blocks nothing; its run at a gate is the audit stationed there,
-which is Enforcement ([Vocabulary](/CONTEXT.md#governance),
-[Gates](/standards/standard/gates.md)). The **verifier table**,
+which is Enforcement ([Vocabulary](/CONTEXT.md#governance)). The
+**verifier table**,
 `standards/verifiers.yaml`, maps every rule id declared under `standards/`
 to the address of the one check that decides it, or to null where no check
 does: a first-party detector by its path, `scripts/repo-lint`; a
 dependency by its pinned pre-commit hook id, `ruff-format`; or a dependency
 by its `pyproject.toml` name and the subcommand it runs, `mypy`,
 `pre-commit validate-manifest`. `scripts/verifier-table` writes the table
-and is its lint. The reasoning behind the rules is the
-[Standard Guide](/docs/guides/standard.md).
+and is its lint. The **boundary table**, `standards/boundaries.yaml`, maps
+every address the verifier table names to the gates that run it;
+`scripts/boundary-table` writes it from the wiring and is its lint. No
+Standard says where it runs; the boundary table does. The reasoning
+behind the rules is the [Standard Guide](/docs/guides/standard.md).
 
 ## Read-only
 
@@ -67,6 +70,29 @@ In a repo other than dev-playbook, no row of the table names a rule
 dev-playbook's shipped table carries; the two tables union at read time.
 
 `standard.a-consumer-adds-only-its-own-rules` · deterministic
+
+## The boundary table
+
+A repo that asks any check, dev-playbook or a consumer whose
+`.pre-commit-config.yaml` wires a `scripts/` hook, carries
+`standards/boundaries.yaml`, byte-identical to what
+`scripts/boundary-table` writes: one row per address the verifier table
+names, sorted, each carrying the gates that run it in a fixed order drawn
+from `commit`, the pre-commit stage at `git commit`; `push`, the pre-push
+stage at `git push`, which runs `make check`; `ci`, a workflow under
+`.github/workflows/`; and `on-demand`, no gate. The rows are read from
+the wiring: the hooks of `.pre-commit-config.yaml` by their stages, with
+`playbook-lint` expanded to its roster, the recipe of `make check`, and
+each workflow's `run` steps less their `SKIP`.
+
+`standard.the-boundary-table` · deterministic
+
+### Every address runs somewhere
+
+Every address the verifier table names runs at a gate or is a registered
+ungated audit, and no registered ungated audit runs at a gate.
+
+`standard.every-address-runs-somewhere` · deterministic
 
 ## A first-party detector
 

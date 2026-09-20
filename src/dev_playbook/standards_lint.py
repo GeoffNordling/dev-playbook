@@ -33,9 +33,8 @@ each the id of its heading in standards/standard/cards.md:
     file is present — "every detector" meaning the playbook-lint roster in
     dev-playbook mode (consumers wire one aggregate hook, so the roster, not
     the config, enumerates what runs) and the local detector hooks in consumer
-    mode. In dev-playbook mode the reverse also holds: a script cited by a
-    card's Audit cell that is neither in the roster nor a registered ungated
-    audit is an enrollment hole.
+    mode. Where each detector runs is the boundary table's question, not this
+    module's (``scripts/boundary-table``).
   - **no-shadowing** — in consumer mode, no local card directory may reuse an
     upstream card directory's name drawn from this hook's own pinned clone.
 
@@ -62,7 +61,7 @@ from pathlib import Path, PurePosixPath
 
 from dev_playbook import md
 from dev_playbook.findings import print_rules, render
-from dev_playbook.playbook_lint import DETECTORS, UNGATED_AUDITS
+from dev_playbook.playbook_lint import DETECTORS
 
 # The dev-playbook checkout this module's hook ships in — the pre-commit clone
 # in consumer repos, dev-playbook's own tree when dogfooded. The shadow rule
@@ -743,7 +742,6 @@ def check_hook_surfaces(
     root: Path,
     dev_playbook_mode: bool,
     roster: tuple[str, ...] = DETECTORS,
-    ungated: frozenset[str] = UNGATED_AUDITS,
 ) -> list[Finding]:
     """The published-hook surfaces agree.
 
@@ -758,12 +756,10 @@ def check_hook_surfaces(
     the set that actually enumerates what the commit gate runs. In consumer
     mode that is the local detector hooks; in dev-playbook mode it is
     ``roster`` (the playbook-lint dispatch list -- the local block carries only
-    the aggregate hook, which owns no rules and earns no card). Dev-playbook
-    mode adds the closure leg: a ``/scripts/`` name cited by any Audit cell
-    must be enrolled in the roster or registered in ``ungated`` (the audits
-    standards/standard/gates.md leaves outside the gates), so a detector card
-    cannot be
-    authored without gating its detector.
+    the aggregate hook, which owns no rules and earns no card). Whether a
+    cited detector runs anywhere is the boundary table's rule
+    (``scripts/boundary-table``, standards/standard/detectors.md, Every
+    address runs somewhere), not a leg here.
     """
     manifest_all, manifest = _manifest_ids(root)
     local = _scripts_entry_ids(_local_hooks(root))
@@ -808,14 +804,6 @@ def check_hook_surfaces(
             f"scripts/{name}",
             f"detector {name} is cited by no card's Audit cell",
         )
-
-    if dev_playbook_mode:
-        for name in sorted(cited - detectors - ungated):
-            host(
-                f"scripts/{name}",
-                f"{name} is cited by a card's Audit cell but is neither in the "
-                "playbook-lint roster nor a registered ungated audit",
-            )
 
     if (root / SCRIPTS_README).is_file():
         table = _readme_table_names(root)
@@ -863,7 +851,6 @@ def audit(
     *,
     hook_repo_root: Path = HOOK_REPO_ROOT,
     roster: tuple[str, ...] = DETECTORS,
-    ungated: frozenset[str] = UNGATED_AUDITS,
 ) -> list[Finding]:
     """Run every applicable rule over ``root`` and return the combined findings.
 
@@ -884,7 +871,7 @@ def audit(
     findings.extend(check_card_question(root))
     findings.extend(check_card_directory(root))
     findings.extend(check_catalog_order(root, dev_playbook_mode))
-    findings.extend(check_hook_surfaces(root, dev_playbook_mode, roster, ungated))
+    findings.extend(check_hook_surfaces(root, dev_playbook_mode, roster))
     if not dev_playbook_mode:
         findings.extend(check_card_shadows_upstream(root, hook_repo_root))
     return findings

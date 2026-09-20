@@ -63,10 +63,10 @@ shell                   audit    shfmt
 shell                   enforce  commit gate
 shell                   adopt    none
 standard                define   /standards/standard/cards.md
-standard                define   /standards/standard/gates.md
 standard                define   /standards/standard/detectors.md
 standard                audit    /scripts/standards-lint
 standard                audit    /scripts/verifier-table
+standard                audit    /scripts/boundary-table
 standard                enforce  commit gate
 standard                adopt    /standards/standard/consuming.md
 testing                 define   /standards/testing/conventions.md

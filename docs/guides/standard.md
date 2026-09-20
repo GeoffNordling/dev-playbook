@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Standard Guide
-description: The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, and why a detector must ignore the GIT_DIR a git hook exports
+description: The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, why a detector must ignore the GIT_DIR a git hook exports, where a check runs, and the red-CI rule
 ---
 
 # Standard Guide
@@ -81,6 +81,46 @@ same derivation is the lint, so the table cannot drift from either side
 ([The verifier table](/standards/standard/detectors.md#the-verifier-table),
 [List rules](/standards/standard/detectors.md#list-rules)). A null row is
 an honest one: the rule is stated and nothing decides it yet.
+
+### Where a check runs
+
+Which gate runs a check is wiring: a hook's stage in
+`.pre-commit-config.yaml`, a line in `make check`, a `run` step in a
+workflow. A Standard that stated its own enforcement could be wrong
+about it and nothing would notice, so no Standard says where it runs.
+The boundary table, `standards/boundaries.yaml`, is derived from the
+wiring by the same generator that lints it, and the four gate names are
+its column set: **commit**, the pre-commit stage at `git commit`;
+**push**, the pre-push stage at `git push`, which runs `make check`;
+**CI**, the canonical workflow on every push and pull request to
+`main`; and **on-demand**, a registered audit no gate runs, which the
+user invokes by hand. A pre-commit hook reaches every gate, since
+`make check` and the workflow both run the suite; `mypy` and `pytest`
+run only inside `make`, so they reach the push gate and never CI
+([The boundary table](/standards/standard/detectors.md#the-boundary-table)).
+The commit and push gates are git hooks in `.git/`, which no clone
+inherits; `uvx pre-commit install` puts them there, step 4 of
+[Bootstrap](/standards/build/bootstrap.md#the-existing-path-adoption).
+
+### A red CI run is never merged
+
+The CI gate has no branch protection behind it, and its block is the
+user's standing rule: a pull request whose CI run is red is not merged.
+[Repository Settings](/standards/tracking/repo-settings.md) configures
+no required status check, so the block sits at the merge button. The
+rule binds the user, not a gate, which is why it is here and not in a
+Standard; that it is nondiscretionary is what keeps the CI gate a gate
+rather than a review.
+
+### A skip is machine state
+
+A detector is skipped at a gate only where its input is machine-local
+rather than held in the repository: `SKIP=ref-lint` where the repos its
+Citations resolve against are not cloned. playbook-lint honors `SKIP`
+per detector name and announces the skip on every run. The canonical
+workflow's `SKIP: ref-lint` is in the boundary table, since the workflow
+is committed; a machine's skip is not, and is recorded in
+[Machines](/docs/machines.md) instead.
 
 ### Verbatim mirrors
 

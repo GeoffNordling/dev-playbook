@@ -947,41 +947,6 @@ def test_aggregate_hook_shape_passes(tmp_path: Path) -> None:
     assert sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL)) == []
 
 
-def test_cited_but_unenrolled_detector_is_flagged(tmp_path: Path) -> None:
-    # The closure leg: a card's Audit cell cites a script that is neither in
-    # the roster nor a registered ungated audit -- a detector card authored
-    # without gating its detector.
-    repo = surfaces_repo(
-        tmp_path,
-        manifest_ids=["agg-lint"],
-        local_ids=["agg-lint"],
-        canonical_ids=["agg-lint"],
-        readme_ids=ALL,
-        cited_ids=[*ALL, "rogue-lint"],
-    )
-
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
-
-    assert any("rogue-lint" in f.message and "roster" in f.message for f in findings)
-
-
-def test_cited_ungated_audit_is_not_an_enrollment_hole(tmp_path: Path) -> None:
-    # workspace-lint's shape: cited by a card, absent from the roster, but
-    # registered as an ungated audit -- deliberate, not an enrollment hole.
-    repo = surfaces_repo(
-        tmp_path,
-        manifest_ids=["agg-lint"],
-        local_ids=["agg-lint"],
-        canonical_ids=["agg-lint"],
-        readme_ids=ALL,
-        cited_ids=[*ALL, "workspace-lint"],
-    )
-
-    findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
-
-    assert findings == []
-
-
 # --- hook-surfaces: consumer mode ---
 
 

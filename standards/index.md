@@ -14,7 +14,7 @@ alphabetical.
 
 ## Directories
 
-- [standard/](/standards/standard/index.md) — Governs how the workspace's standards themselves are declared, found, and kept honest — the card, the catalog, the detectors, and the gates
+- [standard/](/standards/standard/index.md) — Governs how the workspace's standards themselves are declared, found, and kept honest — the card, the catalog, the detectors, and the boundaries
 - [build/](/standards/build/index.md) — Governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 - [decisions/](/standards/decisions/index.md) — Governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, immutability, and status vocabulary
 - [distribution/](/standards/distribution/index.md) — Governs how dev-playbook's checks reach the governed repos — the published hook, the roster, dogfooding, and the pinned rev
