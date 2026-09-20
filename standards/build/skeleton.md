@@ -8,8 +8,8 @@ population: "a governed repo's tree, except standards/build/canonical/ in dev-pl
 # File Skeleton
 
 The entries a governed repo's tree requires, permits, and forbids. Every
-repo on the [roster](/standards/distribution/channel.md#the-roster) is
-bound. A rule under no condition binds every repo, the base layer; each
+governed repo is bound. A rule under no condition binds every repo, the
+base layer; each
 condition is a further layer, and a repo is in every layer whose test its
 tree meets, inferred from facts on disk, never declared. An entry no rule
 names is free. `standards/build/canonical/` in dev-playbook is quoted

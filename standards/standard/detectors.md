@@ -92,7 +92,7 @@ missing leg (`standard.hook-surfaces`).
 dev-playbook is the topmost instance of the pattern. A repo that ships a
 manifest runs what it ships from its own local block; that invariant is
 stated once, in
-[Distribution Channel](/standards/distribution/channel.md#the-local-block-covers-the-manifest).
+[Distribution Channel](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest).
 
 ### Card-namespaced rule ids
 

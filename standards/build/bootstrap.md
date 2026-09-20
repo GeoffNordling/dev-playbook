@@ -83,5 +83,5 @@ Both paths finish on GitHub, in order:
 Add the repo to workspace-lint's `GOVERNED` roster — a dev-playbook edit,
 made only once the repo is green. Inclusion is declared, never inferred from
 the directory listing
-([Distribution Channel](/standards/distribution/channel.md#the-roster));
+([Distribution Channel](/standards/distribution/channel.md));
 until enrolled, the repo is not audited and its pin drift never reported.

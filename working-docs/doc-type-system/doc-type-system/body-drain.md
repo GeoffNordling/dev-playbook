@@ -113,6 +113,12 @@ Three further checks, learned from earlier runs:
 - An H2 that holds H3s is a condition, and every H3 under it applies
   only where the H2 holds. Where an H3 does not depend on its H2, make
   it an H2 of its own.
+- A predicate is generic: it never names one repository, one machine,
+  or a path that exists in one repo only, and it holds of any member of
+  the population. An exemption is a clause in the predicate, "unless the
+  repo is the hook repository", never a condition that selects one repo
+  by identity. A rule that only describes one repo's own configuration
+  is not a Standard's rule; delete it.
 
 ## The edit
 
