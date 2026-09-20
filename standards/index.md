@@ -26,4 +26,4 @@ alphabetical.
 - [references/](/standards/references/index.md) — Verbatim mirrors of external documents, vendored for network-free reading
 - [shell/](/standards/shell/index.md) — Governs how shell is written — the glue-only boundary, strict mode, declared bash, and the shellcheck and shfmt bars every file clears
 - [testing/](/standards/testing/index.md) — Governs how Python tests are written — the pytest framework, mirror layout, test structure, behavioral focus, doubles, and fixtures
-- [tracking/](/standards/tracking/index.md) — Governs how work is tracked — candidates, issue shapes, the label scheme, and repository settings
+- [tracking/](/standards/tracking/index.md) — Governs how work is tracked — issue shapes, the label scheme, and repository settings

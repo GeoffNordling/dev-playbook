@@ -284,7 +284,12 @@ squash-merged by the user. Because
 [repository settings](/standards/tracking/repo-settings.md) take the squash
 message from the PR, its title and body become the permanent commit message on
 `main`: they are authored from the issue brief, the diff, and the record the
-issue and its PR carry, never left as a placeholder.
+issue and its PR carry, never left as a placeholder. The branch's own commits
+do not survive the squash, so a decision that is expensive to reverse and that
+the merged tree does not explain on its own is proposed as a
+[Decision Record](/standards/decisions/records.md) in the body, at most one
+per PR; the user trims or rejects it, and what survives lands under
+`docs/decisions/` in that same PR.
 
 ### The merge-message recipe
 

@@ -12,7 +12,7 @@ arguments: [candidate]
 Turn a Candidate into committed work. A Candidate is uncommitted future work
 recorded in the repo's root `CANDIDATES.md`; promotion authors a GitHub issue
 from it and **deletes the entry in the same change**, so the work never sits in
-both homes. {Read [candidate conventions](~/workspace/dev-playbook/standards/tracking/candidates.md)
+both homes. {Read [candidate conventions](~/workspace/dev-playbook/docs/guides/tracking.md#candidates)
 as the contract}.
 
 This skill owns the lookup and the delete. Authoring the brief and the

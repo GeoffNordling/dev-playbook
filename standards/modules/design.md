@@ -21,7 +21,7 @@ body of code.
 The rules hold a module to one shape, deep: a large amount of behaviour behind
 a small interface, reachable through that interface. The reasoning, diagrams,
 and examples behind them are the
-[Module Design Guide](/docs/design.md); the tests that cross a module's
+[Module Design Guide](/docs/guides/modules.md); the tests that cross a module's
 interface are [Testing Conventions](/standards/testing/conventions.md).
 
 ## Deep, not shallow

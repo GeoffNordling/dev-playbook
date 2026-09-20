@@ -7,7 +7,7 @@ description: The `gh api` calls that make one issue a sub-issue of another or bl
 # Linking Issues
 
 Hierarchy and dependency are native GitHub relationships
-([Relationships](/standards/tracking/issue-shapes.md#relationships)).
+([Relationships](/docs/guides/tracking.md#relationships)).
 Neither has a `gh` subcommand, so both go through `gh api`, and both
 write endpoints take the target issue's internal **database id** rather
 than its number:

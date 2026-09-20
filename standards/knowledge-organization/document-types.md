@@ -36,7 +36,7 @@ frontmatter of the repo's own root `index.md`
 
 | Type | What it is |
 |------|------------|
-| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [tracking/candidates.md](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
+| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see the [Tracking Guide](/docs/guides/tracking.md#candidates)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
 | `Guide` | An explanation of a process or a system, read to understand it; never cited to reject work. |

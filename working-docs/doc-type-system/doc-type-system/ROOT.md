@@ -146,9 +146,10 @@ specification.
      duplication before step 2 begins. The same pass asks of every
      ruleset whether its drained bodies were rules or teaching: where
      a body carried the vocabulary, diagrams, and reasoning behind the
-     rules, that material is restored as a guide under `docs/`, the
-     way `standards/modules/design.md` split into the seven-rule
-     ruleset and `docs/design.md`; prose `block-form-fits-its-content`
+     rules, that material is restored as a guide at
+     `docs/guides/<name>.md`, one per Standard directory, the way
+     `standards/modules/design.md` split into the seven-rule ruleset
+     and `docs/guides/modules.md`; prose `block-form-fits-its-content`
      and python `fail-loudly` and `helper-justification` are the
      candidates already seen.
   2. *The verifier table and `audit`.* One table maps every rule id to
@@ -190,12 +191,15 @@ specification.
      `harness/writing-for-agents.md`, and
      `knowledge-organization/file-roles.md`, leave the tree, each one
      converted to a runbook where it is a procedure, deleted where a
-     runbook already covers it, or moved where it is neither. `docs/`
-     is the destination for a guide that is teaching, the reasoning and
-     vocabulary behind a Standard, as `docs/design.md` is for modules;
-     a guide that is a procedure becomes a runbook; the rule for where
-     each of the six goes is decided case by case at this step, not
-     before. `standards/references/okf-spec.md`, the one `type: Reference`
+     runbook already covers it, or moved where it is neither.
+     `docs/guides/<name>.md` is the destination for a guide that is
+     teaching, the reasoning and vocabulary behind a Standard, as
+     `docs/guides/modules.md` is for modules; a guide that is a
+     procedure an agent performs becomes a runbook; a procedure only
+     the user performs by hand, the GitHub settings an administrator
+     sets, is documentation and lives in the guide, since a runbook is
+     for work an agent is intended to do; the rule for where each of
+     the six goes is decided case by case at this step, not before. `standards/references/okf-spec.md`, the one `type: Reference`
      mirror under the tree, and its `index.md` leave with them, to
      `docs/references/okf-spec.md`, since a vendored upstream spec is
      supporting material a Standard cites and not a Standard; the
@@ -246,6 +250,16 @@ specification.
      no-body rule holds on the day it lands because step 1 drained the
      bodies, and it keeps them drained.
   8. *Ban the word guard.* See the banned words below.
+  9. *Scrub `docs/`.* Every file under `docs/` other than
+     `docs/decisions/` and `docs/guides/` is read and given its
+     long-term home: a guide behind a Standard moves to
+     `docs/guides/<name>.md`, a procedure an agent performs becomes a
+     runbook, a decision becomes a Decision Record, supporting material
+     a Standard cites sits under `docs/references/`, and a working
+     paper that is none of these either stays as a working paper or is
+     deleted. Reason: step 1 sent everything a drain displaced to
+     `docs/` as a holding place, and the PR merges only once each file
+     under `docs/` is where it belongs, never in a temporary home.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
   system, after step 7: its checks point at the specification as a
   Standard, and the loop grows it. In iteration order: an act drafts

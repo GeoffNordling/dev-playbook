@@ -32,6 +32,13 @@ not at all, one of each.
 
 `build.root-only-files` · deterministic
 
+## No other future-work file
+
+No file named `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or `IDEAS.md` exists
+at any depth in the tree.
+
+`build.no-other-future-work-file` · deterministic
+
 ## Runnables live in scripts/
 
 No `bin/` directory and no `tools/` directory exists at the root.

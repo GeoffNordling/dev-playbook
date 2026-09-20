@@ -82,7 +82,7 @@ files are all cheap and deterministic
 
 A dependency reached over the network gets a **port** built for it first,
 and the double then sits at that seam; the
-[Module Design Guide](/docs/design.md) covers when a seam earns its keep
+[Module Design Guide](/docs/guides/modules.md) covers when a seam earns its keep
 ([Double at the port](/standards/testing/conventions.md#double-at-the-port)).
 
 ## What a fake is

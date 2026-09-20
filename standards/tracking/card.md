@@ -1,14 +1,13 @@
 ---
 type: Standard-Card
 title: Tracking
-description: Governs how work is tracked — candidates, issue shapes, the label scheme, and repository settings
+description: Governs how work is tracked — issue shapes, the label scheme, and repository settings
 ---
 
 # Tracking
 
-Governs how work is tracked — candidates, issue shapes, the label
-scheme, and repository settings. This card owns the **shapes** a
-candidate and an issue take, the **labels** a tracker mints and an issue
+Governs how work is tracked — issue shapes, the label scheme, and
+repository settings. This card owns the **shapes** an issue takes, the **labels** a tracker mints and an issue
 carries, and the **settings** the tracker they live on assumes. The
 lifecycle the phase labels name is
 [the software factory](/software-factory/software-factory.md), as are
@@ -16,7 +15,6 @@ lifecycle the phase labels name is
 
 ## Define
 
-- [Candidates](/standards/tracking/candidates.md)
 - [Issue Shapes](/standards/tracking/issue-shapes.md)
 - [Label Scheme](/standards/tracking/label-scheme.md)
 - [Repository Settings](/standards/tracking/repo-settings.md)

@@ -1,7 +1,7 @@
 ---
 type: Standard-Ruleset
 title: Label Scheme
-description: The closed-world label set a governed repo's tracker mints — every label with its description, generated from the scheme data — and the blocked-label ban
+description: The closed-world label set a governed repo's tracker mints — every label with its description, generated from the scheme data
 population: "a governed repo's GitHub labels"
 ---
 
@@ -9,16 +9,9 @@ population: "a governed repo's GitHub labels"
 
 The labels a governed repo's tracker mints. The scheme is closed-world:
 which labels exist is fixed as data in
-`src/dev_playbook/label_scheme.json`, [bootstrap-labels](/scripts/bootstrap-labels)
-mints that data into a repo, and [labelgen](/scripts/labelgen) renders it
-as the table below. Which labels an issue carries is
+`src/dev_playbook/label_scheme.json`, and [labelgen](/scripts/labelgen)
+renders that data as the table below. Which labels an issue carries is
 [Issue Shapes](/standards/tracking/issue-shapes.md).
-
-## Valid labels
-
-The repo's labels are exactly the scheme's, each with the scheme's color
-and description, and no other; workspace-lint reports a missing,
-drifted, or unexpected label (`tracking.label-scheme`).
 
 <!-- labelgen:start -->
 | Label | Description |
@@ -43,13 +36,10 @@ drifted, or unexpected label (`tracking.label-scheme`).
 | `origin:deferral` | Opened by the factory to hold work a review suggested and the run deferred. |
 <!-- labelgen:end -->
 
-The `phase:*` values are the software factory's states
-([the graph](/software-factory/software-factory.md#the-graph)); the
-`wayfinder:*` values are the `/wayfinder` skill's ticket types.
+## Valid labels
 
-## No blocked label
+A governed repo's GitHub labels are exactly the labels declared in the
+scheme data `src/dev_playbook/label_scheme.json`, each carrying the
+color and the description that data gives it.
 
-No label names a blocked state. Blocked is derived from an issue's open
-blockers ([Relationships](/standards/tracking/issue-shapes.md#relationships)),
-never minted; workspace-lint reports a label whose value is `blocked`
-(`tracking.no-blocked-label`).
+`tracking.valid-labels` · deterministic

@@ -17,10 +17,10 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 
 Before doing anything else:
 
-- {Read the [module design guide](~/workspace/dev-playbook/docs/design.md); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
+- {Read the [module design guide](~/workspace/dev-playbook/docs/guides/modules.md); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
 - {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md) end-to-end; the brief formats, the epic body, and the relationships the decompose exit wires}.
 
-Then report: `READ: docs/design.md, issue-shapes.md`. Proceed only after.
+Then report: `READ: docs/guides/modules.md, issue-shapes.md`. Proceed only after.
 
 ## 1. Load context
 

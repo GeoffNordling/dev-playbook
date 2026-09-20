@@ -67,7 +67,7 @@ DOC_SHAPE = "knowledge-organization.doc-shape"
 ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
 
 # Filenames a CANDIDATES.md replaces. Uncommitted work lives in that one
-# register, committed work in issues; see standards/tracking/candidates.md.
+# register, committed work in issues; see standards/build/skeleton.md.
 ROGUE_FUTURE_WORK_NAMES = frozenset({"ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"})
 
 RULES = (

@@ -67,7 +67,7 @@ Work enters as an idea and leaves as an issue a factory node can pick up.
 
 **Before the issue.** The idea funnel feeds `CANDIDATES.md`, a repo's register of
 work described but not yet committed to
-([candidates.md](/standards/tracking/candidates.md)). A Candidate is pre-issue:
+([Tracking Guide](/docs/guides/tracking.md#candidates)). A Candidate is pre-issue:
 no issue exists, so no label does either. `/candidate-promote` finds the entry,
 opens intake on it, and deletes the entry as the issue lands.
 
