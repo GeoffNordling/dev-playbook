@@ -72,7 +72,12 @@ predicate to what the code decides, in both directions:
   verifier yet. A cut clause that is not a constraint goes.
 
 You never change a script, and you never propose stochastic for a
-clause a script could decide.
+clause a script could decide. Write the property, never the procedure:
+the predicate says what is true of the member, "holds every block of
+the canonical file verbatim and in order", and never how the script
+matches it, no whitespace tolerance, no definition of how a block is
+split, no order of comparison. If a sentence would only make sense to
+someone reading the script, it is procedure.
 
 ## The rubric
 
@@ -97,6 +102,17 @@ A rule may need fold and split both; give both, the fold row first.
 Redundant wins over every other verdict. Judge every rule with fresh
 eyes: the tree is months old, and a rule earns its place only by
 deciding something no other rule decides.
+
+Three further checks, learned from earlier runs:
+
+- A clause another rule already decides, in this file or a sibling, is
+  cut from a folded predicate, not restated. One fact, one rule.
+- Before proposing a split rule, test it against this repo. If this
+  repo fails it today, drop it and say so in the report: a rule with no
+  verifier that the population already fails is debt with no owner.
+- An H2 that holds H3s is a condition, and every H3 under it applies
+  only where the H2 holds. Where an H3 does not depend on its H2, make
+  it an H2 of its own.
 
 ## The edit
 

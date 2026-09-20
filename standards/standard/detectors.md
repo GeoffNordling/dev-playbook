@@ -55,11 +55,6 @@ The script is a thin shim over the host repo's reusable modules: the
 logic lives in the module, and the script wires argument parsing and
 output to it.
 
-In dev-playbook the modules are `src/dev_playbook`. A Python file under
-`scripts/` is also bound by
-[Package-backed scripts are shims](/standards/build/python.md#package-backed-scripts-are-shims);
-this rule binds a detector in any language.
-
 ### Explicit roots outrank the hook environment
 
 A detector that shells out to git scrubs the repository-locating
