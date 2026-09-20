@@ -12,6 +12,9 @@ several words compete for one concept, one is picked and the rest
 retired. It appears at the root or not at all
 ([File Skeleton](/standards/build/skeleton.md#root-only-files)).
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## Glossary only
 
 A repo's `CONTEXT.md` holds a glossary and nothing else: no

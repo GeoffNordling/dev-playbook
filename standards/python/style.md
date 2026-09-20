@@ -18,6 +18,9 @@ that invoke ruff and mypy are
 conventions are
 [Testing Conventions](/standards/testing/conventions.md).
 
+The reasoning behind the rules is the
+[Python Guide](/docs/guides/python.md).
+
 ## Empty init
 
 A file named `__init__.py` holds no character other than whitespace: no

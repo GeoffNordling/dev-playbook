@@ -1,5 +1,5 @@
 ---
-type: General-Sheet
+type: Guide
 title: Module Design Guide
 description: The thinking behind the module-design rules — depth and the deletion test, seams and adapters, ports at a process boundary, and the diagrams and examples that teach them
 ---

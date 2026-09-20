@@ -18,6 +18,9 @@ or sample output, and a reference inside it is out of scope. A numbered
 source, since a record frozen at merge goes stale as its referents
 move; references to a record are checked like any other.
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## Reference resolves
 
 A reference names a file or a directory that exists. A root-absolute
@@ -53,6 +56,13 @@ referencing file's own is an inline link whose target is the full
 workspace path, beginning `~/workspace/<repo>/`.
 
 `knowledge-organization.citation-another-repo` · deterministic
+
+## Skill invocation
+
+A reference to a skill is its bare slash invocation, `/<skill-name>`,
+with no link and no code markup.
+
+`knowledge-organization.skill-invocation` · deterministic
 
 ## Fixed repo root
 

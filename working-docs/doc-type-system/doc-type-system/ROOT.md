@@ -101,62 +101,8 @@ specification.
   text the state is not held to, and the split between a checked first
   paragraph and an unchecked body is where the prose and the verifier
   drift apart.
-  1. *Standard takes its new shape.* Every rule gets an id,
-     `<name>.<slug>`, the `standards/<name>/` directory then the
-     heading's GitHub slug, `build.uvlock-and-python-version`, and a
-     kind, deterministic or stochastic, on a trailer line after its
-     predicate, `` `build.uvlock-and-python-version` · deterministic ``,
-     the form the specification files already use. A condition is a
-     rule and carries both; the rules under it name it as their
-     condition. Reason: a loop's check routes each rule to a verifier
-     by id and kind, so a rule without both cannot be checked, and a
-     stochastic rule is one an LLM judge decides, using the predicate
-     as its prompt. The directory as prefix keeps every id the
-     detectors emit today valid; a detector id that matches no
-     heading slug is renamed to the slug in step 2, where the table
-     makes the mismatch a finding. The same step drains the bodies, one
-     ruleset at a time and the pace rising as the results earn trust,
-     never all 29 at once: one Opus agent owns one ruleset and returns
-     one row per rule and nothing else, the rule id, a verdict, and for
-     fold or split the exact new text. The verdicts, from a fixed
-     rubric: enforcement wiring, a pointer to another Standard, or a
-     reason is deleted; an exemption or definition that changes what
-     passes is folded into the predicate; a body sentence that is
-     itself a constraint is split into a rule of its own; a rule
-     another rule in the same directory already decides is redundant
-     and goes; anything a detector that emits the rule's id already
-     honors is folded, never deleted, and any clause the detector does
-     not decide is cut or split into a rule with no verifier yet, so a
-     deterministic predicate says exactly what its script decides. The
-     session decides every row and puts only the ambiguous ones to the
-     user, each with its pick, and a no is kept with its reason. The
-     prompt is [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md).
-     Two rulesets are left undrained on purpose: every rule in
-     `standard/cards.md` binds the card or the catalog, which step 4
-     deletes, and every rule in `standard/gates.md` binds a gate,
-     which step 3 turns into the boundary table; each retires at its
-     step, where its teaching joins `docs/guides/standard.md`.
-     Reason: a rule tagged and left with its body is orphaned
-     work, and a loop that begins with 232 findings across 29 files has
-     no small first move; this is the first instance run by hand, an
-     act that drafts, a yield per rule, an act that applies.
-     The session, never an agent, runs the gates once the agents of a
-     standard return, `scripts/playbook-lint` and `uv run pytest -q`
-     both, since a test outside `standards/` can parse a ruleset's
-     citations; agents share one tree and cannot tell whose failure
-     they see.
-     To do when every ruleset is drained: one quick holistic pass over
-     all 29, generating the two tables of steps 2 and 3, the verifiers
-     and the gates, and reading them across Standards for overlap and
-     duplication before step 2 begins. The same pass asks of every
-     ruleset whether its drained bodies were rules or teaching: where
-     a body carried the vocabulary, diagrams, and reasoning behind the
-     rules, that material is restored as a guide at
-     `docs/guides/<name>.md`, one per Standard directory, the way
-     `standards/modules/design.md` split into the seven-rule ruleset
-     and `docs/guides/modules.md`; prose `block-form-fits-its-content`
-     and python `fail-loudly` and `helper-justification` are the
-     candidates already seen.
+  1. *Standard takes its new shape.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
   2. *The verifier table and `audit`.* One table maps every rule id to
      a script, a judge, or null, one row per id, keyed by id; dev-playbook
      holds the rows for its own rules and a consumer repo holds rows for
@@ -179,6 +125,21 @@ specification.
      emits is `<name>.<slug>`, a rule heading of a Standard in
      `standards/<name>/`, and a row of the table", which is the
      table lint that supersedes standards-lint's `rule-matrix`.
+     The renames that lint forces are the Emitted ids table of
+     [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#emitted-ids):
+     seventy of the seventy-nine ids the detectors emit are no rule
+     heading today. Four of them are decided here, not renamed:
+     `prose.banned-word` gets a deterministic rule of its own in
+     `prose/conventions.md` once prose-lint allows the one mention
+     that states it, since today the rule cannot be written without
+     tripping the check, and the check's scan of code and config
+     beyond the prose population is settled at the same time;
+     `knowledge-organization.doc-shape` splits into README Content's
+     `h1` and CONTEXT.md Content's `the-language-section`;
+     `tracking.no-blocked-label` retires, subsumed by
+     `tracking.valid-labels`; and `registry-location`, a migration
+     check on a legacy registry document, is kept under
+     `local-declaration` or dropped.
   3. *Boundaries read ids from config.* A second table, one per repo and
      never inherited, names the rule ids each boundary runs: the commit
      hook, `make check`, CI, and a loop's check. Every id it names
@@ -202,7 +163,13 @@ specification.
      detector a card cites is in the commit gate's roster or
      registered ungated, becomes the table's rule: every rule id with
      a verifier is named by some boundary or listed as ungated on
-     purpose.
+     purpose. Two facts the boundary table of
+     [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#boundary-table)
+     carries into this step: the canonical `ci.yml`'s `SKIP` removes
+     `ref-lint` from CI in every governed repo, which the config
+     states as that detector's boundaries rather than as an
+     environment variable, and the same `SKIP` names `web-typecheck`,
+     a hook only dev-playbook has, which leaves the canonical file.
   4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
      Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
      files, retire `Standard-Ruleset`, and bind the type `Standard` to
@@ -251,7 +218,14 @@ specification.
      today. `standard/consuming.md` is rewritten as the post-card
      recipe, not moved, since its steps name cards, Audit cells, and
      standards-lint's consumer mode. `standard/detectors.md`'s
-     `the-hosting-pattern` loses its Audit-cell leg here.
+     `the-hosting-pattern` loses its Audit-cell leg here, and
+     Document Types' `typed-standard-card-or-standard-ruleset`
+     becomes the rule for the one type `Standard`. Of the six
+     Guides leaving `standards/`, `harness/files.md` and
+     `harness/writing-for-agents.md` have `docs/guides/harness.md`
+     to fold into and `knowledge-organization/file-roles.md` has
+     `docs/guides/knowledge-organization.md`, where each is
+     teaching; the case-by-case rule above still decides.
   5. *`Object` becomes `DocType`, and the one-module lint.* The
      pseudocode left the three `contract-shape.md` files in PR #491 and
      sits whole in
@@ -304,7 +278,12 @@ specification.
      becomes an issue that names the rule id and the failing members,
      `standard.thin-shims` and the five detectors that hold their own
      logic, `okf-lint`, `repo-lint`, `harness-files-lint`, `ref-lint`,
-     and `python-lint`, being the first. A predicate that turns out
+     and `python-lint`, being the first, and the four rules the
+     holistic pass wrote or restored, `decisions.immutable-after-merge`,
+     `knowledge-organization.skill-invocation`,
+     `distribution.a-valid-manifest`, and the renamed
+     `knowledge-organization.mapping-entry-shape`, being next, since
+     no run has confirmed them. A predicate that turns out
      undecidable as written is rewritten or deleted. Reason: step 1's
      kind tags are aspirational, deterministic meaning a script could
      decide the rule and not that one does, and the drains were
@@ -353,6 +332,22 @@ specification.
   defined by the cut in [Doc-Type](/doc-types/doc-type.md). The shape
   it carries there is the one the refactor replaces with
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)'s.
+
+- **Standard takes its new shape, 2026-09-20.** Step 1 of The system.
+  Every rule in the 25 drained rulesets is a heading, a predicate, and
+  a trailer `` `<name>.<slug>` · deterministic|stochastic ``, 251 rules
+  in all, drained one ruleset at a time by the
+  [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md)
+  rubric; `standard/cards.md` and `standard/gates.md` stay undrained
+  for steps 4 and 3. Teaching the drains displaced is a guide at
+  `docs/guides/<name>.md`, twelve in all, one per Standard directory.
+  The closing pass drew the verifier and boundary tables by hand,
+  read the rulesets across each other, and left its findings and
+  every deferral in
+  [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md),
+  each deferral also named at the step that owns it. Reason: a loop
+  cannot route a rule without an id and a kind, and text no verifier
+  reads is text the state is not held to.
 
 ## Acronyms
 

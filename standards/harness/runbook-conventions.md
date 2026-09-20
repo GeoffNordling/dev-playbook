@@ -19,6 +19,9 @@ craft of the body, the two loads, the information hierarchy, and
 pruning, is [Writing for Agents](/standards/harness/writing-for-agents.md),
 read to write one; this Standard wins where the two collide.
 
+The reasoning behind the rules is the
+[Harness Guide](/docs/guides/harness.md).
+
 ## Location
 
 A skill is `<skills root>/<name>/SKILL.md` and an agent is

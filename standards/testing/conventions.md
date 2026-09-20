@@ -18,6 +18,9 @@ That `tests/` exists at all is
 [File Skeleton](/standards/build/skeleton.md#tests-present)'s rule; what
 goes where inside it is this Standard's.
 
+The reasoning behind the rules is the
+[Test Design Guide](/docs/guides/testing.md).
+
 ## pytest
 
 A governed repo's Python test suite runs on pytest.

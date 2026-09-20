@@ -1,5 +1,5 @@
 ---
-type: General-Sheet
+type: Guide
 title: Test Design Guide
 description: The thinking behind the testing rules — what a test verifies, the tautological test, the non-deterministic boundary, the ladder of doubles, what a fake is, where a mock stands, and why layered coverage is waste
 ---

@@ -17,6 +17,9 @@ material, the source of the
 [canonical artifacts](/standards/build/canonical.md), and no tree rule
 reads it.
 
+The reasoning behind the rules is the
+[Build Guide](/docs/guides/build.md).
+
 ## Required files
 
 `README.md`, `CLAUDE.md`, `index.md`, `.gitignore`,
@@ -80,8 +83,7 @@ names.
 ## Python source
 
 A repo in which `src/` exists beside a root `pyproject.toml`, or
-`scripts/` holds a Python file: a `.py` file, or a file with no extension
-whose first line is a Python shebang.
+`scripts/` holds a [Python file](/standards/build/python.md#scripts).
 
 `build.python-source` · deterministic
 

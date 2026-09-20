@@ -18,6 +18,9 @@ record's `description`, and follows the
 > architectural subset of this kind. A Decision Record generalizes the
 > same artifact past architecture to any hard-to-reverse decision.
 
+The reasoning behind the rules is the
+[Decisions Guide](/docs/guides/decisions.md).
+
 ## The bar
 
 A Decision Record records a decision that is hard to reverse, surprising
@@ -95,6 +98,14 @@ was made, written `YYYY-MM-DD`, or holds `null` where that day is
 unrecoverable.
 
 `decisions.date` · deterministic
+
+## Immutable after merge
+
+A Decision Record that `main` carries has its body, and every
+frontmatter key other than `status`, byte-identical to the first
+commit on `main` that carries the file.
+
+`decisions.immutable-after-merge` · deterministic
 
 ## Status vocabulary
 

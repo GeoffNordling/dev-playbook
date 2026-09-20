@@ -33,6 +33,9 @@ level up and one level down. Two reach farther by their own text,
 [terms that cross sets](#terms-that-cross-sets) into the repo's
 `CONTEXT.md`; a set is otherwise judged with no neighbour's body open.
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## An index in every directory
 
 A set's members sit in the directory of its `index.md`; every

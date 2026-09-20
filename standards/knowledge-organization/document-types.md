@@ -20,6 +20,9 @@ holds the boundary in code with its further exclusions, the transient
 `PLAN.md` and `PROGRESS.md` pair, the root `tmp/` tree, and every
 top-level `tests/` tree.
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## Frontmatter block
 
 A concept document opens with a `---`-delimited frontmatter block whose

@@ -19,6 +19,9 @@ loads is [Claude Code Files](/standards/harness/files.md); the voice a
 `CLAUDE.md` speaks in is Doc Conventions'
 [No first person](/standards/prose/conventions.md#no-first-person).
 
+The reasoning behind the rules is the
+[Harness Guide](/docs/guides/harness.md).
+
 ## No frontmatter
 
 A `CLAUDE.md` opens on its content, with no YAML frontmatter block.

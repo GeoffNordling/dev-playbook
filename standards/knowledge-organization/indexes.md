@@ -17,6 +17,9 @@ repository: an agent triages a document by its frontmatter and navigates
 between documents by the per-directory `index.md`, loading a body only
 when the document is relevant.
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## Typeless
 
 An `index.md` carries no OKF `type`.

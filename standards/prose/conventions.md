@@ -13,6 +13,9 @@ verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
 `.prose-lint-exempt` at its root, under a comment saying why.
 
+The reasoning behind the rules is the
+[Prose Guide](/docs/guides/prose.md).
+
 ## One rule, one place
 
 Each rule the document states lives in the lead sentence of its section.

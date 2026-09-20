@@ -15,6 +15,9 @@ material, outside every tree rule
 ([File Skeleton](/standards/build/skeleton.md)); its `pyproject.toml` is a
 template.
 
+The reasoning behind the rules is the
+[Build Guide](/docs/guides/build.md).
+
 ## ci.yml
 
 `.github/workflows/ci.yml` is byte-identical to the canonical

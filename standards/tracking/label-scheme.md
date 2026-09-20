@@ -36,6 +36,9 @@ renders that data as the table below. Which labels an issue carries is
 | `origin:deferral` | Opened by the factory to hold work a review suggested and the run deferred. |
 <!-- labelgen:end -->
 
+The reasoning behind the rules is the
+[Tracking Guide](/docs/guides/tracking.md).
+
 ## Valid labels
 
 A governed repo's GitHub labels are exactly the labels declared in the

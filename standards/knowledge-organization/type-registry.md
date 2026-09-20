@@ -18,6 +18,9 @@ the two, and against the global table alone when the repo declares no
 `okf_types`. Declaring a local type is one step of
 [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## Global table
 
 The declaration is the `## Types` table of
@@ -57,13 +60,13 @@ declares for itself.
 
 `knowledge-organization.local-declaration` · deterministic
 
-### Entry shape
+### Mapping entry shape
 
 Each entry's key is a type name in Title Case, hyphen-joined for a
 multi-word name, and its value is a non-empty one-line description of
 the type.
 
-`knowledge-organization.entry-shape` · deterministic
+`knowledge-organization.mapping-entry-shape` · deterministic
 
 ### Alphabetical keys
 

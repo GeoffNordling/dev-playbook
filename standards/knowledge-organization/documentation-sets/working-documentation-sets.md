@@ -23,6 +23,9 @@ worklist, held in one member or in one subdirectory with its own
 `ROOT.md`. Below, `ROOT.md` is the nearest root above the member, and
 the set is the whole tree, strands included.
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## Speculative voice
 
 Every member of a working documentation set writes a guess as a guess

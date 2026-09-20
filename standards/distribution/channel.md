@@ -18,12 +18,22 @@ the standard, hook code, a canonical artifact, or a version pin, reaches a
 consumer only when its pinned `rev` moves; the release is the bump
 ([Distribution](/standards/distribution/card.md)).
 
+The reasoning behind the rules is the
+[Distribution Guide](/docs/guides/distribution.md).
+
 ## A publisher dogfoods its manifest
 
 A repo whose root holds `.pre-commit-hooks.yaml` lists every hook id that
 file publishes under a `repo: local` block of its `.pre-commit-config.yaml`.
 
 `distribution.a-publisher-dogfoods-its-manifest` · deterministic
+
+## A valid manifest
+
+A `.pre-commit-hooks.yaml` at a governed repo's root passes
+`pre-commit validate-manifest`.
+
+`distribution.a-valid-manifest` · deterministic
 
 ## A pinned rev
 

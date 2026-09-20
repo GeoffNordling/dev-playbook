@@ -15,6 +15,9 @@ the encoding its file takes,
 doc-type binds nobody, so this Standard is what binds the file to that
 encoding.
 
+The reasoning behind the rules is the
+[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+
 ## One graph
 
 A document typed `Loop` holds one H1, then one paragraph, then one

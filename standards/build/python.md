@@ -11,6 +11,9 @@ A governed repo has one Python project, at the root
 ([File Skeleton](/standards/build/skeleton.md#root-only-files)); this
 Standard binds it.
 
+The reasoning behind the rules is the
+[Build Guide](/docs/guides/build.md).
+
 ## Name mapping
 
 The root `pyproject.toml` sets `project.name` to the repo directory's
