@@ -88,39 +88,95 @@ specification.
 ## Planned
 
 - **The system.** The refactor toward the reference model and the
-  specification, in order; each step exists because the step after it
-  binds to what the step produces, and the reasons are here because
-  the agent doing the work was not in the conversation that decided
-  them.
+  specification. The target shape of one rule, decided 2026-09-20: a heading,
+  the predicate, and a trailer line, nothing else. The predicate is
+  everything between the heading and the trailer, a list of exemptions
+  included when the check needs one, and it is written so that
+  deterministic code lifts it verbatim into a judge's prompt, alone or
+  concatenated with other stochastic rules for one judge call. A body
+  after the trailer is not part of the target: what the 232 bodies
+  hold today is enforcement wiring, which step 3 removes, pointers to
+  other Standards, which the fact base carries, and exemptions, which
+  belong inside the predicate. Reason: text that no verifier reads is
+  text the state is not held to, and the split between a checked first
+  paragraph and an unchecked body is where the prose and the verifier
+  drift apart.
   1. *Standard takes its new shape.* Every rule gets an id,
-     `<standard>.<slug>`, and a kind, deterministic or stochastic, on
-     a trailer line after its predicate paragraph, and a rule may sit
-     under another rule as its condition. Reason: a loop's check routes
-     each rule to a verifier by id and kind, so a rule without both
-     cannot be checked, and a stochastic rule is one an LLM judge
-     decides, using the predicate paragraph as its prompt.
-  2. *The verifier table and `audit`.* One table in the toolchain maps
-     every rule id to exactly one script or judge, and one `audit`
-     function in the package routes ids through it, skips a rule whose
-     condition fails, and returns findings, each one member and one
-     rule id. Reason: this is the one place the Standard files and the
-     code meet, so a rule with no verifier or a verifier with no rule
-     is a lint failure, not a silent gap. The table's shape as declared
+     `<name>.<slug>`, the `standards/<name>/` directory then the
+     heading's GitHub slug, `build.uvlock-and-python-version`, and a
+     kind, deterministic or stochastic, on a trailer line after its
+     predicate, `` `build.uvlock-and-python-version` · deterministic ``,
+     the form the specification files already use. A condition is a
+     rule and carries both; the rules under it name it as their
+     condition. Reason: a loop's check routes each rule to a verifier
+     by id and kind, so a rule without both cannot be checked, and a
+     stochastic rule is one an LLM judge decides, using the predicate
+     as its prompt. The directory as prefix keeps every id the
+     detectors emit today valid; a detector id that matches no
+     heading slug is renamed to the slug in step 2, where the table
+     makes the mismatch a finding. The same step drains the bodies, one
+     ruleset at a time and the pace rising as the results earn trust,
+     never all 29 at once: one Opus agent owns one ruleset and returns
+     one row per rule and nothing else, the rule id, a verdict, and for
+     fold or split the exact new text. The verdicts, from a fixed
+     rubric: enforcement wiring, a pointer to another Standard, or a
+     reason is deleted; an exemption or definition that changes what
+     passes is folded into the predicate; a body sentence that is
+     itself a constraint is split into a rule of its own; anything a
+     detector that emits the rule's id already honors is folded, never
+     deleted, so prose and code stay in step. The user answers yes or
+     no per row before the file is edited, and a no is kept with its
+     reason. Reason: a rule tagged and left with its body is orphaned
+     work, and a loop that begins with 232 findings across 29 files has
+     no small first move; this is the first instance run by hand, an
+     act that drafts, a yield per rule, an act that applies.
+  2. *The verifier table and `audit`.* One table maps every rule id to
+     a script, a judge, or null, one row per id, keyed by id; dev-playbook
+     holds the rows for its own rules and a consumer repo holds rows for
+     the rules it invents, unioned in downhill only, the pattern the type
+     registry already uses. Null is allowed: the table's job is the map,
+     not the fill, and a null row is a gap the view shows rather than a
+     failure. One `audit(standard, state)` function in the package parses
+     the file, skips a rule whose condition fails on the member, skips a
+     null row, runs a script for a deterministic rule, batches the
+     stochastic rules' predicates into one judge prompt, and returns
+     findings, each one member and one rule id. Reason: this is the one
+     place the Standard files and the code meet, so a table row naming
+     no rule, a rule with no row, or a consumer row naming a dev-playbook
+     id is a lint failure, not a silent gap. The table's shape as declared
      data the fact base extracts is the fact base strand's item
      ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
-  3. *Boundaries read ids from config.* The commit hook, `make check`,
-     CI, and a loop's check each name the rule ids they run, in config,
-     not in the Standard. Reason: which boundary runs a rule is
-     wiring, and a Standard that states its own enforcement cannot be
-     audited by a loop without also being gated; the same rule must
-     be gated in one repo and aspirational in another. The config's
-     shape as declared data is the same fact base item as step 2's.
+  3. *Boundaries read ids from config.* A second table, one per repo and
+     never inherited, names the rule ids each boundary runs: the commit
+     hook, `make check`, CI, and a loop's check. Every id it names
+     resolves in the verifier union. Reason: which boundary runs a rule
+     is wiring, and a Standard that states its own enforcement cannot be
+     audited by a loop without also being gated; the same rule is gated
+     in one repo and aspirational in another, which one shared table
+     could not say. The two tables are two files because they have two
+     owners, the verifier map workspace-wide and the boundary map one
+     repo's; both live under `standards/` as plain data, format decided
+     when step 2 is built. The config's shape as declared data is the
+     same fact base item as step 2's.
   4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
      Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
-     files, and bind the type `Standard` to `standards/<name>/<topic>.md`.
-     Reason: the reference model places every cell elsewhere, Define is
-     the Standard file, Audit is the verifier table, Enforce is the
-     boundary config, and Adopt was never a primitive; and viewing is
+     files, retire `Standard-Ruleset`, and bind the type `Standard` to
+     `standards/<name>/<topic>.md`. The directory's `index.md` carries
+     the one-line description the card's question sentence carried, and
+     the catalog row reads it from there. The six Guides under
+     `standards/` today, `build/bootstrap.md`, `standard/consuming.md`,
+     `tracking/linking-issues.md`, `harness/files.md`,
+     `harness/writing-for-agents.md`, and
+     `knowledge-organization/file-roles.md`, leave the tree, each one
+     converted to a runbook where it is a procedure, deleted where a
+     runbook already covers it, or moved where it is neither; `docs/` is
+     not a destination, since it holds the high-level intentional
+     documents, and the rule for where such a file goes is decided case
+     by case at this step, not before. Six of standards-lint's seven
+     rules go with the card; `rule-matrix` is superseded by step 2's
+     table lint. Reason: the reference model places every cell elsewhere,
+     Define is the Standard file, Audit is the verifier table, Enforce is
+     the boundary config, and Adopt was never a primitive; and viewing is
      out of scope for this work.
      [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#what-goes-where)
      lists each disposition. The fact base's extractors item strikes
@@ -128,14 +184,25 @@ specification.
      with its `.txt` file; its logic moves into the package as the
      `standard` extractor, per that item
      ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
-  5. *`Object` becomes `DocType`, and the one-module lint.* Rename
-     across `doc-type.md` and the three `contract-shape.md` files, nest
-     each part inside its doc-type's class, and add the linter that
-     concatenates the four pseudocode fences and parses them as one
-     Python module. Reason: the parts, Edge, Rule, Act, Check, Yield,
-     are not doc-types and must not extend the base; the linter is the
-     first verifier for the specification and is what makes the three
-     contract shapes one design instead of three.
+     A consumer repo's cards, story-forge's five among them, are deleted
+     by that repo at its next pin bump.
+  5. *`Object` becomes `DocType`, and the one-module lint.* The
+     pseudocode left the three `contract-shape.md` files in PR #491 and
+     sits whole in
+     [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language),
+     so this step splits it back: `DocType`, `Target`, and `Finding` to
+     `doc-type.md`, each doc-type's class with its nested parts to its
+     own `contract-shape.md`, and the reference model keeps the toolchain
+     half and the fit. The `Standard` class is written in the shape
+     steps 1 to 4 produce: location `standards/<name>/<topic>.md`,
+     frontmatter `type`, `title`, `description`, `population`, a `Rule`
+     of id, kind, predicate, and condition, and no pointer to a script or
+     a gate. Then add the linter that concatenates the four fences and
+     parses them as one Python module. Reason: the parts, Edge, Rule,
+     Act, Check, Yield, are not doc-types and must not extend the base;
+     the linter is the first verifier for the specification, whose
+     `one-base` and `one-module` rules name `contract-shape.md`, and is
+     what makes the three contract shapes one design instead of three.
   6. *Runbook's two edits.* `accept` replaces `args` as the verb for
      an input edge, and `never write` becomes a `banned` polarity on a
      write edge. Reason: every operation on an edge must be one of the
@@ -143,9 +210,13 @@ specification.
      neither a verb.
   7. *The specification becomes a Standard.* Move
      [specification/](/working-docs/doc-type-system/doc-type-system/specification/index.md)
-     under `standards/` in the shape step 1 produces, bound to no repo
-     boundary. Reason: the first loop's checks point at it, and a loop
-     must not bind to the Standard shape that step 4 deletes.
+     under `standards/` in the shape step 1 produces, bound to no
+     boundary, and add one rule to the Standard file:
+     `doc-type-system.standard.no-body`, deterministic, nothing follows
+     a rule's trailer. Reason: the first loop's checks point at it, and
+     a loop must not bind to the Standard shape that step 4 deletes; the
+     no-body rule holds on the day it lands because step 1 drained the
+     bodies, and it keeps them drained.
   8. *Ban the word guard.* See the banned words below.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
   system, after step 7: its checks point at the specification as a
