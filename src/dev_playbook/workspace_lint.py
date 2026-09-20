@@ -24,8 +24,7 @@ in, so governance is declared rather than inferred. For each governed repo:
     rules rather than from the ruleset list, so a ruleset that reaches the
     branch carrying nothing required is never looked at.
   - **labels** — compare the repo's labels against the canonical scheme at full
-    parity (a finding exactly when bootstrap-labels would repair), and flag any
-    label naming a blocked state.
+    parity (a finding exactly when bootstrap-labels would repair).
   - **issues** — from one open-issues read, check each open issue against the
     shape rules of its species: a build leaf's four-tuple validity and brief
     shape, a build epic's category-only shape, and a wayfinder map's or decision
@@ -63,43 +62,51 @@ from dev_playbook.findings import print_rules, render
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
 # Every rule id this detector can emit. Repo-settings drift, reachability, and
-# the live-repo tracking checks (label scheme, blocked labels, four-tuple
-# validity, brief shape, epic shape, wayfinder shape) answer the tracking card;
-# a stale dev-playbook pin answers the build card (non-blocking).
+# the live-repo tracking checks (label scheme, leaf labels and headings, epic
+# labels, wayfinder labels and body) answer the tracking card; a stale
+# dev-playbook pin answers the build card (non-blocking).
 # Informational pin lines carry no rule id. Each id is a module-level constant so
 # every emission site references the constant, never a raw literal, and RULES
 # (what --list-rules prints) cannot drift from what the detector actually emits.
-SETTINGS = "tracking.settings"
-PROTECTION = "tracking.branch-protection"
-REMOTE = "tracking.remote"
-LABEL_SCHEME = "tracking.label-scheme"
-NO_BLOCKED_LABEL = "tracking.no-blocked-label"
-ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
-EPIC_SHAPE = "tracking.epic-shape"
-WAYFINDER_SHAPE = "tracking.wayfinder-shape"
-TUPLE_VALID = "tracking.tuple-valid"
-SESSION_SHAPE = "tracking.session-shape"
-PIN = "distribution.pin"
+SQUASH_ONLY_MERGES = "tracking.squash-only-merges"
+DEFAULT_BRANCH_PROTECTION = "tracking.default-branch-protection"
+GITHUB_ORIGIN = "tracking.github-origin"
+VALID_LABELS = "tracking.valid-labels"
+CLOSED_FENCES = "tracking.closed-fences"
+BUILD_LABELS = "tracking.build-labels"
+BUILD_HEADINGS = "tracking.build-headings"
+SPIKE_LABELS = "tracking.spike-labels"
+SPIKE_HEADINGS = "tracking.spike-headings"
+SESSION_LABELS = "tracking.session-labels"
+SESSION_HEADINGS = "tracking.session-headings"
+CATEGORY_ONLY = "tracking.category-only"
+WAYFINDER_LABELS = "tracking.wayfinder-labels"
+WAYFINDER_BODY = "tracking.wayfinder-body"
+A_PINNED_REV = "distribution.a-pinned-rev"
 
 RULES = (
-    SETTINGS,
-    PROTECTION,
-    REMOTE,
-    LABEL_SCHEME,
-    NO_BLOCKED_LABEL,
-    ISSUE_BRIEF_SHAPE,
-    EPIC_SHAPE,
-    WAYFINDER_SHAPE,
-    TUPLE_VALID,
-    SESSION_SHAPE,
-    PIN,
+    SQUASH_ONLY_MERGES,
+    DEFAULT_BRANCH_PROTECTION,
+    GITHUB_ORIGIN,
+    VALID_LABELS,
+    CLOSED_FENCES,
+    BUILD_LABELS,
+    BUILD_HEADINGS,
+    SPIKE_LABELS,
+    SPIKE_HEADINGS,
+    SESSION_LABELS,
+    SESSION_HEADINGS,
+    CATEGORY_ONLY,
+    WAYFINDER_LABELS,
+    WAYFINDER_BODY,
+    A_PINNED_REV,
 )
 
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issue-shapes.md states them (§ Build headings, § Spike
 # headings, and § Session headings) — the doc and this rule read one contract
 # and cannot disagree.
-BUILD_HEADINGS = (
+BUILD_HEADING_LIST = (
     "Summary",
     "User intent",
     "Current behavior",
@@ -109,8 +116,8 @@ BUILD_HEADINGS = (
     "Prohibited surfaces",
     "Out of scope",
 )
-SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
-SESSION_HEADINGS = (
+SPIKE_HEADING_LIST = ("Summary", "Question", "Deliverable")
+SESSION_HEADING_LIST = (
     "Summary",
     "User intent",
     "Current behavior",
@@ -124,7 +131,7 @@ SESSION_HEADINGS = (
 # ``§ Tickets`` of dotfiles/.agents/skills/wayfinder/SKILL.md). The skill — not
 # this workspace — is the definition of a map's shape, per
 # standards/tracking/issue-shapes.md § Wayfinder map or ticket, so this rule
-# mirrors the skill directly, the way BUILD_HEADINGS mirrors the brief standard.
+# mirrors the skill directly, the way BUILD_HEADING_LIST mirrors the brief standard.
 # The bundle is installed verbatim at a pin, which is what makes the mirror
 # stable: a pin bump delta-checks these tuples against the upstream text.
 # Wayfinder writes ``##`` sections, not the bold headings a brief uses.
@@ -267,7 +274,7 @@ class Line:
     @property
     def stale(self) -> bool:
         """Whether this line reports a stale (non-blocking) dev-playbook pin."""
-        return self.rule == PIN and not self.blocking
+        return self.rule == A_PINNED_REV and not self.blocking
 
     def render(self) -> str:
         """The finding rendered as ``repo: card.rule message``."""
@@ -394,16 +401,16 @@ def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
     name = repo.name
     config = repo / ".pre-commit-config.yaml"
     if not config.is_file():
-        return Line(name, PIN, "no .pre-commit-config.yaml", blocking=True)
+        return Line(name, A_PINNED_REV, "no .pre-commit-config.yaml", blocking=True)
     rev = pinned_rev(config.read_text(encoding="utf-8"), url)
     if rev is None:
-        return Line(name, PIN, "no dev-playbook pin", blocking=True)
+        return Line(name, A_PINNED_REV, "no dev-playbook pin", blocking=True)
     current = main_sha == rev or (len(rev) >= 7 and main_sha.startswith(rev))
     if current:
         return Line(name, None, "pin current")
     return Line(
         name,
-        PIN,
+        A_PINNED_REV,
         f"{rev} (hook repo main is {main_sha[:12]})",
     )
 
@@ -593,15 +600,27 @@ def check_settings(repo: Path, slug: str | None) -> list[Line]:
     name = repo.name
     if slug is None:
         return [
-            Line(name, REMOTE, "no GitHub origin; settings unchecked", blocking=True)
+            Line(
+                name,
+                GITHUB_ORIGIN,
+                "no GitHub origin; settings unchecked",
+                blocking=True,
+            )
         ]
     settings = fetch_settings(slug)
     if settings is None:
-        return [Line(name, SETTINGS, f"unreachable via gh api ({slug})", blocking=True)]
+        return [
+            Line(
+                name,
+                SQUASH_ONLY_MERGES,
+                f"unreachable via gh api ({slug})",
+                blocking=True,
+            )
+        ]
     return [
         Line(
             name,
-            SETTINGS,
+            SQUASH_ONLY_MERGES,
             f"{field} is {settings.get(field)!r} (want {want!r})",
             blocking=True,
         )
@@ -632,7 +651,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
         return [
             Line(
                 name,
-                PROTECTION,
+                DEFAULT_BRANCH_PROTECTION,
                 f"rules unreachable via gh api ({slug})",
                 blocking=True,
             )
@@ -642,7 +661,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
     lines = [
         Line(
             name,
-            PROTECTION,
+            DEFAULT_BRANCH_PROTECTION,
             f"{branch} is not protected against {operation}",
             blocking=True,
         )
@@ -654,7 +673,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
         lines.append(
             Line(
                 name,
-                PROTECTION,
+                DEFAULT_BRANCH_PROTECTION,
                 f"a ruleset protecting {branch} could not be read",
                 blocking=True,
             )
@@ -667,7 +686,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
             lines.append(
                 Line(
                     name,
-                    PROTECTION,
+                    DEFAULT_BRANCH_PROTECTION,
                     f"ruleset {ruleset.name!r} enforcement is "
                     f"{ruleset.enforcement!r} (want 'ACTIVE')",
                     blocking=True,
@@ -678,7 +697,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
             lines.append(
                 Line(
                     name,
-                    PROTECTION,
+                    DEFAULT_BRANCH_PROTECTION,
                     f"ruleset {ruleset.name!r} grants bypass to {count} "
                     f"actor{'' if count == 1 else 's'} (want none)",
                     blocking=True,
@@ -689,7 +708,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
         lines.append(
             Line(
                 name,
-                PROTECTION,
+                DEFAULT_BRANCH_PROTECTION,
                 f"{branch} is protected by {filed}, not by the canonical "
                 f"{CANONICAL_RULESET!r}",
                 blocking=True,
@@ -703,8 +722,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
 
     Mirrors what bootstrap-labels would repair — a finding for every missing
     label, every drifted color/description, and every label outside the closed
-    world — plus its own named rule for any label naming a blocked state (which
-    the closed-world check already flags, deliberately overlapping).
+    world.
     """
     have = {label["name"]: label for label in labels}
     canonical = canonical_labels()
@@ -713,7 +731,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
     for label_name, color, desc in canonical:
         if label_name not in have:
             lines.append(
-                Line(name, LABEL_SCHEME, f"missing label {label_name}", blocking=True)
+                Line(name, VALID_LABELS, f"missing label {label_name}", blocking=True)
             )
         elif (
             have[label_name].get("color", "").lower() != color.lower()
@@ -722,7 +740,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
             lines.append(
                 Line(
                     name,
-                    LABEL_SCHEME,
+                    VALID_LABELS,
                     f"label {label_name} drifted (color/description)",
                     blocking=True,
                 )
@@ -731,16 +749,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
         if label_name not in canonical_names:
             lines.append(
                 Line(
-                    name, LABEL_SCHEME, f"unexpected label {label_name}", blocking=True
-                )
-            )
-        if label_name.split(":")[-1].lower() == "blocked":
-            lines.append(
-                Line(
-                    name,
-                    NO_BLOCKED_LABEL,
-                    f"label {label_name} names a blocked state",
-                    blocking=True,
+                    name, VALID_LABELS, f"unexpected label {label_name}", blocking=True
                 )
             )
     return lines
@@ -819,7 +828,7 @@ def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[L
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} map carries {offending}; a map carries no factory label",
                 blocking=True,
             )
@@ -829,7 +838,7 @@ def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[L
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} map also carries ticket types {types}; a map is not a ticket",
                 blocking=True,
             )
@@ -837,7 +846,7 @@ def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[L
     lines.extend(
         Line(
             name,
-            WAYFINDER_SHAPE,
+            WAYFINDER_BODY,
             f"#{number} map missing {section} section",
             blocking=True,
         )
@@ -863,7 +872,7 @@ def _ticket_findings(
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} ticket carries {offending}; a decision ticket carries no factory label",
                 blocking=True,
             )
@@ -873,7 +882,7 @@ def _ticket_findings(
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} ticket has multiple wayfinder labels: {types}",
                 blocking=True,
             )
@@ -882,7 +891,7 @@ def _ticket_findings(
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} ticket wayfinder:{types[0]} is not a scheme value",
                 blocking=True,
             )
@@ -890,7 +899,7 @@ def _ticket_findings(
     lines.extend(
         Line(
             name,
-            WAYFINDER_SHAPE,
+            WAYFINDER_BODY,
             f"#{number} ticket missing {section} section",
             blocking=True,
         )
@@ -916,7 +925,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic carries {offending}; an epic carries a category label only",
                 blocking=True,
             )
@@ -926,7 +935,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic missing category label",
                 blocking=True,
             )
@@ -935,7 +944,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic has multiple category labels: {categories}",
                 blocking=True,
             )
@@ -944,7 +953,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic category:{categories[0]} is not a scheme value",
                 blocking=True,
             )
@@ -972,7 +981,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf carries {offending}; a session leaf "
                 "carries a category label and mode:session only",
                 blocking=True,
@@ -983,7 +992,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf missing category label",
                 blocking=True,
             )
@@ -992,7 +1001,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf has multiple category labels: {categories}",
                 blocking=True,
             )
@@ -1001,7 +1010,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf category:{categories[0]} is not a scheme value",
                 blocking=True,
             )
@@ -1018,18 +1027,21 @@ def _tuple_findings(
     scheme, and the mode↔tests pairings holding.
     """
     present = {dim: _dimension_values(labels, dim) for dim in TUPLE_DIMENSIONS}
+    # The spike's rule is the build leaf's plus the tests:no pairing; a leaf
+    # whose mode is missing or ambiguous is held to the build leaf's.
+    rule = SPIKE_LABELS if present["mode"] == ["spike"] else BUILD_LABELS
     lines: list[Line] = []
     for dim in TUPLE_DIMENSIONS:
         vals = present[dim]
         if not vals:
             lines.append(
-                Line(name, TUPLE_VALID, f"#{number} missing {dim} label", blocking=True)
+                Line(name, rule, f"#{number} missing {dim} label", blocking=True)
             )
         elif len(vals) > 1:
             lines.append(
                 Line(
                     name,
-                    TUPLE_VALID,
+                    rule,
                     f"#{number} multiple {dim} labels: {vals}",
                     blocking=True,
                 )
@@ -1038,7 +1050,7 @@ def _tuple_findings(
             lines.append(
                 Line(
                     name,
-                    TUPLE_VALID,
+                    rule,
                     f"#{number} {dim}:{vals[0]} is not a scheme value",
                     blocking=True,
                 )
@@ -1049,7 +1061,7 @@ def _tuple_findings(
         lines.append(
             Line(
                 name,
-                TUPLE_VALID,
+                SPIKE_LABELS,
                 f"#{number} mode:spike requires tests:no",
                 blocking=True,
             )
@@ -1061,17 +1073,23 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
     """A leaf's body carries its mode's required brief headings."""
     modes = _dimension_values(labels, "mode")
     if len(modes) != 1:
-        return []  # a missing or ambiguous mode is tuple-valid's finding
+        return []  # a missing or ambiguous mode is the labels rule's finding
     mode = modes[0]
-    required: tuple[str, ...]
     if mode == "spike":
-        required = SPIKE_HEADINGS
-    elif mode == "direct":
-        required = BUILD_HEADINGS
-    elif mode == "session":
-        required = SESSION_HEADINGS
-    else:
-        return []  # an unknown mode value is tuple-valid's finding
+        return _heading_findings(name, number, body, SPIKE_HEADING_LIST, SPIKE_HEADINGS)
+    if mode == "direct":
+        return _heading_findings(name, number, body, BUILD_HEADING_LIST, BUILD_HEADINGS)
+    if mode == "session":
+        return _heading_findings(
+            name, number, body, SESSION_HEADING_LIST, SESSION_HEADINGS
+        )
+    return []  # an unknown mode value is the labels rule's finding
+
+
+def _heading_findings(
+    name: str, number: int, body: str, required: tuple[str, ...], rule: str
+) -> list[Line]:
+    """The body's missing headings under ``rule``, or its unclosed fence."""
     try:
         prose = [line for _, line in md.lines_outside_fences(body)]
     except md.UnclosedFence as unclosed:
@@ -1084,7 +1102,7 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
         return [
             Line(
                 name,
-                ISSUE_BRIEF_SHAPE,
+                CLOSED_FENCES,
                 f"#{number} body has an {unclosed}",
                 blocking=True,
             )
@@ -1092,7 +1110,7 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
     return [
         Line(
             name,
-            ISSUE_BRIEF_SHAPE,
+            rule,
             f"#{number} missing {heading} heading",
             blocking=True,
         )
@@ -1189,10 +1207,10 @@ def check_tracking(repo: Path, slug: str | None) -> list[Line]:
         return []
     return [
         *_fetch_or_report(
-            repo.name, slug, LABEL_SCHEME, "labels", fetch_labels, check_labels
+            repo.name, slug, VALID_LABELS, "labels", fetch_labels, check_labels
         ),
         *_fetch_or_report(
-            repo.name, slug, ISSUE_BRIEF_SHAPE, "issues", fetch_issues, check_issues
+            repo.name, slug, BUILD_LABELS, "issues", fetch_issues, check_issues
         ),
     ]
 

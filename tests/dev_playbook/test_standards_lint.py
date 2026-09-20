@@ -788,7 +788,7 @@ def test_third_party_and_non_script_pointers_are_outside_the_matrix(
     assert sa.check_rule_matrix(repo, fake_list_rules({})) == []
 
 
-# --- standard.hook-surfaces -------------------------------------------------
+# --- standard.the-hosting-pattern -------------------------------------------------
 
 
 def _manifest(ids: list[str], system_ids: list[str] | None = None) -> str:
@@ -922,7 +922,7 @@ def test_manifest_hook_missing_from_local_is_flagged(tmp_path: Path) -> None:
 
     findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
-    assert sa.HOOK_SURFACES in {f.rule for f in findings}
+    assert sa.THE_HOSTING_PATTERN in {f.rule for f in findings}
     assert any("okf-lint" in f.message for f in findings)
 
 
@@ -942,7 +942,8 @@ def test_local_detector_not_in_manifest_is_flagged(tmp_path: Path) -> None:
     findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any(
-        "standards-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+        "standards-lint" in f.message and f.rule == sa.THE_HOSTING_PATTERN
+        for f in findings
     )
 
 
@@ -960,7 +961,10 @@ def test_manifest_hook_missing_from_canonical_is_flagged(tmp_path: Path) -> None
 
     findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
-    assert any("okf-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings)
+    assert any(
+        "okf-lint" in f.message and f.rule == sa.OFFERED_BY_THE_CANONICAL_TEMPLATE
+        for f in findings
+    )
 
 
 def test_detector_hook_missing_from_readme_table_is_flagged(tmp_path: Path) -> None:
@@ -995,7 +999,8 @@ def test_stray_id_in_canonical_dev_block_is_flagged(tmp_path: Path) -> None:
     findings = sa.check_hook_surfaces(repo, dev_playbook_mode=True, roster=tuple(ALL))
 
     assert any(
-        "stray-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+        "stray-lint" in f.message and f.rule == sa.OFFERED_BY_THE_CANONICAL_TEMPLATE
+        for f in findings
     )
 
 
@@ -1140,7 +1145,7 @@ def test_consumer_mode_mirror_still_flags_local_not_in_manifest(tmp_path: Path) 
     findings = sa.check_hook_surfaces(repo, dev_playbook_mode=False)
 
     assert any(
-        "extra-lint" in f.message and f.rule == sa.HOOK_SURFACES for f in findings
+        "extra-lint" in f.message and f.rule == sa.THE_HOSTING_PATTERN for f in findings
     )
 
 

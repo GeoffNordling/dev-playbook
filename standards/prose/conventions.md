@@ -142,6 +142,14 @@ included, never a synonym, in any case, plural, or compound.
 
 `prose.terminology-the-person-is-the-user` · stochastic
 
+## The banned word
+
+No tracked file of the repo, except a path `.prose-lint-exempt` lists,
+contains the word `human`, bare or plural, in any case, alone or in a
+compound, its frontmatter, code spans, and fenced blocks included.
+
+`prose.the-banned-word` · deterministic
+
 ## Spelling
 
 The document's prose spells `judgment`, never the British `judgement` or

@@ -16,9 +16,9 @@ hook, the roster, dogfooding, and the pinned rev.
 ## Audit
 
 - [workspace-lint](/scripts/workspace-lint) — a governed repo with no
-  dev-playbook pin (`distribution.pin`), and a stale pin, advisory
+  dev-playbook pin (`distribution.a-pinned-rev`), and a stale pin, advisory
 - [repo-lint](/scripts/repo-lint) — a publisher whose local block omits an
-  id its manifest publishes (`distribution.dogfood`)
+  id its manifest publishes (`distribution.a-publisher-dogfoods-its-manifest`)
 
 ## Enforce
 

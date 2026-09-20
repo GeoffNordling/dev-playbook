@@ -13,10 +13,10 @@ def test_render_with_line_includes_the_location_line() -> None:
 
 def test_render_without_line_drops_the_line_segment() -> None:
     line = findings.render(
-        "README.md", "knowledge-organization.doc-shape", "missing an H1 title"
+        "README.md", "knowledge-organization.h1", "missing an H1 title"
     )
 
-    assert line == "README.md: knowledge-organization.doc-shape missing an H1 title"
+    assert line == "README.md: knowledge-organization.h1 missing an H1 title"
 
 
 def test_print_rules_prints_sorted_unique_ids_and_returns_zero(

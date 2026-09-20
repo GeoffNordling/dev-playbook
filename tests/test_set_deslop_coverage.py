@@ -45,6 +45,7 @@ EXEMPT: dict[Path, frozenset[str]] = {
             "no-first-person",
             # prose-lint enforces these deterministically.
             "spelling",
+            "the-banned-word",
             "terminology-the-person-is-the-user",
         }
     ),

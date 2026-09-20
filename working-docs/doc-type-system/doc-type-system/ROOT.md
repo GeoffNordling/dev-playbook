@@ -103,43 +103,51 @@ specification.
   drift apart.
   1. *Standard takes its new shape.* Done 2026-09-20; the entry is in
      [Completed](#completed).
-  2. *The verifier table and `audit`.* One table maps every rule id to
-     a script, a judge, or null, one row per id, keyed by id; dev-playbook
-     holds the rows for its own rules and a consumer repo holds rows for
-     the rules it invents, unioned in downhill only, the pattern the type
-     registry already uses. Null is allowed: the table's job is the map,
-     not the fill, and a null row is a gap the view shows rather than a
-     failure. One `audit(standard, state)` function in the package parses
-     the file, skips a rule whose condition fails on the member, skips a
-     null row, runs a script for a deterministic rule, batches the
-     stochastic rules' predicates into one judge prompt, and returns
-     findings, each one member and one rule id. Reason: this is the one
-     place the Standard files and the code meet, so a table row naming
-     no rule, a rule with no row, or a consumer row naming a dev-playbook
-     id is a lint failure, not a silent gap. The table's shape as declared
-     data the fact base extracts is the fact base strand's item
-     ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
-     `standard/detectors.md` is rewritten at this step: its
-     population becomes "a script the verifier table names", and
-     `standard.card-namespaced-rule-ids` becomes "every id a script
-     emits is `<name>.<slug>`, a rule heading of a Standard in
-     `standards/<name>/`, and a row of the table", which is the
-     table lint that supersedes standards-lint's `rule-matrix`.
-     The renames that lint forces are the Emitted ids table of
-     [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#emitted-ids):
-     seventy of the seventy-nine ids the detectors emit are no rule
-     heading today. Four of them are decided here, not renamed:
-     `prose.banned-word` gets a deterministic rule of its own in
-     `prose/conventions.md` once prose-lint allows the one mention
-     that states it, since today the rule cannot be written without
-     tripping the check, and the check's scan of code and config
-     beyond the prose population is settled at the same time;
-     `knowledge-organization.doc-shape` splits into README Content's
-     `h1` and CONTEXT.md Content's `the-language-section`;
-     `tracking.no-blocked-label` retires, subsumed by
-     `tracking.valid-labels`; and `registry-location`, a migration
-     check on a legacy registry document, is kept under
-     `local-declaration` or dropped.
+  2. *The verifier table.* A generator writes the table and is the lint.
+     - The table is a map: one row per rule id, and the address of the
+       thing that decides it, a homegrown script by path, a dependency
+       by its pinned pre-commit hook id, a judge by its file, or null.
+     - The generator reads the rule headings under `standards/<name>/`,
+       asks each check which ids it emits, and writes the table; it
+       fails on an emitted id that is no rule heading, on an address
+       that does not exist, and on a consumer row that names a
+       dev-playbook rule.
+     - Null is allowed: for a stochastic rule, and for the seventy-one
+       deterministic rules no script has ever checked. No step writes
+       those scripts; a rule unchecked before this plan stays unchecked.
+     - dev-playbook's table ships in the package; a consumer's generator
+       adds rows only for the rules that repo declares, the way the
+       type registry unions.
+     - The generated table is committed, and the commit gate regenerates
+       it and fails on a difference.
+     - The checks change the ids they emit to the rule headings: seventy
+       of seventy-nine differ today, listed in the Emitted ids table of
+       [Verifiers and Boundaries](/working-docs/doc-type-system/doc-type-system/verifiers-and-boundaries.md#emitted-ids).
+       Where one id covers several rules the check splits it; where
+       several ids are one rule the check merges them.
+     - Four ids get a decision, not a rename: `prose.banned-word` gets
+       a deterministic rule in `prose/conventions.md`, which needs
+       prose-lint to allow the one mention that states it;
+       `knowledge-organization.doc-shape` splits into README Content's
+       `h1` and CONTEXT.md Content's `the-language-section`;
+       `tracking.no-blocked-label` retires into `tracking.valid-labels`;
+       `registry-location` is kept under `local-declaration` or dropped.
+     - `standard/detectors.md` is rewritten: its population is "a check
+       the table names", and its id rule is what the generator
+       enforces, replacing standards-lint's `rule-matrix`.
+     - No `audit()` function; a judge, when one is built, reads the table.
+     - Progress, 2026-09-20: the renames and splits are done across all
+       eleven detectors and green, uncommitted. Reading the code showed
+       the worksheet overclaimed six rules no check decides, so they stay
+       null: `an-act-links-a-runbook`, `harness.tool-fields`,
+       `row-description`, `resource`, `ticket-parentage`, and
+       `epic-headings`. `registry-location` is kept under
+       `local-declaration`; an unreachable issues read is filed under
+       `tracking.build-labels`. Still to do: the generator and its table,
+       the gate wiring, the `detectors.md` rewrite, deleting `rule-matrix`,
+       and correcting the worksheet's Emitted ids table.
+     Reason: the table is the one place the Standard files and the
+     checks meet, and a generator that fails cannot drift from either.
   3. *Boundaries read ids from config.* A second table, one per repo and
      never inherited, names the rule ids each boundary runs: the commit
      hook, `make check`, CI, and a loop's check. Every id it names
@@ -170,6 +178,10 @@ specification.
      states as that detector's boundaries rather than as an
      environment variable, and the same `SKIP` names `web-typecheck`,
      a hook only dev-playbook has, which leaves the canonical file.
+     Step 2 filed standards-lint's closure leg, a cited detector that is
+     neither in the playbook-lint roster nor a registered ungated audit,
+     under `standard.the-hosting-pattern`; this step moves it to the
+     boundary table.
   4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
      Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
      files, retire `Standard-Ruleset`, and bind the type `Standard` to

@@ -46,11 +46,11 @@ from dev_playbook.findings import print_rules, render
 # question it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-NO_PRIVATE_ACCESS = "testing.no-private-access"
-MIRROR_LAYOUT = "testing.mirror-layout"
-NO_LOGIC = "testing.no-logic"
+ACCESS_ONLY_PUBLIC_NAMES = "testing.access-only-public-names"
+MIRROR_SOURCE_STRUCTURE = "testing.mirror-source-structure"
+NO_LOGIC_IN_TESTS = "testing.no-logic-in-tests"
 
-RULES = (NO_PRIVATE_ACCESS, MIRROR_LAYOUT, NO_LOGIC)
+RULES = (ACCESS_ONLY_PUBLIC_NAMES, MIRROR_SOURCE_STRUCTURE, NO_LOGIC_IN_TESTS)
 
 # git ls-files already drops gitignored caches; this name filter also covers the
 # rare tracked copy. A test file is scanned when none of its parent directory
@@ -126,7 +126,7 @@ class _PrivacyVisitor(ast.NodeVisitor):
     """Collect private-access findings within one test file's AST.
 
     Both the import reach and the attribute reach emit the one
-    ``testing.no-private-access`` rule; only the message distinguishes them.
+    ``testing.access-only-public-names`` rule; only the message distinguishes them.
     """
 
     def __init__(self, rel: str) -> None:
@@ -208,7 +208,9 @@ class _PrivacyVisitor(ast.NodeVisitor):
 
     def _add(self, node: ast.AST, message: str) -> None:
         self.findings.append(
-            Finding(self.rel, getattr(node, "lineno", 0), NO_PRIVATE_ACCESS, message)
+            Finding(
+                self.rel, getattr(node, "lineno", 0), ACCESS_ONLY_PUBLIC_NAMES, message
+            )
         )
 
 
@@ -270,7 +272,7 @@ def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]
         Finding(
             rel,
             None,
-            MIRROR_LAYOUT,
+            MIRROR_SOURCE_STRUCTURE,
             f"test file for a src module must sit at one of its mirrors ({expected})",
         )
     ]
@@ -304,11 +306,15 @@ def _logic_in_test_body(
     for node in _body_nodes(fn):
         if isinstance(node, ast.If):
             findings.append(
-                Finding(rel, node.lineno, NO_LOGIC, "`if`/`else` in a test body")
+                Finding(
+                    rel, node.lineno, NO_LOGIC_IN_TESTS, "`if`/`else` in a test body"
+                )
             )
         elif isinstance(node, ast.Try):
             findings.append(
-                Finding(rel, node.lineno, NO_LOGIC, "`try`/`except` in a test body")
+                Finding(
+                    rel, node.lineno, NO_LOGIC_IN_TESTS, "`try`/`except` in a test body"
+                )
             )
     return findings
 

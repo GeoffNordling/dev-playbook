@@ -1,7 +1,7 @@
 """Behavioral tests for the prose-lint detector, src/dev_playbook/prose_lint.py.
 
-The rule prose.judgment-spelling flags the British judgement / judgements form
-in authored Markdown; prose.banned-word flags the banned actor noun "human" in
+The rule prose.spelling flags the British judgement / judgements form
+in authored Markdown; prose.the-banned-word flags the banned actor noun "human" in
 every tracked file, with no code-span or fence escape. This test file is listed
 in dev-playbook's own .prose-lint-exempt — its fixtures must name the word to
 test it. The scanning logic is tested with string inputs;
@@ -39,7 +39,7 @@ def test_flags_british_singular() -> None:
     findings = prose_lint.scan_text("f.md", "a judgement call\n")
 
     assert len(findings) == 1
-    assert findings[0].rule == prose_lint.JUDGMENT_SPELLING
+    assert findings[0].rule == prose_lint.SPELLING
     assert findings[0].line == 1
 
 
@@ -93,7 +93,7 @@ def test_flags_banned_actor_noun() -> None:
     findings = prose_lint.scan_banned("f.md", "ask the human first\n")
 
     assert len(findings) == 1
-    assert findings[0].rule == prose_lint.BANNED_WORD
+    assert findings[0].rule == prose_lint.THE_BANNED_WORD
     assert findings[0].line == 1
 
 
@@ -228,7 +228,7 @@ def test_ban_reaches_non_markdown_files(tmp_path: Path) -> None:
     findings = prose_lint.audit(repo)
 
     assert [(f.file, f.rule) for f in findings] == [
-        ("src/tool.py", prose_lint.BANNED_WORD)
+        ("src/tool.py", prose_lint.THE_BANNED_WORD)
     ]
 
 
@@ -350,9 +350,7 @@ def skill(body: str, description: str = "Use when demoing.") -> str:
 
 
 def voice_findings(repo: Path) -> list[prose_lint.Finding]:
-    return [
-        f for f in prose_lint.audit(repo) if f.rule == prose_lint.AGENT_FACING_VOICE
-    ]
+    return [f for f in prose_lint.audit(repo) if f.rule == prose_lint.NO_FIRST_PERSON]
 
 
 def test_claude_md_first_person_fails(tmp_path: Path) -> None:
@@ -504,9 +502,9 @@ def test_list_rules_prints_the_rule_id(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     assert result.stdout.split() == [
-        "prose.agent-facing-voice",
-        "prose.banned-word",
-        "prose.judgment-spelling",
+        "prose.no-first-person",
+        "prose.spelling",
+        "prose.the-banned-word",
     ]
 
 
@@ -524,7 +522,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1
-    assert "doc.md:1: prose.judgment-spelling " in result.stdout
+    assert "doc.md:1: prose.spelling " in result.stdout
 
 
 def test_dev_playbook_self_scan_is_clean() -> None:

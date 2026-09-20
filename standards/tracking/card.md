@@ -23,17 +23,16 @@ lifecycle the phase labels name is
 
 - [workspace-lint](/scripts/workspace-lint) — across repositories via
   `gh api`: a missing GitHub origin, settings drift, and the default
-  branch's protection (`tracking.remote`, `tracking.settings`,
-  `tracking.branch-protection`); label-scheme parity and the
-  blocked-label ban (`tracking.label-scheme`, `tracking.no-blocked-label`);
-  every open post-intake leaf's labels and brief shape
-  (`tracking.tuple-valid`, `tracking.issue-brief-shape`); every session
-  leaf's labels (`tracking.session-shape`); every epic's category-only
-  shape (`tracking.epic-shape`); and every wayfinder map's and decision
-  ticket's shape (`tracking.wayfinder-shape`)
-- [repo-lint](/scripts/repo-lint) — a `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or
-  `IDEAS.md` at any depth (`tracking.rogue-future-work-file`), and a
-  `CANDIDATES.md` outside the repo root (`build.forbidden`)
+  branch's protection (`tracking.github-origin`, `tracking.squash-only-merges`,
+  `tracking.default-branch-protection`); label-scheme parity
+  (`tracking.valid-labels`); every open post-intake leaf's labels,
+  headings, and fences (`tracking.build-labels`, `tracking.build-headings`,
+  `tracking.spike-labels`, `tracking.spike-headings`,
+  `tracking.closed-fences`); every session
+  leaf's labels (`tracking.session-labels`); every epic's category-only
+  labels (`tracking.category-only`); and every wayfinder map's and decision
+  ticket's labels and body (`tracking.wayfinder-labels`,
+  `tracking.wayfinder-body`)
 
 A `CANDIDATES.md` carries `Candidate-List` frontmatter and an index entry like
 any concept doc; okf-lint checks both under the

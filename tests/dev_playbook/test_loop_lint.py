@@ -100,7 +100,9 @@ def test_a_node_with_no_entry_fails(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert result.stdout.startswith("loops/tidy.md: knowledge-organization.loop-nodes ")
+    assert result.stdout.startswith(
+        "loops/tidy.md: knowledge-organization.nodes-and-entries-agree "
+    )
     assert "`extra` has no entry and no yield leads to it" in result.stdout
 
 
@@ -114,7 +116,7 @@ def test_an_entry_with_no_node_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-nodes `ghost` has an entry but is not a node"
+        "knowledge-organization.nodes-and-entries-agree `ghost` has an entry but is not a node"
         in result.stdout
     )
 
@@ -129,7 +131,7 @@ def test_an_edge_the_shape_does_not_allow_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-edges edge `flat` → `user` is check → receiver"
+        "knowledge-organization.edges-follow-the-shape edge `flat` → `user` is check → receiver"
         in result.stdout
     )
 
@@ -142,7 +144,7 @@ def test_a_check_that_links_the_standard_not_the_card_fails(tmp_path: Path) -> N
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "knowledge-organization.loop-entries" in result.stdout
+    assert "knowledge-organization.entries-point-and-condition" in result.stdout
     assert "a check links a card's Audit cell" in result.stdout
 
 
@@ -164,7 +166,7 @@ def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-entries link '/skills/gone.md' does not resolve"
+        "knowledge-organization.entries-point-and-condition link '/skills/gone.md' does not resolve"
         in result.stdout
     )
 
@@ -176,7 +178,8 @@ def test_a_yield_with_no_condition_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-entries `ask` states no condition" in result.stdout
+        "knowledge-organization.entries-point-and-condition `ask` states no condition"
+        in result.stdout
     )
 
 
@@ -186,7 +189,9 @@ def test_verb_sections_out_of_order_fail(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "knowledge-organization.loop-sections verb sections are" in result.stdout
+    assert (
+        "knowledge-organization.three-verb-sections verb sections are" in result.stdout
+    )
 
 
 def test_two_paragraphs_before_the_graph_fail(tmp_path: Path) -> None:
@@ -199,7 +204,7 @@ def test_two_paragraphs_before_the_graph_fail(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-graph 2 paragraphs before the graph"
+        "knowledge-organization.one-graph 2 paragraphs before the graph"
         in result.stdout
     )
 
@@ -220,9 +225,9 @@ def test_list_rules_prints_the_five_rule_ids() -> None:
 
     assert result.returncode == 0
     assert result.stdout.split() == [
-        "knowledge-organization.loop-edges",
-        "knowledge-organization.loop-entries",
-        "knowledge-organization.loop-graph",
-        "knowledge-organization.loop-nodes",
-        "knowledge-organization.loop-sections",
+        "knowledge-organization.edges-follow-the-shape",
+        "knowledge-organization.entries-point-and-condition",
+        "knowledge-organization.nodes-and-entries-agree",
+        "knowledge-organization.one-graph",
+        "knowledge-organization.three-verb-sections",
     ]

@@ -58,7 +58,7 @@ Add the same hook id to the repo's `repo: local` block in
 `.pre-commit-config.yaml`, so the repo runs from its working tree what it
 publishes
 ([The local block covers the manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
-repo-lint's `distribution.dogfood` checks the mirror.
+repo-lint's `distribution.a-publisher-dogfoods-its-manifest` checks the mirror.
 
 ## 5. Station it at a gate
 

@@ -19,9 +19,9 @@ File Skeleton's rule, and everything inside it is this card's.
 
 - [testing-lint](/scripts/testing-lint) — the Python-testing detector,
   three rules: no private-name access from tests
-  (`testing.no-private-access`), test-file mirror placement
-  (`testing.mirror-layout`), and no `if`/`try` logic in a test body
-  (`testing.no-logic`)
+  (`testing.access-only-public-names`), test-file mirror placement
+  (`testing.mirror-source-structure`), and no `if`/`try` logic in a test body
+  (`testing.no-logic-in-tests`)
 
 ## Enforce
 

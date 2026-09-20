@@ -48,7 +48,7 @@ def test_import_of_private_name_from_non_test_module_is_flagged(
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.no-private-access" in result.stdout
+    assert "testing.access-only-public-names" in result.stdout
     assert "tests/test_thing.py" in result.stdout
 
 
@@ -62,11 +62,11 @@ def test_attribute_access_into_private_name_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.no-private-access" in result.stdout
+    assert "testing.access-only-public-names" in result.stdout
 
 
 def test_import_and_attribute_reach_share_one_rule_id(tmp_path: Path) -> None:
-    """Both reaches collapse onto testing.no-private-access; the message differs."""
+    """Both reaches collapse onto testing.access-only-public-names; the message differs."""
     repo = make_repo(
         tmp_path,
         {
@@ -117,7 +117,7 @@ def test_privacy_scans_deprecated_tree(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.no-private-access" in result.stdout
+    assert "testing.access-only-public-names" in result.stdout
     assert "deprecated/tests/test_thing.py" in result.stdout
 
 
@@ -134,7 +134,7 @@ def test_test_file_off_its_module_mirror_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.mirror-layout" in result.stdout
+    assert "testing.mirror-source-structure" in result.stdout
     assert "tests/test_thing.py" in result.stdout
     assert "tests/pkg/test_thing.py" in result.stdout
 
@@ -181,7 +181,7 @@ def test_test_file_under_an_unrecognized_scope_directory_is_flagged(
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.mirror-layout" in result.stdout
+    assert "testing.mirror-source-structure" in result.stdout
     assert "tests/helpers/pkg/test_thing.py" in result.stdout
 
 
@@ -234,7 +234,7 @@ def test_mirror_finding_is_file_level_without_a_line(tmp_path: Path) -> None:
         },
     )
     result = run(repo)
-    assert "tests/test_thing.py: testing.mirror-layout " in result.stdout
+    assert "tests/test_thing.py: testing.mirror-source-structure " in result.stdout
 
 
 # --- no-logic rule ---
@@ -247,7 +247,7 @@ def test_if_statement_in_a_test_body_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.no-logic" in result.stdout
+    assert "testing.no-logic-in-tests" in result.stdout
     assert "tests/test_x.py" in result.stdout
 
 
@@ -266,7 +266,7 @@ def test_try_statement_in_a_test_body_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.no-logic" in result.stdout
+    assert "testing.no-logic-in-tests" in result.stdout
 
 
 def test_if_nested_in_a_loop_in_a_test_body_is_flagged(tmp_path: Path) -> None:
@@ -284,7 +284,7 @@ def test_if_nested_in_a_loop_in_a_test_body_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.no-logic" in result.stdout
+    assert "testing.no-logic-in-tests" in result.stdout
 
 
 def test_if_inside_a_nested_helper_is_exempt(tmp_path: Path) -> None:
@@ -372,9 +372,9 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "testing.no-private-access" in ids
-    assert "testing.mirror-layout" in ids
-    assert "testing.no-logic" in ids
+    assert "testing.access-only-public-names" in ids
+    assert "testing.mirror-source-structure" in ids
+    assert "testing.no-logic-in-tests" in ids
 
 
 def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
@@ -387,4 +387,4 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "tests/test_thing.py:1: testing.no-private-access " in result.stdout
+    assert "tests/test_thing.py:1: testing.access-only-public-names " in result.stdout

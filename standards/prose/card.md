@@ -16,11 +16,11 @@ structure, and brevity.
 ## Audit
 
 - [prose-lint](/scripts/prose-lint) — the prose detector; three rules:
-  `prose.judgment-spelling`, flagging the British `judgement`/`judgements`
-  form in all authored Markdown outside code spans; `prose.banned-word`,
+  `prose.spelling`, flagging the British `judgement`/`judgements`
+  form in all authored Markdown outside code spans; `prose.the-banned-word`,
   flagging the banned actor noun (Terminology: the person is the user) in
   every tracked file this workspace authors, of any type, with no code-span or
-  fence escape; and `prose.agent-facing-voice`, flagging the first person in
+  fence escape; and `prose.no-first-person`, flagging the first person in
   a harness-loaded agent instruction file (Imperative and second person).
   Verbatim `type: Reference` mirrors and the paths a repo declares in its
   root `.prose-lint-exempt` are outside the scan for every one of the three

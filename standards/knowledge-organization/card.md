@@ -26,8 +26,9 @@ the README and CONTEXT.md, cross-references, and documentation sets.
 - [okf-lint](/scripts/okf-lint) — concept-doc frontmatter types, and
   `index.md` presence, introduction, and freshness
 - [ref-lint](/scripts/ref-lint) — Links and Citations resolve
-- [repo-lint](/scripts/repo-lint) — README and CONTEXT.md doc shape
-  (`knowledge-organization.doc-shape`)
+- [repo-lint](/scripts/repo-lint) — README's H1 and CONTEXT.md's Language
+  section (`knowledge-organization.h1`,
+  `knowledge-organization.the-language-section`)
 - [loop-lint](/scripts/loop-lint) — every document typed `Loop` under
   `loops/`: its Mermaid graph agrees with the Acts, Checks, and Yields
   sections around it (`knowledge-organization.loop-*`)

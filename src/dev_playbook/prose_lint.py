@@ -74,11 +74,11 @@ class CannotRun(Exception):
 # Kept module-level constants so every emission site references them, never a
 # raw literal, and RULES (what --list-rules prints) cannot drift from what the
 # detector emits.
-JUDGMENT_SPELLING = "prose.judgment-spelling"
-BANNED_WORD = "prose.banned-word"
-AGENT_FACING_VOICE = "prose.agent-facing-voice"
+SPELLING = "prose.spelling"
+THE_BANNED_WORD = "prose.the-banned-word"
+NO_FIRST_PERSON = "prose.no-first-person"
 
-RULES = (JUDGMENT_SPELLING, BANNED_WORD, AGENT_FACING_VOICE)
+RULES = (SPELLING, THE_BANNED_WORD, NO_FIRST_PERSON)
 
 # The British form: the word "judgement", optionally pluralized, as a whole word
 # so "judgemental" and the American "judgment" are both left alone. Matched
@@ -94,8 +94,8 @@ JUDGMENT_MESSAGE = "British `judgement`/`judgements`; the house spelling is `jud
 BANNED_PATTERN = re.compile(r"\bhumans?\b", re.IGNORECASE)
 
 BANNED_MESSAGE = (
-    "the person is the `user`; the word `human` appears in no authored file "
-    "(prose/conventions.md — Terminology)"
+    "the person is the `user`; the word `human` appears in no tracked file "
+    "(prose/conventions.md — The banned word)"
 )
 
 # A double-quoted span on one line is somebody else's voice — the phrasing a
@@ -143,9 +143,7 @@ def scan_text(rel: str, text: str, line_offset: int = 0) -> list[Finding]:
         prose = md.INLINE_CODE_PATTERN.sub("", line)
         for _ in JUDGEMENT_PATTERN.finditer(prose):
             findings.append(
-                Finding(
-                    rel, line_num + line_offset, JUDGMENT_SPELLING, JUDGMENT_MESSAGE
-                )
+                Finding(rel, line_num + line_offset, SPELLING, JUDGMENT_MESSAGE)
             )
     return findings
 
@@ -160,7 +158,7 @@ def scan_banned(rel: str, text: str) -> list[Finding]:
     findings: list[Finding] = []
     for line_num, line in enumerate(text.splitlines(), start=1):
         for _ in BANNED_PATTERN.finditer(line):
-            findings.append(Finding(rel, line_num, BANNED_WORD, BANNED_MESSAGE))
+            findings.append(Finding(rel, line_num, THE_BANNED_WORD, BANNED_MESSAGE))
     return findings
 
 
@@ -178,7 +176,7 @@ def scan_voice(rel: str, text: str) -> list[Finding]:
         prose = QUOTED_SPEECH_PATTERN.sub("", md.INLINE_CODE_PATTERN.sub("", line))
         for pattern, fault in voice.VOICE_PATTERNS:
             if pattern.search(prose):
-                findings.append(Finding(rel, line_num, AGENT_FACING_VOICE, fault))
+                findings.append(Finding(rel, line_num, NO_FIRST_PERSON, fault))
     return findings
 
 

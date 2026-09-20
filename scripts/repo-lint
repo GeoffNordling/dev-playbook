@@ -53,36 +53,54 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
-REQUIRED_FILE = "build.required-file"
-FORBIDDEN = "build.forbidden"
-CANONICAL_BYTES = "build.canonical-bytes"
-CANONICAL_BLOCK = "build.canonical-block"
-CANONICAL_VALUE = "build.canonical-value"
+REQUIRED_FILES = "build.required-files"
+ROOT_ONLY_FILES = "build.root-only-files"
+NO_OTHER_FUTURE_WORK_FILE = "build.no-other-future-work-file"
+RUNNABLES_LIVE_IN_SCRIPTS = "build.runnables-live-in-scripts"
+DEPENDENCIES_LIVE_IN_PYPROJECT_TOML = "build.dependencies-live-in-pyprojecttoml"
+UVLOCK_AND_PYTHON_VERSION = "build.uvlock-and-python-version"
+ONE_PACKAGE_UNDER_SRC = "build.one-package-under-src"
+TESTS_PRESENT = "build.tests-present"
+LOCKFILE_COMMITTED = "build.lockfile-committed"
+CIYML = "build.ciyml"
+PYTHON_VERSION = "build.python-version"
+PRE_COMMIT_CONFIG_YAML = "build.pre-commit-configyaml"
+MAKEFILE = "build.makefile"
+PYPROJECT_TOML = "build.pyprojecttoml"
+GITIGNORE = "build.gitignore"
+THE_SOURCE_DIRECTORY = "build.the-source-directory"
 NAME_MAPPING = "build.name-mapping"
-SCRIPT_SHEBANG = "build.script-shebang"
-SCRIPT_PYTHON = "build.script-python"
-SELF_AUDIT = "build.self-audit"
-DOGFOOD = "distribution.dogfood"
-DOC_SHAPE = "knowledge-organization.doc-shape"
-ROGUE_FUTURE_WORK = "tracking.rogue-future-work-file"
+SHEBANG_AND_INLINE_METADATA = "build.shebang-and-inline-metadata"
+A_PUBLISHER_DOGFOODS_ITS_MANIFEST = "distribution.a-publisher-dogfoods-its-manifest"
+H1 = "knowledge-organization.h1"
+THE_LANGUAGE_SECTION = "knowledge-organization.the-language-section"
 
 # Filenames a CANDIDATES.md replaces. Uncommitted work lives in that one
 # register, committed work in issues; see standards/build/skeleton.md.
 ROGUE_FUTURE_WORK_NAMES = frozenset({"ROADMAP.md", "TODO.md", "BACKLOG.md", "IDEAS.md"})
 
 RULES = (
-    REQUIRED_FILE,
-    FORBIDDEN,
-    CANONICAL_BYTES,
-    CANONICAL_BLOCK,
-    CANONICAL_VALUE,
+    REQUIRED_FILES,
+    ROOT_ONLY_FILES,
+    NO_OTHER_FUTURE_WORK_FILE,
+    RUNNABLES_LIVE_IN_SCRIPTS,
+    DEPENDENCIES_LIVE_IN_PYPROJECT_TOML,
+    UVLOCK_AND_PYTHON_VERSION,
+    ONE_PACKAGE_UNDER_SRC,
+    TESTS_PRESENT,
+    LOCKFILE_COMMITTED,
+    CIYML,
+    PYTHON_VERSION,
+    PRE_COMMIT_CONFIG_YAML,
+    MAKEFILE,
+    PYPROJECT_TOML,
+    GITIGNORE,
+    THE_SOURCE_DIRECTORY,
     NAME_MAPPING,
-    SCRIPT_SHEBANG,
-    SCRIPT_PYTHON,
-    SELF_AUDIT,
-    DOGFOOD,
-    DOC_SHAPE,
-    ROGUE_FUTURE_WORK,
+    SHEBANG_AND_INLINE_METADATA,
+    A_PUBLISHER_DOGFOODS_ITS_MANIFEST,
+    H1,
+    THE_LANGUAGE_SECTION,
 )
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -252,7 +270,7 @@ def check_precommit_config(root: Path, hook_repo: bool) -> list[Finding]:
             findings.append(
                 Finding(
                     ".pre-commit-config.yaml",
-                    CANONICAL_BLOCK,
+                    PRE_COMMIT_CONFIG_YAML,
                     f"canonical block missing or out of order: '{segment[0].strip()}'",
                 )
             )
@@ -285,7 +303,7 @@ def check_makefile(
             findings.append(
                 Finding(
                     "Makefile",
-                    CANONICAL_BLOCK,
+                    MAKEFILE,
                     f"canonical {name} targets missing (verbatim; extras may follow)",
                 )
             )
@@ -301,15 +319,15 @@ def check_presence(
     findings = []
     for rel in BASE_REQUIRED:
         if not (root / rel).is_file():
-            findings.append(Finding(rel, REQUIRED_FILE, "required in every repo"))
+            findings.append(Finding(rel, REQUIRED_FILES, "required in every repo"))
     if layers.python:
         if not (root / ".python-version").is_file():
             findings.append(
-                Finding(".python-version", REQUIRED_FILE, "required in a python repo")
+                Finding(".python-version", UVLOCK_AND_PYTHON_VERSION, "required in a python repo")
             )
         if "uv.lock" not in tracked:
             findings.append(
-                Finding("uv.lock", REQUIRED_FILE, "must be committed in a python repo")
+                Finding("uv.lock", UVLOCK_AND_PYTHON_VERSION, "must be committed in a python repo")
             )
     if (layers.src or layers.scripts_python) and not any(
         rel.startswith("tests/") for rel in files
@@ -317,7 +335,7 @@ def check_presence(
         findings.append(
             Finding(
                 "tests/",
-                REQUIRED_FILE,
+                TESTS_PRESENT,
                 "required once src/ exists or scripts/ holds Python",
             )
         )
@@ -325,7 +343,7 @@ def check_presence(
         findings.append(
             Finding(
                 "package.json",
-                REQUIRED_FILE,
+                LOCKFILE_COMMITTED,
                 "a committed lockfile must sit alongside package.json",
             )
         )
@@ -341,7 +359,7 @@ def check_forbidden(
             findings.append(
                 Finding(
                     f"{name}/",
-                    FORBIDDEN,
+                    RUNNABLES_LIVE_IN_SCRIPTS,
                     "checked-in runnables live in scripts/, not a root bin/ or tools/",
                 )
             )
@@ -351,48 +369,44 @@ def check_forbidden(
         base = Path(rel).name
         if base == "requirements.txt":
             findings.append(
-                Finding(rel, FORBIDDEN, "dependencies live in pyproject.toml + uv.lock")
+                Finding(rel, DEPENDENCIES_LIVE_IN_PYPROJECT_TOML, "dependencies live in pyproject.toml + uv.lock")
             )
         elif base == "pyproject.toml" and rel != "pyproject.toml":
             findings.append(
-                Finding(rel, FORBIDDEN, "one Python project per repo, at the root")
+                Finding(rel, ROOT_ONLY_FILES, "one Python project per repo, at the root")
             )
         elif base == "CONTEXT.md" and rel != "CONTEXT.md":
             findings.append(
-                Finding(rel, FORBIDDEN, "CONTEXT.md lives at the repo root only")
+                Finding(rel, ROOT_ONLY_FILES, "CONTEXT.md lives at the repo root only")
             )
         elif base in ROGUE_FUTURE_WORK_NAMES:
             findings.append(
                 Finding(
                     rel,
-                    ROGUE_FUTURE_WORK,
+                    NO_OTHER_FUTURE_WORK_FILE,
                     "uncommitted work lives in CANDIDATES.md, committed work in issues",
                 )
             )
         elif base == "CANDIDATES.md" and rel != "CANDIDATES.md":
             findings.append(
-                Finding(rel, FORBIDDEN, "CANDIDATES.md lives at the repo root only")
+                Finding(rel, ROOT_ONLY_FILES, "CANDIDATES.md lives at the repo root only")
             )
     return findings
 
 
 def check_canonical_bytes(root: Path) -> list[Finding]:
-    findings = []
-    pairs = (
-        (".github/workflows/ci.yml", "ci.yml"),
-        (".python-version", ".python-version"),
-    )
-    for rel, canon in pairs:
-        path = root / rel
-        if path.is_file() and path.read_bytes() != canonical_raw(canon):
-            findings.append(
-                Finding(
-                    rel,
-                    CANONICAL_BYTES,
-                    f"must be byte-identical to the canonical {canon}",
-                )
-            )
-    return findings
+    return [
+        *byte_compare(root, ".github/workflows/ci.yml", "ci.yml", CIYML),
+        *byte_compare(root, ".python-version", ".python-version", PYTHON_VERSION),
+    ]
+
+
+def byte_compare(root: Path, rel: str, canon: str, rule: str) -> list[Finding]:
+    """A finding under ``rule`` when ``rel`` exists and differs from ``canon``."""
+    path = root / rel
+    if path.is_file() and path.read_bytes() != canonical_raw(canon):
+        return [Finding(rel, rule, f"must be byte-identical to the canonical {canon}")]
+    return []
 
 
 def gitignore_patterns(text: str) -> list[str]:
@@ -406,7 +420,7 @@ def check_gitignore(root: Path) -> list[Finding]:
         return []
     have = set(gitignore_patterns(path.read_text(encoding="utf-8")))
     return [
-        Finding(".gitignore", CANONICAL_BLOCK, f"missing baseline pattern '{pattern}'")
+        Finding(".gitignore", GITIGNORE, f"missing baseline pattern '{pattern}'")
         for pattern in gitignore_patterns(canonical_text(".gitignore"))
         if pattern not in have
     ]
@@ -431,22 +445,22 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
     try:
         consumer = tomllib.loads(path.read_text(encoding="utf-8"))
     except tomllib.TOMLDecodeError as err:
-        return [Finding("pyproject.toml", CANONICAL_VALUE, f"does not parse: {err}")]
+        return [Finding("pyproject.toml", PYPROJECT_TOML, f"does not parse: {err}")]
     canon = tomllib.loads(canonical_text("pyproject.toml"))
     findings = []
 
-    def pin(dotted: str, expected: object) -> None:
+    def pin(dotted: str, expected: object, rule: str = PYPROJECT_TOML) -> None:
         actual = toml_get(consumer, dotted)
         if actual != expected:
             findings.append(
                 Finding(
                     "pyproject.toml",
-                    CANONICAL_VALUE,
+                    rule,
                     f"{dotted} must be {expected!r}, got {actual!r}",
                 )
             )
 
-    pin("project.name", project_name(repo_name))
+    pin("project.name", project_name(repo_name), NAME_MAPPING)
     pin("project.requires-python", toml_get(canon, "project.requires-python"))
     pin(
         "tool.pytest.ini_options.testpaths",
@@ -475,7 +489,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
             findings.append(
                 Finding(
                     "pyproject.toml",
-                    CANONICAL_VALUE,
+                    PYPROJECT_TOML,
                     f"dependency-groups.dev must contain {floor!r}",
                 )
             )
@@ -490,7 +504,7 @@ def check_pyproject(root: Path, layers: Layers, repo_name: str) -> list[Finding]
             findings.append(
                 Finding(
                     "pyproject.toml",
-                    CANONICAL_VALUE,
+                    PYPROJECT_TOML,
                     "a scripts-only repo (no src/) omits [build-system]",
                 )
             )
@@ -517,7 +531,7 @@ def check_src_package(
         findings.append(
             Finding(
                 f"src/{extra}",
-                NAME_MAPPING,
+                ONE_PACKAGE_UNDER_SRC,
                 f"src/ holds exactly one package, named '{pkg}'",
             )
         )
@@ -525,7 +539,7 @@ def check_src_package(
         findings.append(
             Finding(
                 f"src/{pkg}/",
-                NAME_MAPPING,
+                ONE_PACKAGE_UNDER_SRC,
                 f"src/ holds exactly one package, named '{pkg}'",
             )
         )
@@ -553,12 +567,12 @@ def check_doc_shapes(root: Path) -> list[Finding]:
     if readme.is_file() and not any(
         re.match(r"^# +\S", line) for line in body_lines(readme)
     ):
-        findings.append(Finding("README.md", DOC_SHAPE, "missing an H1 title"))
+        findings.append(Finding("README.md", H1, "missing an H1 title"))
     context = root / "CONTEXT.md"
     if context.is_file():
         lines = body_lines(context)
         findings.extend(
-            Finding("CONTEXT.md", DOC_SHAPE, f"missing section '{section}'")
+            Finding("CONTEXT.md", THE_LANGUAGE_SECTION, f"missing section '{section}'")
             for section in CONTEXT_SECTIONS
             if section not in lines
         )
@@ -585,7 +599,7 @@ def check_scripts(
             findings.append(
                 Finding(
                     str(rel),
-                    SCRIPT_SHEBANG,
+                    SHEBANG_AND_INLINE_METADATA,
                     f"executable Python in scripts/ opens with '{UV_SHEBANG}'",
                 )
             )
@@ -593,7 +607,7 @@ def check_scripts(
             findings.append(
                 Finding(
                     str(rel),
-                    SCRIPT_SHEBANG,
+                    SHEBANG_AND_INLINE_METADATA,
                     f"missing PEP 723 inline metadata block ('{PEP723_OPEN}')",
                 )
             )
@@ -614,7 +628,7 @@ def check_scripts(
                 findings.append(
                     Finding(
                         str(rel),
-                        SCRIPT_PYTHON,
+                        SHEBANG_AND_INLINE_METADATA,
                         f'PEP 723 requires-python must be "{floor}"'
                         " (the repo's .python-version floor)",
                     )
@@ -653,7 +667,7 @@ def check_canonical_artifacts(root: Path) -> list[Finding]:
         findings.append(
             Finding(
                 f"standards/build/canonical/{name}",
-                SELF_AUDIT,
+                THE_SOURCE_DIRECTORY,
                 "no repo-lint compare covers this canonical artifact",
             )
         )
@@ -661,7 +675,7 @@ def check_canonical_artifacts(root: Path) -> list[Finding]:
         findings.append(
             Finding(
                 f"standards/build/canonical/{name}",
-                SELF_AUDIT,
+                THE_SOURCE_DIRECTORY,
                 "canonical artifact missing from standards/build/canonical/",
             )
         )
@@ -699,7 +713,7 @@ def check_dogfood_mirror(root: Path) -> list[Finding]:
         return [
             Finding(
                 ".pre-commit-config.yaml",
-                DOGFOOD,
+                A_PUBLISHER_DOGFOODS_ITS_MANIFEST,
                 f"dogfood local hooks must cover the published manifest "
                 f"(missing: {', '.join(sorted(missing))})",
             )

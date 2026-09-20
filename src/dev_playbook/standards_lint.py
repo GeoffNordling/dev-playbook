@@ -76,7 +76,8 @@ HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 CARD_LAYOUT = "standard.card-layout"
 CATALOG_ORDER = "standard.catalog-order"
 RULE_MATRIX = "standard.rule-matrix"
-HOOK_SURFACES = "standard.hook-surfaces"
+THE_HOSTING_PATTERN = "standard.the-hosting-pattern"
+OFFERED_BY_THE_CANONICAL_TEMPLATE = "standard.offered-by-the-canonical-template"
 CARD_SHADOWS = "standard.card-shadows-upstream"
 CARD_QUESTION = "standard.card-question"
 CARD_DIRECTORY = "standard.card-directory"
@@ -85,7 +86,8 @@ RULES = (
     CARD_LAYOUT,
     CATALOG_ORDER,
     RULE_MATRIX,
-    HOOK_SURFACES,
+    THE_HOSTING_PATTERN,
+    OFFERED_BY_THE_CANONICAL_TEMPLATE,
     CARD_SHADOWS,
     CARD_QUESTION,
     CARD_DIRECTORY,
@@ -831,27 +833,32 @@ def check_hook_surfaces(
 
     findings: list[Finding] = []
 
-    def flag(location: str, message: str) -> None:
-        findings.append(Finding(location, None, HOOK_SURFACES, message))
+    def host(location: str, message: str) -> None:
+        findings.append(Finding(location, None, THE_HOSTING_PATTERN, message))
+
+    def offered(location: str, message: str) -> None:
+        findings.append(
+            Finding(location, None, OFFERED_BY_THE_CANONICAL_TEMPLATE, message)
+        )
 
     # Mirror: the manifest's detectors and the local block's detectors agree.
     for name in sorted(manifest - local):
-        flag(LOCAL_CONFIG, f"manifest hook {name} is missing from the local block")
+        host(LOCAL_CONFIG, f"manifest hook {name} is missing from the local block")
     for name in sorted(local - manifest):
-        flag(LOCAL_CONFIG, f"local hook {name} is not in the published manifest")
+        host(LOCAL_CONFIG, f"local hook {name} is not in the published manifest")
 
     # Canonical menu: the pinned dev-playbook block offers exactly the published
     # manifest. Dev-playbook-only -- consumers have none.
     if dev_playbook_mode:
         canonical = _canonical_dev_hook_ids(root)
         for name in sorted(manifest_all - canonical):
-            flag(
+            offered(
                 CANONICAL_CONFIG,
                 f"manifest hook {name} is missing from the canonical consumer "
                 "template's pinned dev-playbook block",
             )
         for name in sorted(canonical - manifest_all):
-            flag(
+            offered(
                 CANONICAL_CONFIG,
                 f"canonical consumer template hook {name} is not in the published "
                 "manifest",
@@ -860,14 +867,14 @@ def check_hook_surfaces(
     cited = _all_cited_detectors(root)
     detectors = set(roster) if dev_playbook_mode else local
     for name in sorted(detectors - cited):
-        flag(
+        host(
             f"scripts/{name}",
             f"detector {name} is cited by no card's Audit cell",
         )
 
     if dev_playbook_mode:
         for name in sorted(cited - detectors - ungated):
-            flag(
+            host(
                 f"scripts/{name}",
                 f"{name} is cited by a card's Audit cell but is neither in the "
                 "playbook-lint roster nor a registered ungated audit",
@@ -876,7 +883,7 @@ def check_hook_surfaces(
     if (root / SCRIPTS_README).is_file():
         table = _readme_table_names(root)
         for name in sorted(detectors - table):
-            flag(SCRIPTS_README, f"detector {name} is missing from the README table")
+            host(SCRIPTS_README, f"detector {name} is missing from the README table")
     return findings
 
 

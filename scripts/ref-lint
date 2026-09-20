@@ -51,11 +51,13 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 
 # The rule id and finding message for each non-ok reference status.
 RULE_FOR = {
-    "broken": "knowledge-organization.broken-reference",
-    "wrong-form": "knowledge-organization.wrong-form-citation",
+    "broken": "knowledge-organization.reference-resolves",
+    "bad-anchor": "knowledge-organization.fragment-anchor-matches-the-slug",
+    "wrong-form": "knowledge-organization.link-same-bundle",
 }
 MESSAGE_FOR = {
     "broken": "reference does not resolve",
+    "bad-anchor": "anchor names no heading slug of the target",
     "wrong-form": "same-repo target must use a Link, not a Citation",
 }
 RULES = tuple(RULE_FOR.values())
@@ -134,7 +136,7 @@ def citation_actual(resolved: Path, repo_root: Path, repo_name: str) -> Path:
 
 
 def status_of(actual: Path, fragment: str) -> str:
-    """Return 'ok' if actual (and fragment, if any) resolves; 'broken' otherwise.
+    """'ok', 'broken' when actual is missing, or 'bad-anchor' when the fragment is.
 
     File-existence failure short-circuits — the anchor is not checked when the
     file is missing. Fragments on directories or non-.md targets are out of
@@ -146,7 +148,7 @@ def status_of(actual: Path, fragment: str) -> str:
         return "ok"
     if not actual.is_file() or actual.suffix.lower() != ".md":
         return "ok"
-    return "ok" if fragment in md.heading_slugs(actual) else "broken"
+    return "ok" if fragment in md.heading_slugs(actual) else "bad-anchor"
 
 
 def scan_file(filepath: Path, repo_root: Path, repo_name: str) -> list[dict]:
@@ -251,7 +253,7 @@ def main() -> None:
     for filepath in md_files:
         for ref in scan_file(filepath, repo_root, repo_name):
             total += 1
-            if ref["status"] == "broken":
+            if ref["status"] in ("broken", "bad-anchor"):
                 broken += 1
             elif ref["status"] == "wrong-form":
                 wrong_form += 1

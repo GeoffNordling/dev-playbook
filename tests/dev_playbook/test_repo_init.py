@@ -48,7 +48,7 @@ def test_scaffolded_python_repo_passes_playbook_lint(tmp_path: Path) -> None:
 
 
 def test_root_index_carries_an_introduction() -> None:
-    # okf-lint's knowledge-organization.index-intro rule: prose stands between
+    # okf-lint's knowledge-organization.the-introduction rule: prose stands between
     # the H1 and the first entry.
     tree = render_tree(BASE_SPEC, REV)
 
