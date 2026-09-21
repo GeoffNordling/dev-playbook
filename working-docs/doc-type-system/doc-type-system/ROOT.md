@@ -21,9 +21,9 @@ for use outside the set.
 
 Three DocTypes, ten verbs, in
 [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
-the picture of the target state;
-[Doc-Type Specification](/working-docs/doc-type-system/doc-type-system/specification/doc-type.md)
-is the same state as predicates, with one file per doc-type beside it.
+the picture of the target state; the Standard
+[Doc-Type](/standards/doc-type/doc-type.md) is the same state as
+predicates over any doc-type.
 The refactor that reaches them, then one loop that grows the
 specification.
 
@@ -116,29 +116,8 @@ specification.
      [Completed](#completed).
   7. *Tidy the doc-type definitions.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-  8. *The specification becomes a Standard.* Move
-     [specification/](/working-docs/doc-type-system/doc-type-system/specification/index.md)
-     under `standards/`, bound to no gate. Its shape is discussed with
-     the user after the doc-type step; what is known now:
-     - **`one-base` names a location rule.** The pseudocode carries
-       none since 2026-09-21; the predicate drops it.
-     - **`one-module` is not a Python parse.** Its predicate says the
-       blocks "parse as one Python module"; the check that exists is
-       step 7's sync test, four blocks and the reference model's one
-       text, and the predicate says that.
-     - **Its predicates are stale.** `standard.md` says every id maps to
-       exactly one script or judge and defines `audit(standard, state)`;
-       step 2 decided null rows and no `audit()`, and step 3 the derived
-       boundary file. Each predicate is rewritten to the built state or
-       deleted.
-     - **Its ids are three segments**, `doc-type-system.standard.verbs`,
-       and the verifier table's lint accepts only `<dir>.<slug>`. They
-       become `doc-type-system.<slug>`, unique across the directory.
-     - **One rule is added**, `doc-type-system.no-body`, deterministic:
-       nothing follows a rule's trailer. It holds on the day it lands
-       because step 1 drained the bodies, and it keeps them drained.
-     Reason: the first loop's checks point at it, and a loop must not
-     bind to a shape a later step deletes.
+  8. *The specification becomes a Standard.* Done 2026-09-21; the
+     entry is in [Completed](#completed).
   9. *Ban the word guard.* prose-lint's banned-word rule, today one
      word, the actor noun, gains `guard`, with a message naming `condition`;
      `prose/conventions.md`'s rule text and `.prose-lint-exempt` follow.
@@ -181,8 +160,8 @@ specification.
   The one move this plan causes is named at its step, `okf-spec` at
   step 6.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
-  system, after step 8: its checks point at the specification as a
-  Standard, and the loop grows it. In iteration order: an act drafts
+  system, after step 8: its checks point at the Standard
+  [Doc-Type](/standards/doc-type/doc-type.md), and the loop grows it. In iteration order: an act drafts
   candidate predicates, each with its citation or marked invented and
   the members that fail it today; a yield to the user, yes or no per
   predicate; an act applies the accepted ones; a check audits; a yield
@@ -394,6 +373,28 @@ specification.
   a leftover card is an unknown type at the next pin bump. Verified:
   playbook-lint's thirteen detectors clean, `make check` green, 998
   tests.
+- **The specification becomes a Standard, 2026-09-21.** Step 8 of The
+  system. `standards/doc-type/` holds the doc-type Standards: `doc-type.md`,
+  population a directory `doc-types/<name>/`, seven rules over any
+  doc-type, one deterministic and six stochastic until a `contract-shape`
+  extractor exists, bound to no gate; and beside it the three Standards
+  over the files a doc-type types, Runbook Conventions from `harness/`,
+  Loop Conventions from `knowledge-organization/`, and Standard
+  Conventions split out of The Standards Tree, the population, the rule
+  shape, and decidable predicates. The split follows each directory's
+  statement, "X governs Y": a rule over what is inside a file is the
+  doc-type's, a rule over where a file sits is the family's, so
+  Runbook's Location rule moved to Claude Code Files with its id kept,
+  and `typed-standard` and `typed-loop` stayed with Document Types. The
+  Standards Tree gained `standard.the-statement`: every directory index
+  opens with the sentence the catalog repeats. Thirty-three rule ids
+  took the `doc-type.` prefix, in harness-files-lint, loop-lint,
+  standards-lint, and their tests. The draft `specification/` is
+  deleted: its location and one-module rules had no referent, the
+  per-doc-type files restated verb sets or duplicated the Standards
+  above, and `audit()` was decided away at step 2; Loop's three drafted
+  rules are a planned item of the Loop strand. Verified: playbook-lint's
+  thirteen detectors clean, `make check` green.
 - **Tidy the doc-type definitions, 2026-09-21.** Step 7 of The system.
   The pseudocode is four blocks organized as code with imports, the
   base in `doc-types/doc-type.md` and one class per `contract-shape.md`,

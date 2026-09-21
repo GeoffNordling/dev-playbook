@@ -1,7 +1,7 @@
 """Check every Loop's Mermaid graph against the prose around it.
 
 loop-lint is the detector behind Loop Conventions
-(standards/knowledge-organization/loop-conventions.md), the Standard that
+(standards/doc-type/loop-conventions.md), the Standard that
 binds a document typed ``Loop`` to the Loop doc-type's encoding
 (doc-types/loop/encoding.md). It walks a repo's markdown files once (via
 dev_playbook.md.find_md_files, so gitignore-aware and worktree-scoped),
@@ -32,7 +32,7 @@ nothing: a Loop's view is the graph GitHub renders. A repo with no
 (standards/standard/detectors.md).
 
 Output:
-    stdout — one finding per line, ``file: knowledge-organization.loop-… message``.
+    stdout — one finding per line, ``file: doc-type.loop-… message``.
     stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
@@ -53,11 +53,11 @@ from dev_playbook.findings import print_rules, render
 # Every rule id this detector can emit, namespaced by the card whose question
 # it answers. Each is a module-level constant so RULES cannot drift from what
 # the detector emits.
-ONE_GRAPH = "knowledge-organization.one-graph"
-THREE_VERB_SECTIONS = "knowledge-organization.three-verb-sections"
-NODES_AND_ENTRIES_AGREE = "knowledge-organization.nodes-and-entries-agree"
-EDGES_FOLLOW_THE_SHAPE = "knowledge-organization.edges-follow-the-shape"
-ENTRIES_POINT_AND_CONDITION = "knowledge-organization.entries-point-and-condition"
+ONE_GRAPH = "doc-type.one-graph"
+THREE_VERB_SECTIONS = "doc-type.three-verb-sections"
+NODES_AND_ENTRIES_AGREE = "doc-type.nodes-and-entries-agree"
+EDGES_FOLLOW_THE_SHAPE = "doc-type.edges-follow-the-shape"
+ENTRIES_POINT_AND_CONDITION = "doc-type.entries-point-and-condition"
 
 RULES = (
     ONE_GRAPH,

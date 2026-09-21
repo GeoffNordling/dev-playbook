@@ -18,7 +18,7 @@ base's `chain` extractor is its planned successor
 everything the writer does not need — how an edge draws, how a name
 resolves — is the parser's and not this spec's. The
 Standard that binds a runbook to this grammar is
-[Runbook Conventions](/standards/harness/runbook-conventions.md).
+[Runbook Conventions](/standards/doc-type/runbook-conventions.md).
 
 ## From prose to chain
 

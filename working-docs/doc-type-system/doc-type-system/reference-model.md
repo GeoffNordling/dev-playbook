@@ -10,8 +10,8 @@ The target state of the doc-type system, drawn as a reference model:
 one picture of the system as it should be, in pseudocode. It is
 speculative, per
 [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md).
-[Doc-Type Specification](/working-docs/doc-type-system/doc-type-system/specification/doc-type.md)
-holds the predicates that define the set this is one member of.
+The Standard [Doc-Type](/standards/doc-type/doc-type.md) holds the
+predicates that define the set this is one member of.
 
 A markdown file is code in a fuzzy form, and the model that reads it
 is its stochastic compiler. A doc-type gives such a file what code

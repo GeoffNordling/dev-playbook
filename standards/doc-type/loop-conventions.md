@@ -15,8 +15,8 @@ the encoding its file takes,
 doc-type binds nobody, so this Standard is what binds the file to that
 encoding.
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
+The reasoning behind the rules is
+[Doc-Type Explanation](/standards/doc-type/explanation.md#a-loops-file).
 
 ## One graph
 
@@ -26,14 +26,14 @@ fence. The block is a flowchart, opening `flowchart` or `graph`, whose
 statements are Mermaid directives, nodes, and edges between nodes, with
 no `&` fan-out.
 
-`knowledge-organization.one-graph` · deterministic
+`doc-type.one-graph` · deterministic
 
 ## What the paragraph says
 
 In a document typed `Loop`, the paragraph before the graph names the
 state the loop drives and the target state it drives that state toward.
 
-`knowledge-organization.what-the-paragraph-says` · stochastic
+`doc-type.what-the-paragraph-says` · stochastic
 
 ## Three verb sections
 
@@ -44,7 +44,7 @@ every line is an entry, the node id in backticks, an em dash, then the
 entry's text, or is a line indented under an entry, which continues it;
 and no node id carries two entries.
 
-`knowledge-organization.three-verb-sections` · deterministic
+`doc-type.three-verb-sections` · deterministic
 
 ## Nodes and entries agree
 
@@ -52,7 +52,7 @@ Every entry of a document typed `Loop` names a node of its graph, and
 every node of the graph carries an entry or is a receiver, a node with
 no entry that an edge out of a yield leads to.
 
-`knowledge-organization.nodes-and-entries-agree` · deterministic
+`doc-type.nodes-and-entries-agree` · deterministic
 
 ## Edges follow the shape
 
@@ -60,7 +60,7 @@ In a document typed `Loop`, every edge of the graph leads to a step, a
 node whose entry is an act, a check, or a yield, except an edge out of a
 yield, which leads to a step or to a receiver, a node with no entry.
 
-`knowledge-organization.edges-follow-the-shape` · deterministic
+`doc-type.edges-follow-the-shape` · deterministic
 
 ## Entries point and condition
 
@@ -72,12 +72,12 @@ holds names a document typed `Loop`. Every link in an entry is
 root-absolute or relative to the document, and it resolves to a file in
 the repo.
 
-`knowledge-organization.entries-point-and-condition` · deterministic
+`doc-type.entries-point-and-condition` · deterministic
 
 ## An act links a runbook
 
 The link an act's entry holds names a runbook, a skill bundle's
 `SKILL.md` or an agent definition
-([Runbook Conventions](/standards/harness/runbook-conventions.md#location)).
+([Runbook Conventions](/standards/harness/files.md#location)).
 
-`knowledge-organization.an-act-links-a-runbook` · deterministic
+`doc-type.an-act-links-a-runbook` · deterministic

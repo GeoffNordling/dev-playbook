@@ -6,7 +6,7 @@ description: The craft behind any document an agent consumes — the two loads, 
 
 # Writing for Agents
 
-The craft of writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output. [runbook-conventions.md](/standards/harness/runbook-conventions.md) binds the *format* a skill or agent takes and wins where the two collide; this document carries the craft. The skill-specific mechanics — the invocation choice and router skills — are in [Skill mechanics](#skill-mechanics).
+The craft of writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output. [runbook-conventions.md](/standards/doc-type/runbook-conventions.md) binds the *format* a skill or agent takes and wins where the two collide; this document carries the craft. The skill-specific mechanics — the invocation choice and router skills — are in [Skill mechanics](#skill-mechanics).
 
 ## The two loads
 
@@ -27,7 +27,7 @@ A document is built from two content types — **steps** (the ordered actions th
 
 Push too little down and the top bloats; push too much and you hide material the agent actually needs. That tension is the whole decision.
 
-**Progressive disclosure** is the move down the ladder — out of the main file and behind a pointer — so the top stays legible. Not primarily a token optimisation: it is how the hierarchy is protected. Branching is the cleanest disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. When a document has steps, in-file reference that should be disclosed buries them and turns attending to them into a coin-flip — a variance lever, not just a legibility one. (For a skill, the format side of the move — the `references/` tree and its limits — is [runbook-conventions.md](/standards/harness/runbook-conventions.md)'s.)
+**Progressive disclosure** is the move down the ladder — out of the main file and behind a pointer — so the top stays legible. Not primarily a token optimisation: it is how the hierarchy is protected. Branching is the cleanest disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. When a document has steps, in-file reference that should be disclosed buries them and turns attending to them into a coin-flip — a variance lever, not just a legibility one. (For a skill, the format side of the move — the `references/` tree and its limits — is [runbook-conventions.md](/standards/doc-type/runbook-conventions.md)'s.)
 
 **Co-location** is the within-file companion: where the ladder decides _how far down_ a piece sits, co-location decides _what sits beside it_ once there. Keep a concept's definition, rules, and caveats under one heading rather than scattered, so reading one part brings its neighbours with it. The test: the document should read like documentation written for the agent — grouped material reads that way; scattered material does not. (Distinct from duplication: that repeats one meaning in two places; scattering fragments one meaning across many.)
 
@@ -43,11 +43,11 @@ A pointer does two jobs — state what the material is, and list the **branches*
 - **One trigger per branch.** Synonyms that rename a single branch are one branch written twice; collapse them and keep only genuinely distinct branches.
 - **Cut identity the body already carries.**
 
-For a runbook's `description`, Runbook Conventions' [Description](/standards/harness/runbook-conventions.md#description) binds its shape.
+For a runbook's `description`, Runbook Conventions' [Description](/standards/doc-type/runbook-conventions.md#description) binds its shape.
 
 ## Steps and completion criteria
 
-Every step ends on a **completion criterion** — the condition that tells the agent the work is done; for a runbook, Runbook Conventions' [Steps end on a completion criterion](/standards/harness/runbook-conventions.md#steps-end-on-a-completion-criterion) binds it. Two properties make it a lever:
+Every step ends on a **completion criterion** — the condition that tells the agent the work is done; for a runbook, Runbook Conventions' [Steps end on a completion criterion](/standards/doc-type/runbook-conventions.md#steps-end-on-a-completion-criterion) binds it. Two properties make it a lever:
 
 - **Clarity** — can the agent tell done from not-done? A vague bound ("understanding reached") invites **premature completion**: ending the step before it is genuinely done, attention slipping to _being done_. The visible steps still ahead — the **post-completion steps** — supply the pull; the criterion's clarity is the resistance. Defend in order: **sharpen the bound first** (local and cheap); only if it is irreducibly fuzzy _and_ you observe the rush, hide the later steps by splitting the sequence.
 - **Demand** — how much it requires. "Every modified model accounted for" forces thorough work where "produce a change list" does not. Demand drives **legwork** — the digging the agent does within the work, latent in the wording rather than written as its own step — and it is not step-bound: "every rule applied" binds a body of flat reference just as "every step done" binds a sequence, which is how an all-reference document still carries an exhaustiveness bar.
@@ -80,7 +80,7 @@ You win twice: fewer tokens, and a sharper hook for the agent to hang its thinki
 
 ## Skill mechanics
 
-What changes when the document is a skill: the invocation choice and router skills. The front matter fields themselves are [runbook-conventions.md](/standards/harness/runbook-conventions.md)'s to define.
+What changes when the document is a skill: the invocation choice and router skills. The front matter fields themselves are [runbook-conventions.md](/standards/doc-type/runbook-conventions.md)'s to define.
 
 ### Invocation
 

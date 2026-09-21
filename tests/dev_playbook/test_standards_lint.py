@@ -40,7 +40,7 @@ def standard(
 ) -> str:
     """A file typed ``Standard`` (by default) with one rule.
 
-    ``population=None`` omits the key, which ``standard.the-population`` flags.
+    ``population=None`` omits the key, which ``doc-type.the-population`` flags.
     """
     pop = "" if population is None else f'population: "{population}"\n'
     return (
@@ -82,7 +82,7 @@ def readme() -> str:
     return "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
 
 
-# --- standard.directory-layout and standard.the-population -----------------------
+# --- standard.directory-layout and doc-type.the-population -----------------------
 
 
 def test_well_formed_directory_passes_directory_layout(tmp_path: Path) -> None:

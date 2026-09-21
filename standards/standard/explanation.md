@@ -15,10 +15,9 @@ rules intelligible.
 One directory, one standard: the files that state one standard's rules
 and the explanation behind them sit together, one documentation set
 ([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)),
-so a reader who finds one finds the rest. The rule id's trailer is what
-the verifier table reads
-([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
-so a rule without one is a rule no table row can name. A consumer's
+so a reader who finds one finds the rest. The sentence each directory's
+index opens with is the catalog's row, so the two are one text kept in
+two places by a rule rather than by habit. A consumer's
 `standards/<name>/` on a name dev-playbook publishes would silently
 override the workspace-scoped standard of that name, which is why the
 name is reserved; the two scopes are

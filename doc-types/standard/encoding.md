@@ -28,7 +28,7 @@ The phrase is double-quoted, since YAML reads an unquoted `: ` as a
 nested key. The prose between the H1 and the first H2 elaborates on
 it, defines the exclusions, and links the neighbors; no lint reads it.
 The rule and its lint are
-[The population](/standards/standard/tree.md#the-population).
+[The population](/standards/doc-type/standard-conventions.md#the-population).
 
 ## Rules
 
@@ -53,7 +53,7 @@ A rule is a heading; its section is the rule.
   the verifier table's row. Nothing follows it before the next heading.
 
 The rule and its lint are
-[The rule shape](/standards/standard/tree.md#the-rule-shape).
+[The rule shape](/standards/doc-type/standard-conventions.md#the-rule-shape).
 
 ## Conditions
 

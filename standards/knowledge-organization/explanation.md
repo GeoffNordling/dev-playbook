@@ -1,7 +1,7 @@
 ---
 type: Explanation
 title: Knowledge Organization Explanation
-description: The thinking behind the knowledge-organization rules — what CONTEXT.md is for, why a reference takes the form it does, what a description is for, how a documentation set stays navigable, what a working set is, how an index reads, how a Loop is checked, and why a type registry is frontmatter
+description: The thinking behind the knowledge-organization rules — what CONTEXT.md is for, why a reference takes the form it does, what a description is for, how a documentation set stays navigable, what a working set is, how an index reads, and why a type registry is frontmatter
 ---
 
 # Knowledge Organization Explanation
@@ -195,19 +195,6 @@ okf-lint can report the moment it goes stale. The root index declares
 the bundle's OKF version, `okf_version: "0.1"`, per the OKF spec's
 Versioning section; that key is dev-playbook's whole root frontmatter,
 and a consumer repo carries one key more, the `okf_types` mapping.
-
-## How a Loop is checked
-
-A document typed `Loop` is checked by `scripts/loop-lint`, which reads
-it the way the encoding cuts it: one paragraph, one fenced `mermaid`
-flowchart, then three H2s. The graph is the source of truth; the
-paragraph says what state the loop drives and toward what. The detector
-stops at a file's first disagreement, since each rule reads the cut the
-one before it made, and goes on to the next file. A repo with no
-`loops/` tree is clean by construction. The edge rule,
-[Edges follow the shape](/standards/knowledge-organization/loop-conventions.md#edges-follow-the-shape),
-is the shape the Loop doc-type draws: steps in iteration order, a
-programmed exit where its author put it, and control coming back.
 
 ## Why a README lists no harness files
 

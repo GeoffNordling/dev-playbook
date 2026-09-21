@@ -72,7 +72,7 @@ HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
 DIRECTORY_LAYOUT = "standard.directory-layout"
-THE_POPULATION = "standard.the-population"
+THE_POPULATION = "doc-type.the-population"
 THE_CATALOG = "standard.the-catalog"
 NO_SHADOWING = "standard.no-shadowing"
 THE_HOSTING_PATTERN = "standard.the-hosting-pattern"
@@ -224,7 +224,7 @@ def _dev_playbook_mode(root: Path) -> bool:
     return (root / CANONICAL_CONFIG).is_file()
 
 
-# --- standard.directory-layout and standard.the-population ------------------
+# --- standard.directory-layout and doc-type.the-population ------------------
 
 
 def check_directory_layout(root: Path) -> list[Finding]:

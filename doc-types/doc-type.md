@@ -17,10 +17,10 @@ The theory of the system, what a doc-type is made of, its verbs, and
 its rules as predicates, is in-process work and lives in the working
 set, not here:
 [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md),
-with the predicates in
-[Doc-Type Specification](/working-docs/doc-type-system/doc-type-system/specification/doc-type.md),
-and the words in the set's
-[Terms](/working-docs/doc-type-system/ROOT.md#terms).
+with the words in the set's
+[Terms](/working-docs/doc-type-system/ROOT.md#terms). The rules
+every doc-type is held to are the Standard
+[Doc-Type](/standards/doc-type/doc-type.md).
 
 ## The base
 

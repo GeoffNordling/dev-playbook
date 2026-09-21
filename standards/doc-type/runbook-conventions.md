@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Runbook Conventions
-description: The format a runbook takes — location, front matter, the description, model and effort, the H1, completion criteria, the chain, and the rules a skill bundle and an agent definition each add
+description: The format a runbook takes — front matter, the description, model and effort, the H1, completion criteria, the chain, and the rules a skill bundle and an agent definition each add
 population: "a runbook: a skill bundle or an agent definition under a governed repo's .claude/ or dev-playbook's dotfiles/dot-claude/"
 ---
 
@@ -13,31 +13,15 @@ files that act. A bundle whose directory is a symlink belongs to
 whatever manages its target, so it is outside the population and
 harness-files-lint skips it. The
 [Runbook doc-type](/doc-types/runbook/index.md) declares a runbook's
-contract, the Reference chain; this Standard binds the file: where it
-sits, its front matter, its body's shape, and what each kind adds. The
+contract, the Reference chain; this Standard binds the file: its front
+matter, its body's shape, and what each kind adds; where it sits is
+[Location](/standards/harness/files.md#location). The
 craft of the body, the two loads, the information hierarchy, and
 pruning, is [Writing for Agents](/guides/writing-for-agents.md),
 read to write one; this Standard wins where the two collide.
 
-The reasoning behind the rules is the
-[Harness Explanation](/standards/harness/explanation.md).
-
-## Location
-
-A skill is `<skills root>/<name>/SKILL.md` and an agent is
-`<agents root>/<name>.md`, the roots being `.claude/skills/` and
-`.claude/agents/`, and `dotfiles/dot-claude/skills/` and
-`dotfiles/dot-claude/agents/` where those directories exist.
-
-```
-<skills root>/<skill-name>/
-  SKILL.md          # required
-  references/       # optional: docs the skill loads on demand
-  scripts/          # optional: helper scripts the skill invokes
-<agents root>/<agent-name>.md
-```
-
-`harness.location` · deterministic
+The reasoning behind the rules is
+[Doc-Type Explanation](/standards/doc-type/explanation.md#a-runbooks-file).
 
 ## Front matter
 
@@ -71,20 +55,20 @@ effort: <low|medium|high|xhigh>
 tools: <Tool, Tool, ...>            # optional
 ```
 
-`harness.front-matter` · deterministic
+`doc-type.front-matter` · deterministic
 
 ## Name matches its home
 
 A runbook's `name` equals the bundle directory for a skill and the file
 stem for an agent.
 
-`harness.name-matches-its-home` · deterministic
+`doc-type.name-matches-its-home` · deterministic
 
 ## Kebab-case name
 
 A runbook's `name` is kebab-case.
 
-`harness.kebab-case-name` · deterministic
+`doc-type.kebab-case-name` · deterministic
 
 ## Description
 
@@ -94,7 +78,7 @@ is exactly two sentences and the second opens with the literal words
 `Use when`. For a skill with `disable-model-invocation: true` it is
 exactly one sentence.
 
-`harness.description` · deterministic
+`doc-type.description` · deterministic
 
 ## Description states what and when
 
@@ -103,7 +87,7 @@ does. Where that `description` has a second sentence, the second
 sentence names the keywords, contexts, or file types under which the
 runbook is invoked.
 
-`harness.description-states-what-and-when` · stochastic
+`doc-type.description-states-what-and-when` · stochastic
 
 ## Model and effort
 
@@ -111,21 +95,21 @@ A runbook's `model` is one of `haiku`, `sonnet`, `opus`, `fable`, or
 `inherit`, and its `effort` is one of `low`, `medium`, `high`, or
 `xhigh`.
 
-`harness.model-and-effort` · deterministic
+`doc-type.model-and-effort` · deterministic
 
 ## Body opens with an H1
 
 The first non-blank line of a runbook's body, after the front matter,
 is an H1.
 
-`harness.body-opens-with-an-h1` · deterministic
+`doc-type.body-opens-with-an-h1` · deterministic
 
 ## Steps end on a completion criterion
 
 Every step of a runbook's body ends on a completion criterion: the
 condition that tells the agent the work is done.
 
-`harness.steps-end-on-a-completion-criterion` · stochastic
+`doc-type.steps-end-on-a-completion-criterion` · stochastic
 
 ## Carries its chain
 
@@ -137,83 +121,83 @@ span vocabulary cannot carry, which stays plain prose in the body and
 is listed in
 [residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 
-`harness.carries-its-chain` · stochastic
+`doc-type.carries-its-chain` · stochastic
 
 ## Skill
 
 The runbook is a skill.
 
-`harness.skill` · deterministic
+`doc-type.skill` · deterministic
 
 ### Bundle layout
 
 Every file in a skill's `references/` is linked from its `SKILL.md`,
 and every file in its `scripts/` is invoked from its `SKILL.md`.
 
-`harness.bundle-layout` · deterministic
+`doc-type.bundle-layout` · deterministic
 
 ### Model invocation flag
 
 A skill's `disable-model-invocation` is boolean.
 
-`harness.model-invocation-flag` · deterministic
+`doc-type.model-invocation-flag` · deterministic
 
 ### Interactive skills inherit
 
 A skill that runs several turns with the user carries `model: inherit`.
 
-`harness.interactive-skills-inherit` · stochastic
+`doc-type.interactive-skills-inherit` · stochastic
 
 ### Tool fields
 
 A skill's `allowed-tools` and `disallowed-tools`, when present, are
 space-separated tool specs, as in `Bash(git *) Bash(gh *)`.
 
-`harness.tool-fields` · deterministic
+`doc-type.tool-fields` · deterministic
 
 ### Disallowed tools restate nothing
 
 A skill's `disallowed-tools`, when present, names no tool or call that
 a `settings.json` beside its skills root already denies.
 
-`harness.disallowed-tools-restate-nothing` · deterministic
+`doc-type.disallowed-tools-restate-nothing` · deterministic
 
 ### Arguments
 
 A skill's `arguments`, when present, is a non-empty list of bare
 kebab-case names, as in `arguments: [subject]`.
 
-`harness.arguments` · deterministic
+`doc-type.arguments` · deterministic
 
 ### No argument placeholder
 
 A skill's body carries no `$ARGUMENTS` placeholder and no `$0`
 placeholder.
 
-`harness.no-argument-placeholder` · deterministic
+`doc-type.no-argument-placeholder` · deterministic
 
 ### References one level deep
 
 No `.md` file in a skill's `references/` links to another `.md` file
 in that `references/`.
 
-`harness.references-one-level-deep` · deterministic
+`doc-type.references-one-level-deep` · deterministic
 
 ### SKILL.md at most 500 lines
 
 A skill's `SKILL.md` body is at most 500 lines.
 
-`harness.skillmd-at-most-500-lines` · deterministic
+`doc-type.skillmd-at-most-500-lines` · deterministic
 
 ## Agent
 
 The runbook is an agent.
 
-`harness.agent` · deterministic
+`doc-type.agent` · deterministic
 
 ### tools
 
 An agent's `tools`, when present, is a non-empty comma-separated string
 of tool names.
 
-`harness.tools` · deterministic
+`doc-type.tools` · deterministic

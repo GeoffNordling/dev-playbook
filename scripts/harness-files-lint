@@ -3,8 +3,8 @@
 
 The detector for the registry members that carry a content standard
 (standards/harness/files.md): the runbooks — skills and agents — against
-runbook-conventions.md, and the global CLAUDE.md source against
-claude-content.md. Their voice is not checked here; the first-person ban is one
+standards/doc-type/runbook-conventions.md, and the global CLAUDE.md source
+against claude-content.md. Their voice is not checked here; the first-person ban is one
 rule over all authored text and lives with prose-lint.
 
 Two skill roots and two agent roots are checked when present in the target
@@ -58,16 +58,16 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # advisory, not a finding. Each id is a module-level constant so every
 # emission site references the constant, never a raw literal, and RULES (what
 # --list-rules prints) cannot drift from what the detector actually emits.
-FRONT_MATTER = "harness.front-matter"
-NAME_MATCHES_ITS_HOME = "harness.name-matches-its-home"
-KEBAB_CASE_NAME = "harness.kebab-case-name"
-DESCRIPTION = "harness.description"
-MODEL_AND_EFFORT = "harness.model-and-effort"
-MODEL_INVOCATION_FLAG = "harness.model-invocation-flag"
-ARGUMENTS = "harness.arguments"
-TOOLS = "harness.tools"
-BODY_OPENS_WITH_AN_H1 = "harness.body-opens-with-an-h1"
-REFERENCES_ONE_LEVEL_DEEP = "harness.references-one-level-deep"
+FRONT_MATTER = "doc-type.front-matter"
+NAME_MATCHES_ITS_HOME = "doc-type.name-matches-its-home"
+KEBAB_CASE_NAME = "doc-type.kebab-case-name"
+DESCRIPTION = "doc-type.description"
+MODEL_AND_EFFORT = "doc-type.model-and-effort"
+MODEL_INVOCATION_FLAG = "doc-type.model-invocation-flag"
+ARGUMENTS = "doc-type.arguments"
+TOOLS = "doc-type.tools"
+BODY_OPENS_WITH_AN_H1 = "doc-type.body-opens-with-an-h1"
+REFERENCES_ONE_LEVEL_DEEP = "doc-type.references-one-level-deep"
 TWO_SECTIONS = "harness.two-sections"
 REQUIRED_RULES = "harness.required-rules"
 

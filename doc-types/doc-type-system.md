@@ -90,11 +90,13 @@ Loop's view is the Mermaid graph inside each instance.
 
 A doc-type declares what a contract shape *is*; it never binds anyone
 to use it. The binding rule — every instance in the family must carry
-its contract — is a Standard's job: Runbook's obligation rides
-[runbook-conventions](/standards/harness/runbook-conventions.md),
-with no verifier today; Loop's rides
-[loop-conventions](/standards/knowledge-organization/loop-conventions.md),
-audited by `scripts/loop-lint` at the commit gate; Standard's rides the
-Meta-Standard, [standards/standard/](/standards/standard/index.md),
+its contract — is a Standard's job, and the three sit together under
+[standards/doc-type/](/standards/doc-type/index.md): Runbook's
+obligation rides
+[Runbook Conventions](/standards/doc-type/runbook-conventions.md),
+audited by `scripts/harness-files-lint`; Loop's rides
+[Loop Conventions](/standards/doc-type/loop-conventions.md), audited
+by `scripts/loop-lint`; Standard's rides
+[Standard Conventions](/standards/doc-type/standard-conventions.md),
 audited by `scripts/standards-lint`. The shape is never itself a
 Standard, so Standard, Runbook, and Loop remain peers.
