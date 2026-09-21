@@ -33,9 +33,7 @@ specification.
   the three doc-types parallel.
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)
   holds the parallel structure, and each peer has its conventions
-  Standard: `harness/runbook-conventions` for Runbook, the
-  Meta-Standard under `standard/` for Standard, and
-  `knowledge-organization/loop-conventions` for Loop.
+  Standard under `standards/doc-type/`.
 - **Verbs.** Each doc-type is defined by a short list of simple verbs,
   its operations. Overlap between doc-types is allowed.
 - **Both forms.** A target state is written twice: as a reference
@@ -120,35 +118,39 @@ specification.
      entry is in [Completed](#completed).
   9. *Ban the word guard.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-     Decided 2026-09-20. Reason: a habit in the model's weights is
-     caught at the commit gate rather than by the user.
-  10. *Verify every rule.* Last, and likely the first loop. Every rule
-     in every Standard is run against this repo once, and the outcome
-     is recorded, never assumed.
-     - **By kind.** A rule with an address in the verifier table: by
-       running the check, which the green commit gate already does for
-       the 103 decided rows. A deterministic rule with a null row, 76
-       today: by hand or by an agent reading the population against the
-       predicate; where the rule is worth a script, write the checker
-       and give the row an address. A stochastic rule, 83 today: by an
-       agent reading a sample of members against the predicate; no
-       judge tool is built in this plan.
-     - **A false predicate** is fixed in this PR where the fix is small,
-       or becomes an issue naming the rule id and the failing members.
-       Known first: `standard.thin-shims` against the five detectors
-       that hold their own logic, `okf-lint`, `repo-lint`,
-       `harness-files-lint`, `ref-lint`, and `python-lint`; then the
-       four rules the holistic pass wrote or restored,
-       `decisions.immutable-after-merge`,
-       `knowledge-organization.skill-invocation`,
-       `distribution.a-valid-manifest`, and
-       `knowledge-organization.mapping-entry-shape`, which no run has
-       confirmed.
-     - **An undecidable predicate** is rewritten or deleted.
-     Reason: step 1's kind tags are aspirational, deterministic meaning
-     a script could decide the rule and not that one does; a Standard
-     that states what the repo does not do, with no issue that says so,
-     is the slop this work exists to remove.
+  10. *Verify every rule.* Last. A holistic pass over every
+     deterministic predicate, not a rush to the end, and not a Loop:
+     iteration, dynamic workflows, or subagents may do the work, but no
+     `loops/` file is written for it. No
+     new check is added one rule at a time, and no GitHub issue is
+     opened: every rule is fixed, reclassified, merged, or deleted in
+     this PR.
+     - **Reclassify.** Check every rule's kind. A deterministic rule
+       with a null row that no script could decide becomes stochastic.
+       A stochastic rule a script could decide becomes deterministic.
+     - **Deterministic only.** Stochastic rules stay null in the
+       verifier table. This step is deterministic cleanup.
+     - **Design the checking system as one unit.** Today's detectors
+       grew one at a time over months and were never refactored
+       together. Take every deterministic predicate together: which
+       kinds and groups of predicates exist, which files each reads, and
+       how they group into scripts with public APIs. Design a general,
+       modular, extensible system of checking scripts from that,
+       refactor the existing detectors into it, wire it into the
+       pre-commit hooks, and keep it at least as fast as the hooks are
+       today.
+     - **The design comes first.** Before any detector is rewritten, a
+       design document under this strand states the reclassified rule
+       set, the kinds of deterministic predicates, and the proposed
+       scripts and their APIs, and the user approves it. The rewrite
+       follows the approved design.
+     - **Remove redundancy.** A predicate that duplicates or overlaps
+       another is merged into it or deleted.
+     - **A rule the repo breaks** is fixed or deleted here.
+     Reason: step 1 tagged a rule deterministic when a script could
+     decide it, not when one does. A Standard that states what the repo
+     does not do is slop, and a checking system built greedily is one
+     nobody can extend.
 
   A step once here, scrubbing every file under `docs/` into a long-term
   home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except
@@ -178,250 +180,83 @@ specification.
 
 ## Completed
 
-- **One meaning per word, one home per word, 2026-09-15.** Every
-  word the four strands use is defined once, in the Terms bucket of
-  the set's root where more than one strand uses it and of a strand's
-  root where one does, and every other use links to it. Reason: the
-  same word carried two senses more than once in this work, guard
-  beside condition, evaluator beside verifier, bundle beside
-  directory, and each cost a round of correction; a loop reading these
-  files cannot ask which sense was meant. The words are in the set's
-  [Terms](/working-docs/doc-type-system/ROOT.md#terms).
+- **One meaning per word, one home per word, 2026-09-15.** Every word
+  the four strands use is defined once, in the set's
+  [Terms](/working-docs/doc-type-system/ROOT.md#terms) or in one
+  strand's root, and every other use links to it. Reason: the same word
+  carried two senses more than once in this work, and a loop reading
+  these files cannot ask which was meant.
 - **One doc-type for Standard.** Merged into one directory,
-  [doc-types/standard/](/doc-types/standard/index.md), with Contract
-  defined by the cut in [Doc-Type](/doc-types/doc-type.md). The shape
-  it carries there is the one the refactor replaces with
+  [doc-types/standard/](/doc-types/standard/index.md), whose shape the
+  refactor replaces with the
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)'s.
-
 - **Standard takes its new shape, 2026-09-20.** Step 1 of The system.
-  Every rule in the 25 drained rulesets is a heading, a predicate, and
-  a trailer `` `<name>.<slug>` · deterministic|stochastic ``, 251 rules
-  in all, drained one ruleset at a time by the
+  Every rule under `standards/` is a heading, a predicate, and a trailer
+  `` `<name>.<slug>` · deterministic|stochastic ``, drained one ruleset
+  at a time by the
   [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md)
-  rubric; `standard/cards.md` stayed undrained for the card step, and
-  `standard/gates.md` for the boundary step, which retired it. Teaching the drains displaced is a guide at
-  `docs/guides/<name>.md`, twelve in all, one per Standard directory.
-  The closing pass drew the verifier and boundary tables by hand,
-  read the rulesets across each other, and left its findings and
-  every deferral in a worksheet, Verifiers and Boundaries, each
-  deferral also named at the step that owns it; the worksheet was
-  deleted at the boundary step once both tables were real. Reason: a loop
-  cannot route a rule without an id and a kind, and text no verifier
-  reads is text the state is not held to.
-- **The verifier table, 2026-09-20.** Step 2 of The system. The table
-  is `standards/verifiers.yaml`, one row per rule id declared under
-  `standards/`, mapped to the address of the one check that decides it
-  or null: a first-party detector by path, `scripts/repo-lint`; a
-  dependency by its pre-commit hook id, `ruff-format`, `ruff-check`,
-  `shellcheck`, `shfmt`; or a dependency by its `pyproject.toml` name
-  and subcommand, `mypy`, `pre-commit validate-manifest`, since those
-  two run outside pre-commit. `scripts/verifier-table`
-  (`src/dev_playbook/verifier_table.py`) derives it from the rule
-  trailers, each detector's `--list-rules`, and a six-entry dependency
-  map, writes it with `--write`, and is the lint otherwise; it sits in
-  the playbook-lint roster, so the commit gate regenerates and compares
-  on every commit. It fails loud in four ways, each a rule of the
-  rewritten `standard/detectors.md`: `the-verifier-table` when the
-  committed file differs from a fresh write; `an-emitted-id-is-a-rule-heading`
-  when a check claims an id no heading declares deterministic, or two
-  checks claim one id; `an-address-exists` when a dependency address
-  is no hook id and no dependency of the repo; and
-  `a-consumer-adds-only-its-own-rules` when a repo other than
-  dev-playbook declares an id the shipped table carries. A trailer that
-  disagrees with its heading, has none, or repeats an id is exit 2. In
-  a consumer the checks asked are its own `scripts/` hooks, and its
-  table holds only its rules; the union is read from the pinned clone.
-  At first write the table has 262 rows: 103 decided, 83 stochastic
-  null, and 76 deterministic null, the rules no script has ever
-  checked, which stay unchecked. All eleven detectors emit rule-heading
-  ids, with splits and merges as the step-1 worksheet's corrected
-  Emitted ids table listed, before the boundary step deleted it; six rules the step-1 read overclaimed are null
-  (`an-act-links-a-runbook`, `harness.tool-fields`, `row-description`,
-  `resource`, `ticket-parentage`, `epic-headings`). The four decisions:
-  `prose.the-banned-word` is a deterministic rule of
-  `prose/conventions.md`, its three naming files exempt through
-  `.prose-lint-exempt`; `doc-shape` split into `h1` and
-  `the-language-section`; `no-blocked-label` retired into
-  `valid-labels`; `registry-location` kept under `local-declaration`.
-  `standard/cards.md` got trailers so standards-lint's six card rules
-  are headings (`directory-layout`, `define-points-only-at-rulesets`,
-  `the-question-sentence`, `the-directorys-introduction`,
-  `the-catalog`, `no-shadowing`); `audit-cites-a-lint` is null;
-  `rule-matrix` and `card-namespaced-rule-ids` are deleted. No
-  `audit()` function exists; a judge, when one is built, reads the
-  table. Reason: the table is the one place the Standard files and the
-  checks meet, and a generator that fails cannot drift from either.
+  rubric; the teaching the drains displaced became guides. Reason: a
+  loop cannot route a rule without an id and a kind.
+- **The verifier table, 2026-09-20.** Step 2 of The system.
+  `standards/verifiers.yaml` maps every rule id under `standards/` to
+  the one check that decides it, or null. `scripts/verifier-table`
+  derives it from the trailers, each detector's `--list-rules`, and a
+  dependency map; `--write` writes it and the bare call lints it on
+  every commit, failing loud by the rules of `standard/detectors.md`. A
+  consumer's table holds only its own rules; the union is read from the
+  pinned clone.
 - **Boundaries: where each check runs, 2026-09-20.** Step 3 of The
-  system. The file is `standards/boundaries.yaml`, one row per address
-  the verifier table names, valued by the gates that run it in order
-  from `commit`, `push`, `ci`, `on-demand`: at first write nineteen rows,
-  sixteen at all three gates, `scripts/ref-lint` at `[commit, push]`,
-  `mypy` at `[push]`, `scripts/workspace-lint` at `[on-demand]`.
-  `scripts/boundary-table` (`src/dev_playbook/boundary_table.py`)
-  derives it from the wiring, never from prose: each hook of
-  `.pre-commit-config.yaml` by its stages, `playbook-lint` expanded to
-  its roster and the manifest check, the pre-push hook's `make check`
-  read through `make -n`, each workflow's `run` steps under their
-  `SKIP`, and playbook-lint's `UNGATED_AUDITS` for `on-demand`. It
-  writes with `--write`, is the lint otherwise, and sits in the
-  playbook-lint roster. Its two rules are in `standard/detectors.md`:
-  `standard.the-boundary-table`, the committed file equals a fresh
-  write; and `standard.every-address-runs-somewhere`, every address is
-  at a gate or registered ungated, and no registered audit is at a
-  gate. The second is the closure leg standards-lint's hosting rule
-  carried, which left standards-lint with its two tests; the verifier
-  table gained the two rows. `standard/gates.md` is deleted: its three
-  rungs are the file's columns, defined in the boundary rule; its
-  installed-in-every-clone fact was already bootstrap's step 4; its
-  skips rule and the teaching about where a check runs are two sections
-  of `docs/guides/standard.md`; its red CI rule is deleted, a thing
-  nobody needs written down; the per-machine skips stay in
-  `docs/machines.md`. Its readers repointed:
-  `doc-types/standard/encoding.md`, `contract-shape.md`,
-  `residual-ledger.md` (its gates entry deleted), `docs/guides/tracking.md`,
-  `docs/machines.md`, `standard/consuming.md`, `card.md`, `index.md`,
-  `detectors.md`, and the comments in `playbook_lint.py` and
-  `standards_lint.py`; the Meta-Standard's description now ends "and
-  the boundaries", in the card, its index, and the catalog. The
-  canonical `ci.yml` and dev-playbook's own now read `SKIP: ref-lint`:
-  `web-typecheck` is a hook only dev-playbook has, so its name leaves
-  the file every governed repo copies, and dev-playbook's own CI now
-  runs it. The step-1 worksheet, Verifiers and Boundaries, is deleted;
-  every deferral it held was already named at its step. Reason: which
-  gate runs a check is wiring, and a file derived from the wiring
-  cannot lie about it.
+  system. `standards/boundaries.yaml` maps every address the verifier
+  table names to the gates that run it, `commit`, `push`, `ci`,
+  `on-demand`. `scripts/boundary-table` derives it from the wiring, the
+  pre-commit config, the pre-push `make check`, the workflows, and
+  playbook-lint's ungated audits, never from prose. `standard/gates.md`
+  is deleted: the rungs are the file's columns.
 - **Isolate the software factory, 2026-09-20.** Step 4 of The system.
-  The set is `working-docs/software-factory/`; its `ROOT.md` names every
-  piece and where it came from: `docs/` the ten files with their index
-  and README, `agents/` six, `skills/` eight, `code/` the package and
-  `traverse-issue`, `tests/` the three modules and the four helpers
-  after `tests/conftest.py`'s banner, `StoredRow`, `ledger_rows`,
-  `write_definition`, `process_state`, which only they used. Links
-  among the moved files follow them; the `~/.claude/skills/` links
-  between moved skills became citations into the set. The inbound
-  links were cut or repointed as planned, and four more were found:
-  `docs/headless.md`'s preflight paragraph is deleted,
-  `docs/measurement-derivation.md` and `dotfiles/README.md` are
-  reworded, `pyproject.toml`'s comment no longer names the factory
-  tests. `candidate-promote`'s `{Run [/intake]}` span is plain prose,
-  since `scripts/chaingen` refuses a dangling link; the skill does not
-  work without intake, and its fate goes with the factory's. The
-  fact-base strand's factory subject is marked waiting; the viewer
-  strand's example agent is `doc-set-deslopper`. `chaingen` rewrote
-  `chains.txt` to 30 chains. Left for step 7: the Runbook residual
-  ledger's sections for the moved runbooks and `contract-shape.md`'s
-  `adjudicator` excerpt. Verified: playbook-lint's thirteen detectors
-  clean, `make check` green, 1015 tests.
+  Everything of the factory lives in `working-docs/software-factory/`,
+  whose `ROOT.md` names each piece and where it came from; every link
+  into it from the rest of the repo was cut or repointed.
+  `candidate-promote` does not work without intake, and its fate goes
+  with the factory's.
 - **Guide and Explanation, 2026-09-20.** Step 5 of The system. The
-  registry defines `Guide` as instruction on how to do a kind of work
-  and adds `Explanation`, the reasoning behind one Standard's rules at
-  `standards/<name>/explanation.md`; okf-lint holds the slot,
-  `typed-explanation`, and standards-lint admits only
-  `Standard-Ruleset`, `Explanation`, and `Guide` beside a card, under
-  `directory-layout`. The twelve guides moved there, `docs/guides/` is
-  gone, and `headless.md` is a Guide. Target state moved into rulesets:
-  the `protect-main` field table, the bundle tree and the two
-  frontmatter templates, the two skeleton trees, the CONTEXT.md
-  template, and the `okf_types` example. Predicates found only in the
-  explanations became rules: a new ruleset `tracking/candidates.md`,
-  one home, entry shape, structure, in the tracking card's Define
-  cell, a promotion rule cut as procedure; and `prohibited-surfaces`, `artifacts`, the session
-  leaf's `Unknown` scope, `one-published-id`, `the-roster`,
-  `one-version-set`, `a-skip-is-machine-state`; every new id is null
-  in the verifier table. `harness/files.md` is a ruleset,
-  `harness.members`, in the harness card's Define cell;
-  `file-roles.md` is gone, its table a paragraph of the
-  knowledge-organization explanation, and `CONTEXT.md`, the viewer, and
-  `index_tree.py` point at that paragraph or the vocabulary. The
-  isolated factory's links to the moved guides were repointed so
-  ref-lint stays green. A guide has one home, `guides/`, the tree
-  reserved for the type as `standards/` and `loops/` are for theirs,
-  held by okf-lint's `typed-guide`; the six moved there, `bootstrap`,
-  `consuming`, `writing-for-agents`, `linking-issues`, `headless`, and
-  `slop-tics`, a list of actions retyped Guide, and standards-lint
-  admits ruleset and explanation only beside a card. No further
-  trivial conduct rule was found. Verified:
-  playbook-lint's thirteen detectors clean, `make check` green, 1016
-  tests.
-- **Retire the card, 2026-09-20.** Step 6 of The system. The twelve
-  `card.md` files, the type `Standard-Card`, the four cells, `cardgen`,
-  `rulegen`, and the two `.txt` views are gone; the factory's card had
-  gone at step 4. `Standard-Ruleset` is `Standard` in every frontmatter,
-  the registry, and okf-lint, whose rule is `typed-standard`. Each
-  directory index opens with the sentence its card carried, and the
-  catalog row carries that sentence verbatim. `standard/cards.md` is
-  `standard/tree.md`, "The Standards Tree", population "a repo's
-  standards/ tree", five rules: `directory-layout`, `the-population`
-  (new, rulegen's one check kept), `the-rule-shape` (new, null),
-  `the-catalog`, `no-shadowing`, each a predicate and its id line with the
-  reasoning in the explanation; standards-lint decides four, the
-  question sentence, the directory's introduction, Define, and
-  `audit-cites-a-lint` retired, `the-hosting-pattern` without its Audit
-  leg. Loop Conventions and loop-lint: a check links a file typed
-  `Standard`. `guides/consuming.md` is the post-card recipe. The
-  vendored spec is `docs/references/okf-spec.md`, so `references/` is no
-  longer an exception anywhere. Every card sentence was checked against
-  its Standard's explanation: each reason was already there, so nothing
-  moved and the rest, "a chosen gap, not a forgotten one", was deleted.
-  Six runbooks the Adopt cells linked have no pointer from a Standard,
-  as the reference model rules. The doc-type files changed only where
-  a link would break; the prose is step 7's, listed there. Consumers:
-  a leftover card is an unknown type at the next pin bump. Verified:
-  playbook-lint's thirteen detectors clean, `make check` green, 998
-  tests.
-- **Ban the word guard, 2026-09-21.** Step 9 of The system. A guard
-  is one kind of condition, the boolean on a branch or transition, so
-  `condition` is always correct where `guard` is; the ban holds only
-  where the doc-type system defines the word, because in code a guard
-  clause is a guard clause. prose-lint's one banned word became a
-  vocabulary in two layers: the workspace's, the actor noun, fixed in
-  the module, and the repo's, a tracked root `.prose-lint-vocabulary` of
-  word, `say`, and `where`, the directories the ban covers, omitted to
-  cover the whole repo; a later layer adds words and never re-declares
-  one, and a faulty declaration is exit 2. dev-playbook's declares
-  `guard`, say `condition`, under `doc-types/` and `standards/doc-type/`.
-  Doc Conventions gains the rule `prose.the-repo-vocabulary`,
-  deterministic, beside `prose.the-banned-word`. `generator` and
-  `adopt`, once listed here, are not banned: the only reasons on record
-  were one tool's vocabulary and a card cell step 6 deleted, and neither
-  is a reason to ban an English word.
-- **The specification becomes a Standard, 2026-09-21.** Step 8 of The
-  system. `standards/doc-type/` holds the doc-type Standards: `doc-type.md`,
-  population a directory `doc-types/<name>/`, seven rules over any
-  doc-type, one deterministic and six stochastic until a `contract-shape`
-  extractor exists, bound to no gate; and beside it the three Standards
-  over the files a doc-type types, Runbook Conventions from `harness/`,
-  Loop Conventions from `knowledge-organization/`, and Standard
-  Conventions split out of The Standards Tree, the population, the rule
-  shape, and decidable predicates. The split follows each directory's
-  statement, "X governs Y": a rule over what is inside a file is the
-  doc-type's, a rule over where a file sits is the family's, so
-  Runbook's Location rule moved to Claude Code Files with its id kept,
-  and `typed-standard` and `typed-loop` stayed with Document Types. The
-  Standards Tree gained `standard.the-statement`: every directory index
-  opens with the sentence the catalog repeats. Thirty-three rule ids
-  took the `doc-type.` prefix, in harness-files-lint, loop-lint,
-  standards-lint, and their tests. The draft `specification/` is
-  deleted: its location and one-module rules had no referent, the
-  per-doc-type files restated verb sets or duplicated the Standards
-  above, and `audit()` was decided away at step 2; Loop's three drafted
-  rules are a planned item of the Loop strand. Verified: playbook-lint's
-  thirteen detectors clean, `make check` green.
+  registry defines `Guide`, how to do a kind of work, homed in
+  `guides/`, and `Explanation`, the reasoning behind one Standard's
+  rules at `standards/<name>/explanation.md`; standards-lint admits
+  only a Standard, an Explanation, and a Guide in a Standard directory.
+  Target state that lived in explanations became rules, each null in
+  the verifier table until a check exists.
+- **Retire the card, 2026-09-20.** Step 6 of The system. The `card.md`
+  files, the type `Standard-Card`, `cardgen`, `rulegen`, and the `.txt`
+  views are gone, and `Standard-Ruleset` is `Standard` everywhere. Each
+  directory index opens with the sentence its card carried and the
+  catalog repeats it. `standard/cards.md` is `standard/tree.md`, The
+  Standards Tree. A consumer's leftover card is an unknown type at the
+  next pin bump.
 - **Tidy the doc-type definitions, 2026-09-21.** Step 7 of The system.
-  The pseudocode is four blocks organized as code with imports, the
-  base in `doc-types/doc-type.md` and one class per `contract-shape.md`,
-  no class carrying a location; the reference model holds the four
-  whole and `tests/test_pseudocode_sync.py`, temporary, fails when the
-  texts differ. Runbook's verbs are six, `accept` for `args` and a
-  `banned` polarity for `never`, in its three pages and in Runbook
-  Conventions' Carries its chain. `chaingen` and `chains.txt` are
-  deleted, kept at `b266ce4`, with the two "The view" sections. The
-  Standard pages are Population and Rules, its encoding, and a
-  definition with one verb; the registry rulings have one `Standard`
-  row; a Loop's check links a file typed `Standard`. Thirteen factory
-  sections and the card entries left the ledgers. Verified:
-  playbook-lint's thirteen detectors clean, `make check` green, 999
-  tests.
+  The pseudocode is four blocks, the base in `doc-types/doc-type.md`
+  and one class per `contract-shape.md`, none carrying a location; the
+  reference model holds all four and `tests/test_pseudocode_sync.py`,
+  temporary, fails when the texts differ. `chaingen` and `chains.txt`
+  are deleted, kept at `b266ce4`.
+- **The specification becomes a Standard, 2026-09-21.** Step 8 of The
+  system. `standards/doc-type/` holds
+  [Doc-Type](/standards/doc-type/doc-type.md), seven rules over any
+  doc-type directory, and the three Standards over the files a doc-type
+  types, Standard, Runbook, and Loop Conventions. The placement rule: a
+  rule over what is inside a file is the doc-type's Standard's; a rule
+  over where a file sits is the family's. The Standards Tree gained
+  `standard.the-statement`, the sentence every directory index opens
+  with and the catalog repeats. The draft `specification/` is deleted;
+  Loop's three drafted rules are a planned item of the Loop strand.
+- **Ban the word guard, 2026-09-21.** Step 9 of The system. A guard is
+  one kind of condition, so `condition` is always correct where `guard`
+  is. prose-lint's banned word became a vocabulary in two layers: the
+  workspace's actor noun, fixed in the module, and the repo's own words
+  in a tracked root `.prose-lint-vocabulary` of word, `say`, and
+  `where`, the directories the ban covers; a faulty declaration is exit
+  2. dev-playbook bans `guard` under `doc-types/` and
+  `standards/doc-type/`; the rule is `prose.the-repo-vocabulary` in Doc
+  Conventions.
 
 ## Acronyms
 
