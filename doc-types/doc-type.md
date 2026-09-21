@@ -9,8 +9,9 @@ description: What a doc-type is in one sentence, where the theory of the doc-typ
 A **doc-type** hands one documentation family a contract shape: the
 form every member of the family is read against, so a caller learns
 what it needs without reading the body. An **instance** is one member
-of the family, one runbook, one standard, one loop. This repo's built
-doc-types, and what each directory holds, are
+of the family, one runbook, one standard, one explanation, one guide,
+one loop. This repo's built doc-types, and what each directory holds,
+are
 [Doc-Type System](/doc-types/doc-type-system.md).
 
 The theory of the system, what a doc-type is made of, its verbs, and
@@ -27,13 +28,14 @@ every doc-type is held to are the Standard
 The pseudocode of the system is split the way code is: this block is
 the base module, what more than one doc-type uses, and each doc-type's
 `contract-shape.md` holds its own class and opens with the imports it
-needs. The reference model holds the four blocks whole, in this order,
-Runbook, Standard, Loop, and `tests/test_pseudocode_sync.py` fails when
-the texts differ
+needs. The reference model holds the six blocks whole, in this order,
+Runbook, Standard, Explanation, Guide, Loop, and
+`tests/test_pseudocode_sync.py` fails when the texts differ
 ([Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language)).
 
 ```python
 Verb = NewType("Verb", str)      # a verb is a string; the type says which strings
+Id   = NewType("Id", str)        # the id of a part of a DocType, in the written form its DocType fixes
 
 
 class DocType:

@@ -106,7 +106,7 @@ class Explanation(DocType):
         explains: set[Id]         # the trailer line; each id resolves to a part of `subject`, and a part may have no Reason
         why:      str             # everything between the heading and the trailer; never a predicate
 
-    subject: DocType              # the document this explains, the file beside it, found by name; today always a Standard
+    subject: DocType              # the document this explains, the file beside it, found by name
     reasons: list[Reason]         # in file order, and nothing else under the H1
 
 

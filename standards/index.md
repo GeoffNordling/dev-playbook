@@ -15,7 +15,7 @@ alphabetical.
 - [build/](/standards/build/index.md) — Build governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 - [decisions/](/standards/decisions/index.md) — Decision Records governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, immutability, and status vocabulary
 - [distribution/](/standards/distribution/index.md) — Distribution governs how dev-playbook's checks reach the governed repos — the published hook, the roster, dogfooding, and the pinned rev
-- [doc-type/](/standards/doc-type/index.md) — Doc-Type governs the doc-types and the files typed by them — what any doc-type satisfies, and the form a Standard, a Runbook, and a Loop take
+- [doc-type/](/standards/doc-type/index.md) — Doc-Type governs the doc-types and the files typed by them — what any doc-type satisfies, and the form a Standard, a Runbook, a Loop, an Explanation, and a Guide take
 - [harness/](/standards/harness/index.md) — Harness Files governs which files Claude Code loads and where each sits — the members and their classes, a runbook's location, and a CLAUDE.md's content
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — Knowledge Organization governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and documentation sets
 - [modules/](/standards/modules/index.md) — Module Design governs how modules are designed — interfaces, depth, and seams

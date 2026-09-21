@@ -18,35 +18,37 @@ checked against.
   exclusions: `an authored document, except type: Reference and the
   paths in .prose-lint-exempt`. Every rule is a predicate over a member
   of this class.
-- **Rule.** An id, a kind, a predicate, and a condition. The id,
+- **Rule.** An id, a kind, a predicate, and a condition or none. The id,
   `<name>.<slug>`, is the rule's identity, the atom the verifier and
   boundary tables join on. The kind is deterministic or stochastic. The
   predicate is the check whole: a reader with only that text can apply
   it, and for a stochastic rule it is the judge's prompt.
-- **Condition.** What must hold of a member for the rule to bind it,
-  named as a subset of the population: `python`, for a rule that holds
-  only in a repo with a `pyproject.toml`; `harness-loaded agent
-  instructions`, for a rule over runbook and context files only. A
-  rule with no condition binds every member. The word is shared with
+- **Condition.** A part a rule sits under: a heading with no id and
+  no trailer, whose first paragraph names which members the rules
+  under it bind, written once and shared by them: `python`, for the
+  rules that hold only in a repo with a `pyproject.toml`; `harness-loaded
+  agent instructions`, for the rules over runbook and context files
+  only. A rule under no condition binds every member. The word is shared with
   Runbook, where an edge's condition is what must hold for it to fire,
   and with Loop, where it is what must hold for an act or check to
   fire.
 
-The composition rule: exactly one population, any number of rules. A
-Standard carries no pointer to a verifier or a gate, since the
-verifier table and the boundary table hold those, keyed by rule id
+The composition rule: exactly one population, any number of rules,
+each under one condition or none. A Standard carries no pointer to a
+verifier or a gate, since the verifier table and the boundary table
+hold those, keyed by rule id
 ([Detectors](/standards/standard/detectors.md)), and no rationale,
-since the reasoning is the explanation beside it
-([System Legibility](/docs/system-legibility.md#standing-principles)).
+since the Reasons are the Explanation beside it
+([Explanation](/doc-types/explanation/definition.md)).
 
 The shape as code, one module importing the base in
 [Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
 the same text whole and a test keeps them identical.
 
 ```python
-from doc_type import DocType, Target
+from doc_type import DocType, Id, Target
 
-RuleId = NewType("RuleId", str)  # build.tests-present
+RuleId = NewType("RuleId", Id)   # build.tests-present
 
 
 class Standard(DocType):
@@ -54,11 +56,14 @@ class Standard(DocType):
     operations  = {hold}
     frontmatter = DocType.frontmatter | {type, title, population}
 
+    class Condition:              # a part: an H2 with no id and no trailer, written once and shared by the H3 rules under it
+        scope: str                # its first paragraph: which members those rules bind
+
     class Rule:                   # a part: an H2, or an H3 under a condition
         id:        RuleId
         kind:      deterministic | stochastic
         predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
-        condition: "Rule | None"  # the rule this one is under; None binds every member
+        condition: Condition | None   # None binds every member
 
     population: type[Target]      # frontmatter, one phrase naming the class and its exclusions
     rules: list[Rule]             # in file order

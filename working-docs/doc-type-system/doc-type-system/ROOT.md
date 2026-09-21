@@ -164,58 +164,28 @@ specification.
      entry is in [Completed](#completed).
   9. *Ban the word guard.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-  10. *Doc-types before migration.* Step 11 moves prose into
-     Explanations and Guides, and neither has a doc-type: the registry
-     rules them Pending and Important. Building them first is what
-     keeps the migration honest. In order:
-     - **Scrub, done 2026-09-21.** Thirteen Opus agents tagged every
-       paragraph, bullet, and table row of the 13 `explanation.md`
-       files with the rule ids it explains: 232 units, 131 naming one
-       rule, 68 naming several, 32 naming none; 75 of 284 rules
-       explained nowhere. Of the 13 units whose ids crossed a Standard
-       or a family, nine were citations, one sat in the wrong family,
-       and three held one sentence that belongs beside another
-       Standard's rule. The tables were discarded as noise; the ruling
-       they produced is the Explanation principle above.
-     - **Design in the reference model.** Both shapes and the
-       Standard change below are drawn first in
-       [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
-       the one picture; the user approves it there before `doc-types/`
-       changes, and the pinned test fails until the pages catch up.
-     - **Explanation.** Verb: explain. One Explanation beside each
-       Standard, `standards/<name>/<topic>-explanation.md`, typed
-       `Explanation`. Parts: under the H1, Reasons only, each a heading,
-       a body that is the why and never a predicate, and one line
-       naming the rule ids it explains. Composition: every id a Reason
-       names resolves in the Standard beside it, a rule may have no
-       Reason, and no rule-kind trailer appears. The pseudocode names
-       the explained document by its base type, not Standard, so it
-       stays minimal and general. These are its deterministic
-       verifiers; step 12 builds them.
-     - **Guide.** Verb: instruct. One file under `guides/`, typed
-       `Guide`, organised by the work it is read before. Parts: the
-       work, its sections, and citations of rule ids. Composition: a
-       Guide may cite a rule and never states one, so it carries no
-       trailer line, and every id it cites resolves. Its verifiers
-       likewise wait for step 12.
-     - **Standard's condition.** The contract shape's `condition: Rule
-       | None` becomes a `Condition` part, an H2 with no id and no
-       trailer that scopes the H3 rules under it, and `Rule.condition`
-       points at it or none. The reference model, the pinned test, and
-       [the rule shape](/standards/doc-type/standard-conventions.md#the-rule-shape)
-       move together.
-     - **Build.** `doc-types/explanation/` and `doc-types/guide/` in
-       the four-file form; `explanation-conventions.md` and
+  10. *Doc-types before migration.* The shapes are decided in
+     [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md);
+     see [Completed](#completed). What remains, in order:
+     - **Pages.** `doc-types/doc-type.md` gains `Id`,
+       `doc-types/standard/contract-shape.md` the Condition part,
+       `doc-types/explanation/` and `doc-types/guide/` are written in
+       the four-file form, the pinned test lists the two new pages and
+       passes, and the registry rulings row for each.
+     - **Standards.** `explanation-conventions.md` and
        `guide-conventions.md` under `standards/doc-type/`, each rule a
-       predicate over one member with a trailer and a verifier row,
-       null until step 12; the registry rulings row for each; the
-       13 `explanation.md` files split per Standard by script, one
-       file per Standard, each existing paragraph kept as a Reason with
-       its explains line where it is the why of that Standard's rules,
-       moved where it is the why of another Standard's rules, and
-       deleted where it is a citation, a definition, a procedure, or a
-       description of state, so that step 11 works from the new
-       shape.
+       predicate over one member with a trailer and a null verifier row
+       until step 12.
+     - **Migrate.** The 13 `explanation.md` files split per Standard by
+       script; each paragraph is then kept as a Reason with its explains
+       trailer, moved to the Standard it is the why of, or deleted where
+       it is a citation, a definition, a procedure, or a description of
+       state, the user ruling from one sheet per family. The six Guides
+       are retyped and checked for trailers; Guide's parts and the
+       CLOA-parseable encoding that carries them are decided here,
+       from what structure the six share, and the shape page, the
+       encoding page, the reference model, and `guide-conventions.md`
+       follow.
      Reason: the pass was about to move prose between file types with
      no contract, which is how the tangle it untangles was made.
   11. *Settle every rule.* A holistic pass over every rule, not a
@@ -305,6 +275,14 @@ specification.
 
 ## Completed
 
+- **Explanation and Guide shaped, 2026-09-21.** Step 10 of The
+  system, first half. Thirteen Opus agents tagged every paragraph of
+  the 13 `explanation.md` files with the rule ids it explains; the
+  tables were noise and were discarded, but they settled the shape: a
+  Reason is one decision naming one or more rules of the one Standard
+  beside it, a rule may have none, and an Explanation holds nothing
+  else. The reference model gained `Id`, the Condition part,
+  Explanation, and Guide; the pages catch up in the second half.
 - **One meaning per word, one home per word, 2026-09-15.** Every word
   the four strands use is defined once, in the set's
   [Terms](/working-docs/doc-type-system/ROOT.md#terms) or in one

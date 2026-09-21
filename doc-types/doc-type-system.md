@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Doc-Type System
-description: This repo's doc-type instantiation — the registry rulings, the three built doc-types, what each directory holds, and the Standard that binds each one
+description: This repo's doc-type instantiation — the registry rulings, the five built doc-types, what each directory holds, and the Standard that binds each one
 ---
 
 # Doc-Type System
@@ -31,9 +31,9 @@ reader must learn. A row reading *pending* is not yet ruled.
 |---|---|---|
 | Candidate-List | candidate lists | Pending |
 | Decision-Record | decision records | Pending |
-| Explanation | explanations | Pending |
+| Explanation | explanations | The [Explanation](/doc-types/explanation/definition.md) doc-type |
 | General-Sheet | — | Pending; its replacement is an open question ([Candidates](/CANDIDATES.md)) |
-| Guide | guides | Important; no doc-type built yet |
+| Guide | guides | The [Guide](/doc-types/guide/definition.md) doc-type |
 | Log | logs | Pending; the user's to rule |
 | Loop | loops | The [Loop](/doc-types/loop/definition.md) doc-type |
 | README | readmes | Pending |
@@ -52,20 +52,25 @@ reader must learn. A row reading *pending* is not yet ruled.
 
 ## The built doc-types
 
-Three, each one directory under `doc-types/`:
+Five, each one directory under `doc-types/`:
 
 - **Runbook** — an invocable command, a skill or an agent definition
   ([definition](/doc-types/runbook/definition.md)).
 - **Standard** — a normative target a class of object is held to,
   one population and its rules
   ([definition](/doc-types/standard/definition.md)).
+- **Explanation** — the Reasons for one Standard, each one design
+  decision and the argument for it
+  ([definition](/doc-types/explanation/definition.md)).
+- **Guide** — instructs one kind of work
+  ([definition](/doc-types/guide/definition.md)).
 - **Loop** — a document that drives a state toward a target state,
   pointing at runbooks and standards
   ([definition](/doc-types/loop/definition.md)).
 
 Instances never live in the doc-type tree. They stay with their
-populations, under the harness roots, `standards/`, and `loops/`, and
-a contract rides inside its instance file.
+populations, under the harness roots, `standards/`, `guides/`, and
+`loops/`, and a contract rides inside its instance file.
 
 ## The bundle
 
@@ -90,7 +95,7 @@ Loop's view is the Mermaid graph inside each instance.
 
 A doc-type declares what a contract shape *is*; it never binds anyone
 to use it. The binding rule — every instance in the family must carry
-its contract — is a Standard's job, and the three sit together under
+its contract — is a Standard's job, and the five sit together under
 [standards/doc-type/](/standards/doc-type/index.md): Runbook's
 obligation rides
 [Runbook Conventions](/standards/doc-type/runbook-conventions.md),
@@ -98,5 +103,8 @@ audited by `scripts/harness-files-lint`; Loop's rides
 [Loop Conventions](/standards/doc-type/loop-conventions.md), audited
 by `scripts/loop-lint`; Standard's rides
 [Standard Conventions](/standards/doc-type/standard-conventions.md),
-audited by `scripts/standards-lint`. The shape is never itself a
-Standard, so Standard, Runbook, and Loop remain peers.
+audited by `scripts/standards-lint`; Explanation's rides
+[Explanation Conventions](/standards/doc-type/explanation-conventions.md)
+and Guide's
+[Guide Conventions](/standards/doc-type/guide-conventions.md). The
+shape is never itself a Standard, so the five remain peers.
