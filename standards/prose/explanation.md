@@ -96,6 +96,14 @@ who dispatches, reviews, and approves is the `user`, and prose-lint's
 `banned-word` check refuses the commonest synonym everywhere in the
 tree, code and config included, with no backtick escape
 ([Terminology: the person is the user](/standards/prose/conventions.md#terminology-the-person-is-the-user)).
+The banned word is the workspace's layer of a vocabulary a repo extends
+in its own `.prose-lint-vocabulary`: each entry is a word, the word that
+replaces it, and the directories the ban covers, so a term one part of
+a tree defines is held to there and left alone where it means something
+else. dev-playbook bans `guard` under `doc-types/` and
+`standards/doc-type/`, where the doc-type system's word is `condition`,
+and not in code, where a guard clause is a guard clause
+([The repo vocabulary](/standards/prose/conventions.md#the-repo-vocabulary)).
 House spelling is American English, which is why `judgment` is the
 one word prose-lint spells for the writer.
 

@@ -46,6 +46,7 @@ EXEMPT: dict[Path, frozenset[str]] = {
             # prose-lint enforces these deterministically.
             "spelling",
             "the-banned-word",
+            "the-repo-vocabulary",
             "terminology-the-person-is-the-user",
         }
     ),

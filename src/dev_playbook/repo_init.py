@@ -71,7 +71,7 @@ def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
             f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
             f"{fault}; choose another name"
         )
-    if prose_lint.BANNED_PATTERN.search(spec.name):
+    if any(w.pattern.search(spec.name) for w in prose_lint.WORKSPACE_VOCABULARY):
         raise RepoInitError(
             f"'{spec.name}' would write a CLAUDE.md that prose-lint rejects — "
             f"the person is the 'user'; choose another name"

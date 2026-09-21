@@ -185,6 +185,7 @@ prose.positive-statement: null
 prose.spelling: scripts/prose-lint
 prose.terminology-the-person-is-the-user: null
 prose.the-banned-word: scripts/prose-lint
+prose.the-repo-vocabulary: scripts/prose-lint
 prose.third-person: null
 python.annotated-signatures: mypy
 python.docstring-content: null

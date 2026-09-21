@@ -118,12 +118,8 @@ specification.
      [Completed](#completed).
   8. *The specification becomes a Standard.* Done 2026-09-21; the
      entry is in [Completed](#completed).
-  9. *Ban the word guard.* prose-lint's banned-word rule, today one
-     word, the actor noun, gains `guard`, with a message naming `condition`;
-     `prose/conventions.md`'s rule text and `.prose-lint-exempt` follow.
-     `generator` and `adopt`, once listed here, are not banned: the only
-     reasons on record were one tool's vocabulary and a card cell that
-     step 6 deletes, and neither is a reason to ban an English word.
+  9. *Ban the word guard.* Done 2026-09-21; the entry is in
+     [Completed](#completed).
      Decided 2026-09-20. Reason: a habit in the model's weights is
      caught at the commit gate rather than by the user.
   10. *Verify every rule.* Last, and likely the first loop. Every rule
@@ -373,6 +369,22 @@ specification.
   a leftover card is an unknown type at the next pin bump. Verified:
   playbook-lint's thirteen detectors clean, `make check` green, 998
   tests.
+- **Ban the word guard, 2026-09-21.** Step 9 of The system. A guard
+  is one kind of condition, the boolean on a branch or transition, so
+  `condition` is always correct where `guard` is; the ban holds only
+  where the doc-type system defines the word, because in code a guard
+  clause is a guard clause. prose-lint's one banned word became a
+  vocabulary in two layers: the workspace's, the actor noun, fixed in
+  the module, and the repo's, a tracked root `.prose-lint-vocabulary` of
+  word, `say`, and `where`, the directories the ban covers, omitted to
+  cover the whole repo; a later layer adds words and never re-declares
+  one, and a faulty declaration is exit 2. dev-playbook's declares
+  `guard`, say `condition`, under `doc-types/` and `standards/doc-type/`.
+  Doc Conventions gains the rule `prose.the-repo-vocabulary`,
+  deterministic, beside `prose.the-banned-word`. `generator` and
+  `adopt`, once listed here, are not banned: the only reasons on record
+  were one tool's vocabulary and a card cell step 6 deleted, and neither
+  is a reason to ban an English word.
 - **The specification becomes a Standard, 2026-09-21.** Step 8 of The
   system. `standards/doc-type/` holds the doc-type Standards: `doc-type.md`,
   population a directory `doc-types/<name>/`, seven rules over any

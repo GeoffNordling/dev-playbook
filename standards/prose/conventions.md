@@ -11,7 +11,9 @@ How Markdown documents in workspace repos are written. Every authored
 document is bound, except one carrying `type: Reference` frontmatter — a
 verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
-`.prose-lint-exempt` at its root, under a comment saying why.
+`.prose-lint-exempt` at its root, under a comment saying why, and bans
+words of its own, in all or part of its tree, by declaring each with its
+replacement in a tracked `.prose-lint-vocabulary` at its root.
 
 The reasoning behind the rules is the
 [Prose Explanation](/standards/prose/explanation.md).
@@ -149,6 +151,15 @@ contains the word `human`, bare or plural, in any case, alone or in a
 compound, its frontmatter, code spans, and fenced blocks included.
 
 `prose.the-banned-word` · deterministic
+
+## The repo vocabulary
+
+No tracked file under a directory the repo's `.prose-lint-vocabulary`
+names for a word contains that word, bare or plural, in any case, its
+frontmatter, code spans, and fenced blocks included; a word declared
+with no directory is banned in every tracked file of the repo.
+
+`prose.the-repo-vocabulary` · deterministic
 
 ## Spelling
 
