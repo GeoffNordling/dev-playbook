@@ -1,27 +1,29 @@
 ---
 type: General-Sheet
 title: Runbook
-description: What a runbook is — an invocable command written as documentation — its seven verbs, the family the Runbook doc-type serves, and where it lives
+description: What a runbook is — an invocable command written as documentation — its six verbs, the family the Runbook doc-type serves, and where it lives
 ---
 
 # Runbook
 
 A **runbook** is an invocable command written as documentation: a
-skill or an agent definition. It is invoked by name — args in, a
-report out, effects on state in between — and its body is natural
+skill or an agent definition. It is invoked by name — input
+accepted, a report out, effects on state in between — and its body is natural
 imperative English commanding the executing agent.
 
 ## The verbs
 
-Seven, each an edge from the runbook to a node:
+Six, each an edge from the runbook to a node:
 
 - **read** — what it consults.
 - **write** — what state it changes.
 - **do** — the runbooks and scripts it runs.
 - **override** — a previous clause it substitutes.
-- **never** — a write it bans.
-- **args** — what it takes from its caller.
+- **accept** — what it takes from its caller.
 - **report** — what it gives back to its caller.
+
+A ban is not a verb: a write edge carries a `banned` polarity, a write
+the runbook must never make.
 
 ## The family
 

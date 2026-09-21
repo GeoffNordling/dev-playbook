@@ -60,7 +60,8 @@ specification.
   runbook or loop still gets its doc-type document, because the
   document is the legible form. The one requirement that follows is
   a drift check between the document and its substrate, the same
-  deterministic rule chaingen applies to a runbook and its chain. The
+  deterministic rule the deleted prototype chaingen applied to a
+  runbook and its chain. The
   loop half is in the Loop strand
   ([Principles](/working-docs/doc-type-system/loop/ROOT.md#principles)).
 
@@ -113,48 +114,18 @@ specification.
      [Completed](#completed).
   6. *Retire the card.* Done 2026-09-20; the entry is in
      [Completed](#completed).
-  7. *Tidy the doc-type definitions.* The three `contract-shape.md`
-     files and `doc-types/doc-type.md` get the pseudocode back, in the
-     shape the steps above produce. The user approves every edit here
-     before it is committed.
-     - **Split the pseudocode back.** It left the three
-       `contract-shape.md` files in PR #491 and sits whole in
-       [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language):
-       `DocType`, `Target`, and `Finding` go to `doc-type.md`; each
-       doc-type's class with its nested parts goes to its own
-       `contract-shape.md`; the reference model keeps the toolchain half
-       and the fit.
-     - **Rename.** `Object` becomes `DocType` everywhere.
-     - **`Standard`'s class** is written to the shape steps 1 to 6
-       produce: location `standards/<name>/<topic>.md`; frontmatter
-       `type`, `title`, `description`, `population`; a `Rule` of id,
-       kind, predicate, and condition; no pointer to a script or a gate.
-     - **Runbook's two verbs.** `accept` replaces `args` for an input
-       edge, and `never write` becomes a `banned` polarity on a write
-       edge.
-     - **The one-module lint.** A detector concatenates the four fences
-       and parses them as one Python module; it is the first verifier
-       for the specification's `one-base` and `one-module`.
-     - **Step 6's residue.** Step 6 changed only links in the doc-type
-       files, so these still describe the card: `doc-types/standard/`
-       `definition.md` (the verbs, the kinds, where a standard lives),
-       `contract-shape.md` (the card, cardgen, rulegen),
-       `encoding.md` (cells, `card.md`, the two generators),
-       `index.md` and `residual-ledger.md` (the two generated views, the
-       Cards section); `doc-types/doc-type-system.md` (the rulings rows
-       `Standard-Card` and `Standard-Ruleset`, the generators paragraph);
-       `doc-types/loop/encoding.md` and `contract-shape.md` (a check
-       links a card's Audit cell; it links a file typed `Standard`);
-       and `doc-types/index.md`'s row for `standard/`.
-     Reason: the parts, Edge, Rule, Act, Check, Yield, are not doc-types
-     and must not extend the base; every operation on an edge must be
-     one of the doc-type's verbs, and `args` was a noun and `never` a
-     negation; the lint is what makes the three contract shapes one
-     design instead of three.
+  7. *Tidy the doc-type definitions.* Done 2026-09-21; the entry is in
+     [Completed](#completed).
   8. *The specification becomes a Standard.* Move
      [specification/](/working-docs/doc-type-system/doc-type-system/specification/index.md)
      under `standards/`, bound to no gate. Its shape is discussed with
      the user after the doc-type step; what is known now:
+     - **`one-base` names a location rule.** The pseudocode carries
+       none since 2026-09-21; the predicate drops it.
+     - **`one-module` is not a Python parse.** Its predicate says the
+       blocks "parse as one Python module"; the check that exists is
+       step 7's sync test, four blocks and the reference model's one
+       text, and the predicate says that.
      - **Its predicates are stale.** `standard.md` says every id maps to
        exactly one script or judge and defines `audit(standard, state)`;
        step 2 decided null rows and no `audit()`, and step 3 the derived
@@ -422,6 +393,21 @@ specification.
   a link would break; the prose is step 7's, listed there. Consumers:
   a leftover card is an unknown type at the next pin bump. Verified:
   playbook-lint's thirteen detectors clean, `make check` green, 998
+  tests.
+- **Tidy the doc-type definitions, 2026-09-21.** Step 7 of The system.
+  The pseudocode is four blocks organized as code with imports, the
+  base in `doc-types/doc-type.md` and one class per `contract-shape.md`,
+  no class carrying a location; the reference model holds the four
+  whole and `tests/test_pseudocode_sync.py`, temporary, fails when the
+  texts differ. Runbook's verbs are six, `accept` for `args` and a
+  `banned` polarity for `never`, in its three pages and in Runbook
+  Conventions' Carries its chain. `chaingen` and `chains.txt` are
+  deleted, kept at `b266ce4`, with the two "The view" sections. The
+  Standard pages are Population and Rules, its encoding, and a
+  definition with one verb; the registry rulings have one `Standard`
+  row; a Loop's check links a file typed `Standard`. Thirteen factory
+  sections and the card entries left the ledgers. Verified:
+  playbook-lint's thirteen detectors clean, `make check` green, 999
   tests.
 
 ## Acronyms

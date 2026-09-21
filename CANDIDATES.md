@@ -49,11 +49,12 @@ description: Uncommitted future work — described, not yet promoted to issues
   `General-Sheet` today; decide what type they carry.
 - **Where exclusions are written** — decide whether a population's
   exclusions are written in the population mark or in the file's prose.
-- **The parser's trigger** — `scripts/chaingen` writes
-  `doc-types/runbook/chains.txt` by hand today, a temporary location; the
-  end state is a gate that fails when a declared chain and reality disagree.
+- **The parser's trigger** — no gate fails when a declared chain and
+  reality disagree; the prototype parser `chaingen` is deleted, kept in
+  git history at commit `b266ce4`, and the fact base's `chain` extractor
+  is its planned successor.
   The same work settles runbook shadowing: a lint parallel to
-  `standard.card-shadows-upstream`, and a home for the no-shadowing rule,
+  `standard.no-shadowing`, and a home for the no-shadowing rule,
   which sits in the Standard definition's Scope today. Hierarchical
   imports across repositories are the mechanism under both.
 - **The software factory's split** — the factory is isolated under
@@ -101,7 +102,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   chance to codify rules, procedures, and algorithms for writing the next
   one correctly, and no flywheel exists today.
 - **OKF traces** — "OKF trace" has no definition; decide whether a
-  trace is the Reference chain `scripts/chaingen` draws or something more.
+  trace is the Reference chain or something more.
 
 ## Code legibility
 

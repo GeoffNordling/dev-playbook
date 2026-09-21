@@ -39,10 +39,11 @@ cannot carry:
 - **An act** links the runbook it points at, a skill or an agent
   definition, then states its condition: `fires when …`, or `fires
   every iteration`.
-- **A check** links the Audit cell of the card whose standard it
-  measures against, `standards/<card>/card.md#audit`, then states its
-  condition the same way. The cell composed is the audit, never the
-  gate ([Standard](/doc-types/standard/encoding.md#cells)).
+- **A check** links the Standard it measures against, a file typed
+  `Standard` at `standards/<name>/<topic>.md`, then states its
+  condition the same way. What the check runs is the verifier of each
+  of that Standard's rules, never a gate
+  ([The verifier table](/standards/standard/detectors.md#the-verifier-table)).
 - **A yield** names its receiver, the user or a linked Loop, then
   states its condition: `yields when …`.
 

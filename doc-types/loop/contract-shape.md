@@ -17,11 +17,11 @@ taking prescribed actions and validating against prescribed standards
 - **Act.** A prescribed action: a pointer at a runbook, with a
   condition. The act reads the findings the checks before it returned;
   that is how direction reaches it.
-- **Check.** A prescribed standard: a pointer at `Standard.audit`, the
-  auditors a card's audit cell locates, with a condition. A check returns findings, each
-  naming a member and the rule it fails. Zero findings from every check
-  is the target state. The target is written once, in the standards,
-  and a check runs the audit to measure the distance.
+- **Check.** A prescribed standard: a pointer at a Standard, with a
+  condition. A check returns findings, each naming a member and the
+  rule it fails. Zero findings from every check is the target state.
+  The target is written once, in the standards, and a check audits,
+  running each rule's verifier, to measure the distance.
 - **Yield.** A programmed exit: a condition and a receiver, another
   loop or the user. The instance writes "yields when …". A yield is
   resumable: control comes back to the same step with the receiver's
@@ -34,10 +34,34 @@ The composition rule: any number of acts, checks, and yields, in
 iteration order. Each is a step; a step whose condition holds fires,
 and a yield that fires hands control out at its place in the iteration.
 
-The shape's pseudocode is no longer kept here: the target state's is
-[Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language),
-which is speculative and ahead of what the encoding below implements.
+The shape as code, one module importing the base in
+[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
+the same text whole and a test keeps them identical.
 
+```python
+from doc_type import DocType
+from runbook import Runbook
+from standard import Finding, Standard
+
+
+class Loop(DocType):
+    """Acts, checks, and yields, iterated. Drives."""
+    operations  = {act, check, yield}
+    frontmatter = DocType.frontmatter | {type, title}
+
+    class Act:
+        runbook:   Runbook
+        condition: str | None     # None fires every iteration
+    class Check:
+        standard:  Standard
+        condition: str | None
+        findings:  list[Finding]  # what the check returns; the next act and a yield read them
+    class Yield:
+        receiver:  "Loop | User"
+        condition: str | None     # "yields when …"
+
+    steps: list[Act | Check | Yield]   # in iteration order; a step whose condition holds fires
+```
 
 A loop carries no target field and no runtime: the standards the
 checks point at describe the target, and whatever runs the loop is the

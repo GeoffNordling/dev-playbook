@@ -1,30 +1,25 @@
 ---
 type: General-Sheet
 title: Standard Residual Ledger
-description: Standard's residual record — what four cells and a ruleset cannot express, one entry per card or ruleset that has one
+description: Standard's residual record — what the Standard shape cannot express, one entry per Standard that has one
 ---
 
 # Standard Residual Ledger
 
 Standard's residual record: what
-[four cells and a ruleset](/doc-types/standard/contract-shape.md)
+[the Standard shape](/doc-types/standard/contract-shape.md)
 cannot express. That is all an entry is — a record.
 
-## Cards
+## Standards
 
-Empty: every card in the catalog fits the four cells whole, and that is
-a record, not an omission.
-
-## Rulesets
-
-Per ruleset ported to the encoding: what the rewrite could not express,
+Per Standard ported to the encoding: what the rewrite could not express,
 recognized and written down at the moment of porting. Entries name
 populations, rules, and conditions in the vocabulary
 [encoding.md](/doc-types/standard/encoding.md) declares.
 
 An entry is a couple of sentences, hard limit: name each specific thing
 the file could not express and why the shape cannot say it, nothing
-else. A ruleset with nothing to record has no entry.
+else. A Standard with nothing to record has no entry.
 
 ### build/skeleton
 
@@ -143,15 +138,7 @@ it out.
 Could not express the invocation mode as a condition without three
 restated conditions, so the fork sits inside Description's predicate.
 Could not give the no-`SKILL.md` directory and the 500-line advisory a
-lint partner: both emit no rule id. Could not give Carries its chain an
-Audit pointer: `chaingen --check` answers no `--list-rules`.
-
-### standard/cards
-
-Could not express one class of object: the population is the cards and
-the index listing them, joined only by the tree. Could not express the
-dev-playbook meta-card lead slot as a condition; it is a clause of The
-catalog.
+lint partner: both emit no rule id.
 
 ### standard/detectors
 

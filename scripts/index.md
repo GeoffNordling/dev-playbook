@@ -6,10 +6,9 @@ repos and the dev scripts it keeps for itself, with the logic behind both in
 
 - [Scripts](/scripts/README.md) — The executable surface of published hook entry points and local dev scripts, with shared library code in src/dev_playbook/
 
-`chaingen` regenerates `doc-types/runbook/chains.txt` — every runbook's
-Reference chain — and fails on drift via `--check`. `labelgen` does the
-same for the label table in
-`standards/tracking/label-scheme.md`, rendered from `label_scheme.json`.
+`labelgen` regenerates the label table in
+`standards/tracking/label-scheme.md`, rendered from `label_scheme.json`,
+and fails on drift via `--check`.
 `verifier-table` does the same for `standards/verifiers.yaml`, the map from
 every rule id to the check that decides it, and runs in the commit gate.
 `boundary-table` does the same for `standards/boundaries.yaml`, the gates

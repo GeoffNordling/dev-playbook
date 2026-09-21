@@ -102,7 +102,7 @@ From memory, not a fresh search.
   [ledger](/doc-types/loop/residual-ledger.md), seeded empty.
 - **Operations and composition rule.** Three verbs, act, check, yield;
   the checks carry the target. Recorded in [Loop](/doc-types/loop/definition.md).
-- **Location rule and registry.** okf-lint's `type-location` check
+- **Location rule and registry.** okf-lint's `typed-loop` check
   binds `Loop` to `loops/`; the `Loop` row and the Typed Loop rule are
   in `document-types.md`; the registry ruling and the roster entry are
   in `doc-type-system.md`; `loops/` exists with an empty index.

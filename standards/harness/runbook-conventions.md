@@ -130,8 +130,8 @@ condition that tells the agent the work is done.
 ## Carries its chain
 
 Every edge of a runbook's contract is declared in the runbook's own
-file: args by the front matter `arguments` list, and each read, write,
-do, override, never, and report as a span in the body that
+file: what it accepts by the front matter `arguments` list, and each
+read, write, banned write, do, override, and report as a span in the body that
 [encoding.md](/doc-types/runbook/encoding.md) parses, except a ban the
 span vocabulary cannot carry, which stays plain prose in the body and
 is listed in

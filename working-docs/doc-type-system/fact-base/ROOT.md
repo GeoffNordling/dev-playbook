@@ -99,16 +99,13 @@ In order; each produces what the next needs.
   the way
   [Fact Base](/working-docs/doc-type-system/fact-base/fact-base.md)
   was designed.
-- **Extractors.** [chaingen](/scripts/chaingen), the script that writes
-  `chains.txt` today, and `rulegen`, deleted 2026-09-20 by the doc-type
-  plan's step 6 and kept in git history at commit `9be0089`, move into
-  the package as the `chain` and `standard` extractors, chaingen and its
-  text file deleted with the move and both scripts' logic kept,
-  alongside the bedrock extractors, and a `loop` extractor
+- **Extractors.** `chaingen` and `rulegen`, deleted by the doc-type
+  plan's steps 7 and 6 and kept in git history at commits `b266ce4` and
+  `9be0089`, are the models for the `chain` and `standard` extractors
+  in the package, alongside the bedrock extractors, and a `loop` extractor
   reads a Loop document's Mermaid block
   ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned));
-  one refresh writes one fact base per checkout; `chains.txt`, its
-  siblings, and the shims go. The `card` extractor and `cardgen` are
+  one refresh writes one fact base per checkout; the shims go. The `card` extractor and `cardgen` are
   struck: the doc-type system retires Standard-Card, Retire the card in
   [Planned](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned).
 - **Docs follow the moves.** The `doc-types/` indexes and pages that

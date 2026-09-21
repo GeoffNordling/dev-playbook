@@ -27,65 +27,14 @@ parses, verifies, and gates them. Both halves are the system.
 ### The language
 
 ```python
-Verb   = NewType("Verb", str)    # a verb is a string; the type says which strings
-RuleId = NewType("RuleId", str)  # build.tests-present
+Verb = NewType("Verb", str)      # a verb is a string; the type says which strings
 
 
 class DocType:
     """The base of the doc-type system. A class extends it when its instance is one markdown file of that type.
     A part is a class nested inside its DocType: it does not extend DocType and has no verbs."""
-    operations:  set[Verb]       # the doc-type's verbs
-    location:    str             # the path rule
-    frontmatter: dict            # the keys
-
-
-class Runbook(DocType):          # skills/<name>/SKILL.md, agents/<name>.md
-    """One invocable command. Invoked."""
-    operations = {read, write, do, override, accept, report}
-
-    class Edge:                  # a part: lives only inside a Runbook
-        operation: Verb          # one of the six above
-        target:    Target | None # None for accept and report: the signature, drawn at the root
-        condition: str | None    # None fires always
-        banned:    bool = False  # a write the runbook must never make
-
-    chain: list[Edge]            # any number, coarsely ordered, rooted here
-
-
-class Standard(DocType):         # standards/<name>/<topic>.md
-    """One population held to its rules. Held to."""
-    operations = {hold}
-
-    class Rule:                  # a part: an H2, or an H3 under a condition
-        id:        RuleId
-        kind:      deterministic | stochastic
-        predicate: str           # first paragraph, the check whole; a stochastic rule's judge prompt
-        condition: "Rule | None" # the rule this one is under; None binds every member
-
-    population: type[Target]     # frontmatter, one phrase naming the class and its exclusions
-    rules: list[Rule]            # in file order
-
-
-class Loop(DocType):             # loops/<name>.md
-    """Acts, checks, and yields, iterated. Drives."""
-    operations = {act, check, yield}
-
-    class Act:
-        runbook:   Runbook
-        condition: str | None    # None fires every iteration
-    class Check:
-        standard:  Standard
-        condition: str | None
-    class Yield:
-        receiver:  "Loop | User"
-        condition: str | None    # "yields when …"
-
-    steps: list[Act | Check | Yield]   # in iteration order; a step whose condition holds fires
-
-
-class Finding:                   # what a check returns; what an act and a yield read
-    member: Target               # the thing that failed
-    rule:   Standard.Rule        # the rule it failed
+    operations:  set[Verb]        # the doc-type's verbs
+    frontmatter = {description}   # the keys every instance carries; a subclass adds its own
 
 
 Target = DocType | File | Issue | PullRequest | External   # what an edge lands on
@@ -94,6 +43,72 @@ Target = DocType | File | Issue | PullRequest | External   # what an edge lands 
 # PullRequest a GitHub pull request; the factory's contract is issue in, PR out
 # External    the catch-all for whatever the doc-type system does not define:
 #             git history, scratch, the launch prompt, the rest of GitHub
+
+
+from doc_type import DocType, Target, Verb
+
+
+class Runbook(DocType):
+    """One invocable command. Invoked."""
+    operations  = {read, write, do, override, accept, report}
+    frontmatter = DocType.frontmatter | {name, model, effort}   # a skill also carries disable-model-invocation
+
+    class Edge:                   # a part: lives only inside a Runbook
+        operation: Verb           # one of the six above
+        target:    Target | None  # None for accept and report: the signature, drawn at the root
+        condition: str | None     # None fires always
+        banned:    bool = False   # a write the runbook must never make
+
+    chain: list[Edge]             # any number, coarsely ordered, rooted here
+
+
+from doc_type import DocType, Target
+
+RuleId = NewType("RuleId", str)  # build.tests-present
+
+
+class Standard(DocType):
+    """One population held to its rules. Held to."""
+    operations  = {hold}
+    frontmatter = DocType.frontmatter | {type, title, population}
+
+    class Rule:                   # a part: an H2, or an H3 under a condition
+        id:        RuleId
+        kind:      deterministic | stochastic
+        predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
+        condition: "Rule | None"  # the rule this one is under; None binds every member
+
+    population: type[Target]      # frontmatter, one phrase naming the class and its exclusions
+    rules: list[Rule]             # in file order
+
+
+class Finding:                    # what a verifier returns for a member that fails a rule
+    member: Target                # the thing that failed
+    rule:   Standard.Rule         # the rule it failed
+
+
+from doc_type import DocType
+from runbook import Runbook
+from standard import Finding, Standard
+
+
+class Loop(DocType):
+    """Acts, checks, and yields, iterated. Drives."""
+    operations  = {act, check, yield}
+    frontmatter = DocType.frontmatter | {type, title}
+
+    class Act:
+        runbook:   Runbook
+        condition: str | None     # None fires every iteration
+    class Check:
+        standard:  Standard
+        condition: str | None
+        findings:  list[Finding]  # what the check returns; the next act and a yield read them
+    class Yield:
+        receiver:  "Loop | User"
+        condition: str | None     # "yields when …"
+
+    steps: list[Act | Check | Yield]   # in iteration order; a step whose condition holds fires
 ```
 
 ### The toolchain

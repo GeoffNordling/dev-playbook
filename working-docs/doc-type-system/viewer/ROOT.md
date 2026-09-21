@@ -97,10 +97,11 @@ targets.
   panel that needs a primitive the shape lacks is a residual for that
   doc-type's ledger, never a term the viewer invents
   ([Fact Base](/working-docs/doc-type-system/fact-base/fact-base.md#the-objects-are-already-defined)).
-  The generated text files, `chains.txt` and its two siblings, are the
-  proof of concept, the first prototype of this dashboard. They
-  constrain nothing, and carrying them to the screen as they are is not
-  the goal. How an object draws is the renderer's to decide, which the
+  The generated text files, `chains.txt` and its two siblings, were
+  the proof of concept, the first prototype of this dashboard; all
+  three are deleted and kept in git history, the last at commit
+  `b266ce4`. They constrained nothing, and carrying them to the screen
+  was never the goal. How an object draws is the renderer's to decide, which the
   doc-type itself says
   ([Reference Chain Encoding](/doc-types/runbook/encoding.md)), so the
   drawing rules are stated here, in the kind's registry entry, and the

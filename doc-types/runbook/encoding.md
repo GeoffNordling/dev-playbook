@@ -11,10 +11,12 @@ The layer below
 how chain edges are written inside runbook prose, so deterministic
 code reads every chain. This file is the spec for the writer of that
 prose; the primitive map below gives each primitive of the shape its
-written form. The parser is `scripts/chaingen`, which writes every
-chain to `doc-types/runbook/chains.txt` and fails on drift via
-`--check`; everything the writer does not need — how an edge draws,
-how a name resolves — lives in that code and nowhere else. The
+written form. No parser reads it today: the prototype `chaingen` is
+deleted and kept in git history at commit `b266ce4`, and the fact
+base's `chain` extractor is its planned successor
+([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned));
+everything the writer does not need — how an edge draws, how a name
+resolves — is the parser's and not this spec's. The
 Standard that binds a runbook to this grammar is
 [Runbook Conventions](/standards/harness/runbook-conventions.md).
 
@@ -72,7 +74,7 @@ The derived primitives:
 | node type | the file path | `agents/` is an Agent, `SKILL.md` a Skill, `scripts/` or a script extension a Script |
 | node data | frontmatter, verbatim | — |
 | runbook summary | frontmatter `description` | — |
-| args | frontmatter `arguments` list | names only — the name carries the meaning; no placeholder in the body |
+| accepts | frontmatter `arguments` list | names only — the name carries the meaning; no placeholder in the body |
 
 The declared primitives:
 
@@ -90,7 +92,7 @@ The declared primitives:
 | overrides … with … | `{Override <link> … with <link> …}` |
 | reports | `{Report …}` |
 | condition | `{If <condition>, {…}}` |
-| prohibition | `{Never {…}}` |
+| banned write | `{Never {…}}` |
 
 Keywords are imperative — commands to the executing agent; the chain's
 edge labels are their third-person translation.
@@ -154,9 +156,9 @@ without committing any of the named tics}
 "the target document in place" travels to the chain; everything after
 the semicolon stays in the file.
 
-**Prohibition.** `{Never {…}}` wraps exactly one span — inner keyword
-`Write`, `Commit`, or `Merge` — and flips it from action to ban. A ban
-the vocabulary cannot carry stays plain prose, recorded in the
+**Banned write.** `{Never {…}}` wraps exactly one write span — inner
+keyword `Write`, `Commit`, or `Merge` — and flips its polarity to
+banned. A ban the vocabulary cannot carry stays plain prose, recorded in the
 [residual-ledger.md](/doc-types/runbook/residual-ledger.md).
 
 ```

@@ -97,7 +97,7 @@ reads and what it yields. The extractors the Ralph simulation needed:
 | frontmatter | YAML frontmatter | attributes; a `resource` edge | yes, md.py |
 | location | a file's path | the Skill or Agent node type | yes, the runbook shape's `location` predicate |
 | mdlink | markdown links | `links-to` edges | yes, ref-lint |
-| chain | the runbook encoding's spans | chain edges with operation, target, order, condition | yes, chaingen |
+| chain | the runbook encoding's spans | chain edges with operation, target, order, condition | no; the deleted `chaingen` is the model |
 | js-meta | a workflow's `meta` and `ARG_TYPES` literals | a Workflow node with its signature | no |
 | launch-literal | a fenced `Workflow({ name: … })` block | a `launches` edge | no, and fragile |
 
