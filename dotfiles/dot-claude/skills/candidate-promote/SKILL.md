@@ -34,9 +34,9 @@ is passed but the entry.
    skill lands **one** issue — intake does not slice and never mints an epic, so
    a subtree promotes whole and its decomposition waits for the `design` node.
 
-4. {Run [/intake](~/.claude/skills/intake/SKILL.md) with the entry's name and
+4. Run /intake with the entry's name and
    prose as the free-form idea — the children's text too, when promoting a
-   subtree}. A one-line entry is the expected input: intake grills the idea,
+   subtree. A one-line entry is the expected input: intake grills the idea,
    authors the brief and four-tuple, and lands the issue on its own
    confirmation gate, routing a subtree to `phase:design`.
 

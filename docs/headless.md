@@ -38,10 +38,6 @@ subscription credential, not a metered one.
 `--bare` skips the keychain and the subscription login outright and demands
 an API key, and it is never passed.
 
-[`preflight`](/src/dev_playbook/factory/launcher.py) checks all twelve sources
-before every launch and refuses the whole run on a single finding. It reads
-the environment and the settings files only — never the keyring.
-
 ## How stable the policy is
 
 Subscription coverage of `claude -p` has been withdrawn once already and put

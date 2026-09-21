@@ -16,8 +16,8 @@ Every machine runs the same configuration; the few hooks that only make sense on
 
 ```
 dot-claude/          -> ~/.claude/
-  agents/        Typed agent definitions the software factory launches
-  skills/        Claude Code skills (software factory nodes, commit, tool wrappers, etc.)
+  agents/        Typed agent definitions
+  skills/        Claude Code skills (commit, doc-set audits, tool wrappers, etc.)
   rules/         Global rules applied to every conversation
   hooks/         Claude Code hook scripts
   settings.json  Claude Code settings, shared by every machine (see below)

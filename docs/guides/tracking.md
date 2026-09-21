@@ -164,9 +164,8 @@ The scheme is closed-world: which labels exist is fixed as data in
 [bootstrap-labels](/scripts/bootstrap-labels) mints that data into a
 repo, and [labelgen](/scripts/labelgen) renders it as the table in
 [Label Scheme](/standards/tracking/label-scheme.md). The `phase:*` values
-are the software factory's states
-([the graph](/software-factory/software-factory.md#the-graph)); the
-`wayfinder:*` values are the `/wayfinder` skill's ticket types. No label
+are the software factory's states, the factory being isolated under
+`working-docs/software-factory/`; the `wayfinder:*` values are the `/wayfinder` skill's ticket types. No label
 names a blocked state, because blocked is derived from an issue's open
 blockers ([Relationships](#relationships)) and a minted label would drift
 from the truth the tracker already holds.
@@ -188,8 +187,7 @@ The settings live in **Settings → General → Pull Requests**. The
 branch's own commits do not survive the squash, so what the branch
 settled survives only in the tree it merges or in its message; a decision
 that is expensive to reverse and that the merged tree does not explain is
-proposed as a Decision Record in the pull request body
-([Pull requests](/software-factory/factory-operations.md#pull-requests)).
+proposed as a Decision Record in the pull request body.
 
 ### Default branch protection
 

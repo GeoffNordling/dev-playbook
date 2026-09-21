@@ -78,7 +78,7 @@ The acceptance picture. The user starts the viewer once, from
 shows the tree, every tracked markdown file in its two groups
 ([index-tree](/working-docs/doc-type-system/viewer/registry.md#index-tree)),
 each with its description. The user clicks
-`dotfiles/dot-claude/agents/adjudicator.md`: its Reference chain appears,
+`dotfiles/dot-claude/agents/doc-set-deslopper.md`: its Reference chain appears,
 the CLOA object itself. A button on that panel opens the file's details,
 its frontmatter facts, its links in and out, and its rendered source, for
 the times the chain is not enough. The user edits the file in the IDE:

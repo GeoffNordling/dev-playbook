@@ -9,9 +9,8 @@ description: Governs how work is tracked — issue shapes, the label scheme, and
 Governs how work is tracked — issue shapes, the label scheme, and
 repository settings. This card owns the **shapes** an issue takes, the **labels** a tracker mints and an issue
 carries, and the **settings** the tracker they live on assumes. The
-lifecycle the phase labels name is
-[the software factory](/software-factory/software-factory.md), as are
-[pull requests](/software-factory/factory-operations.md#pull-requests).
+lifecycle the phase labels name is the software factory's, isolated
+under `working-docs/software-factory/` and out of scope.
 
 ## Define
 

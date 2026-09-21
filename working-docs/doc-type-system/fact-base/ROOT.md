@@ -79,10 +79,11 @@ In order; each produces what the next needs.
   clusters; what each can touch, the writes buckets and the never bans;
   what the fleet runs on, model, effort, and tools per Agent; and how
   heavy each is, counted from the object and from the file. One subject
-  is already named: the software factory, whose agents are singletons
-  in the `does` graph because the factory's own graph lives in
+  was named, the software factory, whose agents are singletons in the
+  `does` graph because the factory's own graph lives in
   `software-factory.md`, which issue-overwatch reads as a bare imported
-  node. Each use case names a subsystem; each simulation firms the
+  node; the factory is isolated under `working-docs/software-factory/`
+  since 2026-09-20, so that subject waits on its fate. Each use case names a subsystem; each simulation firms the
   seven views, adds extractors, and writes residuals; and one
   simulation is a consumer-repo subsystem, the first data point for
   residual ownership across repos

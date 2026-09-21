@@ -107,33 +107,8 @@ specification.
      [Completed](#completed).
   3. *Boundaries: where each check runs.* Done 2026-09-20; the entry is
      in [Completed](#completed).
-  4. *Isolate the software factory.* Decided 2026-09-20: the factory
-     is out of scope, its future, rewrite or deletion, a later session's;
-     it leaves the tree so no step here trips over it again.
-     - **A new working set**, `working-docs/software-factory/`, whose
-       `ROOT.md` says it is isolated, undecided, and touched by nothing.
-     - **Into it:** the ten files of `software-factory/`; the six agents
-       `adjudicator`, `bug-pr-review`, `build`, `code-pr-review`,
-       `doc-pr-review`, `open-pr`; the eight skills `issue-overwatch`,
-       `agent-view-overwatch`, `issue-review-claims`,
-       `issue-review-simulation`, `wayfinder-to-build`, `intake`,
-       `design`, `user-intent-mini-interview`; the code
-       `src/dev_playbook/factory/`, `scripts/traverse-issue`,
-       `tests/dev_playbook/factory/`, and the factory-only fixtures in
-       `tests/conftest.py`. Links inside the moved files follow them.
-     - **Left in place:** the tracking Standard, whose `phase:*` and
-       `mode:*` labels bootstrap-labels mints into every governed repo;
-       the frozen Decision Records that cite the factory; `wayfinder`,
-       `candidate-promote`, and `commit`, which name it in a phrase.
-       The links into the factory from `standards/tracking/card.md`,
-       `docs/guides/tracking.md`, the root `README.md` and `index.md`,
-       `scripts/README.md`, and `CANDIDATES.md` are cut or repointed.
-     - **Consequences.** `classify()` keeps a `SKILL.md` or `agents/`
-       file harness-owned at any path, so okf-lint stays quiet;
-       harness-files-lint walks only the two harness roots, so it stops
-       seeing them; `**/tests/**` keeps ruff quiet on the moved tests;
-       mypy and pytest stop reading the code; after the next stow the
-       moved skills and agents leave `~/.claude`.
+  4. *Isolate the software factory.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
   5. *Guide and Explanation.* Decided 2026-09-20. A type is told by the
      kind of information it holds, never by who reads or runs it.
      - **`Guide`, redefined:** instruction on how to do a kind of work,
@@ -439,6 +414,28 @@ specification.
   every deferral it held was already named at its step. Reason: which
   gate runs a check is wiring, and a file derived from the wiring
   cannot lie about it.
+- **Isolate the software factory, 2026-09-20.** Step 4 of The system.
+  The set is `working-docs/software-factory/`; its `ROOT.md` names every
+  piece and where it came from: `docs/` the ten files with their index
+  and README, `agents/` six, `skills/` eight, `code/` the package and
+  `traverse-issue`, `tests/` the three modules and the four helpers
+  after `tests/conftest.py`'s banner, `StoredRow`, `ledger_rows`,
+  `write_definition`, `process_state`, which only they used. Links
+  among the moved files follow them; the `~/.claude/skills/` links
+  between moved skills became citations into the set. The inbound
+  links were cut or repointed as planned, and four more were found:
+  `docs/headless.md`'s preflight paragraph is deleted,
+  `docs/measurement-derivation.md` and `dotfiles/README.md` are
+  reworded, `pyproject.toml`'s comment no longer names the factory
+  tests. `candidate-promote`'s `{Run [/intake]}` span is plain prose,
+  since `scripts/chaingen` refuses a dangling link; the skill does not
+  work without intake, and its fate goes with the factory's. The
+  fact-base strand's factory subject is marked waiting; the viewer
+  strand's example agent is `doc-set-deslopper`. `chaingen` rewrote
+  `chains.txt` to 30 chains. Left for step 7: the Runbook residual
+  ledger's sections for the moved runbooks and `contract-shape.md`'s
+  `adjudicator` excerpt. Verified: playbook-lint's thirteen detectors
+  clean, `make check` green, 1015 tests.
 
 ## Acronyms
 
