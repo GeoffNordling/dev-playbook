@@ -15,9 +15,6 @@ concept/harness boundary is the population of
 and `classify()` in [md.py](/src/dev_playbook/md.py) encodes it. Claude
 Code is the only harness in use.
 
-The reasoning behind the rules is the
-[Harness Explanation](/standards/harness/explanation.md#which-files-the-harness-consumes).
-
 ## Members
 
 Every file the harness consumes is a member of the table below, with

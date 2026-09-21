@@ -52,14 +52,25 @@ nothing of it moves.
 - **delete: procedure.** Steps, or a writer's heuristic; a Guide's.
 - **delete: state.** A description of the repo, a script's behaviour,
   a count, or a date, true today and stale tomorrow.
+- **delete: no argument.** A paragraph that justifies a rule no
+  careful reader would ask why of, a directory, a filename, a
+  template's keys; one that explains how a script or a lint uses the
+  rule; or one that says the rule's purpose in more words than the
+  rule.
+
+The bar a why clears is the Decision Record's: surprising without its
+context. Keep a paragraph only when a reader who doubted the rule
+would be moved by it, and write it in one or two sentences; a why
+longer than its rule is suspect, and a why that reads well but changes
+no reader's mind is deleted, however old it is. Most rules end with
+no why.
 
 A sentence in a kept paragraph that holds a member to a state is a
 predicate: leave it out of the why and name it in the report; step 11
 rules on it. Time words go: "today", "yet", "until", "no extractor
-exists", "the three built"; cut them or write the timeless form. A
-rule may end with no why; write nothing to fill one. Where two
-readings are close, pick one, mark the row `?` in the report, and say
-the other in one sentence.
+exists", "the three built"; cut them or write the timeless form. Where
+two readings are close, pick one, mark the row `?` in the report, and
+say the other in one sentence.
 
 ## The edit
 
@@ -75,7 +86,8 @@ it and the lead sentence naming it; repoint any other link into
 holds the text, or unlink it to plain words where the text was
 deleted.
 
-Run `scripts/playbook-lint`. A finding that names a file in your
+Run `scripts/playbook-lint` by its absolute path under the worktree
+root; the relative form is refused. A finding that names a file in your
 directory is yours; a finding that names a file outside it, a link
 into your deleted `explanation.md` from elsewhere, is not: list it in
 the report. Do not edit outside your directory to clear it.

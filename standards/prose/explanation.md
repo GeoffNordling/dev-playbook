@@ -30,7 +30,7 @@ names the forms the residue takes. History earns a sentence only where
 the present is unintelligible without it, a constraint that still
 binds, a decision that still governs. A Decision Record is the
 exception because it is a dated record of a past decision, frozen after
-merge ([Decisions Explanation](/standards/decisions/explanation.md)).
+merge ([Immutable after merge](/standards/decisions/records.md#immutable-after-merge)).
 
 When a real file is itself the standard, a document points at that file
 in the form the cross-reference rules set instead of restating its

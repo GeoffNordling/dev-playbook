@@ -174,12 +174,10 @@ no repo can reach.
 
 Proposal: delete. The rule's intent, that a record stays short and does
 not become a form, is already carried by `decisions.template`'s opener
-and by the prose standard's brevity rules, and the explanation at
-[explanation.md](/standards/decisions/explanation.md#a-record-can-be-one-paragraph)
-says it in plain words: "The value is in recording that a decision was
-made and why, not in filling out sections." Nothing a reviewer needs is
-lost, and the section roster returns to the explanation, where a
-writer's heuristic belongs.
+and by the prose standard's brevity rules: a record is triaged in one to
+three sentences, not filled out by section. Nothing a reviewer needs is
+lost, and the section roster returns to a writer's guide, where a
+heuristic belongs.
 
 ### `decisions.external-convention-evaluation` — "A Decision Record's decision is a verdict on something outside the workspace: a skill, a skill collection, a framework, or a technique."
 

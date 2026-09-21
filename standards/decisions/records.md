@@ -18,9 +18,6 @@ record's `description`, and follows the
 > architectural subset of this kind. A Decision Record generalizes the
 > same artifact past architecture to any hard-to-reverse decision.
 
-The reasoning behind the rules is the
-[Decisions Explanation](/standards/decisions/explanation.md).
-
 ## The bar
 
 A Decision Record records a decision that is hard to reverse, surprising
@@ -30,6 +27,12 @@ looking at the code would wonder why it was done this way, and there
 were genuine alternatives with a specific reason for the choice.
 
 `decisions.the-bar` · stochastic
+
+> **Why.** Each criterion alone leaves nothing worth writing down: an
+> easy-to-reverse decision is reversed, an unsurprising one raises no
+> question, and one with no real alternative records the obvious. A
+> record earns its place by stopping the next engineer from undoing a
+> deliberate choice or re-proposing a rejected one.
 
 ## Scope
 
@@ -107,6 +110,15 @@ commit on `main` that carries the file.
 
 `decisions.immutable-after-merge` · deterministic
 
+> **Why.** A record is the one exemption from
+> [Current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only):
+> it is a dated record of a past decision, the choice made, the
+> alternatives rejected, and the context that forced it. A body
+> rewritten to match later state, or to correct a decision that was
+> reversed, destroys the one thing the record holds. The `status` key
+> is the one exception, so a superseded record points at the record
+> that replaced it.
+
 ## Status vocabulary
 
 A Decision Record either carries no `status` frontmatter key or carries
@@ -143,3 +155,7 @@ The Decision Record names the source and pins the exact state examined:
 the repository SHA, the release or version, and the date it was read.
 
 `decisions.what-was-examined` · stochastic
+
+> **Why.** A verdict on something outside the workspace ages with its
+> subject, so the pin is what lets a later reader tell whether the
+> verdict holds against the version in front of them.

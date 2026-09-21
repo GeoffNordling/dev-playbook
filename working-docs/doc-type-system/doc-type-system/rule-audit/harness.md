@@ -98,9 +98,9 @@ state is what is behind, not the repo. The file that changes is
 
 The predicate splits the global source's two buckets by what a rule
 is: "a dispositional stance under `## Principles`, an operating rule
-for a named situation under `## Behaviors`". The
-[Harness Explanation](/standards/harness/explanation.md#one-scope)
+for a named situation under `## Behaviors`". `harness.two-sections`
 states the same split in its own words: Principles holds "how the
+agent carries itself", Behaviors holds "what the agent does".
 agent carries itself", Behaviors holds "what the agent does".
 
 `dotfiles/dot-claude/CLAUDE.md:77` puts `### Notice repeatable work`

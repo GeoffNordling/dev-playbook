@@ -19,14 +19,20 @@ loads is [Claude Code Files](/standards/harness/files.md); the voice a
 `CLAUDE.md` speaks in is Doc Conventions'
 [No first person](/standards/prose/conventions.md#no-first-person).
 
-The reasoning behind the rules is the
-[Harness Explanation](/standards/harness/explanation.md).
+> **Why.** `## Behaviors` leads because `### Read the standards` must
+> be the first heading in the file. That rule sends every agent to the
+> standards catalog at session start; its sibling `### Navigate docs
+> by index` states how to walk OKF indexes without loading whole
+> trees.
 
 ## No frontmatter
 
 A `CLAUDE.md` opens on its content, with no YAML frontmatter block.
 
 `harness.no-frontmatter` · deterministic
+
+> **Why.** A `CLAUDE.md` is injected into the session as operating
+> configuration, and okf-lint never reads it.
 
 ## Operational scope
 
