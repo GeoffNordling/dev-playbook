@@ -106,7 +106,7 @@ class Explanation(DocType):
         explains: set[Id]         # the trailer line; each id resolves to a part of `subject`, and a part may have no Reason
         why:      str             # everything between the heading and the trailer; never a predicate
 
-    subject: DocType              # the document this explains, the file beside it, found by name
+    subject: DocType              # the document this explains, found by name: the same basename, one directory up
     reasons: list[Reason]         # in file order, and nothing else under the H1
 
 
@@ -166,7 +166,7 @@ Loop ─act───▶ Runbook ─do────▶ Runbook | Script
   ├─check─▶ audit(Standard) ─▶ Findings ─▶ the next act, or a yield
   └─yield─▶ User | Loop
 
-Explanation ─explain──▶ Standard      the Reasons for its rules, in the file beside it
+Explanation ─explain──▶ Standard      the Reasons for its rules, in explanations/ beside it
 Guide       ─instruct─▶ User | Runbook   links a Standard's rules and states none
 
 Gate = a boundary on the path to main that blocks on the findings of its audit

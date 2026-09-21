@@ -13,13 +13,15 @@ required is the document's.
 
 ## The verb
 
-One: **explain** — the explanation explains the document beside it. A
-Reason names one part or several; a part may have no Reason.
+One: **explain** — the explanation explains its subject, the document it
+is named for. A Reason names one part or several; a part may have no
+Reason.
 
 ## The file
 
-An explanation is one file, typed `Explanation`, beside the Standard
-it explains and named for it, holding Reasons and nothing else. In
+An explanation is one file, typed `Explanation`, in the
+`explanations/` directory beside the document it explains and named
+for it, holding Reasons and nothing else. In
 code the Reasons objects might sit inside the object they explain, since
 each names only its parts; a markdown file holds one concern, so they
 sit in a file of their own.
@@ -33,7 +35,7 @@ the why of one document.
 
 ## Where an explanation lives
 
-In the directory of the Standard it explains, named as
+In `explanations/` beside its subject, named for it, as
 [the encoding](/doc-types/explanation/encoding.md) says. The registry's
 rule is
 [Typed Explanation](/standards/knowledge-organization/document-types.md#typed-explanation).

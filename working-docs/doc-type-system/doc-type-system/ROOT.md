@@ -164,58 +164,58 @@ specification.
      entry is in [Completed](#completed).
   9. *Ban the word guard.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-  10. *Doc-types before migration.* The shapes are decided in
-     [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md);
-     see [Completed](#completed). What remains, in order:
-     - **Pages.** `doc-types/doc-type.md` gains `Id`,
-       `doc-types/standard/contract-shape.md` the Condition part,
-       `doc-types/explanation/` and `doc-types/guide/` are written in
-       the four-file form, the pinned test lists the two new pages and
-       passes, and the registry rulings row for each.
-     - **Standards.** `explanation-conventions.md` and
-       `guide-conventions.md` under `standards/doc-type/`, each rule a
-       predicate over one member with a trailer and a null verifier row
-       until step 12.
-     - **Migrate.** The 13 `explanation.md` files split per Standard by
-       script; each paragraph is then kept as a Reason with its explains
-       trailer, moved to the Standard it is the why of, or deleted where
-       it is a citation, a definition, a procedure, or a description of
-       state, the user ruling from one sheet per family. The six Guides
-       are retyped and checked for trailers; Guide's parts and the
-       CLOA-parseable encoding that carries them are decided here,
-       from what structure the six share, and the shape page, the
-       encoding page, the reference model, and `guide-conventions.md`
-       follow.
+  10. *Doc-types before migration.* The shapes, pages, and Standards
+     are done; see [Completed](#completed). What remains, in order:
+     - **Reasons back into the Standard.** The Explanation doc-type is
+       undone. The user reads a rule and its why on one page, and the
+       reader who wants predicates alone is a script, so a Reason is a
+       part of Standard: one `> **Why.**` block after a rule's
+       trailer, running to the next heading, and one after the lead
+       for the document as a whole. The predicate stays heading to
+       trailer, so no detector and no judge prompt changes. The
+       reference model, `doc-types/standard/`, and Standard
+       Conventions take the part; `doc-types/explanation/`,
+       Explanation Conventions, the registry rule
+       `typed-explanation`, and its okf-lint check are deleted.
+       `standards/doc-type/doc-type.md` is written to it first, from
+       the ten Reasons already sorted, and is the test of the
+       encoding.
+     - **Migrate Explanations.** The 13 `explanation.md` files split
+       per Standard by script; each paragraph is then kept as the why
+       of the rule it argues, kept as the document's why, or deleted
+       where it is a citation, a definition, a procedure, or a
+       description of state, the user ruling from one sheet per
+       family. The 13 files are then deleted.
+     - **Migrate Guides.** Guide's parts and the CLOA-parseable
+       encoding that carries them are decided from what structure the
+       six Guides share; the shape page, the encoding page, the
+       reference model, and `guide-conventions.md` follow, then the
+       six are rewritten to that encoding.
      Reason: the pass was about to move prose between file types with
-     no contract, which is how the tangle it untangles was made.
-  11. *Settle every rule.* A holistic pass over every rule, not a
-     rush to the end, and not a Loop: iteration, dynamic workflows, or
-     subagents may do the work, but no `loops/` file is written for it.
-     No GitHub issue is opened: every rule is kept, rewritten, moved to
-     a Guide or an Explanation, folded into a condition, or deleted in
-     this PR, per
-     [Predicate Pass Design](/working-docs/doc-type-system/doc-type-system/rule-audit/design.md),
-     which the user approves before any edit under `standards/`. The
-     rulings per rule are in
-     [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md).
-     - **Documents only.** Rules move to their right homes, judged
-       sentences change, Guides and Explanation Reasons are written
-       into the shapes step 10 built, trailers and the two yaml tables
-       update. Script edits are only
-       what the gate forces: a detector that emits a deleted id stops
-       emitting it, and the tables round-trip. No detector logic
-       changes and no new check is written.
-     - **Kind from the sentence.** A rule with a judgment word is
-       stochastic; a rule a script decides from the files is
-       deterministic. Stochastic rules stay null in the verifier table.
-     - **Remove redundancy.** A predicate that duplicates or overlaps
-       another is merged into it or deleted.
-     - **A rule the repo breaks** is rewritten, deleted, or, where the
-       state is a small named oversight, the repo is fixed.
+     no contract, which is how the tangle it untangles was made. The
+     course correction: the first Explanation written to the separate
+     file showed the user cannot read a rule and its why across two
+     files, and the LLM reader the split served is better served by a
+     projection.
+  11. *Settle every rule.* Go through every rule and rule on each:
+     keep, rewrite, delete, merge with another, or fold under a
+     condition. The first ruling per rule is in
+     [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md),
+     the method in
+     [Predicate Pass Design](/working-docs/doc-type-system/doc-type-system/rule-audit/design.md).
+     Text that is not a predicate leaves the rule: a why becomes the
+     rule's why block, a procedure goes to a Guide, a scoping
+     definition becomes a condition. A rule with a judgment
+     word is stochastic and stays null in the verifier table; a rule a
+     script decides from the files is deterministic. A rule the repo
+     breaks is rewritten, deleted, or, where the state is a small
+     named oversight, the repo is fixed. Documents only: trailers and
+     the two yaml tables update, a detector that emits a deleted id
+     stops emitting it, and no detector logic changes. Output: the
+     Standards say only what is true of the files.
      Reason: the audit found intentions, run-time behaviour, scoping
-     definitions, and code-style instruction filed as predicates. The
-     Standards must state only what is true of the files before any
-     checker is built against them.
+     definitions, and code-style instruction filed as predicates, and
+     a checker is only worth building against a settled spec.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
@@ -282,7 +282,14 @@ specification.
   Reason is one decision naming one or more rules of the one Standard
   beside it, a rule may have none, and an Explanation holds nothing
   else. The reference model gained `Id`, the Condition part,
-  Explanation, and Guide; the pages catch up in the second half.
+  Explanation, and Guide.
+- **Explanation and Guide built, 2026-09-21.** Step 10, second half.
+  `doc-types/explanation/` and `doc-types/guide/` in the four-file
+  form, `Id` in the base page and the Condition part on Standard's,
+  the pinned test over six pages and passing, the registry rows, and
+  `explanation-conventions.md` and `guide-conventions.md` under
+  `standards/doc-type/`, eight rules with null verifier rows. Guide's
+  parts are left undecided until its Guides are migrated.
 - **One meaning per word, one home per word, 2026-09-15.** Every word
   the four strands use is defined once, in the set's
   [Terms](/working-docs/doc-type-system/ROOT.md#terms) or in one

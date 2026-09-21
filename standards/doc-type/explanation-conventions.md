@@ -1,15 +1,15 @@
 ---
 type: Standard
 title: Explanation Conventions
-description: The form a file typed Explanation takes — beside the Standard it explains and named for it, every section a Reason with a body and an explains trailer, and every id a rule of that Standard
+description: The form a file typed Explanation takes — in explanations/ beside its subject and named for it, every section a Reason with a body and an explains trailer, and every id a part of that subject
 population: "a file typed Explanation"
 ---
 
 # Explanation Conventions
 
-A file typed `Explanation`, under `standards/`
+A file typed `Explanation`
 ([Document Types](/standards/knowledge-organization/document-types.md#typed-explanation)):
-the Reasons for one Standard. The
+the Reasons for one document. The
 [Explanation doc-type](/doc-types/explanation/index.md) declares what
 an explanation is and the encoding its file takes,
 [Reasons Encoding](/doc-types/explanation/encoding.md); a doc-type
@@ -17,8 +17,8 @@ binds nobody, so this Standard is what binds the file to that encoding.
 
 ## Beside its subject
 
-A file typed `Explanation` is named `<topic>-explanation.md` and sits
-in a directory that holds a file typed `Standard` named `<topic>.md`.
+A file typed `Explanation` at `<dir>/explanations/<topic>.md` has a
+concept document `<dir>/<topic>.md`, its subject.
 
 `doc-type.beside-its-subject` · deterministic
 
@@ -42,7 +42,7 @@ next heading.
 ## Ids resolve in the subject
 
 Every id a trailer of a file typed `Explanation` names is the id of a
-rule of the file typed `Standard` named `<topic>.md` beside it.
+part of its subject.
 
 `doc-type.ids-resolve-in-the-subject` · deterministic
 

@@ -41,7 +41,7 @@ frontmatter of the repo's own root `index.md`
 |------|------------|
 | `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [Candidates](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
-| `Explanation` | The reasoning and mechanism behind one Standard's rules, rule by rule; never cited to reject work; lives at `standards/<name>/explanation.md`, one per Standard. |
+| `Explanation` | The Reasons for one document, each one design decision and the argument for it; lives at `<dir>/explanations/<topic>.md` beside its subject `<dir>/<topic>.md`. |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
 | `Guide` | Instruction on how to do a kind of work, read before doing it and organized by the work; cites rules in passing and is never cited to reject work; lives under `guides/`, the one tree reserved for it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
@@ -124,6 +124,6 @@ A concept document typed `Guide` lives under `guides/`.
 
 ## Typed Explanation
 
-A concept document typed `Explanation` is `standards/<name>/explanation.md`.
+A concept document typed `Explanation` is `<dir>/explanations/<topic>.md`.
 
 `knowledge-organization.typed-explanation` · deterministic

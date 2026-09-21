@@ -12,12 +12,13 @@ contract takes.
 
 ## The shape
 
-- **Subject.** The document the Explanation explains: the file beside
-  it, found by name. Every id a Reason names resolves to a part of it.
-- **Reason.** One design decision and the argument for it: a heading,
-  a body, and the ids it explains. The body is the why and never a
-  predicate. The ids are one or several, each a part of the subject,
-  and a part may have no Reason.
+- **Subject.** The document the Explanation explains, found by name: the
+  same basename, one directory up. Every id a Reason names resolves to a
+  part of it.
+- **Reason.** One design decision and the argument for it: a heading, a
+  body, and the ids it explains. The body is the why and never a
+  predicate. The ids are one or several, each a part of the subject, and
+  a part may have no Reason.
 
 The composition rule: exactly one subject, any number of Reasons, and
 nothing else. An Explanation states no rule and names no verifier and
@@ -43,6 +44,6 @@ class Explanation(DocType):
         explains: set[Id]         # the trailer line; each id resolves to a part of `subject`, and a part may have no Reason
         why:      str             # everything between the heading and the trailer; never a predicate
 
-    subject: DocType              # the document this explains, the file beside it, found by name
+    subject: DocType              # the document this explains, found by name: the same basename, one directory up
     reasons: list[Reason]         # in file order, and nothing else under the H1
 ```

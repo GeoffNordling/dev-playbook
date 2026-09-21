@@ -1,12 +1,12 @@
 ---
 type: General-Sheet
 title: Predicate Pass Design
-description: The step 11 design the user approves before any Standard changes — where the principles land, the rule count by family before and after, every new sentence, Explanation line, and Guide the rulings call for, the repo changes, the contested calls, the verifier-table delta, and the order of the edits
+description: The step 11 design, approved 2026-09-21 — where the principles land, the rule count by family before and after, every new sentence, Explanation line, and Guide the rulings call for, the repo changes, the contested calls, the verifier-table delta, and the order of the edits
 ---
 
 # Predicate pass design
 
-What step 11 changes, for approval before any edit under `standards/`, `guides/`, `scripts/`, or `src/`. The ruling for every rule is the `ruling` column of [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md), the one record of what happens to each rule. [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) is evidence, the auditors' findings and the reviewers' verdicts; where a verdict and a ruling differ, the ruling stands and the Contested calls section below says why. This document holds only what those sheets do not: the new text, the small repo changes, the contested calls, and the order.
+What step 11 changes. The ruling for every rule is the `ruling` column of [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md), the one record of what happens to each rule. [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) is evidence, the auditors' findings and the reviewers' verdicts; where a verdict and a ruling differ, the ruling stands and the Contested calls section below says why. This document holds only what those sheets do not: the new text, the small repo changes, the contested calls, and the order.
 
 ## Principles
 
@@ -183,7 +183,7 @@ This document designs phase one. Phase two is planned in the strand root, not he
 
 **Phase one, documents, this PR.** Rules move to their right homes, judged sentences change, the Guides and Explanation Reasons are written into the shapes step 10 built, trailers and the two yaml tables update. Script edits are only what the gate forces: a detector that emits a deleted rule id stops emitting it, and the tables round-trip clean. No detector logic changes and no new check is written.
 
-1. `standards/doc-type/`: the rule-shape rewrite, and the Principles as Reasons in `standard-conventions-explanation.md`, the Explanation step 10 gives that Standard, each naming the rule ids it explains. This is the doc-type definition change and waits for approval of this document.
+1. `standards/doc-type/`: the rule-shape rewrite, and the Principles as Reasons in `standard-conventions-explanation.md`, the Explanation step 10 gives that Standard, each naming the rule ids it explains.
 2. Conditions: strip trailers and verifier rows.
 3. Deletes and Guide moves: write the four Guides, then remove the rules and their Explanation paragraphs.
 4. New sentences and Explanation lines, family by family.

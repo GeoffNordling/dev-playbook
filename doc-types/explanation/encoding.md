@@ -9,13 +9,13 @@ description: The layer below the shape — how an Explanation names its subject,
 The layer below [the shape](/doc-types/explanation/contract-shape.md):
 the form an Explanation takes so deterministic code reads the subject
 and every Reason the same way, and where the file sits. The cut points
-are the filename, the heading levels, and the trailer line.
+are the path, the heading levels, and the trailer line.
 
 ## The subject
 
-The filename. The Explanation of the Standard `<topic>.md` is
-`<topic>-explanation.md` in the same directory; the subject is found
-by name and the file carries no key for it. Nothing sits between the
+The path. The Explanation of `<dir>/<topic>.md` is
+`<dir>/explanations/<topic>.md`; the subject is found by name and
+the file carries no key for it. Nothing sits between the
 H1 and the first H2.
 
 ## Reasons
@@ -34,5 +34,5 @@ A Reason is an H2; its section is the Reason. There is no H3.
 
 ## Where an Explanation lives
 
-Beside its subject, in the same directory. The registry's rule is
+In `explanations/` beside its subject. The registry's rule is
 [Typed Explanation](/standards/knowledge-organization/document-types.md#typed-explanation).

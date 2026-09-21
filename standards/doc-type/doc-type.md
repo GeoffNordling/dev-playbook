@@ -13,7 +13,7 @@ is [Doc-Type](/doc-types/doc-type.md). These rules hold of every
 doc-type, the three built and any built later; a rule over the
 instances of one doc-type is that doc-type's own Standard's. The
 reasoning behind these rules is
-[Doc-Type Explanation](/standards/doc-type/explanation.md).
+[Doc-Type Explanation](/standards/doc-type/explanations/doc-type.md).
 
 ## Registered
 
