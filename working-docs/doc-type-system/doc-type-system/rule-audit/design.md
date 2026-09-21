@@ -10,7 +10,7 @@ What step 11 changes, for approval before any edit under `standards/`, `guides/`
 
 ## Principles
 
-The pass applies the Principles of [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles): a predicate is a test over state; kind is judged from the sentence; a scoping heading is not a rule; and the three working policies. Their permanent home after the pass is `standards/doc-type/explanation.md`, as the WHY of the rule-shape and population rules, so the next audit reads them beside the rules they explain. A Standard holds only predicates, so none of them is written as a rule.
+The pass applies the Principles of [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles): a predicate is a test over state; kind is judged from the sentence; a scoping heading is not a rule; and the three working policies. Their permanent home after the pass is `standards/doc-type/standard-conventions-explanation.md`, as Reasons naming the rule-shape and population rule ids, so the next audit reads them beside the rules they explain. A Standard holds only predicates, so none of them is written as a rule.
 
 ## Count by family
 
@@ -90,7 +90,7 @@ Rules whose sentence stands and whose block or exemption changes:
 
 ## Explanation lines
 
-One Reason each, in the Explanation of the rule's Standard under the rule's slug, as step 10 shapes it: the why that left the predicate.
+One Reason each, in the Explanation beside the rule's Standard, naming the rule's id on its explains line, as step 10 shapes it: the why that left the predicate.
 
 | rule | Explanation line |
 |---|---|
@@ -183,7 +183,7 @@ This document designs phase one. Phase two is planned in the strand root, not he
 
 **Phase one, documents, this PR.** Rules move to their right homes, judged sentences change, the Guides and Explanation Reasons are written into the shapes step 10 built, trailers and the two yaml tables update. Script edits are only what the gate forces: a detector that emits a deleted rule id stops emitting it, and the tables round-trip clean. No detector logic changes and no new check is written.
 
-1. `standards/doc-type/`: the rule-shape rewrite, and the Principles as the preamble of `standard-conventions-explanation.md`, the Explanation step 10 gives that Standard. This is the doc-type definition change and waits for approval of this document.
+1. `standards/doc-type/`: the rule-shape rewrite, and the Principles as Reasons in `standard-conventions-explanation.md`, the Explanation step 10 gives that Standard, each naming the rule ids it explains. This is the doc-type definition change and waits for approval of this document.
 2. Conditions: strip trailers and verifier rows.
 3. Deletes and Guide moves: write the four Guides, then remove the rules and their Explanation paragraphs.
 4. New sentences and Explanation lines, family by family.

@@ -32,7 +32,7 @@ yield.
   fact base is an ABox.
 - **TBox.** The schema: classes, properties with a domain and a range,
   a class hierarchy. RDFS. The doc-types are a TBox: `Runbook`,
-  `Standard`, `Loop` are classes; the ten verbs are properties with
+  `Standard`, `Explanation`, `Guide`, `Loop` are classes; the twelve verbs are properties with
   domains and ranges.
 - **Axioms.** OWL adds what the schema cannot say: functional
   properties (an order has at most one refund), disjoint classes

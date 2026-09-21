@@ -19,7 +19,7 @@ for use outside the set.
 
 ## Goal
 
-Three DocTypes, ten verbs, in
+Five DocTypes, twelve verbs, in
 [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
 the picture of the target state; the Standard
 [Doc-Type](/standards/doc-type/doc-type.md) is the same state as
@@ -71,14 +71,20 @@ specification.
   which members the H3 rules under it bind. It is one shape whether
   it has one child or eleven, and its definition is never repeated in
   the children.
-- **An Explanation explains one document, and its map to what it
-  explains is explicit.** Each Reason names, in its own text and not
-  by position, the ids of the things it explains. Today the document
-  is a Standard and the ids are rule ids, one Explanation per Standard
-  file; the shape names neither, so a later doc-type is explained the
-  same way. How many ids one Reason may name is open until the scrub
-  in step 10 measures the existing text; see [Open](#open). Decided
-  2026-09-21.
+- **An Explanation is the Reasons for one Standard, and nothing
+  else.** A Reason is one design decision and the argument for it: a
+  heading, a body, and one line naming the rule ids it explains. A
+  decision lands as one rule or several of the same Standard, a
+  deterministic rule beside its stochastic partner or several
+  deterministic rules cut apart to be checkable, so a Reason names one
+  id or several, and every id resolves in the Standard beside it. A
+  Reason is optional: a rule may have none, and none is written for a
+  rule whose why nobody holds. Text that is a reason for no rule is
+  not an Explanation: a definition goes to the Standard's lead or the
+  glossary, a procedure to a Guide, and the rest is deleted. The
+  pseudocode names the explained document by its base type, so a later
+  doc-type is explained the same way. Decided 2026-09-21 from the
+  scrub in step 10.
 - **Three working policies** that shaped the step 11 rulings and hold
   for any later audit: repo change is the expensive way out; no credit for rule count, so
   delete is the default for a rule that restates another or binds
@@ -108,17 +114,12 @@ specification.
   type. `Object`, its earlier name, is retired.
 - **Part** — a class nested inside a DocType: an Edge, a Rule, an
   Act, a Check, a Yield. A part has no verbs.
+- **Reason** — the one Part of an Explanation: one design decision
+  and the argument for it, naming the rule ids of the Standard beside
+  it that the decision landed as.
 
 ## Open
 
-- **Reason cardinality.** Whether a Reason names one rule or several.
-  One concern can legitimately be a deterministic rule and a
-  stochastic rule side by side, or several deterministic rules split
-  for a reason of their own, and one Reason then explains the set;
-  copying the text per rule and linking one rule to another's text are
-  both copies. Decided after step 10's scrub tags every paragraph of
-  the 13 explanation files with the rule ids it explains, zero, one, or
-  several, and whether they cross a Standard or a family.
 - **Rule order.** Standard rules are unordered in
   [Population and Rules](/doc-types/standard/contract-shape.md) and in
   file order in the reference model. One must give.
@@ -167,27 +168,30 @@ specification.
      Explanations and Guides, and neither has a doc-type: the registry
      rules them Pending and Important. Building them first is what
      keeps the migration honest. In order:
-     - **Scrub first.** Every paragraph of the 13 `explanation.md`
-       files is tagged with the rule ids it explains, zero, one, or
-       several, and whether they sit in one Standard, across Standards
-       of a family, or across families; the table is a member of this
-       set. The counts decide Reason cardinality and how much text
-       explains no rule.
-     - **Design in this set.** One member, `explanation-and-guide.md`
-       in this directory, not yet written, states both contract shapes in prose and pseudocode, the
-       encoding of each, the registry rulings, and the Standard change
-       below; the user approves it before `doc-types/` changes.
-     - **Explanation.** Verb: explain. One Explanation per document
-       it explains; for a Standard, `standards/<name>/<topic>-explanation.md`,
-       typed `Explanation`. Parts: a preamble under the H1 for what is
-       true of the document as a whole, then Reasons, each a heading,
-       a body that is the why and never a predicate, and a line naming
-       the ids it explains. Composition: every id a Reason names
-       resolves in the explained document, a thing may have no Reason,
-       no rule-kind trailer appears, and the cardinality the scrub
-       decides. The pseudocode names the explained document by its
-       base type, not Standard, so it stays minimal and general. These
-       are its deterministic verifiers; step 12 builds them.
+     - **Scrub, done 2026-09-21.** Thirteen Opus agents tagged every
+       paragraph, bullet, and table row of the 13 `explanation.md`
+       files with the rule ids it explains: 232 units, 131 naming one
+       rule, 68 naming several, 32 naming none; 75 of 284 rules
+       explained nowhere. Of the 13 units whose ids crossed a Standard
+       or a family, nine were citations, one sat in the wrong family,
+       and three held one sentence that belongs beside another
+       Standard's rule. The tables were discarded as noise; the ruling
+       they produced is the Explanation principle above.
+     - **Design in the reference model.** Both shapes and the
+       Standard change below are drawn first in
+       [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
+       the one picture; the user approves it there before `doc-types/`
+       changes, and the pinned test fails until the pages catch up.
+     - **Explanation.** Verb: explain. One Explanation beside each
+       Standard, `standards/<name>/<topic>-explanation.md`, typed
+       `Explanation`. Parts: under the H1, Reasons only, each a heading,
+       a body that is the why and never a predicate, and one line
+       naming the rule ids it explains. Composition: every id a Reason
+       names resolves in the Standard beside it, a rule may have no
+       Reason, and no rule-kind trailer appears. The pseudocode names
+       the explained document by its base type, not Standard, so it
+       stays minimal and general. These are its deterministic
+       verifiers; step 12 builds them.
      - **Guide.** Verb: instruct. One file under `guides/`, typed
        `Guide`, organised by the work it is read before. Parts: the
        work, its sections, and citations of rule ids. Composition: a
@@ -206,9 +210,12 @@ specification.
        predicate over one member with a trailer and a verifier row,
        null until step 12; the registry rulings row for each; the
        13 `explanation.md` files split per Standard by script, one
-       file per Standard, existing text placed under the rule it names
-       where the link is plain and left in the preamble where it is
-       not, so that step 11 works from the new shape.
+       file per Standard, each existing paragraph kept as a Reason with
+       its explains line where it is the why of that Standard's rules,
+       moved where it is the why of another Standard's rules, and
+       deleted where it is a citation, a definition, a procedure, or a
+       description of state, so that step 11 works from the new
+       shape.
      Reason: the pass was about to move prose between file types with
      no contract, which is how the tangle it untangles was made.
   11. *Settle every rule.* A holistic pass over every rule, not a
@@ -258,6 +265,17 @@ specification.
      Reason: a checking system built greedily is one nobody can extend,
      and a checker is only worth building against a spec that is
      settled.
+
+  13. *The rule id namespace.* A rule id is `<family>.<slug>`, the
+     directory and the heading, while the Explanation's check and the
+     Standard's own population are per file: an id names a family and
+     the verifier then finds which Standard it landed in. Decide
+     whether the id becomes `<standard>.<slug>`, or the family stays the
+     namespace and a Standard directory is the unit that owns it, and
+     move the trailers, the two yaml tables, and every detector that
+     emits an id together. Reason: the id scheme thinks in families and
+     the doc-types think in files, and one of them should give; not
+     before step 12, which touches every emitter anyway.
 
   A step once here, scrubbing every file under `docs/` into a long-term
   home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except

@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Reference Model
-description: The doc-type system's target state as a reference model — three DocTypes, ten verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
+description: The doc-type system's target state as a reference model — five DocTypes, twelve verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
 ---
 
 # Reference Model
@@ -28,6 +28,7 @@ parses, verifies, and gates them. Both halves are the system.
 
 ```python
 Verb = NewType("Verb", str)      # a verb is a string; the type says which strings
+Id   = NewType("Id", str)        # the id of a part of a DocType, in the written form its DocType fixes
 
 
 class DocType:
@@ -62,9 +63,9 @@ class Runbook(DocType):
     chain: list[Edge]             # any number, coarsely ordered, rooted here
 
 
-from doc_type import DocType, Target
+from doc_type import DocType, Id, Target
 
-RuleId = NewType("RuleId", str)  # build.tests-present
+RuleId = NewType("RuleId", Id)   # build.tests-present
 
 
 class Standard(DocType):
@@ -72,11 +73,14 @@ class Standard(DocType):
     operations  = {hold}
     frontmatter = DocType.frontmatter | {type, title, population}
 
+    class Condition:              # a part: an H2 with no id and no trailer, written once and shared by the H3 rules under it
+        scope: str                # its first paragraph: which members those rules bind
+
     class Rule:                   # a part: an H2, or an H3 under a condition
         id:        RuleId
         kind:      deterministic | stochastic
         predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
-        condition: "Rule | None"  # the rule this one is under; None binds every member
+        condition: Condition | None   # None binds every member
 
     population: type[Target]      # frontmatter, one phrase naming the class and its exclusions
     rules: list[Rule]             # in file order
@@ -85,6 +89,35 @@ class Standard(DocType):
 class Finding:                    # what a verifier returns for a member that fails a rule
     member: Target                # the thing that failed
     rule:   Standard.Rule         # the rule it failed
+
+
+from doc_type import DocType, Id
+
+
+class Explanation(DocType):
+    """The Reasons for one document. Explains.
+    In code, Reasons might sit inside the document they explain, but markdown is more rigid;
+    in order to ensure a markdown file holds only one concern, we split Reasons into a 
+    distinct Explanation object that gets its own file."""
+    operations  = {explain}
+    frontmatter = DocType.frontmatter | {type, title}
+
+    class Reason:                 # a part: an H2; one design decision and the argument for it
+        explains: set[Id]         # the trailer line; each id resolves to a part of `subject`, and a part may have no Reason
+        why:      str             # everything between the heading and the trailer; never a predicate
+
+    subject: DocType              # the document this explains, the file beside it, found by name; today always a Standard
+    reasons: list[Reason]         # in file order, and nothing else under the H1
+
+
+from doc_type import DocType
+
+
+class Guide(DocType):
+    """What a reader needs before one kind of work: steps, calls, a checklist, a catalogue. Instructs.
+    It links a Standard's rules as any document does and states none, so it carries no trailer."""
+    operations  = {instruct}
+    frontmatter = DocType.frontmatter | {type, title}
 
 
 from doc_type import DocType
@@ -120,9 +153,9 @@ def audit(standard, state) -> list[Finding]  # parse the file, route each id, sk
 boundary: commit hook | make check | CI | a loop's check     # each names the rule ids it runs
 ```
 
-Runbook is invoked, Standard is held to, Loop drives. Ten verbs
-across three DocTypes. A verb belongs to a DocType only; a part has
-none.
+Runbook is invoked, Standard is held to, Explanation explains, Guide
+instructs, Loop drives. Twelve verbs across five DocTypes. A verb
+belongs to a DocType only; a part has none.
 
 ## How they fit
 
@@ -132,6 +165,9 @@ Loop ─act───▶ Runbook ─do────▶ Runbook | Script
   │                   ─write─▶ state
   ├─check─▶ audit(Standard) ─▶ Findings ─▶ the next act, or a yield
   └─yield─▶ User | Loop
+
+Explanation ─explain──▶ Standard      the Reasons for its rules, in the file beside it
+Guide       ─instruct─▶ User | Runbook   links a Standard's rules and states none
 
 Gate = a boundary on the path to main that blocks on the findings of its audit
 ```
@@ -160,7 +196,6 @@ What the picture has no place for, and where each thing goes:
   listed by its directory index.
 - **Ruleset as a second object.** There is one object; the Standard
   file holds the rules.
-- **Condition as its own type.** A rule another rule is under.
 - **`args` and `never` as verbs.** `accept` is the verb for args; a
   ban is a polarity on a write edge.
 - **`Object`.** Renamed `DocType`, which is what it was.
