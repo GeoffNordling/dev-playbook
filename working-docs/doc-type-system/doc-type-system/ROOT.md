@@ -166,12 +166,27 @@ specification.
      [Completed](#completed).
   10. *Doc-types before migration.* The shapes, pages, and Standards
      are done; see [Completed](#completed). What remains, in order:
-     - **Migrate Explanations.** The 13 `explanation.md` files split
-       per Standard by script; each paragraph is then kept as the why
-       of the rule it argues, kept as the document's why, or deleted
-       where it is a citation, a definition, a procedure, or a
-       description of state, the user ruling from one sheet per
-       family. The 13 files are then deleted.
+     - **Migrate Explanations.** Thirteen Opus agents, one per
+       family under `standards/`, launched in parallel, each loading
+       [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md):
+       it moves each paragraph of its `explanation.md` into the why
+       block of the rule it argues or of the Standard as a whole, or
+       deletes it as a citation, a definition, a procedure, or a
+       description of state, by its own judgment; deletes the file;
+       cleans the leads and index in its own directory; and returns a
+       table of every paragraph's destination with its `?` rows.
+       The orchestrator then, in one scripted pass: unlinks the
+       links into the 13 files from outside their directories, the
+       rule-audit pages included, to plain words or to the rule that
+       now holds the text; deletes the `Explanation` row of the type
+       registry, the rule Typed Explanation, `EXPLANATION_PATH` and
+       its finding and test in `scripts/okf-lint`, and the words "or
+       `Explanation`" in the tree Standard's directory-layout rule;
+       regenerates `standards/verifiers.yaml`. Done when no
+       `explanation.md` exists under `standards/`, no link to one
+       remains, and `scripts/playbook-lint` and `make test` are
+       clean. The user reads the Standards and the `?` rows, not
+       sheets, and commits once.
      - **Migrate Guides.** Guide's parts and the CLOA-parseable
        encoding that carries them are decided from what structure the
        six Guides share; the shape page, the encoding page, the
