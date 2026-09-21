@@ -120,7 +120,7 @@ A Standard is one directory under `standards/`. Its card is
 subdirectory of `standards/` except `references/` holds one; the tree's
 rule is one directory, one Standard, the card beside the rulesets it
 points at. The rule and its lint are
-[Directory layout](/standards/standard/cards.md#directory-layout).
+[Directory layout](/standards/standard/tree.md#directory-layout).
 
 A ruleset is `standards/<name>/<topic>.md`, typed `Standard-Ruleset`,
 beside the card that points at it. A ruleset with special cases, the
@@ -154,7 +154,7 @@ family prefix, a new sibling on the same subject keeps it.
 Each repo that carries Standards has its own catalog at
 `standards/index.md`; in dev-playbook that is
 [standards/index.md](/standards/index.md). Its membership and order are
-[The catalog](/standards/standard/cards.md#the-catalog).
+[The catalog](/standards/standard/tree.md#the-catalog).
 
 ## The scripts
 

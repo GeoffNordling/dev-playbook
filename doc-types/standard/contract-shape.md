@@ -27,7 +27,7 @@ opens `Governs how`, names the territory its Define cell covers, and
 runs about a breath; the frontmatter `description` repeats it verbatim
 less the period, so the catalog row and the card state the same remit;
 the rule and its lint are
-[The question sentence](/standards/standard/cards.md#the-question-sentence).
+[The Standards Tree](/standards/standard/tree.md).
 Each cell holds pointers, annotated where the annotation carries a fact
 nothing else holds; an empty cell states an explicit "none" so gaps stay
 visible. Cards are thin — often just a handful of pointers — and never
@@ -36,7 +36,7 @@ restate the content of their targets.
 - **Define.** The rulesets: documents typed `Standard-Ruleset`, each
   one population and its rules, the link alone with no annotation,
   since the directory's index carries each ruleset's description
-  ([Define points only at rulesets](/standards/standard/cards.md#define-points-only-at-rulesets)).
+  ([The Standards Tree](/standards/standard/tree.md)).
 - **Audit.** Read-only deviation detection: the detectors that report
   nonconformance without blocking anything. A formatter is a detector
   by its check mode
@@ -61,8 +61,8 @@ restate the content of their targets.
 
 The composition rule at the card: exactly one of each cell, in that
 order, each holding any number of pointers. The cards themselves are
-the examples: [Build](/standards/build/card.md) and
-[Meta-Standard](/standards/standard/card.md) — the latter is the card
+the examples: [Build](/standards/build/index.md) and
+[Meta-Standard](/standards/standard/index.md) — the latter is the card
 of the Standard that governs cards, since the meta-standard is an
 instance of the format it defines.
 

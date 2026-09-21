@@ -111,55 +111,8 @@ specification.
      [Completed](#completed).
   5. *Guide and Explanation.* Done 2026-09-20; the entry is in
      [Completed](#completed).
-  6. *Retire the card.* Delete the card, `standards/<name>/card.md`,
-     and everything that exists only to read it, and bind the one type
-     `Standard` to `standards/<name>/<topic>.md`.
-     - **Delete.** The thirteen `card.md` files and the type
-       `Standard-Card`; the four cells Define, Audit, Enforce, Adopt;
-       `scripts/cardgen`, `scripts/rulegen`, and the two `.txt` files
-       under `doc-types/standard/`. `rulegen`'s logic is not moved here:
-       the `standard` extractor is the fact-base strand's item
-       ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
-     - **Retype.** `Standard-Ruleset` becomes `Standard` in every
-       frontmatter, in Document Types' registry rows, in
-       `type-registry.md`'s example, and in
-       `doc-types/doc-type-system.md`; okf-lint's
-       `typed-standard-card-or-standard-ruleset` becomes the rule for
-       the one type.
-     - **The description moves.** The directory's `index.md` carries
-       the one-line description the card's question sentence carried,
-       and the catalog row in `standards/index.md` reads it from there.
-     - **`standard/cards.md` becomes the successor Standard**,
-       population "a repo's `standards/` tree": one directory per
-       Standard at `standards/<name>/<topic>.md`; the directory index
-       carries the description; the catalog order; no shadowing of an
-       upstream directory name; and the rule shape itself, an H2 with a
-       predicate and a `<name>.<slug> · kind` trailer and H3s only under
-       a condition, which no Standard states today.
-     - **standards-lint shrinks.** Six of its eight rules, the card
-       rules, go with the card, and `standard.audit-cites-a-lint` with
-       them; `the-hosting-pattern` loses its Audit-cell leg; what
-       remains is rewritten against the successor Standard.
-     - **A loop's check links a Standard.** Loop Conventions'
-       `entries-point-and-condition` says a check links `card.md#audit`;
-       it says a Standard file instead, and loop-lint follows. Decided
-       2026-09-20.
-     - **`standard/consuming.md` is rewritten** as the post-card recipe:
-       its steps name cards, Audit cells, Enforce cells, and
-       standards-lint's consumer mode. It is a Guide; where a guide
-       lives is step 5's open decision.
-     - **The vendored spec leaves.** `standards/references/okf-spec.md`,
-       the one `type: Reference` file under the tree, and its `index.md`
-       move to `docs/references/`, with the citation in
-       `knowledge-organization/indexes.md` and the row in
-       `standards/index.md`; a vendored upstream spec is material a
-       Standard cites, not a Standard.
-     - **Consumers.** A consumer repo's cards, story-forge's five, are
-       deleted by that repo at its next pin bump.
-     Reason: the reference model places every cell elsewhere, Define is
-     the Standard file, Audit is the verifier table, Enforce is the
-     boundary file, and Adopt was never a primitive
-     ([What goes where](/working-docs/doc-type-system/doc-type-system/reference-model.md#what-goes-where)).
+  6. *Retire the card.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
   7. *Tidy the doc-type definitions.* The three `contract-shape.md`
      files and `doc-types/doc-type.md` get the pseudocode back, in the
      shape the steps above produce. The user approves every edit here
@@ -182,6 +135,17 @@ specification.
      - **The one-module lint.** A detector concatenates the four fences
        and parses them as one Python module; it is the first verifier
        for the specification's `one-base` and `one-module`.
+     - **Step 6's residue.** Step 6 changed only links in the doc-type
+       files, so these still describe the card: `doc-types/standard/`
+       `definition.md` (the verbs, the kinds, where a standard lives),
+       `contract-shape.md` (the card, cardgen, rulegen),
+       `encoding.md` (cells, `card.md`, the two generators),
+       `index.md` and `residual-ledger.md` (the two generated views, the
+       Cards section); `doc-types/doc-type-system.md` (the rulings rows
+       `Standard-Card` and `Standard-Ruleset`, the generators paragraph);
+       `doc-types/loop/encoding.md` and `contract-shape.md` (a check
+       links a card's Audit cell; it links a file typed `Standard`);
+       and `doc-types/index.md`'s row for `standard/`.
      Reason: the parts, Edge, Rule, Act, Check, Yield, are not doc-types
      and must not extend the base; every operation on an edge must be
      one of the doc-type's verbs, and `args` was a noun and `never` a
@@ -432,6 +396,32 @@ specification.
   admits ruleset and explanation only beside a card. No further
   trivial conduct rule was found. Verified:
   playbook-lint's thirteen detectors clean, `make check` green, 1016
+  tests.
+- **Retire the card, 2026-09-20.** Step 6 of The system. The twelve
+  `card.md` files, the type `Standard-Card`, the four cells, `cardgen`,
+  `rulegen`, and the two `.txt` views are gone; the factory's card had
+  gone at step 4. `Standard-Ruleset` is `Standard` in every frontmatter,
+  the registry, and okf-lint, whose rule is `typed-standard`. Each
+  directory index opens with the sentence its card carried, and the
+  catalog row carries that sentence verbatim. `standard/cards.md` is
+  `standard/tree.md`, "The Standards Tree", population "a repo's
+  standards/ tree", five rules: `directory-layout`, `the-population`
+  (new, rulegen's one check kept), `the-rule-shape` (new, null),
+  `the-catalog`, `no-shadowing`, each a predicate and its id line with the
+  reasoning in the explanation; standards-lint decides four, the
+  question sentence, the directory's introduction, Define, and
+  `audit-cites-a-lint` retired, `the-hosting-pattern` without its Audit
+  leg. Loop Conventions and loop-lint: a check links a file typed
+  `Standard`. `guides/consuming.md` is the post-card recipe. The
+  vendored spec is `docs/references/okf-spec.md`, so `references/` is no
+  longer an exception anywhere. Every card sentence was checked against
+  its Standard's explanation: each reason was already there, so nothing
+  moved and the rest, "a chosen gap, not a forgotten one", was deleted.
+  Six runbooks the Adopt cells linked have no pointer from a Standard,
+  as the reference model rules. The doc-type files changed only where
+  a link would break; the prose is step 7's, listed there. Consumers:
+  a leftover card is an unknown type at the next pin bump. Verified:
+  playbook-lint's thirteen detectors clean, `make check` green, 998
   tests.
 
 ## Acronyms

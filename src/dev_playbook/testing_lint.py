@@ -1,6 +1,6 @@
 """Audit a repo's Python tests against the workspace testing conventions.
 
-testing-lint is the detector behind the Python-testing card. It walks a repo's
+testing-lint is the detector behind the Python-testing Standard. It walks a repo's
 Python files once (via dev_playbook.pyast.find_python_files, so gitignore-aware
 and worktree-scoped) and applies three rules to the test files it finds:
 
@@ -42,8 +42,8 @@ from pathlib import Path
 from dev_playbook import pyast
 from dev_playbook.findings import print_rules, render
 
-# Every rule id this detector can emit, namespaced by the testing card whose
-# question it answers. Each id is a module-level constant so every emission site
+# Every rule id this detector can emit, namespaced by the testing directory
+# whose Standard it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
 ACCESS_ONLY_PUBLIC_NAMES = "testing.access-only-public-names"

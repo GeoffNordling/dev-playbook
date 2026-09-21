@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Loop Conventions
 description: The form a document typed Loop takes — one paragraph, one Mermaid graph, and the Acts, Checks, and Yields sections that agree with it
 population: "a document typed Loop"
@@ -67,8 +67,7 @@ yield, which leads to a step or to a receiver, a node with no entry.
 Every entry of a document typed `Loop` states its condition, `fires
 when …` or `fires every iteration` for an act or a check and `yields
 when …` for a yield. An act's entry holds at least one link; a check's
-entry links a document typed `Standard-Card` at its `audit` fragment; a
-yield's entry holds a link or the words `the user`, and every link it
+entry links a document typed `Standard`; a yield's entry holds a link or the words `the user`, and every link it
 holds names a document typed `Loop`. Every link in an entry is
 root-absolute or relative to the document, and it resolves to a file in
 the repo.

@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Indexes
 description: The index.md file — typeless, an introduction naming what the directory holds, a listing of every concept document with its description, alphabetical unless declared otherwise, authored not generated
 population: "an index.md"
@@ -12,7 +12,7 @@ agent see what the directory holds, and read each document's one-line
 `description`, without opening every file. A repo's agent-navigated
 documentation is one
 [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog)
-bundle per the [OKF SPEC](/standards/references/okf-spec.md), the whole
+bundle per the [OKF SPEC](/docs/references/okf-spec.md), the whole
 repository: an agent triages a document by its frontmatter and navigates
 between documents by the per-directory `index.md`, loading a body only
 when the document is relevant.

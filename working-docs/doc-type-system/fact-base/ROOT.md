@@ -99,11 +99,12 @@ In order; each produces what the next needs.
   the way
   [Fact Base](/working-docs/doc-type-system/fact-base/fact-base.md)
   was designed.
-- **Extractors.** [chaingen](/scripts/chaingen) and
-  [rulegen](/scripts/rulegen), the scripts that write the text files
-  today, move into the package as the `chain` and `standard`
-  extractors, the scripts and their text files deleted with the move
-  and their logic kept, alongside the bedrock extractors, and a `loop` extractor
+- **Extractors.** [chaingen](/scripts/chaingen), the script that writes
+  `chains.txt` today, and `rulegen`, deleted 2026-09-20 by the doc-type
+  plan's step 6 and kept in git history at commit `9be0089`, move into
+  the package as the `chain` and `standard` extractors, chaingen and its
+  text file deleted with the move and both scripts' logic kept,
+  alongside the bedrock extractors, and a `loop` extractor
   reads a Loop document's Mermaid block
   ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned));
   one refresh writes one fact base per checkout; `chains.txt`, its

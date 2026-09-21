@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Documentation Sets
 description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, every row inside the set, one home for every fact, distinct concerns, and terms defined once
 population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Reference mirror among them"
@@ -26,7 +26,7 @@ edited here. A member's **concern** is the one purpose its frontmatter
 a set's concern is its index's introduction
 ([Indexes](/standards/knowledge-organization/indexes.md#the-introduction)).
 The rules bind the set level, how the members relate to each other and
-to their concerns; what one member holds is [Prose](/standards/prose/card.md)'s.
+to their concerns; what one member holds is [Doc Conventions](/standards/prose/conventions.md)'s.
 Every rule here reads one set: its index, its members, and the index one
 level up and one level down. Two reach farther by their own text,
 [one home](#one-home) into any set or repo and

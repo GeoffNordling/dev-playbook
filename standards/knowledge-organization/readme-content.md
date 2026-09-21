@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: README Content
 description: The README content floor — an H1 and a purpose sentence, with no agent instructions, no decisions, and no roster of harness-injected files
 population: "a README.md"

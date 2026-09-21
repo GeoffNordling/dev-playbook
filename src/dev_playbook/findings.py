@@ -1,7 +1,7 @@
 """GNU-format finding rendering shared by the workspace detectors.
 
 Every detector emits findings in the one format the meta-standard's detector
-contract fixes (standards/standard/detectors.md): ``location:line: card.rule
+contract fixes (standards/standard/detectors.md): ``location:line: name.rule
 message`` — a colon
 after the location, single spaces, a repo-relative path; ``:line`` omitted for a
 file-level finding. Rendering lives here so the format is defined once and
@@ -26,7 +26,7 @@ def print_rules(rules: Iterable[str]) -> int:
     """Print a detector's rule ids, one per line, sorted and deduplicated.
 
     The shared body of every detector's ``--list-rules`` flag: it needs no
-    repository and runs from any cwd, so the card↔rule matrix detector can
+    repository and runs from any cwd, so the verifier table's generator can
     enumerate the fleet's rules. Returns 0, the flag's exit code.
     """
     for rule in sorted(set(rules)):

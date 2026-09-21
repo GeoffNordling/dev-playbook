@@ -1,7 +1,7 @@
 ---
 type: Explanation
 title: Standard Explanation
-description: The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, why a detector must ignore the GIT_DIR a git hook exports, and where a check runs
+description: The thinking behind the meta-standard's rules — why one directory holds one standard, what a detector is and is not, why an absent surface is clean, why a detector must ignore the GIT_DIR a git hook exports, and where a check runs
 ---
 
 # Standard Explanation
@@ -9,6 +9,20 @@ description: The thinking behind the meta-standard's rules — what a detector i
 The reasoning behind the meta-standard, the rulesets under
 `standards/standard/`: the vocabulary and the reasons that make the
 rules intelligible.
+
+## The tree
+
+One directory, one standard: the files that state one standard's rules
+and the explanation behind them sit together, one documentation set
+([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)),
+so a reader who finds one finds the rest. The rule id's trailer is what
+the verifier table reads
+([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
+so a rule without one is a rule no table row can name. A consumer's
+`standards/<name>/` on a name dev-playbook publishes would silently
+override the workspace-scoped standard of that name, which is why the
+name is reserved; the two scopes are
+[Scope](/doc-types/standard/definition.md#scope).
 
 ## Detectors
 

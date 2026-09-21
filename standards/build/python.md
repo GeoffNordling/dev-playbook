@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: The Python Project
 description: The root Python project — the name mapping, what a Python file in scripts/ carries, and when an entry point is declared
 population: "a governed repo's root Python project: pyproject.toml, the package under src/, and the Python under scripts/"

@@ -11,14 +11,15 @@ workspace.
 
 ## How this directory reads
 
-Every directory here except `references/` is one standard. Its `card.md`
-is the **standard card**: the four-cell record — define, audit, enforce,
-adopt — locating the standard's contract, checkers, gates, and adoption
-helpers. Beside the card sit the Standards its Define cell points at
-(`build/skeleton.md` beside `build/card.md`) and the explanation behind
-them. The rule is the tree: **one directory, one
-standard**; `references/` holds vendored mirrors. The contract behind the
-cards and the rulesets is the Standard doc-type
+Every directory here is one standard: the files typed `Standard` that
+state its rules, one population each (`build/skeleton.md`,
+`build/canonical.md`, `build/python.md`), the explanation behind them
+(`build/explanation.md`), and an `index.md` whose opening sentence is
+the standard's remit. Which check decides each rule is
+[the verifier table](/standards/verifiers.yaml), and where each check
+runs is [the boundary table](/standards/boundaries.yaml). The rule is
+the tree: **one directory, one standard**. The contract behind a
+Standard file is the Standard doc-type
 ([doc-types/standard/](/doc-types/standard/index.md)).
 
 ## Rules live here; their subjects live elsewhere
@@ -30,12 +31,12 @@ governs lives wherever that population naturally lives:
 |---|---|
 | `build/` | every repo tree in the workspace |
 | `harness/` | the harness files in every repo |
-| `standard/` | the cards in this very directory |
+| `standard/` | the `standards/` tree itself |
 
-The last row is the one loop: the meta-standard's population is the cards
-themselves, which tempts a reader to mistake this directory for a
+The last row is the one loop: the meta-standard's population is the tree
+itself, which tempts a reader to mistake this directory for a
 governance hierarchy. It is not — everything here is under the
-meta-standard **in form only** (the card format), while each standard's
+meta-standard **in form only** (the file and tree shape), while each standard's
 substance governs its own population, one rung down. A rejection always
 cites exactly one rung up: a bad Makefile is rejected by `build/`, never by
 `standard/`.

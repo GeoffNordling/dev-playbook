@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Distribution Channel
 description: How the hook repository's checks reach the governed repos — a publisher's local block and a consumer's pinned rev
 population: "a governed repo's share of the distribution channel: its hook manifest, its local block, and its pin on the hook repository"
@@ -15,8 +15,7 @@ is independent of where the consumer or any of its worktrees sits on disk
 and identical on CI, and the clone carries the
 [canonical artifacts](/standards/build/canonical.md) with it. A change to
 the standard, hook code, a canonical artifact, or a version pin, reaches a
-consumer only when its pinned `rev` moves; the release is the bump
-([Distribution](/standards/distribution/card.md)).
+consumer only when its pinned `rev` moves; the release is the bump.
 
 The reasoning behind the rules is the
 [Distribution Explanation](/standards/distribution/explanation.md).

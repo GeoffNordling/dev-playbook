@@ -1,44 +1,39 @@
 """Audit the ``standards/`` tree against the meta-standard's deterministic rules.
 
-standards-lint is the detector behind the meta-standard card, a published hook
-any repo can run over its own ``standards/`` tree. It runs in two modes:
+standards-lint is the detector behind the meta-standard, a published hook any
+repo can run over its own ``standards/`` tree. It runs in two modes:
 **dev-playbook mode**, where the audited tree is dev-playbook itself (or a
 fixture simulating it), detected by the canonical consumer template
 ``standards/build/canonical/.pre-commit-config.yaml`` -- which only the hook
 repo hosts; and **consumer mode**, every other repo, which is policed from this
 hook's own pinned clone. A repo carrying no standards/ surface
--- neither a catalog nor a card -- is clean by construction. The rules,
-each the id of its heading in standards/standard/cards.md:
+-- neither a catalog nor a Standard directory -- is clean by construction. The
+rules, each the id of its heading in standards/standard/tree.md:
 
-  - **directory-layout** — every immediate subdirectory of ``standards/``
-    except ``references/`` is a card directory holding ``card.md``: ``type:
-    Standard-Card`` frontmatter and the four cells (Define, Audit, Enforce,
-    Adopt) as ``##`` sections, in that order; every other ``.md`` under it,
-    ``index.md`` aside, is typed ``Standard-Ruleset`` or ``Explanation``.
-    The only flat files under ``standards/`` are README.md and
+  - **directory-layout** — every immediate subdirectory of ``standards/`` is a
+    Standard directory: it holds at least one file typed ``Standard``, and every
+    tracked ``.md`` under it, ``index.md`` aside, is typed ``Standard`` or
+    ``Explanation``. The only flat files under ``standards/`` are README.md and
     index.md.
-  - **define-points-only-at-rulesets** — a Define bullet is the link alone.
-  - **the-question-sentence** — the sentence after a card's H1 opens ``Governs
-    how`` and the frontmatter description repeats it less the period.
-  - **the-directorys-introduction** — a card directory's ``index.md`` opens
-    with the card's title and question sentence and lists the card first.
+  - **the-population** — a file typed ``Standard`` names its population in
+    frontmatter, one string.
   - **the-catalog** — ``standards/index.md`` follows its declared ordering:
     README first, then only directories -- (in dev-playbook mode) the
     meta-standard's ``standard/`` when the tree carries it, the rest
-    alphabetical by name -- each card directory's row carrying the card's
-    description verbatim.
+    alphabetical by name -- each row carrying the directory index's opening
+    sentence verbatim, less its period.
   - **the-hosting-pattern** and **offered-by-the-canonical-template** — the
     detector-hook id sets agree between the published manifest and the local
     block; in dev-playbook mode the canonical consumer template's pinned block
-    offers exactly what the manifest publishes. Every detector must be cited
-    by a card and carry a scripts/README.md validation-table row when that
-    file is present — "every detector" meaning the playbook-lint roster in
-    dev-playbook mode (consumers wire one aggregate hook, so the roster, not
-    the config, enumerates what runs) and the local detector hooks in consumer
-    mode. Where each detector runs is the boundary table's question, not this
-    module's (``scripts/boundary-table``).
-  - **no-shadowing** — in consumer mode, no local card directory may reuse an
-    upstream card directory's name drawn from this hook's own pinned clone.
+    offers exactly what the manifest publishes. Every detector carries a
+    scripts/README.md validation-table row when that file is present — "every
+    detector" meaning the playbook-lint roster in dev-playbook mode (consumers
+    wire one aggregate hook, so the roster, not the config, enumerates what
+    runs) and the local detector hooks in consumer mode. Where each detector
+    runs is the boundary table's question, not this module's
+    (``scripts/boundary-table``).
+  - **no-shadowing** — in consumer mode, no local Standard directory may reuse
+    an upstream directory's name drawn from this hook's own pinned clone.
 
 Which check decides which rule is the verifier table,
 ``standards/verifiers.yaml``; ``scripts/verifier-table`` writes it from this
@@ -67,19 +62,17 @@ from dev_playbook.playbook_lint import DETECTORS
 
 # The dev-playbook checkout this module's hook ships in — the pre-commit clone
 # in consumer repos, dev-playbook's own tree when dogfooded. The shadow rule
-# resolves its upstream card set here, since a consumer never carries
-# dev-playbook's own cards. The module sits at src/dev_playbook/, so the repo
-# root is three parents up.
+# resolves its upstream directory set here, since a consumer never carries
+# dev-playbook's own Standards. The module sits at src/dev_playbook/, so the
+# repo root is three parents up.
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# Every rule id this detector can emit, namespaced by the meta card whose
+# Every rule id this detector can emit, namespaced by the meta-standard whose
 # question it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
 DIRECTORY_LAYOUT = "standard.directory-layout"
-DEFINE_POINTS_ONLY_AT_RULESETS = "standard.define-points-only-at-rulesets"
-THE_QUESTION_SENTENCE = "standard.the-question-sentence"
-THE_DIRECTORYS_INTRODUCTION = "standard.the-directorys-introduction"
+THE_POPULATION = "standard.the-population"
 THE_CATALOG = "standard.the-catalog"
 NO_SHADOWING = "standard.no-shadowing"
 THE_HOSTING_PATTERN = "standard.the-hosting-pattern"
@@ -87,41 +80,27 @@ OFFERED_BY_THE_CANONICAL_TEMPLATE = "standard.offered-by-the-canonical-template"
 
 RULES = (
     DIRECTORY_LAYOUT,
-    DEFINE_POINTS_ONLY_AT_RULESETS,
-    THE_QUESTION_SENTENCE,
-    THE_DIRECTORYS_INTRODUCTION,
+    THE_POPULATION,
     THE_CATALOG,
     NO_SHADOWING,
     THE_HOSTING_PATTERN,
     OFFERED_BY_THE_CANONICAL_TEMPLATE,
 )
 
-CARD_TYPE = "Standard-Card"
-# The types a card directory admits beside its card and its indexes.
-ADMITTED_TYPES = frozenset({"Standard-Ruleset", "Explanation"})
+STANDARD_TYPE = "Standard"
+# The types a Standard directory admits beside its index.
+ADMITTED_TYPES = frozenset({STANDARD_TYPE, "Explanation"})
 STANDARDS = "standards"
 CATALOG = "standards/index.md"
 README = "standards/README.md"
-# The one file every card directory holds; the directory's name is the card's.
-CARD_FILE = "card.md"
+INDEX = "index.md"
 META_DIR = "standard"
-META_CARD = f"standards/{META_DIR}/{CARD_FILE}"
-# The subdirectories of standards/ that hold no card: vendored mirrors.
-NON_CARD_DIRS = frozenset({"references"})
-# The four cells every card carries as ``##`` sections, in this order.
-CELLS = ("Define", "Audit", "Enforce", "Adopt")
-# The spaced em dash that turns a pointer bullet into an annotated one.
-DASH = " — "
 
-# A ``## Heading`` (exactly level two): three ``#`` would fail the ``\s`` after.
-_H2 = re.compile(r"^##\s+(.+?)\s*#*\s*$")
-# Any ATX heading, used to bound the opening paragraph of a card.
+# Any ATX heading, used to bound the opening paragraph of a document.
 _HEADING = re.compile(r"^#{1,6}\s")
 # A sentence terminator: a period at end of line or before a space. Requiring the
 # boundary keeps ``CLAUDE.md`` and ``index.md`` from ending a sentence mid-word.
 _SENTENCE_END = re.compile(r"\.(?=\s|$)")
-# The opening every card's question sentence must use.
-QUESTION_LEAD = "Governs how"
 # An index bullet: ``- [title](/root-absolute) — description``; the target's
 # ``#`` anchor is dropped and the description, when present, captured.
 _BULLET = re.compile(
@@ -171,34 +150,6 @@ def _frontmatter(path: Path) -> dict | None:
         raise CannotRun(f"cannot read frontmatter of {path.name}: {err}") from err
 
 
-def _title(path: Path) -> str:
-    """A doc's frontmatter title, falling back to its stem for sorting."""
-    front = _frontmatter(path)
-    title = front.get("title") if front else None
-    return title if isinstance(title, str) else path.stem
-
-
-def _h2_sections(path: Path) -> list[str]:
-    """The level-two heading texts of a document, in order."""
-    return [m.group(1) for _, line in md.content_lines(path) if (m := _H2.match(line))]
-
-
-def _is_card_path(rel: str) -> bool:
-    """Whether ``rel`` is a ``standards/<name>/card.md`` card slot."""
-    parts = PurePosixPath(rel).parts
-    return len(parts) == 3 and parts[0] == STANDARDS and parts[2] == CARD_FILE
-
-
-def _card_name(rel: str) -> str:
-    """The card's name, the directory a ``standards/<name>/card.md`` sits in."""
-    return PurePosixPath(rel).parts[1]
-
-
-def _card_path(name: str) -> str:
-    """The ``standards/<name>/card.md`` slot of a card named ``name``."""
-    return f"{STANDARDS}/{name}/{CARD_FILE}"
-
-
 def _tracked(root: Path) -> list[str]:
     """Every tracked file of the checkout, repo-relative.
 
@@ -211,39 +162,34 @@ def _tracked(root: Path) -> list[str]:
     try:
         found = md.find_files(root)
     except subprocess.CalledProcessError as err:
-        raise CannotRun(f"cannot scan cards: {root} is not a git checkout") from err
+        raise CannotRun(
+            f"cannot scan {STANDARDS}/: {root} is not a git checkout"
+        ) from err
     return [_relpath(p, root) for p in found]
 
 
-def _card_paths(root: Path) -> list[str]:
-    """Every ``standards/<name>/card.md`` in the checkout, sorted."""
-    return sorted(rel for rel in _tracked(root) if _is_card_path(rel))
+def _standard_dirs(root: Path) -> list[str]:
+    """Every immediate subdirectory of ``standards/``, by name, sorted.
 
-
-def _card_dirs(root: Path) -> list[str]:
-    """Every immediate subdirectory of ``standards/`` that owes a card, sorted.
-
-    A directory is one that holds any tracked file at any depth; the vendored
-    ``references/`` is the one exempt name.
+    A directory is one that holds any tracked file at any depth.
     """
     names = {
         parts[1]
         for rel in _tracked(root)
         if len(parts := PurePosixPath(rel).parts) >= 3 and parts[0] == STANDARDS
     }
-    return sorted(names - NON_CARD_DIRS)
+    return sorted(names)
 
 
 def _members(root: Path) -> list[str]:
-    """Every tracked ``.md`` in a card directory that is not its card or an index."""
+    """Every tracked ``.md`` in a Standard directory that is not an index."""
     return sorted(
         rel
         for rel in _tracked(root)
         if len(parts := PurePosixPath(rel).parts) >= 3
         and parts[0] == STANDARDS
-        and parts[1] not in NON_CARD_DIRS
         and parts[-1].endswith(".md")
-        and parts[-1] not in {CARD_FILE, "index.md"}
+        and parts[-1] != INDEX
     )
 
 
@@ -255,7 +201,7 @@ def _flat_strays(root: Path) -> list[str]:
         if len(parts := PurePosixPath(rel).parts) == 2
         and parts[0] == STANDARDS
         and parts[1].endswith(".md")
-        and parts[1] not in {"README.md", "index.md"}
+        and parts[1] not in {"README.md", INDEX}
     )
 
 
@@ -265,23 +211,24 @@ def _dev_playbook_mode(root: Path) -> bool:
     The probe is the canonical consumer template's presence --
     ``standards/build/canonical/.pre-commit-config.yaml``. Only the hook repo
     hosts that template; consumers copy *from* it and never carry it. Keying on
-    the meta card ``standards/standard.md`` instead would collide with the shadow
-    rule -- a consumer may innocently name a card ``standard.md``, which must stay
-    in consumer mode so the shadow rule catches it, not flip the whole audit into
-    dev-playbook mode. The template cannot be created innocently, so it carries no
-    such ambiguity, and the probe is self-consistent with hook-surfaces' canonical
-    leg, which reads exactly this file -- that leg can never CannotRun on an absent
-    template. Path equality against the hook clone is deliberately avoided: it
-    would put every fixture in consumer mode and break every dev-playbook-mode test.
+    the meta-standard's directory ``standards/standard/`` instead would collide
+    with the shadow rule -- a consumer may innocently name a directory
+    ``standard``, which must stay in consumer mode so the shadow rule catches
+    it, not flip the whole audit into dev-playbook mode. The template cannot be
+    created innocently, so it carries no such ambiguity, and the probe is
+    self-consistent with hook-surfaces' canonical leg, which reads exactly this
+    file -- that leg can never CannotRun on an absent template. Path equality
+    against the hook clone is deliberately avoided: it would put every fixture
+    in consumer mode and break every dev-playbook-mode test.
     """
     return (root / CANONICAL_CONFIG).is_file()
 
 
-# --- standard.directory-layout ----------------------------------------------
+# --- standard.directory-layout and standard.the-population ------------------
 
 
-def check_card_layout(root: Path) -> list[Finding]:
-    """Flag a stray flat file, a cardless directory, an unadmitted member, or a malformed card."""
+def check_directory_layout(root: Path) -> list[Finding]:
+    """Flag a stray flat file, an unadmitted member, a Standard-less directory, or a populationless Standard."""
     findings: list[Finding] = []
     for rel in _flat_strays(root):
         findings.append(
@@ -289,20 +236,11 @@ def check_card_layout(root: Path) -> list[Finding]:
                 rel,
                 None,
                 DIRECTORY_LAYOUT,
-                f"flat file under {STANDARDS}/; a card is {_card_path('<name>')}",
+                f"flat file under {STANDARDS}/; a Standard is "
+                f"{STANDARDS}/<name>/<topic>.md",
             )
         )
-    cards = _card_paths(root)
-    for name in _card_dirs(root):
-        if _card_path(name) not in cards:
-            findings.append(
-                Finding(
-                    f"{STANDARDS}/{name}",
-                    None,
-                    DIRECTORY_LAYOUT,
-                    f"card directory has no {CARD_FILE}",
-                )
-            )
+    with_standard: set[str] = set()
     for rel in _members(root):
         front = _frontmatter(root / rel)
         doctype = front.get("type") if front else None
@@ -312,76 +250,47 @@ def check_card_layout(root: Path) -> list[Finding]:
                     rel,
                     None,
                     DIRECTORY_LAYOUT,
-                    f"typed {doctype!r} in a card directory; a card directory "
-                    f"admits {', '.join(sorted(ADMITTED_TYPES))}",
-                )
-            )
-    for rel in cards:
-        path = root / rel
-        front = _frontmatter(path)
-        if not front or front.get("type") != CARD_TYPE:
-            findings.append(
-                Finding(
-                    rel, None, DIRECTORY_LAYOUT, f"card must be typed '{CARD_TYPE}'"
+                    f"typed {doctype!r} in a Standard directory; a Standard "
+                    f"directory admits {', '.join(sorted(ADMITTED_TYPES))}",
                 )
             )
             continue
-        for line in _section_lines(path, "Define"):
-            if DASH in line:
-                findings.append(
-                    Finding(
-                        rel,
-                        None,
-                        DEFINE_POINTS_ONLY_AT_RULESETS,
-                        "Define bullet carries an annotation; a Define bullet is "
-                        "the link alone",
-                    )
-                )
-                break
-        sections = [s for s in _h2_sections(path) if s in CELLS]
-        missing = [c for c in CELLS if c not in sections]
-        if missing:
+        if doctype != STANDARD_TYPE:
+            continue
+        with_standard.add(PurePosixPath(rel).parts[1])
+        population = front.get("population") if front else None
+        if not isinstance(population, str) or not population.strip():
             findings.append(
                 Finding(
                     rel,
                     None,
-                    DIRECTORY_LAYOUT,
-                    f"card is missing the cell(s): {', '.join(missing)}",
+                    THE_POPULATION,
+                    "a Standard names its population: a `population` string in "
+                    "frontmatter",
                 )
             )
-        elif len(sections) != len(CELLS):
-            # All four present but one repeats — a duplicate, not a reordering.
-            duplicates = sorted({c for c in sections if sections.count(c) > 1})
+    for name in _standard_dirs(root):
+        if name not in with_standard:
             findings.append(
                 Finding(
-                    rel,
+                    f"{STANDARDS}/{name}",
                     None,
                     DIRECTORY_LAYOUT,
-                    f"card has duplicate cell(s): {', '.join(duplicates)}",
-                )
-            )
-        elif sections != list(CELLS):
-            findings.append(
-                Finding(
-                    rel,
-                    None,
-                    DIRECTORY_LAYOUT,
-                    f"card cells are out of order (want {', '.join(CELLS)})",
+                    f"directory holds no file typed '{STANDARD_TYPE}'",
                 )
             )
     return findings
 
 
-# --- standard.the-question-sentence -----------------------------------------
+# --- standard.the-catalog ---------------------------------------------------
 
 
 def _opening_sentence(path: Path) -> tuple[int, str] | None:
-    """The ``(line, text)`` of the first sentence after a card's H1.
+    """The ``(line, text)`` of the first sentence after a document's H1.
 
     The sentence is the run up to the first period at a word boundary, taken from
     the paragraph following the H1 with its line breaks flattened to spaces.
-    Returns None when the card has no H1 or nothing follows it, which
-    ``check_card_question`` reports rather than crashing on.
+    Returns None when the document has no H1 or nothing follows it.
     """
     lines = list(md.content_lines(path))
     start = next((i for i, (_, ln) in enumerate(lines) if ln.startswith("# ")), None)
@@ -406,118 +315,6 @@ def _opening_sentence(path: Path) -> tuple[int, str] | None:
     return number, text[: end.start()] if end else text
 
 
-def check_card_question(root: Path) -> list[Finding]:
-    """Flag a card whose question sentence and description have come apart.
-
-    Card Catalog's The question sentence (standards/standard/cards.md) binds the
-    two: the sentence after the H1 opens ``Governs how`` and
-    names the governed question, and the frontmatter description repeats it
-    verbatim less the period, so the catalog row and the card state one remit.
-    """
-    findings: list[Finding] = []
-    for rel in _card_paths(root):
-        path = root / rel
-        front = _frontmatter(path)
-        if not front or front.get("type") != CARD_TYPE:
-            continue  # card-layout owns a mistyped slot.
-        opening = _opening_sentence(path)
-        if opening is None:
-            findings.append(
-                Finding(
-                    rel, None, THE_QUESTION_SENTENCE, "card states no question sentence"
-                )
-            )
-            continue
-        line, sentence = opening
-        if not sentence.startswith(QUESTION_LEAD):
-            findings.append(
-                Finding(
-                    rel,
-                    line,
-                    THE_QUESTION_SENTENCE,
-                    f"question sentence must open '{QUESTION_LEAD}'",
-                )
-            )
-        description = front.get("description")
-        if not isinstance(description, str) or description.strip() != sentence:
-            findings.append(
-                Finding(
-                    rel,
-                    line,
-                    THE_QUESTION_SENTENCE,
-                    "description must repeat the question sentence verbatim, "
-                    f"less its period: {sentence!r}",
-                )
-            )
-    return findings
-
-
-# --- standard.the-directorys-introduction -----------------------------------
-
-
-def _expected_intro(front: dict) -> str:
-    """The sentence a card directory's index opens with: title, then question.
-
-    ``Build`` and ``Governs how a repository is laid out`` compose to ``Build
-    governs how a repository is laid out``; the description is the question
-    sentence less its period (``card-question``), so no period is appended.
-    """
-    title = str(front.get("title", "")).strip()
-    description = str(front.get("description", "")).strip()
-    return f"{title} {description[:1].lower()}{description[1:]}"
-
-
-def check_card_directory(root: Path) -> list[Finding]:
-    """Flag a card directory whose index does not open with its card.
-
-    Card Catalog's The directory's introduction (standards/standard/cards.md):
-    the directory's ``index.md`` opens with the card's title and question
-    sentence and lists the card first, so the card states the set's concern.
-    """
-    findings: list[Finding] = []
-    for rel in _card_paths(root):
-        front = _frontmatter(root / rel)
-        if not front or front.get("type") != CARD_TYPE:
-            continue  # card-layout owns a mistyped slot.
-        index = f"{STANDARDS}/{_card_name(rel)}/index.md"
-        if not (root / index).is_file():
-            findings.append(
-                Finding(
-                    index,
-                    None,
-                    THE_DIRECTORYS_INTRODUCTION,
-                    "card directory has no index.md",
-                )
-            )
-            continue
-        expected = _expected_intro(front)
-        opening = _opening_sentence(root / index)
-        if opening is None or opening[1] != expected:
-            findings.append(
-                Finding(
-                    index,
-                    opening[0] if opening else None,
-                    THE_DIRECTORYS_INTRODUCTION,
-                    "index must open with the card's title and question sentence: "
-                    f"{expected!r}",
-                )
-            )
-        bullets = _index_bullets(root / index)
-        if not bullets or bullets[0][1] != rel:
-            findings.append(
-                Finding(
-                    index,
-                    None,
-                    THE_DIRECTORYS_INTRODUCTION,
-                    f"index must list {rel} first",
-                )
-            )
-    return findings
-
-
-# --- standard.the-catalog ---------------------------------------------------
-
-
 def _index_bullets(path: Path) -> list[tuple[str, str, str | None]]:
     """An index's ``(title, target, description)`` bullets in listing order.
 
@@ -534,7 +331,7 @@ def _index_bullets(path: Path) -> list[tuple[str, str, str | None]]:
 
 def _is_directory_bullet(target: str) -> bool:
     """Whether a catalog bullet points at a child directory's ``index.md``."""
-    return PurePosixPath(target).name == "index.md"
+    return PurePosixPath(target).name == INDEX
 
 
 def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
@@ -542,19 +339,15 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
 
     okf-lint already enforces catalog *membership* (the ``Ordering:`` marker
     exempts only its generic alphabetical rule), so this checks order and each
-    card row's description: README, then directories only -- the meta-standard's
+    row's description: README, then directories only -- the meta-standard's
     ``standard/`` *when the tree is dev-playbook's own and carries it*, the rest
-    alphabetical by name -- each card directory's row repeating the card's
-    description verbatim. The meta lead slot is mode-gated -- only a
-    dev-playbook-mode tree that carries ``standards/standard/card.md`` gets it.
-    In consumer mode a card named ``standard`` is an ordinary card sorted among
-    the others, so a consumer that names one draws only the intended
-    ``card-shadows-upstream`` finding, never a spurious catalog-order complaint
-    about a meta-standard it has no concept of. The file-existence check stays
-    load-bearing under the mode conjunct: a dev-playbook-mode tree that
-    legitimately omits the meta card must not be forced to carry a meta lead row,
-    and okf-lint's index rule independently forces every existing card directory
-    to have a catalog row, so dev-playbook cannot silently drop its own.
+    alphabetical by name -- each row repeating its directory index's opening
+    sentence verbatim, less the period. The meta lead slot is mode-gated -- only
+    a dev-playbook-mode tree that carries ``standards/standard/`` gets it. In
+    consumer mode a directory named ``standard`` is an ordinary directory sorted
+    among the others, so a consumer that names one draws only the intended
+    ``no-shadowing`` finding, never a spurious catalog-order complaint about a
+    meta-standard it has no concept of.
     """
     if not (root / CATALOG).is_file():
         raise CannotRun(f"no catalog at {CATALOG}")
@@ -574,8 +367,8 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
             )
         ]
 
-    has_meta_lead = dev_playbook_mode and (root / META_CARD).is_file()
-    meta_index = f"{STANDARDS}/{META_DIR}/index.md"
+    meta_index = f"{STANDARDS}/{META_DIR}/{INDEX}"
+    has_meta_lead = dev_playbook_mode and (root / meta_index).is_file()
     dirs = [t for t in targets if _is_directory_bullet(t)]
     rest = [t for t in dirs if not (has_meta_lead and t == meta_index)]
     expected = (
@@ -601,57 +394,26 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
     for _, target, description in bullets:
         if not _is_directory_bullet(target):
             continue
-        card = _card_path(PurePosixPath(target).parent.name)
-        if not (root / card).is_file():
+        opening = _opening_sentence(root / target)
+        if opening is None:
+            findings.append(
+                Finding(target, None, THE_CATALOG, "index states no opening sentence")
+            )
             continue
-        front = _frontmatter(root / card)
-        want = front.get("description") if front else None
-        if isinstance(want, str) and description != want.strip():
+        if description != opening[1]:
             findings.append(
                 Finding(
                     CATALOG,
                     None,
                     THE_CATALOG,
-                    f"row for {target} must carry the card's description verbatim",
+                    f"row for {target} must carry the index's opening sentence "
+                    f"verbatim: {opening[1]!r}",
                 )
             )
     return findings
 
 
-# --- the card's cells -------------------------------------------------------
-
-
-def _section_lines(path: Path, heading: str) -> list[str]:
-    """The lines under a card's ``## heading`` cell, up to the next ``##``."""
-    lines: list[str] = []
-    in_section = False
-    for _, line in md.content_lines(path):
-        m = _H2.match(line)
-        if m:
-            in_section = m.group(1).strip() == heading
-            continue
-        if in_section:
-            lines.append(line)
-    return lines
-
-
-def _audit_citations(path: Path) -> list[str]:
-    """The first-party detector names an Audit cell cites via ``/scripts/`` links.
-
-    Third-party detectors (ruff, shellcheck, shfmt) are cited by name and pin,
-    never a ``/scripts/`` link, and non-script pointers target other trees --
-    both fall outside the matrix by this scoping.
-    """
-    names: list[str] = []
-    for line in _section_lines(path, "Audit"):
-        for _, target in md.markdown_links(line):
-            clean = target.partition("#")[0]
-            if clean.startswith("/scripts/"):
-                names.append(PurePosixPath(clean).name)
-    return names
-
-
-# --- standard.hook-surfaces -------------------------------------------------
+# --- standard.the-hosting-pattern -------------------------------------------
 
 MANIFEST = ".pre-commit-hooks.yaml"
 LOCAL_CONFIG = ".pre-commit-config.yaml"
@@ -740,14 +502,6 @@ def _readme_table_names(root: Path) -> set[str]:
     }
 
 
-def _all_cited_detectors(root: Path) -> set[str]:
-    """Every detector any card's Audit cell cites via a ``/scripts/`` link."""
-    cited: set[str] = set()
-    for rel in _card_paths(root):
-        cited.update(_audit_citations(root / rel))
-    return cited
-
-
 def _manifest_ids(root: Path) -> tuple[set[str], set[str]]:
     """The manifest's ``(all published ids, detector ids)``.
 
@@ -781,15 +535,14 @@ def check_hook_surfaces(
     offer exactly what the manifest publishes -- consumers carry no canonical
     template, so that leg is dev-playbook-only.
 
-    The per-detector legs -- cited by a card's Audit cell, rowed in the
-    scripts/README.md validation table when that file is present -- run over
-    the set that actually enumerates what the commit gate runs. In consumer
-    mode that is the local detector hooks; in dev-playbook mode it is
-    ``roster`` (the playbook-lint dispatch list -- the local block carries only
-    the aggregate hook, which owns no rules and earns no card). Whether a
-    cited detector runs anywhere is the boundary table's rule
-    (``scripts/boundary-table``, standards/standard/detectors.md, Every
-    address runs somewhere), not a leg here.
+    The per-detector leg -- rowed in the scripts/README.md validation table when
+    that file is present -- runs over the set that actually enumerates what the
+    commit gate runs. In consumer mode that is the local detector hooks; in
+    dev-playbook mode it is ``roster`` (the playbook-lint dispatch list -- the
+    local block carries only the aggregate hook, which owns no rules). Which
+    rule a detector decides is the verifier table's (``scripts/verifier-table``),
+    and whether it runs anywhere the boundary table's (``scripts/boundary-table``),
+    not legs here.
     """
     manifest_all, manifest = _manifest_ids(root)
     local = _scripts_entry_ids(_local_hooks(root))
@@ -827,14 +580,7 @@ def check_hook_surfaces(
                 "manifest",
             )
 
-    cited = _all_cited_detectors(root)
     detectors = set(roster) if dev_playbook_mode else local
-    for name in sorted(detectors - cited):
-        host(
-            f"scripts/{name}",
-            f"detector {name} is cited by no card's Audit cell",
-        )
-
     if (root / SCRIPTS_README).is_file():
         table = _readme_table_names(root)
         for name in sorted(detectors - table):
@@ -845,31 +591,32 @@ def check_hook_surfaces(
 # --- standard.no-shadowing --------------------------------------------------
 
 
-def check_card_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Finding]:
-    """Flag any local card whose name shadows an upstream card (consumer mode).
+def check_shadows_upstream(root: Path, hook_repo_root: Path) -> list[Finding]:
+    """Flag any local Standard directory whose name shadows an upstream one (consumer mode).
 
-    The upstream set is the ``standards/<name>/card.md`` names of
-    ``hook_repo_root`` -- the pinned clone this hook ships in. A local card that
-    reuses an upstream name silently overrides dev-playbook's standard of that
-    name, so the collision is caught at the consumer's commit gate. Self-policing:
-    no network, no workspace scan -- a collision introduced upstream surfaces at
-    the consumer's next pin bump as a red gate, resolved locally.
+    The upstream set is the ``standards/<name>/`` directory names of
+    ``hook_repo_root`` -- the pinned clone this hook ships in. A local directory
+    that reuses an upstream name silently overrides dev-playbook's Standard of
+    that name, so the collision is caught at the consumer's commit gate.
+    Self-policing: no network, no workspace scan -- a collision introduced
+    upstream surfaces at the consumer's next pin bump as a red gate, resolved
+    locally.
 
     A non-git ``hook_repo_root`` funnels into CannotRun through ``_tracked``,
     the single chokepoint for every git scan -- so if the clone the hook ships in
     is not a git checkout, that surfaces as the module's uniform exit-2 diagnostic
     rather than an uncaught ``CalledProcessError``.
     """
-    upstream = {_card_name(rel) for rel in _card_paths(hook_repo_root)}
+    upstream = set(_standard_dirs(hook_repo_root))
     return [
         Finding(
-            rel,
+            f"{STANDARDS}/{name}",
             None,
             NO_SHADOWING,
-            f"local card shadows the upstream {_card_path(name)} card",
+            f"local directory shadows the upstream {STANDARDS}/{name}/",
         )
-        for rel in _card_paths(root)
-        if (name := _card_name(rel)) in upstream
+        for name in _standard_dirs(root)
+        if name in upstream
     ]
 
 
@@ -884,26 +631,25 @@ def audit(
 ) -> list[Finding]:
     """Run every applicable rule over ``root`` and return the combined findings.
 
-    A repo carrying no standards/ surface -- neither a catalog nor a card -- is
-    clean by construction: there is nothing to police, so the walk returns no
-    findings rather than can't-run on the absent catalog (the harness-files-lint
-    optional-surface precedent). A repo with cards but no catalog is a malformed
-    surface, so it still fails loud through ``check_catalog_order``. The
-    canonical-template leg of hook-surfaces and the shadow rule are gated on the
-    mode the marker probe resolves: the shadow rule fires in consumer mode only,
-    since dev-playbook's own cards cannot shadow themselves.
+    A repo carrying no standards/ surface -- neither a catalog nor a Standard
+    directory -- is clean by construction: there is nothing to police, so the
+    walk returns no findings rather than can't-run on the absent catalog (the
+    harness-files-lint optional-surface precedent). A repo with directories but
+    no catalog is a malformed surface, so it still fails loud through
+    ``check_catalog_order``. The canonical-template leg of hook-surfaces and the
+    shadow rule are gated on the mode the marker probe resolves: the shadow rule
+    fires in consumer mode only, since dev-playbook's own directories cannot
+    shadow themselves.
     """
-    if not (root / CATALOG).is_file() and not _card_paths(root):
+    if not (root / CATALOG).is_file() and not _standard_dirs(root):
         return []
     dev_playbook_mode = _dev_playbook_mode(root)
     findings: list[Finding] = []
-    findings.extend(check_card_layout(root))
-    findings.extend(check_card_question(root))
-    findings.extend(check_card_directory(root))
+    findings.extend(check_directory_layout(root))
     findings.extend(check_catalog_order(root, dev_playbook_mode))
     findings.extend(check_hook_surfaces(root, dev_playbook_mode, roster))
     if not dev_playbook_mode:
-        findings.extend(check_card_shadows_upstream(root, hook_repo_root))
+        findings.extend(check_shadows_upstream(root, hook_repo_root))
     return findings
 
 

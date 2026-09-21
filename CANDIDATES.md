@@ -31,7 +31,7 @@ description: Uncommitted future work — described, not yet promoted to issues
 
 - **The registry pass's remaining rows** — the rulings table in
   [Doc-Type System](/doc-types/doc-type-system.md) reads *pending* on every
-  kind but Standard, Standard-Card, Runbook, Guide, and Vocabulary; each is
+  kind but Standard, Runbook, Guide, and Vocabulary; each is
   ruled, and a thin doc-type built where the ruling says so. Log and Survey
   are the user's: at the last count Log had 35 files (story-forge 31, of
   which 27 are tooled Assessment Records; mission-control 3;
@@ -54,7 +54,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   end state is a gate that fails when a declared chain and reality disagree.
   The same work settles runbook shadowing: a lint parallel to
   `standard.card-shadows-upstream`, and a home for the no-shadowing rule,
-  which sits in the Standard-Card definition's Scope today. Hierarchical
+  which sits in the Standard definition's Scope today. Hierarchical
   imports across repositories are the mechanism under both.
 - **The software factory's split** — the factory is isolated under
   `working-docs/software-factory/` since 2026-09-20, its rewrite or

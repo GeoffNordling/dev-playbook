@@ -141,7 +141,7 @@ def test_flags_harness_markdown(tmp_path: Path) -> None:
 def test_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {"standards/references/x.md": "---\ntype: Reference\n---\na judgement\n"},
+        {"docs/references/x.md": "---\ntype: Reference\n---\na judgement\n"},
     )
 
     assert prose_lint.audit(repo) == []
@@ -247,7 +247,7 @@ def test_ban_reaches_frontmatter(tmp_path: Path) -> None:
 def test_ban_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {"standards/references/spec.md": "---\ntype: Reference\n---\nhuman\n"},
+        {"docs/references/spec.md": "---\ntype: Reference\n---\nhuman\n"},
     )
 
     assert prose_lint.audit(repo) == []

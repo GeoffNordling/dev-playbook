@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Detectors
 description: The check contract behind the verifier and boundary tables — the two tables, read-only, clean on an absent surface, and the shim, git-root, hosting, rule-id, output, and exit-code rules a first-party script obeys
 population: "a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the two tables at standards/verifiers.yaml and standards/boundaries.yaml"
@@ -125,9 +125,8 @@ another repository.
 ### The hosting pattern
 
 A first-party detector is published as a hook in its repo's
-`.pre-commit-hooks.yaml`, is cited by a card's Audit cell, and has a row
-in the validation table of `scripts/README.md` where the repo has that
-file.
+`.pre-commit-hooks.yaml` and has a row in the validation table of
+`scripts/README.md` where the repo has that file.
 
 `standard.the-hosting-pattern` · deterministic
 

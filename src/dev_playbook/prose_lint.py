@@ -1,6 +1,6 @@
 """Audit authored content against the workspace prose standard.
 
-prose-lint is the detector behind the Prose card. It walks a repo's files once
+prose-lint is the detector behind the Prose Standard. It walks a repo's files once
 (via dev_playbook.md.find_files, so gitignore-aware and worktree-scoped) and
 applies two deterministic rules:
 
@@ -37,7 +37,7 @@ every rule skips (dev-playbook's own lists this module and its test file,
 which must name the banned word to ban it).
 
 Output:
-    stdout — one finding per line, ``file:line: <card>.rule message``.
+    stdout — one finding per line, ``file:line: <name>.rule message``.
     stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
@@ -69,8 +69,8 @@ class CannotRun(Exception):
     """
 
 
-# The rule ids this detector emits, each namespaced by the card whose question
-# it answers — all three under Prose, whose Doc Conventions holds every rule row.
+# The rule ids this detector emits, each namespaced by the directory whose
+# Standard it answers — all three under Prose, whose Doc Conventions holds every rule row.
 # Kept module-level constants so every emission site references them, never a
 # raw literal, and RULES (what --list-rules prints) cannot drift from what the
 # detector emits.

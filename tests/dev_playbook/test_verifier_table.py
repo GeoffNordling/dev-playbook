@@ -31,7 +31,7 @@ def make_repo(tmp_path: Path, files: dict[str, str]) -> Path:
 
 def standard(name: str, rules: list[tuple[str, str]]) -> str:
     """A Standard whose headings are the given (title, kind) rules."""
-    body = f"---\ntype: Standard-Ruleset\ntitle: {name}\n---\n\n# {name}\n"
+    body = f"---\ntype: Standard\ntitle: {name}\n---\n\n# {name}\n"
     for title, kind in rules:
         slug = title.lower().replace(" ", "-")
         body += f"\n## {title}\n\nA predicate.\n\n`{name}.{slug}` · {kind}\n"

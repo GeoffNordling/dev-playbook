@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Claude Code Files
 description: The registry of repo files the Claude Code harness consumes — each member's class, role, and content standard
 population: "a file in a governed repo that the Claude Code harness consumes"

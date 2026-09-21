@@ -141,7 +141,7 @@ knowledge-organization.title: scripts/okf-lint
 knowledge-organization.typed-explanation: scripts/okf-lint
 knowledge-organization.typed-guide: scripts/okf-lint
 knowledge-organization.typed-loop: scripts/okf-lint
-knowledge-organization.typed-standard-card-or-standard-ruleset: scripts/okf-lint
+knowledge-organization.typed-standard: scripts/okf-lint
 knowledge-organization.typeless: null
 knowledge-organization.types: scripts/okf-lint
 knowledge-organization.vocabulary-type: null
@@ -203,8 +203,6 @@ standard.a-skip-is-machine-state: null
 standard.an-absent-surface-is-clean: null
 standard.an-address-exists: scripts/verifier-table
 standard.an-emitted-id-is-a-rule-heading: scripts/verifier-table
-standard.audit-cites-a-lint: null
-standard.define-points-only-at-rulesets: scripts/standards-lint
 standard.directory-layout: scripts/standards-lint
 standard.every-address-runs-somewhere: scripts/boundary-table
 standard.exit-codes: null
@@ -216,9 +214,9 @@ standard.offered-by-the-canonical-template: scripts/standards-lint
 standard.read-only: null
 standard.the-boundary-table: scripts/boundary-table
 standard.the-catalog: scripts/standards-lint
-standard.the-directorys-introduction: scripts/standards-lint
 standard.the-hosting-pattern: scripts/standards-lint
-standard.the-question-sentence: scripts/standards-lint
+standard.the-population: scripts/standards-lint
+standard.the-rule-shape: null
 standard.the-verifier-table: scripts/verifier-table
 standard.thin-shims: null
 testing.access-only-public-names: scripts/testing-lint

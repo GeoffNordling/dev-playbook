@@ -1,6 +1,6 @@
 """Audit a repo's Decision Records against the records contract.
 
-decisions-lint is the detector behind the Decision Records card. It walks a
+decisions-lint is the detector behind the Decision Records Standard. It walks a
 repo's markdown files once (via dev_playbook.md.find_md_files, so gitignore-aware
 and worktree-scoped), keeps the ones under ``docs/decisions/``, and applies two
 rules:
@@ -42,8 +42,8 @@ import yaml
 from dev_playbook import md
 from dev_playbook.findings import print_rules, render
 
-# Every rule id this detector can emit, namespaced by the decisions card whose
-# question it answers. Each id is a module-level constant so every emission site
+# Every rule id this detector can emit, namespaced by the decisions directory
+# whose Standard it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
 SEQUENTIAL_NUMBERING = "decisions.sequential-numbering"

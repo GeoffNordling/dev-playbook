@@ -9,30 +9,31 @@ description: The consumer-repo recipe for a first repo-scoped standard — grow 
 Most standards a repo runs are workspace-scoped: inherited from
 dev-playbook through its published hooks, governing every repo alike. A
 repo with a convention no other repo shares declares its own
-**repo-scoped** standard, the same card-and-detector machinery the
-[Meta-Standard](/standards/standard/card.md) card defines, hosted in the
-consumer repo instead of dev-playbook. The recipe below is the order of
-operations; every rule a step meets is stated once, in the Standard the
-step links.
+**repo-scoped** standard, the same tree-and-detector machinery the
+meta-standard ([standards/standard/](/standards/standard/index.md))
+defines, hosted in the consumer repo instead of dev-playbook. The recipe
+below is the order of operations; every rule a step meets is stated once,
+in the Standard the step links.
 
 ## 1. Grow the `standards/` tree
 
 If the repo has no `standards/` tree yet, create its landing doc first:
 `standards/README.md` (`type: README`) and `standards/index.md`, with
 the README listed first. Add the standard's directory
-`standards/<name>/`, holding its **card** at `card.md` with the four
-cells, the **Standard** the card points at, and an `index.md` that opens
-with the card's question sentence and lists the card first; register
-the directory in the catalog. The layout, the name, the directory's
-index, and the catalog order are
-[Card Catalog](/standards/standard/cards.md): a name no dev-playbook card
-carries ([No shadowing](/standards/standard/cards.md#no-shadowing)), and
-the README-first catalog
-([The catalog](/standards/standard/cards.md#the-catalog)).
+`standards/<name>/`, holding the **Standard**, a file typed `Standard`
+at `standards/<name>/<topic>.md` with its `population` and its rules,
+and an `index.md` whose opening sentence states the directory's remit;
+register the directory in the catalog, its row carrying that sentence.
+The layout, the population, the rule shape, the catalog order, and the
+name are [The Standards Tree](/standards/standard/tree.md): a name no
+dev-playbook directory carries
+([No shadowing](/standards/standard/tree.md#no-shadowing)), and the
+README-first catalog
+([The catalog](/standards/standard/tree.md#the-catalog)).
 
 ## 2. Write a contract-conforming detector
 
-Back the card's Audit cell with a detector, a `scripts/<name>` shim over
+Back the Standard's rules with a detector, a `scripts/<name>` shim over
 the repo's own reusable modules, obeying the first-party rules in
 [Detectors](/standards/standard/detectors.md#a-first-party-detector):
 read-only, one finding per line in GNU format with rule-heading ids,
@@ -60,14 +61,13 @@ publishes
 ([The local block covers the manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
 repo-lint's `distribution.a-publisher-dogfoods-its-manifest` checks the mirror.
 
-## 5. Station it at a gate
+## 5. Record it in the two tables
 
-The local-block wiring runs the detector at the **commit gate**. Record
-that rung in the card's Enforce cell
-([Cells](/doc-types/standard/encoding.md#cells)), so the card names
-where nonconformance blocks the path to main. Then
-`scripts/boundary-table --write` records the same in
-`standards/boundaries.yaml`, read from the wiring
+The local-block wiring runs the detector at the **commit gate**. Which
+rule the detector decides is the verifier table, `standards/verifiers.yaml`
+([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
+and where it runs is the boundary table, `standards/boundaries.yaml`,
+read from the wiring
 ([The boundary table](/standards/standard/detectors.md#the-boundary-table)).
 
 ## 6. Turn the meta-standard's own policing on

@@ -21,9 +21,9 @@ to. Five rules:
     entry or is a receiver some yield leads to.
   - **loop-edges** — a step leads to a step; only a yield leads to a
     receiver; a receiver leads to a step.
-  - **loop-entries** — an act links a file; a check links a card's Audit
-    cell, ``standards/<card>/card.md#audit``; a yield names the user or
-    links a Loop; every entry states its condition.
+  - **loop-entries** — an act links a file; a check links a file typed
+    ``Standard``; a yield names the user or links a Loop; every entry
+    states its condition.
 
 The detector stops at a file's first disagreement, since each rule reads
 the cut the one before it made, and goes on to the next file. It writes
@@ -69,8 +69,7 @@ RULES = (
 
 LOOPS_DIR = "loops"
 LOOP_TYPE = "Loop"
-CARD_TYPE = "Standard-Card"
-AUDIT_CELL = "audit"
+STANDARD_TYPE = "Standard"
 VERBS = ("Acts", "Checks", "Yields")
 VERB_OF = {"Acts": "act", "Checks": "check", "Yields": "yield"}
 RECEIVER = "receiver"
@@ -305,17 +304,14 @@ def check_entry(node: str, verb: str, rest: str, loop_path: Path, root: Path) ->
                 )
         return
     if not links:
-        what = "runbook" if verb == "act" else "card"
+        what = "runbook" if verb == "act" else "Standard"
         raise Disagreement(ENTRIES_POINT_AND_CONDITION, f"`{node}` links no {what}")
     target = _resolve(links[0], loop_path, root)
-    if verb == "check":
-        fragment = links[0].partition("#")[2]
-        if _type_of(target) != CARD_TYPE or fragment != AUDIT_CELL:
-            raise Disagreement(
-                ENTRIES_POINT_AND_CONDITION,
-                f"`{node}` checks {links[0]!r}; a check links a card's Audit cell, "
-                f"`standards/<card>/card.md#{AUDIT_CELL}`",
-            )
+    if verb == "check" and _type_of(target) != STANDARD_TYPE:
+        raise Disagreement(
+            ENTRIES_POINT_AND_CONDITION,
+            f"`{node}` checks {links[0]!r}; a check links a file typed Standard",
+        )
 
 
 # --- one Loop -----------------------------------------------------------------

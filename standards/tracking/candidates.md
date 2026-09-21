@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Candidates
 description: The register of a repo's uncommitted future work — one CANDIDATES.md at the root, one home per unit of work, the entry shape, and the headings and nesting
 population: "a repo's CANDIDATES.md"

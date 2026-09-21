@@ -5,9 +5,8 @@ document types, indexes, the README and CONTEXT.md, cross-references, and
 documentation sets. The reasoning behind the rules is
 [Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
-Ordering: the card, then reading order.
+Ordering: reading order.
 
-- [Knowledge Organization](/standards/knowledge-organization/card.md) — Governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and documentation sets
 - [Document Types](/standards/knowledge-organization/document-types.md) — The frontmatter profile every concept document carries — a registered type, a title, a description, and a resource where an asset backs the document
 - [Type Registry](/standards/knowledge-organization/type-registry.md) — The document-type vocabulary — dev-playbook's Types table and the additive okf_types a consumer declares in its root index
 - [Indexes](/standards/knowledge-organization/indexes.md) — The index.md file — typeless, an introduction naming what the directory holds, a listing of every concept document with its description, alphabetical unless declared otherwise, authored not generated

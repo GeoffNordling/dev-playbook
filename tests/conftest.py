@@ -95,7 +95,7 @@ def make_repo(tmp_path: Path) -> Callable[[dict[str, str]], Path]:
     """Write a throwaway repo from a {relative path: contents} map; return its root.
 
     Used by the lint tests to stand up a fixture repo -- source files,
-    standards cards, and whatever else a rule reads -- against ``tmp_path``.
+    Standards, and whatever else a rule reads -- against ``tmp_path``.
     """
 
     def factory(files: dict[str, str]) -> Path:

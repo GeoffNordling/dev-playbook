@@ -97,11 +97,12 @@ Commit freely with `--no-verify` while the work is in flight; the gate is the
 worklist, not the judge, until §7 takes its verdict. Work to an empty gate.
 
 **Each finding names its own authority.** A finding's rule id reads
-`<card>.<rule>`, and the card half is a directory: `standards/<card>/card.md` in
-the dev-playbook checkout, whose Define cell names the document that governs the
-fix. {Read [the standards index](~/workspace/dev-playbook/standards/index.md);
-it lists every card directory} to reach it. Take the fix from that document
-rather than from the detector's message, which states the symptom.
+`<name>.<rule>`, and the name half is a directory, `standards/<name>/` in
+the dev-playbook checkout, whose Standard files hold the rule under the
+heading the slug names. {Read
+[the standards index](~/workspace/dev-playbook/standards/index.md); it
+lists every directory} to reach it. Take the fix from that rule rather
+than from the detector's message, which states the symptom.
 
 Three shapes account for most of what a bump reddens:
 

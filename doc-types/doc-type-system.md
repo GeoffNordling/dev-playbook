@@ -99,6 +99,6 @@ its contract — is a Standard's job: Runbook's obligation rides
 audited by the chain drift check; Loop's rides
 [loop-conventions](/standards/knowledge-organization/loop-conventions.md),
 audited by `scripts/loop-lint` at the commit gate; Standard's rides the
-Meta-Standard, [standards/standard/](/standards/standard/card.md),
+Meta-Standard, [standards/standard/](/standards/standard/index.md),
 audited by `scripts/standards-lint`. The shape is never itself a
 Standard, so Standard, Runbook, and Loop remain peers.

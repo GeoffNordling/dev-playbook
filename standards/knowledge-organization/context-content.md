@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: CONTEXT.md Content
 description: The CONTEXT.md vocabulary center — Vocabulary frontmatter, the Language section, the entry shape, and the rules that keep a glossary tight
 population: "a repo's CONTEXT.md"

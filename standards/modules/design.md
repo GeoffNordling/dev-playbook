@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Module Design Conventions
 description: The deep-module contract — depth, the seam rules, and the port at a process boundary
 population: "a module in a governed repo's source: anything with an interface and an implementation"

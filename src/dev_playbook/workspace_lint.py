@@ -42,7 +42,7 @@ anonymous requests instead of failing (see ``check_auth``). ``--pins-only``
 reads nothing over the network and so is exempt.
 
 Output:
-    stdout — one finding per line, ``repo: card.rule message`` (the repo name
+    stdout — one finding per line, ``repo: name.rule message`` (the repo name
              stands in the location slot; this audit inspects repos, not files).
     stderr — informational per-repo lines (current/absent pins) and one summary.
     exit   — 0 clean, 1 findings, 2 cannot run.
@@ -63,8 +63,8 @@ from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
 # Every rule id this detector can emit. Repo-settings drift, reachability, and
 # the live-repo tracking checks (label scheme, leaf labels and headings, epic
-# labels, wayfinder labels and body) answer the tracking card; a stale
-# dev-playbook pin answers the build card (non-blocking).
+# labels, wayfinder labels and body) answer the tracking Standard; a stale
+# dev-playbook pin answers the distribution Standard (non-blocking).
 # Informational pin lines carry no rule id. Each id is a module-level constant so
 # every emission site references the constant, never a raw literal, and RULES
 # (what --list-rules prints) cannot drift from what the detector actually emits.
@@ -277,7 +277,7 @@ class Line:
         return self.rule == A_PINNED_REV and not self.blocking
 
     def render(self) -> str:
-        """The finding rendered as ``repo: card.rule message``."""
+        """The finding rendered as ``repo: name.rule message``."""
         assert self.rule is not None
         return render(self.repo, self.rule, self.message)
 

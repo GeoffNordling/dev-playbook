@@ -7,7 +7,7 @@ that owns them, `knowledge-organization.*`:
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the type registry, plus `title` and `description`. `resource`
     is optional in general and required on a `Recipe-Description`, and a
-    document typed `Standard-Card` or `Standard-Ruleset` lives under `standards/`
+    document typed `Standard` lives under `standards/`,
     one typed `Loop` under `loops/`, one typed `Guide` under `guides/`, and
     one typed `Explanation` at `standards/<name>/explanation.md` — each the
     place reserved for its label. The registry
@@ -96,9 +96,7 @@ TYPES = "knowledge-organization.types"
 TITLE = "knowledge-organization.title"
 DESCRIPTION = "knowledge-organization.description"
 RECIPE_DESCRIPTION = "knowledge-organization.recipe-description"
-TYPED_STANDARD_CARD_OR_STANDARD_RULESET = (
-    "knowledge-organization.typed-standard-card-or-standard-ruleset"
-)
+TYPED_STANDARD = "knowledge-organization.typed-standard"
 TYPED_LOOP = "knowledge-organization.typed-loop"
 TYPED_EXPLANATION = "knowledge-organization.typed-explanation"
 TYPED_GUIDE = "knowledge-organization.typed-guide"
@@ -121,7 +119,7 @@ RULES = (
     TITLE,
     DESCRIPTION,
     RECIPE_DESCRIPTION,
-    TYPED_STANDARD_CARD_OR_STANDARD_RULESET,
+    TYPED_STANDARD,
     TYPED_LOOP,
     TYPED_EXPLANATION,
     TYPED_GUIDE,
@@ -166,7 +164,7 @@ RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # Standard or a Loop found elsewhere is either misfiled or mistyped — see
 # doc-types/standard/definition.md and doc-types/loop/definition.md, each's
 # "Where a ... lives".
-STANDARDS_TYPES = frozenset({"Standard-Card", "Standard-Ruleset"})
+STANDARDS_TYPES = frozenset({"Standard"})
 # An Explanation's one slot: beside the Standard whose rules it explains.
 EXPLANATION_PATH = re.compile(r"standards/[^/]+/explanation\.md")
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
@@ -490,7 +488,7 @@ def check_types(
             findings.append(
                 Finding(
                     rel,
-                    TYPED_STANDARD_CARD_OR_STANDARD_RULESET,
+                    TYPED_STANDARD,
                     f"'{doctype}' lives under standards/",
                 )
             )

@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Document Types
 description: The frontmatter profile every concept document carries — a registered type, a title, a description, and a resource where an asset backs the document
 population: "a concept document"
@@ -49,8 +49,7 @@ frontmatter of the repo's own root `index.md`
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
 | `Reference` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `Standard-Card` | The record of one Standard's four verbs — cells (define, audit, enforce, adopt) pointing at its rulesets, detectors, gates, and adoption helpers; `standards/<name>/card.md`, one per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
-| `Standard-Ruleset` | One population and its rules, what a Standard's Define cell points at: a normative target a reviewer or linter could cite to reject work; lives beside its card under `standards/`, the one tree reserved for it (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
+| `Standard` | One population and its rules, a normative target a reviewer or linter could cite to reject work; lives under `standards/<name>/`, the one tree reserved for it, one directory per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
@@ -105,12 +104,11 @@ a non-empty value.
 
 `knowledge-organization.recipe-description` · deterministic
 
-## Typed Standard-Card or Standard-Ruleset
+## Typed Standard
 
-A concept document typed `Standard-Card` or `Standard-Ruleset` lives
-under `standards/`.
+A concept document typed `Standard` lives under `standards/`.
 
-`knowledge-organization.typed-standard-card-or-standard-ruleset` · deterministic
+`knowledge-organization.typed-standard` · deterministic
 
 ## Typed Loop
 

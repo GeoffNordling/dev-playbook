@@ -83,7 +83,7 @@ repo, never an intermediate group.
 workspace-scoped standard carries, since a consumer's
 `standards/<name>/card.md` on an upstream name would silently override
 the upstream standard of that name; the rule and its lint are
-[No shadowing](/standards/standard/cards.md#no-shadowing).
+[No shadowing](/standards/standard/tree.md#no-shadowing).
 
 ## Where a standard lives
 
@@ -93,5 +93,5 @@ nothing outside it claims either label. okf-lint's
 `standards/<name>/card.md` and every immediate subdirectory of
 `standards/` except `references/` holds one; the rulesets sit beside it.
 The layout's rule and its lint are
-[Directory layout](/standards/standard/cards.md#directory-layout); the
+[Directory layout](/standards/standard/tree.md#directory-layout); the
 file forms are [the encoding](/doc-types/standard/encoding.md).

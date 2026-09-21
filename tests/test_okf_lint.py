@@ -36,12 +36,12 @@ BASE_BUNDLE: dict[str, str] = {
         "# Standards\n"
     ),
     "standards/knowledge-organization/document-types.md": (
-        "---\ntype: Standard-Ruleset\ntitle: Document Types\n"
+        "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Explanation` | reasons |\n| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
-        "| `Recipe-Description` | describes code |\n| `Standard-Card` | points |\n| `Standard-Ruleset` | rules |\n"
+        "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
         "| `Survey` | evaluates |\n"
     ),
     "standards/knowledge-organization/index.md": (
@@ -82,12 +82,12 @@ def run_okf_lint(
 # spuriously). It declares a small fixed vocabulary; the local extension names the
 # consumer-extension tests use are chosen to sit outside it.
 UPSTREAM_REGISTRY = (
-    "---\ntype: Standard-Ruleset\ntitle: Document Types\n"
+    "---\ntype: Standard\ntitle: Document Types\n"
     "description: The document type registry\n---\n\n"
     "# Document Types\n\n## Types\n\n"
     "| Type | What it is |\n|------|------------|\n"
     "| `Guide` | teaching |\n| `README` | landing |\n"
-    "| `Recipe-Description` | describes code |\n| `Standard-Card` | points |\n| `Standard-Ruleset` | rules |\n"
+    "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
     "| `Survey` | evaluates |\n"
 )
 
@@ -211,7 +211,7 @@ def _root_index_listing(*extra: str) -> str:
 
 
 def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
-    doc = "---\ntype: Standard-Ruleset\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
     repo = make_bundle(
         tmp_path,
         {
@@ -223,12 +223,9 @@ def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert (
-        "knowledge-organization.typed-standard-card-or-standard-ruleset"
-        in result.stdout
-    )
+    assert "knowledge-organization.typed-standard" in result.stdout
     assert "ops.md" in result.stdout
-    assert "'Standard-Ruleset' lives under standards/" in result.stdout
+    assert "'Standard' lives under standards/" in result.stdout
 
 
 def test_guide_outside_guides_dir_is_flagged(tmp_path: Path) -> None:
@@ -313,7 +310,7 @@ def test_loop_under_loops_dir_is_clean(tmp_path: Path) -> None:
 
 
 def test_standard_nested_under_standards_dir_is_clean(tmp_path: Path) -> None:
-    doc = "---\ntype: Standard-Ruleset\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
     factory_index = (
         "# standards/factory/ — index\n\nThe factory.\n\n"
         "- [Ops](/standards/factory/ops.md) — How ops runs\n"
@@ -342,7 +339,7 @@ def test_directory_of_concept_docs_without_an_index_is_flagged(tmp_path: Path) -
     """A subdirectory holding concept documents carries an index.md of its own;
     one without is a `knowledge-organization.an-index-in-every-directory` finding on the
     missing file, whatever the parent index lists."""
-    doc = "---\ntype: Standard-Ruleset\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    doc = "---\ntype: Standard\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
     index = (
         "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
@@ -657,7 +654,7 @@ def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> Non
     that lets the consumer-mode tests pin a synthetic registry instead of
     asserting against dev-playbook's live one."""
     upstream_doc = (
-        "---\ntype: Standard-Ruleset\ntitle: Document Types\n"
+        "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
@@ -898,7 +895,7 @@ def test_okf_types_that_is_not_a_mapping_degrades_to_a_finding(tmp_path: Path) -
 # of the two paths one ever sat at: dev-playbook's own registry path, and the
 # path a consumer landed on by mirroring that path's earlier folder name.
 LEGACY_REGISTRY_DOC = (
-    "---\ntype: Standard-Ruleset\ntitle: Local Types\n"
+    "---\ntype: Standard\ntitle: Local Types\n"
     "description: The local type registry\n---\n\n"
     "# Local Types\n\n## Types\n\n"
     "| Type | What it is |\n|------|------------|\n"
@@ -994,7 +991,7 @@ def test_list_rules_includes_registry_location(tmp_path: Path) -> None:
 # --- rule ids and finding format ---
 
 
-def test_list_rules_prints_card_namespaced_ids_from_any_cwd(tmp_path: Path) -> None:
+def test_list_rules_prints_namespaced_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
         ["uv", "run", "--script", str(OKF_LINT), "--list-rules"],
         cwd=tmp_path,
@@ -1017,7 +1014,7 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
     out of the registry silently; now it is a `knowledge-organization.row-shape` finding at the
     row's line."""
     doc = (
-        "---\ntype: Standard-Ruleset\ntitle: Document Types\n"
+        "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
@@ -1043,12 +1040,12 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
     separated word capitalized) is a malformed registry row, not a silently
     accepted type."""
     doc = (
-        "---\ntype: Standard-Ruleset\ntitle: Document Types\n"
+        "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Guide` | teaching |\n| `README` | landing |\n"
-        "| `Recipe-Description` | describes code |\n| `Standard-Card` | points |\n| `Standard-Ruleset` | rules |\n"
+        "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
         "| `Survey` | evaluates |\n"
         "| `bogus name` | nonsense |\n"
     )
@@ -1220,7 +1217,7 @@ def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> Non
     """document-types.md declares its `## Types` table alphabetical; a table
     whose rows are not is a `knowledge-organization.alphabetical-order` finding."""
     doc = (
-        "---\ntype: Standard-Ruleset\ntitle: Document Types\n"
+        "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"

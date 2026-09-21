@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Type Registry
 description: The document-type vocabulary — dev-playbook's Types table and the additive okf_types a consumer declares in its root index
 population: "a document-type declaration: dev-playbook's `## Types` table, or a consumer's root-index `okf_types` mapping"
@@ -33,7 +33,7 @@ carries `standards/build/canonical/`.
 
 Every row of the `## Types` table below its header holds, in its first
 cell, one backticked type name in Title Case, hyphen-joined for a
-multi-word name: `Decision-Record`, `Standard-Card`, `README`.
+multi-word name: `Decision-Record`, `Candidate-List`, `README`.
 
 `knowledge-organization.row-shape` · deterministic
 
