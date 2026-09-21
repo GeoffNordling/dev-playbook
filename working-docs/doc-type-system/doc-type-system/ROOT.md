@@ -147,39 +147,52 @@ specification.
      entry is in [Completed](#completed).
   9. *Ban the word guard.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-  10. *Verify every rule.* Last. A holistic pass over every
-     deterministic predicate, not a rush to the end, and not a Loop:
-     iteration, dynamic workflows, or subagents may do the work, but no
-     `loops/` file is written for it. No
-     new check is added one rule at a time, and no GitHub issue is
-     opened: every rule is fixed, reclassified, merged, or deleted in
-     this PR.
-     - **Reclassify.** Check every rule's kind. A deterministic rule
-       with a null row that no script could decide becomes stochastic.
-       A stochastic rule a script could decide becomes deterministic.
-     - **Deterministic only.** Stochastic rules stay null in the
-       verifier table. This step is deterministic cleanup.
-     - **Design the checking system as one unit.** Today's detectors
-       grew one at a time over months and were never refactored
-       together. Take every deterministic predicate together: which
-       kinds and groups of predicates exist, which files each reads, and
-       how they group into scripts with public APIs. Design a general,
-       modular, extensible system of checking scripts from that,
-       refactor the existing detectors into it, wire it into the
-       pre-commit hooks, and keep it at least as fast as the hooks are
-       today.
-     - **The design comes first.** Before any detector is rewritten, a
-       design document under this strand states the reclassified rule
-       set, the kinds of deterministic predicates, and the proposed
-       scripts and their APIs, and the user approves it. The rewrite
-       follows the approved design.
+  10. *Settle every rule.* A holistic pass over every rule, not a
+     rush to the end, and not a Loop: iteration, dynamic workflows, or
+     subagents may do the work, but no `loops/` file is written for it.
+     No GitHub issue is opened: every rule is kept, rewritten, moved to
+     a Guide or an Explanation, folded into a condition, or deleted in
+     this PR, per
+     [Predicate Pass Design](/working-docs/doc-type-system/doc-type-system/rule-audit/design.md),
+     which the user approves before any edit under `standards/`. The
+     rulings per rule are in
+     [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md).
+     - **Documents only.** Rules move to their right homes, judged
+       sentences change, Guides and Explanation lines are written,
+       trailers and the two yaml tables update. Script edits are only
+       what the gate forces: a detector that emits a deleted id stops
+       emitting it, and the tables round-trip. No detector logic
+       changes and no new check is written.
+     - **Kind from the sentence.** A rule with a judgment word is
+       stochastic; a rule a script decides from the files is
+       deterministic. Stochastic rules stay null in the verifier table.
      - **Remove redundancy.** A predicate that duplicates or overlaps
        another is merged into it or deleted.
-     - **A rule the repo breaks** is fixed or deleted here.
-     Reason: step 1 tagged a rule deterministic when a script could
-     decide it, not when one does. A Standard that states what the repo
-     does not do is slop, and a checking system built greedily is one
-     nobody can extend.
+     - **A rule the repo breaks** is rewritten, deleted, or, where the
+       state is a small named oversight, the repo is fixed.
+     Reason: the audit found intentions, run-time behaviour, scoping
+     definitions, and code-style instruction filed as predicates. The
+     Standards must state only what is true of the files before any
+     checker is built against them.
+  11. *The checking system.* A greenfield refactor, after step 10
+     merges. Today's detectors grew one at a time over months and were
+     never refactored together. Take every deterministic predicate of
+     the settled Standards together: which kinds and groups exist,
+     which files each reads, and how they group into scripts with
+     public APIs. Design a general, modular, extensible system of
+     checking scripts from that, build it, wire it into the pre-commit
+     hooks, and keep it at least as fast as the hooks are today. It
+     absorbs what step 10 leaves unchecked: the sixteen weak checks,
+     the thin-shim moves, the `doc-type.one-base` check, and the
+     H2-without-trailer condition shape.
+     - **The design comes first.** Before any detector is rewritten, a
+       design document under this strand states the kinds of
+       deterministic predicates and the proposed scripts and their
+       APIs, and the user approves it. The rewrite follows the approved
+       design.
+     Reason: a checking system built greedily is one nobody can extend,
+     and a checker is only worth building against a spec that is
+     settled.
 
   A step once here, scrubbing every file under `docs/` into a long-term
   home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except
