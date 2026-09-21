@@ -1,12 +1,12 @@
 ---
 type: General-Sheet
 title: Predicate Pass Design
-description: The step 10 design the user approves before any Standard changes — where the principles land, the rule count by family before and after, every new sentence, Explanation line, and Guide the rulings call for, the repo changes, the contested calls, the verifier-table delta, and the order of the edits
+description: The step 11 design the user approves before any Standard changes — where the principles land, the rule count by family before and after, every new sentence, Explanation line, and Guide the rulings call for, the repo changes, the contested calls, the verifier-table delta, and the order of the edits
 ---
 
 # Predicate pass design
 
-What step 10 changes, for approval before any edit under `standards/`, `guides/`, `scripts/`, or `src/`. The ruling for every rule is the `ruling` column of [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md), the one record of what happens to each rule. [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) is evidence, the auditors' findings and the reviewers' verdicts; where a verdict and a ruling differ, the ruling stands and the Contested calls section below says why. This document holds only what those sheets do not: the new text, the small repo changes, the contested calls, and the order.
+What step 11 changes, for approval before any edit under `standards/`, `guides/`, `scripts/`, or `src/`. The ruling for every rule is the `ruling` column of [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md), the one record of what happens to each rule. [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) is evidence, the auditors' findings and the reviewers' verdicts; where a verdict and a ruling differ, the ruling stands and the Contested calls section below says why. This document holds only what those sheets do not: the new text, the small repo changes, the contested calls, and the order.
 
 ## Principles
 
@@ -90,7 +90,7 @@ Rules whose sentence stands and whose block or exemption changes:
 
 ## Explanation lines
 
-One paragraph each in the family's `explanation.md`, under the rule's anchor: the why that left the predicate.
+One Reason each, in the Explanation of the rule's Standard under the rule's slug, as step 10 shapes it: the why that left the predicate.
 
 | rule | Explanation line |
 |---|---|
@@ -181,9 +181,9 @@ The 16 rules whose detector tests less than the sentence. The sentence stands in
 
 This document designs phase one. Phase two is planned in the strand root, not here.
 
-**Phase one, documents, this PR.** Rules move to their right homes, judged sentences change, the Guides and Explanation lines are written, trailers and the two yaml tables update. Script edits are only what the gate forces: a detector that emits a deleted rule id stops emitting it, and the tables round-trip clean. No detector logic changes and no new check is written.
+**Phase one, documents, this PR.** Rules move to their right homes, judged sentences change, the Guides and Explanation Reasons are written into the shapes step 10 built, trailers and the two yaml tables update. Script edits are only what the gate forces: a detector that emits a deleted rule id stops emitting it, and the tables round-trip clean. No detector logic changes and no new check is written.
 
-1. `standards/doc-type/`: the rule-shape rewrite and the Principles paragraphs in its `explanation.md`. This is the doc-type definition change and waits for approval of this document.
+1. `standards/doc-type/`: the rule-shape rewrite, and the Principles as the preamble of `standard-conventions-explanation.md`, the Explanation step 10 gives that Standard. This is the doc-type definition change and waits for approval of this document.
 2. Conditions: strip trailers and verifier rows.
 3. Deletes and Guide moves: write the four Guides, then remove the rules and their Explanation paragraphs.
 4. New sentences and Explanation lines, family by family.
@@ -191,7 +191,7 @@ This document designs phase one. Phase two is planned in the strand root, not he
 6. Emitters of deleted ids silenced; regenerate the two tables; standards-lint, verifier-table, and boundary-table pass; `pre-commit run --all-files` no slower than before.
 7. PR for the user to merge.
 
-**Phase two, detectors.** Step 11 of [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned), after this PR merges. Not designed here.
+**Phase two, detectors.** Step 12 of [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned), after this PR merges. Not designed here.
 
 ## Acronyms
 

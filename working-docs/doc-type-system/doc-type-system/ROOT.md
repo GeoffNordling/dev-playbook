@@ -56,7 +56,7 @@ specification.
   release, a GitHub setting, git history, another repo), and not a
   definition that scopes other rules. Behaviour and instruction go to
   a Guide; the why goes to an Explanation; a scoping definition is an
-  H2 with no trailer. The step 10 sort
+  H2 with no trailer. The step 11 sort
   ([Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md))
   found each of these mis-filed as a rule.
 - **Kind is judged from the sentence, not the trailer.** A sentence a
@@ -71,7 +71,15 @@ specification.
   which members the H3 rules under it bind. It is one shape whether
   it has one child or eleven, and its definition is never repeated in
   the children.
-- **Three working policies** that shaped the step 10 rulings and hold
+- **An Explanation explains one document, and its map to what it
+  explains is explicit.** Each Reason names, in its own text and not
+  by position, the ids of the things it explains. Today the document
+  is a Standard and the ids are rule ids, one Explanation per Standard
+  file; the shape names neither, so a later doc-type is explained the
+  same way. How many ids one Reason may name is open until the scrub
+  in step 10 measures the existing text; see [Open](#open). Decided
+  2026-09-21.
+- **Three working policies** that shaped the step 11 rulings and hold
   for any later audit: repo change is the expensive way out; no credit for rule count, so
   delete is the default for a rule that restates another or binds
   something too small to matter; and "keep it because a detector
@@ -103,6 +111,14 @@ specification.
 
 ## Open
 
+- **Reason cardinality.** Whether a Reason names one rule or several.
+  One concern can legitimately be a deterministic rule and a
+  stochastic rule side by side, or several deterministic rules split
+  for a reason of their own, and one Reason then explains the set;
+  copying the text per rule and linking one rule to another's text are
+  both copies. Decided after step 10's scrub tags every paragraph of
+  the 13 explanation files with the rule ids it explains, zero, one, or
+  several, and whether they cross a Standard or a family.
 - **Rule order.** Standard rules are unordered in
   [Population and Rules](/doc-types/standard/contract-shape.md) and in
   file order in the reference model. One must give.
@@ -147,7 +163,55 @@ specification.
      entry is in [Completed](#completed).
   9. *Ban the word guard.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-  10. *Settle every rule.* A holistic pass over every rule, not a
+  10. *Doc-types before migration.* Step 11 moves prose into
+     Explanations and Guides, and neither has a doc-type: the registry
+     rules them Pending and Important. Building them first is what
+     keeps the migration honest. In order:
+     - **Scrub first.** Every paragraph of the 13 `explanation.md`
+       files is tagged with the rule ids it explains, zero, one, or
+       several, and whether they sit in one Standard, across Standards
+       of a family, or across families; the table is a member of this
+       set. The counts decide Reason cardinality and how much text
+       explains no rule.
+     - **Design in this set.** One member, `explanation-and-guide.md`
+       in this directory, not yet written, states both contract shapes in prose and pseudocode, the
+       encoding of each, the registry rulings, and the Standard change
+       below; the user approves it before `doc-types/` changes.
+     - **Explanation.** Verb: explain. One Explanation per document
+       it explains; for a Standard, `standards/<name>/<topic>-explanation.md`,
+       typed `Explanation`. Parts: a preamble under the H1 for what is
+       true of the document as a whole, then Reasons, each a heading,
+       a body that is the why and never a predicate, and a line naming
+       the ids it explains. Composition: every id a Reason names
+       resolves in the explained document, a thing may have no Reason,
+       no rule-kind trailer appears, and the cardinality the scrub
+       decides. The pseudocode names the explained document by its
+       base type, not Standard, so it stays minimal and general. These
+       are its deterministic verifiers; step 12 builds them.
+     - **Guide.** Verb: instruct. One file under `guides/`, typed
+       `Guide`, organised by the work it is read before. Parts: the
+       work, its sections, and citations of rule ids. Composition: a
+       Guide may cite a rule and never states one, so it carries no
+       trailer line, and every id it cites resolves. Its verifiers
+       likewise wait for step 12.
+     - **Standard's condition.** The contract shape's `condition: Rule
+       | None` becomes a `Condition` part, an H2 with no id and no
+       trailer that scopes the H3 rules under it, and `Rule.condition`
+       points at it or none. The reference model, the pinned test, and
+       [the rule shape](/standards/doc-type/standard-conventions.md#the-rule-shape)
+       move together.
+     - **Build.** `doc-types/explanation/` and `doc-types/guide/` in
+       the four-file form; `explanation-conventions.md` and
+       `guide-conventions.md` under `standards/doc-type/`, each rule a
+       predicate over one member with a trailer and a verifier row,
+       null until step 12; the registry rulings row for each; the
+       13 `explanation.md` files split per Standard by script, one
+       file per Standard, existing text placed under the rule it names
+       where the link is plain and left in the preamble where it is
+       not, so that step 11 works from the new shape.
+     Reason: the pass was about to move prose between file types with
+     no contract, which is how the tangle it untangles was made.
+  11. *Settle every rule.* A holistic pass over every rule, not a
      rush to the end, and not a Loop: iteration, dynamic workflows, or
      subagents may do the work, but no `loops/` file is written for it.
      No GitHub issue is opened: every rule is kept, rewritten, moved to
@@ -158,8 +222,9 @@ specification.
      rulings per rule are in
      [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md).
      - **Documents only.** Rules move to their right homes, judged
-       sentences change, Guides and Explanation lines are written,
-       trailers and the two yaml tables update. Script edits are only
+       sentences change, Guides and Explanation Reasons are written
+       into the shapes step 10 built, trailers and the two yaml tables
+       update. Script edits are only
        what the gate forces: a detector that emits a deleted id stops
        emitting it, and the tables round-trip. No detector logic
        changes and no new check is written.
@@ -174,7 +239,7 @@ specification.
      definitions, and code-style instruction filed as predicates. The
      Standards must state only what is true of the files before any
      checker is built against them.
-  11. *The checking system.* A greenfield refactor, after step 10
+  12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
      the settled Standards together: which kinds and groups exist,
@@ -182,7 +247,7 @@ specification.
      public APIs. Design a general, modular, extensible system of
      checking scripts from that, build it, wire it into the pre-commit
      hooks, and keep it at least as fast as the hooks are today. It
-     absorbs what step 10 leaves unchecked: the sixteen weak checks,
+     absorbs what step 11 leaves unchecked: the sixteen weak checks,
      the thin-shim moves, the `doc-type.one-base` check, and the
      H2-without-trailer condition shape.
      - **The design comes first.** Before any detector is rewritten, a

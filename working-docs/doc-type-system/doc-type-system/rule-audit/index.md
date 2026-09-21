@@ -1,6 +1,6 @@
 # working-docs/doc-type-system/doc-type-system/rule-audit/ — index
 
-Step 10's rule audit: the shared prompt an agent loads to audit one
+Step 11's rule audit: the shared prompt an agent loads to audit one
 Standard family's rules, and the reports each family produces.
 
 Ordering: the prompt, then the reports in family order.
@@ -23,6 +23,6 @@ Ordering: the prompt, then the reports in family order.
 - [Testing Family Rule Audit](/working-docs/doc-type-system/doc-type-system/rule-audit/testing.md) — The rule audit over the testing/ family — every rule's kind, detector coverage, repo state, and overlap, with escalations for what breaks or is weakly checked
 - [Issue Shapes Rule Audit](/working-docs/doc-type-system/doc-type-system/rule-audit/tracking-issue-shapes.md) — The rule audit over the tracking/ family's Issue Shapes — every rule's kind, detector coverage, repo state, and overlap, with escalations for what breaks or is weakly checked
 - [Candidates, Label Scheme, and Repo Settings Rule Audit](/working-docs/doc-type-system/doc-type-system/rule-audit/tracking-scheme.md) — The rule audit over the tracking/ family — every rule's kind, detector coverage, repo state, and overlap, with escalations for what breaks or is weakly checked
-- [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) — The rulings step 10 needs from the seventeen rule-audit reports — every reclassification, low-value rule, break in this repo, and weak check on one line each, with the auditor's proposal, the reviewer's verdict, and the user's ruling
+- [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) — The rulings step 11 needs from the seventeen rule-audit reports — every reclassification, low-value rule, break in this repo, and weak check on one line each, with the auditor's proposal, the reviewer's verdict, and the user's ruling
 - [Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md) — Every rule in standards/ sorted by the decidability test into predicate, condition, or intention, with the code-style subject flagged, grouped by the class the user rules on
-- [Predicate Pass Design](/working-docs/doc-type-system/doc-type-system/rule-audit/design.md) — The step 10 design the user approves before any Standard changes — where the principles land, the rule count by family before and after, every new sentence, Explanation line, and Guide the rulings call for, the repo changes, the contested calls, the verifier-table delta, and the order of the edits
+- [Predicate Pass Design](/working-docs/doc-type-system/doc-type-system/rule-audit/design.md) — The step 11 design the user approves before any Standard changes — where the principles land, the rule count by family before and after, every new sentence, Explanation line, and Guide the rulings call for, the repo changes, the contested calls, the verifier-table delta, and the order of the edits

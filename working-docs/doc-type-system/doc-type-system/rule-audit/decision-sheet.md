@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Rule Audit Decision Sheet
-description: The rulings step 10 needs from the seventeen rule-audit reports — every reclassification, low-value rule, break in this repo, and weak check on one line each, with the auditor's proposal, the reviewer's verdict, and the user's ruling
+description: The rulings step 11 needs from the seventeen rule-audit reports — every reclassification, low-value rule, break in this repo, and weak check on one line each, with the auditor's proposal, the reviewer's verdict, and the user's ruling
 ---
 
 # Rule audit: decision sheet
