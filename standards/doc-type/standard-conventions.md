@@ -17,9 +17,6 @@ doc-type binds nobody, so this Standard is what binds the file to that
 encoding. The tree the file sits in is
 [The Standards Tree](/standards/standard/tree.md).
 
-The reasoning behind the rules is
-[Doc-Type Explanation](/standards/doc-type/explanation.md#a-standards-file).
-
 ## The population
 
 A file typed `Standard` names the population its rules bind in its
@@ -35,9 +32,10 @@ Each rule of a Standard is a heading, a first paragraph, at most one
 block or table stating the target state, and last a trailer line,
 `` `<name>.<slug>` · deterministic `` or
 `` `<name>.<slug>` · stochastic ``, where `<name>` is the directory and
-`<slug>` the heading's GitHub slug; nothing follows the trailer before
-the next heading. A level-three heading sits only under a level-two
-heading that carries no trailer, which scopes it.
+`<slug>` the heading's GitHub slug; after the trailer, before the next
+heading, is at most one block opening `> **Why.**`. A level-three
+heading sits only under a level-two heading that carries no trailer,
+which scopes it.
 
 `doc-type.the-rule-shape` · deterministic
 

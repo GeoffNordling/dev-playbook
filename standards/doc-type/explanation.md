@@ -1,7 +1,7 @@
 ---
 type: Explanation
 title: Doc-Type Explanation
-description: The thinking behind the doc-type Standards — why Doc-Type's member is a directory, why its rules are general and mostly stochastic today, and the reasons behind the rules a Standard's, a runbook's, and a loop's file each obey
+description: The thinking behind the doc-type Standards — the reasons behind the rules a Standard's, a runbook's, and a loop's file each obey; Doc-Type's own rules carry their why beside them
 ---
 
 # Doc-Type Explanation

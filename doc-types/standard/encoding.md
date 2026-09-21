@@ -50,7 +50,10 @@ A rule is a heading; its section is the rule.
   `` `<name>.<slug>` · deterministic `` or
   `` `<name>.<slug>` · stochastic ``, `<name>` the directory and
   `<slug>` the heading's slug: the rule's id and kind, and the key of
-  the verifier table's row. Nothing follows it before the next heading.
+  the verifier table's row.
+- **The why.** A block after the trailer, opening `> **Why.**` and
+  running to the next heading: the argument for the rule, never a
+  predicate. A rule may have none.
 
 The rule and its lint are
 [The rule shape](/standards/doc-type/standard-conventions.md#the-rule-shape).
@@ -70,20 +73,25 @@ reader's map of a long Standard is its `description`, so a heading
 that only groups rules for navigation, `Voice` or `Mechanics`, is
 written as neither: a lint would read it as a condition.
 
+## The document's own why
+
+A block of the same form, `> **Why.**` to the next heading, sitting
+after the prose between the H1 and the first rule or condition: the
+argument for the Standard as a whole, not any one rule's. A Standard
+may have none.
+
 ## Everything else
 
-Content that is not the population, a condition, or a rule has its
-home in another document: the reason behind a rule in the directory's
-`explanation.md`, typed `Explanation`; procedure and a writer's
+Content that is not the population, a condition, a rule, or a why
+has its home in another document: procedure and a writer's
 heuristics in a guide, since each does a second thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)).
 
 ## Where a Standard lives
 
 A Standard is `standards/<name>/<topic>.md`, typed `Standard`, in a
-directory that holds at least one such file, with its explanation
-beside it as `explanation.md`; the tree's rule is one directory, one
-standard, and the rule and its lint are
+directory that holds at least one such file; the tree's rule is one
+directory, one standard, and the rule and its lint are
 [Directory layout](/standards/standard/tree.md#directory-layout). A
 Standard with special cases, the files that add rules for one kind of
 its member, is a directory `standards/<name>/<topic>/` holding the
@@ -99,9 +107,9 @@ A filename under `standards/`, directory or file alike, is kebab-case
 and names its topic as a noun: a plain noun (`conventions.md`,
 `records.md`, `distribution/`), a noun compound (`cache-gate.md`,
 `context-content.md`), or a gerund compound (`linking-issues.md`) —
-never a bare verb (`skill-write.md`). `index.md` and `explanation.md`
-are the fixed role names, named for what the file is in its directory
-rather than for a topic; a special-case directory's general Standard is
+never a bare verb (`skill-write.md`). `index.md` is a
+fixed role name, named for what the file is in its directory rather
+than for a topic; a special-case directory's general Standard is
 named for its topic like any other
 (`documentation-sets/documentation-sets.md`), never `standard.md`,
 which would overload the word. When a directory has an established

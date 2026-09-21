@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Reference Model
-description: The doc-type system's target state as a reference model — five DocTypes, twelve verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
+description: The doc-type system's target state as a reference model — four DocTypes, eleven verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
 ---
 
 # Reference Model
@@ -81,33 +81,16 @@ class Standard(DocType):
         kind:      deterministic | stochastic
         predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
         condition: Condition | None   # None binds every member
+        why:       str | None     # a block after the trailer, running to the next heading; never a predicate
 
     population: type[Target]      # frontmatter, one phrase naming the class and its exclusions
     rules: list[Rule]             # in file order
+    why: str | None               # a block after the lead, before the first rule; the Standard's own reason, not any one rule's
 
 
 class Finding:                    # what a verifier returns for a member that fails a rule
     member: Target                # the thing that failed
     rule:   Standard.Rule         # the rule it failed
-
-
-from doc_type import DocType, Id
-
-
-class Explanation(DocType):
-    """The Reasons for one document. Explains.
-    In code, Reasons might sit inside the document they explain, but markdown is more rigid;
-    in order to ensure a markdown file holds only one concern, we split Reasons into a 
-    distinct Explanation object that gets its own file."""
-    operations  = {explain}
-    frontmatter = DocType.frontmatter | {type, title}
-
-    class Reason:                 # a part: an H2; one design decision and the argument for it
-        explains: set[Id]         # the trailer line; each id resolves to a part of `subject`, and a part may have no Reason
-        why:      str             # everything between the heading and the trailer; never a predicate
-
-    subject: DocType              # the document this explains, found by name: the same basename, one directory up
-    reasons: list[Reason]         # in file order, and nothing else under the H1
 
 
 from doc_type import DocType
@@ -153,9 +136,9 @@ def audit(standard, state) -> list[Finding]  # parse the file, route each id, sk
 boundary: commit hook | make check | CI | a loop's check     # each names the rule ids it runs
 ```
 
-Runbook is invoked, Standard is held to, Explanation explains, Guide
-instructs, Loop drives. Twelve verbs across five DocTypes. A verb
-belongs to a DocType only; a part has none.
+Runbook is invoked, Standard is held to, Guide instructs, Loop drives.
+Eleven verbs across four DocTypes. A verb belongs to a DocType only; a
+part has none.
 
 ## How they fit
 
@@ -166,8 +149,7 @@ Loop ─act───▶ Runbook ─do────▶ Runbook | Script
   ├─check─▶ audit(Standard) ─▶ Findings ─▶ the next act, or a yield
   └─yield─▶ User | Loop
 
-Explanation ─explain──▶ Standard      the Reasons for its rules, in explanations/ beside it
-Guide       ─instruct─▶ User | Runbook   links a Standard's rules and states none
+Guide ─instruct─▶ User | Runbook   links a Standard's rules and states none
 
 Gate = a boundary on the path to main that blocks on the findings of its audit
 ```

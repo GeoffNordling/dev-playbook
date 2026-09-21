@@ -18,11 +18,13 @@ checked against.
   exclusions: `an authored document, except type: Reference and the
   paths in .prose-lint-exempt`. Every rule is a predicate over a member
   of this class.
-- **Rule.** An id, a kind, a predicate, and a condition or none. The id,
-  `<name>.<slug>`, is the rule's identity, the atom the verifier and
-  boundary tables join on. The kind is deterministic or stochastic. The
-  predicate is the check whole: a reader with only that text can apply
-  it, and for a stochastic rule it is the judge's prompt.
+- **Rule.** An id, a kind, a predicate, a condition or none, and a
+  why or none. The id, `<name>.<slug>`, is the rule's identity, the
+  atom the verifier and boundary tables join on. The kind is
+  deterministic or stochastic. The predicate is the check whole: a
+  reader with only that text can apply it, and for a stochastic rule
+  it is the judge's prompt. The why is the argument for the rule,
+  never itself a predicate.
 - **Condition.** A part a rule sits under: a heading with no id and
   no trailer, whose first paragraph names which members the rules
   under it bind, written once and shared by them: `python`, for the
@@ -37,9 +39,9 @@ The composition rule: exactly one population, any number of rules,
 each under one condition or none. A Standard carries no pointer to a
 verifier or a gate, since the verifier table and the boundary table
 hold those, keyed by rule id
-([Detectors](/standards/standard/detectors.md)), and no rationale,
-since the Reasons are the Explanation beside it
-([Explanation](/doc-types/explanation/definition.md)).
+([Detectors](/standards/standard/detectors.md)). A rule's why, and
+the Standard's own, sit beside what they argue for, not in a
+separate file.
 
 The shape as code, one module importing the base in
 [Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
@@ -64,9 +66,11 @@ class Standard(DocType):
         kind:      deterministic | stochastic
         predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
         condition: Condition | None   # None binds every member
+        why:       str | None     # a block after the trailer, running to the next heading; never a predicate
 
     population: type[Target]      # frontmatter, one phrase naming the class and its exclusions
     rules: list[Rule]             # in file order
+    why: str | None               # a block after the lead, before the first rule; the Standard's own reason, not any one rule's
 
 
 class Finding:                    # what a verifier returns for a member that fails a rule

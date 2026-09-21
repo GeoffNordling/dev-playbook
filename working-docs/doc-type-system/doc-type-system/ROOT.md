@@ -166,20 +166,6 @@ specification.
      [Completed](#completed).
   10. *Doc-types before migration.* The shapes, pages, and Standards
      are done; see [Completed](#completed). What remains, in order:
-     - **Reasons back into the Standard.** The Explanation doc-type is
-       undone. The user reads a rule and its why on one page, and the
-       reader who wants predicates alone is a script, so a Reason is a
-       part of Standard: one `> **Why.**` block after a rule's
-       trailer, running to the next heading, and one after the lead
-       for the document as a whole. The predicate stays heading to
-       trailer, so no detector and no judge prompt changes. The
-       reference model, `doc-types/standard/`, and Standard
-       Conventions take the part; `doc-types/explanation/`,
-       Explanation Conventions, the registry rule
-       `typed-explanation`, and its okf-lint check are deleted.
-       `standards/doc-type/doc-type.md` is written to it first, from
-       the ten Reasons already sorted, and is the test of the
-       encoding.
      - **Migrate Explanations.** The 13 `explanation.md` files split
        per Standard by script; each paragraph is then kept as the why
        of the rule it argues, kept as the document's why, or deleted
@@ -290,6 +276,18 @@ specification.
   `explanation-conventions.md` and `guide-conventions.md` under
   `standards/doc-type/`, eight rules with null verifier rows. Guide's
   parts are left undecided until its Guides are migrated.
+- **Explanation undone, the why folded into Standard, 2026-09-21.**
+  Step 10, third part. Moving the Explanation file to
+  `<dir>/explanations/<topic>.md` surfaced that the user cannot read a
+  rule and its why across two files. `doc-types/explanation/`,
+  Explanation Conventions, the registry rule `typed-explanation`, and
+  its okf-lint check are deleted; the reference model drops
+  `Explanation`, four DocTypes now. `Standard.Rule` and `Standard`
+  each gained a `why: str | None`, a `> **Why.**` block after a
+  rule's trailer or after the lead, never a predicate; the predicate
+  stays heading to trailer, so no detector or judge prompt changed.
+  `standards/doc-type/doc-type.md` carries the ten Reasons sorted for
+  the deleted Explanation, folded in as the test of the encoding.
 - **One meaning per word, one home per word, 2026-09-15.** Every word
   the four strands use is defined once, in the set's
   [Terms](/working-docs/doc-type-system/ROOT.md#terms) or in one

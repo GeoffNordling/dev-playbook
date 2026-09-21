@@ -28,8 +28,8 @@ every doc-type is held to are the Standard
 The pseudocode of the system is split the way code is: this block is
 the base module, what more than one doc-type uses, and each doc-type's
 `contract-shape.md` holds its own class and opens with the imports it
-needs. The reference model holds the six blocks whole, in this order,
-Runbook, Standard, Explanation, Guide, Loop, and
+needs. The reference model holds the five blocks whole, in this order,
+Runbook, Standard, Guide, Loop, and
 `tests/test_pseudocode_sync.py` fails when the texts differ
 ([Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language)).
 

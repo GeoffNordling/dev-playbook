@@ -263,7 +263,7 @@ def test_explanation_outside_its_slot_is_flagged(tmp_path: Path) -> None:
     assert result.returncode == 1
     assert "knowledge-organization.typed-explanation" in result.stdout
     assert "why.md" in result.stdout
-    assert "'Explanation' lives at <dir>/explanations/<topic>.md" in result.stdout
+    assert "'Explanation' lives at standards/<name>/explanation.md" in result.stdout
 
 
 def test_loop_outside_loops_dir_is_flagged(tmp_path: Path) -> None:

@@ -9,7 +9,7 @@ that owns them, `knowledge-organization.*`:
     is optional in general and required on a `Recipe-Description`, and a
     document typed `Standard` lives under `standards/`,
     one typed `Loop` under `loops/`, one typed `Guide` under `guides/`, and
-    one typed `Explanation` at `<dir>/explanations/<topic>.md` — each the
+    one typed `Explanation` at `standards/<name>/explanation.md` — each the
     place reserved for its label. The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
@@ -166,9 +166,7 @@ RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # "Where a ... lives".
 STANDARDS_TYPES = frozenset({"Standard"})
 # An Explanation's one slot: beside the Standard whose rules it explains.
-# TODO(migrate-explanations): drop the second alternative once no
-# standards/<name>/explanation.md remains.
-EXPLANATION_PATH = re.compile(r"(?:.*/)?explanations/[^/]+\.md|standards/[^/]+/explanation\.md")
+EXPLANATION_PATH = re.compile(r"standards/[^/]+/explanation\.md")
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # A type name of the shape the Type Registry's Row shape rule declares: Title
 # Case, hyphen-joined for a multi-word name, acronyms upper.
@@ -503,7 +501,7 @@ def check_types(
                 Finding(
                     rel,
                     TYPED_EXPLANATION,
-                    "'Explanation' lives at <dir>/explanations/<topic>.md",
+                    "'Explanation' lives at standards/<name>/explanation.md",
                 )
             )
     return findings

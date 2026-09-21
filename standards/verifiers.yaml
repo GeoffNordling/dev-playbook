@@ -53,7 +53,6 @@ doc-type.agent: null
 doc-type.an-act-links-a-runbook: null
 doc-type.an-encoding: null
 doc-type.arguments: scripts/harness-files-lint
-doc-type.beside-its-subject: null
 doc-type.body-opens-with-an-h1: scripts/harness-files-lint
 doc-type.bundle-layout: null
 doc-type.carries-its-chain: null
@@ -65,10 +64,8 @@ doc-type.edges-follow-the-shape: scripts/loop-lint
 doc-type.entries-point-and-condition: scripts/loop-lint
 doc-type.front-matter: scripts/harness-files-lint
 doc-type.held-to-a-standard: null
-doc-type.ids-resolve-in-the-subject: null
 doc-type.interactive-skills-inherit: null
 doc-type.kebab-case-name: scripts/harness-files-lint
-doc-type.level-two-sections-only: null
 doc-type.links-rules-states-none: null
 doc-type.model-and-effort: scripts/harness-files-lint
 doc-type.model-invocation-flag: scripts/harness-files-lint
@@ -78,7 +75,6 @@ doc-type.no-argument-placeholder: null
 doc-type.no-trailer: null
 doc-type.nodes-and-entries-agree: scripts/loop-lint
 doc-type.one-base: null
-doc-type.one-decision-argued: null
 doc-type.one-graph: scripts/loop-lint
 doc-type.one-sentence: null
 doc-type.references-one-level-deep: scripts/harness-files-lint
@@ -87,7 +83,6 @@ doc-type.skill: null
 doc-type.skillmd-at-most-500-lines: null
 doc-type.steps-end-on-a-completion-criterion: null
 doc-type.the-population: scripts/standards-lint
-doc-type.the-reason-shape: null
 doc-type.the-rule-shape: null
 doc-type.three-verb-sections: scripts/loop-lint
 doc-type.tool-fields: null
