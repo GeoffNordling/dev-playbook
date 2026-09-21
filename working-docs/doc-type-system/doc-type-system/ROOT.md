@@ -47,6 +47,35 @@ specification.
 - **Predicates are written one way.**
   [Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md)
   is how; it may become the Standard that governs it.
+- **A predicate is a test over state.** It is decided from the bytes
+  of the repo at one commit, by reading them or by a pure function of
+  them such as a formatter. It is not a test over run-time behaviour
+  (what a script exits or prints), not an instruction to an author
+  (where a helper sits, which double a test uses), not a fact held
+  outside the files (the day a decision was made, the latest upstream
+  release, a GitHub setting, git history, another repo), and not a
+  definition that scopes other rules. Behaviour and instruction go to
+  a Guide; the why goes to an Explanation; a scoping definition is an
+  H2 with no trailer. The step 10 sort
+  ([Rule Sort Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/sort-sheet.md))
+  found each of these mis-filed as a rule.
+- **Kind is judged from the sentence, not the trailer.** A sentence a
+  script decides from the files with no judgment call is
+  deterministic; a sentence with a judgment word ("describes",
+  "names the concept", "small against") is stochastic. Where a
+  sentence mixes the two, the mechanical part stays deterministic and
+  the judgment moves to the Explanation. Whether a check exists yet
+  is a separate question; an unchecked predicate of either kind is
+  allowed until the detector rewrite lands.
+- **A scoping heading is not a rule.** An H2 with no trailer names
+  which members the H3 rules under it bind. It is one shape whether
+  it has one child or eleven, and its definition is never repeated in
+  the children.
+- **Three working policies** that shaped the step 10 rulings and hold
+  for any later audit: repo change is the expensive way out; no credit for rule count, so
+  delete is the default for a rule that restates another or binds
+  something too small to matter; and "keep it because a detector
+  emits the id" is backwards, since the detector follows the rule.
 - **Stochasticity is a continuous scale per file.** A markdown file
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
