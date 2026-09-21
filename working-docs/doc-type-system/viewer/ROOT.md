@@ -222,7 +222,7 @@ each waits on it.
   [CLOA views](/working-docs/doc-type-system/viewer/registry.md#cloa-views):
   a name, a selection from the fact base, and drawing rules for each of
   the runbook, the Standard, and the loop. A Standard-Card kind is not
-  among them: the doc-type system retires the card, step 4 of
+  among them: the doc-type system retires the card, step 6 of
   [Planned](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned).
 - **Pinning and the arrangement** — pin, close others, and the
   arrangement saved and restored per checkout.

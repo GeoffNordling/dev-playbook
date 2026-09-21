@@ -67,7 +67,7 @@ object in a tree: its member is one line of workspace-lint's source.
 
 Could not express The only future-work file over the member: its objects
 are the rogue `ROADMAP.md` and its kin elsewhere in the tree, so it binds
-a member outside the population, the way Gates' red-CI rule does.
+a member outside the population.
 
 ### tracking/issue-shapes
 

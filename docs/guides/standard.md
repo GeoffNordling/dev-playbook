@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Standard Guide
-description: The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, why a detector must ignore the GIT_DIR a git hook exports, where a check runs, and the red-CI rule
+description: The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, why a detector must ignore the GIT_DIR a git hook exports, and where a check runs
 ---
 
 # Standard Guide
@@ -101,16 +101,6 @@ run only inside `make`, so they reach the push gate and never CI
 The commit and push gates are git hooks in `.git/`, which no clone
 inherits; `uvx pre-commit install` puts them there, step 4 of
 [Bootstrap](/standards/build/bootstrap.md#the-existing-path-adoption).
-
-### A red CI run is never merged
-
-The CI gate has no branch protection behind it, and its block is the
-user's standing rule: a pull request whose CI run is red is not merged.
-[Repository Settings](/standards/tracking/repo-settings.md) configures
-no required status check, so the block sits at the merge button. The
-rule binds the user, not a gate, which is why it is here and not in a
-Standard; that it is nondiscretionary is what keeps the CI gate a gate
-rather than a review.
 
 ### A skip is machine state
 

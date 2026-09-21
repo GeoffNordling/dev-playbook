@@ -107,30 +107,70 @@ specification.
      [Completed](#completed).
   3. *Boundaries: where each check runs.* Done 2026-09-20; the entry is
      in [Completed](#completed).
-  4. *Where guides live.* Decide, with the user, the rule for teaching
-     prose before the card step moves any more of it. Undecided today.
-     - **The state.** Twelve guides sit at `docs/guides/<name>.md`, one
-       per Standard directory, put there by step 1's drains; six remain
-       under `standards/`: `build/bootstrap.md`, `standard/consuming.md`,
-       `tracking/linking-issues.md`, `harness/files.md`,
-       `harness/writing-for-agents.md`, and
-       `knowledge-organization/file-roles.md`.
-     - **To decide.** Whether a guide may live inside a Standard
-       directory, or every guide lives under `docs/guides/`, or
-       somewhere else; and whether `Guide` is the right type name.
-     - **Then apply the rule to all eighteen.** Move, merge, convert to
-       a runbook where the file is a procedure an agent performs, or
-       delete where a runbook already covers it. A procedure only the
-       user performs by hand, the GitHub settings an administrator sets,
-       is documentation, not a runbook. `harness/files.md` and
-       `harness/writing-for-agents.md` have `docs/guides/harness.md` to
-       fold into, and `knowledge-organization/file-roles.md` has
-       `docs/guides/knowledge-organization.md`, if the rule sends them
-       there.
-     Reason: the rule was set once by exclusion, no guide under
-     `standards/`, and applied to some files and not others; a rule for
-     eighteen files should be chosen on purpose.
-  5. *Retire the card.* Delete the card, `standards/<name>/card.md`,
+  4. *Isolate the software factory.* Decided 2026-09-20: the factory
+     is out of scope, its future, rewrite or deletion, a later session's;
+     it leaves the tree so no step here trips over it again.
+     - **A new working set**, `working-docs/software-factory/`, whose
+       `ROOT.md` says it is isolated, undecided, and touched by nothing.
+     - **Into it:** the ten files of `software-factory/`; the six agents
+       `adjudicator`, `bug-pr-review`, `build`, `code-pr-review`,
+       `doc-pr-review`, `open-pr`; the eight skills `issue-overwatch`,
+       `agent-view-overwatch`, `issue-review-claims`,
+       `issue-review-simulation`, `wayfinder-to-build`, `intake`,
+       `design`, `user-intent-mini-interview`; the code
+       `src/dev_playbook/factory/`, `scripts/traverse-issue`,
+       `tests/dev_playbook/factory/`, and the factory-only fixtures in
+       `tests/conftest.py`. Links inside the moved files follow them.
+     - **Left in place:** the tracking Standard, whose `phase:*` and
+       `mode:*` labels bootstrap-labels mints into every governed repo;
+       the frozen Decision Records that cite the factory; `wayfinder`,
+       `candidate-promote`, and `commit`, which name it in a phrase.
+       The links into the factory from `standards/tracking/card.md`,
+       `docs/guides/tracking.md`, the root `README.md` and `index.md`,
+       `scripts/README.md`, and `CANDIDATES.md` are cut or repointed.
+     - **Consequences.** `classify()` keeps a `SKILL.md` or `agents/`
+       file harness-owned at any path, so okf-lint stays quiet;
+       harness-files-lint walks only the two harness roots, so it stops
+       seeing them; `**/tests/**` keeps ruff quiet on the moved tests;
+       mypy and pytest stop reading the code; after the next stow the
+       moved skills and agents leave `~/.claude`.
+  5. *Guide and Explanation.* Decided 2026-09-20. A type is told by the
+     kind of information it holds, never by who reads or runs it.
+     - **`Guide`, redefined:** instruction on how to do a kind of work,
+       read before doing it; organized by the work, citing rules in
+       passing; never cited to reject work. Members:
+       `harness/writing-for-agents.md`, `build/bootstrap.md`,
+       `standard/consuming.md`, `tracking/linking-issues.md`, and
+       `docs/headless.md`. A runbook differs in that invoking it does
+       the job; a guide is read, and the job is done afterwards.
+     - **`Explanation`, new:** the reasoning and mechanism behind one
+       Standard's rules, organized rule by rule, at
+       `standards/<name>/explanation.md`; never cited to reject work.
+       standards-lint admits the file by its type. The twelve
+       `docs/guides/<name>.md` become these and `docs/guides/` goes.
+     - **Target state leaves the explanations.** A Standard holds
+       predicates over state and the target state they compare against;
+       an explanation holds neither. The `protect-main` field table
+       moves into `tracking/repo-settings.md`, the two frontmatter
+       templates into `harness/runbook-conventions.md`, the two trees
+       into `build/skeleton.md`, and any predicate found only in an
+       explanation into its ruleset.
+     - **The other four.** `harness/files.md`: its table is a registry
+       `classify()` mirrors, so it becomes a ruleset under `harness/`,
+       and its prose joins the harness explanation.
+       `knowledge-organization/file-roles.md` dissolves: its terms are
+       in `CONTEXT.md`, its table is a paragraph of the
+       knowledge-organization explanation. The `docs/` files typed
+       `General-Sheet` stay so; no type is made for three files.
+     - **Trivial conduct rules are deleted**, not retyped: the red-CI
+       rule went 2026-09-20, and any like it found in the explanations,
+       a rule no one needs written down, goes the same way.
+     - **Open:** where a guide lives, `docs/guides/` or beside the
+       Standard it serves, admitted like an explanation.
+     Reason: `Guide` held four kinds of information under one name, and
+     a name that says how-to kept attracting procedures; the software
+     factory's contracts, the fifth kind, are out of scope.
+  6. *Retire the card.* Delete the card, `standards/<name>/card.md`,
      and everything that exists only to read it, and bind the one type
      `Standard` to `standards/<name>/<topic>.md`.
      - **Delete.** The thirteen `card.md` files and the type
@@ -165,8 +205,8 @@ specification.
        2026-09-20.
      - **`standard/consuming.md` is rewritten** as the post-card recipe:
        its steps name cards, Audit cells, Enforce cells, and
-       standards-lint's consumer mode. Where it lives is the guides
-       step's rule.
+       standards-lint's consumer mode. It is a Guide; where a guide
+       lives is step 5's open decision.
      - **The vendored spec leaves.** `standards/references/okf-spec.md`,
        the one `type: Reference` file under the tree, and its `index.md`
        move to `docs/references/`, with the citation in
@@ -179,7 +219,7 @@ specification.
      the Standard file, Audit is the verifier table, Enforce is the
      boundary file, and Adopt was never a primitive
      ([What goes where](/working-docs/doc-type-system/doc-type-system/reference-model.md#what-goes-where)).
-  6. *Tidy the doc-type definitions.* The three `contract-shape.md`
+  7. *Tidy the doc-type definitions.* The three `contract-shape.md`
      files and `doc-types/doc-type.md` get the pseudocode back, in the
      shape the steps above produce. The user approves every edit here
      before it is committed.
@@ -191,7 +231,7 @@ specification.
        `contract-shape.md`; the reference model keeps the toolchain half
        and the fit.
      - **Rename.** `Object` becomes `DocType` everywhere.
-     - **`Standard`'s class** is written to the shape steps 1 to 5
+     - **`Standard`'s class** is written to the shape steps 1 to 6
        produce: location `standards/<name>/<topic>.md`; frontmatter
        `type`, `title`, `description`, `population`; a `Rule` of id,
        kind, predicate, and condition; no pointer to a script or a gate.
@@ -206,7 +246,7 @@ specification.
      one of the doc-type's verbs, and `args` was a noun and `never` a
      negation; the lint is what makes the three contract shapes one
      design instead of three.
-  7. *The specification becomes a Standard.* Move
+  8. *The specification becomes a Standard.* Move
      [specification/](/working-docs/doc-type-system/doc-type-system/specification/index.md)
      under `standards/`, bound to no gate. Its shape is discussed with
      the user after the doc-type step; what is known now:
@@ -223,15 +263,15 @@ specification.
        because step 1 drained the bodies, and it keeps them drained.
      Reason: the first loop's checks point at it, and a loop must not
      bind to a shape a later step deletes.
-  8. *Ban the word guard.* prose-lint's banned-word rule, today one
+  9. *Ban the word guard.* prose-lint's banned-word rule, today one
      word, the actor noun, gains `guard`, with a message naming `condition`;
      `prose/conventions.md`'s rule text and `.prose-lint-exempt` follow.
      `generator` and `adopt`, once listed here, are not banned: the only
      reasons on record were one tool's vocabulary and a card cell that
-     step 5 deletes, and neither is a reason to ban an English word.
+     step 6 deletes, and neither is a reason to ban an English word.
      Decided 2026-09-20. Reason: a habit in the model's weights is
      caught at the commit gate rather than by the user.
-  9. *Verify every rule.* Last, and likely the first loop. Every rule
+  10. *Verify every rule.* Last, and likely the first loop. Every rule
      in every Standard is run against this repo once, and the outcome
      is recorded, never assumed.
      - **By kind.** A rule with an address in the verifier table: by
@@ -262,10 +302,10 @@ specification.
   A step once here, scrubbing every file under `docs/` into a long-term
   home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except
   `docs/guides/`, and the eight loose files there predate this work.
-  The two moves this plan does cause are named at their steps, the
-  red-CI rule at step 3 and `okf-spec` at step 5.
+  The one move this plan causes is named at its step, `okf-spec` at
+  step 6.
 - **First instance.** One loop, `loops/<name>.md`, over the doc-type
-  system, after step 7: its checks point at the specification as a
+  system, after step 8: its checks point at the specification as a
   Standard, and the loop grows it. In iteration order: an act drafts
   candidate predicates, each with its citation or marked invented and
   the members that fail it today; a yield to the user, yes or no per
@@ -381,10 +421,11 @@ specification.
   carried, which left standards-lint with its two tests; the verifier
   table gained the two rows. `standard/gates.md` is deleted: its three
   rungs are the file's columns, defined in the boundary rule; its
-  installed-in-every-clone fact was already bootstrap's step 4; its red
-  CI rule, its skips rule, and the teaching about where a check runs
-  are three sections of `docs/guides/standard.md`; the per-machine
-  skips stay in `docs/machines.md`. Its readers repointed:
+  installed-in-every-clone fact was already bootstrap's step 4; its
+  skips rule and the teaching about where a check runs are two sections
+  of `docs/guides/standard.md`; its red CI rule is deleted, a thing
+  nobody needs written down; the per-machine skips stay in
+  `docs/machines.md`. Its readers repointed:
   `doc-types/standard/encoding.md`, `contract-shape.md`,
   `residual-ledger.md` (its gates entry deleted), `docs/guides/tracking.md`,
   `docs/machines.md`, `standard/consuming.md`, `card.md`, `index.md`,
