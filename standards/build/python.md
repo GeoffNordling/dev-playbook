@@ -12,7 +12,7 @@ A governed repo has one Python project, at the root
 Standard binds it.
 
 The reasoning behind the rules is the
-[Build Guide](/docs/guides/build.md).
+[Build Explanation](/standards/build/explanation.md).
 
 ## Name mapping
 

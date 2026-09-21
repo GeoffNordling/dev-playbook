@@ -1,14 +1,14 @@
 ---
-type: Guide
-title: Python Guide
+type: Explanation
+title: Python Explanation
 description: The thinking behind the Python style rules — why an init is empty, which docstrings matter, what a fallback hides, where a constant sits, why future annotations are gone, what justifies a helper, and which tool decides each rule
 ---
 
-# Python Guide
+# Python Explanation
 
-The guide behind [Python Style](/standards/python/style.md), the
-ruleset that binds a Python file a governed repo tracks. This guide
-carries the reasoning and the examples; nothing here is enforced.
+The reasoning behind [Python Style](/standards/python/style.md), the
+ruleset that binds a Python file a governed repo tracks, with the
+examples.
 
 ## Why an init is empty
 

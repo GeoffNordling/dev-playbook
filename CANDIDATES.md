@@ -37,9 +37,8 @@ description: Uncommitted future work — described, not yet promoted to issues
   which 27 are tooled Assessment Records; mission-control 3;
   sysadmin-playbook 1) and Survey had 5 (idea-tree 2, sounds 1, media-tools
   1, one stray worktree).
-- **The doc-type build loop over Guides** — Guide is roughly half of the
-  meaningful documentation in this repo and has no doc-type. Run the loop
-  there, new doc-types as peers of Standard and Runbook, possibly more than
+- **The doc-type build loop over Guides** — Guide and Explanation have no
+  doc-type. Run the loop there, new doc-types as peers of Standard and Runbook, possibly more than
   one level; with Standard and Runbook as exemplars, Fable proposes the
   abstractions, the user accepts, rejects, and steers, and the instruction
   states the constraints outright, above all that every CLOA object is 100%
@@ -48,10 +47,6 @@ description: Uncommitted future work — described, not yet promoted to issues
   is replaced, and the type working-set files carry is settled with it.
 - **The doc-type family's own type** — the files under `doc-types/` carry
   `General-Sheet` today; decide what type they carry.
-- **Guide as the procedure kind** — decide whether Guide is the kind a
-  procedure carries. The two `consuming.md` are typed `Standard-Ruleset` and
-  describe themselves as recipes; Bootstrap and Tracker Operations, the
-  same shape, are typed `Guide`.
 - **Where exclusions are written** — decide whether a population's
   exclusions are written in the population mark or in the file's prose.
 - **The parser's trigger** — `scripts/chaingen` writes

@@ -24,7 +24,7 @@ worklist, held in one member or in one subdirectory with its own
 the set is the whole tree, strands included.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Speculative voice
 

@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Test-First Discipline
 description: The test-first discipline `tests:yes` work runs under — the chunk, the slice loop, and the whole-chunk refactor pass
 ---

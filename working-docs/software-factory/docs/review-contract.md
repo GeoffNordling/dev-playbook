@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Review Contract
 description: The contract the three reviews run under — the two severities, the thread model, the cycle header, delta re-review, suggestion dispositions, the report envelope, and the escalation boundary
 ---

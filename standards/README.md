@@ -15,8 +15,8 @@ Every directory here except `references/` is one standard. Its `card.md`
 is the **standard card**: the four-cell record — define, audit, enforce,
 adopt — locating the standard's contract, checkers, gates, and adoption
 helpers. Beside the card sit the Standards its Define cell points at
-(`build/skeleton.md` beside `build/card.md`), any templates, and the
-guides that serve them. The rule is the tree: **one directory, one
+(`build/skeleton.md` beside `build/card.md`) and the explanation behind
+them. The rule is the tree: **one directory, one
 standard**; `references/` holds vendored mirrors. The contract behind the
 cards and the rulesets is the Standard doc-type
 ([doc-types/standard/](/doc-types/standard/index.md)).

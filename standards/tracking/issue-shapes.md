@@ -9,12 +9,12 @@ population: "a GitHub issue in a governed repo"
 
 A GitHub issue in a governed repo is committed work, at any size. Work
 not yet decided on is a Candidate in `CANDIDATES.md`
-([Tracking Guide](/docs/guides/tracking.md#candidates)), and a unit of
+([Candidates](/standards/tracking/candidates.md)), and a unit of
 work sits in one home, never both. An issue is one of five species, told from
 its labels and its sub-issues, and each species fixes the labels the
 issue carries and the headings its body carries. The labels are
 [Label Scheme](/standards/tracking/label-scheme.md)'s; the calls that
-link issues are [Linking Issues](/standards/tracking/linking-issues.md).
+link issues are [Linking Issues](/guides/linking-issues.md).
 
 ## Written for the user
 
@@ -103,6 +103,21 @@ What happens after the work, including edge cases and error conditions.
 
 `tracking.build-headings` · deterministic
 
+### Prohibited surfaces
+
+A build leaf's `Prohibited surfaces` names only the paths whose touching
+is a real hazard.
+
+`tracking.prohibited-surfaces` · stochastic
+
+### Artifacts
+
+Where a build leaf's body carries an `Artifacts` section, each block
+under it sits in a code fence, four backticks when the block has fences
+of its own.
+
+`tracking.artifacts` · deterministic
+
 ## Spike
 
 The issue has no sub-issues and carries `mode:spike`.
@@ -155,7 +170,8 @@ label scheme, and carries no `mode:*` label other than `mode:session`, no
 A session leaf carries `Summary`, `User intent`, `Current behavior`,
 `Desired behavior`, `Acceptance criteria`, and `Out of scope` in its
 body, each as a bold heading; a heading shown inside a code fence is
-quoted, not carried.
+quoted, not carried. Its `Out of scope` may read
+`Unknown; dealt with when found.`
 
 `tracking.session-headings` · deterministic
 

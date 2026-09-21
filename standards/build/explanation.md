@@ -1,18 +1,16 @@
 ---
-type: Guide
-title: Build Guide
+type: Explanation
+title: Build Explanation
 description: The thinking behind the build rules — layers inferred from the tree, what each required file is for, the four strengths of a canonical compare, what a green check means, why CI runs no tests, and the reasons behind the pyproject pins
 ---
 
-# Build Guide
+# Build Explanation
 
-The guide behind the three build rulesets,
+The reasoning behind the three build rulesets,
 [File Skeleton](/standards/build/skeleton.md),
 [Canonical Artifacts](/standards/build/canonical.md), and
-[The Python Project](/standards/build/python.md). Each states its rules
-as predicates `repo-lint` or a reviewer can decide; this guide carries
-the vocabulary, the worked trees, and the reasoning that make the rules
-intelligible. Nothing here is enforced; every rule is in its Standard.
+[The Python Project](/standards/build/python.md): the vocabulary and
+the reasons that make the rules intelligible.
 
 ## Layers are inferred, never declared
 
@@ -51,7 +49,7 @@ each holds is another Standard's rule.
 - `CONTEXT.md` — the vocabulary center
   ([CONTEXT.md Content](/standards/knowledge-organization/context-content.md)).
 - `CANDIDATES.md` — the register of uncommitted future work
-  ([Tracking Guide](/docs/guides/tracking.md#candidates)).
+  ([Candidates](/standards/tracking/candidates.md)).
 - `pyproject.toml` — the one Python project
   ([The Python Project](/standards/build/python.md)).
 
@@ -80,44 +78,6 @@ content, each governed by the Standard that owns the content:
   line of work, each kept as long as its work runs
   ([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)).
 - `.claude/` — Claude Code files; `worktrees/` under it is gitignored.
-
-A base tree:
-
-```
-<repo>/
-├── .github/workflows/ci.yml
-├── .gitignore
-├── .pre-commit-config.yaml
-├── CANDIDATES.md       # optional
-├── CLAUDE.md
-├── Makefile
-├── README.md
-├── index.md
-└── scripts/            # optional — shell here, gated by shellcheck and shfmt
-```
-
-A full stack, Python with a package and scripts:
-
-```
-<repo>/
-├── .github/workflows/ci.yml
-├── .gitignore
-├── .pre-commit-config.yaml
-├── .python-version
-├── CANDIDATES.md       # optional
-├── CLAUDE.md
-├── CONTEXT.md          # optional
-├── Makefile
-├── README.md
-├── docs/decisions/     # optional
-├── index.md
-├── pyproject.toml
-├── uv.lock
-├── scripts/
-├── src/<package>/
-│   └── __init__.py     # empty
-└── tests/
-```
 
 ## The files are the standard
 
@@ -218,11 +178,13 @@ pin is a choice that looks reversible until its reason is read.
 
 ## One version set
 
-The Python interpreter, ruff, mypy, pytest, and every hook `rev` are
-pinned once, in the canonical artifacts, at the latest stable release,
-and every copy carries the same value; a standalone script's PEP 723
-`requires-python` states the same floor as `.python-version`. Exact
-resolutions live in each repo's `uv.lock`.
+The pins live once, in the canonical artifacts, so every copy carries
+the same value, and each is the latest stable release
+([One version set](/standards/build/canonical.md#one-version-set)); a
+standalone script's PEP 723 `requires-python` states the same floor as
+`.python-version`
+([Shebang and inline metadata](/standards/build/python.md#shebang-and-inline-metadata)).
+Exact resolutions live in each repo's `uv.lock`.
 
 ## Package-backed scripts are shims
 

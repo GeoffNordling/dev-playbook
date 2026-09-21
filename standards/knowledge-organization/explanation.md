@@ -1,45 +1,41 @@
 ---
-type: Guide
-title: Knowledge Organization Guide
+type: Explanation
+title: Knowledge Organization Explanation
 description: The thinking behind the knowledge-organization rules — what CONTEXT.md is for, why a reference takes the form it does, what a description is for, how a documentation set stays navigable, what a working set is, how an index reads, how a Loop is checked, and why a type registry is frontmatter
 ---
 
-# Knowledge Organization Guide
+# Knowledge Organization Explanation
 
-The guide behind the nine knowledge-organization rulesets under
-[standards/knowledge-organization/](/standards/knowledge-organization/index.md).
-Each states its rules as predicates okf-lint, ref-lint, loop-lint,
-repo-lint, or a reviewer can decide; this guide carries the templates,
-the examples, and the reasoning. Nothing here is enforced.
+The reasoning behind the knowledge-organization rulesets under
+[standards/knowledge-organization/](/standards/knowledge-organization/index.md),
+with the examples.
+
+## Concept document or harness-owned file
+
+Every file in a workspace repository sits on two axes. **Role** is who
+consumes it: a concept document is prose a reader loads to understand
+something, and a harness-owned file is one a tool consumes as
+configuration or runs as code. **Content** is what it holds: a rule of
+the system, or the procedure of one job
+([File roles](/CONTEXT.md#file-roles)). The axes are independent. A
+rule's home is a concept document, a Standard, a Decision Record, the
+vocabulary, and a harness-owned file that needs one cites the document
+that owns it. A procedure a reader follows before doing the work, an
+adoption walkthrough or a migration, is a concept document typed
+`Guide`; a procedure the harness runs, a skill body or an agent
+definition, is a runbook. The boundary between the two roles is the
+population of
+[Document Types](/standards/knowledge-organization/document-types.md);
+which files exist is [File Skeleton](/standards/build/skeleton.md)'s.
 
 ## CONTEXT.md is a glossary
 
 A repo's `CONTEXT.md` is a glossary and nothing else
 ([Glossary only](/standards/knowledge-organization/context-content.md#glossary-only)):
 implementation decisions live in Decision Records, specifications in
-their own documents. Its shape:
-
-````md
----
-type: Vocabulary
-title: {Context Name}
-description: {One-line description of the vocabulary}
----
-
-# {Context Name}
-
-{One or two sentences on what this context is and why it exists.}
-
-## Language
-
-**Order**:
-{A one or two sentence description of the term}
-_Avoid_: Purchase, transaction
-
-**Invoice**:
-A request for payment sent to a customer after delivery.
-_Avoid_: Bill, payment request
-````
+their own documents; its shape is the
+[Entry shape](/standards/knowledge-organization/context-content.md#entry-shape)
+rule's template.
 
 When several words exist for one concept, the entry picks the best one
 and lists the others under `_Avoid_`. The test before adding a term: is
@@ -229,14 +225,7 @@ from a README because they live in `CLAUDE.md` and `docs/decisions/`.
 dev-playbook's `## Types` table is the global registry, the vocabulary
 every repo inherits. A consumer declares its own types in the
 `okf_types` mapping of its root `index.md` frontmatter
-([Local declaration](/standards/knowledge-organization/type-registry.md#local-declaration)):
-
-```yaml
-okf_version: "0.1"
-okf_types:
-  Resume: A resume markdown source, master or batch variant
-  Story: One work-experience story in SPAR form
-```
+([Local declaration](/standards/knowledge-organization/type-registry.md#local-declaration)).
 
 Frontmatter, not a document under the repo's own `standards/` tree:
 that tree is the meta-standard's population, so a registry document

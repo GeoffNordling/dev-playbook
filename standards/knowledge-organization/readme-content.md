@@ -13,7 +13,7 @@ prerequisites, a quick-start, an architecture overview, and examples
 arrive as the project earns them.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## H1
 

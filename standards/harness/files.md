@@ -1,27 +1,27 @@
 ---
-type: Guide
+type: Standard-Ruleset
 title: Claude Code Files
 description: The registry of repo files the Claude Code harness consumes — each member's class, role, and content standard
+population: "a file in a governed repo that the Claude Code harness consumes"
 ---
 
 # Claude Code Files
 
-The files in a workspace repo that exist for the Claude Code harness.
-They carry no OKF frontmatter and sit outside okf-lint. The
+A file in a governed repo that the Claude Code harness consumes: loaded
+as configuration, run as code, or injected into agent context. It
+carries no OKF frontmatter and sits outside okf-lint; the
 concept/harness boundary is the population of
-[Document Types](/standards/knowledge-organization/document-types.md);
-its code encoding is `classify()` in [md.py](/src/dev_playbook/md.py).
+[Document Types](/standards/knowledge-organization/document-types.md),
+and `classify()` in [md.py](/src/dev_playbook/md.py) encodes it. Claude
+Code is the only harness in use.
 
-Claude Code is named deliberately as the only harness currently in use.
+The reasoning behind the rules is the
+[Harness Explanation](/standards/harness/explanation.md#which-files-the-harness-consumes).
 
-Every member has a **class**, naming what the harness does with it:
+## Members
 
-- **runbook** — documentation that acts, invoked by name; its body is
-  governed by the
-  [Runbook doc-type](/doc-types/runbook/index.md).
-- **context** — prose injected into agent context; read, never invoked.
-- **configuration** — data the harness reads.
-- **code** — deterministic programs the harness runs.
+Every file the harness consumes is a member of the table below, with
+the class the table gives it.
 
 | Member | Class | Role | Content standard |
 |---|---|---|---|
@@ -33,8 +33,4 @@ Every member has a **class**, naming what the harness does with it:
 | `hooks/` | code | run as code around harness events | none yet |
 | `.claude/workflows/*.js` | code | run as code by the Workflow tool | none yet |
 
-Global runbooks live in `dotfiles/dot-claude/skills/` and
-`dotfiles/dot-claude/agents/`, stow-linked into `~/.claude/`; repo
-runbooks live in the repo's own `.claude/skills/` and `.claude/agents/`.
-The layout a runbook takes under those roots is Runbook Conventions'
-[Location](/standards/harness/runbook-conventions.md#location).
+`harness.members` · deterministic

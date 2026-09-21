@@ -25,9 +25,10 @@ that decides its fate has every piece in one place.
 ## What is here, and where it came from
 
 - **`docs/`** — the ten files of `software-factory/` at the repo root,
-  with that directory's `index.md` and `README.md`. They are typed
-  `Guide`; the doc-type plan's step 5 redefines `Guide` and leaves
-  these as they are.
+  with that directory's `index.md` and `README.md`. They were typed
+  `Guide`; the doc-type plan's step 5 gave `Guide` one home, `guides/`,
+  so these carry `General-Sheet`, the type of an unsettled working-set
+  member, until the factory's fate is decided.
 - **`agents/`** — six agent definitions from `dotfiles/dot-claude/agents/`:
   `adjudicator`, `bug-pr-review`, `build`, `code-pr-review`,
   `doc-pr-review`, `open-pr`.
@@ -68,7 +69,7 @@ that decides its fate has every piece in one place.
 
 - **Isolated, 2026-09-20.** Moved whole by step 4 of the doc-type
   plan; the inbound links from `standards/tracking/card.md`,
-  `docs/guides/tracking.md`, `docs/headless.md`, the root `README.md`
+  the tracking guide, `docs/headless.md`, the root `README.md`
   and `index.md`, `scripts/README.md`, and `CANDIDATES.md` were cut or
   repointed there.
 

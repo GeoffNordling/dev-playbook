@@ -18,7 +18,7 @@ between documents by the per-directory `index.md`, loading a body only
 when the document is relevant.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Typeless
 

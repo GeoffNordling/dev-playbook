@@ -11,13 +11,14 @@ content and a runbook's format. Which files the harness loads, and
 what it does with each, is the registry
 [Claude Code Files](/standards/harness/files.md); the craft behind any
 document an agent consumes is
-[Writing for Agents](/standards/harness/writing-for-agents.md), read to
+[Writing for Agents](/guides/writing-for-agents.md), read to
 write one. The voice every harness-loaded file speaks in is the
 [Prose](/standards/prose/card.md) card's. Claude Code is the only harness in
 use.
 
 ## Define
 
+- [Claude Code Files](/standards/harness/files.md)
 - [CLAUDE.md Content](/standards/harness/claude-content.md)
 - [Runbook Conventions](/standards/harness/runbook-conventions.md)
 

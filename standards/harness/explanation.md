@@ -1,29 +1,33 @@
 ---
-type: Guide
-title: Harness Guide
+type: Explanation
+title: Harness Explanation
 description: The thinking behind the harness rules — where a runbook lives and what its front matter holds, what each skill and agent field does, how arguments reach a skill, what an agent's body is, and why a CLAUDE.md has no frontmatter and one scope
 ---
 
-# Harness Guide
+# Harness Explanation
 
-The guide behind the two harness rulesets,
-[Runbook Conventions](/standards/harness/runbook-conventions.md) for a
+The reasoning behind the harness rulesets,
+[Claude Code Files](/standards/harness/files.md) for which files the
+harness consumes, [Runbook Conventions](/standards/harness/runbook-conventions.md) for a
 skill bundle or an agent definition, and
 [CLAUDE.md Content](/standards/harness/claude-content.md) for a
-`CLAUDE.md`. This guide carries the templates, the field semantics, and
-the reasoning; nothing here is enforced.
+`CLAUDE.md`: the field semantics and the reasons.
+
+## Which files the harness consumes
+
+Every member of [Claude Code Files](/standards/harness/files.md) has a
+**class**, naming what the harness does with it: a **runbook** is
+documentation that acts, invoked by name, its body governed by the
+[Runbook doc-type](/doc-types/runbook/index.md); **context** is prose
+injected into agent context, read and never invoked; **configuration**
+is data the harness reads; **code** is a deterministic program the
+harness runs. Claude Code is named deliberately as the only harness
+currently in use.
 
 ## Where a runbook lives
 
-```
-.claude/skills/<skill-name>/
-  SKILL.md          # required
-  references/       # optional: docs the skill loads on demand
-  scripts/          # optional: helper scripts the skill invokes
-.claude/agents/<agent-name>.md
-```
-
-A governed repo carries these under `.claude/`; dev-playbook carries
+A governed repo carries its runbooks under `.claude/`
+([Location](/standards/harness/runbook-conventions.md#location)); dev-playbook carries
 the workspace-global set under `dotfiles/dot-claude/`, which Stow links
 into `~/.claude/`. harness-files-lint discovers runbooks at these roots
 and stops on a directory under a skills root with no `SKILL.md`.
@@ -36,29 +40,6 @@ prints an advisory on a longer file, with no rule id
 ([Bundle layout](/standards/harness/runbook-conventions.md#bundle-layout)).
 
 ## The front matter
-
-A skill's block:
-
-```yaml
-name: <skill-name>
-description: <what it does. Use when …>
-disable-model-invocation: <true|false>
-model: <haiku|sonnet|opus|fable|inherit>
-effort: <low|medium|high|xhigh>
-allowed-tools: <tool spec>          # optional
-disallowed-tools: <tool spec>       # optional
-arguments: [<name>, ...]            # optional
-```
-
-An agent's block:
-
-```yaml
-name: <agent-name>
-description: <what it does. Use when …>
-model: <haiku|sonnet|opus|fable|inherit>
-effort: <low|medium|high|xhigh>
-tools: <Tool, Tool, ...>            # optional
-```
 
 The vocabulary is exact
 ([Front matter](/standards/harness/runbook-conventions.md#front-matter)):

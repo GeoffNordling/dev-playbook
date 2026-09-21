@@ -97,6 +97,21 @@ def test_well_formed_card_passes_card_layout(tmp_path: Path) -> None:
     assert sa.check_card_layout(repo) == []
 
 
+def test_unadmitted_member_of_a_card_directory_is_flagged(tmp_path: Path) -> None:
+    # A card directory admits a ruleset or an explanation, and nothing else.
+    files = card_dir("build", "Build")
+    files["standards/build/notes.md"] = (
+        "---\ntype: General-Sheet\ntitle: Notes\ndescription: n\n---\n\n# Notes\n"
+    )
+    repo = make_repo(tmp_path, files)
+
+    findings = sa.check_card_layout(repo)
+
+    assert [f.rule for f in findings] == [sa.DIRECTORY_LAYOUT]
+    assert findings[0].file == "standards/build/notes.md"
+    assert "General-Sheet" in findings[0].message
+
+
 def test_flat_standards_file_is_flagged_as_a_stray(tmp_path: Path) -> None:
     # A card is standards/<name>/card.md; a flat standards/<name>.md is the old
     # layout and no longer a card slot.
@@ -188,7 +203,7 @@ def test_directory_without_a_card_is_flagged(tmp_path: Path) -> None:
         {
             "standards/build/index.md": "# build\n",
             "standards/build/layers.md": (
-                "---\ntype: Standard\ntitle: Layers\ndescription: layers\n---\n\n# Layers\n"
+                "---\ntype: Standard-Ruleset\ntitle: Layers\ndescription: layers\n---\n\n# Layers\n"
             ),
         },
     )

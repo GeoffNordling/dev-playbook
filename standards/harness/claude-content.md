@@ -20,7 +20,7 @@ loads is [Claude Code Files](/standards/harness/files.md); the voice a
 [No first person](/standards/prose/conventions.md#no-first-person).
 
 The reasoning behind the rules is the
-[Harness Guide](/docs/guides/harness.md).
+[Harness Explanation](/standards/harness/explanation.md).
 
 ## No frontmatter
 

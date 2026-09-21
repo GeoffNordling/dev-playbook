@@ -9,7 +9,7 @@ population: "a concept document"
 
 The frontmatter a concept document carries, the prose `.md` file a
 reader loads to understand something
-([File Roles](/standards/knowledge-organization/file-roles.md)). The
+([Concept document or harness-owned file](/standards/knowledge-organization/explanation.md#concept-document-or-harness-owned-file)). The
 boundary is drawn by exclusion from a repo's `.md` files: `index.md` is a
 typeless listing ([Indexes](/standards/knowledge-organization/indexes.md));
 the members of the Claude Code file registry
@@ -21,7 +21,7 @@ holds the boundary in code with its further exclusions, the transient
 top-level `tests/` tree.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Frontmatter block
 
@@ -39,10 +39,11 @@ frontmatter of the repo's own root `index.md`
 
 | Type | What it is |
 |------|------------|
-| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see the [Tracking Guide](/docs/guides/tracking.md#candidates)); lives in `CANDIDATES.md`, one per repo. |
+| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [Candidates](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
+| `Explanation` | The reasoning and mechanism behind one Standard's rules, rule by rule; never cited to reject work; lives at `standards/<name>/explanation.md`, one per Standard. |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
-| `Guide` | An explanation of a process or a system, read to understand it; never cited to reject work. |
+| `Guide` | Instruction on how to do a kind of work, read before doing it and organized by the work; cites rules in passing and is never cited to reject work; lives under `guides/`, the one tree reserved for it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
 | `Loop` | A document that drives a state toward a target state by iteratively taking prescribed actions and validating against prescribed standards; lives under `loops/`, the one tree reserved for it (see [the Loop doc-type](/doc-types/loop/definition.md#where-a-loop-lives)). |
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
@@ -116,3 +117,15 @@ under `standards/`.
 A concept document typed `Loop` lives under `loops/`.
 
 `knowledge-organization.typed-loop` · deterministic
+
+## Typed Guide
+
+A concept document typed `Guide` lives under `guides/`.
+
+`knowledge-organization.typed-guide` · deterministic
+
+## Typed Explanation
+
+A concept document typed `Explanation` is `standards/<name>/explanation.md`.
+
+`knowledge-organization.typed-explanation` · deterministic

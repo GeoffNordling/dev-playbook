@@ -40,8 +40,9 @@ BASE_BUNDLE: dict[str, str] = {
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
-        "| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
+        "| `Explanation` | reasons |\n| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard-Card` | points |\n| `Standard-Ruleset` | rules |\n"
+        "| `Survey` | evaluates |\n"
     ),
     "standards/knowledge-organization/index.md": (
         "# standards/knowledge-organization/ — index\n\nThe KO standards.\n\n"
@@ -87,6 +88,7 @@ UPSTREAM_REGISTRY = (
     "| Type | What it is |\n|------|------------|\n"
     "| `Guide` | teaching |\n| `README` | landing |\n"
     "| `Recipe-Description` | describes code |\n| `Standard-Card` | points |\n| `Standard-Ruleset` | rules |\n"
+    "| `Survey` | evaluates |\n"
 )
 
 
@@ -229,6 +231,44 @@ def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
     assert "'Standard-Ruleset' lives under standards/" in result.stdout
 
 
+def test_guide_outside_guides_dir_is_flagged(tmp_path: Path) -> None:
+    doc = "---\ntype: Guide\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    repo = make_bundle(
+        tmp_path,
+        {
+            "ops.md": doc,
+            "index.md": _root_index_listing("- [Ops](/ops.md) — How ops runs"),
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "knowledge-organization.typed-guide" in result.stdout
+    assert "ops.md" in result.stdout
+    assert "'Guide' lives under guides/" in result.stdout
+
+
+def test_explanation_outside_its_slot_is_flagged(tmp_path: Path) -> None:
+    doc = (
+        "---\ntype: Explanation\ntitle: Why\ndescription: Why the rules\n---\n\n# Why\n"
+    )
+    repo = make_bundle(
+        tmp_path,
+        {
+            "why.md": doc,
+            "index.md": _root_index_listing("- [Why](/why.md) — Why the rules"),
+        },
+    )
+
+    result = run_okf_lint(repo)
+
+    assert result.returncode == 1
+    assert "knowledge-organization.typed-explanation" in result.stdout
+    assert "why.md" in result.stdout
+    assert "'Explanation' lives at standards/<name>/explanation.md" in result.stdout
+
+
 def test_loop_outside_loops_dir_is_flagged(tmp_path: Path) -> None:
     doc = "---\ntype: Loop\ntitle: Tidy\ndescription: Drives the tree tidy\n---\n\n# Tidy\n"
     repo = make_bundle(
@@ -362,7 +402,7 @@ def test_ordering_marker_alone_is_not_an_introduction(tmp_path: Path) -> None:
 
 def test_non_standard_type_outside_standards_dir_is_clean(tmp_path: Path) -> None:
     """The rule binds the `Standard` label alone — every other type roams free."""
-    doc = "---\ntype: Guide\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
+    doc = "---\ntype: Survey\ntitle: Ops\ndescription: How ops runs\n---\n\n# Ops\n"
     repo = make_bundle(
         tmp_path,
         {
@@ -1009,6 +1049,7 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
         "| Type | What it is |\n|------|------------|\n"
         "| `Guide` | teaching |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard-Card` | points |\n| `Standard-Ruleset` | rules |\n"
+        "| `Survey` | evaluates |\n"
         "| `bogus name` | nonsense |\n"
     )
     repo = make_bundle(
@@ -1028,7 +1069,7 @@ def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> No
     """The `Ordering:` marker exempts only as an intro line; one appearing after
     the first entry is not an exemption, so the out-of-alphabetical concept order
     (README.md still leads) is still flagged."""
-    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    guide = "---\ntype: Survey\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
         "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"
@@ -1078,7 +1119,9 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
 
 def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
     """The README.md entry must head an index; here it trails a concept doc."""
-    guide = "---\ntype: Guide\ntitle: Zebra\ndescription: zebra guide\n---\n\n# Zebra\n"
+    guide = (
+        "---\ntype: Survey\ntitle: Zebra\ndescription: zebra guide\n---\n\n# Zebra\n"
+    )
     index = (
         "# standards/ — index\n\nThe standards.\n\n"
         "- [Zebra](/standards/zebra.md) — zebra guide\n"
@@ -1099,7 +1142,7 @@ def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
     """An intro line beginning `Ordering:` declares a meaningful order and
     exempts the index from the alphabetical checks. README.md still leads, so the
     marker excuses only the out-of-alphabetical concept order below."""
-    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    guide = "---\ntype: Survey\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
         "# standards/ — index\n\nThe standards.\n\n"
         "Ordering: by significance, not alphabetical.\n\n"
@@ -1126,7 +1169,9 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
     """The `Ordering:` marker exempts only the alphabetical checks; the README.md
     entry must lead even under the marker, so a marked index that lists it
     non-first is still flagged."""
-    guide = "---\ntype: Guide\ntitle: Zebra\ndescription: zebra guide\n---\n\n# Zebra\n"
+    guide = (
+        "---\ntype: Survey\ntitle: Zebra\ndescription: zebra guide\n---\n\n# Zebra\n"
+    )
     index = (
         "# standards/ — index\n\nThe standards.\n\n"
         "Ordering: by significance, not alphabetical.\n\n"
@@ -1148,7 +1193,7 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
 def test_concept_entries_out_of_alphabetical_order_are_flagged(
     tmp_path: Path,
 ) -> None:
-    guide = "---\ntype: Guide\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
+    guide = "---\ntype: Survey\ntitle: {t}\ndescription: {d}\n---\n\n# {t}\n"
     index = (
         "# standards/ — index\n\nThe standards.\n\n"
         "- [Standards](/standards/README.md) — Standards desc\n"

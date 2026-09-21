@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: PR Feedback
 description: The comment surfaces a pull request carries, threads first, and how a committing node re-enters on a rework lap
 ---

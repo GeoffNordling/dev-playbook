@@ -8,8 +8,9 @@ that owns them, `knowledge-organization.*`:
     drawn from the type registry, plus `title` and `description`. `resource`
     is optional in general and required on a `Recipe-Description`, and a
     document typed `Standard-Card` or `Standard-Ruleset` lives under `standards/`
-    and one typed `Loop` under `loops/` — each the tree reserved for its label
-    (`knowledge-organization.type-location`). The registry
+    one typed `Loop` under `loops/`, one typed `Guide` under `guides/`, and
+    one typed `Explanation` at `standards/<name>/explanation.md` — each the
+    place reserved for its label. The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
     own `## Types` table (`REGISTRY_DOC`), read and shape-checked there as the
@@ -99,6 +100,8 @@ TYPED_STANDARD_CARD_OR_STANDARD_RULESET = (
     "knowledge-organization.typed-standard-card-or-standard-ruleset"
 )
 TYPED_LOOP = "knowledge-organization.typed-loop"
+TYPED_EXPLANATION = "knowledge-organization.typed-explanation"
+TYPED_GUIDE = "knowledge-organization.typed-guide"
 THE_INTRODUCTION = "knowledge-organization.the-introduction"
 THE_LISTING = "knowledge-organization.the-listing"
 ORDERING = "knowledge-organization.ordering"
@@ -120,6 +123,8 @@ RULES = (
     RECIPE_DESCRIPTION,
     TYPED_STANDARD_CARD_OR_STANDARD_RULESET,
     TYPED_LOOP,
+    TYPED_EXPLANATION,
+    TYPED_GUIDE,
     THE_INTRODUCTION,
     THE_LISTING,
     ORDERING,
@@ -162,6 +167,8 @@ RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # doc-types/standard/definition.md and doc-types/loop/definition.md, each's
 # "Where a ... lives".
 STANDARDS_TYPES = frozenset({"Standard-Card", "Standard-Ruleset"})
+# An Explanation's one slot: beside the Standard whose rules it explains.
+EXPLANATION_PATH = re.compile(r"standards/[^/]+/explanation\.md")
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # A type name of the shape the Type Registry's Row shape rule declares: Title
 # Case, hyphen-joined for a multi-word name, acronyms upper.
@@ -213,8 +220,10 @@ def _table_cells(line: str) -> list[str]:
 
 def _is_separator_row(cells: list[str]) -> bool:
     """Whether a table row is the header/body delimiter (``|---|---|``)."""
-    return bool(cells) and all(set(c) <= {"-", ":", " "} for c in cells) and any(
-        "-" in c for c in cells
+    return (
+        bool(cells)
+        and all(set(c) <= {"-", ":", " "} for c in cells)
+        and any("-" in c for c in cells)
     )
 
 
@@ -457,7 +466,9 @@ def check_types(
         if doctype is None:
             findings.append(Finding(rel, TYPES, "missing 'type'"))
         elif doctype not in registry:
-            findings.append(Finding(rel, TYPES, f"type '{doctype}' not in the registry"))
+            findings.append(
+                Finding(rel, TYPES, f"type '{doctype}' not in the registry")
+            )
         if not fm.get("title"):
             findings.append(Finding(rel, TITLE, "missing 'title'"))
         description = fm.get("description")
@@ -485,6 +496,16 @@ def check_types(
             )
         if doctype == "Loop" and not rel.startswith("loops/"):
             findings.append(Finding(rel, TYPED_LOOP, "'Loop' lives under loops/"))
+        if doctype == "Guide" and not rel.startswith("guides/"):
+            findings.append(Finding(rel, TYPED_GUIDE, "'Guide' lives under guides/"))
+        if doctype == "Explanation" and not EXPLANATION_PATH.fullmatch(rel):
+            findings.append(
+                Finding(
+                    rel,
+                    TYPED_EXPLANATION,
+                    "'Explanation' lives at standards/<name>/explanation.md",
+                )
+            )
     return findings
 
 
@@ -540,7 +561,9 @@ def check_indexes(
     index_dirs: set[Dir] = {dir_of(rel) for rel in index_docs}
 
     if () not in index_dirs:
-        return [Finding("index.md", THE_ROOT_INDEX, "repository root index.md is missing")]
+        return [
+            Finding("index.md", THE_ROOT_INDEX, "repository root index.md is missing")
+        ]
 
     # Expected ownership: each concept doc belongs to its nearest index; each
     # non-root index is a child of its nearest ancestor index.
@@ -573,7 +596,9 @@ def check_indexes(
 
         for bad in sorted(set(invalid_targets)):
             findings.append(
-                Finding(rel, THE_LISTING, f"lists {bad} which is not a concept document")
+                Finding(
+                    rel, THE_LISTING, f"lists {bad} which is not a concept document"
+                )
             )
 
         # First occurrence wins for the description map; duplicate bullets are
@@ -625,7 +650,9 @@ def check_indexes(
             )
         for extra in sorted(listed_child_set - expected_children):
             findings.append(
-                Finding(rel, THE_LISTING, f"lists unexpected child index {extra}/index.md")
+                Finding(
+                    rel, THE_LISTING, f"lists unexpected child index {extra}/index.md"
+                )
             )
 
     # The root index.md is typeless (not a concept doc), so check_types never
@@ -635,7 +662,11 @@ def check_indexes(
         findings.append(Finding("index.md", FRONTMATTER_BLOCK, root_err))
     elif not root_fm or "okf_version" not in root_fm:
         findings.append(
-            Finding("index.md", OKF_VERSION_DECLARED, "root index.md must declare okf_version")
+            Finding(
+                "index.md",
+                OKF_VERSION_DECLARED,
+                "root index.md must declare okf_version",
+            )
         )
     return findings
 

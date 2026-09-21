@@ -13,6 +13,7 @@ build.makefile: scripts/repo-lint
 build.name-mapping: scripts/repo-lint
 build.no-other-future-work-file: scripts/repo-lint
 build.one-package-under-src: scripts/repo-lint
+build.one-version-set: null
 build.pre-commit-configyaml: scripts/repo-lint
 build.pyprojecttoml: scripts/repo-lint
 build.python: null
@@ -44,6 +45,8 @@ decisions.what-was-examined: null
 distribution.a-pinned-rev: scripts/workspace-lint
 distribution.a-publisher-dogfoods-its-manifest: scripts/repo-lint
 distribution.a-valid-manifest: pre-commit validate-manifest
+distribution.one-published-id: null
+distribution.the-roster: null
 harness.agent: null
 harness.arguments: scripts/harness-files-lint
 harness.body-opens-with-an-h1: scripts/harness-files-lint
@@ -57,6 +60,7 @@ harness.global-file: null
 harness.interactive-skills-inherit: null
 harness.kebab-case-name: scripts/harness-files-lint
 harness.location: null
+harness.members: null
 harness.model-and-effort: scripts/harness-files-lint
 harness.model-invocation-flag: scripts/harness-files-lint
 harness.name-matches-its-home: scripts/harness-files-lint
@@ -134,6 +138,8 @@ knowledge-organization.the-root-index: scripts/okf-lint
 knowledge-organization.three-verb-sections: scripts/loop-lint
 knowledge-organization.tight-definitions: null
 knowledge-organization.title: scripts/okf-lint
+knowledge-organization.typed-explanation: scripts/okf-lint
+knowledge-organization.typed-guide: scripts/okf-lint
 knowledge-organization.typed-loop: scripts/okf-lint
 knowledge-organization.typed-standard-card-or-standard-ruleset: scripts/okf-lint
 knowledge-organization.typeless: null
@@ -193,6 +199,7 @@ shell.sourced-fragments: null
 shell.strict-mode: null
 standard.a-consumer-adds-only-its-own-rules: scripts/verifier-table
 standard.a-first-party-detector: null
+standard.a-skip-is-machine-state: null
 standard.an-absent-surface-is-clean: null
 standard.an-address-exists: scripts/verifier-table
 standard.an-emitted-id-is-a-rule-heading: scripts/verifier-table
@@ -239,6 +246,7 @@ testing.test-file-naming: null
 testing.the-lightest-double: null
 testing.the-mocking-library: null
 tracking.a-stable-body: null
+tracking.artifacts: null
 tracking.behavioural-not-procedural: null
 tracking.build-headings: scripts/workspace-lint
 tracking.build-labels: scripts/workspace-lint
@@ -246,11 +254,14 @@ tracking.build-leaf: null
 tracking.category-only: scripts/workspace-lint
 tracking.closed-fences: scripts/workspace-lint
 tracking.default-branch-protection: scripts/workspace-lint
+tracking.entry-shape: null
 tracking.epic: null
 tracking.epic-headings: null
 tracking.github-origin: scripts/workspace-lint
 tracking.no-child-list: null
 tracking.one-goal: null
+tracking.one-home: null
+tracking.prohibited-surfaces: null
 tracking.session-headings: scripts/workspace-lint
 tracking.session-labels: scripts/workspace-lint
 tracking.session-leaf: null
@@ -259,6 +270,7 @@ tracking.spike-headings: scripts/workspace-lint
 tracking.spike-labels: scripts/workspace-lint
 tracking.squash-only-merges: scripts/workspace-lint
 tracking.standing-rulings: null
+tracking.structure: null
 tracking.ticket-parentage: null
 tracking.user-intent: null
 tracking.valid-labels: scripts/workspace-lint

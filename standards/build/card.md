@@ -35,7 +35,7 @@ skeleton, the canonical artifacts, and the Python project.
 
 ## Adopt
 
-- [Bootstrap](/standards/build/bootstrap.md) — how a repository joins the
+- [Bootstrap](/guides/bootstrap.md) — how a repository joins the
   workspace: scaffold a fresh repo with `repo-init` or adopt an existing one
   to green, then the GitHub tail and roster enrollment
 - [enable-repo-governance](/dotfiles/dot-claude/skills/enable-repo-governance/SKILL.md)

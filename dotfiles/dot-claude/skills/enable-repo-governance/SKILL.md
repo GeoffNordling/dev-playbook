@@ -10,7 +10,7 @@ effort: xhigh
 
 An existing repo joins the workspace by being brought to green against the
 pinned standard, then enrolled. {Read
-[bootstrap.md](~/workspace/dev-playbook/standards/build/bootstrap.md); that
+[bootstrap.md](~/workspace/dev-playbook/guides/bootstrap.md); that
 document is the authority on the adoption steps and their order — this skill
 owns only the choreography around them: preflight, the findings loop, the
 hand-offs, and the commits}.

@@ -16,11 +16,11 @@ harness-files-lint skips it. The
 contract, the Reference chain; this Standard binds the file: where it
 sits, its front matter, its body's shape, and what each kind adds. The
 craft of the body, the two loads, the information hierarchy, and
-pruning, is [Writing for Agents](/standards/harness/writing-for-agents.md),
+pruning, is [Writing for Agents](/guides/writing-for-agents.md),
 read to write one; this Standard wins where the two collide.
 
 The reasoning behind the rules is the
-[Harness Guide](/docs/guides/harness.md).
+[Harness Explanation](/standards/harness/explanation.md).
 
 ## Location
 
@@ -28,6 +28,14 @@ A skill is `<skills root>/<name>/SKILL.md` and an agent is
 `<agents root>/<name>.md`, the roots being `.claude/skills/` and
 `.claude/agents/`, and `dotfiles/dot-claude/skills/` and
 `dotfiles/dot-claude/agents/` where those directories exist.
+
+```
+<skills root>/<skill-name>/
+  SKILL.md          # required
+  references/       # optional: docs the skill loads on demand
+  scripts/          # optional: helper scripts the skill invokes
+<agents root>/<agent-name>.md
+```
 
 `harness.location` · deterministic
 
@@ -39,6 +47,29 @@ its kind's vocabulary: a skill's `name`, `description`,
 `allowed-tools`, `disallowed-tools`, and `arguments` optional; an
 agent's `name`, `description`, `model`, and `effort`, with `tools`
 optional.
+
+A skill's block:
+
+```yaml
+name: <skill-name>
+description: <what it does. Use when …>
+disable-model-invocation: <true|false>
+model: <haiku|sonnet|opus|fable|inherit>
+effort: <low|medium|high|xhigh>
+allowed-tools: <tool spec>          # optional
+disallowed-tools: <tool spec>       # optional
+arguments: [<name>, ...]            # optional
+```
+
+An agent's block:
+
+```yaml
+name: <agent-name>
+description: <what it does. Use when …>
+model: <haiku|sonnet|opus|fable|inherit>
+effort: <low|medium|high|xhigh>
+tools: <Tool, Tool, ...>            # optional
+```
 
 `harness.front-matter` · deterministic
 

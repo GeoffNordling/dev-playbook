@@ -19,7 +19,7 @@ That `tests/` exists at all is
 goes where inside it is this Standard's.
 
 The reasoning behind the rules is the
-[Test Design Guide](/docs/guides/testing.md).
+[Test Design Explanation](/standards/testing/explanation.md).
 
 ## pytest
 

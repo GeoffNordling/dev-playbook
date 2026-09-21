@@ -14,6 +14,7 @@ under `working-docs/software-factory/` and out of scope.
 
 ## Define
 
+- [Candidates](/standards/tracking/candidates.md)
 - [Issue Shapes](/standards/tracking/issue-shapes.md)
 - [Label Scheme](/standards/tracking/label-scheme.md)
 - [Repository Settings](/standards/tracking/repo-settings.md)

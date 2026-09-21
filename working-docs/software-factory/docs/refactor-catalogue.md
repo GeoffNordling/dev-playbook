@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Refactor Catalogue
 description: The structural candidates — the cue and the move for each — and the step-size rule governing a refactor step
 ---

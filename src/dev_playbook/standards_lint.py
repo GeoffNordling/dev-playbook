@@ -13,8 +13,10 @@ each the id of its heading in standards/standard/cards.md:
   - **directory-layout** — every immediate subdirectory of ``standards/``
     except ``references/`` is a card directory holding ``card.md``: ``type:
     Standard-Card`` frontmatter and the four cells (Define, Audit, Enforce,
-    Adopt) as ``##`` sections, in that order. The only flat files under
-    ``standards/`` are README.md and index.md.
+    Adopt) as ``##`` sections, in that order; every other ``.md`` under it,
+    ``index.md`` aside, is typed ``Standard-Ruleset`` or ``Explanation``.
+    The only flat files under ``standards/`` are README.md and
+    index.md.
   - **define-points-only-at-rulesets** — a Define bullet is the link alone.
   - **the-question-sentence** — the sentence after a card's H1 opens ``Governs
     how`` and the frontmatter description repeats it less the period.
@@ -95,6 +97,8 @@ RULES = (
 )
 
 CARD_TYPE = "Standard-Card"
+# The types a card directory admits beside its card and its indexes.
+ADMITTED_TYPES = frozenset({"Standard-Ruleset", "Explanation"})
 STANDARDS = "standards"
 CATALOG = "standards/index.md"
 README = "standards/README.md"
@@ -230,6 +234,19 @@ def _card_dirs(root: Path) -> list[str]:
     return sorted(names - NON_CARD_DIRS)
 
 
+def _members(root: Path) -> list[str]:
+    """Every tracked ``.md`` in a card directory that is not its card or an index."""
+    return sorted(
+        rel
+        for rel in _tracked(root)
+        if len(parts := PurePosixPath(rel).parts) >= 3
+        and parts[0] == STANDARDS
+        and parts[1] not in NON_CARD_DIRS
+        and parts[-1].endswith(".md")
+        and parts[-1] not in {CARD_FILE, "index.md"}
+    )
+
+
 def _flat_strays(root: Path) -> list[str]:
     """Flat ``standards/*.md`` files that are neither README.md nor index.md."""
     return sorted(
@@ -264,7 +281,7 @@ def _dev_playbook_mode(root: Path) -> bool:
 
 
 def check_card_layout(root: Path) -> list[Finding]:
-    """Flag a stray flat file, a cardless directory, or a malformed card."""
+    """Flag a stray flat file, a cardless directory, an unadmitted member, or a malformed card."""
     findings: list[Finding] = []
     for rel in _flat_strays(root):
         findings.append(
@@ -284,6 +301,19 @@ def check_card_layout(root: Path) -> list[Finding]:
                     None,
                     DIRECTORY_LAYOUT,
                     f"card directory has no {CARD_FILE}",
+                )
+            )
+    for rel in _members(root):
+        front = _frontmatter(root / rel)
+        doctype = front.get("type") if front else None
+        if doctype not in ADMITTED_TYPES:
+            findings.append(
+                Finding(
+                    rel,
+                    None,
+                    DIRECTORY_LAYOUT,
+                    f"typed {doctype!r} in a card directory; a card directory "
+                    f"admits {', '.join(sorted(ADMITTED_TYPES))}",
                 )
             )
     for rel in cards:

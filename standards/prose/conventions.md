@@ -14,7 +14,7 @@ it lives. A repo exempts any further path by listing it in a tracked
 `.prose-lint-exempt` at its root, under a comment saying why.
 
 The reasoning behind the rules is the
-[Prose Guide](/docs/guides/prose.md).
+[Prose Explanation](/standards/prose/explanation.md).
 
 ## One rule, one place
 
@@ -92,7 +92,7 @@ prohibition appears only where the prohibition itself is the rule.
 ## No slop tics
 
 The document commits none of the tics
-[Slop Tics](/standards/prose/slop-tics.md) names.
+[Slop Tics](/guides/slop-tics.md) names.
 
 `prose.no-slop-tics` · stochastic
 

@@ -18,13 +18,26 @@ material, the source of the
 reads it.
 
 The reasoning behind the rules is the
-[Build Guide](/docs/guides/build.md).
+[Build Explanation](/standards/build/explanation.md).
 
 ## Required files
 
 `README.md`, `CLAUDE.md`, `index.md`, `.gitignore`,
 `.pre-commit-config.yaml`, and `Makefile` exist at the root, and
 `.github/workflows/ci.yml` exists.
+
+```
+<repo>/
+├── .github/workflows/ci.yml
+├── .gitignore
+├── .pre-commit-config.yaml
+├── CANDIDATES.md       # optional
+├── CLAUDE.md
+├── Makefile
+├── README.md
+├── index.md
+└── scripts/            # optional — shell here, gated by shellcheck and shfmt
+```
 
 `build.required-files` · deterministic
 
@@ -69,6 +82,27 @@ A repo in which `pyproject.toml` exists at the root.
 ## Python package
 
 A Python repo in which `src/` exists.
+
+```
+<repo>/
+├── .github/workflows/ci.yml
+├── .gitignore
+├── .pre-commit-config.yaml
+├── .python-version
+├── CANDIDATES.md       # optional
+├── CLAUDE.md
+├── CONTEXT.md          # optional
+├── Makefile
+├── README.md
+├── docs/decisions/     # optional
+├── index.md
+├── pyproject.toml
+├── uv.lock
+├── scripts/
+├── src/<package>/
+│   └── __init__.py     # empty
+└── tests/
+```
 
 `build.python-package` · deterministic
 

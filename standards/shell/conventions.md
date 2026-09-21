@@ -15,7 +15,7 @@ reads into itself. Both also meet the dialect, shellcheck, and formatting
 rules every shell file meets.
 
 The reasoning behind the rules is the
-[Shell Guide](/docs/guides/shell.md).
+[Shell Explanation](/standards/shell/explanation.md).
 
 ## Bash, declared
 

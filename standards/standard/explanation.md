@@ -1,16 +1,14 @@
 ---
-type: Guide
-title: Standard Guide
+type: Explanation
+title: Standard Explanation
 description: The thinking behind the meta-standard's rules — what a detector is and is not, why an absent surface is clean, why a detector must ignore the GIT_DIR a git hook exports, and where a check runs
 ---
 
-# Standard Guide
+# Standard Explanation
 
-The guide behind the meta-standard, the Standards under
-`standards/standard/`. Each states its rules as predicates a reviewer or
-a script can decide; this guide carries the vocabulary and the reasoning
-that make the rules intelligible. Nothing here is enforced; every rule
-is in its Standard.
+The reasoning behind the meta-standard, the rulesets under
+`standards/standard/`: the vocabulary and the reasons that make the
+rules intelligible.
 
 ## Detectors
 
@@ -100,13 +98,15 @@ run only inside `make`, so they reach the push gate and never CI
 ([The boundary table](/standards/standard/detectors.md#the-boundary-table)).
 The commit and push gates are git hooks in `.git/`, which no clone
 inherits; `uvx pre-commit install` puts them there, step 4 of
-[Bootstrap](/standards/build/bootstrap.md#the-existing-path-adoption).
+[Bootstrap](/guides/bootstrap.md#the-existing-path-adoption).
 
 ### A skip is machine state
 
 A detector is skipped at a gate only where its input is machine-local
 rather than held in the repository: `SKIP=ref-lint` where the repos its
-Citations resolve against are not cloned. playbook-lint honors `SKIP`
+Citations resolve against are not cloned
+([A skip is machine state](/standards/standard/detectors.md#a-skip-is-machine-state)).
+playbook-lint honors `SKIP`
 per detector name and announces the skip on every run. The canonical
 workflow's `SKIP: ref-lint` is in the boundary table, since the workflow
 is committed; a machine's skip is not, and is recorded in

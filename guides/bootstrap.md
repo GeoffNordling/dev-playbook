@@ -53,7 +53,7 @@ standard, in this order:
    over the repo; the findings are the worklist, and each rule's define doc
    is the fix's authority. Forbidden files get explicit dispositions —
    `ROADMAP.md` and kin become `CANDIDATES.md` entries or issues
-   ([Tracking Guide](/docs/guides/tracking.md#candidates)),
+   ([Candidates](/standards/tracking/candidates.md)),
    `requirements.txt` moves into `pyproject.toml`.
 
 The adoption lands as one reviewable unit — a small diff as a single

@@ -40,7 +40,7 @@ restate the content of their targets.
 - **Audit.** Read-only deviation detection: the detectors that report
   nonconformance without blocking anything. A formatter is a detector
   by its check mode
-  ([A formatter has two modes](/docs/guides/standard.md#a-formatter-has-two-modes)).
+  ([A formatter has two modes](/standards/standard/explanation.md#a-formatter-has-two-modes)).
   This is the cell a Loop's check composes
   ([Loop](/doc-types/loop/contract-shape.md)), never the gate.
 - **Enforce.** What compels conformance, in one of two modes. At a

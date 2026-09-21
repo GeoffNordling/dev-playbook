@@ -19,7 +19,7 @@ conventions are
 [Testing Conventions](/standards/testing/conventions.md).
 
 The reasoning behind the rules is the
-[Python Guide](/docs/guides/python.md).
+[Python Explanation](/standards/python/explanation.md).
 
 ## Empty init
 

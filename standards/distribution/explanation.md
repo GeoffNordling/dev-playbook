@@ -1,16 +1,15 @@
 ---
-type: Guide
-title: Distribution Guide
+type: Explanation
+title: Distribution Explanation
 description: The thinking behind the distribution rules — one published hook id, why enrollment rides the pin, the roster, why dev-playbook dogfoods its manifest instead of pinning, and why a stale pin is advisory
 ---
 
-# Distribution Guide
+# Distribution Explanation
 
-The guide behind
+The reasoning behind
 [Distribution Channel](/standards/distribution/channel.md), the ruleset
 that binds a governed repo's share of the channel: its hook manifest,
-its local block, and its pin on the hook repository. This guide carries
-the reasoning; nothing here is enforced.
+its local block, and its pin on the hook repository.
 
 ## One published id
 
@@ -18,7 +17,8 @@ The manifest `.pre-commit-hooks.yaml` publishes exactly one hook,
 `playbook-lint`, backed by `scripts/playbook-lint`, which dispatches to
 every detector in its roster, `src/dev_playbook/playbook_lint.py`, and
 runs `uvx pre-commit validate-manifest` where the audited repo
-publishes a manifest of its own.
+publishes a manifest of its own
+([One published id](/standards/distribution/channel.md#one-published-id)).
 
 A consumer never enumerates detectors, so enrollment rides the pin: a
 detector added upstream reaches every consumer at its next pin bump
@@ -30,7 +30,8 @@ pre-commit clones it over unauthenticated HTTPS.
 workspace-lint's `GOVERNED` roster names every governed repo and
 nothing else; inclusion is declared there, never inferred from the
 directory listing under the workspace root, since repos land there for
-reasons the standard has no say in.
+reasons the standard has no say in
+([The roster](/standards/distribution/channel.md#the-roster)).
 
 A repo the roster omits is not audited and draws no output. A roster
 entry with no such repo under the workspace root is a false claim, and

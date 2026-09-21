@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Deviation Contract
 description: The contract a deviation runs under — the three limiters, the halt-commit-escalate lane, the PR-callout lane, and the deviation ledger
 ---

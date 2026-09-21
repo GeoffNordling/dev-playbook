@@ -109,42 +109,8 @@ specification.
      in [Completed](#completed).
   4. *Isolate the software factory.* Done 2026-09-20; the entry is in
      [Completed](#completed).
-  5. *Guide and Explanation.* Decided 2026-09-20. A type is told by the
-     kind of information it holds, never by who reads or runs it.
-     - **`Guide`, redefined:** instruction on how to do a kind of work,
-       read before doing it; organized by the work, citing rules in
-       passing; never cited to reject work. Members:
-       `harness/writing-for-agents.md`, `build/bootstrap.md`,
-       `standard/consuming.md`, `tracking/linking-issues.md`, and
-       `docs/headless.md`. A runbook differs in that invoking it does
-       the job; a guide is read, and the job is done afterwards.
-     - **`Explanation`, new:** the reasoning and mechanism behind one
-       Standard's rules, organized rule by rule, at
-       `standards/<name>/explanation.md`; never cited to reject work.
-       standards-lint admits the file by its type. The twelve
-       `docs/guides/<name>.md` become these and `docs/guides/` goes.
-     - **Target state leaves the explanations.** A Standard holds
-       predicates over state and the target state they compare against;
-       an explanation holds neither. The `protect-main` field table
-       moves into `tracking/repo-settings.md`, the two frontmatter
-       templates into `harness/runbook-conventions.md`, the two trees
-       into `build/skeleton.md`, and any predicate found only in an
-       explanation into its ruleset.
-     - **The other four.** `harness/files.md`: its table is a registry
-       `classify()` mirrors, so it becomes a ruleset under `harness/`,
-       and its prose joins the harness explanation.
-       `knowledge-organization/file-roles.md` dissolves: its terms are
-       in `CONTEXT.md`, its table is a paragraph of the
-       knowledge-organization explanation. The `docs/` files typed
-       `General-Sheet` stay so; no type is made for three files.
-     - **Trivial conduct rules are deleted**, not retyped: the red-CI
-       rule went 2026-09-20, and any like it found in the explanations,
-       a rule no one needs written down, goes the same way.
-     - **Open:** where a guide lives, `docs/guides/` or beside the
-       Standard it serves, admitted like an explanation.
-     Reason: `Guide` held four kinds of information under one name, and
-     a name that says how-to kept attracting procedures; the software
-     factory's contracts, the fifth kind, are out of scope.
+  5. *Guide and Explanation.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
   6. *Retire the card.* Delete the card, `standards/<name>/card.md`,
      and everything that exists only to read it, and bind the one type
      `Standard` to `standards/<name>/<topic>.md`.
@@ -436,6 +402,37 @@ specification.
   ledger's sections for the moved runbooks and `contract-shape.md`'s
   `adjudicator` excerpt. Verified: playbook-lint's thirteen detectors
   clean, `make check` green, 1015 tests.
+- **Guide and Explanation, 2026-09-20.** Step 5 of The system. The
+  registry defines `Guide` as instruction on how to do a kind of work
+  and adds `Explanation`, the reasoning behind one Standard's rules at
+  `standards/<name>/explanation.md`; okf-lint holds the slot,
+  `typed-explanation`, and standards-lint admits only
+  `Standard-Ruleset`, `Explanation`, and `Guide` beside a card, under
+  `directory-layout`. The twelve guides moved there, `docs/guides/` is
+  gone, and `headless.md` is a Guide. Target state moved into rulesets:
+  the `protect-main` field table, the bundle tree and the two
+  frontmatter templates, the two skeleton trees, the CONTEXT.md
+  template, and the `okf_types` example. Predicates found only in the
+  explanations became rules: a new ruleset `tracking/candidates.md`,
+  one home, entry shape, structure, in the tracking card's Define
+  cell, a promotion rule cut as procedure; and `prohibited-surfaces`, `artifacts`, the session
+  leaf's `Unknown` scope, `one-published-id`, `the-roster`,
+  `one-version-set`, `a-skip-is-machine-state`; every new id is null
+  in the verifier table. `harness/files.md` is a ruleset,
+  `harness.members`, in the harness card's Define cell;
+  `file-roles.md` is gone, its table a paragraph of the
+  knowledge-organization explanation, and `CONTEXT.md`, the viewer, and
+  `index_tree.py` point at that paragraph or the vocabulary. The
+  isolated factory's links to the moved guides were repointed so
+  ref-lint stays green. A guide has one home, `guides/`, the tree
+  reserved for the type as `standards/` and `loops/` are for theirs,
+  held by okf-lint's `typed-guide`; the six moved there, `bootstrap`,
+  `consuming`, `writing-for-agents`, `linking-issues`, `headless`, and
+  `slop-tics`, a list of actions retyped Guide, and standards-lint
+  admits ruleset and explanation only beside a card. No further
+  trivial conduct rule was found. Verified:
+  playbook-lint's thirteen detectors clean, `make check` green, 1016
+  tests.
 
 ## Acronyms
 

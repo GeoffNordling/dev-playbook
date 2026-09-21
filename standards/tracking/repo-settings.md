@@ -10,7 +10,7 @@ population: "a governed repo's GitHub settings: its merge settings and the rules
 The GitHub settings every governed repo carries.
 
 The reasoning behind the rules is the
-[Tracking Guide](/docs/guides/tracking.md).
+[Tracking Explanation](/standards/tracking/explanation.md).
 
 ## GitHub origin
 
@@ -39,5 +39,14 @@ rules in force: force pushes are blocked, and deletions are restricted.
 Every ruleset supplying one of those two rules has enforcement Active
 and an empty bypass list, and at least one of them is named
 `protect-main`.
+
+| Field | Value |
+|---|---|
+| Ruleset Name | `protect-main` |
+| Enforcement status | Active |
+| Bypass list | empty |
+| Target branches | Include default branch |
+| Restrict deletions | checked |
+| Block force pushes | checked |
 
 `tracking.default-branch-protection` · deterministic

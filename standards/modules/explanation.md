@@ -1,17 +1,15 @@
 ---
-type: Guide
-title: Module Design Guide
+type: Explanation
+title: Module Design Explanation
 description: The thinking behind the module-design rules — depth and the deletion test, seams and adapters, ports at a process boundary, and the diagrams and examples that teach them
 ---
 
-# Module Design Guide
+# Module Design Explanation
 
-The guide behind
+The reasoning behind
 [Module Design Conventions](/standards/modules/design.md), the ruleset
-that holds a module to one shape. The ruleset states each rule as a
-predicate a reviewer can decide; this guide carries the vocabulary, the
-reasoning, the diagrams, and the examples that make the rules
-intelligible. Nothing here is enforced; every rule is in the ruleset.
+that holds a module to one shape: the vocabulary, the diagrams, and the
+examples that make the rules intelligible.
 
 A module is anything with an interface and an implementation. The class
 is deliberately scale-agnostic: a function, a class, a package, and a

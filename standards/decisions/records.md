@@ -19,7 +19,7 @@ record's `description`, and follows the
 > same artifact past architecture to any hard-to-reverse decision.
 
 The reasoning behind the rules is the
-[Decisions Guide](/docs/guides/decisions.md).
+[Decisions Explanation](/standards/decisions/explanation.md).
 
 ## The bar
 

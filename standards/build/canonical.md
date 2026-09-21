@@ -16,7 +16,7 @@ material, outside every tree rule
 template.
 
 The reasoning behind the rules is the
-[Build Guide](/docs/guides/build.md).
+[Build Explanation](/standards/build/explanation.md).
 
 ## ci.yml
 
@@ -88,6 +88,13 @@ and sets `[tool.uv] package = false`. Every other value is free.
 are free, and further patterns may follow.
 
 `build.gitignore` · deterministic
+
+## One version set
+
+Every version the canonical artifacts pin, the Python interpreter, ruff,
+mypy, pytest, and each hook `rev`, is the latest stable release.
+
+`build.one-version-set` · deterministic
 
 ## The source directory
 

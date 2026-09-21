@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: Factory Operations
 description: The factory's operating contract — how a ready issue is dispatched, built, reviewed, and carried to the merge
 ---

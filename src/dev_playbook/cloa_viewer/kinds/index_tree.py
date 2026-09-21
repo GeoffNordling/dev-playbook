@@ -1,7 +1,7 @@
 """The ``index-tree`` kind: the checkout's markdown, arranged by its indexes.
 
-One view file per checkout, in the two groups the
-[File Roles](/standards/knowledge-organization/file-roles.md) guide names.
+One view file per checkout, in the two groups the vocabulary's
+[File roles](/CONTEXT.md#file-roles) names.
 The concept documents come from the walk: it starts at the root ``index.md``
 and follows every listing entry, so the tree on screen is the hierarchy the
 [Indexes](/standards/knowledge-organization/indexes.md) standard describes and

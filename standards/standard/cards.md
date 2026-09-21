@@ -24,9 +24,11 @@ the pre-commit suite stations it at the commit gate
 
 Every immediate subdirectory of `standards/` except `references/` is a
 card directory: it holds `card.md`, typed `Standard-Card`, with Define,
-Audit, Enforce, and Adopt as its H2 sections, in that order, each once,
-and the only flat files under `standards/` are `README.md` and
-`index.md`; standards-lint reports a departure.
+Audit, Enforce, and Adopt as its H2 sections, in that order, each once;
+every other `.md` file under it, `index.md` aside, is typed
+`Standard-Ruleset` or `Explanation`; and the only flat files
+under `standards/` are `README.md` and `index.md`; standards-lint
+reports a departure.
 
 `standard.directory-layout` · deterministic
 
@@ -77,7 +79,8 @@ reports an annotated bullet.
 
 `standard.define-points-only-at-rulesets` · deterministic
 
-A Guide is linked from a Standard's prose or from the Adopt cell; a tool
+An Explanation is linked from a Standard's prose, a Guide from a
+Standard's prose or from the Adopt cell; a tool
 from the Audit, Enforce, or Adopt cell; and a doc-type file from a
 Standard's prose or from a card's lead paragraph. A Standard's one-line
 summary lives once, in the directory's index listing, which carries its

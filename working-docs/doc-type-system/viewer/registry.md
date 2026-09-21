@@ -35,9 +35,8 @@ shown on screen.
 ## index-tree
 
 Per checkout. The containment tree, restricted to tracked markdown.
-Every tracked markdown file, in the two groups the
-[File Roles](/standards/knowledge-organization/file-roles.md) guide
-names: **concept documents**, arranged by the `index.md` hierarchy
+Every tracked markdown file, in the two groups the vocabulary's
+[File roles](/CONTEXT.md#file-roles) names: **concept documents**, arranged by the `index.md` hierarchy
 ([Indexes](/standards/knowledge-organization/indexes.md)), and
 **harness-owned files**, a flat list. Tracked means what
 [gitrepo.py](/src/dev_playbook/gitrepo.py) lists; the group is what

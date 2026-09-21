@@ -19,7 +19,14 @@ consumer only when its pinned `rev` moves; the release is the bump
 ([Distribution](/standards/distribution/card.md)).
 
 The reasoning behind the rules is the
-[Distribution Guide](/docs/guides/distribution.md).
+[Distribution Explanation](/standards/distribution/explanation.md).
+
+## One published id
+
+The hook repository's `.pre-commit-hooks.yaml` publishes exactly one
+hook, `playbook-lint`.
+
+`distribution.one-published-id` · deterministic
 
 ## A publisher dogfoods its manifest
 
@@ -41,3 +48,10 @@ A governed repo's `.pre-commit-config.yaml` pins the hook repository to a
 `rev`, unless the repo is the hook repository itself.
 
 `distribution.a-pinned-rev` · deterministic
+
+## The roster
+
+A governed repo is named in workspace-lint's `GOVERNED` roster, and
+every name in the roster is a repo under the workspace root.
+
+`distribution.the-roster` · deterministic

@@ -13,7 +13,7 @@ retired. It appears at the root or not at all
 ([File Skeleton](/standards/build/skeleton.md#root-only-files)).
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Glossary only
 
@@ -40,6 +40,28 @@ An entry under `## Language` in a repo's `CONTEXT.md` is the term in
 bold on its own line, its definition on the lines beneath, and, at
 most, one final `_Avoid_:` line naming the words retired in the term's
 favor.
+
+````md
+---
+type: Vocabulary
+title: {Context Name}
+description: {One-line description of the vocabulary}
+---
+
+# {Context Name}
+
+{One or two sentences on what this context is and why it exists.}
+
+## Language
+
+**Order**:
+{A one or two sentence description of the term}
+_Avoid_: Purchase, transaction
+
+**Invoice**:
+A request for payment sent to a customer after delivery.
+_Avoid_: Bill, payment request
+````
 
 `knowledge-organization.entry-shape` · deterministic
 

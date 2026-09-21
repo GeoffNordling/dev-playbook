@@ -1,14 +1,14 @@
 ---
-type: Guide
-title: Shell Guide
+type: Explanation
+title: Shell Explanation
 description: The thinking behind the shell rules — bash and not POSIX sh, shellcheck and the cost of a disable, shfmt's defaults as the bar, when a script has outgrown shell, what strict mode fixes, and why a sourced fragment is different
 ---
 
-# Shell Guide
+# Shell Explanation
 
-The guide behind [Shell Conventions](/standards/shell/conventions.md),
-the ruleset that binds a shell file in a governed repo. This guide
-carries the reasoning and the examples; nothing here is enforced.
+The reasoning behind [Shell Conventions](/standards/shell/conventions.md),
+the ruleset that binds a shell file in a governed repo, with the
+examples.
 
 ## Bash, not POSIX sh
 

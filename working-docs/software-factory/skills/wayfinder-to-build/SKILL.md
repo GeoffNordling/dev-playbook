@@ -23,7 +23,7 @@ Before doing anything else:
   end-to-end}.
 - {Read [software factory](~/workspace/dev-playbook/working-docs/software-factory/docs/software-factory.md)
   end-to-end}.
-- {Read the [module design guide](~/workspace/dev-playbook/docs/guides/modules.md); the
+- {Read the [module design explanation](~/workspace/dev-playbook/standards/modules/explanation.md); the
   qualities a good slice boundary preserves}.
 
 Then report: `READ: issue-shapes.md, software-factory.md,
@@ -49,7 +49,7 @@ the map:
 
 The hand-off takes only a **finished** map labelled `wayfinder:map`: every
 child ticket closed ({Read
-[the open sub-issues query in linking issues](~/workspace/dev-playbook/standards/tracking/linking-issues.md)}
+[the open sub-issues query in linking issues](~/workspace/dev-playbook/guides/linking-issues.md)}
 — it must return nothing) and no fog left in **Not yet specified**. {If anything is
 still open — a ticket, a fog patch, {Report exactly what is open} and end
 the session there}.
@@ -144,7 +144,7 @@ child is carried to brief-complete — and released at its own
 — later, in its own design session with full attention.
 
 Then {Read
-[linking issues](~/workspace/dev-playbook/standards/tracking/linking-issues.md)
+[linking issues](~/workspace/dev-playbook/guides/linking-issues.md)
 for the commands that wire the native relationships} and {Write to GitHub
 the wiring; every child a sub-issue of the epic, and every ordered slice
 blocked-by its predecessor}.

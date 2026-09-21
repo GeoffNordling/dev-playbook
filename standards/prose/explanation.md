@@ -1,14 +1,13 @@
 ---
-type: Guide
-title: Prose Guide
+type: Explanation
+title: Prose Explanation
 description: The thinking behind the prose rules — where a rule sits in a section, why history is cut, how a block's form is chosen, why the two voices differ, what the slop-tics catalog is, and the examples that show the casing and parallelism rules
 ---
 
-# Prose Guide
+# Prose Explanation
 
-The guide behind [Doc Conventions](/standards/prose/conventions.md),
-the ruleset that binds an authored document. This guide carries the
-examples and the reasoning; nothing here is enforced.
+The reasoning behind [Doc Conventions](/standards/prose/conventions.md),
+the ruleset that binds an authored document, with the examples.
 
 ## One rule, one place
 
@@ -26,12 +25,12 @@ ones with no `src/`." A reader who skims the lead then knows the reach.
 
 A document describes what exists and what is planned next
 ([Current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
-[Changelog residue](/standards/prose/slop-tics.md#changelog-residue)
+[Changelog residue](/guides/slop-tics.md#changelog-residue)
 names the forms the residue takes. History earns a sentence only where
 the present is unintelligible without it, a constraint that still
 binds, a decision that still governs. A Decision Record is the
 exception because it is a dated record of a past decision, frozen after
-merge ([Decisions Guide](/docs/guides/decisions.md)).
+merge ([Decisions Explanation](/standards/decisions/explanation.md)).
 
 When a real file is itself the standard, a document points at that file
 in the form the cross-reference rules set instead of restating its
@@ -62,7 +61,7 @@ prohibition itself is the rule
 
 ## The slop-tics catalog
 
-[Slop Tics](/standards/prose/slop-tics.md) is the content of the
+[Slop Tics](/guides/slop-tics.md) is the content of the
 [No slop tics](/standards/prose/conventions.md#no-slop-tics) rule: each
 tic's definition, the action that removes it, and before-and-after
 examples. The document-remove-tics skill rewrites a document against it

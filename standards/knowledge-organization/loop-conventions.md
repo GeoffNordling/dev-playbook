@@ -16,7 +16,7 @@ doc-type binds nobody, so this Standard is what binds the file to that
 encoding.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## One graph
 

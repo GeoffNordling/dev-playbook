@@ -1,16 +1,15 @@
 ---
-type: Guide
-title: Decisions Guide
+type: Explanation
+title: Decisions Explanation
 description: The thinking behind the Decision Record rules — the bar with worked examples, where a record lives, how a new record is numbered, why a record is frozen after merge, and what the optional sections are for
 ---
 
-# Decisions Guide
+# Decisions Explanation
 
-The guide behind
+The reasoning behind
 [Decision Record Conventions](/standards/decisions/records.md), the
-ruleset that binds a numbered record under a repo's `docs/decisions/`.
-This guide carries the examples and the reasoning; nothing here is
-enforced.
+ruleset that binds a numbered record under a repo's `docs/decisions/`,
+with the examples.
 
 ## The bar
 

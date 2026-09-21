@@ -15,7 +15,7 @@ reintroducing it.
 ## The container direction
 
 AFK work — headless, no user attached — has no fence today, regardless of the
-native sandbox's on/off state: [headless.md](/docs/headless.md) covers why
+native sandbox's on/off state: [headless.md](/guides/headless.md) covers why
 path-scoped permission rules don't help there. **A container** is the intended
 fence. The whole `claude` process would run inside it, so every tool — file
 tools included — sees only the directories we chose to put there.

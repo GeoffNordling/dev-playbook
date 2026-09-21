@@ -132,7 +132,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
 | `labelgen` | Render the label scheme as the table in [label-scheme.md](/standards/tracking/label-scheme.md); `--check` fails on drift |
 | `bump-pin` | Check whether one consumer repo's dev-playbook `rev` pin can move to the published head (`--check`, a probe that restores the config) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |
-| `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
+| `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook-lint` self-check; the GitHub tail is [bootstrap.md](/guides/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages and wire up the `~/.bashrc.d` loader |
 

@@ -5,7 +5,7 @@ new workspace repository from the canonical artifacts under
 ``standards/build/canonical/``, then runs the local setup steps: ``git init``,
 ``uv lock``, staging, pre-commit hook installation, and a ``playbook-lint``
 self-check. The GitHub-side tail of the procedure is prose, not code:
-``standards/build/bootstrap.md``.
+``guides/bootstrap.md``.
 """
 
 import argparse
@@ -186,8 +186,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(f"initialized {target}")
     print(
-        "next: review and commit, then follow standards/build/bootstrap.md "
-        "for the GitHub tail"
+        "next: review and commit, then follow guides/bootstrap.md for the GitHub tail"
     )
     return 0
 

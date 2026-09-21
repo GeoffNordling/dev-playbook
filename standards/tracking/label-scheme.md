@@ -37,7 +37,7 @@ renders that data as the table below. Which labels an issue carries is
 <!-- labelgen:end -->
 
 The reasoning behind the rules is the
-[Tracking Guide](/docs/guides/tracking.md).
+[Tracking Explanation](/standards/tracking/explanation.md).
 
 ## Valid labels
 

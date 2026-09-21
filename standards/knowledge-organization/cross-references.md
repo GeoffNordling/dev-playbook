@@ -19,7 +19,7 @@ source, since a record frozen at merge goes stale as its referents
 move; references to a record are checked like any other.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Reference resolves
 

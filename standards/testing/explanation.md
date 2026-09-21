@@ -1,17 +1,15 @@
 ---
-type: Guide
-title: Test Design Guide
+type: Explanation
+title: Test Design Explanation
 description: The thinking behind the testing rules — what a test verifies, the tautological test, the non-deterministic boundary, the ladder of doubles, what a fake is, where a mock stands, and why layered coverage is waste
 ---
 
-# Test Design Guide
+# Test Design Explanation
 
-The guide behind
+The reasoning behind
 [Testing Conventions](/standards/testing/conventions.md), the ruleset
-that governs a governed repo's Python test suite. The ruleset states each
-rule as a predicate a reviewer can decide; this guide carries the
-vocabulary, the reasoning, and the examples that make the rules
-intelligible. Nothing here is enforced; every rule is in the ruleset.
+that governs a governed repo's Python test suite: the vocabulary, the
+reasons, and the examples.
 
 ## What a test verifies
 
@@ -82,7 +80,7 @@ files are all cheap and deterministic
 
 A dependency reached over the network gets a **port** built for it first,
 and the double then sits at that seam; the
-[Module Design Guide](/docs/guides/modules.md) covers when a seam earns its keep
+[Module Design Explanation](/standards/modules/explanation.md) covers when a seam earns its keep
 ([Double at the port](/standards/testing/conventions.md#double-at-the-port)).
 
 ## What a fake is

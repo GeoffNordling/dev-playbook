@@ -1,5 +1,5 @@
 ---
-type: General-Sheet
+type: Guide
 title: Slop Tics
 description: The named tics in Claude's slop writing — the patterns to remove from any workspace document
 ---

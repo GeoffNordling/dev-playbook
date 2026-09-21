@@ -74,7 +74,7 @@ Every standard has a **scope** — the population it governs:
 - **Repo-scoped** — declared in one consumer repo, governing that repo
   alone. A repo stands one up when it has a convention no other repo
   shares; the recipe is
-  [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
+  [Adopting a Repo-Scoped Standard](/guides/consuming.md).
 
 Exactly two levels: a standard governs the whole workspace or a single
 repo, never an intermediate group.

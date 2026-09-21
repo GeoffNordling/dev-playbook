@@ -22,7 +22,7 @@ and is its lint. The **boundary table**, `standards/boundaries.yaml`, maps
 every address the verifier table names to the gates that run it;
 `scripts/boundary-table` writes it from the wiring and is its lint. No
 Standard says where it runs; the boundary table does. The reasoning
-behind the rules is the [Standard Guide](/docs/guides/standard.md).
+behind the rules is the [Standard Explanation](/standards/standard/explanation.md).
 
 ## Read-only
 
@@ -93,6 +93,13 @@ Every address the verifier table names runs at a gate or is a registered
 ungated audit, and no registered ungated audit runs at a gate.
 
 `standard.every-address-runs-somewhere` · deterministic
+
+### A skip is machine state
+
+A detector is skipped at a gate only where its input is machine-local
+rather than held in the repository.
+
+`standard.a-skip-is-machine-state` · stochastic
 
 ## A first-party detector
 

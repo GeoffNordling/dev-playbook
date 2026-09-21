@@ -41,6 +41,6 @@ below hold the rules.
 
 ## Adopt
 
-- [Adopting a Repo-Scoped Standard](/standards/standard/consuming.md) — the
+- [Adopting a Repo-Scoped Standard](/guides/consuming.md) — the
   consumer-repo recipe: grow the `standards/` tree, write and publish a
   conforming detector, mirror it, gate it

@@ -34,7 +34,7 @@ level up and one level down. Two reach farther by their own text,
 `CONTEXT.md`; a set is otherwise judged with no neighbour's body open.
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## An index in every directory
 

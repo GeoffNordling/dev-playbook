@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: User Checkpoints
 description: Every point where the factory stops for the user — the merge prohibition, escalation, the issue-review verdict, and the final-review pause
 ---

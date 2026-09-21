@@ -16,10 +16,10 @@ frontmatter of its own root `index.md`, an `okf_types` mapping beside
 `okf_version`; okf-lint resolves a document's `type` against the union of
 the two, and against the global table alone when the repo declares no
 `okf_types`. Declaring a local type is one step of
-[Adopting a Repo-Scoped Standard](/standards/standard/consuming.md).
+[Adopting a Repo-Scoped Standard](/guides/consuming.md).
 
 The reasoning behind the rules is the
-[Knowledge Organization Guide](/docs/guides/knowledge-organization.md).
+[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Global table
 
@@ -57,6 +57,13 @@ The declaration is the `okf_types` mapping in the frontmatter of the
 root `index.md` of a repo that does not carry
 `standards/build/canonical/`, one entry per document type the repo
 declares for itself.
+
+```yaml
+okf_version: "0.1"
+okf_types:
+  Resume: A resume markdown source, master or batch variant
+  Story: One work-experience story in SPAR form
+```
 
 `knowledge-organization.local-declaration` · deterministic
 

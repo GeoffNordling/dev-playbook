@@ -60,7 +60,7 @@ The boundary a document or a set declares: a document's frontmatter `description
 ### File roles
 
 The two axes a repository file sits on, its role and its content
-([File Roles](/standards/knowledge-organization/file-roles.md)).
+([Concept document or harness-owned file](/standards/knowledge-organization/explanation.md#concept-document-or-harness-owned-file)).
 
 **Concept document**
 Prose a reader loads to understand something. It carries OKF frontmatter, and okf-lint reads its type.
