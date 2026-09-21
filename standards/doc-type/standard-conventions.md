@@ -31,15 +31,13 @@ reports a Standard without one.
 
 ## The rule shape
 
-Each rule of a Standard is a level-two heading, a first paragraph that
-is the predicate every member of the population is held to, at most one
-block or table stating the target state the predicate compares against,
-and last a trailer line, `` `<name>.<slug>` · deterministic `` or
+Each rule of a Standard is a heading, a first paragraph, at most one
+block or table stating the target state, and last a trailer line,
+`` `<name>.<slug>` · deterministic `` or
 `` `<name>.<slug>` · stochastic ``, where `<name>` is the directory and
 `<slug>` the heading's GitHub slug; nothing follows the trailer before
 the next heading. A level-three heading sits only under a level-two
-heading that is a condition, and is then a rule bound under that
-condition.
+heading that carries no trailer, which scopes it.
 
 `doc-type.the-rule-shape` · deterministic
 

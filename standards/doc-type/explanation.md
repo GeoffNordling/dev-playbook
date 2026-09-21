@@ -83,6 +83,49 @@ members, or asks for taste, is one no verifier, script or judge,
 returns one value for, which is why each is decidable of one member at
 one moment.
 
+### The rule shape
+
+The first paragraph is the predicate every member is held to; the
+block or table is the target state it compares against. An H2 without
+a trailer is a condition: it names which members the rules under it
+bind
+([The rule shape](/standards/doc-type/standard-conventions.md#the-rule-shape)).
+
+### What a rule may state
+
+The principles a rule is admitted or refused by. A rule audit reads
+them beside the rules they explain.
+
+**A predicate is a test over state.** It is decided from the bytes of
+the repo at one commit, by reading them or by a pure function of them
+such as a formatter. It is not a test over run-time behaviour, what a
+script exits or prints; not an instruction to an author, where a
+helper sits or which double a test uses; not a fact held outside the
+files, the day a decision was made, the latest upstream release, a
+GitHub setting, git history, another repo; and not a definition that
+scopes other rules. Behaviour and instruction go to a Guide; the why
+goes to an Explanation; a scoping definition is an H2 with no trailer.
+
+**Kind is judged from the sentence, not the trailer.** A sentence a
+script decides from the files with no judgment call is deterministic;
+a sentence with a judgment word, "describes", "names the concept",
+"small against", is stochastic. Where a sentence mixes the two, the
+mechanical part stays deterministic and the judgment moves to the
+Explanation. Whether a check exists is a separate question: an
+unchecked predicate of either kind is allowed, and the check follows
+the rule.
+
+**A scoping heading is not a rule.** An H2 with no trailer names which
+members the H3 rules under it bind. It is one shape whether it has one
+child or eleven, and its definition is never repeated in the children.
+
+**Three working policies** hold for any audit of the rules. A repo
+change is the expensive way out: a rule the repo breaks is rewritten
+or deleted before the repo is fixed to meet it. There is no credit for
+rule count: delete is the default for a rule that restates another or
+binds something too small to matter. And keeping a rule because a
+detector emits its id is backwards: the detector follows the rule.
+
 ## A runbook's file
 
 A runbook is the one built doc-type whose file carries no OKF
