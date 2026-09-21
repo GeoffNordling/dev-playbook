@@ -658,7 +658,7 @@ def check_canonical_artifacts(root: Path) -> list[Finding]:
     """Diff the hook repo's canonical directory against CANONICAL_MANIFEST.
 
     Gated on the hook-repo condition: only dev-playbook carries
-    standards/build/canonical/, so only it owns the ten canonical artifacts.
+    standards/build/canonical/, so only it owns the canonical artifacts.
     """
     canon_dir = root / "standards" / "build" / "canonical"
     present = {p.name for p in canon_dir.iterdir() if p.is_file()}
