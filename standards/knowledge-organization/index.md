@@ -11,7 +11,7 @@ Ordering: reading order.
 - [Indexes](/standards/knowledge-organization/indexes.md) — The index.md file — typeless, an introduction naming what the directory holds, a listing of every concept document with its description, alphabetical unless declared otherwise, authored not generated
 - [README Content](/standards/knowledge-organization/readme-content.md) — The README content floor — an H1 and a purpose sentence, with no agent instructions, no decisions, and no roster of harness-injected files
 - [CONTEXT.md Content](/standards/knowledge-organization/context-content.md) — The CONTEXT.md vocabulary center — Vocabulary frontmatter, the Language section, the entry shape, and the rules that keep a glossary tight
-- [Cross-References](/standards/knowledge-organization/cross-references.md) — The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, and fragment anchors that match a heading's slug
+- [Cross-References](/standards/knowledge-organization/cross-references.md) — The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, fragment anchors that match a heading's distinct slug, and the link text that names the target
 
 ## Directories
 

@@ -101,8 +101,10 @@ knowledge-organization.fragment-anchor-matches-the-slug: scripts/ref-lint
 knowledge-organization.frontmatter-block: scripts/okf-lint
 knowledge-organization.glossary-only: null
 knowledge-organization.h1: scripts/repo-lint
+knowledge-organization.headings-slugify-distinctly: null
 knowledge-organization.inline-code-for-a-varying-location: null
 knowledge-organization.link-same-bundle: scripts/ref-lint
+knowledge-organization.link-text-names-heading-or-title: null
 knowledge-organization.mapping-entry-shape: scripts/okf-lint
 knowledge-organization.no-agent-instructions-or-decisions: null
 knowledge-organization.no-roster-of-harness-injected-files: null

@@ -190,9 +190,12 @@ the `Considered Options` heading of a Decision Record is exempt.
 Each heading below the H1 is a proposition the section establishes,
 in the third person; each name an encoding reads from a body as an
 action, such as a Guide step's bold run, is the imperative that names
-the action. Both are written in block language, the register of
-headlines, articles and copulas dropped, in the fewest words that
-carry the point. The heading forms, over one rule:
+the action. Exempt: a heading that states no point of its own and only
+scopes the sections under it, which names the case those sections bind.
+Both are written in block language, the register of headlines, articles
+and copulas dropped, in the fewest words that carry the point, which is
+a noun phrase wherever one carries it. The heading forms, over one
+rule:
 
 | Heading | Verdict |
 |---|---|

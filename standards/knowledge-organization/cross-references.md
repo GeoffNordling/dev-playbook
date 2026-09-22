@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Cross-References
-description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, and fragment anchors that match a heading's slug
+description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, fragment anchors that match a heading's distinct slug, and the link text that names the target
 population: "a reference from an authored document to a workspace file, directory, or skill, except inside a code block, fenced or indented, or from inside a numbered Decision Record"
 ---
 
@@ -42,6 +42,17 @@ anchor the GitHub slug of a heading the file carries.
 
 `knowledge-organization.fragment-anchor-matches-the-slug` · deterministic
 
+## Headings slugify distinctly
+
+No two headings of a markdown file carry the same GitHub slug.
+
+`knowledge-organization.headings-slugify-distinctly` · deterministic
+
+> **Why.** GitHub disambiguates a repeated slug by appending the
+> heading's position, so the second heading's anchor is positional and
+> breaks the moment the file is reordered, the failure
+> [stable named anchor](#stable-named-anchor) bars.
+
 ## Stable named anchor
 
 A reference's `#anchor` carries no number that is the heading's
@@ -49,6 +60,18 @@ position in the file; where the target numbers every heading by
 position and carries no other anchor, the reference carries no anchor.
 
 `knowledge-organization.stable-named-anchor` · deterministic
+
+## Link text names heading or title
+
+A reference's link text is the target heading's text, or the target
+document's title where the heading does not fit the citing sentence.
+
+`knowledge-organization.link-text-names-heading-or-title` · stochastic
+
+> **Why.** A heading is a proposition and a citation is most often a
+> noun phrase inside a sentence, so the two forms collide; the title is
+> the noun phrase naming the same target, and the anchor carries the
+> precision the text drops.
 
 > **Why.** A positional anchor, `#223-revision` or an in-prose
 > `§2.10`, breaks silently the moment its target is renumbered or
