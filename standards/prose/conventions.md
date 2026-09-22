@@ -17,7 +17,7 @@ replacement in a tracked `.prose-lint-vocabulary` at its root.
 
 ## One rule, one place
 
-Each rule the document states lives in the lead sentence of its section.
+Each rule the document states lives in the lead sentence of its section, except a statement of the document's own scope, which sits in the section under the H1.
 
 `prose.one-rule-one-place` · stochastic
 
@@ -40,8 +40,7 @@ is exempt.
 
 ## Point at canonical artifacts
 
-Where a file is itself the standard, the document references that file and
-does not restate its contents.
+Where a file is itself the standard, the document links that file rather than reproducing its contents; naming one entry as a worked example is not reproduction.
 
 `prose.point-at-canonical-artifacts` · stochastic
 
@@ -49,9 +48,7 @@ does not restate its contents.
 
 ## Open with purpose
 
-The opening states what the document is for and what a reader should be able
-to do after reading. It says why that matters before the reader thinks to ask,
-and addresses a reader with no prior conversation context.
+The opening states what the document is for and what a reader should be able to do after reading; an `index.md` and a `README.md` answer instead to the opening-sentence and purpose-sentence rules of the knowledge-organization Standard.
 
 `prose.open-with-purpose` · stochastic
 
@@ -73,8 +70,7 @@ The pairs:
   Items that are not parallel are prose.
 - **Inline vs callout.** A callout earns the break in flow where the aside
   would derail the argument inline.
-- **Table vs repeated structure.** The same shape with the same fields three or
-  more times is a table; anything fewer or uneven is prose with bold leads.
+- **Table vs repeated structure.** The same shape with the same fields two or more times is a table; anything fewer or uneven is prose with bold leads.
 - **Quote vs paraphrase.** The quote goes where the original wording is the
   point; the paraphrase where only the idea is.
 - **Code block vs inline code.** Multi-line, runnable, or illustrative code goes
@@ -84,9 +80,7 @@ The pairs:
 
 ## Declarative present tense
 
-Every sentence is in the present tense, except in a member of a
-[working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md),
-which may write a guess as a guess.
+Every sentence is in the present tense, except a sentence reporting a measurement or an incident that happened, and except in a member of a working documentation set, which may write a guess as a guess.
 
 `prose.declarative-present-tense` · stochastic
 
@@ -110,8 +104,6 @@ The document is a harness-loaded agent instruction: it is a `CLAUDE.md`, or
 a segment of its path inside the repository is `skills`, `rules`, or
 `agents`.
 
-`prose.harness-loaded-agent-instructions` · deterministic
-
 ### No first person
 
 A harness-loaded agent instruction never speaks in the first person: the
@@ -132,8 +124,6 @@ double-quoted utterance, an inline code span, or a fenced block.
 The document is a declarative document: it is not a `CLAUDE.md`, and no
 segment of its path inside the repository is `skills`, `rules`, or `agents`.
 
-`prose.declarative-documents` · deterministic
-
 ### Third person
 
 A declarative document speaks in the declarative mood and the third person,
@@ -150,17 +140,13 @@ One name per concept holds across the document.
 
 ## Terminology: the person is the user
 
-One actor — the dispatcher, reviewer, and approver — is the `user`
-throughout the document, its frontmatter, code spans, and fenced blocks
-included, never a synonym, in any case, plural, or compound.
+One actor, the dispatcher, reviewer, and approver, is the `user` throughout the document, its frontmatter, code spans, and fenced blocks included, never a synonym, in any case, plural, or compound. A numbered Decision Record is exempt.
 
 `prose.terminology-the-person-is-the-user` · stochastic
 
 ## The banned word
 
-No tracked file of the repo, except a path `.prose-lint-exempt` lists,
-contains the word `human`, bare or plural, in any case, alone or in a
-compound, its frontmatter, code spans, and fenced blocks included.
+The file does not contain a word the workspace vocabulary bans, `WORKSPACE_VOCABULARY` in `src/dev_playbook/prose_lint.py`, bare or plural, in any case, alone or in a compound, its frontmatter, code spans, and fenced blocks included.
 
 `prose.the-banned-word` · deterministic
 
@@ -188,9 +174,18 @@ fenced block.
 ## Heading casing
 
 The H1 is in Title Case and every heading below it is in sentence case, except
-that a proper noun or a code identifier keeps its native case at any level.
+that a proper noun or a code identifier keeps its native case at any level, and
+the `Considered Options` heading of a Decision Record is exempt.
 
 `prose.heading-casing` · stochastic
+
+## Assertion headings
+
+Each heading below the H1, and each name an encoding reads from a body such as a Guide step's bold run, is an assertion: one clause stating the point its section makes, `Write docstrings that say what the thing does`, not a label naming its topic, `What a docstring says`.
+
+`prose.assertion-headings` · stochastic
+
+> **Why.** A parse shows the names and nothing beneath them, so read alone and in order the assertions are the document's argument, and labels are only its table of contents. One clause keeps a name a headline rather than a second body.
 
 ## Grammatical parallelism
 

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Runbook Conventions
-description: The format a runbook takes — front matter, the description, model and effort, the H1, completion criteria, the chain, and the rules a skill bundle and an agent definition each add
+description: The format a runbook takes — front matter, the description, model and effort, the H1, the chain, and the rules a skill bundle and an agent definition each add
 population: "a runbook: a skill bundle or an agent definition under a governed repo's .claude/ or dev-playbook's dotfiles/dot-claude/"
 ---
 
@@ -119,25 +119,12 @@ is an H1.
 
 `doc-type.body-opens-with-an-h1` · deterministic
 
-## Steps end on a completion criterion
-
-Every step of a runbook's body ends on a completion criterion: the
-condition that tells the agent the work is done.
-
-`doc-type.steps-end-on-a-completion-criterion` · stochastic
-
-> **Why.** An agent's body is the launched subagent's system prompt,
-> set at spawn: nothing reaches that agent except the launching prompt,
-> and the report travels back as the subagent's final message. A step
-> that does not say when the work is done leaves the agent nothing else
-> to read it from.
-
 ## Carries its chain
 
 Every edge of a runbook's contract is declared in the runbook's own
 file: what it accepts by the front matter `arguments` list, and each
 read, write, banned write, do, override, and report as a span in the body that
-[encoding.md](/doc-types/runbook/encoding.md) parses, except a ban the
+[encoding.md](/doc-types/runbook/encoding.md) parses, except an edge the
 span vocabulary cannot carry, which stays plain prose in the body and
 is listed in
 [residual-ledger.md](/doc-types/runbook/residual-ledger.md).
@@ -147,8 +134,6 @@ is listed in
 ## Skill
 
 The runbook is a skill.
-
-`doc-type.skill` · deterministic
 
 ### Bundle layout
 
@@ -177,13 +162,6 @@ A skill's `allowed-tools` and `disallowed-tools`, when present, are
 space-separated tool specs, as in `Bash(git *) Bash(gh *)`.
 
 `doc-type.tool-fields` · deterministic
-
-### Disallowed tools restate nothing
-
-A skill's `disallowed-tools`, when present, names no tool or call that
-a `settings.json` beside its skills root already denies.
-
-`doc-type.disallowed-tools-restate-nothing` · deterministic
 
 ### Arguments
 
@@ -219,8 +197,6 @@ A skill's `SKILL.md` body is at most 500 lines.
 ## Agent
 
 The runbook is an agent.
-
-`doc-type.agent` · deterministic
 
 ### tools
 

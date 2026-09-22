@@ -33,10 +33,8 @@ the set is the whole tree, strands included.
 
 ## Speculative voice
 
-Every member of a working documentation set writes a guess as a guess
-and sets an open question beside its topic, and the set's `ROOT.md`
-declares the set speculative. This is the whole exemption from
-[declarative present tense](/standards/prose/conventions.md#declarative-present-tense).
+Every member of a working documentation set writes a guess as a guess,
+and the set's `ROOT.md` declares the set speculative.
 
 `knowledge-organization.speculative-voice` · stochastic
 
@@ -55,23 +53,10 @@ link.
 A working documentation set is one directory under `working-docs/` at
 the repo root, `working-docs/<work>/`, holding the set's `index.md`, its
 `ROOT.md`, and its members under lowercase kebab-case names, flat or in
-subdirectories — the one
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes a set, here named and placed.
+subdirectories, except a member whose kind fixes its name (`README.md`,
+`PROMPT.md`, `SKILL.md`, `CLAUDE.md`, a Python module).
 
 `knowledge-organization.where-a-set-lives` · deterministic
-
-## A set stands on main
-
-A working documentation set, the one
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes a set, is present on `main`.
-
-`knowledge-organization.a-set-stands-on-main` · deterministic
-
-> **Why.** The speculative voice lets a set stand on `main`: a reader
-> meets a guess marked as a guess, and the worklist shows where the
-> work is.
 
 ## `working-docs/` holds only sets
 
@@ -97,10 +82,11 @@ file: the set's `ROOT.md`, or, where the work splits into strands, the
 ## Buckets
 
 Every fact in a member of a working documentation set sits under a named
-section, its bucket
-([one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
-made navigable), and a bucket holds facts of its own type only. A
-bucket is one of the buckets below, or one the member coins where none
+section, its bucket, and a bucket holds facts of its own type only; the
+section under the member's H1, which says what the member is and what it
+is for, is exempt.
+
+A bucket is one of the buckets below, or one the member coins where none
 of them fits; material awaiting triage sits under `Unfiled`. The named
 buckets:
 

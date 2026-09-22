@@ -25,9 +25,8 @@ typed `Standard`, one population and its rules, at
 
 Every immediate subdirectory of `standards/` is a Standard directory: it
 holds at least one file typed `Standard`, and every other `.md` file
-under it, `index.md` aside, is typed `Standard`; the
-only flat files under `standards/` are `README.md` and `index.md`;
-standards-lint reports a departure.
+under it, `index.md` aside, is typed `Standard`; the only flat `.md`
+files under `standards/` are `README.md` and `index.md`.
 
 `standard.directory-layout` · deterministic
 

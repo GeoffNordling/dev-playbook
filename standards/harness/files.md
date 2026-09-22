@@ -17,8 +17,8 @@ Code is the only harness in use.
 
 ## Members
 
-Every file the harness consumes is a member of the table below, with
-the class the table gives it.
+Every file under `.claude/` or `dotfiles/dot-claude/` in a governed
+repo matches a member row of the table below.
 
 | Member | Class | Role | Content standard |
 |---|---|---|---|
@@ -32,6 +32,10 @@ the class the table gives it.
 
 `harness.members` · deterministic
 
+> **Why.** Claude Code fixes which files it reads; the table is the
+> workspace's record of that set, and the predicate holds the repo to
+> the table.
+
 ## Location
 
 A skill is `<skills root>/<name>/SKILL.md` and an agent is
@@ -44,6 +48,7 @@ A skill is `<skills root>/<name>/SKILL.md` and an agent is
   SKILL.md          # required
   references/       # optional: docs the skill loads on demand
   scripts/          # optional: helper scripts the skill invokes
+  agents/           # optional: agent definitions the skill launches
 <agents root>/<agent-name>.md
 ```
 

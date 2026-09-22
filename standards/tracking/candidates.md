@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Candidates
-description: The register of a repo's uncommitted future work — one CANDIDATES.md at the root, one home per unit of work, the entry shape, and the headings and nesting
+description: The register of a repo's uncommitted future work — one CANDIDATES.md at the root, the entry shape, and the headings and nesting
 population: "a repo's CANDIDATES.md"
 ---
 
@@ -22,17 +22,10 @@ its absence means nothing has been recorded yet.
 > chosen to build it, and deciding to write its brief is what ends
 > that.
 
-## One home
-
-A unit of work is a Candidate or an issue, never both.
-
-`tracking.one-home` · stochastic
-
 ## Entry shape
 
-An entry is one list item: a bolded short name, an em dash, then one or
-two sentences of intent, with no fields, no acceptance criteria, and no
-checkboxes.
+An entry is one list item: a bolded name, an em dash, then at most two
+sentences, with no fields, no acceptance criteria, and no checkboxes.
 
 ```markdown
 - **Column selection** — the export is all-or-nothing today; users want to

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Decision Record Conventions
-description: How a Decision Record is written, from the bar that warrants one and the directory that holds it to its scope, template, date, numbering, status vocabulary, optional sections, and the pin on an external-convention evaluation
+description: How a Decision Record is written, from the bar that warrants one and the directory that holds it to its template, date, numbering, status vocabulary, and the pin on an external-convention evaluation
 population: "a Decision Record: a numbered NNNN-slug.md file under a repo's docs/decisions/, except that directory's index.md and README.md"
 ---
 
@@ -34,14 +34,6 @@ were genuine alternatives with a specific reason for the choice.
 > record earns its place by stopping the next engineer from undoing a
 > deliberate choice or re-proposing a rejected one.
 
-## Scope
-
-A Decision Record sits in the `docs/decisions/` of the repo it governs,
-and a decision that governs several repos sits in the repo that governs
-them.
-
-`decisions.scope` · stochastic
-
 ## The directory
 
 The `docs/decisions/` directory holding a Decision Record holds numbered
@@ -59,18 +51,11 @@ record.
 
 `decisions.sequential-numbering` · deterministic
 
-## Slug case
-
-A Decision Record's slug, the part of its filename after `NNNN-` and
-before `.md`, is kebab-case.
-
-`decisions.slug-case` · deterministic
-
 ## Template
 
 A Decision Record's frontmatter holds `type: Decision-Record`, a
 `title`, a `description`, and a `date`; its body opens with an H1
-repeating the `title`, followed by one to three sentences:
+repeating the `title`.
 
 ```md
 ---
@@ -89,35 +74,20 @@ date: {YYYY-MM-DD}
 
 ## Context, decision, and reason
 
-A Decision Record's opening sentences give the context the decision was
-made in, the decision itself, and the reason for it.
+A Decision Record's body gives the context the decision was made in,
+the decision itself, and the reason for it.
 
 `decisions.context-decision-and-reason` · stochastic
 
 ## Date
 
-A Decision Record's `date` frontmatter key holds the day the decision
-was made, written `YYYY-MM-DD`, or holds `null` where that day is
-unrecoverable.
+A Decision Record's `date` frontmatter key holds a `YYYY-MM-DD` date or
+`null`
 
 `decisions.date` · deterministic
 
-## Immutable after merge
-
-A Decision Record that `main` carries has its body, and every
-frontmatter key other than `status`, byte-identical to the first
-commit on `main` that carries the file.
-
-`decisions.immutable-after-merge` · deterministic
-
-> **Why.** A record is the one exemption from
-> [Current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only):
-> it is a dated record of a past decision, the choice made, the
-> alternatives rejected, and the context that forced it. A body
-> rewritten to match later state, or to correct a decision that was
-> reversed, destroys the one thing the record holds. The `status` key
-> is the one exception, so a superseded record points at the record
-> that replaced it.
+> **Why.** The date is the day the decision was made, not the writing
+> day, and null where that day is unrecoverable.
 
 ## Status vocabulary
 
@@ -134,25 +104,16 @@ directory that holds a record numbered `NNNN`.
 
 `decisions.supersession-target` · deterministic
 
-## Optional sections
-
-A Decision Record's body carries no section beyond the H1 except
-`Considered Options` and `Consequences`, and neither of those sections
-is empty.
-
-`decisions.optional-sections` · deterministic
-
 ## External-convention evaluation
 
 A Decision Record's decision is a verdict on something outside the
 workspace: a skill, a skill collection, a framework, or a technique.
 
-`decisions.external-convention-evaluation` · stochastic
-
 ### What was examined
 
-The Decision Record names the source and pins the exact state examined:
-the repository SHA, the release or version, and the date it was read.
+A Decision Record whose decision is a verdict on something outside the
+workspace names the source and pins at least one of the repository SHA
+and the release or version examined.
 
 `decisions.what-was-examined` · stochastic
 

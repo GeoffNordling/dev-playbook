@@ -44,20 +44,20 @@ exists, or who develops it.
 
 ## One scope
 
-Every rule in a `CLAUDE.md` sits at the widest scope where it is true,
-and at exactly one: the global source carries what holds for every
-session on the machine, a root file carries what holds for its repo
-alone, and a nested `<dir>/CLAUDE.md` carries only the delta from the
-files above it.
+A nested `<dir>/CLAUDE.md` states no rule already stated in the root
+file above it.
 
 `harness.one-scope` · stochastic
+
+> **Why.** A rule sits at the widest scope where it is true:
+> machine-wide in the global source, repo-wide in the root file, only
+> the delta in a nested file. A repo can check one part of that, the
+> nested file against its root.
 
 ## Global file
 
 The `CLAUDE.md` sits at `dotfiles/dot-claude/CLAUDE.md`, the global
 source linked to `~/.claude/CLAUDE.md`.
-
-`harness.global-file` · deterministic
 
 ### Two sections
 

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Documentation Sets
-description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, every row inside the set, one home for every fact, distinct concerns, and terms defined once
+description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, every row inside the set, one home for every fact, distinct concerns, and terms that cross sets
 population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Mirror mirror among them"
 ---
 
@@ -29,7 +29,7 @@ The rules bind the set level, how the members relate to each other and
 to their concerns; what one member holds is [Doc Conventions](/standards/prose/conventions.md)'s.
 Every rule here reads one set: its index, its members, and the index one
 level up and one level down. Two reach farther by their own text,
-[one home](#one-home) into any set or repo and
+[one home](#one-home) into any set and
 [terms that cross sets](#terms-that-cross-sets) into the repo's
 `CONTEXT.md`; a set is otherwise judged with no neighbour's body open.
 
@@ -66,9 +66,8 @@ expects each row they find.
 
 A fact, rule, or decision has one home, the member whose concern is the
 thing the fact binds and the most general such member where the fact
-still holds; every other document links there, whether it sits in the
-same set, another set, or another repo, and states the fact without its
-reason.
+still holds; every other document in this repo links there and states
+the fact without its reason.
 
 `knowledge-organization.one-home` · stochastic
 
@@ -89,16 +88,6 @@ A child set's introduction names a concern its parent's introduction
 does not.
 
 `knowledge-organization.distinct-from-the-parent` · stochastic
-
-## Terms defined once
-
-A term is defined once, in the member whose concern it is, and every
-other use links that definition.
-
-`knowledge-organization.terms-defined-once` · stochastic
-
-> **Why.** A definition is a fact like any other, so its home follows
-> [one home](#one-home).
 
 ## Terms that cross sets
 

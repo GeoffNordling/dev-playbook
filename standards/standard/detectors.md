@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Detectors
-description: The check contract behind the verifier and boundary tables — the two tables, read-only, clean on an absent surface, and the shim, git-root, hosting, rule-id, output, and exit-code rules a first-party script obeys
+description: The check contract behind the verifier and boundary tables — the two tables, read-only, and the shim, git-root, hosting, and canonical-template rules a first-party script obeys
 population: "a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the two tables at standards/verifiers.yaml and standards/boundaries.yaml"
 ---
 
@@ -25,23 +25,12 @@ Standard says where it runs; the boundary table does.
 
 ## Read-only
 
-A detector leaves everything git tracks as it found it.
+A first-party detector run without an explicit write flag leaves
+everything git tracks as it found it; `verifier-table --write` and
+`boundary-table --write` are enforcement, and a dependency the verifier
+table names may write at its gate, `ruff-format` and `shfmt -w`.
 
-`standard.read-only` · deterministic
-
-## An absent surface is clean
-
-A detector whose surface is optional, a `skills/`, `standards/`, or
-`loops/` tree, exits 0 and reports no finding in a repo that has no such
-surface.
-
-`standard.an-absent-surface-is-clean` · deterministic
-
-> **Why.** The alternative, dropping the detector from repos that
-> lack the surface, would make the hook set differ from repo to repo
-> and would leave a repo unpoliced the day it grows the surface. The
-> gap closes inside the detector, so the wiring stays the same
-> everywhere.
+`standard.read-only` · stochastic
 
 ## The verifier table
 
@@ -120,20 +109,19 @@ rather than held in the repository.
 
 The detector is a script the audited repo hosts at `scripts/<name>`.
 
-`standard.a-first-party-detector` · deterministic
-
 ### Thin shims
 
-The script holds no rule logic of its own: it puts the host repo's
-package on the import path and calls that package's entry point.
+The script holds no rule logic: apart from its shebang and inline
+metadata block, its statements are at most one that puts the host repo's
+package on `sys.path`, one import from that package, and one call of the
+imported entry point.
 
 `standard.thin-shims` · deterministic
 
 ### Git runs against the given root
 
-A first-party detector that runs git addresses the repository it was
-given even when its environment carries an absolute `GIT_DIR` that names
-another repository.
+A first-party detector that runs git clears the variables
+`git rev-parse --local-env-vars` lists from the child environment.
 
 `standard.git-runs-against-the-given-root` · deterministic
 
@@ -145,39 +133,19 @@ another repository.
 
 ### The hosting pattern
 
-A first-party detector is published as a hook in its repo's
-`.pre-commit-hooks.yaml` and has a row in the validation table of
-`scripts/README.md` where the repo has that file.
+A first-party detector is reachable from its repo's published hook,
+named in the `playbook-lint` roster, wired as a `scripts/` hook its
+`.pre-commit-config.yaml` and `.pre-commit-hooks.yaml` both carry, or
+registered as an ungated audit, and has a row in a `scripts/README.md`
+script table where the repo has that file.
 
 `standard.the-hosting-pattern` · deterministic
 
 ### Offered by the canonical template
 
-A first-party detector in the repo that carries
-`standards/build/canonical/` is a hook of that canonical
-`.pre-commit-config.yaml`'s pinned block.
+A first-party detector the repo carrying `standards/build/canonical/`
+publishes in `.pre-commit-hooks.yaml` is a hook of that canonical
+`.pre-commit-config.yaml`'s pinned dev-playbook block, which offers
+exactly the ids that manifest publishes.
 
 `standard.offered-by-the-canonical-template` · deterministic
-
-### List rules
-
-A first-party detector answers `--list-rules` by printing every rule id
-it can emit, one per line, and exiting 0.
-
-`standard.list-rules` · deterministic
-
-### Finding format
-
-A finding is one line, `location:line: <rule id> message`: a colon after
-the location, single spaces, the location a repo-relative path, or the
-member's name where the member is not a file, and `:line` omitted for a
-finding on the whole member.
-
-`standard.finding-format` · deterministic
-
-### Exit codes
-
-A first-party detector exits 0 when clean, 1 when it has findings, and 2
-when it cannot run.
-
-`standard.exit-codes` · deterministic

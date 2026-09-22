@@ -74,8 +74,6 @@ place.
 
 The `index.md` at the repository root.
 
-`knowledge-organization.the-root-index` · deterministic
-
 ### OKF version declared
 
 The `index.md` at the repository root declares `okf_version` in its

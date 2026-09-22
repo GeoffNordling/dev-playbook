@@ -68,8 +68,6 @@ No file named `requirements.txt` exists anywhere in the tree.
 
 A repo in which `pyproject.toml` exists at the root.
 
-`build.python` · deterministic
-
 ### uv.lock and .python-version
 
 `uv.lock` is tracked and `.python-version` exists, both at the root.
@@ -101,8 +99,6 @@ A Python repo in which `src/` exists.
 └── tests/
 ```
 
-`build.python-package` · deterministic
-
 > **Why.** The condition is a conjunction on purpose: `src/` is the
 > default source root of most JavaScript build tools as well, so a
 > repo without `pyproject.toml` is not Python, whatever it keeps in
@@ -121,23 +117,8 @@ names.
 A repo in which `src/` exists beside a root `pyproject.toml`, or
 `scripts/` holds a [Python file](/standards/build/python.md#scripts).
 
-`build.python-source` · deterministic
-
 ### tests/ present
 
 `tests/` exists and is not empty.
 
 `build.tests-present` · deterministic
-
-## JavaScript
-
-A repo in which `package.json` exists at the root.
-
-`build.javascript` · deterministic
-
-### Lockfile committed
-
-A lockfile, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock`,
-or `bun.lockb`, is tracked beside `package.json`.
-
-`build.lockfile-committed` · deterministic

@@ -51,11 +51,15 @@ description: {One-line description of the vocabulary}
 
 ## Language
 
-**Order**:
+### Orders
+
+{One or two sentences on what this group of terms covers.}
+
+**Order**
 {A one or two sentence description of the term}
 _Avoid_: Purchase, transaction
 
-**Invoice**:
+**Invoice**
 A request for payment sent to a customer after delivery.
 _Avoid_: Bill, payment request
 ````
@@ -64,9 +68,10 @@ _Avoid_: Bill, payment request
 
 ## Tight definitions
 
-An entry's definition in a repo's `CONTEXT.md` is one sentence that says
-what the term is, and where a concept document defines the term the
-definition links that document.
+An entry's definition in a repo's `CONTEXT.md` is at most two
+sentences: one that says what the term is, and at most one more that
+sharpens it; where a concept document defines the term the definition
+links that document.
 
 `knowledge-organization.tight-definitions` · stochastic
 

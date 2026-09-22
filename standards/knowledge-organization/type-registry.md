@@ -24,8 +24,6 @@ The declaration is the `## Types` table of
 `standards/knowledge-organization/document-types.md`, in the repo that
 carries `standards/build/canonical/`.
 
-`knowledge-organization.global-table` · deterministic
-
 ### Row shape
 
 Every row of the `## Types` table below its header holds, in its first
@@ -37,9 +35,11 @@ multi-word name: `Decision-Record`, `Candidate-List`, `README`.
 ### Row description
 
 Every row of the `## Types` table below its header holds, in its second
-cell, a non-empty one-line description of what the type is.
+cell, non-empty text on one line.
 
 `knowledge-organization.row-description` · deterministic
+
+> **Why.** The second cell is a description a reader picks the type by.
 
 ### Alphabetical order
 
@@ -62,8 +62,6 @@ okf_types:
   Story: One work-experience story in SPAR form
 ```
 
-`knowledge-organization.local-declaration` · deterministic
-
 > **Why.** Frontmatter, not a document under the consumer's own
 > `standards/` tree: that tree is the meta-standard's population, so a
 > registry document there could not pass, and a path that mirrors
@@ -73,10 +71,11 @@ okf_types:
 ### Mapping entry shape
 
 Each entry's key is a type name in Title Case, hyphen-joined for a
-multi-word name, and its value is a non-empty one-line description of
-the type.
+multi-word name, and its value is non-empty text on one line.
 
 `knowledge-organization.mapping-entry-shape` · deterministic
+
+> **Why.** The value is a description a reader picks the type by.
 
 ### Alphabetical keys
 

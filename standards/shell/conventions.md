@@ -54,8 +54,6 @@ default options.
 
 The shell file has the executable bit set.
 
-`shell.executable-scripts` · deterministic
-
 ### Glue only
 
 An executable script wires tools together and nothing more: it defines no
@@ -84,8 +82,6 @@ first command is `set -euo pipefail`.
 
 The shell file is under `.bashrc.d/`.
 
-`shell.sourced-fragments` · deterministic
-
 ### No shebang, no strict mode
 
 A sourced fragment carries neither a shebang nor `set -euo pipefail`.
@@ -102,14 +98,3 @@ A sourced fragment carries neither a shebang nor `set -euo pipefail`.
 A sourced fragment opens with a `# shellcheck shell=bash` directive.
 
 `shell.dialect-directive` · deterministic
-
-### Bounded to shell integration
-
-A sourced fragment holds only what mutates the parent shell: directory
-changes, aliases, and completions.
-
-`shell.bounded-to-shell-integration` · stochastic
-
-> **Why.** The boundary is the one job a child Python process cannot
-> do: it cannot change the parent's directory, define its aliases, or
-> register its completions.

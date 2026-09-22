@@ -59,7 +59,7 @@ same set.
 `operations` and `frontmatter`; every other class in its block is
 nested inside that one, extends nothing, and declares no operations.
 
-`doc-type.one-base` · stochastic
+`doc-type.one-base` · deterministic
 
 > **Why.** One class per doc-type keeps the blocks a module a reader
 > holds in mind; a part is a class nested in its DocType, so that a
@@ -97,8 +97,7 @@ that every file of the type is a member of it.
 
 ## One sentence
 
-`definition.md` opens with one sentence that says what one instance is
-and what the doc-type does.
+`definition.md` opens with one sentence that says what one instance is.
 
 `doc-type.one-sentence` · stochastic
 

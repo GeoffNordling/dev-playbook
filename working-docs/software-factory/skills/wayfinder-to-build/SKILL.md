@@ -23,7 +23,7 @@ Before doing anything else:
   end-to-end}.
 - {Read [software factory](~/workspace/dev-playbook/working-docs/software-factory/docs/software-factory.md)
   end-to-end}.
-- {Read the [Module Design standard](~/workspace/dev-playbook/standards/modules/design.md); the
+- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module); the
   qualities a good slice boundary preserves}.
 
 Then report: `READ: issue-shapes.md, software-factory.md,

@@ -28,10 +28,13 @@ encoding. The tree the file sits in is
 ## The population
 
 A file typed `Standard` names the population its rules bind in its
-frontmatter: a `population` key holding one phrase; standards-lint
-reports a Standard without one.
+frontmatter: a `population` key holding one phrase.
 
 `doc-type.the-population` · deterministic
+
+> **Why.** standards-lint reports a Standard without a population. What
+> a detector reports is not part of the predicate, so the clause lives
+> here.
 
 
 ## The rule shape
@@ -46,6 +49,12 @@ heading sits only under a level-two heading that carries no trailer,
 which scopes it.
 
 `doc-type.the-rule-shape` · deterministic
+
+> **Why.** The first paragraph is the predicate every member is held
+> to; the block or table is the target state it compares against. An H2
+> without a trailer is a condition: it names which members the rules
+> under it bind. It is one shape whether it has one child or eleven,
+> and its definition is never repeated in the children.
 
 
 ## The document's why
@@ -63,6 +72,20 @@ Each rule's predicate is true or false of one member of the population
 at one moment, with no comparison to another member and no taste.
 
 `doc-type.decidable-predicates` · stochastic
+
+> **Why.** A predicate is decided from the bytes of the repo at one
+> commit, by reading them or by a pure function of them such as a
+> formatter. It is not a test over run-time behaviour, what a script
+> exits or prints; not an instruction to an author; not a fact held
+> outside the files, the day a decision was made, the latest upstream
+> release, a GitHub setting, git history, another repo; and not a
+> definition that scopes other rules. Behaviour and instruction go to a
+> Guide, the why to the why block, a scoping definition to an H2 with
+> no trailer. Kind is judged from the sentence, not the trailer: a
+> sentence a script decides from the files with no judgment call is
+> deterministic, a sentence with a judgment word is stochastic, and
+> where a sentence mixes the two the mechanical part stays
+> deterministic and the judgment moves to the why block.
 
 
 ## A why states no predicate

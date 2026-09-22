@@ -123,10 +123,13 @@ are free, and further patterns may follow.
 
 ## One version set
 
-Every version the canonical artifacts pin, the Python interpreter, ruff,
-mypy, pytest, and each hook `rev`, is the latest stable release.
+Every version the canonical artifacts pin in more than one file carries
+the same value in each
 
 `build.one-version-set` · deterministic
+
+> **Why.** The pins are meant to be the latest stable releases, bumped
+> together; that is why a version pinned in two files must agree.
 
 ## The source directory
 

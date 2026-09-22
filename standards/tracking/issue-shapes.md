@@ -9,8 +9,8 @@ population: "a GitHub issue in a governed repo"
 
 A GitHub issue in a governed repo is committed work, at any size. Work
 not yet decided on is a Candidate in `CANDIDATES.md`
-([Candidates](/standards/tracking/candidates.md)), and a unit of
-work sits in one home, never both. An issue is one of five species, told from
+([Candidates](/standards/tracking/candidates.md)). An issue is one of
+five species, told from
 its labels and its sub-issues, and each species fixes the labels the
 issue carries and the headings its body carries. The labels are
 [Label Scheme](/standards/tracking/label-scheme.md)'s; the calls that
@@ -44,8 +44,8 @@ heading and carried by a separate issue that carries `phase:intake`.
 
 ## User intent
 
-Where an issue's body carries a `User intent` heading, what stands under
-it is the user's own words for this issue, never an agent's paraphrase.
+An issue's `User intent` section is written in the user's voice, not an
+agent's paraphrase.
 
 `tracking.user-intent` · stochastic
 
@@ -63,8 +63,6 @@ label other than `phase:intake`, closes every code fence its body opens.
 ## Build leaf
 
 The issue has no sub-issues and carries `mode:direct`.
-
-`tracking.build-leaf` · deterministic
 
 ### Build labels
 
@@ -107,26 +105,17 @@ What happens after the work, including edge cases and error conditions.
 
 `tracking.build-headings` · deterministic
 
-### Prohibited surfaces
-
-A build leaf's `Prohibited surfaces` names only the paths whose touching
-is a real hazard.
-
-`tracking.prohibited-surfaces` · stochastic
-
 ### Artifacts
 
 Where a build leaf's body carries an `Artifacts` section, each block
 under it sits in a code fence, four backticks when the block has fences
 of its own.
 
-`tracking.artifacts` · deterministic
+`tracking.artifacts` · stochastic
 
 ## Spike
 
 The issue has no sub-issues and carries `mode:spike`.
-
-`tracking.spike` · deterministic
 
 ### Spike labels
 
@@ -158,8 +147,6 @@ What a good answer looks like.
 ## Session leaf
 
 The issue has no sub-issues and carries `mode:session`.
-
-`tracking.session-leaf` · deterministic
 
 ### Session labels
 
@@ -195,8 +182,6 @@ decision.
 
 The issue has sub-issues and carries no `wayfinder:*` label.
 
-`tracking.epic` · deterministic
-
 ### Category only
 
 An epic carries exactly one `category:*` label, a value of the label
@@ -225,20 +210,11 @@ An epic's body does not list its sub-issues.
 
 `tracking.no-child-list` · stochastic
 
-### Standing rulings
-
-Where an epic's body carries a `Standing rulings` heading, the rulings
-under it are a numbered list.
-
-`tracking.standing-rulings` · deterministic
-
 ## Wayfinder map or ticket
 
 The issue carries a `wayfinder:*` label: `wayfinder:map` makes it a
 **map**, and any other `wayfinder:*` value makes it a **decision
 ticket**.
-
-`tracking.wayfinder-map-or-ticket` · deterministic
 
 ### Wayfinder labels
 

@@ -67,7 +67,8 @@ non-empty and does not end with a period.
 ## Description voice
 
 A concept document's `description` is a sentence fragment in the present
-tense that names what the document is or what it governs.
+tense that names what the document is, what it governs, or, for a
+`Decision-Record`, the decision it records.
 
 `knowledge-organization.description-voice` · stochastic
 

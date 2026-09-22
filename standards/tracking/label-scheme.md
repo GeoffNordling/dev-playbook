@@ -35,15 +35,3 @@ renders that data as the table below. Which labels an issue carries is
 | `wayfinder:task` | A decision ticket resolved by manual work that unblocks a decision. |
 | `origin:deferral` | Opened by the factory to hold work a review suggested and the run deferred. |
 <!-- labelgen:end -->
-
-## Valid labels
-
-A governed repo's GitHub labels are exactly the labels declared in the
-scheme data `src/dev_playbook/label_scheme.json`, each carrying the
-color and the description that data gives it.
-
-`tracking.valid-labels` · deterministic
-
-> **Why.** No label names a blocked state, because blocked is read
-> from an issue's open blockers, and a minted label would drift from
-> the truth the tracker already holds.

@@ -7,14 +7,20 @@ description: What to settle before writing code or a test — the module's small
 # Design and Testing
 
 How a module is shaped and how the tests that cross its interface are
-written. A **module** is anything with an interface and an
-implementation — a function, a class, a package, a tier-spanning slice —
-and its **interface** is everything a caller must know to use it
-correctly: the type signature, and with it the invariants, the ordering
-constraints, the error modes, the required configuration, and the
-performance characteristics
-([Module Design Conventions](/standards/modules/design.md)). Shaping a
-module comes first, because the interface it leaves is the surface the
+written.
+
+A module in a governed repo's source: anything with an interface and an
+implementation. The class is deliberately scale-agnostic, and a function, a
+class, a package, and a tier-spanning slice are each a member, bound alike.
+
+A module has exactly one **interface**, the surface it presents to its callers
+and to its tests. The interface is everything a caller must know to use the
+module correctly: the type signature, and with it the invariants, the ordering
+constraints, the error modes, the required configuration, and the performance
+characteristics. The **implementation** is what sits inside the module, its
+body of code.
+
+Shaping a module comes first, because the interface it leaves is the surface the
 tests cross: writing one test, choosing a double, and setting up and
 tearing down all start from that surface. The references between the
 sequences hold what is consulted rather than performed — the seams an

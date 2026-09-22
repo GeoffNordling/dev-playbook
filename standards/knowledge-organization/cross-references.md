@@ -2,7 +2,7 @@
 type: Standard
 title: Cross-References
 description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, and fragment anchors that match a heading's slug
-population: "a reference from an authored document to a workspace file, directory, or skill, except inside a fenced code block, or from inside a numbered Decision Record"
+population: "a reference from an authored document to a workspace file, directory, or skill, except inside a code block, fenced or indented, or from inside a numbered Decision Record"
 ---
 
 # Cross-References
@@ -11,9 +11,9 @@ A reference from one document to another, or to a directory or a skill.
 Which form it takes depends on where the target lives, this repo or
 another, and on whether the referencing file has a fixed repo root, a
 single repo it is always read from. Both link forms are inline; there
-is no separate citations section. A fenced code block, triple backticks
-or `~~~`, may hold `~/workspace/` and `/`-root paths in shell examples
-or sample output, and a reference inside it is out of scope. A numbered
+is no separate citations section. A code block, fenced or indented, may
+hold `~/workspace/` and `/`-root paths in shell examples or sample
+output, and a reference inside it is out of scope. A numbered
 [Decision Record](/standards/decisions/records.md) is exempt as a
 source, since a record frozen at merge goes stale as its referents
 move; references to a record are checked like any other.
@@ -25,14 +25,15 @@ move; references to a record are checked like any other.
 
 ## Reference resolves
 
-A reference names a file or a directory that exists. A root-absolute
-target resolves against the repository root of the checkout the
-referencing file is read in; a `~/workspace/<repo>/` target naming that
-same repository resolves against that checkout too, and a
-`~/workspace/<repo>/` target naming any other repository resolves at
-its absolute path under `~/workspace/`.
+A reference names a file or a directory that exists in the referencing
+file's own repository.
 
 `knowledge-organization.reference-resolves` · deterministic
+
+> **Why.** A `~/workspace/<repo>/` target naming another repository
+> resolves against that repo's main checkout. A repo cannot check the
+> other side from its own files, so the predicate binds same-repo
+> targets.
 
 ## Fragment anchor matches the slug
 
@@ -43,11 +44,9 @@ anchor the GitHub slug of a heading the file carries.
 
 ## Stable named anchor
 
-A reference's `#anchor` names its target heading by the words of the
-heading and carries no number that is the heading's position in the
-file. Where the target numbers every heading by position and carries no
-other anchor, the reference drops the anchor and names the concept the
-heading carries in the link text.
+A reference's `#anchor` carries no number that is the heading's
+position in the file; where the target numbers every heading by
+position and carries no other anchor, the reference carries no anchor.
 
 `knowledge-organization.stable-named-anchor` · deterministic
 
@@ -71,8 +70,8 @@ workspace path, beginning `~/workspace/<repo>/`.
 
 ## Skill invocation
 
-A reference to a skill is its bare slash invocation, `/<skill-name>`,
-with no link and no code markup.
+A reference to a skill names it by its slash invocation,
+`/<skill-name>`.
 
 `knowledge-organization.skill-invocation` · deterministic
 
@@ -80,8 +79,6 @@ with no link and no code markup.
 
 The referencing file has a fixed repo root: no segment of its path
 inside the repository is `skills`, `rules`, or `agents`.
-
-`knowledge-organization.fixed-repo-root` · deterministic
 
 ### Link, same bundle
 
@@ -102,20 +99,20 @@ beginning `/` and naming the path from the repository root.
 The referencing file has no fixed repo root: a segment of its path
 inside the repository is `skills`, `rules`, or `agents`.
 
-`knowledge-organization.no-fixed-repo-root` · deterministic
-
 > **Why.** A runbook, a skill bundle, an agent definition, or a global
 > rule under `~/.claude/` is loaded from arbitrary repos, so a leading
 > `/` in one has no root to resolve against.
 
 ### Workspace path for a stable location
 
-A reference to a file at a stable location in the referencing file's
-own repository is an inline link whose target is the full
-`~/workspace/<repo>/<path>` path, unless the target is inside the
-referencing file's own skill bundle.
+A reference to a file in the referencing file's own repository is an
+inline link whose target is the full `~/workspace/<repo>/<path>` path,
+unless the target is inside the referencing file's own skill bundle.
 
 `knowledge-organization.workspace-path-for-a-stable-location` · deterministic
+
+> **Why.** The condition above says what stable means: a location
+> fixed relative to the repo root.
 
 ### Relative path inside the bundle
 

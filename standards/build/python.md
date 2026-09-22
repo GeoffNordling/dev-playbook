@@ -13,17 +13,19 @@ Standard binds it.
 
 ## Name mapping
 
-The root `pyproject.toml` sets `project.name` to the repo directory's
-name lowercased, `My-Repo` → `my-repo`, and the import package is that
-name with each hyphen an underscore, `my_repo`.
+The root `pyproject.toml` sets `project.name` to the repository's own
+name lowercased, the directory holding the shared `.git` and so the same
+from the main checkout and every worktree, `My-Repo` to `my-repo`, and
+the import package is that name with each hyphen an underscore,
+`my_repo`.
 
 `build.name-mapping` · deterministic
 
 ## Entry points
 
 `[project.scripts]` in the root `pyproject.toml` is absent, or every
-entry under it has the value `<package>.cli:main`, where `<package>` is
-the import package and `src/<package>/cli.py` defines `main`.
+entry under it has the value `<module>:main`, where `<module>` is a
+module inside the import package and that module defines `main`.
 
 `build.entry-points` · deterministic
 
@@ -31,8 +33,6 @@ the import package and `src/<package>/cli.py` defines `main`.
 
 A Python file under `scripts/`: a file whose name ends in `.py`, or a
 file with no extension whose first line is a Python shebang.
-
-`build.scripts` · deterministic
 
 ### Shebang and inline metadata
 

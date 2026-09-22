@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Guide Conventions
-description: The form a document typed Guide takes — every ordered list a sequence of steps under its own heading, each step opening with its bold name, headings that carry the gist, no trailer line, rules linked and never stated, and a description naming the work it is read before
+description: The form a document typed Guide takes — every ordered list a sequence of steps under its own heading, each step opening with its bold name, no trailer line, rules linked and never stated, and a description naming the work it is read before
 population: "a document typed Guide"
 ---
 
@@ -43,18 +43,6 @@ run names; a ranking, an enumeration, or a set of alternatives is a
 bulleted list.
 
 `doc-type.an-ordered-list-is-a-sequence` · stochastic
-
-## Headings carry the gist
-
-Each heading below the level-one heading of a document typed `Guide`
-names what its section holds specifically enough that the headings,
-read alone and in order, say what the guide covers.
-
-`doc-type.headings-carry-the-gist` · stochastic
-
-> **Why.** A reference's body may hold a diagram, a table, or a
-> fenced block that no parse reads; the heading is the one line of it
-> that reaches a reader who has not opened the file.
 
 ## No trailer
 

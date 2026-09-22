@@ -2,7 +2,7 @@
 
 When the user wants to explore alternative interfaces for a chosen deepening candidate, use this parallel sub-agent pattern. Based on "Design It Twice" (Ousterhout) — your first idea is unlikely to be the best.
 
-Uses the vocabulary of the [Module Design standard](~/workspace/dev-playbook/standards/modules/design.md) — **module**, **interface**, **seam**, **adapter**, **leverage** — and the dependency categories below.
+Uses the vocabulary of the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module) — **module**, **interface**, **seam**, **adapter**, **leverage** — and the dependency categories below.
 
 ## Dependency categories
 
@@ -13,7 +13,7 @@ When assessing a cluster of shallow modules for deepening, classify its dependen
 - **3. Remote but owned (Ports & Adapters).** Your own services across a network boundary (microservices, internal APIs). Define a **port** (interface) at the seam. The deep module owns the logic; the transport is injected as an **adapter**. Tests use an in-memory adapter. Production uses an HTTP/gRPC/queue adapter.
 - **4. True external (Mock).** Third-party services (Stripe, Twilio, etc.) you don't control. The deepened module takes the external dependency as an injected port; tests provide a mock adapter.
 
-Categories 3 and 4 are where the standard's [port at a process boundary](~/workspace/dev-playbook/standards/modules/design.md#a-port-at-a-process-boundary) rule binds. Categories 1 and 2 assert only that deepening is feasible.
+Categories 3 and 4 are where the guide's [port at a process boundary](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module) step binds. Categories 1 and 2 assert only that deepening is feasible.
 
 Recommendation shape for a category 3 or 4 dependency: *"Define a port at the seam, implement an HTTP adapter for production and an in-memory adapter for testing, so the logic sits in one deep module even though it's deployed across a network."*
 
