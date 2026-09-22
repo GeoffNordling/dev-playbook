@@ -15,9 +15,9 @@ predicates that define the set this is one member of.
 
 A markdown file is code in a fuzzy form, and the model that reads it
 is its stochastic compiler. A doc-type gives such a file what code
-has: structure, a contract, an API, and a type. The CLOA, the
-correct level of abstraction, is a view of the system derived deterministically
-from structure embedded in the files.
+has: structure, a contract, an API, and a type. The CLOA is a view of
+the system derived deterministically from structure embedded in the
+files.
 
 ## The system
 
@@ -200,4 +200,6 @@ What the picture has no place for, and where each thing goes:
 
 ## Acronyms
 
-None.
+- **CI** — Continuous Integration.
+- **CLOA** — Correct Level Of Abstraction.
+- **PR** — Pull Request.

@@ -9,7 +9,7 @@ description: The root of the doc-type system strand — the language of doc-type
 The strand that holds the language: what a doc-type is, its verbs, its
 rules as predicates, its encodings as grammar. Speculative, per
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
-It defines Loop, one of its three doc-types
+It defines Loop, one of its four doc-types
 ([Loop](/working-docs/doc-type-system/loop/ROOT.md)), and each
 encoding it writes defines an extractor of the fact base
 ([Fact Base Strand](/working-docs/doc-type-system/fact-base/ROOT.md)).
@@ -19,7 +19,7 @@ for use outside the set.
 
 ## Goal
 
-Five DocTypes, twelve verbs, in
+Four DocTypes, eleven verbs, in
 [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
 the picture of the target state; the Standard
 [Doc-Type](/standards/doc-type/doc-type.md) is the same state as
@@ -45,42 +45,24 @@ specification.
   [Terms](/working-docs/doc-type-system/ROOT.md#terms), one
   meaning each.
 - **Predicates are written one way.**
-  [Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md)
-  is how; it may become the Standard that governs it.
-- **A predicate is a test over state.** It is decided from the bytes
-  of the repo at one commit, by reading them or by a pure function of
-  them such as a formatter. It is not a test over run-time behaviour
-  (what a script exits or prints), not an instruction to an author
-  (where a helper sits, which double a test uses), not a fact held
-  outside the files (the day a decision was made, the latest upstream
-  release, a GitHub setting, git history, another repo), and not a
-  definition that scopes other rules. Behaviour and instruction go to
-  a Guide; the why goes to a `> **Why.**` block; a scoping definition
-  is an H2 with no trailer. The step 11 sort found each of these
-  mis-filed as a rule.
-- **Kind is judged from the sentence, not the trailer.** A sentence a
-  script decides from the files with no judgment call is
-  deterministic; a sentence with a judgment word ("describes",
-  "names the concept", "small against") is stochastic. Where a
-  sentence mixes the two, the mechanical part stays deterministic and
-  the judgment moves to the why block. Whether a check exists yet
-  is a separate question; an unchecked predicate of either kind is
+  [Writing Predicates](/guides/writing-predicates.md)
+  is how.
+- **A predicate is a test over state, and kind is judged from the
+  sentence.** The rule and its argument are
+  [Every predicate decidable of one member](/standards/doc-type/standard-conventions.md#every-predicate-decidable-of-one-member);
+  the step 11 sort found behaviour, instruction, outside facts, and
+  scoping definitions each mis-filed as a rule. Whether a check exists
+  yet is a separate question; an unchecked predicate of either kind is
   allowed until the detector rewrite lands.
-- **A scoping heading is not a rule.** An H2 with no trailer names
-  which members the H3 rules under it bind. It is one shape whether
-  it has one child or eleven, and its definition is never repeated in
-  the children.
-- **The why sits with the rule it argues, in the same file.** A
-  `> **Why.**` block after a rule's trailer argues that rule; one
-  ending the opening prose argues the file. The block is optional — a
-  rule may have none, and none is written for a rule whose why nobody
-  holds — and it states no predicate. Text that argues no rule is not
-  a why: a definition goes to the Standard's lead or the glossary, a
-  procedure to a Guide, and the rest is deleted. The Explanation type
-  is deleted, because the user cannot read a rule and its why across
-  two files. Decided 2026-09-21 from the scrub in step 10; the rules
-  are in
-  [Standard Conventions](/standards/doc-type/standard-conventions.md).
+- **A scoping heading is not a rule.** An H2 with no trailer is a
+  condition, per
+  [A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
+- **The why sits with the rule it argues, in the same file.** The
+  block's form is
+  [A why states no predicate](/standards/doc-type/standard-conventions.md#a-why-states-no-predicate);
+  a rule may have none. Decided 2026-09-21 from the scrub in step 10,
+  which is why the Explanation type is deleted: the user cannot read a
+  rule and its why across two files.
 - **Three working policies** that shaped the step 11 rulings and hold
   for any later audit: repo change is the expensive way out; no credit for rule count, so
   delete is the default for a rule that restates another or binds
@@ -212,7 +194,7 @@ specification.
     the same question.
   - **Its input.**
     [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md)
-    holds what step 11 leaves unchecked: the sixteen rules whose
+    holds what step 11 leaves unchecked: the fourteen rules whose
     detector tests less than the sentence, with the survey behind
     them, the thin-shim moves, the `doc-type.one-base-class` check,
     and the H2-without-trailer condition shape. The 52 deterministic
@@ -303,8 +285,7 @@ specification.
 - **Explanations migrated, the type deleted, 2026-09-21.** Step 10,
   fourth part. Thirteen Opus agents, one per family, sorted each
   `explanation.md` into rule whys, the Standard's own why, or a
-  delete, per
-  [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md).
+  delete, per the Migrate Explanations prompt, since deleted.
   The Explanation type, its registry rows, rule, okf-lint check, and
   `ADMITTED_TYPES` entry are gone; 22 inbound links repointed. The
   predicates the agents left out are in their reports, for step 11.
@@ -312,12 +293,10 @@ specification.
   are Sequence, Step, and Reference; the parse is the headings and
   the step names. The verbatim-mirror type became `Mirror` and
   Runbook's chain the chain to free the word. Five Opus agents
-  rewrote the Guides per
-  [Migrate Guides](/working-docs/doc-type-system/doc-type-system/migrate-guides.md);
+  rewrote the Guides per the Migrate Guides prompt, since deleted;
   `headless.md` moved to `docs/` as a General-Sheet. The residual
   ledger holds five entries.
 
 ## Acronyms
 
-- **CI** — Continuous Integration.
-- **PR** — Pull Request.
+None.

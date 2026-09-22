@@ -16,7 +16,7 @@ repository shows. Speculative, per
 Nothing here is decided; the one question it raises is in the top
 root's [Open](/working-docs/doc-type-system/ROOT.md#open).
 
-## Source
+## The source is one recorded talk
 
 Frank Coyle, "Agents and Ontologies," recorded in mission-control at
 `ideas/ontology-guardrails.md` on 2026-07-27. No link or venue was

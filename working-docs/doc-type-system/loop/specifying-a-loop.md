@@ -12,7 +12,7 @@ How work reaches a loop when the user is not there. Speculative, per
 ## The predicate
 
 A **predicate** is defined in [Terms](/working-docs/doc-type-system/ROOT.md#terms), and
-[Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md#the-litmus) holds the
+[Writing Predicates](/guides/writing-predicates.md#the-litmus-one-member-one-moment-one-bool) holds the
 litmus a candidate passes before it is one.
 
 A predicate says what is true of a member. It does not say why, which
@@ -22,7 +22,7 @@ runbook's.
 The verifier is a script or a judge; a rule a judge decides is
 stochastic and still a predicate. A loop's check audits it like any
 other; whether a repo boundary also runs it is that boundary's wiring.
-[Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md)
+[Writing Predicates](/guides/writing-predicates.md)
 is how one is written.
 
 ## The three written forms

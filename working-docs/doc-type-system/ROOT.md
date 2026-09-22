@@ -44,7 +44,7 @@ a selection of the fact base. Loop is a leaf.
   │  DOC-TYPE SYSTEM · the language                                │
   │  picture ······· reference-model.md                            │
   │  predicates ···· standards/doc-type/doc-type.md                │
-  │  method ········ writing-predicates.md                         │
+  │  method ········ guides/writing-predicates.md                  │
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │

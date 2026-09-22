@@ -1,22 +1,22 @@
 ---
-type: General-Sheet
+type: Guide
 title: Writing Predicates
-description: How to write a rule so a verifier can decide it — one member, one moment, one bool, the property not the witness, the file it reads named, what not how, the future not the past, no new nouns, the trailer, and what is not a predicate
+description: How to write a rule so a verifier can decide it — one member, one moment, one bool, the property not the witness, the file it reads named, what not how, the future not the past, no new nouns, the trailer, and what is not a predicate; read before writing a rule
 ---
 
 # Writing Predicates
 
-A predicate and a specification are defined in [Terms](/working-docs/doc-type-system/ROOT.md#terms).
-This guide is how to write one so that a script or a judge can decide
-it, learned from the corrections made while writing the doc-type
-system's own specification. Speculative, per
-[Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md): a guide
-for now, and likely the Standard that governs how a predicate is
-written once its own sections pass the litmus. The `/write-predicates`
-skill will point here.
+The work is writing a rule's predicate so that a script or a judge can
+decide it. A predicate and a specification are defined in
+[Terms](/working-docs/doc-type-system/ROOT.md#terms). Test each draft
+against the litmus first. The sections after it each give one habit of
+a predicate that passes, then the trailer that follows it, then what
+is not a predicate at all.
 
-## The litmus
+## The litmus: one member, one moment, one bool
 
+The rule is
+[Every predicate decidable of one member](/standards/doc-type/standard-conventions.md#every-predicate-decidable-of-one-member).
 Write the predicate as if it were `def rule(member) -> bool`. It
 passes when:
 
@@ -33,7 +33,7 @@ script, the rule is deterministic. If the answer is a judge with a
 prompt, the rule is stochastic and the predicate is the prompt. If
 there is no answer, it is not yet a predicate.
 
-## Specify the property, not the witness
+## The predicate specifies the property, not the witness
 
 A reference model is one state that satisfies the spec. Rewriting it
 as rules, "the types are Runbook, Standard, and Loop", "the verbs are
@@ -46,7 +46,7 @@ property.
 What is true of one named member only goes under a condition: a rule
 "the doc-type is Runbook", and beneath it the rules for that member.
 
-## Name what the verifier reads
+## The predicate names the file the verifier reads
 
 A verifier opens a file. Write the file: `encoding.md`, not "the
 encoding"; `contract-shape.md`, not "the contract shape". The concept
@@ -54,7 +54,7 @@ is the mapping, the class, the sentence; the file is where it is
 written, and only the file can be read. Where a verifier reads a path
 pattern, write the pattern: `doc-types/<name>/`.
 
-## Say what, never how or why
+## The predicate says what, never how or why
 
 The first paragraph is the predicate and says what is true of the
 member. The reason goes after it. The fix goes in a runbook. A
@@ -69,7 +69,7 @@ becomes parts" decides nothing. "Maps each markdown construct to one
 part of the class, and every instance parses into one object of it"
 decides.
 
-## Describe the future, never forbid the past
+## The predicate describes the future, never forbids the past
 
 A predicate says what is true of the target state. It never prohibits
 a shape that exists only today: "no Standard names the script that
@@ -79,7 +79,7 @@ predicate the new shape satisfies, and let the old shape fail it.
 
 ## No new nouns
 
-A word that is not already defined in one place is not used. Prefer
+Only a word already defined in one place is used. Prefer
 the path, `doc-types/<name>/`, to a coined name for it. Prefer the
 industry term to a local one: condition, verifier, specification.
 One meaning per word: the word used for a rule's guard is condition,
@@ -87,13 +87,15 @@ and the same word is never used in a second sense in the same
 document. Where a term is needed, define it once, in Terms,
 and link to the definition everywhere else.
 
-## The trailer
+## The trailer carries the id and the kind
 
-After the predicate paragraph, one line: the rule id, `<standard>.<slug>`,
-and the kind, deterministic or stochastic. A condition is a rule and
-carries both too.
+After the predicate paragraph, one line: the rule id, `<family>.<slug>`,
+the directory and the heading's slug, and the kind, deterministic or
+stochastic, per
+[A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
+A condition is an H2 with no trailer.
 
-## What is not a predicate
+## An objective, a goal, and a permission are not predicates
 
 - **An objective**
   ([Terms](/working-docs/doc-type-system/ROOT.md#terms))
@@ -103,7 +105,3 @@ carries both too.
 - **A permission**, "two doc-types may share a verb", is the absence of
   a rule. Write nothing, and say in the introduction that the absence
   is deliberate.
-
-## Acronyms
-
-None.

@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Detector Fixes
-description: Step 12's input — the sixteen rules whose detector tests less than the sentence, the survey of what each detector misses, the thin-shim moves, and the one-base check, none of them touched by step 11
+description: Step 12's input — the fourteen rules whose detector tests less than the sentence, the survey of what each detector misses, the thin-shim moves, and the one-base check, none of them touched by step 11
 ---
 
 # Detector Fixes
@@ -11,11 +11,11 @@ a detector that tests less than its sentence stays as it is, and the gap
 is recorded here rather than fixed. This sheet is the whole input: the
 rule ids, the survey behind them, and the two moves that ride along.
 
-## The sixteen weak checks
+## The fourteen weak checks
 
 The rules whose detector tests less than the sentence:
 
-`build.pre-commit-configyaml-holds-every-canonical-block`, `build.every-canonical-file-has-a-rule-and-every-rule-a-file`, `doc-type.entries-point-and-condition`, `doc-type.references-one-level-deep`, `doc-type.three-verb-sections`, `knowledge-organization.fragment-anchor-matches-the-slug`, `knowledge-organization.readme-holds-an-h1`, `knowledge-organization.root-absolute-path-in-the-same-repo`, `knowledge-organization.alphabetical-unless-declared-otherwise`, `knowledge-organization.one-entry-per-concept-document-and-child-directory`, `knowledge-organization.type-names-a-registered-type`, `prose.no-first-person`, `prose.no-word-the-repo-bans`, `standard.the-boundary-table-generated-from-the-wiring`, `tracking.closed-fences`, `tracking.map-sections-ticket-question`.
+`build.every-canonical-file-has-a-rule-and-every-rule-a-file`, `doc-type.entries-point-and-condition`, `doc-type.references-one-level-deep`, `doc-type.three-verb-sections`, `knowledge-organization.fragment-anchor-matches-the-slug`, `knowledge-organization.readme-holds-an-h1`, `knowledge-organization.root-absolute-path-in-the-same-repo`, `knowledge-organization.alphabetical-unless-declared-otherwise`, `knowledge-organization.one-entry-per-concept-document-and-child-directory`, `prose.no-first-person`, `prose.no-word-the-repo-bans`, `standard.the-boundary-table-generated-from-the-wiring`, `tracking.closed-fences`, `tracking.map-sections-ticket-question`.
 
 ## What each detector misses
 
