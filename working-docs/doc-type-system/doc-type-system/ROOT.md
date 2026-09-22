@@ -57,7 +57,7 @@ specification.
   definition that scopes other rules. Behaviour and instruction go to
   a Guide; the why goes to an Explanation; a scoping definition is an
   H2 with no trailer. The step 11 sort
-  ([Rule Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/rulings.md#rules-by-family))
+  ([Step 11 Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/index.md))
   found each of these mis-filed as a rule.
 - **Kind is judged from the sentence, not the trailer.** A sentence a
   script decides from the files with no judgment call is
@@ -170,7 +170,8 @@ specification.
      keep, rewrite, delete, merge with another, or fold under a
      condition. The ruling per rule, the text each ruling needs, and
      the order of the pass are in
-     [Rule Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/rulings.md).
+     [Step 11 Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/index.md),
+     one file per agent with the prompt its kind loads.
      Text that is not a predicate leaves the rule: a why becomes the
      rule's why block, a procedure goes to a Guide, a scoping
      definition becomes a condition. A rule with a judgment

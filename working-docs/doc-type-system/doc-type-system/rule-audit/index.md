@@ -1,9 +1,10 @@
 # working-docs/doc-type-system/doc-type-system/rule-audit/ — index
 
 Step 11's rule audit: the shared prompt an agent loads to audit one
-Standard family's rules, and the reports each family produces.
+Standard family's rules, the reports each family produces, the records
+the rulings left, and the work orders that apply them.
 
-Ordering: the prompt, then the reports in family order.
+Ordering: the audit prompt, the reports in family order, the records, then the work orders.
 
 - [Rule Audit Prompt](/working-docs/doc-type-system/doc-type-system/rule-audit/PROMPT.md) — The prompt one agent loads to audit one Standard family's rules — kind, detector coverage, repo state, and overlap, reported without edits or fixes
 - [Build Family Rule Audit](/working-docs/doc-type-system/doc-type-system/rule-audit/build.md) — The rule audit over the build/ family — every rule's kind, detector coverage, repo state, and overlap, with escalations for what breaks or is weakly checked
@@ -24,4 +25,6 @@ Ordering: the prompt, then the reports in family order.
 - [Issue Shapes Rule Audit](/working-docs/doc-type-system/doc-type-system/rule-audit/tracking-issue-shapes.md) — The rule audit over the tracking/ family's Issue Shapes — every rule's kind, detector coverage, repo state, and overlap, with escalations for what breaks or is weakly checked
 - [Candidates, Label Scheme, and Repo Settings Rule Audit](/working-docs/doc-type-system/doc-type-system/rule-audit/tracking-scheme.md) — The rule audit over the tracking/ family — every rule's kind, detector coverage, repo state, and overlap, with escalations for what breaks or is weakly checked
 - [Rule Audit Decision Sheet](/working-docs/doc-type-system/doc-type-system/rule-audit/decision-sheet.md) — The rulings step 11 needs from the seventeen rule-audit reports — every reclassification, low-value rule, break in this repo, and weak check on one line each, with the auditor's proposal, the reviewer's verdict, and the user's ruling
-- [Rule Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/rulings.md) — Every rule in standards/ with its ruling and the text the ruling needs, by family, plus the Guides the moved rules land in, the repo changes, the contested calls, and the order of the step 11 pass
+- [Contested Calls](/working-docs/doc-type-system/doc-type-system/rule-audit/contested-calls.md) — The twelve step 11 rows where the reviewer disagreed with the auditor, and the decision on each
+- [Detector Fixes](/working-docs/doc-type-system/doc-type-system/rule-audit/detector-fixes.md) — The sixteen rules whose detector tests less than the sentence, the thin-shim moves, and the one-base check — step 12's input, untouched by step 11
+- [apply/](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/index.md) — Step 11's work orders: the prompt each agent kind loads, and the work order each agent applies, one file per agent

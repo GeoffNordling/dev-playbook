@@ -1,0 +1,25 @@
+# working-docs/doc-type-system/doc-type-system/rule-audit/apply/ — index
+
+Step 11's work orders: the prompt each agent kind loads, and the work order each agent applies, one file per agent.
+
+Ordering: the three prompts, then the work orders in wave order, families alphabetical.
+
+- [Guide Apply Prompt](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/guide-prompt.md) — The prompt a Guide agent loads to write one Guide from the rules step 11 moves out of a Standard — what to read, how rule text becomes sequence, step, and reference, and the report
+- [Family Apply Prompt](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/family-prompt.md) — The prompt a family agent loads to apply the step 11 rulings to one Standard family — the six rulings and what each changes, the principles, and the report
+- [Repo Apply Prompt](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/repo-prompt.md) — The prompt the repo-changes agent loads to close the small repo oversights step 11 found — one edit per bullet, the conventions each edit follows, and the report
+- [Guide Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/guides.md) — The five Guides step 11 writes — one bullet each naming the file, when it is read, its gist, and the rules it takes
+- [Build Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/build.md) — The build family agent's work order — every rule under standards/build/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Decisions Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/decisions.md) — The decisions family agent's work order — every rule under standards/decisions/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Distribution Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/distribution.md) — The distribution family agent's work order — every rule under standards/distribution/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Doc Type Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/doc-type.md) — The doc-type family agent's work order — every rule under standards/doc-type/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Harness Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/harness.md) — The harness family agent's work order — every rule under standards/harness/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Knowledge Organization Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/knowledge-organization.md) — The knowledge-organization family agent's work order — every rule under standards/knowledge-organization/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Modules Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/modules.md) — The modules family agent's work order — every rule under standards/modules/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Prose Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/prose.md) — The prose family agent's work order — every rule under standards/prose/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Python Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/python.md) — The python family agent's work order — every rule under standards/python/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Shell Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/shell.md) — The shell family agent's work order — every rule under standards/shell/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Standard Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/standard.md) — The standard family agent's work order — every rule under standards/standard/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Testing Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/testing.md) — The testing family agent's work order — every rule under standards/testing/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Tracking Rulings](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/tracking.md) — The tracking family agent's work order — every rule under standards/tracking/ with its ruling, its trailer kind after the pass, and the text the ruling needs
+- [Repo Change Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/repo-changes.md) — The eleven repo oversights step 11 fixes — one bullet each naming the rule that found it and the edit that closes it
+- [Orchestrator Work Order](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/orchestrator.md) — The step 11 pass as the orchestrator runs it — the wave order, the detector emitters silenced with their tests, and the two yaml tables regenerated
