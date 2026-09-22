@@ -173,12 +173,6 @@ specification.
        six Guides share; the shape page, the encoding page, the
        reference model, and `guide-conventions.md` follow, then the
        six are rewritten to that encoding.
-     Reason: the pass was about to move prose between file types with
-     no contract, which is how the tangle it untangles was made. The
-     course correction: the first Explanation written to the separate
-     file showed the user cannot read a rule and its why across two
-     files, and the LLM reader the split served is better served by a
-     projection.
   11. *Settle every rule.* Go through every rule and rule on each:
      keep, rewrite, delete, merge with another, or fold under a
      condition. The first ruling per rule is in

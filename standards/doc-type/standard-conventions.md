@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Standard Conventions
-description: The form a file typed Standard takes — one population in its frontmatter, each rule a heading, a predicate, and a trailer, and every predicate decidable of one member
+description: The form a file typed Standard takes — one population in its frontmatter, each rule a heading, a predicate, and a trailer, the why blocks that argue them, and every predicate decidable of one member
 population: "a file typed Standard"
 ---
 
@@ -48,9 +48,27 @@ which scopes it.
 `doc-type.the-rule-shape` · deterministic
 
 
+## The document's why
+
+The prose between a Standard's level-one heading and its first
+level-two heading ends with at most one block opening `> **Why.**`:
+the argument for the file as a whole, not for any one of its rules.
+
+`doc-type.the-documents-why` · deterministic
+
+
 ## Decidable predicates
 
 Each rule's predicate is true or false of one member of the population
 at one moment, with no comparison to another member and no taste.
 
 `doc-type.decidable-predicates` · stochastic
+
+
+## A why states no predicate
+
+No sentence of a why block, a rule's or the file's own, holds a member
+of the population to a state; the block argues for the rule or the file
+it sits with.
+
+`doc-type.a-why-states-no-predicate` · stochastic
