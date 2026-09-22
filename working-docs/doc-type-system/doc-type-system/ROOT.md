@@ -193,12 +193,17 @@ specification.
        is the section's name for its own rule, and
        `prose.one-rule-one-place`, relaxed in this wave, bars the
        second copy in another section or another document, not the one
-       inside the section. The rule exempts two forms: a heading
-       that states no point of its own and only scopes the sections
-       under it names the case those sections bind, which is what a
-       condition's H2 does, and a Guide step's bold run stays
-       imperative, since an encoding reads it from the body as an
-       action. Every other heading speaks in the third person, so the
+       inside the section. Two headings name something other than a
+       proposition: a heading that states no point of its own and only
+       scopes the sections under it names the case those sections
+       bind, which is what a condition's H2 does, and a Guide step's
+       bold run stays imperative, since an encoding reads it from the
+       body as an action. A third form belongs to a whole document,
+       not a heading: where every section below the H1 opens with the
+       same definition run, the headings are the terms the repo
+       speaks, and `guides/slop-tics.md` is the one such document, its
+       fifteen tic names left standing. Every other heading speaks in
+       the third person, so the
        four imperative headings of `prose/conventions.md`, held here
        so one rename settles the file, convert with the rest. Two
        rules govern the rename's wake:

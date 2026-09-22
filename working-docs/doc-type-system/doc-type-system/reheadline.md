@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Reheadline
-description: The prompt one agent loads to reheadline one Guide or Standard — the proposition it writes for every heading, the condition it exempts, the trailers that follow, what it leaves for the orchestrator, and the map it writes to disk
+description: The prompt one agent loads to reheadline one Guide or Standard — the document test it runs first, the proposition it writes for every heading, the two forms it leaves alone, the trailers that follow, and the map it writes to disk
 ---
 
 # Reheadline
@@ -25,6 +25,24 @@ result,
 and
 [Link text names heading or title](/standards/knowledge-organization/cross-references.md#link-text-names-heading-or-title).
 
+## First, the document test
+
+Before you write anything, count the sections below the H1 that open
+with the same definition run, a bold run such as `**Definition.**` that
+says what the heading's own words mean.
+
+Where **every** section opens that way, the document names terms, and
+its headings are the vocabulary the rest of the repo speaks. Do not
+write propositions for it. Leave every name as it is, put every heading
+in `terms`, set `document_form` to `terms`, and stop — block language
+is the only change such a document takes, so an article drops and
+nothing else moves.
+
+Where **any** section does not open that way, the document takes
+propositions, and the rest of this prompt applies. A single heading you
+find hard to compress does not make a document of terms: the test is
+every section or none.
+
 ## Your job
 
 Write the proposition for every heading below the H1. Where what you
@@ -35,9 +53,14 @@ that come out the same are the ones that were already right.
 A heading is a proposition the section establishes, in the third
 person, in block language — the register of headlines, articles and
 copulas dropped — in the fewest words that carry the point, a noun
-phrase wherever one carries it. You compress what the section itself
-states: a Standard's lead sentence, a Guide section's **Definition**
-and **Action** runs.
+phrase wherever one carries it. You compress what the section states as
+its point, which in a Standard is the lead sentence.
+
+Write each heading from its own section. Two headings in a row that
+come out on one pattern are a sign you are fitting a shape rather than
+reading a section: `prose.grammatical-parallelism` was deleted for
+asking headings to match each other, and this rule fits each heading to
+its own proposition.
 
 The forms, over one rule whose predicate is "The document's prose
 spells `judgment`, never the British `judgement`":
@@ -56,15 +79,15 @@ the heading is the section's name for its own rule, and
 bars the second copy in another section, not the one inside this
 section.
 
-## The condition is exempt
+## The two headings you leave alone
 
-A condition states no point of its own: it is an H2 that carries no
-trailer, whose H3s carry the rules, and whose words name the case those
-H3s bind. It has no predicate to compress. Leave it as it is and report
-it as exempt.
-
-A name an encoding reads from a body as an action — a Guide step's bold
-run — is not a heading of this kind at all. Leave every bold run alone.
+- **The case.** A condition states no point of its own: an H2 that
+  carries no trailer, whose H3s carry the rules, and whose words name
+  the case those H3s bind. It has no predicate to compress. Leave it
+  and report it in `exempt`.
+- **The imperative.** A name an encoding reads from a body as an
+  action, such as a Guide step's bold run, is not a heading of this
+  kind at all. Leave every bold run alone and report nothing.
 
 ## The trailer follows the heading
 
@@ -110,6 +133,7 @@ order, whether or not it changed:
 ```json
 {
   "file": "standards/prose/conventions.md",
+  "document_form": "propositions",
   "headings": [
     {
       "old_heading": "Spelling",
@@ -140,14 +164,19 @@ order, whether or not it changed:
 }
 ```
 
-`old_id` and `new_id` are `null` for a Guide. A condition appears in
-`exempt` and not in `headings`. `unsure` is the empty list where nothing
-was close; put a row there rather than silently picking, since the
-orchestrator reads it.
+`document_form` is `propositions` or `terms`, whichever the document
+test gave. `old_id` and `new_id` are `null` for a Guide. A condition
+appears in `exempt` and not in `headings`. `unsure` is the empty list
+where nothing was close; put a row there rather than silently picking,
+since the orchestrator reads it.
 
-Edit your file, write the map, and report in two sentences: how many
-headings changed, how many came out the same, how many were exempt, and
-anything in `unsure`.
+Where `document_form` is `terms`, `headings` is empty and every heading
+sits in `terms`, each as `{"heading": "...", "slug": "..."}`, with a
+row in `headings` only where block language dropped an article.
+
+Edit your file, write the map, and report in two sentences: the
+document form, how many headings changed, how many came out the same,
+how many were exempt, and anything in `unsure`.
 
 ## Acronyms
 

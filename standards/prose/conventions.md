@@ -190,15 +190,26 @@ the `Considered Options` heading of a Decision Record is exempt.
 
 ## Headings are propositions
 
-Each heading below the H1 is a proposition the section establishes,
-in the third person; each name an encoding reads from a body as an
-action, such as a Guide step's bold run, is the imperative that names
-the action. Exempt: a heading that states no point of its own and only
-scopes the sections under it, which names the case those sections bind.
-Both are written in block language, the register of headlines, articles
-and copulas dropped, in the fewest words that carry the point, which is
-a noun phrase wherever one carries it. The heading forms, over one
-rule:
+Each heading below the H1 is a proposition the section establishes, in
+the third person. Two headings inside any document name something else,
+and a proposition would displace what they name:
+
+- **The imperative** names an action: a name an encoding reads from a
+  body, such as a Guide step's bold run.
+- **The case** names what a scope binds: a heading that states no point
+  of its own and only scopes the sections under it.
+
+A third form is the document's, not a heading's. Where every section
+below the H1 opens with the same definition run, each heading in that
+document names the term its own section defines. Where one section does
+not open that way, no heading in it takes this form — a heading is
+never exempt for resisting a proposition.
+
+Every form is written in block language — the register of headlines,
+articles and copulas dropped — in the fewest words that carry the
+point, a noun phrase wherever one carries it.
+
+The verdicts, over one rule:
 
 | Heading | Verdict |
 |---|---|
@@ -208,10 +219,18 @@ rule:
 | `Write judgment, not judgement` | fails: the imperative, which addresses the reader |
 | `The prose spells judgment and never the British judgement` | fails: the predicate restated |
 
+[Slop Tics](/guides/slop-tics.md) is such a document: its fifteen
+sections open with `**Definition.**`, so `Flourish` names the term, and
+`The ordinary word, not the flourish` would put the fix where the name
+belongs.
+
 `prose.headings-are-propositions` · stochastic
 
 > **Why.** A parse shows the headings and nothing beneath them, so read
 > alone and in order the propositions are the document's argument; a
 > topic name is only its table of contents, and a restated predicate is
-> a second body.
+> a second body. Where the sections define terms, the headings are the
+> vocabulary the rest of the repo speaks, and a reader looks one up
+> rather than reading them in order, so a proposition in that place
+> costs the name and buys no argument.
 

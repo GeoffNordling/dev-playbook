@@ -244,7 +244,7 @@ stronger writing and are usually false. The words are "everything", "never",
   style..." → **After** "I am incapable of reading Claude's slop-filled
   style..."
 
-## The hypothetical misreader
+## Hypothetical misreader
 
 **Definition.** Writing aimed at a reader who is about to misunderstand, rather
 than the one actually reading. This is unnecessary bloat.
