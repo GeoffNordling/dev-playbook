@@ -17,13 +17,16 @@ replacement in a tracked `.prose-lint-vocabulary` at its root.
 
 ## One rule, one place
 
-Each rule the document states lives in the lead sentence of its section, except a statement of the document's own scope, which sits in the section under the H1.
+Each rule the document states lives in the lead sentence of one section, and no other section of the document states it again; the section's own heading, which names that same rule, sits inside that one place. Exempt: a statement of the document's own scope, which sits in the section under the H1.
 
 `prose.one-rule-one-place` · stochastic
 
 > **Why.** A section can stop at its lead when the lead carries the
 > whole rule, so section size matches topic size and a reader who skims
-> the leads reads every rule.
+> the leads reads every rule. A heading compressing that same rule is
+> the section's name for it, so a heading and a lead that say the same
+> thing are one place, not two; the second place this bars is another
+> section, or another document, where the copies drift apart.
 
 ## Current state and next steps only
 

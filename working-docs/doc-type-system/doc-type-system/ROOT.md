@@ -187,14 +187,13 @@ specification.
        knows what the bodies say; a heading that already passes stays.
        A body is otherwise untouched, with one release: where the new
        heading absorbs the body's opening words, the body may shed
-       them, so long as what is left still states the rule whole, which
-       `prose.one-rule-one-place` demands of every lead sentence. Where
-       shedding them would leave a fragment, and it usually will, the
-       heading recompresses instead of the body giving way — the lead
-       `One name per concept holds across the document.` keeps a
-       heading of `One name, one concept`, the idiom the file already
-       uses at `One rule, one place`, rather than a heading that is the
-       lead's first four words. The rule exempts two forms: a heading
+       them, so long as what is left reads as a sentence and the rule
+       survives whole across the heading and that sentence. A heading
+       and a lead that say the same thing are no finding — the heading
+       is the section's name for its own rule, and
+       `prose.one-rule-one-place`, relaxed in this wave, bars the
+       second copy in another section or another document, not the one
+       inside the section. The rule exempts two forms: a heading
        that states no point of its own and only scopes the sections
        under it names the case those sections bind, which is what a
        condition's H2 does, and a Guide step's bold run stays
