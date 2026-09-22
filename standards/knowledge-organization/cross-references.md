@@ -61,6 +61,11 @@ position and carries no other anchor, the reference carries no anchor.
 
 `knowledge-organization.stable-named-anchor` · deterministic
 
+> **Why.** A positional anchor, `#223-revision` or an in-prose
+> `§2.10`, breaks silently the moment its target is renumbered or
+> reordered, while a stale named anchor names a slug the file does
+> not carry.
+
 ## Link text names heading or title
 
 A reference's link text is the target heading's text, or the target
@@ -72,11 +77,6 @@ document's title where the heading does not fit the citing sentence.
 > noun phrase inside a sentence, so the two forms collide; the title is
 > the noun phrase naming the same target, and the anchor carries the
 > precision the text drops.
-
-> **Why.** A positional anchor, `#223-revision` or an in-prose
-> `§2.10`, breaks silently the moment its target is renumbered or
-> reordered, while a stale named anchor names a slug the file does
-> not carry.
 
 ## Citation, another repo
 
