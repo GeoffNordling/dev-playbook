@@ -80,7 +80,7 @@ Both paths finish on GitHub, in order:
    canonical label scheme.
 3. **Set the merge and protection settings.** Set the merge settings and
    the default-branch protection ruleset by hand, per
-   [repo-settings.md](/standards/tracking/repo-settings.md) — both sit
+   [repo-settings.md](/guides/repo-settings.md) — both sit
    behind GitHub's Administration permission, so no script does this.
 
 ## Enroll in the GOVERNED roster

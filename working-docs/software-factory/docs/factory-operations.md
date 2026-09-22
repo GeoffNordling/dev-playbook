@@ -281,7 +281,7 @@ in [node-agent-and-skill-authoring.md](/working-docs/software-factory/docs/node-
 
 One PR per issue — spikes open none — opened at the review stop and
 squash-merged by the user. Because
-[repository settings](/standards/tracking/repo-settings.md) take the squash
+[repository settings](/guides/repo-settings.md) take the squash
 message from the PR, its title and body become the permanent commit message on
 `main`: they are authored from the issue brief, the diff, and the record the
 issue and its PR carry, never left as a placeholder. The branch's own commits

@@ -128,7 +128,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
+| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
 | `labelgen` | Render the label scheme as the table in [label-scheme.md](/standards/tracking/label-scheme.md); `--check` fails on drift |
 | `bump-pin` | Check whether one consumer repo's dev-playbook `rev` pin can move to the published head (`--check`, a probe that restores the config) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |

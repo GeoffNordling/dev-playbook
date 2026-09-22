@@ -30,6 +30,7 @@ The work order of the `prose` family agent: every rule under `standards/prose/`,
 | `prose.spelling` | prose/conventions.md | keep | deterministic |  |
 | `prose.heading-casing` | prose/conventions.md | rewrite | stochastic | Block: the rule gains the clause "the `Considered Options` heading of a Decision Record is exempt". |
 | `prose.grammatical-parallelism` | prose/conventions.md | keep | stochastic |  |
+| `prose.assertion-headings` | prose/conventions.md | add | stochastic | After: `prose.heading-casing`. Rule:<br>## Assertion headings<br><br>Each heading below the H1, and each name an encoding reads from a body such as a Guide step's bold run, is an assertion: one clause stating the point its section makes, `Write docstrings that say what the thing does`, not a label naming its topic, `What a docstring says`.<br><br>`prose.assertion-headings` · stochastic<br><br>> **Why.** A parse shows the names and nothing beneath them, so read alone and in order the assertions are the document's argument, and labels are only its table of contents. One clause keeps a name a headline rather than a second body. |
 
 ## Acronyms
 

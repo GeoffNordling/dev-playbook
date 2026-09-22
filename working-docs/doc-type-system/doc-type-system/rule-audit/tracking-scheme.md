@@ -9,7 +9,7 @@ description: The rule audit over the tracking/ family — every rule's kind, det
 Three of the four Standards in the `tracking/` family are audited here:
 [Candidates](/standards/tracking/candidates.md),
 [Label Scheme](/standards/tracking/label-scheme.md), and
-[Repository Settings](/standards/tracking/repo-settings.md). They hold
+[Repository Settings](/guides/repo-settings.md). They hold
 seven rules between them. No reclassification is proposed in either
 direction: every trailer already carries the kind its predicate earns.
 Three rules break. All three breaks sit in repos other than the one that

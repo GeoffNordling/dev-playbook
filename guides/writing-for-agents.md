@@ -53,7 +53,9 @@ For a runbook's `description`, Runbook Conventions' [Description](/standards/doc
 
 ## Steps and completion criteria
 
-Every step ends on a **completion criterion** — the condition that tells the agent the work is done; for a runbook, Runbook Conventions' [Steps end on a completion criterion](/standards/doc-type/runbook-conventions.md#steps-end-on-a-completion-criterion) binds it. Two properties make it a lever:
+Every step ends on a **completion criterion** — the condition that tells the agent the work is done. End every step of a runbook's body on one: an agent's body is the launched subagent's system prompt, set at spawn, so nothing reaches that agent except the launching prompt, and the report travels back as the subagent's final message. A step that does not say when the work is done leaves the agent nothing else to read it from.
+
+Two properties make the criterion a lever:
 
 - **Clarity** — can the agent tell done from not-done? A vague bound ("understanding reached") invites **premature completion**: ending the step before it is genuinely done, attention slipping to _being done_. The visible steps still ahead — the **post-completion steps** — supply the pull; the criterion's clarity is the resistance. Defend in order: **sharpen the bound first** (local and cheap); only if it is irreducibly fuzzy _and_ you observe the rush, hide the later steps by splitting the sequence.
 - **Demand** — how much it requires. "Every modified model accounted for" forces thorough work where "produce a change list" does not. Demand drives **legwork** — the digging the agent does within the work, latent in the wording rather than written as its own step — and it is not step-bound: "every rule applied" binds a body of flat reference just as "every step done" binds a sequence, which is how an all-reference document still carries an exhaustiveness bar.

@@ -182,6 +182,27 @@ specification.
      the two yaml tables update, a detector that emits a deleted id
      stops emitting it, and no detector logic changes. Output: the
      Standards say only what is true of the files.
+     Three additions, decided 2026-09-22 after the Guide wave:
+     - **The modules family retires.** All seven of its rules are
+       judgments, six to the Design and Testing Guide and one deleted,
+       so `standards/modules/` goes and the lead's definitions of
+       module, interface, and implementation move into that Guide's
+       lead. A Standard with no rules is not kept as a definitions page.
+     - **Assertion headings.** One rule in Doc Conventions,
+       `prose.assertion-headings`, stochastic: each heading below the H1,
+       and each name an encoding reads from a body such as a Guide
+       step's bold run, is one clause stating the point its section
+       makes, not a label naming its topic. It covers every type, so the
+       Guide's own gist rule, `doc-type.headings-carry-the-gist`, is
+       deleted. Reason: a parse shows the names and nothing beneath
+       them; assertions read alone are the document's argument, labels
+       are only its table of contents. No deterministic companion:
+       policing prose by script is not attempted.
+     - **The reheadlining pass** is step 11's last wave, after the
+       family passes: one agent per Guide and per Standard file,
+       rewriting each label heading into an assertion, the bodies
+       untouched. The nine Guides and the long tail of Standard rule
+       headings such as `Description` and `Skill` are its scope.
      Reason: the audit found intentions, run-time behaviour, scoping
      definitions, and code-style instruction filed as predicates, and
      a checker is only worth building against a settled spec.

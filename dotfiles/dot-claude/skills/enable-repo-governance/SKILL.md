@@ -71,7 +71,7 @@ concrete choices.
 The merge settings and the protection ruleset sit behind GitHub's
 Administration permission — hand those to the user per bootstrap.md's tail,
 pointing at {Read
-[repo-settings.md](~/workspace/dev-playbook/standards/tracking/repo-settings.md)},
+[repo-settings.md](~/workspace/dev-playbook/guides/repo-settings.md)},
 and wait for their confirmation before calling the tail done.
 
 ## 5. Land the target

@@ -19,7 +19,8 @@ This document designs phase one. Phase two is planned in the strand root, not he
 3. The Principles into `standard-conventions.md`'s why blocks, with the doc-type family pass.
 4. Repo changes, one agent, from the list above.
 5. The orchestrator: emitters of deleted ids silenced with their tests; regenerate the two tables; `playbook-lint` and `make test` pass; `pre-commit run --all-files` no slower than before.
-6. PR for the user to merge.
+6. Reheadlining, one agent per Guide and per Standard file, in parallel, after the family passes: every label heading becomes an assertion per `prose.assertion-headings`, one clause stating the section's point; bodies, trailers, and slugs' link targets are the agent's to keep consistent, and it edits only its file and the files that link its old anchors. Then the tables regenerate again, since a rule's slug is its heading's.
+7. PR for the user to merge.
 
 **Phase two, detectors.** Step 12 of [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned), after this PR merges. Not designed here.
 

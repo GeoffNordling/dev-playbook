@@ -55,6 +55,9 @@ every row, in file order.
   then the part's words, after the trailer and before the next heading;
   where the part opens `*stands.*`, a why block is already there: read
   it, confirm it says what the part says, and add nothing.
+- **add**: the rule does not exist yet. The text cell is the whole
+  rule, heading to why block; paste it verbatim after the rule the
+  `After:` part names.
 - **delete**: remove the heading, the first paragraph, any block, the
   trailer, and any why block.
 - **guide**: the same removal as delete. The Guide the text cell names
