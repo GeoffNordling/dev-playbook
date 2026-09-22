@@ -52,4 +52,4 @@ The primary carries every repo and runs every check, so nothing goes
 permanently unchecked. Which gates each check reaches is
 [the boundary table](/standards/boundaries.yaml), derived from committed
 wiring; a machine's skip is not in it, and is recorded here instead
-([A skip is machine state](/standards/standard/explanation.md#a-skip-is-machine-state)).
+([A skip is machine state](/standards/standard/detectors.md#a-skip-is-machine-state)).

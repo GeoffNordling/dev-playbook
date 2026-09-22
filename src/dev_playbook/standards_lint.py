@@ -12,9 +12,8 @@ rules, each the id of its heading in standards/standard/tree.md:
 
   - **directory-layout** — every immediate subdirectory of ``standards/`` is a
     Standard directory: it holds at least one file typed ``Standard``, and every
-    tracked ``.md`` under it, ``index.md`` aside, is typed ``Standard`` or
-    ``Explanation``. The only flat files under ``standards/`` are README.md and
-    index.md.
+    tracked ``.md`` under it, ``index.md`` aside, is typed ``Standard``. The only
+    flat files under ``standards/`` are README.md and index.md.
   - **the-population** — a file typed ``Standard`` names its population in
     frontmatter, one string.
   - **the-catalog** — ``standards/index.md`` follows its declared ordering:
@@ -89,7 +88,7 @@ RULES = (
 
 STANDARD_TYPE = "Standard"
 # The types a Standard directory admits beside its index.
-ADMITTED_TYPES = frozenset({STANDARD_TYPE, "Explanation"})
+ADMITTED_TYPES = frozenset({STANDARD_TYPE})
 STANDARDS = "standards"
 CATALOG = "standards/index.md"
 README = "standards/README.md"

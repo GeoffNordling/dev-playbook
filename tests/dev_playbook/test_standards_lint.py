@@ -50,14 +50,6 @@ def standard(
     )
 
 
-def explanation(title: str) -> str:
-    """A file typed ``Explanation``."""
-    return (
-        f"---\ntype: Explanation\ntitle: {title} Explanation\ndescription: why\n---\n\n"
-        f"# {title} Explanation\n\nBecause.\n"
-    )
-
-
 def std_index(name: str, title: str, *, intro: str | None = None) -> str:
     """A Standard directory's index: an opening sentence, then its members."""
     intro = intro if intro is not None else f"{remit_of(title)}."
@@ -86,15 +78,13 @@ def readme() -> str:
 
 
 def test_well_formed_directory_passes_directory_layout(tmp_path: Path) -> None:
-    files = std_dir("build", "Build")
-    files["standards/build/explanation.md"] = explanation("Build")
-    repo = make_repo(tmp_path, files)
+    repo = make_repo(tmp_path, std_dir("build", "Build"))
 
     assert sa.check_directory_layout(repo) == []
 
 
 def test_unadmitted_member_of_a_standard_directory_is_flagged(tmp_path: Path) -> None:
-    # A Standard directory admits a Standard or an Explanation, and nothing else.
+    # A Standard directory admits a Standard, and nothing else.
     files = std_dir("build", "Build")
     files["standards/build/notes.md"] = (
         "---\ntype: General-Sheet\ntitle: Notes\ndescription: n\n---\n\n# Notes\n"
@@ -152,7 +142,6 @@ def test_directory_without_a_standard_is_flagged(tmp_path: Path) -> None:
         tmp_path,
         {
             "standards/build/index.md": "# build\n",
-            "standards/build/explanation.md": explanation("Build"),
         },
     )
 

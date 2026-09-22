@@ -1,8 +1,8 @@
 # standards/ — index
 
 The catalog: every standard is one directory here, holding the files
-typed `Standard` that state its rules, one population each, and the
-explanation behind them; each row below carries the directory index's
+typed `Standard` that state its rules, one population each, each rule
+carrying its own why; each row below carries the directory index's
 opening sentence. See [Standard](/doc-types/standard/definition.md).
 Ordering: README, then the directories — meta-standard first, the rest
 alphabetical.

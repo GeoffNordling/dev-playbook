@@ -50,9 +50,12 @@ something no other rule states.
 
 ### `doc-type.steps-end-on-a-completion-criterion` — Every step of a runbook's body ends on a completion criterion
 
-The predicate binds "every step of a runbook's body". The reason is in
-[An agent's body is its system prompt](/standards/doc-type/explanation.md#an-agents-body-is-its-system-prompt):
-a runbook's steps end on a criterion "because nothing else will".
+The predicate binds "every step of a runbook's body". The reason is the
+rule's own why
+([Steps end on a completion criterion](/standards/doc-type/runbook-conventions.md#steps-end-on-a-completion-criterion)):
+nothing reaches a launched agent except the launching prompt, so "a step
+that does not say when the work is done leaves the agent nothing else to
+read it from".
 
 Eighteen of the thirty runbooks carry numbered steps. Only
 `dotfiles/dot-claude/skills/update-standards-pin/SKILL.md` gives every
@@ -126,10 +129,9 @@ edges — and a delete would leave the Reference chain bound by nothing.
 
 ### `doc-type.interactive-skills-inherit` — A skill that runs several turns with the user carries `model: inherit`
 
-The reason is in
-[What the fields do](/standards/doc-type/explanation.md#what-the-fields-do):
-"A pinned model governs only the turn that loads the skill. A skill
-that runs several turns with the user carries `inherit`." A pinned
+The reason is the rule's own why
+([Interactive skills inherit](/standards/doc-type/runbook-conventions.md#interactive-skills-inherit)):
+"A pinned model governs only the turn that loads the skill." A pinned
 model on a multi-turn skill therefore governs the first turn and
 nothing after it.
 

@@ -56,10 +56,10 @@ named in the verifier table as `ruff-check`, applies three more.
 First, `D` is off for every file under `tests/`. The repo's
 `pyproject.toml:68` sets `"**/tests/**" = ["D"]`, so the exemption
 reaches the whole tree, not the test functions the predicate names.
-[Python Explanation](/standards/python/explanation.md#which-docstrings-matter)
-is explicit about the difference: "A test module's own helpers, the
-factories and fixtures defined as plain functions, carry docstrings:
-their names are not similarly load-bearing." Three such helpers carry
+The deleted Python Explanation was explicit about the difference: a test
+module's own helpers, the factories and fixtures defined as plain
+functions, carry docstrings, since their names are not similarly
+load-bearing. Three such helpers carry
 none — `tests/transcript_fakes.py:142` `completed`, `:147` `not_found`,
 and `:155` `runner` — and neither does the factory at
 `tests/conftest.py:80`. Eleven test classes in

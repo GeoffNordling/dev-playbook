@@ -254,9 +254,9 @@ settings between machines, not a source of authority to enforce — committing
 and pushing those edits is the user's", and then argues it: "Two consequences
 hold the design together", followed by two named consequences with the hook
 files that implement each. That is a decision with its rationale, which
-[Why a README lists no harness files](/standards/knowledge-organization/explanation.md#why-a-readme-lists-no-harness-files)
-sends to `docs/decisions/`: "Agent instructions and architecture decisions are
-absent from a README because they live in `CLAUDE.md` and `docs/decisions/`."
+[No roster of harness-injected files](/standards/knowledge-organization/readme-content.md#no-roster-of-harness-injected-files)
+sends to `docs/decisions/`: agent instructions and architecture decisions are
+absent from a README because they live in `CLAUDE.md` and `docs/decisions/`.
 No numbered record states it — I read the titles of all 29 records under
 `docs/decisions/`, and none covers the settings symlink.
 

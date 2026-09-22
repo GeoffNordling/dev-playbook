@@ -152,7 +152,6 @@ knowledge-organization.the-purpose-sentence: null
 knowledge-organization.the-root-index: scripts/okf-lint
 knowledge-organization.tight-definitions: null
 knowledge-organization.title: scripts/okf-lint
-knowledge-organization.typed-explanation: scripts/okf-lint
 knowledge-organization.typed-guide: scripts/okf-lint
 knowledge-organization.typed-loop: scripts/okf-lint
 knowledge-organization.typed-standard: scripts/okf-lint

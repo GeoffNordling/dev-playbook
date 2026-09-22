@@ -152,10 +152,12 @@ invokes the same script twice, at line 123 as `play-sound stop` and at
 line 187 as `play-sound notification`. One script serves two events on a
 two-word dispatch.
 
-[Shell Explanation](/standards/shell/explanation.md#when-a-script-has-outgrown-shell)
-states the intent: "The moment it reaches for a function, an array, or
-argument parsing, it has outgrown shell and is rewritten as a Python
-`scripts/` shim over `src/`." Neither file has outgrown shell. Both are
+The rule's own why
+([Glue only](/standards/shell/conventions.md#glue-only))
+states the intent: "A script that reaches for a function, an array, or
+argument parsing has outgrown shell: the same work as a Python `scripts/`
+shim over `src/` is testable and typed." Neither file has outgrown shell.
+Both are
 Claude Code hooks stowed into `~/.claude/`, not repo runnables, so the
 remedy the explanation names does not reach them: `scripts/` ships uv
 entry points that a stowed dotfile cannot import. The repo does write a

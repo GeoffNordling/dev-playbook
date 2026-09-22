@@ -30,8 +30,8 @@ state. The state is described twice. The rule's predicate is the prose
 form, what a writer reads to know what to make; the verifier the table
 names for the rule's id, deterministic code or a model returning a
 value, is the checkable form, what says whether one member is in the
-state. The reasoning behind the rules sits beside the file as
-`explanation.md`, typed `Explanation`.
+state. The reasoning behind a rule sits beside it in the file, a block
+after its trailer.
 
 ## The family
 
@@ -39,9 +39,8 @@ The directories under `standards/`, one per standard: `standards/prose/`
 holds the Standards that bind an authored document, `standards/build/`
 those that bind a repo's tracked tree. A standard does one thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)):
-its question, and the rules that answer it. The reason behind a rule
-is its explanation's; procedure and a writer's heuristics are a
-guide's.
+its question, and the rules that answer it. Procedure and a writer's
+heuristics are a guide's.
 
 ## Named by the question
 

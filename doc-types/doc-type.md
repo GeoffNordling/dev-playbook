@@ -9,8 +9,7 @@ description: What a doc-type is in one sentence, where the theory of the doc-typ
 A **doc-type** hands one documentation family a contract shape: the
 form every member of the family is read against, so a caller learns
 what it needs without reading the body. An **instance** is one member
-of the family, one runbook, one standard, one explanation, one guide,
-one loop. This repo's built doc-types, and what each directory holds,
+of the family, one runbook, one standard, one guide, one loop. This repo's built doc-types, and what each directory holds,
 are
 [Doc-Type System](/doc-types/doc-type-system.md).
 

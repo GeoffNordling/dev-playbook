@@ -72,10 +72,8 @@ detectors do. `scripts/verifier-table --write` writes
 scripts are addresses the verifier table names, so both are members of this
 Standard's population.
 
-The repo knows about the split. The
-[Standard Explanation](/standards/standard/explanation.md#a-formatter-has-two-modes)
-says a formatter has two modes, that `shfmt -d` is a detector and `shfmt -w`
-is enforcement. The two table generators are the same shape: the default run
+The repo knows about the split: a formatter has two modes, and `shfmt -d`
+is a detector where `shfmt -w` is enforcement. The two table generators are the same shape: the default run
 compares and prints findings, `--write` regenerates. The predicate carries
 none of that, so it reads as false of the two scripts the meta-standard
 itself defines.

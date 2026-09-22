@@ -31,7 +31,6 @@ reader must learn. A row reading *pending* is not yet ruled.
 |---|---|---|
 | Candidate-List | candidate lists | Pending |
 | Decision-Record | decision records | Pending |
-| Explanation | explanations | Pending |
 | General-Sheet | — | Pending; its replacement is an open question ([Candidates](/CANDIDATES.md)) |
 | Guide | guides | The [Guide](/doc-types/guide/definition.md) doc-type |
 | Log | logs | Pending; the user's to rule |

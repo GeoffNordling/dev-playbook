@@ -8,9 +8,8 @@ that owns them, `knowledge-organization.*`:
     drawn from the type registry, plus `title` and `description`. `resource`
     is optional in general and required on a `Recipe-Description`, and a
     document typed `Standard` lives under `standards/`,
-    one typed `Loop` under `loops/`, one typed `Guide` under `guides/`, and
-    one typed `Explanation` at `standards/<name>/explanation.md` — each the
-    place reserved for its label. The registry
+    one typed `Loop` under `loops/`, and one typed `Guide` under `guides/` —
+    each the place reserved for its label. The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
     own `## Types` table (`REGISTRY_DOC`), read and shape-checked there as the
@@ -98,7 +97,6 @@ DESCRIPTION = "knowledge-organization.description"
 RECIPE_DESCRIPTION = "knowledge-organization.recipe-description"
 TYPED_STANDARD = "knowledge-organization.typed-standard"
 TYPED_LOOP = "knowledge-organization.typed-loop"
-TYPED_EXPLANATION = "knowledge-organization.typed-explanation"
 TYPED_GUIDE = "knowledge-organization.typed-guide"
 THE_INTRODUCTION = "knowledge-organization.the-introduction"
 THE_LISTING = "knowledge-organization.the-listing"
@@ -121,7 +119,6 @@ RULES = (
     RECIPE_DESCRIPTION,
     TYPED_STANDARD,
     TYPED_LOOP,
-    TYPED_EXPLANATION,
     TYPED_GUIDE,
     THE_INTRODUCTION,
     THE_LISTING,
@@ -165,8 +162,6 @@ RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # doc-types/standard/definition.md and doc-types/loop/definition.md, each's
 # "Where a ... lives".
 STANDARDS_TYPES = frozenset({"Standard"})
-# An Explanation's one slot: beside the Standard whose rules it explains.
-EXPLANATION_PATH = re.compile(r"standards/[^/]+/explanation\.md")
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # A type name of the shape the Type Registry's Row shape rule declares: Title
 # Case, hyphen-joined for a multi-word name, acronyms upper.
@@ -496,14 +491,6 @@ def check_types(
             findings.append(Finding(rel, TYPED_LOOP, "'Loop' lives under loops/"))
         if doctype == "Guide" and not rel.startswith("guides/"):
             findings.append(Finding(rel, TYPED_GUIDE, "'Guide' lives under guides/"))
-        if doctype == "Explanation" and not EXPLANATION_PATH.fullmatch(rel):
-            findings.append(
-                Finding(
-                    rel,
-                    TYPED_EXPLANATION,
-                    "'Explanation' lives at standards/<name>/explanation.md",
-                )
-            )
     return findings
 
 

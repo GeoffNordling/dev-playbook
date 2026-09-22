@@ -67,8 +67,7 @@ gh issue create --title "..." \
 
 ## 4. Wire the relationships
 
-Independent native relationships, per
-[Relationships](~/workspace/dev-playbook/standards/tracking/explanation.md#relationships):
+Independent native relationships:
 each ordered slice **blocked-by** its predecessor, and every slice a
 **sub-issue** of the epic. Neither is a body field and neither is a label.
 

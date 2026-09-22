@@ -88,9 +88,8 @@ The reading question: about thirty fixtures live in the test modules
 that use them, not in any `conftest.py` — `tests/test_ref_lint.py:63`,
 `tests/dev_playbook/cloa_viewer/test_server.py:19` and twelve more in
 `tests/dev_playbook/cloa_viewer/test_cli.py` among them. A module is not
-a directory, so a literal reading makes every one of them a break. The
-[Test Design Explanation](/standards/testing/explanation.md) reads the
-other way: it speaks of each directory level carrying its own
+a directory, so a literal reading makes every one of them a break. The deleted Test Design Explanation read the
+other way: it spoke of each directory level carrying its own
 `conftest.py` so that a domain-specific fixture stays with the tests of
 its domain, which is about hoisting, not about banning a module-local
 fixture.

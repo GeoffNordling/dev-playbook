@@ -37,8 +37,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   which 27 are tooled Assessment Records; mission-control 3;
   sysadmin-playbook 1) and Survey had 5 (idea-tree 2, sounds 1, media-tools
   1, one stray worktree).
-- **The doc-type build loop over Guides** — Guide and Explanation have no
-  doc-type. Run the loop there, new doc-types as peers of Standard and Runbook, possibly more than
+- **The doc-type build loop over Guides** — Guide has no doc-type. Run the loop there, new doc-types as peers of Standard and Runbook, possibly more than
   one level; with Standard and Runbook as exemplars, Fable proposes the
   abstractions, the user accepts, rejects, and steers, and the instruction
   states the constraints outright, above all that every CLOA object is 100%

@@ -166,27 +166,8 @@ specification.
      [Completed](#completed).
   10. *Doc-types before migration.* The shapes, pages, and Standards
      are done; see [Completed](#completed). What remains, in order:
-     - **Migrate Explanations.** Thirteen Opus agents, one per
-       family under `standards/`, launched in parallel, each loading
-       [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md):
-       it moves each paragraph of its `explanation.md` into the why
-       block of the rule it argues or of the Standard as a whole, or
-       deletes it as a citation, a definition, a procedure, or a
-       description of state, by its own judgment; deletes the file;
-       cleans the leads and index in its own directory; and returns a
-       table of every paragraph's destination with its `?` rows.
-       The orchestrator then, in one scripted pass: unlinks the
-       links into the 13 files from outside their directories, the
-       rule-audit pages included, to plain words or to the rule that
-       now holds the text; deletes the `Explanation` row of the type
-       registry, the rule Typed Explanation, `EXPLANATION_PATH` and
-       its finding and test in `scripts/okf-lint`, and the words "or
-       `Explanation`" in the tree Standard's directory-layout rule;
-       regenerates `standards/verifiers.yaml`. Done when no
-       `explanation.md` exists under `standards/`, no link to one
-       remains, and `scripts/playbook-lint` and `make test` are
-       clean. The user reads the Standards and the `?` rows, not
-       sheets, and commits once.
+     - **Migrate Explanations.** Done 2026-09-21; the entry is in
+       [Completed](#completed).
      - **Migrate Guides.** Guide's parts and the CLOA-parseable
        encoding that carries them are decided from what structure the
        six Guides share; the shape page, the encoding page, the
@@ -303,6 +284,26 @@ specification.
   stays heading to trailer, so no detector or judge prompt changed.
   `standards/doc-type/doc-type.md` carries the ten Reasons sorted for
   the deleted Explanation, folded in as the test of the encoding.
+- **Explanations migrated, the type deleted, 2026-09-21.** Step 10,
+  fourth part. Thirteen Opus agents, one per family under
+  `standards/`, each sorted every paragraph of its `explanation.md`
+  into the why block of the rule it argues, the Standard's own block,
+  or a delete, wrote the whys, deleted the file, and cleaned its
+  directory's leads and index. Two ran first as a pilot, harness and
+  decisions; reading them added a sixth delete category, **no
+  argument**, and the bar a why clears to
+  [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md),
+  so the eleven that followed cut a why that justifies a rule nobody
+  doubts. The orchestrator then repointed or unlinked the 22 links
+  into the deleted files, deleted the `Explanation` row of the type
+  registry and of the registry rulings, the rule Typed Explanation
+  and its okf-lint check and test, `Explanation` from
+  `ADMITTED_TYPES` in `standards_lint`, and the type from the tree
+  Standard's directory-layout rule, and regenerated
+  `standards/verifiers.yaml`. No `explanation.md` remains under
+  `standards/`; the 13 detectors and 1012 tests are clean. The
+  paragraphs left out as predicates are in the agents' reports, for
+  step 11 to rule on.
 - **One meaning per word, one home per word, 2026-09-15.** Every word
   the four strands use is defined once, in the set's
   [Terms](/working-docs/doc-type-system/ROOT.md#terms) or in one

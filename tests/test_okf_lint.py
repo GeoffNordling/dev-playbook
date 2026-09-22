@@ -40,7 +40,7 @@ BASE_BUNDLE: dict[str, str] = {
         "description: The document type registry\n---\n\n"
         "# Document Types\n\n## Types\n\n"
         "| Type | What it is |\n|------|------------|\n"
-        "| `Explanation` | reasons |\n| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
+        "| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
         "| `Survey` | evaluates |\n"
     ),
@@ -244,26 +244,6 @@ def test_guide_outside_guides_dir_is_flagged(tmp_path: Path) -> None:
     assert "knowledge-organization.typed-guide" in result.stdout
     assert "ops.md" in result.stdout
     assert "'Guide' lives under guides/" in result.stdout
-
-
-def test_explanation_outside_its_slot_is_flagged(tmp_path: Path) -> None:
-    doc = (
-        "---\ntype: Explanation\ntitle: Why\ndescription: Why the rules\n---\n\n# Why\n"
-    )
-    repo = make_bundle(
-        tmp_path,
-        {
-            "why.md": doc,
-            "index.md": _root_index_listing("- [Why](/why.md) — Why the rules"),
-        },
-    )
-
-    result = run_okf_lint(repo)
-
-    assert result.returncode == 1
-    assert "knowledge-organization.typed-explanation" in result.stdout
-    assert "why.md" in result.stdout
-    assert "'Explanation' lives at standards/<name>/explanation.md" in result.stdout
 
 
 def test_loop_outside_loops_dir_is_flagged(tmp_path: Path) -> None:

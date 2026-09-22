@@ -43,10 +43,11 @@ other: a module with a dependency in another process cannot satisfy
 ### `modules.deep-not-shallow` — A module's interface is small against the behaviour behind it
 
 The predicate measures the interface against the behaviour behind it, and
-the [Explanation](/standards/modules/explanation.md#the-deletion-test)
+the rule's own why
+([Deep, not shallow](/standards/modules/design.md#deep-not-shallow))
 gives the deletion test: deleting a deep module pushes its complexity out
-across its callers, where it reappears N times; deleting a pass-through
-relocates the same code once.
+across its callers, where it reappears once per caller; deleting a
+pass-through relocates the same code once.
 
 Two members fail that test.
 
@@ -137,10 +138,9 @@ call inside their own bodies, differing only in the filter applied to the
 result.
 
 Proposal: rewrite the predicate. Importing a collaborator that never
-varies is what every module in the workspace does, and the rule's own
-[Explanation](/standards/modules/explanation.md#dependencies-are-accepted-not-constructed)
-illustrates the fault with `new StripeGateway()` inside a body, which is
-construction, not import. The new sentence: "A module constructs none of
+varies is what every module in the workspace does, and the fault the rule
+means is `new StripeGateway()` inside a body, which is construction, not
+import. The new sentence: "A module constructs none of
 its dependencies in its own body: a dependency whose behaviour a caller
 or a test must vary is a parameter, and one that never varies is
 imported." That still condemns the three inline `git ls-files` calls and
@@ -184,10 +184,8 @@ which `transcript_export.client` already fronts.
 ### `modules.the-interface-is-the-test-surface` — Every behaviour of a module is reachable through its interface
 
 The predicate says every behaviour is reachable through the interface,
-and the
-[Explanation](/standards/modules/explanation.md#the-interface-is-the-test-surface)
-gives the remedy: "the interface is redrawn until the behaviour is
-reachable". The test tree holds 36 `monkeypatch.setattr` calls, and each
+and the remedy it implies is that the interface is redrawn until the
+behaviour is reachable. The test tree holds 36 `monkeypatch.setattr` calls, and each
 one names a behaviour the interface does not offer:
 
 - `tests/dev_playbook/cloa_viewer/test_refresh.py:98` replaces
@@ -211,9 +209,8 @@ definition dead, and the half that can be acted on is already
 `testing.access-only-public-names`, which is deterministic, checked by
 `scripts/testing-lint`, and gated at commit, push, and ci. What the
 deletion would lose is the instruction to redraw the interface rather
-than reach past it, and that sentence belongs in
-[Module Design Explanation](/standards/modules/explanation.md), where it
-already sits.
+than reach past it, and that sentence belongs in the why of
+[The interface is the test surface](/standards/modules/design.md#the-interface-is-the-test-surface).
 
 ### `modules.results-are-returned-not-written` — A module that computes a value returns it and does not mutate the caller's argument to deliver it
 

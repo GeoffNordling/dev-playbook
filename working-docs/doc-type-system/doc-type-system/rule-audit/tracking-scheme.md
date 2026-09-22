@@ -40,8 +40,8 @@ rule is low value.
 ### `tracking.entry-shape` — An entry is one list item: a bolded short name, an em dash, then one or two sentences of intent, with no fields, no acceptance criteria, and no checkboxes
 
 The predicate caps an entry at two sentences and requires an em dash after
-the bolded name. The example block under it shows a two-line entry. The
-[Tracking Explanation](/standards/tracking/explanation.md#candidates) gives
+the bolded name. The example block under it shows a two-line entry. The rule's own why
+([Entry shape](/standards/tracking/candidates.md#entry-shape)) gives
 the reason: brief furniture on a Candidate is the signal that the brief
 could be written, so the work belongs in an issue and not in this file.
 
