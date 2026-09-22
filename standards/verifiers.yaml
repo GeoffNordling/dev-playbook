@@ -48,11 +48,14 @@ distribution.a-valid-manifest: pre-commit validate-manifest
 distribution.one-published-id: null
 distribution.the-roster: null
 doc-type.a-composition-rule: null
+doc-type.a-sequence-is-one-list: null
+doc-type.a-step-opens-with-its-name: null
 doc-type.a-verb-set: null
 doc-type.a-why-states-no-predicate: null
 doc-type.agent: null
 doc-type.an-act-links-a-runbook: null
 doc-type.an-encoding: null
+doc-type.an-ordered-list-is-a-sequence: null
 doc-type.arguments: scripts/harness-files-lint
 doc-type.body-opens-with-an-h1: scripts/harness-files-lint
 doc-type.bundle-layout: null
@@ -64,6 +67,7 @@ doc-type.disallowed-tools-restate-nothing: null
 doc-type.edges-follow-the-shape: scripts/loop-lint
 doc-type.entries-point-and-condition: scripts/loop-lint
 doc-type.front-matter: scripts/harness-files-lint
+doc-type.headings-carry-the-gist: null
 doc-type.held-to-a-standard: null
 doc-type.interactive-skills-inherit: null
 doc-type.kebab-case-name: scripts/harness-files-lint

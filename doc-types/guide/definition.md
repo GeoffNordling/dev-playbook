@@ -6,8 +6,8 @@ description: What a guide is — instructs one kind of work — its one verb, th
 
 # Guide
 
-A **guide** instructs one kind of work: steps, calls, a checklist, a
-catalogue, whatever the reader needs.
+A **guide** instructs one kind of work: sequences of steps to take and
+references to consult, in whatever mixture the work needs.
 
 ## The verb
 

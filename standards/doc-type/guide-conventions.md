@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Guide Conventions
-description: The form a document typed Guide takes — no trailer line, rules linked and never stated, and a description naming the work it is read before
+description: The form a document typed Guide takes — every ordered list a sequence of steps under its own heading, each step opening with its bold name, headings that carry the gist, no trailer line, rules linked and never stated, and a description naming the work it is read before
 population: "a document typed Guide"
 ---
 
@@ -14,12 +14,53 @@ is and the encoding its file takes,
 [Instruction Encoding](/doc-types/guide/encoding.md); a doc-type binds
 nobody, so this Standard is what binds the file to that encoding.
 
+> **Why.** The parse of a Guide shows its headings and its step names
+> and nothing of the bodies beneath them, so those names are all a
+> reader gets of the guide before opening it.
+
+## A sequence is one list
+
+Every ordered list in a document typed `Guide` sits directly under a
+heading, is the only ordered list of that heading's section, starts at
+`1.`, and nests no ordered list; before it the section holds at most
+one paragraph of one sentence, and after it nothing, no paragraph and
+no nested heading.
+
+`doc-type.a-sequence-is-one-list` · deterministic
+
+## A step opens with its name
+
+Each item of an ordered list in a document typed `Guide` opens with a
+bold run ending in a period, followed by the item's text.
+
+`doc-type.a-step-opens-with-its-name` · deterministic
+
+## An ordered list is a sequence
+
+Each ordered list in a document typed `Guide` is a run of actions a
+reader performs in the order given, each item one action that its bold
+run names; a ranking, an enumeration, or a set of alternatives is a
+bulleted list.
+
+`doc-type.an-ordered-list-is-a-sequence` · stochastic
+
+## Headings carry the gist
+
+Each heading below the level-one heading of a document typed `Guide`
+names what its section holds specifically enough that the headings,
+read alone and in order, say what the guide covers.
+
+`doc-type.headings-carry-the-gist` · stochastic
+
+> **Why.** A reference's body may hold a diagram, a table, or a
+> fenced block that no parse reads; the heading is the one line of it
+> that reaches a reader who has not opened the file.
+
 ## No trailer
 
 No line of a document typed `Guide` is a rule trailer,
 `` `<name>.<slug>` · deterministic `` or
-`` `<name>.<slug>` · stochastic ``, or a Reason trailer, a line opening
-with the word `explains`.
+`` `<name>.<slug>` · stochastic ``.
 
 `doc-type.no-trailer` · deterministic
 

@@ -97,10 +97,23 @@ from doc_type import DocType
 
 
 class Guide(DocType):
-    """What a reader needs before one kind of work: steps, calls, a checklist, a catalogue. Instructs.
+    """What a reader needs before one kind of work: sequences of steps, and references. Instructs.
     It links a Standard's rules as any document does and states none, so it carries no trailer."""
     operations  = {instruct}
     frontmatter = DocType.frontmatter | {type, title}
+
+    class Step:                   # a part: one item of a sequence's ordered list
+        name: str                 # the item's leading bold run; the instruction after it is the body's
+
+    class Sequence:               # a part: a heading whose section is one ordered list, numbered from one
+        name:  str                # the heading's text
+        steps: list[Step]         # in list order, one or more
+
+    class Reference:              # a part: a heading whose section holds no ordered list; its body is opaque
+        name:  str                # the heading's text, the whole of what the contract shows
+        parts: list["Sequence | Reference"]   # the headings nested beneath it, in file order
+
+    parts: list[Sequence | Reference]   # in file order; the names, read down, are the gist of the guide
 
 
 from doc_type import DocType
