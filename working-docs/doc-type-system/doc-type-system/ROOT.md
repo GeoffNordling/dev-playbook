@@ -164,15 +164,8 @@ specification.
      entry is in [Completed](#completed).
   9. *Ban the word guard.* Done 2026-09-21; the entry is in
      [Completed](#completed).
-  10. *Doc-types before migration.* The shapes, pages, and Standards
-     are done; see [Completed](#completed). What remains, in order:
-     - **Migrate Explanations.** Done 2026-09-21; the entry is in
-       [Completed](#completed).
-     - **Migrate Guides.** Guide's parts and the CLOA-parseable
-       encoding that carries them are decided from what structure the
-       six Guides share; the shape page, the encoding page, the
-       reference model, and `guide-conventions.md` follow, then the
-       six are rewritten to that encoding.
+  10. *Doc-types before migration.* Done 2026-09-21; the entries are
+     in [Completed](#completed).
   11. *Settle every rule.* Go through every rule and rule on each:
      keep, rewrite, delete, merge with another, or fold under a
      condition. The first ruling per rule is in
@@ -279,102 +272,21 @@ specification.
   `standards/doc-type/doc-type.md` carries the ten Reasons sorted for
   the deleted Explanation, folded in as the test of the encoding.
 - **Explanations migrated, the type deleted, 2026-09-21.** Step 10,
-  fourth part. Thirteen Opus agents, one per family under
-  `standards/`, each sorted every paragraph of its `explanation.md`
-  into the why block of the rule it argues, the Standard's own block,
-  or a delete, wrote the whys, deleted the file, and cleaned its
-  directory's leads and index. Two ran first as a pilot, harness and
-  decisions; reading them added a sixth delete category, **no
-  argument**, and the bar a why clears to
-  [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md),
-  so the eleven that followed cut a why that justifies a rule nobody
-  doubts. The orchestrator then repointed or unlinked the 22 links
-  into the deleted files, deleted the `Explanation` row of the type
-  registry and of the registry rulings, the rule Typed Explanation
-  and its okf-lint check and test, `Explanation` from
-  `ADMITTED_TYPES` in `standards_lint`, and the type from the tree
-  Standard's directory-layout rule, and regenerated
-  `standards/verifiers.yaml`. No `explanation.md` remains under
-  `standards/`; the 13 detectors and 1012 tests are clean. The
-  paragraphs left out as predicates are in the agents' reports, for
-  step 11 to rule on.
-- **One meaning per word, one home per word, 2026-09-15.** Every word
-  the four strands use is defined once, in the set's
-  [Terms](/working-docs/doc-type-system/ROOT.md#terms) or in one
-  strand's root, and every other use links to it. Reason: the same word
-  carried two senses more than once in this work, and a loop reading
-  these files cannot ask which was meant.
-- **One doc-type for Standard.** Merged into one directory,
-  [doc-types/standard/](/doc-types/standard/index.md), whose shape the
-  refactor replaces with the
-  [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)'s.
-- **Standard takes its new shape, 2026-09-20.** Step 1 of The system.
-  Every rule under `standards/` is a heading, a predicate, and a trailer
-  `` `<name>.<slug>` · deterministic|stochastic ``, drained one ruleset
-  at a time by the
-  [Body Drain](/working-docs/doc-type-system/doc-type-system/body-drain.md)
-  rubric; the teaching the drains displaced became guides. Reason: a
-  loop cannot route a rule without an id and a kind.
-- **The verifier table, 2026-09-20.** Step 2 of The system.
-  `standards/verifiers.yaml` maps every rule id under `standards/` to
-  the one check that decides it, or null. `scripts/verifier-table`
-  derives it from the trailers, each detector's `--list-rules`, and a
-  dependency map; `--write` writes it and the bare call lints it on
-  every commit, failing loud by the rules of `standard/detectors.md`. A
-  consumer's table holds only its own rules; the union is read from the
-  pinned clone.
-- **Boundaries: where each check runs, 2026-09-20.** Step 3 of The
-  system. `standards/boundaries.yaml` maps every address the verifier
-  table names to the gates that run it, `commit`, `push`, `ci`,
-  `on-demand`. `scripts/boundary-table` derives it from the wiring, the
-  pre-commit config, the pre-push `make check`, the workflows, and
-  playbook-lint's ungated audits, never from prose. `standard/gates.md`
-  is deleted: the rungs are the file's columns.
-- **Isolate the software factory, 2026-09-20.** Step 4 of The system.
-  Everything of the factory lives in `working-docs/software-factory/`,
-  whose `ROOT.md` names each piece and where it came from; every link
-  into it from the rest of the repo was cut or repointed.
-  `candidate-promote` does not work without intake, and its fate goes
-  with the factory's.
-- **Guide and Explanation, 2026-09-20.** Step 5 of The system. The
-  registry defines `Guide`, how to do a kind of work, homed in
-  `guides/`, and `Explanation`, the reasoning behind one Standard's
-  rules at `standards/<name>/explanation.md`; standards-lint admits
-  only a Standard, an Explanation, and a Guide in a Standard directory.
-  Target state that lived in explanations became rules, each null in
-  the verifier table until a check exists.
-- **Retire the card, 2026-09-20.** Step 6 of The system. The `card.md`
-  files, the type `Standard-Card`, `cardgen`, `rulegen`, and the `.txt`
-  views are gone, and `Standard-Ruleset` is `Standard` everywhere. Each
-  directory index opens with the sentence its card carried and the
-  catalog repeats it. `standard/cards.md` is `standard/tree.md`, The
-  Standards Tree. A consumer's leftover card is an unknown type at the
-  next pin bump.
-- **Tidy the doc-type definitions, 2026-09-21.** Step 7 of The system.
-  The pseudocode is four blocks, the base in `doc-types/doc-type.md`
-  and one class per `contract-shape.md`, none carrying a location; the
-  reference model holds all four and `tests/test_pseudocode_sync.py`,
-  temporary, fails when the texts differ. `chaingen` and `chains.txt`
-  are deleted, kept at `b266ce4`.
-- **The specification becomes a Standard, 2026-09-21.** Step 8 of The
-  system. `standards/doc-type/` holds
-  [Doc-Type](/standards/doc-type/doc-type.md), seven rules over any
-  doc-type directory, and the three Standards over the files a doc-type
-  types, Standard, Runbook, and Loop Conventions. The placement rule: a
-  rule over what is inside a file is the doc-type's Standard's; a rule
-  over where a file sits is the family's. The Standards Tree gained
-  `standard.the-statement`, the sentence every directory index opens
-  with and the catalog repeats. The draft `specification/` is deleted;
-  Loop's three drafted rules are a planned item of the Loop strand.
-- **Ban the word guard, 2026-09-21.** Step 9 of The system. A guard is
-  one kind of condition, so `condition` is always correct where `guard`
-  is. prose-lint's banned word became a vocabulary in two layers: the
-  workspace's actor noun, fixed in the module, and the repo's own words
-  in a tracked root `.prose-lint-vocabulary` of word, `say`, and
-  `where`, the directories the ban covers; a faulty declaration is exit
-  2. dev-playbook bans `guard` under `doc-types/` and
-  `standards/doc-type/`; the rule is `prose.the-repo-vocabulary` in Doc
-  Conventions.
+  fourth part. Thirteen Opus agents, one per family, sorted each
+  `explanation.md` into rule whys, the Standard's own why, or a
+  delete, per
+  [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md).
+  The Explanation type, its registry rows, rule, okf-lint check, and
+  `ADMITTED_TYPES` entry are gone; 22 inbound links repointed. The
+  predicates the agents left out are in their reports, for step 11.
+- **Guides migrated, 2026-09-21.** Step 10, last part. Guide's parts
+  are Sequence, Step, and Reference; the parse is the headings and
+  the step names. The verbatim-mirror type became `Mirror` and
+  Runbook's chain the chain to free the word. Five Opus agents
+  rewrote the Guides per
+  [Migrate Guides](/working-docs/doc-type-system/doc-type-system/migrate-guides.md);
+  `headless.md` moved to `docs/` as a General-Sheet. The residual
+  ledger holds five entries.
 
 ## Acronyms
 

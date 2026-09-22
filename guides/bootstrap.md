@@ -14,20 +14,22 @@ on the same GitHub tail and roster enrollment.
 
 [`scripts/repo-init`](/scripts/repo-init) creates the repo locally:
 
-```bash
-scripts/repo-init <name> --description '<one-line purpose>' [--python]
-```
+1. **Run `repo-init`.**
 
-It renders the [skeleton](/standards/build/skeleton.md) from the
-[canonical artifacts](/standards/build/canonical.md), pinning the hook
-`rev` at dev-playbook's `origin/main` as of init time, then runs
-`git init -b main` and `uv lock`, stages everything, installs both
-pre-commit stages, and self-checks the result with `playbook-lint` — the
-same hook it just installed, so a scaffold that would fail its own first
-commit never reaches you. It fails loud when the target directory already
-exists or the self-check reports findings.
+   ```bash
+   scripts/repo-init <name> --description '<one-line purpose>' [--python]
+   ```
 
-The first commit is yours to make after review; the commit gate runs on it.
+   It renders the [skeleton](/standards/build/skeleton.md) from the
+   [canonical artifacts](/standards/build/canonical.md), pinning the
+   hook `rev` at dev-playbook's `origin/main` as of init time, then runs
+   `git init -b main` and `uv lock`, stages everything, installs both
+   pre-commit stages, and self-checks the result with `playbook-lint` —
+   the same hook it just installed, so a scaffold that would fail its
+   own first commit never reaches you. It fails loud when the target
+   directory already exists or the self-check reports findings.
+2. **Make the first commit.** The first commit is yours to make after
+   review; the commit gate runs on it.
 
 ## The existing path: adoption
 
@@ -55,33 +57,37 @@ standard, in this order:
    `ROADMAP.md` and kin become `CANDIDATES.md` entries or issues
    ([Candidates](/standards/tracking/candidates.md)),
    `requirements.txt` moves into `pyproject.toml`.
-
-The adoption lands as one reviewable unit — a small diff as a single
-commit straight to main, a large one as a branch and PR; either way the
-commit gate at the new pin is the verification.
+6. **Land the adoption.** The adoption lands as one reviewable unit — a
+   small diff as a single commit straight to main, a large one as a
+   branch and PR; either way the commit gate at the new pin is the
+   verification.
 
 ## The GitHub tail
 
 Both paths finish on GitHub, in order:
 
-1. Fresh repo only: create the repository in the browser — pick the
-   visibility deliberately, and add no README, `.gitignore`, or license, so
-   the remote starts empty. Then `git remote add origin <url>` and push.
-   `gh repo create` is not the route: `createRepository` sits outside a
-   fine-grained PAT's reach ("Resource not accessible by personal access
-   token"). The PAT must carry the `workflow` scope, because the scaffold
-   ships `.github/workflows/ci.yml` and a push that adds a workflow file is
+1. **Create the remote.** Fresh repo only: create the repository in the
+   browser — pick the visibility deliberately, and add no README,
+   `.gitignore`, or license, so the remote starts empty. Then
+   `git remote add origin <url>` and push. `gh repo create` is not the
+   route: `createRepository` sits outside a fine-grained PAT's reach
+   ("Resource not accessible by personal access token"). The PAT must
+   carry the `workflow` scope, because the scaffold ships
+   `.github/workflows/ci.yml` and a push that adds a workflow file is
    rejected without it.
-2. `~/workspace/dev-playbook/scripts/bootstrap-labels` — enforce the
+2. **Run `bootstrap-labels`.**
+   `~/workspace/dev-playbook/scripts/bootstrap-labels` — enforce the
    canonical label scheme.
-3. Set the merge settings and the default-branch protection ruleset by hand,
-   per [repo-settings.md](/standards/tracking/repo-settings.md) — both sit
+3. **Set the merge and protection settings.** Set the merge settings and
+   the default-branch protection ruleset by hand, per
+   [repo-settings.md](/standards/tracking/repo-settings.md) — both sit
    behind GitHub's Administration permission, so no script does this.
 
-## Enrollment
+## Enroll in the GOVERNED roster
 
-Add the repo to workspace-lint's `GOVERNED` roster — a dev-playbook edit,
-made only once the repo is green. Inclusion is declared, never inferred from
-the directory listing
-([Distribution Channel](/standards/distribution/channel.md));
-until enrolled, the repo is not audited and its pin drift never reported.
+1. **Add the repo to `GOVERNED`.** Add the repo to workspace-lint's
+   `GOVERNED` roster — a dev-playbook edit, made only once the repo is
+   green. Inclusion is declared, never inferred from the directory listing
+   ([Distribution Channel](/standards/distribution/channel.md));
+   until enrolled, the repo is not audited and its pin drift never
+   reported.

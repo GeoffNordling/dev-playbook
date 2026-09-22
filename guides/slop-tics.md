@@ -259,8 +259,8 @@ follow a single sentence.
 
 ## Prepositional padding
 
-**Definition.** A phrase that spends a preposition to say what a compound says in
-fewer words. Common in headings, where the subject ends up buried behind the
+**Definition.** A phrase that spends a preposition to say what a compound says
+in fewer words. Common in headings, where the subject ends up buried behind the
 preposition instead of leading.
 
 **Action.** Write the compound.
