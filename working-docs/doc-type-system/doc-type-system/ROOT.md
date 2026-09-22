@@ -181,14 +181,26 @@ specification.
        `prose.headings-are-propositions`, the fewest words that carry
        what the section establishes, so a reader of the headings alone
        knows what the bodies say; a heading that already passes stays,
-       a file's headings stay grammatically parallel, bodies untouched;
-       links to the old anchors follow. Heading mood is settled: a
-       heading speaks in the third person, so the four imperative
-       headings of `prose/conventions.md`, held here so one rename
-       settles the file, become propositions like the rest; a Guide
-       step's bold run stays imperative, which `prose.third-person`
-       exempts. Then the two tables regenerate again, since a rule's
-       id is its heading's slug.
+       and bodies are untouched. The rule exempts two forms: a heading
+       that states no point of its own and only scopes the sections
+       under it names the case those sections bind, which is what a
+       condition's H2 does, and a Guide step's bold run stays
+       imperative, since an encoding reads it from the body as an
+       action. Every other heading speaks in the third person, so the
+       four imperative headings of `prose/conventions.md`, held here
+       so one rename settles the file, convert with the rest. Two
+       rules govern the rename's wake:
+       `knowledge-organization.headings-slugify-distinctly`, so no two
+       propositions in a file land on one slug, and
+       `knowledge-organization.link-text-names-heading-or-title`,
+       which moves the text of each citation as well as its anchor, to
+       the new proposition or to the target's title where a
+       proposition will not sit in the citing sentence. Then the ids
+       move, since a rule's id is its heading's slug: the two tables
+       regenerate, and the ids written into the detectors and into
+       `DEPENDENCY_RULES` follow. That exposure may be wide, since the
+       ids a detector hardcodes sit under bare topic nouns the rule
+       fails, `## Spelling` and `## Docstrings` among them.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
