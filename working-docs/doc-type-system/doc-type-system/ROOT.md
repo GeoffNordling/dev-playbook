@@ -166,46 +166,45 @@ specification.
      [Completed](#completed).
   10. *Doc-types before migration.* Done 2026-09-21; the entries are
      in [Completed](#completed).
-  11. *Settle every rule.* Go through every rule and rule on each:
-     keep, rewrite, delete, merge with another, or fold under a
-     condition. The ruling per rule, the text each ruling needs, and
-     the order of the pass are in
-     [Step 11 Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/index.md),
-     one file per agent with the prompt its kind loads.
-     Text that is not a predicate leaves the rule: a why becomes the
-     rule's why block, a procedure goes to a Guide, a scoping
-     definition becomes a condition. A rule with a judgment
-     word is stochastic and stays null in the verifier table; a rule a
-     script decides from the files is deterministic. A rule the repo
-     breaks is rewritten, deleted, or, where the state is a small
-     named oversight, the repo is fixed. Documents only: trailers and
-     the two yaml tables update, a detector that emits a deleted id
-     stops emitting it, and no detector logic changes. Output: the
+  11. *Settle every rule.* Every rule ruled on, keep, rewrite,
+     delete, or fold under a condition, and the rulings applied by
+     agents, one work order each, in
+     [Step 11 Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/index.md).
+     Text that is not a predicate leaves the rule: a why to the why
+     block, a procedure to a Guide, a scoping definition to a
+     condition. Documents only: no detector logic changes. Output: the
      Standards say only what is true of the files.
-     Three additions, decided 2026-09-22 after the Guide wave:
-     - **The modules family retires.** All seven of its rules are
-       judgments, six to the Design and Testing Guide and one deleted,
-       so `standards/modules/` goes and the lead's definitions of
-       module, interface, and implementation move into that Guide's
-       lead. A Standard with no rules is not kept as a definitions page.
-     - **Assertion headings.** One rule in Doc Conventions,
-       `prose.assertion-headings`, stochastic: each heading below the H1,
-       and each name an encoding reads from a body such as a Guide
-       step's bold run, is one clause stating the point its section
-       makes, not a label naming its topic. It covers every type, so the
-       Guide's own gist rule, `doc-type.headings-carry-the-gist`, is
-       deleted. Reason: a parse shows the names and nothing beneath
-       them; assertions read alone are the document's argument, labels
-       are only its table of contents. No deterministic companion:
-       policing prose by script is not attempted.
-     - **The reheadlining pass** is step 11's last wave, after the
-       family passes: one agent per Guide and per Standard file,
-       rewriting each label heading into an assertion, the bodies
-       untouched. The nine Guides and the long tail of Standard rule
-       headings such as `Description` and `Skill` are its scope.
-     Reason: the audit found intentions, run-time behaviour, scoping
-     definitions, and code-style instruction filed as predicates, and
-     a checker is only worth building against a settled spec.
+     Waves 1 and 2 are done; the entries are in [Completed](#completed).
+     The waves left, in order:
+     - **Wave 3, repo changes.** One agent, the eleven bullets of
+       [Repo Change Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/repo-changes.md):
+       edits outside `standards/` that the audit found the rules
+       demand, `CLAUDE.md`, `CONTEXT.md`, three skill models, a
+       Decision Record, acronym appendices, and six more. Its first run
+       was rolled back 2026-09-22, unseen by the user; it relaunches
+       only after the user reads the eleven bullets in the terminal
+       and strikes the ones they reject.
+     - **Wave 4, the orchestrator.** By hand, in the session: silence
+       the emitters of the ids wave 2 deleted or conditioned, twelve
+       across `testing_lint`, `workspace_lint`, `repo_lint`, `okf_lint`,
+       and the `mypy` row of `verifier_table` and `boundaries.yaml`,
+       with their tests; regenerate the two yaml tables; carry the
+       five changed index openings into `standards/index.md`; repoint
+       or unlink the twenty anchors into deleted rules; settle the
+       rows the family agents reported instead of deciding, six why
+       blocks the ruling said stand but say something else, three
+       conditions still holding a why block, `label-scheme.md` left
+       with no rules, the JavaScript condition removed with its only
+       rule, and a factory skill citing a rule the Guide never got;
+       then `playbook-lint`, `make test`, and `pre-commit run
+       --all-files` no slower than before.
+     - **Wave 5, reheadlining.** One agent per Guide and per Standard
+       file, in parallel: every label heading becomes an assertion per
+       `prose.assertion-headings`, one clause stating the section's
+       point, bodies untouched; links to the old anchors follow. Then
+       the two tables regenerate again, since a rule's id is its
+       heading's slug.
+     - **Wave 6, the PR**, for the user to merge.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
@@ -264,6 +263,16 @@ specification.
   file ([Principles](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles)).
 
 ## Completed
+
+- **Step 11 waves 1 and 2, 2026-09-22.** Five Opus agents wrote four
+  Guides and one reference from rule text, and moved
+  `tracking/repo-settings.md` to `guides/`; thirteen Opus agents then
+  applied all 283 rulings, one family each. Decided on the way: the
+  modules family retires, its seven rules all judgments and now in the
+  Design and Testing Guide; `prose.assertion-headings` replaces the
+  Guide gist rule, every parsed heading one clause stating its point;
+  a reheadlining wave follows the family passes. Commits b5a0c08 and
+  b01d0fd.
 
 - **Explanation and Guide shaped, 2026-09-21.** Step 10 of The
   system, first half. Thirteen Opus agents tagged every paragraph of

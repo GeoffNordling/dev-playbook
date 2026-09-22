@@ -14,13 +14,12 @@ This document designs phase one. Phase two is planned in the strand root, not he
 
 **Phase one, documents, this PR.** Rules move to their right homes, judged sentences change, the Guides and why blocks are written into the shapes step 10 built, trailers and the two yaml tables update. Script edits are only what the gate forces: a detector that emits a deleted rule id stops emitting it, and the tables round-trip clean. No detector logic changes and no new check is written.
 
-1. Guides first: the four new Guides and the Writing for Agents reference, one agent per Guide, from the rule text still in place.
-2. Family passes, one agent per family, in parallel: conditions stripped, deletes and Guide-move rules removed with their why blocks, new sentences pasted, why blocks written, trailers changed. Each agent edits its family's Standards only and reports every row it could not apply.
-3. The Principles into `standard-conventions.md`'s why blocks, with the doc-type family pass.
-4. Repo changes, one agent, from the list above.
-5. The orchestrator: emitters of deleted ids silenced with their tests; regenerate the two tables; `playbook-lint` and `make test` pass; `pre-commit run --all-files` no slower than before.
-6. Reheadlining, one agent per Guide and per Standard file, in parallel, after the family passes: every label heading becomes an assertion per `prose.assertion-headings`, one clause stating the section's point; bodies, trailers, and slugs' link targets are the agent's to keep consistent, and it edits only its file and the files that link its old anchors. Then the tables regenerate again, since a rule's slug is its heading's.
-7. PR for the user to merge.
+1. Guides first: done, commit b5a0c08.
+2. Family passes, one agent per family, in parallel, the Principles landing in `standard-conventions.md`'s why blocks with the doc-type family: done, commit b01d0fd.
+3. Repo changes, one agent, from [Repo Change Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/repo-changes.md), after the user reads its bullets in the terminal and strikes any; its first run was rolled back 2026-09-22.
+4. The orchestrator: emitters of deleted and conditioned ids silenced with their tests; the two tables regenerated; the five changed index openings carried into `standards/index.md`; anchors into deleted rules repointed or unlinked; the rows the family agents reported instead of deciding settled with the user; `playbook-lint` and `make test` pass; `pre-commit run --all-files` no slower than before.
+5. Reheadlining, one agent per Guide and per Standard file, in parallel: every label heading becomes an assertion per `prose.assertion-headings`, one clause stating the section's point; bodies untouched; links to old anchors follow. Then the tables regenerate again, since a rule's id is its heading's slug.
+6. PR for the user to merge.
 
 **Phase two, detectors.** Step 12 of [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned), after this PR merges. Not designed here.
 
