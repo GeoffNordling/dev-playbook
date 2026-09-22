@@ -99,10 +99,6 @@ beginning `/` and naming the path from the repository root.
 The referencing file has no fixed repo root: a segment of its path
 inside the repository is `skills`, `rules`, or `agents`.
 
-> **Why.** A runbook, a skill bundle, an agent definition, or a global
-> rule under `~/.claude/` is loaded from arbitrary repos, so a leading
-> `/` in one has no root to resolve against.
-
 ### Workspace path for a stable location
 
 A reference to a file in the referencing file's own repository is an
@@ -111,8 +107,10 @@ unless the target is inside the referencing file's own skill bundle.
 
 `knowledge-organization.workspace-path-for-a-stable-location` · deterministic
 
-> **Why.** The condition above says what stable means: a location
-> fixed relative to the repo root.
+> **Why.** A runbook, a skill bundle, an agent definition, or a
+> global rule under `~/.claude/` is loaded from arbitrary repos, so a
+> leading `/` in one has no root to resolve against; the full
+> workspace path is the one form that resolves from anywhere.
 
 ### Relative path inside the bundle
 

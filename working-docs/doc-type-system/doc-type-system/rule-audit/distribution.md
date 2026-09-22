@@ -62,7 +62,7 @@ run on this machine until the roster and the disk agree.
 That is the deeper fault. The clause is a claim about a filesystem outside
 the repo, so no script reading only repo files can decide it, which is why
 the proposed kind is stochastic rather than deterministic. The rule's own why
-([The roster](/standards/distribution/channel.md#the-roster)) already
+(The roster) already
 states the intent in prose: "A name with no repo behind it is a false
 claim, and a sweep that quietly covers less is worse than one that
 pass a quietly shorter sweep." That sentence describes how workspace-lint

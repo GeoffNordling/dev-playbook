@@ -82,7 +82,7 @@ the decision itself, and the reason for it.
 ## Date
 
 A Decision Record's `date` frontmatter key holds a `YYYY-MM-DD` date or
-`null`
+`null`.
 
 `decisions.date` · deterministic
 

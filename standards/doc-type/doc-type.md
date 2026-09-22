@@ -22,11 +22,11 @@ instances of one doc-type is that doc-type's own Standard's.
 > pseudocode carries none. The population is `doc-types/<name>/`, not
 > the files of that type: a rule over instances is already some
 > Standard's, so this Standard asks one thing of the instances, that
-> one Standard covers them, and leaves the rest to it. Six of the
-> seven rules below read the pseudocode in `contract-shape.md` or
-> prose in `definition.md`, never parsed as Python, so each is
-> stochastic, a judge's prompt; Registered is deterministic because
-> the rulings table and the index are both tables a script reads.
+> one Standard covers them, and leaves the rest to it. A rule that
+> reads the pseudocode in `contract-shape.md` or the prose in
+> `definition.md`, never parsed as Python, is stochastic, a judge's
+> prompt; a rule that reads a table or a class header a script parses,
+> as Registered and One base do, is deterministic.
 
 ## Registered
 

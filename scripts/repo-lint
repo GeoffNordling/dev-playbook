@@ -155,14 +155,12 @@ class Layers:
     python: bool
     src: bool
     scripts_python: bool
-    js: bool
 
     def names(self) -> list[str]:
         flags = [
             ("python", self.python),
             ("src", self.src),
             ("scripts", self.scripts_python),
-            ("js", self.js),
         ]
         return ["base"] + [name for name, on in flags if on]
 
@@ -175,7 +173,6 @@ def infer_layers(root: Path, python_files: list[Path]) -> Layers:
         scripts_python=any(
             p.relative_to(root).parts[:1] == ("scripts",) for p in python_files
         ),
-        js=(root / "package.json").is_file(),
     )
 
 

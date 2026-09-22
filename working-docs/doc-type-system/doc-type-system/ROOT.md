@@ -173,22 +173,8 @@ specification.
      block, a procedure to a Guide, a scoping definition to a
      condition. Documents only: no detector logic changes. Output: the
      Standards say only what is true of the files.
-     Waves 1 to 3 are done; the entries are in [Completed](#completed).
+     Waves 1 to 4 are done; the entries are in [Completed](#completed).
      The waves left, in order:
-     - **Wave 4, the orchestrator.** By hand, in the session: silence
-       the emitters of the ids wave 2 deleted or conditioned, twelve
-       across `testing_lint`, `workspace_lint`, `repo_lint`, `okf_lint`,
-       and the `mypy` row of `verifier_table` and `boundaries.yaml`,
-       with their tests; regenerate the two yaml tables; carry the
-       five changed index openings into `standards/index.md`; repoint
-       or unlink the twenty anchors into deleted rules; settle the
-       rows the family agents reported instead of deciding, six why
-       blocks the ruling said stand but say something else, three
-       conditions still holding a why block, `label-scheme.md` left
-       with no rules, the JavaScript condition removed with its only
-       rule, and a factory skill citing a rule the Guide never got;
-       then `playbook-lint`, `make test`, and `pre-commit run
-       --all-files` no slower than before.
      - **Wave 5, reheadlining.** One agent per Guide and per Standard
        file, in parallel: every label heading becomes an assertion per
        `prose.assertion-headings`, one clause stating the section's
@@ -255,6 +241,20 @@ specification.
   file ([Principles](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles)).
 
 ## Completed
+
+- **Step 11 wave 4, 2026-09-22.** The orchestrator pass, by hand in
+  the session, closing what the family waves left across files. The
+  twelve emitters of deleted ids went silent, and the four GitHub
+  audits of `workspace-lint` kept their checks under a new Standard,
+  `tracking/github-settings.md`, after the user ruled that a check
+  needs a predicate over state, not a Guide. The two yaml tables
+  regenerated, five catalog rows took their indexes' openings, and
+  fifteen anchors into deleted rules were unlinked. The reported rows
+  settled: one why block rewritten, three why blocks under conditions
+  moved or dropped, two terminal periods, a factory skill's stale
+  gloss, and the doc-type lead's rule count. Three routing citations
+  wave 2 had tightened away were restored, and the deslopper gained
+  the `assertion-headings` slice. Commits 88d0381 and this one.
 
 - **Step 11 wave 3, 2026-09-22.** The repo changes, by hand in the
   session rather than by agent, after the first agent run was rolled

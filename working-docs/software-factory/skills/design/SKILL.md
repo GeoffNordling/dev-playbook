@@ -17,7 +17,7 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 
 Before doing anything else:
 
-- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module); small interface, deep implementation, accept dependencies, return results, keep the surface small — the lens for weighing a solution's shape}.
+- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module); small interface, deep implementation, accept dependencies, keep the surface small — the lens for weighing a solution's shape}.
 - {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md) end-to-end; the brief formats, the epic body, and the relationships the decompose exit wires}.
 
 Then report: `READ: docs/guides/modules.md, issue-shapes.md`. Proceed only after.

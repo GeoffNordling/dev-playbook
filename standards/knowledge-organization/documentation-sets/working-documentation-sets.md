@@ -34,7 +34,9 @@ the set is the whole tree, strands included.
 ## Speculative voice
 
 Every member of a working documentation set writes a guess as a guess,
-and the set's `ROOT.md` declares the set speculative.
+and the set's `ROOT.md` declares the set speculative. This is the whole
+exemption from
+[declarative present tense](/standards/prose/conventions.md#declarative-present-tense).
 
 `knowledge-organization.speculative-voice` · stochastic
 
@@ -51,7 +53,9 @@ link.
 ## Where a set lives
 
 A working documentation set is one directory under `working-docs/` at
-the repo root, `working-docs/<work>/`, holding the set's `index.md`, its
+the repo root, `working-docs/<work>/`, the one
+[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+makes, here named and placed: it holds the set's `index.md`, its
 `ROOT.md`, and its members under lowercase kebab-case names, flat or in
 subdirectories, except a member whose kind fixes its name (`README.md`,
 `PROMPT.md`, `SKILL.md`, `CLAUDE.md`, a Python module).
@@ -82,9 +86,11 @@ file: the set's `ROOT.md`, or, where the work splits into strands, the
 ## Buckets
 
 Every fact in a member of a working documentation set sits under a named
-section, its bucket, and a bucket holds facts of its own type only; the
-section under the member's H1, which says what the member is and what it
-is for, is exempt.
+section, its bucket, the
+[one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
+of that fact inside the member, and a bucket holds facts of its own type
+only; the section under the member's H1, which says what the member is
+and what it is for, is exempt.
 
 A bucket is one of the buckets below, or one the member coins where none
 of them fits; material awaiting triage sits under `Unfiled`. The named

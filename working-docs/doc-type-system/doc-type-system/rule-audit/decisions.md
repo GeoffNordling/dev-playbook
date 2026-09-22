@@ -110,7 +110,7 @@ three parts, not in fixing where they sit.
 ### `decisions.immutable-after-merge` — "A Decision Record that `main` carries has its body, and every frontmatter key other than `status`, byte-identical to the first commit on `main` that carries the file."
 
 The rule sits at
-[records.md:102-108](/standards/decisions/records.md#immutable-after-merge).
+`records.md:102-108`.
 Sixteen of the twenty-nine records on `main` differ from the first
 commit that carried them at their current path.
 
@@ -154,7 +154,7 @@ merged and the rule cannot be obeyed backwards.
 ### `decisions.optional-sections` — "A Decision Record's body carries no section beyond the H1 except `Considered Options` and `Consequences`, and neither of those sections is empty."
 
 The rule sits at
-[records.md:125-131](/standards/decisions/records.md#optional-sections).
+`records.md:125-131`.
 Twenty of the twenty-nine records carry a section it forbids.
 
 The forbidden headings are the ordinary ones.

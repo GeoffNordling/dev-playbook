@@ -64,11 +64,10 @@ in the Standard the step links.
    ([The boundary table](/standards/standard/detectors.md#the-boundary-table)).
 6. **Turn the meta-standard's own policing on.** The meta-standard's
    detector, `standards-lint`, is a published dev-playbook hook. Bump
-   the pin to a dev-playbook `rev` that carries it
-   ([A pinned rev](/standards/distribution/channel.md#a-pinned-rev)):
-   from that rev it runs the consumer-mode rules over the repo's
-   `standards/` tree (`standards-lint --list-rules` is the registry).
-   Until the pin moves, the tree is unpoliced by the meta-standard.
+   the pin to a dev-playbook `rev` that carries it: from that rev it
+   runs the consumer-mode rules over the repo's `standards/` tree
+   (`standards-lint --list-rules` is the registry). Until the pin
+   moves, the tree is unpoliced by the meta-standard.
 7. **Register a local document type (only if the standard needs one).**
    Skip this step unless the new standard governs a **document type**
    the global OKF registry does not carry. If it does, declare the type

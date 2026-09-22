@@ -99,11 +99,6 @@ A Python repo in which `src/` exists.
 └── tests/
 ```
 
-> **Why.** The condition is a conjunction on purpose: `src/` is the
-> default source root of most JavaScript build tools as well, so a
-> repo without `pyproject.toml` is not Python, whatever it keeps in
-> `src/`.
-
 ### One package under src/
 
 `src/` holds exactly one entry: a directory whose name is the import

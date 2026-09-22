@@ -124,7 +124,7 @@ are free, and further patterns may follow.
 ## One version set
 
 Every version the canonical artifacts pin in more than one file carries
-the same value in each
+the same value in each.
 
 `build.one-version-set` · deterministic
 

@@ -4,7 +4,6 @@
 # under .github/workflows/; on-demand is a registered audit no gate runs.
 # Written by scripts/boundary-table, which also fails when this file and a
 # fresh write differ. Regenerate with: scripts/boundary-table --write
-mypy: [push]
 pre-commit validate-manifest: [commit, push, ci]
 ruff-check: [commit, push, ci]
 ruff-format: [commit, push, ci]

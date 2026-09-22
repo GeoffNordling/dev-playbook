@@ -49,9 +49,10 @@ agent's paraphrase.
 
 `tracking.user-intent` · stochastic
 
-> **Why.** The defect the rule catches is one epic-level block of
-> intent copied into every child: the words are the user's, but they
-> are not this issue's.
+> **Why.** Only the user can vouch for what they meant. A paraphrase
+> is an agent's reading of the intent, and the reading is what drifts,
+> so the section keeps the user's words and the agent's reading goes
+> elsewhere in the issue.
 
 ## Closed fences
 

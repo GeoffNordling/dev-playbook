@@ -15,7 +15,10 @@ carries a document type no other repo shares declares it in the
 frontmatter of its own root `index.md`, an `okf_types` mapping beside
 `okf_version`; okf-lint resolves a document's `type` against the union of
 the two, and against the global table alone when the repo declares no
-`okf_types`. Declaring a local type is one step of
+`okf_types`. The declaration is frontmatter and not a document under
+the consumer's own `standards/` tree, since that tree is the
+meta-standard's population, and a registry document there could not
+pass. Declaring a local type is one step of
 [Adopting a Repo-Scoped Standard](/guides/consuming.md).
 
 ## Global table
@@ -61,12 +64,6 @@ okf_types:
   Resume: A resume markdown source, master or batch variant
   Story: One work-experience story in SPAR form
 ```
-
-> **Why.** Frontmatter, not a document under the consumer's own
-> `standards/` tree: that tree is the meta-standard's population, so a
-> registry document there could not pass, and a path that mirrors
-> dev-playbook's own folder name breaks the moment that folder is
-> renamed upstream.
 
 ### Mapping entry shape
 

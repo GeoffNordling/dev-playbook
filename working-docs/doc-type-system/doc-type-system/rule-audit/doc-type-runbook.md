@@ -52,7 +52,7 @@ something no other rule states.
 
 The predicate binds "every step of a runbook's body". The reason is the
 rule's own why
-([Steps end on a completion criterion](/standards/doc-type/runbook-conventions.md#steps-end-on-a-completion-criterion)):
+(Steps end on a completion criterion):
 nothing reaches a launched agent except the launching prompt, so "a step
 that does not say when the work is done leaves the agent nothing else to
 read it from".

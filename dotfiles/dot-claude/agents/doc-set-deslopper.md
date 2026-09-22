@@ -78,7 +78,6 @@ The fact slices:
 - **One home** —
   [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
 - **Terms** —
-  [terms defined once](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once),
   [terms that cross sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets),
   [tight definitions](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#tight-definitions),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only).
@@ -109,6 +108,7 @@ The set slices:
   so no first person never binds it,
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
+  [assertion headings](~/workspace/dev-playbook/standards/prose/conventions.md#assertion-headings),
   [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
 
 A working set's differences reach the auditors through their own

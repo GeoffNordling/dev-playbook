@@ -7,7 +7,7 @@ description: The rule audit over the standards/modules/ family — every rule's 
 # Modules Family Rule Audit
 
 The family holds seven rules in one Standard,
-[Module Design Conventions](/standards/modules/design.md), over the
+Module Design Conventions, over the
 population "a module in a governed repo's source". One trailer needs
 reclassification: `modules.results-are-returned-not-written` is
 decidable by an AST pass and moves to deterministic; nothing moves the
@@ -44,7 +44,7 @@ other: a module with a dependency in another process cannot satisfy
 
 The predicate measures the interface against the behaviour behind it, and
 the rule's own why
-([Deep, not shallow](/standards/modules/design.md#deep-not-shallow))
+(Deep, not shallow)
 gives the deletion test: deleting a deep module pushes its complexity out
 across its callers, where it reappears once per caller; deleting a
 pass-through relocates the same code once.
@@ -210,7 +210,7 @@ definition dead, and the half that can be acted on is already
 `scripts/testing-lint`, and gated at commit, push, and ci. What the
 deletion would lose is the instruction to redraw the interface rather
 than reach past it, and that sentence belongs in the why of
-[The interface is the test surface](/standards/modules/design.md#the-interface-is-the-test-surface).
+The interface is the test surface.
 
 ### `modules.results-are-returned-not-written` — A module that computes a value returns it and does not mutate the caller's argument to deliver it
 
