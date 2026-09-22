@@ -55,35 +55,32 @@ specification.
   outside the files (the day a decision was made, the latest upstream
   release, a GitHub setting, git history, another repo), and not a
   definition that scopes other rules. Behaviour and instruction go to
-  a Guide; the why goes to an Explanation; a scoping definition is an
-  H2 with no trailer. The step 11 sort found each of these mis-filed
-  as a rule.
+  a Guide; the why goes to a `> **Why.**` block; a scoping definition
+  is an H2 with no trailer. The step 11 sort found each of these
+  mis-filed as a rule.
 - **Kind is judged from the sentence, not the trailer.** A sentence a
   script decides from the files with no judgment call is
   deterministic; a sentence with a judgment word ("describes",
   "names the concept", "small against") is stochastic. Where a
   sentence mixes the two, the mechanical part stays deterministic and
-  the judgment moves to the Explanation. Whether a check exists yet
+  the judgment moves to the why block. Whether a check exists yet
   is a separate question; an unchecked predicate of either kind is
   allowed until the detector rewrite lands.
 - **A scoping heading is not a rule.** An H2 with no trailer names
   which members the H3 rules under it bind. It is one shape whether
   it has one child or eleven, and its definition is never repeated in
   the children.
-- **An Explanation is the Reasons for one Standard, and nothing
-  else.** A Reason is one design decision and the argument for it: a
-  heading, a body, and one line naming the rule ids it explains. A
-  decision lands as one rule or several of the same Standard, a
-  deterministic rule beside its stochastic partner or several
-  deterministic rules cut apart to be checkable, so a Reason names one
-  id or several, and every id resolves in the Standard beside it. A
-  Reason is optional: a rule may have none, and none is written for a
-  rule whose why nobody holds. Text that is a reason for no rule is
-  not an Explanation: a definition goes to the Standard's lead or the
-  glossary, a procedure to a Guide, and the rest is deleted. The
-  pseudocode names the explained document by its base type, so a later
-  doc-type is explained the same way. Decided 2026-09-21 from the
-  scrub in step 10.
+- **The why sits with the rule it argues, in the same file.** A
+  `> **Why.**` block after a rule's trailer argues that rule; one
+  ending the opening prose argues the file. The block is optional — a
+  rule may have none, and none is written for a rule whose why nobody
+  holds — and it states no predicate. Text that argues no rule is not
+  a why: a definition goes to the Standard's lead or the glossary, a
+  procedure to a Guide, and the rest is deleted. The Explanation type
+  is deleted, because the user cannot read a rule and its why across
+  two files. Decided 2026-09-21 from the scrub in step 10; the rules
+  are in
+  [Standard Conventions](/standards/doc-type/standard-conventions.md).
 - **Three working policies** that shaped the step 11 rulings and hold
   for any later audit: repo change is the expensive way out; no credit for rule count, so
   delete is the default for a rule that restates another or binds
@@ -113,9 +110,9 @@ specification.
   type. `Object`, its earlier name, is retired.
 - **Part** — a class nested inside a DocType: an Edge, a Rule, an
   Act, a Check, a Yield. A part has no verbs.
-- **Reason** — the one Part of an Explanation: one design decision
-  and the argument for it, naming the rule ids of the Standard beside
-  it that the decision landed as.
+- **Why** — a block opening `> **Why.**`: the argument for the rule
+  whose trailer it follows, or for the file when it ends the opening
+  prose. It holds no predicate.
 
 ## Open
 
@@ -165,59 +162,11 @@ specification.
      [Completed](#completed).
   10. *Doc-types before migration.* Done 2026-09-21; the entries are
      in [Completed](#completed).
-  11. *Settle every rule.* Every rule ruled on, keep, rewrite,
-     delete, or fold under a condition, and the rulings applied by
-     agents, one work order each; the work orders and the audit sheets
-     that fed them were deleted once spent, and commits b5a0c08,
-     b01d0fd, and 9000802 hold them. What the audit found and step 11
-     does not close is in
+  11. *Settle every rule.* Done 2026-09-22 over five waves; the
+     entries are in [Completed](#completed). What the audit found
+     and step 11 does not close is in
      [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md),
      step 12's input.
-     Text that is not a predicate leaves the rule: a why to the why
-     block, a procedure to a Guide, a scoping definition to a
-     condition. Documents only: no detector logic changes. Output: the
-     Standards say only what is true of the files.
-     Waves 1 to 4 are done; the entries are in [Completed](#completed).
-     The waves left, in order:
-     - **Wave 5, reheadlining.** One agent per Guide and per Standard
-       file, in parallel: every heading below the H1 becomes a
-       proposition in block language per
-       `prose.headings-are-propositions`, the fewest words that carry
-       what the section establishes, so a reader of the headings alone
-       knows what the bodies say; a heading that already passes stays.
-       A body is otherwise untouched, with one release: where the new
-       heading absorbs the body's opening words, the body may shed
-       them, so long as what is left reads as a sentence and the rule
-       survives whole across the heading and that sentence. A heading
-       and a lead that say the same thing are no finding — the heading
-       is the section's name for its own rule, and
-       `prose.one-rule-one-place`, relaxed in this wave, bars the
-       second copy in another section or another document, not the one
-       inside the section. Two headings name something other than a
-       proposition: a heading that states no point of its own and only
-       scopes the sections under it names the case those sections
-       bind, which is what a condition's H2 does, and a Guide step's
-       bold run stays imperative, since an encoding reads it from the
-       body as an action. A third form belongs to a whole document,
-       not a heading: where every section below the H1 opens with the
-       same definition run, the headings are the terms the repo
-       speaks, and `guides/slop-tics.md` is the one such document, its
-       fifteen tic names left standing. Every other heading speaks in
-       the third person, so the
-       four imperative headings of `prose/conventions.md`, held here
-       so one rename settles the file, convert with the rest. Two
-       rules govern the rename's wake:
-       `knowledge-organization.headings-slugify-distinctly`, so no two
-       propositions in a file land on one slug, and
-       `knowledge-organization.link-text-names-heading-or-title`,
-       which moves the text of each citation as well as its anchor, to
-       the new proposition or to the target's title where a
-       proposition will not sit in the citing sentence. Then the ids
-       move, since a rule's id is its heading's slug: the two tables
-       regenerate, and the ids written into the detectors and into
-       `DEPENDENCY_RULES` follow. That exposure may be wide, since the
-       ids a detector hardcodes sit under bare topic nouns the rule
-       fails, `## Spelling` and `## Docstrings` among them.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
@@ -281,6 +230,20 @@ specification.
   file ([Principles](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles)).
 
 ## Completed
+
+- **Step 11 wave 5, reheadlining, 2026-09-22.** Thirty-seven Opus
+  agents, one per Guide or Standard file, in two batches of 8 and 29,
+  rewrote 169 headings into propositions; the orchestrator applied the
+  union repo-wide, since a rule's id is its heading's slug. 112 ids
+  moved, in three forms — plain, escaped regex, and one bare slug —
+  66 inbound citations repointed, most carrying their link text to the
+  new heading and the rest to the target's title where the heading
+  would not sit in the sentence, and both yaml tables regenerated.
+  `okf-lint` found the type registry by that heading's slug and went
+  blind on the rename; the slug is a named constant now, and step 12's
+  brief carries the coupling. Dropped: trimming the body openings the
+  new headings absorb, since the overlap is no finding. Commits
+  b76047e, ae587cd, dedc625, 4439ea5, 0d22ed4, and this one.
 
 - **Step 11 wave 4, 2026-09-22.** The orchestrator pass, by hand in
   the session, closing what the family waves left across files. The
