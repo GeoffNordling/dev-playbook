@@ -47,13 +47,13 @@ is one the repo complies with.
   policies: no credit for rule count, and a detector never keeps a
   rule alive.
 - **Simple.** Fewer moving parts beats a clever one.
-- **Plain rules.** A rule that survives reads plain, direct, and
+- **Plain rules.** On exit every rule body reads plain, direct, and
   concrete: it names the file, the value, and the comparison, so the
-  user understands it on first reading. A rule the user cannot
-  understand is restated in that form or deleted; the triage found
-  its first three rows unreadable and deleted two. A proposal on
-  screen states how it differs from today's rule and from today's
-  enforcement.
+  user understands it on first reading. A body that does not is
+  restated with its meaning held and its heading fixed, since the
+  heading is the id and every heading is approved. Unclear wording is
+  never a reason to delete. A proposal on screen states how it
+  differs from today's sentence and from today's enforcement.
 
 ## Constraints
 
@@ -188,8 +188,9 @@ is one the repo complies with.
   escalated and ruled on, in
   [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md).
   `build` and `python` done by hand as the calibration sample; the
-  other ten families by one Opus agent each. The exit list is the
-  specification the package is written to.
+  other ten families by one Opus agent each, launched with
+  [Triage Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/triage-family.md).
+  The exit list is the specification the package is written to.
 - **The measurement.** Time `playbook-lint` on this repo and the
   test suite, before any code moves.
 - **The rewrite.** The package, module by module, against the exit
