@@ -14,7 +14,8 @@ binds one file's own state. The repo-level shape around that file, meaning
 file carries to run from a bare clone, is
 [The Python Project](/standards/build/python.md). The task-runner targets
 that invoke ruff and mypy are
-[Canonical Artifacts](/standards/build/canonical.md#makefile-holds-its-layers-targets), and pytest
+[Canonical Artifacts](/standards/build/canonical.md#makefile-holds-its-layers-targets),
+and pytest
 conventions are
 [Testing Conventions](/standards/testing/conventions.md).
 

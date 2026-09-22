@@ -9,7 +9,8 @@ description: What a repo in the workspace declares rather than leaves to be infe
 What a repo in the workspace declares rather than leaves to be
 inferred: that it is governed, what it decided, and what work is in
 flight inside it. The roster is consulted when a repo is added to the
-workspace, at the [roster enrollment](/guides/bootstrap.md#the-green-repo-enrolls-in-governed)
+workspace, at the
+[roster enrollment](/guides/bootstrap.md#the-green-repo-enrolls-in-governed)
 that ends [Bootstrap](/guides/bootstrap.md); the rest is consulted
 when a Decision Record or a working documentation set is written.
 

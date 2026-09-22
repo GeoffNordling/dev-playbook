@@ -88,7 +88,7 @@ file: the set's `ROOT.md`, or, where the work splits into strands, the
 Every fact in a member of a working documentation set sits under a named
 section, its bucket, the
 [one home per fact](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact)
-of that fact inside the member, and a bucket holds facts of its own type
+inside the member, and a bucket holds facts of its own type
 only; the section under the member's H1, which says what the member is
 and what it is for, is exempt.
 

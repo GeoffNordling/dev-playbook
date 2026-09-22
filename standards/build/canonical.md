@@ -86,8 +86,8 @@ of files and gives each one a rule whose target is that file's path.
 `tool.ruff.lint.select`, `tool.ruff.lint.ignore`,
 `tool.ruff.lint.pydocstyle.convention`, and every `[tool.mypy]` key.
 Where the canonical file writes a placeholder, the copy writes its own
-name: `project.name` is the project name of the
-[the repo directory names the project and package](/standards/build/python.md#the-repo-directory-names-the-project-and-package), and
+name: `project.name` is the project name
+[The Python Project](/standards/build/python.md#the-repo-directory-names-the-project-and-package) fixes, and
 `tool.ruff.lint.isort.known-first-party` is the one-item list holding the
 import package. `[dependency-groups] dev` carries every floor the
 canonical file lists. In a repo with `src/`, every `[build-system]` key

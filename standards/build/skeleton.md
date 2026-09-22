@@ -102,8 +102,7 @@ A Python repo in which `src/` exists.
 ### One package under src/
 
 `src/` holds exactly one entry: a directory whose name is the import
-package the [the repo directory names the project and package](/standards/build/python.md#the-repo-directory-names-the-project-and-package)
-names.
+package [The Python Project](/standards/build/python.md#the-repo-directory-names-the-project-and-package) names.
 
 `build.one-package-under-src` · deterministic
 

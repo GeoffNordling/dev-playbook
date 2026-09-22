@@ -30,9 +30,8 @@ to their concerns; what one member holds is [Doc Conventions](/standards/prose/c
 Every rule here reads one set: its index, its members, and the index one
 level up and one level down. Two reach farther by their own text,
 [one home per fact](#one-home-per-fact) into any set and
-[crossing terms in CONTEXT.md](#crossing-terms-in-contextmd) into
-the repo's `CONTEXT.md`; a set is otherwise judged with no neighbour's
-body open.
+[crossing terms in CONTEXT.md](#crossing-terms-in-contextmd) out to the
+repo root; a set is otherwise judged with no neighbour's body open.
 
 ## An index in every directory
 

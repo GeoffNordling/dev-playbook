@@ -58,7 +58,8 @@ sentence after all, and is kept so step 12 does not re-open it.
 ## The two moves that ride along
 
 The five thin shims that carry rule logic move it into the package
-(`standard.the-script-holds-no-rule-logic`), and `doc-type.one-base-class` gains its check.
+(`standard.the-script-holds-no-rule-logic`), and `doc-type.one-base-class`
+gains its check.
 
 ## Acronyms
 

@@ -49,7 +49,9 @@ A pointer does two jobs — state what the material is, and list the **branches*
 - **One trigger per branch.** Synonyms that rename a single branch are one branch written twice; collapse them and keep only genuinely distinct branches.
 - **Cut identity the body already carries.**
 
-For a runbook's `description`, Runbook Conventions' [Description, two sentences or one](/standards/doc-type/runbook-conventions.md#description-two-sentences-or-one) binds its shape.
+For a runbook's `description`, Runbook Conventions'
+[Description, two sentences or one](/standards/doc-type/runbook-conventions.md#description-two-sentences-or-one)
+binds its shape.
 
 ## Every step ends on a completion criterion
 
