@@ -1,13 +1,13 @@
 ---
 type: General-Sheet
 title: Runbook Residual Ledger
-description: Runbook's residual record — what the Reference chain cannot express, one entry per ported runbook
+description: Runbook's residual record — what the chain cannot express, one entry per ported runbook
 ---
 
 # Runbook Residual Ledger
 
 Runbook's residual record: what the
-[Reference chain](/doc-types/runbook/contract-shape.md)
+[chain](/doc-types/runbook/contract-shape.md)
 cannot express. That is all an entry is — a record.
 
 ## Runbooks

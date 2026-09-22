@@ -80,8 +80,8 @@ CLOA object is the document's node and every edge its doc-type extractor
 yielded: for a runbook, the root with its name, type, and node data, the
 signature, and the chain edges with operation, target, condition, and
 annotation
-([Reference Chain](/doc-types/runbook/contract-shape.md),
-[Reference Chain Encoding](/doc-types/runbook/encoding.md)); for a
+([the chain](/doc-types/runbook/contract-shape.md),
+[Nodes and Edges Encoding](/doc-types/runbook/encoding.md)); for a
 Standard, its population and its rules with their conditions
 ([Population and Rules Encoding](/doc-types/standard/encoding.md));
 for a loop, its acts, checks, and yields, read from the Mermaid block

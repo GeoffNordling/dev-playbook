@@ -1,14 +1,14 @@
 ---
 type: General-Sheet
 title: Nodes and Edges
-description: Runbook's contract shape — nodes joined by labeled edges, the Reference chain, rooted at one runbook — in prose
+description: Runbook's contract shape — nodes joined by labeled edges, the chain, rooted at one runbook — in prose
 ---
 
 # Nodes and Edges
 
-Nodes joined by labeled edges, the **Reference chain**, are Runbook's
-contract shape ([Doc-Type](/doc-types/doc-type.md)): the form every
-runbook's contract takes. A runbook is an invocable command written as
+Nodes joined by labeled edges, the **chain**, are Runbook's contract
+shape ([Doc-Type](/doc-types/doc-type.md)): the form every runbook's
+contract takes. A runbook is an invocable command written as
 documentation ([Runbook](/doc-types/runbook/definition.md)).
 
 ## The shape
@@ -63,8 +63,8 @@ more: its contract lives outside this corpus.
 | Type     | What chains do with it | How it runs | Where its declaration lives |
 | -------- | ---------------------- | ----------- | --------------------------- |
 | Standard | read                   | —           | The Standard doc-type ([Doc-Type System](/doc-types/doc-type-system.md)) |
-| Agent    | do                     | fresh context, its own permissions — a subprocess | Its own Reference chain |
-| Skill    | do                     | the calling context, the caller's permissions — in-process | Its own Reference chain |
+| Agent    | do                     | fresh context, its own permissions — a subprocess | Its own chain |
+| Skill    | do                     | the calling context, the caller's permissions — in-process | Its own chain |
 | Script   | do                     | deterministic code via the shell | The code itself |
 
 A node may also carry its permission expression and model pin as node

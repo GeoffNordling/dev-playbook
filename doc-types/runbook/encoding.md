@@ -7,7 +7,7 @@ description: The layer below the contract shape — the spec a writer follows to
 # Nodes and Edges Encoding
 
 The layer below
-[the shape](/doc-types/runbook/contract-shape.md), the Reference chain:
+[the shape](/doc-types/runbook/contract-shape.md), the chain:
 how chain edges are written inside runbook prose, so deterministic
 code reads every chain. This file is the spec for the writer of that
 prose; the primitive map below gives each primitive of the shape its

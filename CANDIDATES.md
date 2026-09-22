@@ -101,7 +101,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   chance to codify rules, procedures, and algorithms for writing the next
   one correctly, and no flywheel exists today.
 - **OKF traces** — "OKF trace" has no definition; decide whether a
-  trace is the Reference chain or something more.
+  trace is the chain or something more.
 
 ## Code legibility
 

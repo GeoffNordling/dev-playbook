@@ -55,8 +55,8 @@ Deterministic code can only show what is extractable or declared.
   markdown file links to another, a frontmatter field names a resource,
   a module imports a module.
 - **Declared** facts are what an author wrote in a fixed shape: the
-  `description` line in frontmatter, a runbook's Reference chain, a
-  Standard's rules, an index's one-line entries.
+  `description` line in frontmatter, a runbook's chain, a Standard's
+  rules, an index's one-line entries.
 
 Everything a model would otherwise infer at view time, what a file is
 for, which files form a subsystem, is already forced into declared form
@@ -133,9 +133,9 @@ needs a second data structure.
 | cross-reference matrix | which X take part in which Y | `does` edges laid out as a grid |
 | interface card | how one thing is used | one node and every edge leaving it |
 
-Control flow is a selection only because the Reference chain already
-declares order and condition on its edges. Where nothing declares
-order, the selection is empty, and empty is the correct answer.
+Control flow is a selection only because the chain already declares
+order and condition on its edges. Where nothing declares order, the
+selection is empty, and empty is the correct answer.
 
 The principle underneath: **a thing a view draws is a node; a thing a
 view explains is an attribute.** Directories are nodes because the tree
@@ -239,11 +239,11 @@ The worked case is `ralph-loop.js`. Its loop, its exit on
 extractable. Its iteration prompt, lines 80 to 105, is a string literal
 that says: run the check gate, read the plan and progress files, do the
 next task, write the check-off and a progress line, do `/commit`,
-report `{tasksLeft, blocker, summary}`. That is a Reference chain with
-args, reads, does, writes, and a typed report, and `${PLAN}` and
-`${CHECK}` are its args. The only thing wrong with it is where it
-lives. As a string in JavaScript no doc-type extractor reaches it, so
-the iteration agent's every read and write is invisible.
+report `{tasksLeft, blocker, summary}`. That is a chain with args,
+reads, does, writes, and a typed report, and `${PLAN}` and `${CHECK}`
+are its args. The only thing wrong with it is where it lives. As a
+string in JavaScript no doc-type extractor reaches it, so the iteration
+agent's every read and write is invisible.
 
 The fix is structural, not descriptive. The prompt becomes
 `dotfiles/dot-claude/agents/ralph-iteration.md`, an Agent runbook like

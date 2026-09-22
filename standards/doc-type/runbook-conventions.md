@@ -13,8 +13,8 @@ files that act. A bundle whose directory is a symlink belongs to
 whatever manages its target, so it is outside the population and
 harness-files-lint skips it. The
 [Runbook doc-type](/doc-types/runbook/index.md) declares a runbook's
-contract, the Reference chain; this Standard binds the file: its front
-matter, its body's shape, and what each kind adds; where it sits is
+contract, the chain; this Standard binds the file: its front matter,
+its body's shape, and what each kind adds; where it sits is
 [Location](/standards/harness/files.md#location). The
 craft of the body, the two loads, the information hierarchy, and
 pruning, is [Writing for Agents](/guides/writing-for-agents.md),

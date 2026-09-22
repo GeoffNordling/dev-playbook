@@ -26,7 +26,7 @@ disagree, the fact base has priority
 - **fact base**, **view**, **extractor** — the set's words
   ([Terms](/working-docs/doc-type-system/ROOT.md#terms)).
 - **CLOA object** — what a doc-type's contract shape defines for one
-  document, a runbook's Reference chain, a Standard's rules
+  document, a runbook's chain, a Standard's rules
   ([Doc-Type](/doc-types/doc-type.md)). In the fact base it is
   the nodes and edges that document's doc-type extractor yields.
 - **checkout** — one working copy of a repo, a main checkout or a
@@ -78,7 +78,7 @@ The acceptance picture. The user starts the viewer once, from
 shows the tree, every tracked markdown file in its two groups
 ([index-tree](/working-docs/doc-type-system/viewer/registry.md#index-tree)),
 each with its description. The user clicks
-`dotfiles/dot-claude/agents/doc-set-deslopper.md`: its Reference chain appears,
+`dotfiles/dot-claude/agents/doc-set-deslopper.md`: its chain appears,
 the CLOA object itself. A button on that panel opens the file's details,
 its frontmatter facts, its links in and out, and its rendered source, for
 the times the chain is not enough. The user edits the file in the IDE:
@@ -93,7 +93,7 @@ targets.
   contract shape above all. A panel uses the object's own primitives and
   the object's own terms, and mints neither: a runbook panel says edge,
   node, bucket, condition, and never a word the
-  [Reference chain](/doc-types/runbook/contract-shape.md) does not. A
+  [chain](/doc-types/runbook/contract-shape.md) does not. A
   panel that needs a primitive the shape lacks is a residual for that
   doc-type's ledger, never a term the viewer invents
   ([Fact Base](/working-docs/doc-type-system/fact-base/fact-base.md#the-objects-are-already-defined)).
@@ -103,7 +103,7 @@ targets.
   `b266ce4`. They constrained nothing, and carrying them to the screen
   was never the goal. How an object draws is the renderer's to decide, which the
   doc-type itself says
-  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)), so the
+  ([Nodes and Edges Encoding](/doc-types/runbook/encoding.md)), so the
   drawing rules are stated here, in the kind's registry entry, and the
   meaning they draw is the doc-type's.
 - **A view drops; it never adds or converts**

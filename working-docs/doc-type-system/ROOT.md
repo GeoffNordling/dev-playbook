@@ -176,7 +176,7 @@ the seed of the system's eventual context file.
   relation type, and, where the source declares them, an order, a
   condition, and a detail quoted from the source. The detail is what
   the runbook encoding calls annotation
-  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)).
+  ([Nodes and Edges Encoding](/doc-types/runbook/encoding.md)).
 - **Derivation** — a deterministic function from rows to rows. It
   reads the fact base and derives new rows from existing ones, with
   no judgment, and never touches a file. Not a rule: a rule is a

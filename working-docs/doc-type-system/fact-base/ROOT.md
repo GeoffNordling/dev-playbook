@@ -60,7 +60,7 @@ strand's own:
 - **Primitive** — one named element of a vocabulary: `reads`,
   `bucket:git`, `contains`.
 - **Vocabulary** — the closed set of primitives one doc-type owns
-  ([Reference Chain](/doc-types/runbook/contract-shape.md#edges)).
+  ([the chain](/doc-types/runbook/contract-shape.md#edges)).
 - **Schema** — the fact base's set of node types and relation types:
   the union of every vocabulary plus the bedrock relations. The fact
   base has a schema and no vocabulary of its own.
