@@ -5,17 +5,18 @@ export const meta = {
   phases: [{ title: 'Scatter' }],
 }
 
-// args: a required JSON string of options. No defaults.
+// args: a required object of options. No defaults.
 //   jobs    array of { id, prompt, model, effort }; results return in this order, keyed by id.
 //           model ('haiku' | 'sonnet' | 'opus' | ...) and effort ('low' | 'medium' | 'high' |
 //           'xhigh' | 'max') are per-job and required on every job — no batch-level identity.
 //   schema  optional JSON Schema applied to every job's structured output
 //
-// NOTE (2026-06-25, re-probed 2026-07-31): the Workflow runtime's own docs are wrong here — they
-// say objects/arrays reach the script verbatim, but every args value actually arrives
-// JSON-serialized to a string (or undefined when omitted), so the contract is: the caller passes
-// an object, this script parses it. Re-verified directly against the runtime with a probe workflow
-// that reported `typeof args` for both a passed object ("string") and an omitted one ("undefined").
+// NOTE (2026-06-25, re-probed 2026-07-31, 2026-09-08 and 2026-09-22): how args reaches the script
+// has changed across runtime versions. Through 2026-07 every value arrived JSON-serialized to a
+// string; since 2026-09-08 a bare object passed by the caller arrives as the object itself, while
+// a value routed through the skill wrapper still arrives as a string. The contract is therefore:
+// the caller passes an object, and this script accepts either form and validates the result the
+// same way.
 const ALLOWED = ['jobs', 'schema']
 
 // Pre-flight batch limit. Scatter-gather spawns one agent per job in a single parallel() call,
@@ -25,11 +26,13 @@ const MAX_JOBS = 1000
 function parseArgs(raw) {
   if (raw == null)
     throw new Error(`scatter-gather: args is required — pass {jobs} (schema optional)`)
-  if (typeof raw !== 'string')
-    throw new Error(`scatter-gather: args must be a JSON string, got ${typeof raw}`)
   let opts
-  try { opts = JSON.parse(raw) }
-  catch (e) { throw new Error(`scatter-gather: args is not valid JSON (${e.message})`) }
+  if (typeof raw === 'string') {
+    try { opts = JSON.parse(raw) }
+    catch (e) { throw new Error(`scatter-gather: args is not valid JSON (${e.message})`) }
+  } else {
+    opts = raw
+  }
   if (opts === null || typeof opts !== 'object' || Array.isArray(opts))
     throw new Error(`scatter-gather: args must decode to a JSON object`)
   for (const k of Object.keys(opts)) {

@@ -266,7 +266,7 @@
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
   "voice": {
-    "enabled": true,
+    "enabled": false,
     "mode": "hold"
   },
   "autoMemoryEnabled": false,
@@ -281,5 +281,5 @@
       "All GitHub CLI (`gh`) operations are approved, including writes such as `gh issue comment`, `gh issue edit` (phase-label changes), `gh issue create`/`close`/`reopen`, `gh pr create`, and `gh pr comment`/`edit`. The software factory's hands-off (auto-mode) nodes use them to post review findings and advance the `phase:*` label on an issue's own GitHub tracker and to open and annotate its PR. These are routine internal project-management writes against our own repositories, not escalations or unrecognized infrastructure."
     ]
   },
-  "voiceEnabled": true
+  "voiceEnabled": false
 }
