@@ -19,7 +19,7 @@ Reusable patterns — recipes — for getting leverage out of the Claude Code ha
 
 ## Subscription billing constraint
 
-We recognize programatic, API-based workflows as a supremely-powerful pattern in agentic development. Alas, as a private individual with very limited funding, we're restricted to subscription billing.
+We recognize programatic, API-based workflows as a strong pattern in agentic development. As a private individual with very limited funding, we're restricted to subscription billing.
 
 Headless `claude -p` draws from that same subscription pool, so a recipe may reach for it. [Headless Operation](/docs/headless.md) covers what it guarantees and what it does not.
 

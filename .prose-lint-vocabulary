@@ -1,0 +1,11 @@
+# Words this repo bans beyond the workspace's, each with the word that
+# replaces it and the directories the ban covers
+# (prose/conventions.md — The repo vocabulary).
+
+# The doc-type system's word for the predicate under which a part applies
+# is condition; guard is the same thing under a second name.
+guard:
+  say: condition
+  where:
+    - doc-types
+    - standards/doc-type

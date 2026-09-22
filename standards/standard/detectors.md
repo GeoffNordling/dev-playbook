@@ -1,146 +1,151 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Detectors
-description: The detector contract behind every Audit cell; read-only, wired throughout its scope, a formatter by its check mode, and the shim, git-environment, hosting, rule-id, output, and exit-code rules a first-party script obeys
-population: "a detector: a read-only check an Audit cell cites, first-party at scripts/<name> or third-party by its pin"
+description: The check contract behind the verifier and boundary tables — the two tables, read-only, and the shim, git-root, hosting, and canonical-template rules a first-party script obeys
+population: "a check the verifier table names, first-party at scripts/<name> or a dependency by its address, and the two tables at standards/verifiers.yaml and standards/boundaries.yaml"
 ---
 
 # Detectors
 
-A **detector** is the read-only check behind an Audit cell: it inspects
+A **detector** is a read-only check the verifier table names: it inspects
 the repository against one or more Standards and emits findings, and by
 itself it blocks nothing; its run at a gate is the audit stationed there,
-which is Enforcement ([Vocabulary](/CONTEXT.md#governance),
-[Gates](/standards/standard/gates.md)). A first-party detector is a
-script the audited repo hosts at `scripts/<name>`; a third-party one,
-`ruff`, `shellcheck`, `shfmt`, is cited by its bare name and pin
-([Cells](/doc-types/standard/encoding.md#cells)). What an Audit cell
-cites, and how, is
-[Card Catalog](/standards/standard/cards.md#audit-cites-a-lint).
+which is Enforcement ([Vocabulary](/CONTEXT.md#governance)). The
+**verifier table**,
+`standards/verifiers.yaml`, maps every rule id declared under `standards/`
+to the address of the one check that decides it, or to null where no check
+does: a first-party detector by its path, `scripts/repo-lint`; a
+dependency by its pinned pre-commit hook id, `ruff-format`; or a dependency
+by its `pyproject.toml` name and the subcommand it runs, `mypy`,
+`pre-commit validate-manifest`. `scripts/verifier-table` writes the table
+and is its lint. The **boundary table**, `standards/boundaries.yaml`, maps
+every address the verifier table names to the gates that run it;
+`scripts/boundary-table` writes it from the wiring and is its lint. No
+Standard says where it runs; the boundary table does.
 
-## Read-only
+## Read-only without a write flag
 
-A detector leaves everything git tracks as it found it; reading state
-outside the working tree does not disqualify it.
+A first-party detector run without an explicit write flag leaves
+everything git tracks as it found it; `verifier-table --write` and
+`boundary-table --write` are enforcement, and a dependency the verifier
+table names may write at its gate, `ruff-format` and `shfmt -w`.
 
-workspace-lint queries GitHub over `gh api`, writes findings to stdout
-and a summary to stderr, and changes nothing git tracks, so it is
-read-only and belongs in an Audit cell.
+`standard.read-only-without-a-write-flag` · stochastic
 
-## A formatter is a detector by its check mode
+## A declaring repo carries the generated verifier table
 
-`shfmt -d` and `ruff format --check` report and mutate nothing, so the
-tool is a detector an Audit cell cites; its write mode, `shfmt -w`,
-stationed at the commit gate is Enforcement, never an audit.
+A repo that declares a rule under `standards/` carries
+`standards/verifiers.yaml`, byte-identical to what `scripts/verifier-table`
+writes: one row per declared rule id, sorted, each carrying the address of
+the one check that decides it or null.
 
-## Wired throughout its scope
+`standard.a-declaring-repo-carries-the-generated-verifier-table` · deterministic
 
-A detector runs over its whole governed population, a workspace-scoped
-one in every repo and a repo-scoped one throughout its host repo, never a
-subset; one whose surface is optional, skills or a `standards/` tree,
-exits 0 silently when the surface is absent, and every other asserts
-unconditionally and fails loud.
+> **Why.** Question and mechanism cross-cut: several detectors check
+> one Standard, and one detector checks for several Standards, so the
+> one-to-one fact sits at the rule id rather than at the check. A
+> null row is an honest one: the rule is stated and no check decides
+> it.
 
-Applicability lives inside the detector, so a gap closes there and the
-detector stays wired everywhere.
+### An emitted id is a rule heading
+
+Every id a check claims, a first-party detector under `--list-rules` or a
+dependency in the generator's dependency map, is the id of a rule
+declared deterministic under `standards/`, and no two checks claim the
+same id.
+
+`standard.an-emitted-id-is-a-rule-heading` · deterministic
+
+### An address exists
+
+Every dependency address the table names resolves in the repo: a hook id
+of its `.pre-commit-config.yaml`, or a dependency its `pyproject.toml`
+declares, or `pre-commit` itself where that config file exists.
+
+`standard.an-address-exists` · deterministic
+
+### A consumer adds only its own rules
+
+In a repo other than dev-playbook, no row of the table names a rule
+dev-playbook's shipped table carries; the two tables union at read time.
+
+`standard.a-consumer-adds-only-its-own-rules` · deterministic
+
+## The boundary table, generated from the wiring
+
+A repo that asks any check, dev-playbook or a consumer whose
+`.pre-commit-config.yaml` wires a `scripts/` hook, carries
+`standards/boundaries.yaml`, byte-identical to what
+`scripts/boundary-table` writes: one row per address the verifier table
+names, sorted, each carrying the gates that run it in a fixed order drawn
+from `commit`, the pre-commit stage at `git commit`; `push`, the pre-push
+stage at `git push`, which runs `make check`; `ci`, a workflow under
+`.github/workflows/`; and `on-demand`, no gate. The rows are read from
+the wiring: the hooks of `.pre-commit-config.yaml` by their stages, with
+`playbook-lint` expanded to its roster, the recipe of `make check`, and
+each workflow's `run` steps less their `SKIP`.
+
+`standard.the-boundary-table-generated-from-the-wiring` · deterministic
+
+> **Why.** A Standard that stated its own enforcement could be wrong
+> about it and nothing would notice, so where a check runs is read
+> from the wiring instead.
+
+### Every address runs somewhere
+
+Every address the verifier table names runs at a gate or is a registered
+ungated audit, and no registered ungated audit runs at a gate.
+
+`standard.every-address-runs-somewhere` · deterministic
+
+### A skip is machine state
+
+A detector is skipped at a gate only where its input is machine-local
+rather than held in the repository.
+
+`standard.a-skip-is-machine-state` · stochastic
 
 ## A first-party detector
 
-A script the audited repo hosts at `scripts/<name>`: in dev-playbook a
-shim over `src/dev_playbook`, in a consumer repo the repo's own.
+The detector is a script the audited repo hosts at `scripts/<name>`.
 
-### Thin shims
+### The script holds no rule logic
 
-The script is a thin shim over the host repo's reusable modules: the
-logic lives in the module, and the script wires argument parsing and
-output to it.
+The script holds no rule logic: apart from its shebang and inline
+metadata block, its statements are at most one that puts the host repo's
+package on `sys.path`, one import from that package, and one call of the
+imported entry point.
 
-In dev-playbook the modules are `src/dev_playbook`. A Python file under
-`scripts/` is also bound by
-[Package-backed scripts are shims](/standards/build/python.md#package-backed-scripts-are-shims);
-this rule binds a detector in any language.
+`standard.the-script-holds-no-rule-logic` · deterministic
 
-### Explicit roots outrank the hook environment
+### Git runs against the given root
 
-A detector that shells out to git scrubs the repository-locating
-variables `git rev-parse --local-env-vars` names from every subprocess
-environment, leaving transport and auth settings such as
-`GIT_SSH_COMMAND` in place, and its test suite clears the same set before
-every test.
+A first-party detector that runs git clears the variables
+`git rev-parse --local-env-vars` lists from the child environment.
 
-Detectors run at git gates, and a hook inherits an absolute `GIT_DIR`
-whenever discovery from its own working directory would land on the
-wrong repository: always from a linked worktree, where agent work
-happens, and in submodule flows. The variable silently outranks
-`git -C <root>` and the working directory in every child process,
-redirecting git to the hook's repository instead of the audited one. A
-plain clone's hook exports no absolute `GIT_DIR`, so its absence there is
-no evidence the clause is stale. git names the set itself through
-`git rev-parse --local-env-vars`, which stays correct across git
-versions, and the set includes the `GIT_CONFIG_*` channel, through which
-ad-hoc config relocates a repository as readily as `GIT_DIR` does.
-dev-playbook detectors call `gitrepo.no_git_env`; a self-contained
-consumer detector cannot import it and either carries its own copy or
-runs `unset $(git rev-parse --local-env-vars)`, the remedy `githooks(5)`
-documents. The same variable makes a bare `git init` a silent no-op,
-which is why the test suite clears the set (an autouse fixture in
-`tests/conftest.py`).
+`standard.git-runs-against-the-given-root` · deterministic
 
-### The hosting pattern
+> **Why.** Git exports `GIT_DIR` to a hook it runs, always when the
+> hook fires in a linked worktree, and `GIT_DIR` outranks both the
+> working directory and an explicit `git -C <root>`. The failure is
+> silent: a detector told to audit one repository reads another and
+> reports on it.
 
-The script lives at `scripts/<name>`, is published in the repo's own
-`.pre-commit-hooks.yaml`, is mirrored in its `repo: local` block, is
-cited by a card's Audit cell, and carries a row in `scripts/README.md`'s
-validation table when the repo has that file; standards-lint reports a
-missing leg (`standard.hook-surfaces`).
+### Every detector is reachable and listed
 
-dev-playbook is the topmost instance of the pattern. A repo that ships a
-manifest runs what it ships from its own local block; that invariant is
-stated once, in
-[Distribution Channel](/standards/distribution/channel.md#the-local-block-covers-the-manifest).
+A first-party detector is reachable from its repo's published hook,
+named in the `playbook-lint` roster, wired as a `scripts/` hook its
+`.pre-commit-config.yaml` and `.pre-commit-hooks.yaml` both carry, or
+registered as an ungated audit, and has a row in a `scripts/README.md`
+script table where the repo has that file.
 
-### Card-namespaced rule ids
+`standard.every-detector-is-reachable-and-listed` · deterministic
 
-Every finding carries a rule id of the form `card.rule`, namespaced by
-the card whose question it answers and named after that question rather
-than the tool that detects it; every prefix the script emits belongs to a
-card whose Audit cell cites it, and every such citation is backed by at
-least one id with that card's prefix (`standard.rule-matrix`).
+### Offered by the canonical template
 
-Question and mechanism cross-cut: one card is cited by several
-detectors, and one detector by several cards. The one-to-one invariant
-sits a level down, at the rule: every `card.rule` id belongs to exactly
-one card.
+A first-party detector the repo carrying `standards/build/canonical/`
+publishes in `.pre-commit-hooks.yaml` is a hook of that canonical
+`.pre-commit-config.yaml`'s pinned dev-playbook block, which offers
+exactly the ids that manifest publishes.
 
-### `--list-rules`
-
-The script answers `--list-rules`, printing every `card.rule` id it can
-emit, one per line.
-
-standards-lint runs it to build the rule matrix, so the printed set is
-the ground truth the matrix joins on.
-
-### Finding format
-
-A finding is one line in GNU format, `file:line: card.rule message`: a
-colon after the location, single spaces, a repo-relative path, and
-`:line` omitted for a file-level finding.
-
-`README.md: knowledge-organization.doc-shape missing an H1 title` is a
-file-level finding.
-
-### Exit codes
-
-The script exits 0 when clean, 1 when it has findings, and 2 when it
-cannot run.
-
-### Verbatim content
-
-The script excludes a document typed `Reference`, a verbatim copy of an
-upstream external one, by consulting the shared registry
-`src/dev_playbook/external.py` (`is_verbatim_doc`), so every detector
-excludes the same documents.
-
-Such a document is not the repo's to hold to the authored-content
-standards. One registry is what keeps the exclusion from drifting into an
-unsynced, undocumented per-detector skip list.
+`standard.offered-by-the-canonical-template` · deterministic

@@ -19,11 +19,11 @@ for use outside the set.
 
 ## Goal
 
-Three DocTypes, ten verbs, in
+Five DocTypes, twelve verbs, in
 [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
-the picture of the target state;
-[Doc-Type Specification](/working-docs/doc-type-system/doc-type-system/specification/doc-type.md)
-is the same state as predicates, with one file per doc-type beside it.
+the picture of the target state; the Standard
+[Doc-Type](/standards/doc-type/doc-type.md) is the same state as
+predicates over any doc-type.
 The refactor that reaches them, then one loop that grows the
 specification.
 
@@ -33,9 +33,7 @@ specification.
   the three doc-types parallel.
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)
   holds the parallel structure, and each peer has its conventions
-  Standard: `harness/runbook-conventions` for Runbook, the
-  Meta-Standard under `standard/` for Standard, and
-  `knowledge-organization/loop-conventions` for Loop.
+  Standard under `standards/doc-type/`.
 - **Verbs.** Each doc-type is defined by a short list of simple verbs,
   its operations. Overlap between doc-types is allowed.
 - **Both forms.** A target state is written twice: as a reference
@@ -49,6 +47,45 @@ specification.
 - **Predicates are written one way.**
   [Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md)
   is how; it may become the Standard that governs it.
+- **A predicate is a test over state.** It is decided from the bytes
+  of the repo at one commit, by reading them or by a pure function of
+  them such as a formatter. It is not a test over run-time behaviour
+  (what a script exits or prints), not an instruction to an author
+  (where a helper sits, which double a test uses), not a fact held
+  outside the files (the day a decision was made, the latest upstream
+  release, a GitHub setting, git history, another repo), and not a
+  definition that scopes other rules. Behaviour and instruction go to
+  a Guide; the why goes to a `> **Why.**` block; a scoping definition
+  is an H2 with no trailer. The step 11 sort found each of these
+  mis-filed as a rule.
+- **Kind is judged from the sentence, not the trailer.** A sentence a
+  script decides from the files with no judgment call is
+  deterministic; a sentence with a judgment word ("describes",
+  "names the concept", "small against") is stochastic. Where a
+  sentence mixes the two, the mechanical part stays deterministic and
+  the judgment moves to the why block. Whether a check exists yet
+  is a separate question; an unchecked predicate of either kind is
+  allowed until the detector rewrite lands.
+- **A scoping heading is not a rule.** An H2 with no trailer names
+  which members the H3 rules under it bind. It is one shape whether
+  it has one child or eleven, and its definition is never repeated in
+  the children.
+- **The why sits with the rule it argues, in the same file.** A
+  `> **Why.**` block after a rule's trailer argues that rule; one
+  ending the opening prose argues the file. The block is optional — a
+  rule may have none, and none is written for a rule whose why nobody
+  holds — and it states no predicate. Text that argues no rule is not
+  a why: a definition goes to the Standard's lead or the glossary, a
+  procedure to a Guide, and the rest is deleted. The Explanation type
+  is deleted, because the user cannot read a rule and its why across
+  two files. Decided 2026-09-21 from the scrub in step 10; the rules
+  are in
+  [Standard Conventions](/standards/doc-type/standard-conventions.md).
+- **Three working policies** that shaped the step 11 rulings and hold
+  for any later audit: repo change is the expensive way out; no credit for rule count, so
+  delete is the default for a rule that restates another or binds
+  something too small to matter; and "keep it because a detector
+  emits the id" is backwards, since the detector follows the rule.
 - **Stochasticity is a continuous scale per file.** A markdown file
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
@@ -60,7 +97,8 @@ specification.
   runbook or loop still gets its doc-type document, because the
   document is the legible form. The one requirement that follows is
   a drift check between the document and its substrate, the same
-  deterministic rule chaingen applies to a runbook and its chain. The
+  deterministic rule the deleted prototype chaingen applied to a
+  runbook and its chain. The
   loop half is in the Loop strand
   ([Principles](/working-docs/doc-type-system/loop/ROOT.md#principles)).
 
@@ -72,6 +110,9 @@ specification.
   type. `Object`, its earlier name, is retired.
 - **Part** — a class nested inside a DocType: an Edge, a Rule, an
   Act, a Check, a Yield. A part has no verbs.
+- **Why** — a block opening `> **Why.**`: the argument for the rule
+  whose trailer it follows, or for the file when it ends the opening
+  prose. It holds no predicate.
 
 ## Open
 
@@ -88,107 +129,193 @@ specification.
 ## Planned
 
 - **The system.** The refactor toward the reference model and the
-  specification, in order; each step exists because the step after it
-  binds to what the step produces, and the reasons are here because
-  the agent doing the work was not in the conversation that decided
-  them.
-  1. *Standard takes its new shape.* Every rule gets an id,
-     `<standard>.<slug>`, and a kind, deterministic or stochastic, on
-     a trailer line after its predicate paragraph, and a rule may sit
-     under another rule as its condition. Reason: a loop's check routes
-     each rule to a verifier by id and kind, so a rule without both
-     cannot be checked, and a stochastic rule is one an LLM judge
-     decides, using the predicate paragraph as its prompt.
-  2. *The verifier table and `audit`.* One table in the toolchain maps
-     every rule id to exactly one script or judge, and one `audit`
-     function in the package routes ids through it, skips a rule whose
-     condition fails, and returns findings, each one member and one
-     rule id. Reason: this is the one place the Standard files and the
-     code meet, so a rule with no verifier or a verifier with no rule
-     is a lint failure, not a silent gap. The table's shape as declared
-     data the fact base extracts is the fact base strand's item
-     ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
-  3. *Boundaries read ids from config.* The commit hook, `make check`,
-     CI, and a loop's check each name the rule ids they run, in config,
-     not in the Standard. Reason: which boundary runs a rule is
-     wiring, and a Standard that states its own enforcement cannot be
-     audited by a loop without also being gated; the same rule must
-     be gated in one repo and aspirational in another. The config's
-     shape as declared data is the same fact base item as step 2's.
-  4. *Retire the card.* Delete `Standard-Card`, its four cells, Define,
-     Audit, Enforce, Adopt, `cardgen`, `rulegen`, and the `.txt`
-     files, and bind the type `Standard` to `standards/<name>/<topic>.md`.
-     Reason: the reference model places every cell elsewhere, Define is
-     the Standard file, Audit is the verifier table, Enforce is the
-     boundary config, and Adopt was never a primitive; and viewing is
-     out of scope for this work.
-     [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#what-goes-where)
-     lists each disposition. The fact base's extractors item strikes
-     the card extractor for this reason. `rulegen` goes as a script
-     with its `.txt` file; its logic moves into the package as the
-     `standard` extractor, per that item
-     ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
-  5. *`Object` becomes `DocType`, and the one-module lint.* Rename
-     across `doc-type.md` and the three `contract-shape.md` files, nest
-     each part inside its doc-type's class, and add the linter that
-     concatenates the four pseudocode fences and parses them as one
-     Python module. Reason: the parts, Edge, Rule, Act, Check, Yield,
-     are not doc-types and must not extend the base; the linter is the
-     first verifier for the specification and is what makes the three
-     contract shapes one design instead of three.
-  6. *Runbook's two edits.* `accept` replaces `args` as the verb for
-     an input edge, and `never write` becomes a `banned` polarity on a
-     write edge. Reason: every operation on an edge must be one of the
-     doc-type's verbs, and `args` was a noun and `never` a negation,
-     neither a verb.
-  7. *The specification becomes a Standard.* Move
-     [specification/](/working-docs/doc-type-system/doc-type-system/specification/index.md)
-     under `standards/` in the shape step 1 produces, bound to no repo
-     boundary. Reason: the first loop's checks point at it, and a loop
-     must not bind to the Standard shape that step 4 deletes.
-  8. *Ban the word guard.* See the banned words below.
-- **First instance.** One loop, `loops/<name>.md`, over the doc-type
-  system, after step 7: its checks point at the specification as a
-  Standard, and the loop grows it. In iteration order: an act drafts
-  candidate predicates, each with its citation or marked invented and
-  the members that fail it today; a yield to the user, yes or no per
-  predicate; an act applies the accepted ones; a check audits; a yield
-  to the user with the diff. A no is kept with its reason, and the
-  reason is a candidate predicate itself. The design behind it is
-  [Specifying a Loop](/working-docs/doc-type-system/loop/specifying-a-loop.md).
-  Whether Loop gains a part for the scalar this loop descends is the
-  Loop strand's item
-  ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned)).
-- **The `/write-predicates` skill.** A runbook that points at
-  [Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md);
-  after the guide settles. Also improve writing-predicates.md; it's
-  a rough first draft user does not endorse it yet.
-- **Banned words in prose-lint.** One entry for each retired word,
-  guard, generator, and adopt, each message naming the word to use
-  instead, so a habit in the model's weights is caught at the commit
-  boundary rather than by the user. The three doc-type directories
-  and `CONTEXT.md` take the set's terms when the strand drains.
-- **One clause in System Legibility.** Its sentence that
-  documentation is the stochastic thing and code the deterministic
-  one is imprecise; one clause says that stochasticity is a scale per
-  file ([Principles](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles)).
+  specification. The target shape of one rule, decided 2026-09-20: a heading,
+  the predicate, and a trailer line, nothing else. The predicate is
+  everything between the heading and the trailer, a list of exemptions
+  included when the check needs one, and it is written so that
+  deterministic code lifts it verbatim into a judge's prompt, alone or
+  concatenated with other stochastic rules for one judge call. A body
+  after the trailer is not part of the target: what the 232 bodies
+  hold today is enforcement wiring, which step 3 removes, pointers to
+  other Standards, which the fact base carries, and exemptions, which
+  belong inside the predicate. Reason: text that no verifier reads is
+  text the state is not held to, and the split between a checked first
+  paragraph and an unchecked body is where the prose and the verifier
+  drift apart.
+  1. *Standard takes its new shape.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
+  2. *The verifier table.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
+  3. *Boundaries: where each check runs.* Done 2026-09-20; the entry is
+     in [Completed](#completed).
+  4. *Isolate the software factory.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
+  5. *Guide and Explanation.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
+  6. *Retire the card.* Done 2026-09-20; the entry is in
+     [Completed](#completed).
+  7. *Tidy the doc-type definitions.* Done 2026-09-21; the entry is in
+     [Completed](#completed).
+  8. *The specification becomes a Standard.* Done 2026-09-21; the
+     entry is in [Completed](#completed).
+  9. *Ban the word guard.* Done 2026-09-21; the entry is in
+     [Completed](#completed).
+  10. *Doc-types before migration.* Done 2026-09-21; the entries are
+     in [Completed](#completed).
+  11. *Settle every rule.* Done 2026-09-22 over five waves; the
+     entries are in [Completed](#completed). What the audit found
+     and step 11 does not close is in
+     [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md),
+     the detector suite's input.
+
+  A step once here, scrubbing every file under `docs/` into a long-term
+  home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except
+  `docs/guides/`, and the eight loose files there predate this work.
+  The one move this plan causes is named at its step, `okf-spec` at
+  step 6.
+- **The detector suite.** One holistic pass over the checking system:
+  refactor, reconsider, redesign. The detectors grew one at a time over
+  months and were never refactored together, and step 11 settled the
+  Standards they answer to, so the pass rewrites the whole Python
+  detector suite against the settled rules, from scratch where that is
+  cleaner. It must stay at least as fast as the hooks are today.
+  - **Four layers name the same rules, and no two of them agree.** At
+    step 11's close, 217 rules carry a trailer:
+
+    | Layer | What it is | Where it lives |
+    | --- | --- | --- |
+    | Family | the directory, and the id's namespace | 12 of them |
+    | Standard | the file, and the population a rule binds | 31 rule-carrying files |
+    | Detector | the script that decides the rule | 18 addresses over 98 rules; 119 rules have none |
+    | Gate | when the detector runs | commit, push, ci, or on-demand |
+
+    Family and Standard part company in 6 of the 12 families:
+    `knowledge-organization.` spans 8 files, `doc-type.` 5,
+    `tracking.` 4, `build.` 3, `harness.` and `standard.` 2 each. A
+    detector crosses both — `repo-lint` decides 20 rules from 3
+    families and 6 files, `harness-files-lint` 12 rules from 2
+    families. The gate is a fourth cut again: `workspace-lint` holds
+    14 rules and runs at no gate at all.
+  - **The id schema is designed with the scripts, not after them.** An
+    id is `<family>.<slug>`, the directory and the heading's slug, so
+    the namespace is coarser than the population it binds. One fix
+    has been proposed and measured, `<standard>.<slug>`, and the
+    evidence is against it: it moves 210 of the 217 ids, only 7 match
+    their file; it drops the word that carries the meaning
+    (`build.ciyml-byte-identical-to-canonical` becomes
+    `canonical.ciyml-…`); and it lands `prose/conventions.md`,
+    `shell/conventions.md` and `testing/conventions.md` on one
+    `conventions.` namespace. There are no slug collisions today, so
+    nothing is broken. The design rules on the schema — including
+    leaving it alone — with the layer map above in front of it,
+    because what names a group of rules and what script owns them are
+    the same question.
+  - **Its input.**
+    [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md)
+    holds what step 11 leaves unchecked: the sixteen rules whose
+    detector tests less than the sentence, with the survey behind
+    them, the thin-shim moves, the `doc-type.one-base-class` check,
+    and the H2-without-trailer condition shape. The 52 deterministic
+    rules with a null verifier are the rest of the ground.
+  - **A detector may key on something that is not an id.** `okf-lint`
+    finds the type registry by that heading's slug, so a rename of the
+    heading lands in the detector. The design gives every such
+    coupling one named place.
 
 ## Completed
 
-- **One meaning per word, one home per word, 2026-09-15.** Every
-  word the four strands use is defined once, in the Terms bucket of
-  the set's root where more than one strand uses it and of a strand's
-  root where one does, and every other use links to it. Reason: the
-  same word carried two senses more than once in this work, guard
-  beside condition, evaluator beside verifier, bundle beside
-  directory, and each cost a round of correction; a loop reading these
-  files cannot ask which sense was meant. The words are in the set's
-  [Terms](/working-docs/doc-type-system/ROOT.md#terms).
-- **One doc-type for Standard.** Merged into one directory,
-  [doc-types/standard/](/doc-types/standard/index.md), with Contract
-  defined by the cut in [Doc-Type](/doc-types/doc-type.md). The shape
-  it carries there is the one the refactor replaces with
-  [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)'s.
+- **Step 11 wave 5, reheadlining, 2026-09-22.** Thirty-seven Opus
+  agents, one per Guide or Standard file, in two batches of 8 and 29,
+  rewrote 169 headings into propositions; the orchestrator applied the
+  union repo-wide, since a rule's id is its heading's slug. 112 ids
+  moved, in three forms — plain, escaped regex, and one bare slug —
+  66 inbound citations repointed, most carrying their link text to the
+  new heading and the rest to the target's title where the heading
+  would not sit in the sentence, and both yaml tables regenerated.
+  `okf-lint` found the type registry by that heading's slug and went
+  blind on the rename; the slug is a named constant now, and the
+  detector suite's item carries the coupling. Dropped: trimming the body openings the
+  new headings absorb, since the overlap is no finding. Commits
+  b76047e, ae587cd, dedc625, 4439ea5, 0d22ed4, and this one.
+
+- **Step 11 wave 4, 2026-09-22.** The orchestrator pass, by hand in
+  the session, closing what the family waves left across files. The
+  twelve emitters of deleted ids went silent, and the four GitHub
+  audits of `workspace-lint` kept their checks under a new Standard,
+  `tracking/github-settings.md`, after the user ruled that a check
+  needs a predicate over state, not a Guide. The two yaml tables
+  regenerated, five catalog rows took their indexes' openings, and
+  fifteen anchors into deleted rules were unlinked. The reported rows
+  settled: one why block rewritten, three why blocks under conditions
+  moved or dropped, two terminal periods, a factory skill's stale
+  gloss, and the doc-type lead's rule count. Three routing citations
+  wave 2 had tightened away were restored, and the deslopper gained
+  the `assertion-headings` slice. Commits 88d0381 and this one.
+
+- **Step 11 wave 3, 2026-09-22.** The repo changes, by hand in the
+  session rather than by agent, after the first agent run was rolled
+  back unseen. Eight of the eleven bullets landed: three skill models
+  to `inherit`, the repeatable-work rule under `CLAUDE.md`'s
+  Behaviors, acronym appendices on 35 files, two index openings, two
+  Flourish tics, two wayfinder headings recased, sixteen second-person
+  uses rewritten, and the settings-symlink design moved out of
+  `dotfiles/README.md` into record 0030. Struck: the `CONTEXT.md`
+  terms and the `ROOT.md` link tree, both duplicating what exists;
+  held for wave 5: the four prose headings. Commit 9000802.
+
+- **Step 11 waves 1 and 2, 2026-09-22.** Five Opus agents wrote four
+  Guides and one reference from rule text, and moved
+  `tracking/repo-settings.md` to `guides/`; thirteen Opus agents then
+  applied all 283 rulings, one family each. Decided on the way: the
+  modules family retires, its seven rules all judgments and now in the
+  Design and Testing Guide; `prose.assertion-headings` replaces the
+  Guide gist rule, every parsed heading one clause stating its point;
+  a reheadlining wave follows the family passes. Commits b5a0c08 and
+  b01d0fd.
+
+- **Explanation and Guide shaped, 2026-09-21.** Step 10 of The
+  system, first half. Thirteen Opus agents tagged every paragraph of
+  the 13 `explanation.md` files with the rule ids it explains; the
+  tables were noise and were discarded, but they settled the shape: a
+  Reason is one decision naming one or more rules of the one Standard
+  beside it, a rule may have none, and an Explanation holds nothing
+  else. The reference model gained `Id`, the Condition part,
+  Explanation, and Guide.
+- **Explanation and Guide built, 2026-09-21.** Step 10, second half.
+  `doc-types/explanation/` and `doc-types/guide/` in the four-file
+  form, `Id` in the base page and the Condition part on Standard's,
+  the pinned test over six pages and passing, the registry rows, and
+  `explanation-conventions.md` and `guide-conventions.md` under
+  `standards/doc-type/`, eight rules with null verifier rows. Guide's
+  parts are left undecided until its Guides are migrated.
+- **Explanation undone, the why folded into Standard, 2026-09-21.**
+  Step 10, third part. Moving the Explanation file to
+  `<dir>/explanations/<topic>.md` surfaced that the user cannot read a
+  rule and its why across two files. `doc-types/explanation/`,
+  Explanation Conventions, the registry rule `typed-explanation`, and
+  its okf-lint check are deleted; the reference model drops
+  `Explanation`, four DocTypes now. `Standard.Rule` and `Standard`
+  each gained a `why: str | None`, a `> **Why.**` block after a
+  rule's trailer or after the lead, never a predicate; the predicate
+  stays heading to trailer, so no detector or judge prompt changed.
+  `standards/doc-type/doc-type.md` carries the ten Reasons sorted for
+  the deleted Explanation, folded in as the test of the encoding.
+- **Explanations migrated, the type deleted, 2026-09-21.** Step 10,
+  fourth part. Thirteen Opus agents, one per family, sorted each
+  `explanation.md` into rule whys, the Standard's own why, or a
+  delete, per
+  [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md).
+  The Explanation type, its registry rows, rule, okf-lint check, and
+  `ADMITTED_TYPES` entry are gone; 22 inbound links repointed. The
+  predicates the agents left out are in their reports, for step 11.
+- **Guides migrated, 2026-09-21.** Step 10, last part. Guide's parts
+  are Sequence, Step, and Reference; the parse is the headings and
+  the step names. The verbatim-mirror type became `Mirror` and
+  Runbook's chain the chain to free the word. Five Opus agents
+  rewrote the Guides per
+  [Migrate Guides](/working-docs/doc-type-system/doc-type-system/migrate-guides.md);
+  `headless.md` moved to `docs/` as a General-Sheet. The residual
+  ledger holds five entries.
 
 ## Acronyms
 

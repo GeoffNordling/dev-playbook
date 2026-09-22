@@ -7,12 +7,12 @@ that owns them, `knowledge-organization.*`:
   - **Type-lint** — every concept document carries frontmatter with a `type`
     drawn from the type registry, plus `title` and `description`. `resource`
     is optional in general and required on a `Recipe-Description`, and a
-    document typed `Standard-Card` or `Standard-Ruleset` lives under `standards/`
-    and one typed `Loop` under `loops/` — each the tree reserved for its label
-    (`knowledge-organization.type-location`). The registry
+    document typed `Standard` lives under `standards/`,
+    one typed `Loop` under `loops/`, and one typed `Guide` under `guides/` —
+    each the place reserved for its label. The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
-    own `## Types` table (`REGISTRY_DOC`), read and shape-checked there as the
+    own `## `type` names a registered type` table (`REGISTRY_DOC`), read and shape-checked there as the
     sole source of truth, with no union and no local declaration. In consumer
     mode — every other repo — the authoritative registry is read from this
     script's own hook clone (`UPSTREAM_REGISTRY_ROOT`), and the audited tree's
@@ -20,18 +20,17 @@ that owns them, `knowledge-organization.*`:
     (`LOCAL_TYPES_KEY`), whose names union onto the upstream set (additive only
     — a local type may be added but never shadow, loosen, or drop an upstream
     one). The mapping's shape is checked so a broken declaration degrades to
-    findings on `index.md` rather than aborting the scan, and a leftover local
-    registry *document* at either historical path (`LEGACY_REGISTRY_DOCS`) is
-    itself a finding. Membership is exact-case throughout.
+    findings on `index.md` rather than aborting the scan. Membership is
+    exact-case throughout.
 
   - **Index-staleness** — every `index.md` lists exactly the concept documents
     it owns (a concept document is owned by the nearest `index.md` at or above
     its directory), each with a `description` matching the child's frontmatter,
     and links each child directory's own `index.md`. A directory holding
     concept documents carries an `index.md` of its own
-    (`knowledge-organization.index-present`), and every `index.md` opens with
+    (`knowledge-organization.an-index-in-every-directory`), and every `index.md` opens with
     an introduction between its H1 and its first entry
-    (`knowledge-organization.index-intro`) — presence only; what it says is a
+    (`knowledge-organization.introduction-between-h1-and-listing`) — presence only; what it says is a
     reviewer's judgment. The repository root `index.md` additionally declares
     `okf_version`. The prose standard for these rules lives in this repo's
     standards/ tree.
@@ -90,37 +89,52 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
-FRONTMATTER = "knowledge-organization.frontmatter"
-TYPE = "knowledge-organization.type"
-TITLE = "knowledge-organization.title"
-DESCRIPTION = "knowledge-organization.description"
-RESOURCE = "knowledge-organization.resource"
-INDEX = "knowledge-organization.index"
-REGISTRY_ROW = "knowledge-organization.registry-row"
-DESCRIPTION_SHAPE = "knowledge-organization.description-shape"
-INDEX_ORDERING = "knowledge-organization.index-ordering"
-REGISTRY_LOCATION = "knowledge-organization.registry-location"
-TYPE_LOCATION = "knowledge-organization.type-location"
-INDEX_PRESENT = "knowledge-organization.index-present"
-INDEX_INTRO = "knowledge-organization.index-intro"
+FRONTMATTER_BLOCK = "knowledge-organization.frontmatter-a-yaml-mapping"
+TYPES = "knowledge-organization.type-names-a-registered-type"
+TITLE = "knowledge-organization.non-empty-title"
+DESCRIPTION = "knowledge-organization.non-empty-description-no-closing-period"
+RECIPE_DESCRIPTION = "knowledge-organization.recipe-description-carries-a-resource"
+TYPED_STANDARD = "knowledge-organization.standard-lives-under-standards"
+TYPED_LOOP = "knowledge-organization.loop-lives-under-loops"
+TYPED_GUIDE = "knowledge-organization.guide-lives-under-guides"
+THE_INTRODUCTION = "knowledge-organization.introduction-between-h1-and-listing"
+THE_LISTING = (
+    "knowledge-organization.one-entry-per-concept-document-and-child-directory"
+)
+ORDERING = "knowledge-organization.alphabetical-unless-declared-otherwise"
+OKF_VERSION_DECLARED = "knowledge-organization.okf-version-declared"
+AN_INDEX_IN_EVERY_DIRECTORY = "knowledge-organization.an-index-in-every-directory"
+ROW_SHAPE = "knowledge-organization.type-name-in-first-cell"
+ALPHABETICAL_ORDER = "knowledge-organization.rows-in-alphabetical-order"
+MAPPING_ENTRY_SHAPE = "knowledge-organization.type-name-to-description"
+ALPHABETICAL_KEYS = "knowledge-organization.keys-in-alphabetical-order"
+ADD_NEVER_SHADOW = "knowledge-organization.add-never-shadow"
 
 RULES = (
-    FRONTMATTER,
-    TYPE,
+    FRONTMATTER_BLOCK,
+    TYPES,
     TITLE,
     DESCRIPTION,
-    RESOURCE,
-    INDEX,
-    REGISTRY_ROW,
-    DESCRIPTION_SHAPE,
-    INDEX_ORDERING,
-    REGISTRY_LOCATION,
-    TYPE_LOCATION,
-    INDEX_PRESENT,
-    INDEX_INTRO,
+    RECIPE_DESCRIPTION,
+    TYPED_STANDARD,
+    TYPED_LOOP,
+    TYPED_GUIDE,
+    THE_INTRODUCTION,
+    THE_LISTING,
+    ORDERING,
+    OKF_VERSION_DECLARED,
+    AN_INDEX_IN_EVERY_DIRECTORY,
+    ROW_SHAPE,
+    ALPHABETICAL_ORDER,
+    MAPPING_ENTRY_SHAPE,
+    ALPHABETICAL_KEYS,
+    ADD_NEVER_SHADOW,
 )
 
 REGISTRY_DOC = "standards/knowledge-organization/document-types.md"
+# The registry table is found by its heading's slug, so a rename of that
+# heading in REGISTRY_DOC lands here and nowhere else.
+REGISTRY_SECTION_SLUG = "type-names-a-registered-type"
 # The root-index frontmatter key a consumer declares its local document types
 # under, beside okf_version: a mapping of type name to one-line description.
 # Frontmatter rather than a document under the consumer's standards/ tree,
@@ -134,7 +148,6 @@ LOCAL_TYPES_KEY = "okf_types"
 # landed on by mirroring that path's earlier folder name. Consumer mode reads
 # neither, so a repo still carrying one would silently lose every type it
 # declares — finding one is a migration finding naming where the types go now.
-LEGACY_REGISTRY_DOCS = (REGISTRY_DOC, "standards/docs/document-types.md")
 # The canonical consumer template — the file that puts the audited tree in APEX
 # mode. Only dev-playbook (or a fixture simulating it) hosts this template;
 # consumers copy *from* it and never carry it. This is the same probe
@@ -142,16 +155,12 @@ LEGACY_REGISTRY_DOCS = (REGISTRY_DOC, "standards/docs/document-types.md")
 # src/dev_playbook/standards_lint.py).
 CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
-# The types reserved to one tree each, and those trees. A normative
-# conformance target lives under standards/ and a loop under loops/, and
-# nothing else claims either label, so a Standard or a Loop found elsewhere is
-# either misfiled or mistyped — see doc-types/standard/definition.md and
-# doc-types/loop/definition.md, each's "Where a ... lives".
-LOCATION_BOUND_TYPES = {
-    "Standard-Card": "standards/",
-    "Standard-Ruleset": "standards/",
-    "Loop": "loops/",
-}
+# The types reserved to standards/. A normative conformance target lives
+# there and a loop under loops/, and nothing else claims either label, so a
+# Standard or a Loop found elsewhere is either misfiled or mistyped — see
+# doc-types/standard/definition.md and doc-types/loop/definition.md, each's
+# "Where a ... lives".
+STANDARDS_TYPES = frozenset({"Standard"})
 BACKTICK_NAME = re.compile(r"`([^`]+)`")
 # A type name of the shape the Type Registry's Row shape rule declares: Title
 # Case, hyphen-joined for a multi-word name, acronyms upper.
@@ -189,7 +198,7 @@ def _is_type_name(name: str) -> bool:
 
     ``README``, ``Guide`` and ``Recipe-Description`` pass; ``bogus name``,
     ``Bogus Name`` and ``lowercase`` do not. One implementation for the two
-    places a type name is declared — a `## Types` row's backticked first cell,
+    places a type name is declared — a `## `type` names a registered type` row's backticked first cell,
     and an `okf_types` key in a consumer's root index frontmatter — so a name
     legal in one is legal in the other.
     """
@@ -203,8 +212,10 @@ def _table_cells(line: str) -> list[str]:
 
 def _is_separator_row(cells: list[str]) -> bool:
     """Whether a table row is the header/body delimiter (``|---|---|``)."""
-    return bool(cells) and all(set(c) <= {"-", ":", " "} for c in cells) and any(
-        "-" in c for c in cells
+    return (
+        bool(cells)
+        and all(set(c) <= {"-", ":", " "} for c in cells)
+        and any("-" in c for c in cells)
     )
 
 
@@ -214,12 +225,12 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     ``registry_root`` is the tree carrying the registry document — the apex
     tree's own, or the hook clone's for the consumer-mode read (see
     `HOOK_REPO_ROOT`). Returns ``(names, malformed_rows)`` — the backticked type
-    names of the `## Types` table in table order (so the caller can both build
+    names of the `## `type` names a registered type` table in table order (so the caller can both build
     the registry set and check the declared alphabetical order), and the line
     numbers of the rows whose first cell is not a single backticked type name,
     which the caller turns into `knowledge-organization.registry-row` findings
     rather than silently dropping the type. Raises ToolError when no valid type
-    is parsed — the document is absent, or its `## Types` table is missing or has
+    is parsed — the document is absent, or its `## `type` names a registered type` table is missing or has
     no valid row — since a missing authoritative registry means the hook cannot
     run.
     """
@@ -234,7 +245,7 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     for line_num, line in lines:
         heading = md.HEADING_PATTERN.match(line)
         if heading:
-            in_types = md.github_slug(heading.group(1)) == "types"
+            in_types = md.github_slug(heading.group(1)) == REGISTRY_SECTION_SLUG
             seen_separator = False
             continue
         if not in_types or not line.lstrip().startswith("|"):
@@ -255,7 +266,7 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     if not valid:
         raise ToolError(
             f"no usable type registry at {REGISTRY_DOC}: the document is absent "
-            "or its '## Types' table has no valid rows"
+            f"or its '{REGISTRY_SECTION_SLUG}' table has no valid rows"
         )
     return valid, malformed
 
@@ -265,18 +276,18 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
 
     Owns ``parse_registry``: returns the registry set (consumed by the type-lint)
     and its own findings — a ``knowledge-organization.registry-row`` per malformed row and a
-    ``knowledge-organization.index-ordering`` when the `## Types` table is not alphabetical by type
+    ``knowledge-organization.alphabetical-unless-declared-otherwise`` when the `## `type` names a registered type` table is not alphabetical by type
     name (the document's intro declares it alphabetical). Called only in apex
     mode — see `main()` — since the registry's shape is dev-playbook's to fix,
     never a consumer's. Raises ToolError if the registry document or its
-    `## Types` table is absent.
+    `## `type` names a registered type` table is absent.
     """
     type_names, malformed_rows = parse_registry(registry_root)
     findings = [
         Finding(
             REGISTRY_DOC,
-            REGISTRY_ROW,
-            "`## Types` row's first cell is not a backticked Title Case type name",
+            ROW_SHAPE,
+            "`## `type` names a registered type` row's first cell is not a backticked Title Case type name",
             line=line_num,
         )
         for line_num in malformed_rows
@@ -285,8 +296,8 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
         findings.append(
             Finding(
                 REGISTRY_DOC,
-                INDEX_ORDERING,
-                "`## Types` rows are not in alphabetical order by type name",
+                ALPHABETICAL_ORDER,
+                "`## `type` names a registered type` rows are not in alphabetical order by type name",
             )
         )
     return set(type_names), findings
@@ -332,7 +343,7 @@ def check_local_types(
         return set(), [
             Finding(
                 "index.md",
-                REGISTRY_ROW,
+                MAPPING_ENTRY_SHAPE,
                 f"'{LOCAL_TYPES_KEY}' is not a mapping of type name to description",
             )
         ]
@@ -345,7 +356,7 @@ def check_local_types(
             findings.append(
                 Finding(
                     "index.md",
-                    REGISTRY_ROW,
+                    MAPPING_ENTRY_SHAPE,
                     f"'{LOCAL_TYPES_KEY}' key {key!r} is not a Title-Case, "
                     "hyphen-joined type name",
                 )
@@ -356,7 +367,7 @@ def check_local_types(
             findings.append(
                 Finding(
                     "index.md",
-                    REGISTRY_ROW,
+                    MAPPING_ENTRY_SHAPE,
                     f"local type `{key}` has no one-line description",
                 )
             )
@@ -370,7 +381,7 @@ def check_local_types(
             findings.append(
                 Finding(
                     "index.md",
-                    REGISTRY_ROW,
+                    ADD_NEVER_SHADOW,
                     f"local type `{key}` case-insensitively shadows {target}",
                 )
             )
@@ -379,32 +390,11 @@ def check_local_types(
         findings.append(
             Finding(
                 "index.md",
-                REGISTRY_ROW,
+                ALPHABETICAL_KEYS,
                 f"'{LOCAL_TYPES_KEY}' keys are not in alphabetical order",
             )
         )
     return set(names), findings
-
-
-def check_legacy_registry(repo_root: Path) -> list[Finding]:
-    """Flag a local registry *document* left behind by the move to `okf_types`.
-
-    Consumer mode only. A consumer used to declare its local types in a registry
-    document of its own, at one of `LEGACY_REGISTRY_DOCS`. Consumer mode reads
-    neither path now, so a repo that still carries one would silently lose every
-    type it declares; one finding per leftover document says where those types
-    go instead.
-    """
-    return [
-        Finding(
-            rel,
-            REGISTRY_LOCATION,
-            "the local type registry now lives in the root index.md frontmatter "
-            f"under '{LOCAL_TYPES_KEY}'",
-        )
-        for rel in LEGACY_REGISTRY_DOCS
-        if (repo_root / rel).is_file()
-    ]
 
 
 def relpath(path: Path, repo_root: Path) -> str:
@@ -438,16 +428,18 @@ def check_types(
     for rel in concept_docs:
         fm, err = frontmatter_of(repo_root / rel)
         if err is not None:
-            findings.append(Finding(rel, FRONTMATTER, err))
+            findings.append(Finding(rel, FRONTMATTER_BLOCK, err))
             continue
         if fm is None:
-            findings.append(Finding(rel, TYPE, "no OKF frontmatter"))
+            findings.append(Finding(rel, FRONTMATTER_BLOCK, "no OKF frontmatter"))
             continue
         doctype = fm.get("type")
         if doctype is None:
-            findings.append(Finding(rel, TYPE, "missing 'type'"))
+            findings.append(Finding(rel, TYPES, "missing 'type'"))
         elif doctype not in registry:
-            findings.append(Finding(rel, TYPE, f"type '{doctype}' not in the registry"))
+            findings.append(
+                Finding(rel, TYPES, f"type '{doctype}' not in the registry")
+            )
         if not fm.get("title"):
             findings.append(Finding(rel, TITLE, "missing 'title'"))
         description = fm.get("description")
@@ -457,19 +449,26 @@ def check_types(
             findings.append(
                 Finding(
                     rel,
-                    DESCRIPTION_SHAPE,
+                    DESCRIPTION,
                     "description must not end with a trailing period",
                 )
             )
         if doctype in RESOURCE_REQUIRED_TYPES and not fm.get("resource"):
             findings.append(
-                Finding(rel, RESOURCE, f"'{doctype}' requires a 'resource'")
+                Finding(rel, RECIPE_DESCRIPTION, f"'{doctype}' requires a 'resource'")
             )
-        bound_dir = LOCATION_BOUND_TYPES.get(doctype)
-        if bound_dir is not None and not rel.startswith(bound_dir):
+        if doctype in STANDARDS_TYPES and not rel.startswith("standards/"):
             findings.append(
-                Finding(rel, TYPE_LOCATION, f"'{doctype}' lives under {bound_dir}")
+                Finding(
+                    rel,
+                    TYPED_STANDARD,
+                    f"'{doctype}' lives under standards/",
+                )
             )
+        if doctype == "Loop" and not rel.startswith("loops/"):
+            findings.append(Finding(rel, TYPED_LOOP, "'Loop' lives under loops/"))
+        if doctype == "Guide" and not rel.startswith("guides/"):
+            findings.append(Finding(rel, TYPED_GUIDE, "'Guide' lives under guides/"))
     return findings
 
 
@@ -525,7 +524,11 @@ def check_indexes(
     index_dirs: set[Dir] = {dir_of(rel) for rel in index_docs}
 
     if () not in index_dirs:
-        return [Finding("index.md", INDEX, "repository root index.md is missing")]
+        return [
+            Finding(
+                "index.md", OKF_VERSION_DECLARED, "repository root index.md is missing"
+            )
+        ]
 
     # Expected ownership: each concept doc belongs to its nearest index; each
     # non-root index is a child of its nearest ancestor index.
@@ -540,7 +543,7 @@ def check_indexes(
         findings.append(
             Finding(
                 "/".join((*d, "index.md")),
-                INDEX_PRESENT,
+                AN_INDEX_IN_EVERY_DIRECTORY,
                 "directory holds concept documents but no index.md",
             )
         )
@@ -558,7 +561,9 @@ def check_indexes(
 
         for bad in sorted(set(invalid_targets)):
             findings.append(
-                Finding(rel, INDEX, f"lists {bad} which is not a concept document")
+                Finding(
+                    rel, THE_LISTING, f"lists {bad} which is not a concept document"
+                )
             )
 
         # First occurrence wins for the description map; duplicate bullets are
@@ -570,19 +575,19 @@ def check_indexes(
         listed_targets = set(listed_map)
         counts = Counter(target for target, _ in listed_concepts)
         for dup in sorted(t for t, c in counts.items() if c > 1):
-            findings.append(Finding(rel, INDEX, f"lists {dup} more than once"))
+            findings.append(Finding(rel, THE_LISTING, f"lists {dup} more than once"))
 
         expected = owned_concepts[d]
 
         for missing in sorted(expected - listed_targets):
-            findings.append(Finding(rel, INDEX, f"omits concept doc {missing}"))
+            findings.append(Finding(rel, THE_LISTING, f"omits concept doc {missing}"))
         for extra in sorted(listed_targets - expected):
             reason = (
                 "does not exist"
                 if not (repo_root / extra).is_file()
                 else "is not owned by this directory"
             )
-            findings.append(Finding(rel, INDEX, f"lists {extra} which {reason}"))
+            findings.append(Finding(rel, THE_LISTING, f"lists {extra} which {reason}"))
         for target in sorted(expected & listed_targets):
             listed_desc = listed_map[target]
             # A frontmatter error here is already reported by check_types (target
@@ -591,13 +596,13 @@ def check_indexes(
             actual_desc = fm.get("description") if fm else None
             if listed_desc is None:
                 findings.append(
-                    Finding(rel, INDEX, f"entry for {target} has no description")
+                    Finding(rel, THE_LISTING, f"entry for {target} has no description")
                 )
             elif actual_desc is not None and listed_desc != actual_desc:
                 findings.append(
                     Finding(
                         rel,
-                        INDEX,
+                        THE_LISTING,
                         f"description for {target} does not match its frontmatter",
                     )
                 )
@@ -606,21 +611,27 @@ def check_indexes(
         listed_child_set = set(listed_children)
         for missing in sorted(expected_children - listed_child_set):
             findings.append(
-                Finding(rel, INDEX, f"omits child index {missing}/index.md")
+                Finding(rel, THE_LISTING, f"omits child index {missing}/index.md")
             )
         for extra in sorted(listed_child_set - expected_children):
             findings.append(
-                Finding(rel, INDEX, f"lists unexpected child index {extra}/index.md")
+                Finding(
+                    rel, THE_LISTING, f"lists unexpected child index {extra}/index.md"
+                )
             )
 
     # The root index.md is typeless (not a concept doc), so check_types never
     # sees it; its frontmatter error, if any, is caught only here.
     root_fm, root_err = frontmatter_of(repo_root / "index.md")
     if root_err is not None:
-        findings.append(Finding("index.md", FRONTMATTER, root_err))
+        findings.append(Finding("index.md", FRONTMATTER_BLOCK, root_err))
     elif not root_fm or "okf_version" not in root_fm:
         findings.append(
-            Finding("index.md", INDEX, "root index.md must declare okf_version")
+            Finding(
+                "index.md",
+                OKF_VERSION_DECLARED,
+                "root index.md must declare okf_version",
+            )
         )
     return findings
 
@@ -653,7 +664,7 @@ def check_index_intro(index_docs: list[str], repo_root: Path) -> list[Finding]:
             findings.append(
                 Finding(
                     rel,
-                    INDEX_INTRO,
+                    THE_INTRODUCTION,
                     "no introduction between the H1 and the first entry",
                 )
             )
@@ -706,7 +717,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
         readmes = [i for i, (_, is_readme) in enumerate(group_a) if is_readme]
         if readmes and readmes[0] != 0:
             findings.append(
-                Finding(rel, INDEX_ORDERING, "the README.md entry must be listed first")
+                Finding(rel, ORDERING, "the README.md entry must be listed first")
             )
         if exempt:
             continue
@@ -715,7 +726,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
             findings.append(
                 Finding(
                     rel,
-                    INDEX_ORDERING,
+                    ORDERING,
                     "concept-doc entries are not in alphabetical order by title",
                 )
             )
@@ -723,7 +734,7 @@ def check_index_ordering(index_docs: list[str], repo_root: Path) -> list[Finding
             findings.append(
                 Finding(
                     rel,
-                    INDEX_ORDERING,
+                    ORDERING,
                     "child-directory entries are not in alphabetical order by title",
                 )
             )
@@ -768,7 +779,6 @@ def main(argv: list[str] | None = None) -> int:
             registry = set(upstream_names)
             local_names, registry_findings = check_local_types(repo_root, registry)
             registry = registry | local_names
-            registry_findings.extend(check_legacy_registry(repo_root))
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
         print(f"okf-lint: {err}", file=sys.stderr)

@@ -51,6 +51,12 @@ When work is ready to commit on `main` and there have been no instructions
 about where, stop and ask rather than choosing. On a branch or worktree,
 commit there. This supersedes the harness's default.
 
+### Notice repeatable work
+
+The user strives to engineer loops for standard, repeatable tasks.
+When the task at hand looks repeatable, say so in one line and suggest the
+user consider setting up a loop. Then carry on — this is a reminder, not a gate.
+
 ## Principles
 
 ### Be direct
@@ -73,9 +79,3 @@ yourself.
 Write in ASD-STE100 Simplified Technical English, in the project's own
 terms from `CONTEXT.md` wherever they apply, and carry each claim on a specific
 example — the actual file, name, line, or value — so the point is visible.
-
-### Notice repeatable work
-
-The user strives to engineer loops for standard, repeatable tasks.
-When the task at hand looks repeatable, say so in one line and suggest the
-user consider setting up a loop. Then carry on — this is a reminder, not a gate.

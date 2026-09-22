@@ -1,7 +1,7 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Decision Record Conventions
-description: How a Decision Record is written, from the bar that warrants one and the directory that holds it to its scope, template, date, numbering, immutability, status vocabulary, optional sections, and the pin on an external-convention evaluation
+description: How a Decision Record is written, from the bar that warrants one and the directory that holds it to its template, date, numbering, status vocabulary, and the pin on an external-convention evaluation
 population: "a Decision Record: a numbered NNNN-slug.md file under a repo's docs/decisions/, except that directory's index.md and README.md"
 ---
 
@@ -18,65 +18,44 @@ record's `description`, and follows the
 > architectural subset of this kind. A Decision Record generalizes the
 > same artifact past architecture to any hard-to-reverse decision.
 
-## The bar
+## Hard to reverse, surprising, a real trade-off
 
-A record records a decision that is hard to reverse, surprising without
-its context, and the outcome of a real trade-off, all three at once:
-changing course later carries meaningful cost, a future reader looking
-at the code would wonder why it was done this way, and there were
-genuine alternatives with a specific reason for the choice.
+A Decision Record records a decision that is hard to reverse, surprising
+without its context, and the outcome of a real trade-off, all three at
+once: changing course later carries meaningful cost, a future reader
+looking at the code would wonder why it was done this way, and there
+were genuine alternatives with a specific reason for the choice.
 
-An easy-to-reverse decision is simply reversed, not recorded. An
-unsurprising one raises no questions. One with no real alternative
-leaves nothing to record beyond "we did the obvious thing."
+`decisions.hard-to-reverse-surprising-a-real-trade-off` · stochastic
 
-Decisions that clear the bar:
+> **Why.** Each criterion alone leaves nothing worth writing down: an
+> easy-to-reverse decision is reversed, an unsurprising one raises no
+> question, and one with no real alternative records the obvious. A
+> record earns its place by stopping the next engineer from undoing a
+> deliberate choice or re-proposing a rejected one.
 
-- **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
-- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
-- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target. Not every library — just the ones that would take a quarter to swap out.
-- **Boundary and scope decisions.** "Customer data is owned by the Customer context; other contexts reference it by ID only." The explicit no-s are as valuable as the yes-s.
-- **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
-- **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
-- **Rejected alternatives when the rejection is non-obvious.** When GraphQL was considered and REST won for subtle reasons, record it — otherwise GraphQL gets proposed again in six months.
+## Numbered records, index, README, nothing else
 
-## Scope
+The `docs/decisions/` directory holding a Decision Record holds numbered
+records, one `index.md`, and one `README.md`, and nothing else.
 
-A record sits in the repo of the thing it governs: a decision about one
-repo is recorded in that repo's `docs/decisions/`, and a decision about
-the workspace, a standard, a cross-repo convention, or the software
-factory, is recorded in dev-playbook.
+`decisions.numbered-records-index-readme-nothing-else` · deterministic
 
-## The directory
+## Four digits from 0001, no gaps or repeats
 
-A repo's `docs/decisions/` holds numbered records, one `index.md`, and
-one `README.md`, and nothing else. It is created lazily, with the first
+A Decision Record's filename is `NNNN-slug.md`, where `NNNN` is the
+record's number zero-padded to four digits. The number is `0001` or
+higher, no other record in the directory carries it, and every number
+from `0001` up to the highest number in the directory belongs to a
 record.
 
-ref-lint classifies every file it finds there. A numbered record is
-exempt as a reference source, since an immutable record goes stale as
-its referents move; `index.md` and `README.md` are validated like any
-other document; and any other file stops the run rather than being
-silently exempted.
+`decisions.four-digits-from-0001-no-gaps-or-repeats` · deterministic
 
-## Sequential numbering
+## Four frontmatter keys, title repeated as H1
 
-A record's filename is `NNNN-slug.md`: a number zero-padded to four
-digits, a hyphen, then a kebab-case slug. The number is unique in the
-directory and one higher than the highest number already there, so the
-sequence has no gaps.
-
-A writer numbering a new record scans `docs/decisions/` for the highest
-existing number and increments by one. `decisions-lint` reports a
-number that is not zero-padded to four digits, a duplicate, and a gap in
-the sequence (`decisions.sequential-numbering`).
-
-## Template
-
-A record's frontmatter and body match the template below: the three
-standard keys `type`, `title`, and `description`, plus `date`; then an
-H1 repeating the title; then one to three sentences giving the context,
-the decision, and the reason.
+A Decision Record's frontmatter holds `type: Decision-Record`, a
+`title`, a `description`, and a `date`; its body opens with an H1
+repeating the `title`.
 
 ```md
 ---
@@ -91,64 +70,53 @@ date: {YYYY-MM-DD}
 {1-3 sentences: what's the context, what did we decide, and why.}
 ```
 
-A Decision Record can be a single paragraph: the value is in recording
-that a decision was made and why, not in filling out sections.
+`decisions.four-frontmatter-keys-title-repeated-as-h1` · deterministic
 
-A Decision Record is a concept document, so it carries the standard
-`type` + `title` + `description` frontmatter (see
-[Document Types](/standards/knowledge-organization/document-types.md)).
-The `description` is the record's triage line and feeds
-`docs/decisions/index.md`; on a one-sentence record it echoes the body,
-since the description serves triage and the body is the record.
+## Context, decision, and reason
 
-## Date
+A Decision Record's body gives the context the decision was made in,
+the decision itself, and the reason for it.
 
-A record carries a `date` frontmatter key holding the day the decision
-was made, `YYYY-MM-DD`. A record written after the fact carries the
-decision's date, not the writing date, and where that day is genuinely
-unrecoverable the key holds `null` rather than a guess.
+`decisions.context-decision-and-reason` · stochastic
 
-## Immutability
+## YYYY-MM-DD date or null
 
-A record's body is frozen once its introducing pull request merges:
-thereafter only the `status` key changes, and a reversal or a
-replacement is a new record that sets the old one's `status` to
-`superseded by NNNN`.
+A Decision Record's `date` frontmatter key holds a `YYYY-MM-DD` date or
+`null`.
 
-Before merge, the record is ordinary development-branch work and is
-edited freely. After merge, the body is never rewritten, neither to
-match later state nor to correct a decision that was reversed.
+`decisions.yyyy-mm-dd-date-or-null` · deterministic
 
-## Status vocabulary
+> **Why.** The date is the day the decision was made, not the writing
+> day, and null where that day is unrecoverable.
 
-`status` is an optional frontmatter key beyond the required three, and
-when present it holds exactly one of `proposed`, `accepted`,
-`deprecated`, or `superseded by NNNN`, where `NNNN` is the 4-digit,
-zero-padded number of the record that replaces this one.
+## Proposed, accepted, deprecated, superseded, or absent
 
-`decisions-lint` matches this vocabulary exactly
-(`decisions.status-vocabulary`). A record that needs no status omits the
-key.
+A Decision Record either carries no `status` frontmatter key or carries
+one holding exactly one of `proposed`, `accepted`, `deprecated`, or
+`superseded by NNNN`, where `NNNN` is four digits.
 
-## Optional sections
+`decisions.proposed-accepted-deprecated-superseded-or-absent` · deterministic
 
-Beyond the template a record carries at most two further sections,
-`Considered Options` and `Consequences`, and neither appears empty.
+## Superseded by a record that exists
 
-- **Considered Options** — the rejected alternatives, when they are
-  worth remembering.
-- **Consequences** — the non-obvious downstream effects, when they need
-  to be called out.
+A Decision Record whose `status` is `superseded by NNNN` sits in a
+directory that holds a record numbered `NNNN`.
 
-Most records carry neither.
+`decisions.superseded-by-a-record-that-exists` · deterministic
 
 ## External-convention evaluation
 
-A record whose decision is a verdict on something outside the
+A Decision Record's decision is a verdict on something outside the
 workspace: a skill, a skill collection, a framework, or a technique.
 
-### What was examined
+### Source named, SHA or version pinned
 
-The record names the source and pins the exact state examined: the
-repository SHA, the release or version, and the date it was read. A
-record that adopted nothing is a record all the same.
+A Decision Record whose decision is a verdict on something outside the
+workspace names the source and pins at least one of the repository SHA
+and the release or version examined.
+
+`decisions.source-named-sha-or-version-pinned` · stochastic
+
+> **Why.** A verdict on something outside the workspace ages with its
+> subject, so the pin is what lets a later reader tell whether the
+> verdict holds against the version in front of them.

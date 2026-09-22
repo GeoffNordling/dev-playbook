@@ -49,5 +49,7 @@ run.
   repos. `SKIP=ref-lint` stands the detector down.
 
 The primary carries every repo and runs every check, so nothing goes
-permanently unchecked. Which gates this affects is recorded in
-[Gates](/standards/standard/gates.md#skips).
+permanently unchecked. Which gates each check reaches is
+[the boundary table](/standards/boundaries.yaml), derived from committed
+wiring; a machine's skip is not in it, and is recorded here instead
+([A skip is machine state](/standards/standard/detectors.md#a-skip-is-machine-state)).

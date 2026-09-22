@@ -60,7 +60,7 @@ strand's own:
 - **Primitive** — one named element of a vocabulary: `reads`,
   `bucket:git`, `contains`.
 - **Vocabulary** — the closed set of primitives one doc-type owns
-  ([Reference Chain](/doc-types/runbook/contract-shape.md#edges)).
+  ([the chain](/doc-types/runbook/contract-shape.md#edges)).
 - **Schema** — the fact base's set of node types and relation types:
   the union of every vocabulary plus the bedrock relations. The fact
   base has a schema and no vocabulary of its own.
@@ -79,10 +79,11 @@ In order; each produces what the next needs.
   clusters; what each can touch, the writes buckets and the never bans;
   what the fleet runs on, model, effort, and tools per Agent; and how
   heavy each is, counted from the object and from the file. One subject
-  is already named: the software factory, whose agents are singletons
-  in the `does` graph because the factory's own graph lives in
+  was named, the software factory, whose agents are singletons in the
+  `does` graph because the factory's own graph lives in
   `software-factory.md`, which issue-overwatch reads as a bare imported
-  node. Each use case names a subsystem; each simulation firms the
+  node; the factory is isolated under `working-docs/software-factory/`
+  since 2026-09-20, so that subject waits on its fate. Each use case names a subsystem; each simulation firms the
   seven views, adds extractors, and writes residuals; and one
   simulation is a consumer-repo subsystem, the first data point for
   residual ownership across repos
@@ -98,16 +99,14 @@ In order; each produces what the next needs.
   the way
   [Fact Base](/working-docs/doc-type-system/fact-base/fact-base.md)
   was designed.
-- **Extractors.** [chaingen](/scripts/chaingen) and
-  [rulegen](/scripts/rulegen), the scripts that write the text files
-  today, move into the package as the `chain` and `standard`
-  extractors, the scripts and their text files deleted with the move
-  and their logic kept, alongside the bedrock extractors, and a `loop` extractor
+- **Extractors.** `chaingen` and `rulegen`, deleted by the doc-type
+  plan's steps 7 and 6 and kept in git history at commits `b266ce4` and
+  `9be0089`, are the models for the `chain` and `standard` extractors
+  in the package, alongside the bedrock extractors, and a `loop` extractor
   reads a Loop document's Mermaid block
   ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned));
-  one refresh writes one fact base per checkout; `chains.txt`, its
-  siblings, and the shims go. The `card` extractor and `cardgen` are
-  struck: the doc-type system retires Standard-Card, step 4 of
+  one refresh writes one fact base per checkout; the shims go. The `card` extractor and `cardgen` are
+  struck: the doc-type system retires Standard-Card, Retire the card in
   [Planned](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned).
 - **Docs follow the moves.** The `doc-types/` indexes and pages that
   name the text files and the shims, and `scripts/index.md`.

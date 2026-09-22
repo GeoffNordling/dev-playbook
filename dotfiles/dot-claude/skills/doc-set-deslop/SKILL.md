@@ -22,7 +22,7 @@ it to the directory whose `index.md` is the set's root; the target is
 that set and every child set nested under it
 ([Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
 A working set is a directory under `working-docs/`
-([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)).
+([one directory under `working-docs/`](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-directory-under-working-docs)).
 A hint that names two unrelated sets, or no hint at all, stops the
 skill before anything runs: ask which set, since a run is one set and
 one diff.

@@ -5,7 +5,7 @@ new workspace repository from the canonical artifacts under
 ``standards/build/canonical/``, then runs the local setup steps: ``git init``,
 ``uv lock``, staging, pre-commit hook installation, and a ``playbook-lint``
 self-check. The GitHub-side tail of the procedure is prose, not code:
-``standards/build/bootstrap.md``.
+``guides/bootstrap.md``.
 """
 
 import argparse
@@ -71,7 +71,7 @@ def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
             f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
             f"{fault}; choose another name"
         )
-    if prose_lint.BANNED_PATTERN.search(spec.name):
+    if any(w.pattern.search(spec.name) for w in prose_lint.WORKSPACE_VOCABULARY):
         raise RepoInitError(
             f"'{spec.name}' would write a CLAUDE.md that prose-lint rejects — "
             f"the person is the 'user'; choose another name"
@@ -186,8 +186,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(f"initialized {target}")
     print(
-        "next: review and commit, then follow standards/build/bootstrap.md "
-        "for the GitHub tail"
+        "next: review and commit, then follow guides/bootstrap.md for the GitHub tail"
     )
     return 0
 

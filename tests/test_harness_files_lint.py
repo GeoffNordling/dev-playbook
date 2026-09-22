@@ -91,7 +91,10 @@ def test_missing_required_field_is_a_harness_finding(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1
-    assert ".claude/skills/greet/SKILL.md: harness.required-field" in result.stdout
+    assert (
+        ".claude/skills/greet/SKILL.md: doc-type.front-matter-holds-its-kinds-vocabulary"
+        in result.stdout
+    )
 
 
 def test_unclosed_front_matter_names_what_is_wrong(tmp_path: Path) -> None:
@@ -102,7 +105,7 @@ def test_unclosed_front_matter_names_what_is_wrong(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.parse" in result.stdout
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in result.stdout
     assert "never closed" in result.stdout
 
 
@@ -112,7 +115,7 @@ def test_name_mismatch_is_flagged(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1
-    assert "harness.name-match" in result.stdout
+    assert "doc-type.name-matches-its-home" in result.stdout
 
 
 def test_body_length_is_a_stderr_advisory_that_never_fails(tmp_path: Path) -> None:
@@ -146,7 +149,7 @@ def test_description_that_is_not_two_sentences_blocks(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.description-sentences" in result.stdout
+    assert "doc-type.description-two-sentences-or-one" in result.stdout
 
 
 def test_unterminated_description_counts_as_zero_sentences(tmp_path: Path) -> None:
@@ -170,7 +173,7 @@ def test_trigger_rule_binds_a_model_invoked_skill(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.description-trigger" in result.stdout
+    assert "doc-type.description-two-sentences-or-one" in result.stdout
 
 
 def test_a_user_invoked_description_is_one_sentence(tmp_path: Path) -> None:
@@ -194,7 +197,7 @@ def test_a_user_invoked_description_carrying_a_trigger_blocks(tmp_path: Path) ->
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.description-sentences" in result.stdout
+    assert "doc-type.description-two-sentences-or-one" in result.stdout
     assert "must be exactly 1" in result.stdout
 
 
@@ -210,7 +213,7 @@ def test_a_malformed_invocation_field_keeps_the_strict_description_rule(
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.description-sentences" in result.stdout
+    assert "doc-type.description-two-sentences-or-one" in result.stdout
 
 
 def test_use_when_must_open_the_second_sentence(tmp_path: Path) -> None:
@@ -223,7 +226,7 @@ def test_use_when_must_open_the_second_sentence(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.description-trigger" in result.stdout
+    assert "doc-type.description-two-sentences-or-one" in result.stdout
 
 
 def test_period_inside_a_token_does_not_end_a_sentence(tmp_path: Path) -> None:
@@ -246,7 +249,7 @@ def test_unknown_frontmatter_field_blocks(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.unknown-field" in result.stdout
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in result.stdout
     assert "turns" in result.stdout
 
 
@@ -269,7 +272,7 @@ def test_user_invocable_is_an_unknown_field(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.unknown-field" in result.stdout
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in result.stdout
     assert "user-invocable" in result.stdout
 
 
@@ -281,7 +284,7 @@ def test_argument_hint_is_an_unknown_field(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.unknown-field" in result.stdout
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in result.stdout
     assert "argument-hint" in result.stdout
 
 
@@ -302,7 +305,7 @@ def test_arguments_that_is_not_a_list_blocks(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.arguments-format" in result.stdout
+    assert "doc-type.arguments-bare-kebab-case-names" in result.stdout
 
 
 def test_non_kebab_argument_name_blocks(tmp_path: Path) -> None:
@@ -312,7 +315,7 @@ def test_non_kebab_argument_name_blocks(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.arguments-format" in result.stdout
+    assert "doc-type.arguments-bare-kebab-case-names" in result.stdout
     assert "setHint" in result.stdout
 
 
@@ -359,7 +362,7 @@ def test_a_directory_with_no_skill_md_is_an_error_state(tmp_path: Path) -> None:
     assert "no SKILL.md" in result.stderr
 
 
-def test_list_rules_prints_harness_ids_from_any_cwd(tmp_path: Path) -> None:
+def test_list_rules_prints_rule_ids_from_any_cwd(tmp_path: Path) -> None:
     result = subprocess.run(
         ["uv", "run", "--script", str(HARNESS_FILES_LINT), "--list-rules"],
         cwd=tmp_path,
@@ -368,15 +371,15 @@ def test_list_rules_prints_harness_ids_from_any_cwd(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "harness.required-field" in ids
-    assert "harness.body-h1" in ids
-    assert "harness.description-sentences" in ids
-    assert "harness.unknown-field" in ids
-    assert "harness.arguments-format" in ids
-    assert "harness.tools-format" in ids
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in ids
+    assert "doc-type.body-opens-with-an-h1" in ids
+    assert "doc-type.description-two-sentences-or-one" in ids
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in ids
+    assert "doc-type.arguments-bare-kebab-case-names" in ids
+    assert "doc-type.tools-comma-separated-tool-names" in ids
     assert "harness.banned-field" not in ids
     assert "body-length" not in " ".join(ids)
-    assert all(rule.startswith("harness.") for rule in ids), ids
+    assert all(rule.startswith(("harness.", "doc-type.")) for rule in ids), ids
 
 
 def test_repo_self_scan_is_clean() -> None:
@@ -404,7 +407,7 @@ def test_agent_name_must_match_file_stem(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.name-match" in result.stdout
+    assert "doc-type.name-matches-its-home" in result.stdout
     assert "file stem" in result.stdout
 
 
@@ -419,7 +422,7 @@ def test_skill_only_field_on_an_agent_is_unknown(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.unknown-field" in result.stdout
+    assert "doc-type.front-matter-holds-its-kinds-vocabulary" in result.stdout
     assert "disable-model-invocation" in result.stdout
 
 
@@ -431,7 +434,7 @@ def test_agent_tools_must_be_a_string(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.tools-format" in result.stdout
+    assert "doc-type.tools-comma-separated-tool-names" in result.stdout
 
 
 def test_agent_description_takes_the_two_sentence_shape(tmp_path: Path) -> None:
@@ -448,7 +451,7 @@ def test_agent_description_takes_the_two_sentence_shape(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "harness.description-sentences" in result.stdout
+    assert "doc-type.description-two-sentences-or-one" in result.stdout
     assert "must be exactly 2" in result.stdout
 
 
@@ -500,7 +503,10 @@ def test_global_claude_extra_section_fails(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: harness.behaviors-then-principles"
+        in result.stdout
+    )
 
 
 def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
@@ -517,7 +523,10 @@ def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-shape" in result.stdout
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: harness.behaviors-then-principles"
+        in result.stdout
+    )
 
 
 def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
@@ -533,7 +542,7 @@ def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.global-claude-rules" in result.stdout
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.two-required-rules" in result.stdout
     assert "Navigate docs by index" in result.stdout
 
 

@@ -1,4 +1,5 @@
 # Paths prose-lint does not scan (prose/conventions.md — Terminology).
-# The two files that must name the banned word in order to ban it.
+# The three files that must name the banned word in order to ban it.
 src/dev_playbook/prose_lint.py
 tests/dev_playbook/test_prose_lint.py
+standards/prose/conventions.md

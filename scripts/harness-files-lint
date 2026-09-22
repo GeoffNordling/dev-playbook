@@ -3,8 +3,8 @@
 
 The detector for the registry members that carry a content standard
 (standards/harness/files.md): the runbooks — skills and agents — against
-runbook-conventions.md, and the global CLAUDE.md source against
-claude-content.md. Their voice is not checked here; the first-person ban is one
+standards/doc-type/runbook-conventions.md, and the global CLAUDE.md source
+against claude-content.md. Their voice is not checked here; the first-person ban is one
 rule over all authored text and lives with prose-lint.
 
 Two skill roots and two agent roots are checked when present in the target
@@ -59,46 +59,32 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # advisory, not a finding. Each id is a module-level constant so every
 # emission site references the constant, never a raw literal, and RULES (what
 # --list-rules prints) cannot drift from what the detector actually emits.
-PARSE = "harness.parse"
-FRONT_MATTER = "harness.front-matter"
-REQUIRED_FIELD = "harness.required-field"
-NAME_MATCH = "harness.name-match"
-NAME_FORMAT = "harness.name-format"
-DESCRIPTION_TYPE = "harness.description-type"
-DESCRIPTION_LENGTH = "harness.description-length"
-DESCRIPTION_SENTENCES = "harness.description-sentences"
-DESCRIPTION_TRIGGER = "harness.description-trigger"
-UNKNOWN_FIELD = "harness.unknown-field"
-MODEL_VALUE = "harness.model-value"
-EFFORT_VALUE = "harness.effort-value"
-DMI_TYPE = "harness.dmi-type"
-ARGUMENTS_FORMAT = "harness.arguments-format"
-TOOLS_FORMAT = "harness.tools-format"
-BODY_H1 = "harness.body-h1"
-REFERENCES_DEPTH = "harness.references-depth"
-GLOBAL_CLAUDE_SHAPE = "harness.global-claude-shape"
-GLOBAL_CLAUDE_RULES = "harness.global-claude-rules"
+FRONT_MATTER = "doc-type.front-matter-holds-its-kinds-vocabulary"
+NAME_MATCHES_ITS_HOME = "doc-type.name-matches-its-home"
+KEBAB_CASE_NAME = "doc-type.kebab-case-name"
+DESCRIPTION = "doc-type.description-two-sentences-or-one"
+MODEL_AND_EFFORT = "doc-type.model-and-effort-from-closed-sets"
+MODEL_INVOCATION_FLAG = "doc-type.boolean-disable-model-invocation"
+ARGUMENTS = "doc-type.arguments-bare-kebab-case-names"
+TOOLS = "doc-type.tools-comma-separated-tool-names"
+BODY_OPENS_WITH_AN_H1 = "doc-type.body-opens-with-an-h1"
+REFERENCES_ONE_LEVEL_DEEP = "doc-type.references-one-level-deep"
+TWO_SECTIONS = "harness.behaviors-then-principles"
+REQUIRED_RULES = "harness.two-required-rules"
 
 RULES = (
-    PARSE,
     FRONT_MATTER,
-    REQUIRED_FIELD,
-    NAME_MATCH,
-    NAME_FORMAT,
-    DESCRIPTION_TYPE,
-    DESCRIPTION_LENGTH,
-    DESCRIPTION_SENTENCES,
-    DESCRIPTION_TRIGGER,
-    UNKNOWN_FIELD,
-    MODEL_VALUE,
-    EFFORT_VALUE,
-    DMI_TYPE,
-    ARGUMENTS_FORMAT,
-    TOOLS_FORMAT,
-    BODY_H1,
-    REFERENCES_DEPTH,
-    GLOBAL_CLAUDE_SHAPE,
-    GLOBAL_CLAUDE_RULES,
+    NAME_MATCHES_ITS_HOME,
+    KEBAB_CASE_NAME,
+    DESCRIPTION,
+    MODEL_AND_EFFORT,
+    MODEL_INVOCATION_FLAG,
+    ARGUMENTS,
+    TOOLS,
+    BODY_OPENS_WITH_AN_H1,
+    REFERENCES_ONE_LEVEL_DEEP,
+    TWO_SECTIONS,
+    REQUIRED_RULES,
 )
 
 # Each kind's front matter vocabulary is closed: these fields and nothing
@@ -185,7 +171,7 @@ def check_required_fields(
 ) -> list[Finding]:
     """Report each required field missing from the front matter."""
     return [
-        Finding(rel, REQUIRED_FIELD, f"missing '{field}'")
+        Finding(rel, FRONT_MATTER, f"missing '{field}'")
         for field in required
         if field not in fm
     ]
@@ -206,12 +192,12 @@ def check_name(fm: dict, anchor: str, anchor_kind: str, rel: str) -> list[Findin
         findings.append(
             Finding(
                 rel,
-                NAME_MATCH,
+                NAME_MATCHES_ITS_HOME,
                 f"name '{name}' does not match {anchor_kind} '{anchor}'",
             )
         )
     if not KEBAB_RE.match(name):
-        findings.append(Finding(rel, NAME_FORMAT, f"name '{name}' is not kebab-case"))
+        findings.append(Finding(rel, KEBAB_CASE_NAME, f"name '{name}' is not kebab-case"))
     return findings
 
 
@@ -240,7 +226,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                DESCRIPTION_TYPE,
+                DESCRIPTION,
                 f"description must be a string, got {type(desc).__name__}",
             )
         ]
@@ -249,7 +235,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                DESCRIPTION_LENGTH,
+                DESCRIPTION,
                 f"description is {len(desc)} chars (max {DESCRIPTION_MAX})",
             )
         )
@@ -276,7 +262,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                DESCRIPTION_SENTENCES,
+                DESCRIPTION,
                 f"description is {len(sentences)} sentence(s), must be exactly "
                 f"{expected} — {shape}",
             )
@@ -285,7 +271,7 @@ def check_description(fm: dict, rel: str) -> list[Finding]:
         findings.append(
             Finding(
                 rel,
-                DESCRIPTION_TRIGGER,
+                DESCRIPTION,
                 f"second sentence must begin '{TRIGGER_PREFIX}' and name the "
                 f"trigger keywords/contexts/file types, got: '{sentences[1][:40]}'",
             )
@@ -299,7 +285,7 @@ def check_unknown_fields(fm: dict, rel: str, known: tuple[str, ...]) -> list[Fin
     return [
         Finding(
             rel,
-            UNKNOWN_FIELD,
+            FRONT_MATTER,
             f"'{field}' is not a documented front matter field "
             f"(vocabulary is closed to {known})",
         )
@@ -314,7 +300,7 @@ def check_model(fm: dict, rel: str) -> list[Finding]:
     if model is None:
         return []
     if model not in VALID_MODELS:
-        return [Finding(rel, MODEL_VALUE, f"model '{model}' not in {VALID_MODELS}")]
+        return [Finding(rel, MODEL_AND_EFFORT, f"model '{model}' not in {VALID_MODELS}")]
     return []
 
 
@@ -324,7 +310,7 @@ def check_effort(fm: dict, rel: str) -> list[Finding]:
     if effort is None:
         return []
     if effort not in VALID_EFFORTS:
-        return [Finding(rel, EFFORT_VALUE, f"effort '{effort}' not in {VALID_EFFORTS}")]
+        return [Finding(rel, MODEL_AND_EFFORT, f"effort '{effort}' not in {VALID_EFFORTS}")]
     return []
 
 
@@ -337,7 +323,7 @@ def check_disable_model_invocation(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                DMI_TYPE,
+                MODEL_INVOCATION_FLAG,
                 f"disable-model-invocation must be boolean, got '{value}'",
             )
         ]
@@ -353,7 +339,7 @@ def check_arguments(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                ARGUMENTS_FORMAT,
+                ARGUMENTS,
                 f"arguments must be a non-empty list of kebab-case names, "
                 f"got '{value}'",
             )
@@ -361,7 +347,7 @@ def check_arguments(fm: dict, rel: str) -> list[Finding]:
     return [
         Finding(
             rel,
-            ARGUMENTS_FORMAT,
+            ARGUMENTS,
             f"argument '{item}' is not a kebab-case name",
         )
         for item in value
@@ -378,7 +364,7 @@ def check_tools(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                TOOLS_FORMAT,
+                TOOLS,
                 f"tools must be a comma-separated string of tool names, got '{value}'",
             )
         ]
@@ -386,7 +372,7 @@ def check_tools(fm: dict, rel: str) -> list[Finding]:
         return [
             Finding(
                 rel,
-                TOOLS_FORMAT,
+                TOOLS,
                 f"tools has an empty entry in '{value}'",
             )
         ]
@@ -402,9 +388,9 @@ def check_body_h1(body: str, rel: str) -> list[Finding]:
         if stripped.startswith("# "):
             return []
         return [
-            Finding(rel, BODY_H1, f"body must start with H1, got: '{stripped[:40]}'")
+            Finding(rel, BODY_OPENS_WITH_AN_H1, f"body must start with H1, got: '{stripped[:40]}'")
         ]
-    return [Finding(rel, BODY_H1, "body is empty")]
+    return [Finding(rel, BODY_OPENS_WITH_AN_H1, "body is empty")]
 
 
 def body_length_advisory(body: str, rel: str) -> str | None:
@@ -451,7 +437,7 @@ def check_references_depth(skill_dir: Path, rel_dir: str) -> list[Finding]:
                 findings.append(
                     Finding(
                         rel_md,
-                        REFERENCES_DEPTH,
+                        REFERENCES_ONE_LEVEL_DEEP,
                         f"link to sibling reference file '{target}' "
                         "(references/ must be one level deep)",
                     )
@@ -482,7 +468,7 @@ def audit_skill(skill_dir: Path, repo_root: Path) -> tuple[list[Finding], list[s
     try:
         fm, body = parse_runbook(skill_md)
     except Exception as e:
-        return [Finding(rel, PARSE, str(e))], []
+        return [Finding(rel, FRONT_MATTER, str(e))], []
 
     if fm is None:
         return [Finding(rel, FRONT_MATTER, "no YAML front matter found")], []
@@ -511,7 +497,7 @@ def audit_agent(agent_md: Path, repo_root: Path) -> list[Finding]:
     try:
         fm, body = parse_runbook(agent_md)
     except Exception as e:
-        return [Finding(rel, PARSE, str(e))]
+        return [Finding(rel, FRONT_MATTER, str(e))]
 
     if fm is None:
         return [Finding(rel, FRONT_MATTER, "no YAML front matter found")]
@@ -554,13 +540,13 @@ def check_global_claude(repo_root: Path) -> list[Finding]:
         findings.append(
             Finding(
                 GLOBAL_CLAUDE,
-                GLOBAL_CLAUDE_SHAPE,
+                TWO_SECTIONS,
                 f"H2 sections must be exactly {list(GLOBAL_CLAUDE_SECTIONS)},"
                 f" got {list(sections)}",
             )
         )
     findings.extend(
-        Finding(GLOBAL_CLAUDE, GLOBAL_CLAUDE_RULES, f"missing rule '{rule}'")
+        Finding(GLOBAL_CLAUDE, REQUIRED_RULES, f"missing rule '{rule}'")
         for rule in GLOBAL_CLAUDE_REQUIRED_RULES
         if rule not in headings
     )

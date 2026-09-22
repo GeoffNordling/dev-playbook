@@ -13,7 +13,7 @@ deterministically, and where the file sits. The graph is the source of
 truth; the prose around it carries only what a Mermaid label cannot,
 the pointers and the conditions in full. Loop has no generated view: the graph GitHub renders is the view. What checks that
 graph and prose agree is a lint, and the Standard that stations it is
-[Loop Conventions](/standards/knowledge-organization/loop-conventions.md).
+[Loop Conventions](/standards/doc-type/loop-conventions.md).
 
 ## The graph
 
@@ -39,10 +39,11 @@ cannot carry:
 - **An act** links the runbook it points at, a skill or an agent
   definition, then states its condition: `fires when …`, or `fires
   every iteration`.
-- **A check** links the Audit cell of the card whose standard it
-  measures against, `standards/<card>/card.md#audit`, then states its
-  condition the same way. The cell composed is the audit, never the
-  gate ([Standard](/doc-types/standard/encoding.md#cells)).
+- **A check** links the Standard it measures against, a file typed
+  `Standard` at `standards/<name>/<topic>.md`, then states its
+  condition the same way. What the check runs is the verifier of each
+  of that Standard's rules, never a gate
+  ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)).
 - **A yield** names its receiver, the user or a linked Loop, then
   states its condition: `yields when …`.
 

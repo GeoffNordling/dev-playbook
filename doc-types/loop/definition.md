@@ -16,15 +16,15 @@ measurements iterated toward a target.
 Three, iterated:
 
 - **act** — a pointer at a runbook.
-- **check** — a pointer at a standard's audit.
+- **check** — a pointer at a standard, audited.
 - **yield** — a programmed exit to another loop or to the user, resumed
   where it left.
 
 The target is not a field of the loop: it is written in the standards
-the checks measure against. An act reads a standard's definition to
-know what the target looks like; a check runs the same standard's audit
-to measure the distance, and the target state is reached when every
-check returns no findings.
+the checks measure against. An act reads a standard to know what the
+target looks like; a check runs the same standard's verifiers to
+measure the distance, and the target state is reached when every check
+returns no findings.
 
 A loop yields where its author put the yield, never, once at the end,
 every K rounds, every turn, and the doc-type does not say when. A loop

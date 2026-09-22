@@ -2,7 +2,7 @@
 name: runbook-creator
 description: Author a new runbook — a skill bundle or an agent definition — against the workspace's runbook conventions. Use when the user says to create a skill or an agent.
 disable-model-invocation: false
-model: opus
+model: inherit
 effort: xhigh
 arguments: [idea]
 ---
@@ -20,8 +20,8 @@ waiting, so the first line of the new file gets written at step 2.
 The rules live in these two, and this skill is only the workflow over them.
 Before doing anything else:
 
-- {Read [runbook-conventions.md](~/workspace/dev-playbook/standards/harness/runbook-conventions.md) end-to-end; the binding format a skill or agent takes}.
-- {Read [writing-for-agents.md](~/workspace/dev-playbook/standards/harness/writing-for-agents.md) end-to-end; the craft of writing what an agent consumes}.
+- {Read [runbook-conventions.md](~/workspace/dev-playbook/standards/doc-type/runbook-conventions.md) end-to-end; the binding format a skill or agent takes}.
+- {Read [writing-for-agents.md](~/workspace/dev-playbook/guides/writing-for-agents.md) end-to-end; the craft of writing what an agent consumes}.
 
 Then report: `READ: runbook-conventions.md, writing-for-agents.md`. Proceed only
 after.

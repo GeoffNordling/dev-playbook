@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: CONTEXT.md Content
 description: The CONTEXT.md vocabulary center — Vocabulary frontmatter, the Language section, the entry shape, and the rules that keep a glossary tight
 population: "a repo's CONTEXT.md"
@@ -10,32 +10,33 @@ population: "a repo's CONTEXT.md"
 A repo's `CONTEXT.md`, its vocabulary disambiguation center: when
 several words compete for one concept, one is picked and the rest
 retired. It appears at the root or not at all
-([File Skeleton](/standards/build/skeleton.md#root-only-files));
-repo-lint checks its shape
-([Knowledge Organization](/standards/knowledge-organization/card.md)).
+([File Skeleton](/standards/build/skeleton.md#one-at-the-root-or-none)).
 
 ## Glossary only
 
-The file is a glossary and nothing else: no implementation details, no
-spec, no scratch pad.
+A repo's `CONTEXT.md` holds a glossary and nothing else: no
+implementation detail, no specification, and no scratch note.
 
-Implementation decisions live in Decision Records
-([Decision Record Conventions](/standards/decisions/records.md)).
+`knowledge-organization.glossary-only` · stochastic
 
-## OKF frontmatter
+## Frontmatter declares type: Vocabulary
 
-The file opens with `type: Vocabulary`, `title`, and `description`
-([Document Types](/standards/knowledge-organization/document-types.md)).
+A repo's `CONTEXT.md` declares `type: Vocabulary` in its frontmatter.
 
-## The Language section
+`knowledge-organization.frontmatter-declares-type-vocabulary` · deterministic
 
-`## Language` is present, the one required section.
+## Language section present
 
-## Entry shape
+A repo's `CONTEXT.md` has a `## Language` section.
 
-An entry is the term in bold on its own line, its definition beneath,
-and an `_Avoid_` line listing the words retired in its favor where other
-words compete.
+`knowledge-organization.language-section-present` · deterministic
+
+## Term, definition, Avoid line
+
+An entry under `## Language` in a repo's `CONTEXT.md` is the term in
+bold on its own line, its definition on the lines beneath, and, at
+most, one final `_Avoid_:` line naming the words retired in the term's
+favor.
 
 ````md
 ---
@@ -46,42 +47,41 @@ description: {One-line description of the vocabulary}
 
 # {Context Name}
 
-{One or two sentence description of what this context is and why it exists.}
+{One or two sentences on what this context is and why it exists.}
 
 ## Language
 
-**Order**:
+### Orders
+
+{One or two sentences on what this group of terms covers.}
+
+**Order**
 {A one or two sentence description of the term}
 _Avoid_: Purchase, transaction
 
-**Invoice**:
+**Invoice**
 A request for payment sent to a customer after delivery.
 _Avoid_: Bill, payment request
-
-**Customer**:
-A person or organization that places orders.
-_Avoid_: Client, buyer, account
 ````
 
-## One word per concept
+`knowledge-organization.term-definition-avoid-line` · deterministic
 
-When several words exist for one concept, the entry picks the best one
-and lists the others under `_Avoid_`.
+## Definitions at most two sentences
 
-## Tight definitions
+An entry's definition in a repo's `CONTEXT.md` is at most two
+sentences: one that says what the term is, and at most one more that
+sharpens it; where a concept document defines the term the definition
+links that document.
 
-A definition is one sentence that says what the term is; where a
-concept document defines the term, the sentence links it, and that
-document is the definition's home
-([terms defined once](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once)).
+`knowledge-organization.definitions-at-most-two-sentences` · stochastic
 
 ## Project terms only
 
-Every term is specific to the project's context; a general programming
-concept, a timeout, an error type, a utility pattern, has no entry,
-however heavily the project uses it; nor has a term one documentation
-set defines and uses within itself. This file holds the term that
-crosses sets.
+Every term with an entry under `## Language` in a repo's `CONTEXT.md` is
+specific to the project's context and is used beyond the documentation
+set that defines it: a general programming concept, a timeout, an error
+type, a utility pattern, has no entry however heavily the project uses
+it, and nor has a term one documentation set defines and uses within
+itself.
 
-The test before adding a term: is this a concept unique to this context,
-and used beyond the set that defines it? Only then does it belong.
+`knowledge-organization.project-terms-only` · stochastic

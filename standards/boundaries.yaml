@@ -1,0 +1,24 @@
+# The boundary table: every check address the verifier table names, and the
+# gates that run it. commit is the pre-commit stage at `git commit`; push is
+# the pre-push stage at `git push`, which runs `make check`; ci is a workflow
+# under .github/workflows/; on-demand is a registered audit no gate runs.
+# Written by scripts/boundary-table, which also fails when this file and a
+# fresh write differ. Regenerate with: scripts/boundary-table --write
+pre-commit validate-manifest: [commit, push, ci]
+ruff-check: [commit, push, ci]
+ruff-format: [commit, push, ci]
+scripts/boundary-table: [commit, push, ci]
+scripts/decisions-lint: [commit, push, ci]
+scripts/harness-files-lint: [commit, push, ci]
+scripts/loop-lint: [commit, push, ci]
+scripts/okf-lint: [commit, push, ci]
+scripts/prose-lint: [commit, push, ci]
+scripts/python-lint: [commit, push, ci]
+scripts/ref-lint: [commit, push]
+scripts/repo-lint: [commit, push, ci]
+scripts/standards-lint: [commit, push, ci]
+scripts/testing-lint: [commit, push, ci]
+scripts/verifier-table: [commit, push, ci]
+scripts/workspace-lint: [on-demand]
+shellcheck: [commit, push, ci]
+shfmt: [commit, push, ci]

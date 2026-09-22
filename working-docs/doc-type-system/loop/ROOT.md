@@ -12,8 +12,10 @@ The strand that builds the **Loop** doc-type, a third directory under
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
 Loop is one of the doc-type system's three doc-types
 ([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)):
-its predicates are
-[Loop Specification](/working-docs/doc-type-system/doc-type-system/specification/loop.md).
+the rules every doc-type is held to are the Standard
+[Doc-Type](/standards/doc-type/doc-type.md), and a Loop's instances
+are held to
+[Loop Conventions](/standards/doc-type/loop-conventions.md).
 Loop is a leaf: no strand's plan waits on it except by use. The
 doc-type system's first instance and the fact base's simulation loop
 are both loops.
@@ -72,6 +74,15 @@ From memory, not a fresh search.
 
 ## Planned
 
+- **Three rules for Loop Conventions.** Drafted in the retired
+  specification, deleted with it at step 8 of the doc-type system:
+  every step points at a Runbook, a Standard, a Loop, or the user that
+  exists; no Runbook edge and no Standard rule lands on a file under
+  `loops/`; a check passes on zero findings and on nothing else, any
+  threshold being a yield's condition. Each becomes a rule of
+  [Loop Conventions](/standards/doc-type/loop-conventions.md)
+  or is dropped, when that Standard is next revised.
+
 - **The objective part.** Infinitely many states satisfy a
   specification, so a loop that proposes doc-types needs a scalar to
   descend, lexicographic, residuals, then doc-types, then verbs, then
@@ -102,12 +113,12 @@ From memory, not a fresh search.
   [ledger](/doc-types/loop/residual-ledger.md), seeded empty.
 - **Operations and composition rule.** Three verbs, act, check, yield;
   the checks carry the target. Recorded in [Loop](/doc-types/loop/definition.md).
-- **Location rule and registry.** okf-lint's `type-location` check
+- **Location rule and registry.** okf-lint's `typed-loop` check
   binds `Loop` to `loops/`; the `Loop` row and the Typed Loop rule are
   in `document-types.md`; the registry ruling and the roster entry are
   in `doc-type-system.md`; `loops/` exists with an empty index.
 - **Obligation.** `scripts/loop-lint` is the detector behind
-  [Loop Conventions](/standards/knowledge-organization/loop-conventions.md),
+  [Loop Conventions](/standards/doc-type/loop-conventions.md),
   the Standard that binds a `Loop` file to the encoding; enrolled in the
   `playbook-lint` roster, so a bad Loop file cannot be committed. Logic in
   `src/dev_playbook/loop_lint.py`, tests beside it.

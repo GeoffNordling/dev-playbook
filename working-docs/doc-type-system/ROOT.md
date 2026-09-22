@@ -11,7 +11,7 @@ every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
 `worktree-cloa-viewer-tool-2`, which describe one theory. The set is
 four strands, each with its own root and its own worklist
-([Worklist](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#worklist)).
+([One list of items, state by section](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-list-of-items-state-by-section)).
 This root holds only what crosses strands.
 
 ## Goal
@@ -43,12 +43,12 @@ a selection of the fact base. Loop is a leaf.
   ┌───────────────────────────────┴────────────────────────────────┐
   │  DOC-TYPE SYSTEM · the language                                │
   │  picture ······· reference-model.md                            │
-  │  predicates ···· specification/ doc-type · runbook · standard  │
+  │  predicates ···· standards/doc-type/doc-type.md                │
   │  method ········ writing-predicates.md                         │
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │
-  │  plan: refactor steps 1–8 · banned words · /write-predicates  │
+  │  plan: refactor steps 1–10 · banned words · /write-predicates │
   │        · first instance, a loop that proposes predicates       │
   └────────────┬──────────────────────────────────┬────────────────┘
   Loop is one  │                                  │  each encoding
@@ -176,7 +176,7 @@ the seed of the system's eventual context file.
   relation type, and, where the source declares them, an order, a
   condition, and a detail quoted from the source. The detail is what
   the runbook encoding calls annotation
-  ([Reference Chain Encoding](/doc-types/runbook/encoding.md)).
+  ([Nodes and Edges Encoding](/doc-types/runbook/encoding.md)).
 - **Derivation** — a deterministic function from rows to rows. It
   reads the fact base and derives new rows from existing ones, with
   no judgment, and never touches a file. Not a rule: a rule is a

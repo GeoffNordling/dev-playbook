@@ -14,7 +14,7 @@ when it recurs; a countermeasure, once built, is linked from its entry.
 
 **Definition.** Sentence-level style patterns: changelog residue,
 contrast pairs, closing cadence, and the rest. The named tics live in
-[slop-tics.md](/standards/prose/slop-tics.md).
+[slop-tics.md](/guides/slop-tics.md).
 
 **Action.** `/document-remove-tics` dispatches the tics-remover agent to
 remove them from a document.
@@ -76,7 +76,7 @@ Never duplicate facts across multiple documents.
 
 - **Before** "A runbook is harness-owned — Claude Code loads it as
   configuration, not as prose to learn from — so it is not an OKF
-  concept document." (the file-roles standard owns this) → **After**
+  concept document." (Document Types owns this) → **After**
   deleted.
 
 ## Section-scale duplication

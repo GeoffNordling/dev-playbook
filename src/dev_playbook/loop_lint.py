@@ -1,7 +1,7 @@
 """Check every Loop's Mermaid graph against the prose around it.
 
 loop-lint is the detector behind Loop Conventions
-(standards/knowledge-organization/loop-conventions.md), the Standard that
+(standards/doc-type/loop-conventions.md), the Standard that
 binds a document typed ``Loop`` to the Loop doc-type's encoding
 (doc-types/loop/encoding.md). It walks a repo's markdown files once (via
 dev_playbook.md.find_md_files, so gitignore-aware and worktree-scoped),
@@ -21,9 +21,9 @@ to. Five rules:
     entry or is a receiver some yield leads to.
   - **loop-edges** — a step leads to a step; only a yield leads to a
     receiver; a receiver leads to a step.
-  - **loop-entries** — an act links a file; a check links a card's Audit
-    cell, ``standards/<card>/card.md#audit``; a yield names the user or
-    links a Loop; every entry states its condition.
+  - **loop-entries** — an act links a file; a check links a file typed
+    ``Standard``; a yield names the user or links a Loop; every entry
+    states its condition.
 
 The detector stops at a file's first disagreement, since each rule reads
 the cut the one before it made, and goes on to the next file. It writes
@@ -32,7 +32,7 @@ nothing: a Loop's view is the graph GitHub renders. A repo with no
 (standards/standard/detectors.md).
 
 Output:
-    stdout — one finding per line, ``file: knowledge-organization.loop-… message``.
+    stdout — one finding per line, ``file: doc-type.loop-… message``.
     stderr — one readable summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 
@@ -53,18 +53,23 @@ from dev_playbook.findings import print_rules, render
 # Every rule id this detector can emit, namespaced by the card whose question
 # it answers. Each is a module-level constant so RULES cannot drift from what
 # the detector emits.
-LOOP_GRAPH = "knowledge-organization.loop-graph"
-LOOP_SECTIONS = "knowledge-organization.loop-sections"
-LOOP_NODES = "knowledge-organization.loop-nodes"
-LOOP_EDGES = "knowledge-organization.loop-edges"
-LOOP_ENTRIES = "knowledge-organization.loop-entries"
+ONE_GRAPH = "doc-type.one-paragraph-then-one-graph"
+THREE_VERB_SECTIONS = "doc-type.acts-checks-and-yields-in-that-order"
+NODES_AND_ENTRIES_AGREE = "doc-type.nodes-and-entries-agree"
+EDGES_FOLLOW_THE_SHAPE = "doc-type.edges-lead-to-steps"
+ENTRIES_POINT_AND_CONDITION = "doc-type.every-entry-states-its-condition"
 
-RULES = (LOOP_GRAPH, LOOP_SECTIONS, LOOP_NODES, LOOP_EDGES, LOOP_ENTRIES)
+RULES = (
+    ONE_GRAPH,
+    THREE_VERB_SECTIONS,
+    NODES_AND_ENTRIES_AGREE,
+    EDGES_FOLLOW_THE_SHAPE,
+    ENTRIES_POINT_AND_CONDITION,
+)
 
 LOOPS_DIR = "loops"
 LOOP_TYPE = "Loop"
-CARD_TYPE = "Standard-Card"
-AUDIT_CELL = "audit"
+STANDARD_TYPE = "Standard"
 VERBS = ("Acts", "Checks", "Yields")
 VERB_OF = {"Acts": "act", "Checks": "check", "Yields": "yield"}
 RECEIVER = "receiver"
@@ -136,11 +141,11 @@ def slice_loop(body: str) -> tuple[list[str], Sections]:
                 if info == "mermaid":
                     if mermaid is not None:
                         raise Disagreement(
-                            LOOP_GRAPH, "two mermaid blocks; the encoding is one"
+                            ONE_GRAPH, "two mermaid blocks; the encoding is one"
                         )
                     if sections:
                         raise Disagreement(
-                            LOOP_GRAPH, "the mermaid block sits after a verb section"
+                            ONE_GRAPH, "the mermaid block sits after a verb section"
                         )
                     mermaid, in_mermaid = [], True
                 continue
@@ -154,17 +159,17 @@ def slice_loop(body: str) -> tuple[list[str], Sections]:
             level, text = len(m.group(1)), m.group(2).strip()
             if level == 1:
                 if seen_h1:
-                    raise Disagreement(LOOP_GRAPH, "two H1s")
+                    raise Disagreement(ONE_GRAPH, "two H1s")
                 seen_h1 = True
                 continue
             if mermaid is None:
                 raise Disagreement(
-                    LOOP_GRAPH,
+                    ONE_GRAPH,
                     f"heading {text!r} before the graph; only the paragraph sits there",
                 )
             if level != 2:
                 raise Disagreement(
-                    LOOP_SECTIONS,
+                    THREE_VERB_SECTIONS,
                     f"heading {text!r} is H{level}; the verb sections are H2s",
                 )
             sections.append((text, []))
@@ -176,15 +181,15 @@ def slice_loop(body: str) -> tuple[list[str], Sections]:
             sections[-1][1].append(line)
         elif line.strip():
             raise Disagreement(
-                LOOP_SECTIONS,
+                THREE_VERB_SECTIONS,
                 f"text between the graph and the first verb heading: {line.strip()!r}",
             )
     if mermaid is None:
-        raise Disagreement(LOOP_GRAPH, "no mermaid block")
+        raise Disagreement(ONE_GRAPH, "no mermaid block")
     paragraphs = [p for p in "\n".join(before).split("\n\n") if p.strip()]
     if len(paragraphs) != 1:
         raise Disagreement(
-            LOOP_GRAPH,
+            ONE_GRAPH,
             f"{len(paragraphs)} paragraphs before the graph; the encoding is one",
         )
     return mermaid, sections
@@ -195,7 +200,7 @@ def entries_of(sections: Sections) -> Entries:
     names = [text for text, _ in sections]
     if names != list(VERBS):
         raise Disagreement(
-            LOOP_SECTIONS,
+            THREE_VERB_SECTIONS,
             f"verb sections are {names}; the encoding is {list(VERBS)} in that order",
         )
     entries: Entries = {}
@@ -207,7 +212,7 @@ def entries_of(sections: Sections) -> Entries:
             if m := ENTRY_RE.match(line):
                 node, rest = m.group(1), m.group(2)
                 if node in entries:
-                    raise Disagreement(LOOP_SECTIONS, f"`{node}` has two entries")
+                    raise Disagreement(THREE_VERB_SECTIONS, f"`{node}` has two entries")
                 entries[node] = (verb, rest)
             elif line.startswith((" ", "\t")) and entries:
                 node = next(reversed(entries))
@@ -217,7 +222,7 @@ def entries_of(sections: Sections) -> Entries:
                 )
             else:
                 raise Disagreement(
-                    LOOP_SECTIONS,
+                    THREE_VERB_SECTIONS,
                     f"{heading}: not an entry, `- `id` — …`: {line.strip()!r}",
                 )
     return entries
@@ -230,7 +235,7 @@ def graph_of(mermaid: list[str]) -> tuple[set[str], list[tuple[str, str]]]:
     """The node ids and (source, target) edges of a Mermaid flowchart."""
     lines = [line.strip() for line in mermaid if line.strip()]
     if not lines or not lines[0].startswith(("flowchart", "graph")):
-        raise Disagreement(LOOP_GRAPH, "the mermaid block is not a flowchart")
+        raise Disagreement(ONE_GRAPH, "the mermaid block is not a flowchart")
     nodes: set[str] = set()
     edges: list[tuple[str, str]] = []
     for stmt in lines[1:]:
@@ -238,7 +243,7 @@ def graph_of(mermaid: list[str]) -> tuple[set[str], list[tuple[str, str]]]:
             continue
         if "&" in stmt:
             raise Disagreement(
-                LOOP_GRAPH,
+                ONE_GRAPH,
                 f"`&` fan-out is not read; write one edge per line: {stmt!r}",
             )
         ids = []
@@ -246,7 +251,7 @@ def graph_of(mermaid: list[str]) -> tuple[set[str], list[tuple[str, str]]]:
             m = NODE_RE.match(term.strip())
             if not m:
                 raise Disagreement(
-                    LOOP_GRAPH, f"cannot read node {term.strip()!r} in {stmt!r}"
+                    ONE_GRAPH, f"cannot read node {term.strip()!r} in {stmt!r}"
                 )
             ids.append(m.group(1))
             nodes.add(m.group(1))
@@ -266,7 +271,9 @@ def _resolve(link: str, loop_path: Path, root: Path) -> Path:
         else loop_path.parent / target
     )
     if not path.is_file():
-        raise Disagreement(LOOP_ENTRIES, f"link {link!r} does not resolve")
+        raise Disagreement(
+            ENTRIES_POINT_AND_CONDITION, f"link {link!r} does not resolve"
+        )
     return path
 
 
@@ -279,34 +286,32 @@ def check_entry(node: str, verb: str, rest: str, loop_path: Path, root: Path) ->
     """One entry's pointer and condition."""
     if not any(phrase in rest for phrase in CONDITION_OF[verb]):
         raise Disagreement(
-            LOOP_ENTRIES,
+            ENTRIES_POINT_AND_CONDITION,
             f"`{node}` states no condition ({' / '.join(CONDITION_OF[verb])})",
         )
     links = LINK_RE.findall(rest)
     if verb == "yield":
         if not links and "the user" not in rest:
             raise Disagreement(
-                LOOP_ENTRIES, f"`{node}` names no receiver: the user or a linked Loop"
+                ENTRIES_POINT_AND_CONDITION,
+                f"`{node}` names no receiver: the user or a linked Loop",
             )
         for link in links:
             if _type_of(_resolve(link, loop_path, root)) != LOOP_TYPE:
                 raise Disagreement(
-                    LOOP_ENTRIES,
+                    ENTRIES_POINT_AND_CONDITION,
                     f"`{node}` yields to {link!r}, which is not typed Loop",
                 )
         return
     if not links:
-        what = "runbook" if verb == "act" else "card"
-        raise Disagreement(LOOP_ENTRIES, f"`{node}` links no {what}")
+        what = "runbook" if verb == "act" else "Standard"
+        raise Disagreement(ENTRIES_POINT_AND_CONDITION, f"`{node}` links no {what}")
     target = _resolve(links[0], loop_path, root)
-    if verb == "check":
-        fragment = links[0].partition("#")[2]
-        if _type_of(target) != CARD_TYPE or fragment != AUDIT_CELL:
-            raise Disagreement(
-                LOOP_ENTRIES,
-                f"`{node}` checks {links[0]!r}; a check links a card's Audit cell, "
-                f"`standards/<card>/card.md#{AUDIT_CELL}`",
-            )
+    if verb == "check" and _type_of(target) != STANDARD_TYPE:
+        raise Disagreement(
+            ENTRIES_POINT_AND_CONDITION,
+            f"`{node}` checks {links[0]!r}; a check links a file typed Standard",
+        )
 
 
 # --- one Loop -----------------------------------------------------------------
@@ -321,19 +326,21 @@ def check_loop(loop_path: Path, root: Path) -> int:
     for node in entries:
         if node not in nodes:
             raise Disagreement(
-                LOOP_NODES, f"`{node}` has an entry but is not a node of the graph"
+                NODES_AND_ENTRIES_AGREE,
+                f"`{node}` has an entry but is not a node of the graph",
             )
     kind = {node: entries[node][0] if node in entries else RECEIVER for node in nodes}
     yielded_to = {t for s, t in edges if kind[s] == "yield"}
     for node in sorted(nodes):
         if kind[node] == RECEIVER and node not in yielded_to:
             raise Disagreement(
-                LOOP_NODES, f"`{node}` has no entry and no yield leads to it"
+                NODES_AND_ENTRIES_AGREE,
+                f"`{node}` has no entry and no yield leads to it",
             )
     for s, t in edges:
         if kind[t] not in MAY_LEAD_TO[kind[s]]:
             raise Disagreement(
-                LOOP_EDGES,
+                EDGES_FOLLOW_THE_SHAPE,
                 f"edge `{s}` → `{t}` is {kind[s]} → {kind[t]}; the shape does not allow it",
             )
     for node, (verb, rest) in entries.items():

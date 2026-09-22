@@ -1,69 +1,49 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Candidates
-description: The CANDIDATES.md register of uncommitted future work — the only future-work file, entry shape, structure, and promotion to an issue
+description: The register of a repo's uncommitted future work — one CANDIDATES.md at the root, the entry shape, and the headings and nesting
 population: "a repo's CANDIDATES.md"
 ---
 
 # Candidates
 
 A repo's `CANDIDATES.md`, the register of the future work it has not
-committed to. Committed work lives in GitHub issues
-([Issue Shapes](/standards/tracking/issue-shapes.md)); a
-**Candidate** is work described but not yet decided, and a unit of work
-has [one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
-The file is optional, one per repo, at the root
-([File Skeleton](/standards/build/skeleton.md#root-only-files)); its
-absence means nothing has been recorded yet. It carries `Candidate-List`
-frontmatter and an index entry like any concept document
-([Document Types](/standards/knowledge-organization/document-types.md)).
+committed to: a **Candidate** is work described but not yet decided, and
+committed work is a GitHub issue
+([Issue Shapes](/standards/tracking/issue-shapes.md)). The file is
+optional, one per repo, at the root
+([One at the root, or none](/standards/build/skeleton.md#one-at-the-root-or-none)), typed
+`Candidate-List`
+([Document Types](/standards/knowledge-organization/document-types.md));
+its absence means nothing has been recorded yet.
 
-## Uncommitted work
+> **Why.** Commitment is a decision, not a capability: an entry may be
+> perfectly specifiable and stay a Candidate for as long as nobody has
+> chosen to build it, and deciding to write its brief is what ends
+> that.
 
-Every entry is work this repo would implement once the decision is made,
-and that decision has not been made. Commitment is a decision, not a
-capability: an entry may be perfectly specifiable and stay a Candidate for
-as long as nobody has chosen to build it, and deciding to write its brief
-is what ends that. The author makes this call; no detector checks it.
+## One list item per entry
 
-A Candidate is serious and repo-scoped: not the unfiltered, cross-repo
-ideas that belong in mission-control's capture path, and never material
-that is not work at all. Once committed, the work belongs in an issue at
-whatever size fits — an epic, an ordinary issue, or a one-line bug.
-
-## The only future-work file
-
-No `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or `IDEAS.md` exists anywhere in
-the tree; `CANDIDATES.md` is the one future-work file a repo carries.
-repo-lint reports a rogue file (`tracking.rogue-future-work-file`).
-
-## Entry shape
-
-An entry is one list item — a bolded short name, an em dash, then one or
-two sentences of intent — and carries no fields, no acceptance criteria,
-and no checkboxes.
+An entry is one list item: a bolded name, an em dash, then at most two
+sentences, with no fields, no acceptance criteria, and no checkboxes.
 
 ```markdown
 - **Column selection** — the export is all-or-nothing today; users want to
   choose which columns ship.
 ```
 
-The bolded name is the entry's handle: what promotion is pointed at, and
-what gets deleted when it lands. The prose says what the work is, never
-how to do it, since an approach decided this early goes stale before the
-work starts. Brief furniture on a Candidate is the signal that the brief
-could be written, and therefore that the work belongs in an issue.
+`tracking.one-list-item-per-entry` · deterministic
 
-## Structure
+> **Why.** An approach decided this early goes stale before the work
+> starts, and brief furniture — fields, acceptance criteria,
+> checkboxes — is the signal that the brief could be written, and
+> therefore that the work belongs in an issue.
 
-A `##` heading groups entries and carries no other meaning; nesting
-decomposes, a parent being an outcome and its children the work that
-achieves it, to any depth; and order carries no meaning in either
-dimension.
+## Every entry under a heading
 
-Headings are navigational only, free to invent. Since order is
-meaningless, every merge conflict in this file resolves by keeping both
-sides. A register in full:
+Every entry sits under a `##` heading, directly or nested under a parent
+entry; a heading groups its entries and carries no other meaning, and a
+nested entry is work that achieves its parent's outcome.
 
 ```markdown
 ---
@@ -91,14 +71,8 @@ description: Uncommitted future work — described, not yet promoted to issues
   nothing.
 ```
 
-## Promotion
+`tracking.every-entry-under-a-heading` · stochastic
 
-An entry whose issue has been authored is deleted in the same change, so
-the work never sits in both homes; a parent promotes with its whole
-subtree as one issue, never as an issue per child.
-
-Intake does not slice, so the subtree's decomposition is deferred to the
-`design` node like any other multi-issue plan
-([Issue Shapes](/standards/tracking/issue-shapes.md)). Deleting an
-entry without promoting it is ordinary editing: a Candidate that no longer
-appeals is removed, and nothing records that it was once considered.
+> **Why.** Neither the order of the headings nor the order of the
+> entries carries meaning, so every merge conflict in this file
+> resolves by keeping both sides.

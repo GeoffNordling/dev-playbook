@@ -13,7 +13,7 @@ attended sessions, which ruled headless out before it was ever weighed. The
 claim was never true. **The workspace begins using `claude -p`, on the
 expectation that subscription billing for it holds long-term.** Anthropic
 withdrew that coverage once and restored it, and the support article states it
-plainly; [headless.md](/docs/headless.md) carries the evidence and tracks where
+plainly; [headless.md](/guides/headless.md) carries the evidence and tracks where
 the policy stands. Direct API and Agent SDK use remains out of scope on cost,
 unchanged by this record.
 

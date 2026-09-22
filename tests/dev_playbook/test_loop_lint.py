@@ -15,13 +15,8 @@ SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "loop-lint"
 
 RUNBOOK = "---\nname: tidy\ndescription: Tidies\n---\n\nTidy the tree.\n"
 STANDARD = (
-    "---\ntype: Standard-Ruleset\ntitle: Tidy Tree\ndescription: A tidy tree\n"
+    "---\ntype: Standard\ntitle: Tidy Tree\ndescription: A tidy tree\n"
     'population: "a tree"\n---\n\n# Tidy Tree\n\n## Flat\n\nNo nesting.\n'
-)
-CARD = (
-    "---\ntype: Standard-Card\ntitle: Tidy\ndescription: How the tree stays tidy\n"
-    "---\n\n# Tidy\n\n## Define\n\n[Tidy Tree](/standards/tidy/tree.md)\n\n"
-    "## Audit\n\n`scripts/tidy-lint`\n\n## Enforce\n\nNone.\n\n## Adopt\n\nNone.\n"
 )
 LOOP = """---
 type: Loop
@@ -48,7 +43,7 @@ flowchart LR
 
 ## Checks
 
-- `flat` — [Tidy](/standards/tidy/card.md#audit), fires every
+- `flat` — [Tidy Tree](/standards/tidy/tree.md), fires every
   iteration.
 
 ## Yields
@@ -66,11 +61,10 @@ def run(repo: Path) -> subprocess.CompletedProcess:
 
 
 def make_repo(tmp_path: Path, loop: str | None = LOOP) -> Path:
-    """A git repo holding a runbook, a Standard, its card, and one Loop."""
+    """A git repo holding a runbook, a Standard, and one Loop."""
     files = {
         "skills/tidy.md": RUNBOOK,
         "standards/tidy/tree.md": STANDARD,
-        "standards/tidy/card.md": CARD,
     }
     if loop is not None:
         files["loops/tidy.md"] = loop
@@ -100,21 +94,21 @@ def test_a_node_with_no_entry_fails(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert result.stdout.startswith("loops/tidy.md: knowledge-organization.loop-nodes ")
+    assert result.stdout.startswith("loops/tidy.md: doc-type.nodes-and-entries-agree ")
     assert "`extra` has no entry and no yield leads to it" in result.stdout
 
 
 def test_an_entry_with_no_node_fails(tmp_path: Path) -> None:
     loop = LOOP.replace(
         "## Checks\n",
-        "## Checks\n\n- `ghost` — [Tidy](/standards/tidy/card.md#audit), fires every iteration.\n",
+        "## Checks\n\n- `ghost` — [Tidy Tree](/standards/tidy/tree.md), fires every iteration.\n",
     )
 
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-nodes `ghost` has an entry but is not a node"
+        "doc-type.nodes-and-entries-agree `ghost` has an entry but is not a node"
         in result.stdout
     )
 
@@ -129,32 +123,21 @@ def test_an_edge_the_shape_does_not_allow_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-edges edge `flat` → `user` is check → receiver"
+        "doc-type.edges-lead-to-steps edge `flat` → `user` is check → receiver"
         in result.stdout
     )
 
 
-def test_a_check_that_links_the_standard_not_the_card_fails(tmp_path: Path) -> None:
+def test_a_check_that_links_a_file_not_typed_standard_fails(tmp_path: Path) -> None:
     loop = LOOP.replace(
-        "[Tidy](/standards/tidy/card.md#audit)", "[Tidy Tree](/standards/tidy/tree.md)"
+        "[Tidy Tree](/standards/tidy/tree.md)", "[tidy](/skills/tidy.md)"
     )
 
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "knowledge-organization.loop-entries" in result.stdout
-    assert "a check links a card's Audit cell" in result.stdout
-
-
-def test_a_check_that_links_the_card_without_the_audit_cell_fails(
-    tmp_path: Path,
-) -> None:
-    loop = LOOP.replace("/standards/tidy/card.md#audit", "/standards/tidy/card.md")
-
-    result = run(make_repo(tmp_path, loop))
-
-    assert result.returncode == 1
-    assert "a check links a card's Audit cell" in result.stdout
+    assert "doc-type.every-entry-states-its-condition" in result.stdout
+    assert "a check links a file typed Standard" in result.stdout
 
 
 def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
@@ -164,7 +147,7 @@ def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-entries link '/skills/gone.md' does not resolve"
+        "doc-type.every-entry-states-its-condition link '/skills/gone.md' does not resolve"
         in result.stdout
     )
 
@@ -176,7 +159,8 @@ def test_a_yield_with_no_condition_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-entries `ask` states no condition" in result.stdout
+        "doc-type.every-entry-states-its-condition `ask` states no condition"
+        in result.stdout
     )
 
 
@@ -186,7 +170,10 @@ def test_verb_sections_out_of_order_fail(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "knowledge-organization.loop-sections verb sections are" in result.stdout
+    assert (
+        "doc-type.acts-checks-and-yields-in-that-order verb sections are"
+        in result.stdout
+    )
 
 
 def test_two_paragraphs_before_the_graph_fail(tmp_path: Path) -> None:
@@ -199,7 +186,7 @@ def test_two_paragraphs_before_the_graph_fail(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "knowledge-organization.loop-graph 2 paragraphs before the graph"
+        "doc-type.one-paragraph-then-one-graph 2 paragraphs before the graph"
         in result.stdout
     )
 
@@ -220,9 +207,9 @@ def test_list_rules_prints_the_five_rule_ids() -> None:
 
     assert result.returncode == 0
     assert result.stdout.split() == [
-        "knowledge-organization.loop-edges",
-        "knowledge-organization.loop-entries",
-        "knowledge-organization.loop-graph",
-        "knowledge-organization.loop-nodes",
-        "knowledge-organization.loop-sections",
+        "doc-type.acts-checks-and-yields-in-that-order",
+        "doc-type.edges-lead-to-steps",
+        "doc-type.every-entry-states-its-condition",
+        "doc-type.nodes-and-entries-agree",
+        "doc-type.one-paragraph-then-one-graph",
     ]

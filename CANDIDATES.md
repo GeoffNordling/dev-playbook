@@ -31,15 +31,13 @@ description: Uncommitted future work — described, not yet promoted to issues
 
 - **The registry pass's remaining rows** — the rulings table in
   [Doc-Type System](/doc-types/doc-type-system.md) reads *pending* on every
-  kind but Standard, Standard-Card, Runbook, Guide, and Vocabulary; each is
+  kind but Standard, Runbook, Guide, and Vocabulary; each is
   ruled, and a thin doc-type built where the ruling says so. Log and Survey
   are the user's: at the last count Log had 35 files (story-forge 31, of
   which 27 are tooled Assessment Records; mission-control 3;
   sysadmin-playbook 1) and Survey had 5 (idea-tree 2, sounds 1, media-tools
   1, one stray worktree).
-- **The doc-type build loop over Guides** — Guide is roughly half of the
-  meaningful documentation in this repo and has no doc-type. Run the loop
-  there, new doc-types as peers of Standard and Runbook, possibly more than
+- **The doc-type build loop over Guides** — Guide has no doc-type. Run the loop there, new doc-types as peers of Standard and Runbook, possibly more than
   one level; with Standard and Runbook as exemplars, Fable proposes the
   abstractions, the user accepts, rejects, and steers, and the instruction
   states the constraints outright, above all that every CLOA object is 100%
@@ -48,21 +46,19 @@ description: Uncommitted future work — described, not yet promoted to issues
   is replaced, and the type working-set files carry is settled with it.
 - **The doc-type family's own type** — the files under `doc-types/` carry
   `General-Sheet` today; decide what type they carry.
-- **Guide as the procedure kind** — decide whether Guide is the kind a
-  procedure carries. The two `consuming.md` are typed `Standard-Ruleset` and
-  describe themselves as recipes; Bootstrap and Tracker Operations, the
-  same shape, are typed `Guide`.
 - **Where exclusions are written** — decide whether a population's
   exclusions are written in the population mark or in the file's prose.
-- **The parser's trigger** — `scripts/chaingen` writes
-  `doc-types/runbook/chains.txt` by hand today, a temporary location; the
-  end state is a gate that fails when a declared chain and reality disagree.
+- **The parser's trigger** — no gate fails when a declared chain and
+  reality disagree; the prototype parser `chaingen` is deleted, kept in
+  git history at commit `b266ce4`, and the fact base's `chain` extractor
+  is its planned successor.
   The same work settles runbook shadowing: a lint parallel to
-  `standard.card-shadows-upstream`, and a home for the no-shadowing rule,
-  which sits in the Standard-Card definition's Scope today. Hierarchical
+  `standard.no-shadowing`, and a home for the no-shadowing rule,
+  which sits in the Standard definition's Scope today. Hierarchical
   imports across repositories are the mechanism under both.
-- **The software factory's split** — when the factory is rewritten, its
-  object-state rules (the pull request body's sections, the cycle header,
+- **The software factory's split** — the factory is isolated under
+  `working-docs/software-factory/` since 2026-09-20, its rewrite or
+  deletion undecided; when it is rewritten, its object-state rules (the pull request body's sections, the cycle header,
   the label four-tuple) become a Standard under `standards/software-factory/`,
   the two regions and the moves between them become a Guide where they are,
   and the `gh` mechanics move into the review runbooks
@@ -105,7 +101,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   chance to codify rules, procedures, and algorithms for writing the next
   one correctly, and no flywheel exists today.
 - **OKF traces** — "OKF trace" has no definition; decide whether a
-  trace is the Reference chain `scripts/chaingen` draws or something more.
+  trace is the chain or something more.
 
 ## Code legibility
 

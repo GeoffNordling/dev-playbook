@@ -2,7 +2,7 @@
 name: rewind-compact
 description: Prepare a limited conversation rewind, compressing the discarded turns into a compaction summary to paste after /rewind.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: medium
 arguments: [target]
 ---

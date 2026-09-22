@@ -145,8 +145,8 @@ one to its caller.
 - **A document does one thing.** It does that thing predictably and
   in a structured way. What the thing is, and the structure it takes,
   is fixed at the CLOA by the document's type: each doc-type has its
-  own CLOA shape and representation — a runbook's chain, a card's four
-  cells, a standard's population and rules. Content that does a second
+  own CLOA shape and representation — a runbook's chain, a standard's
+  population and rules. Content that does a second
   thing belongs in a second document.
 
 ### The vocabulary API
@@ -165,8 +165,7 @@ that file. It is a public surface for user/AI conversation.
   declared here. Until that exists, the word stays out of the active
   vocabulary.
 - **Hardening.** Any part of this doctrine that grows a checkable
-  claim moves toward a Standard card with real audit and enforce
-  sections.
+  claim moves toward a Standard whose rules a verifier decides.
 
 ## Acronyms
 

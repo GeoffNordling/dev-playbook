@@ -35,7 +35,7 @@ A checkout directory holds:
 - `<kind>/<subject>.json` — a view file of a per-subject kind, the
   subject being the thing in the checkout the file is about, at the
   subject's path: `markdown-file/docs/working-in-loops.md.json`,
-  `runbook-chain/dotfiles/dot-claude/agents/adjudicator.md.json`.
+  `runbook-chain/dotfiles/dot-claude/agents/doc-set-deslopper.md.json`.
 
 A view file is named by its path under the checkout directory. Writing
 the same path again replaces the panel in place, which is what live
@@ -74,8 +74,8 @@ the file: the directory says them.
   "envelope": 1,
   "kind": "runbook-chain",
   "kind_version": 1,
-  "title": "adjudicator",
-  "subject": "dotfiles/dot-claude/agents/adjudicator.md",
+  "title": "doc-set-deslopper",
+  "subject": "dotfiles/dot-claude/agents/doc-set-deslopper.md",
   "stamp": {
     "commit": "46321be7c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5",
     "generated_at": "2026-09-08T14:02:11Z",

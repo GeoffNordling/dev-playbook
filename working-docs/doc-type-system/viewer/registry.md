@@ -35,9 +35,8 @@ shown on screen.
 ## index-tree
 
 Per checkout. The containment tree, restricted to tracked markdown.
-Every tracked markdown file, in the two groups the
-[File Roles](/standards/knowledge-organization/file-roles.md) guide
-names: **concept documents**, arranged by the `index.md` hierarchy
+Every tracked markdown file, in the two groups the vocabulary's
+[File roles](/CONTEXT.md#file-roles) names: **concept documents**, arranged by the `index.md` hierarchy
 ([Indexes](/standards/knowledge-organization/indexes.md)), and
 **harness-owned files**, a flat list. Tracked means what
 [gitrepo.py](/src/dev_playbook/gitrepo.py) lists; the group is what
@@ -81,8 +80,8 @@ CLOA object is the document's node and every edge its doc-type extractor
 yielded: for a runbook, the root with its name, type, and node data, the
 signature, and the chain edges with operation, target, condition, and
 annotation
-([Reference Chain](/doc-types/runbook/contract-shape.md),
-[Reference Chain Encoding](/doc-types/runbook/encoding.md)); for a
+([the chain](/doc-types/runbook/contract-shape.md),
+[Nodes and Edges Encoding](/doc-types/runbook/encoding.md)); for a
 Standard, its population and its rules with their conditions
 ([Population and Rules Encoding](/doc-types/standard/encoding.md));
 for a loop, its acts, checks, and yields, read from the Mermaid block

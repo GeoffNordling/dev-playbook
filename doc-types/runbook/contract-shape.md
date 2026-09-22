@@ -1,14 +1,14 @@
 ---
 type: General-Sheet
 title: Nodes and Edges
-description: Runbook's contract shape — nodes joined by labeled edges, the Reference chain, rooted at one runbook — in prose, and the view every runbook collapses to
+description: Runbook's contract shape — nodes joined by labeled edges, the chain, rooted at one runbook — in prose
 ---
 
 # Nodes and Edges
 
-Nodes joined by labeled edges, the **Reference chain**, are Runbook's
-contract shape ([Doc-Type](/doc-types/doc-type.md)): the form every
-runbook's contract takes. A runbook is an invocable command written as
+Nodes joined by labeled edges, the **chain**, are Runbook's contract
+shape ([Doc-Type](/doc-types/doc-type.md)): the form every runbook's
+contract takes. A runbook is an invocable command written as
 documentation ([Runbook](/doc-types/runbook/definition.md)).
 
 ## The shape
@@ -24,14 +24,31 @@ documentation ([Runbook](/doc-types/runbook/definition.md)).
 
 The composition rule: any number of edges, coarsely ordered, rooted at
 one runbook. The chain is the contract written down: the signature —
-args in, reports out — plus the effects, in the coarse order they
+accepts in, reports out — plus the effects, in the coarse order they
 fire. The fine-grained sequencing it drops stays in the instance's
 body.
 
-The shape's pseudocode is no longer kept here: the target state's is
-[Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md#the-language),
-which is speculative and ahead of what the encoding below implements.
+The shape as code, one module importing the base in
+[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
+the same text whole and a test keeps them identical.
 
+```python
+from doc_type import DocType, Target, Verb
+
+
+class Runbook(DocType):
+    """One invocable command. Invoked."""
+    operations  = {read, write, do, override, accept, report}
+    frontmatter = DocType.frontmatter | {name, model, effort}   # a skill also carries disable-model-invocation
+
+    class Edge:                   # a part: lives only inside a Runbook
+        operation: Verb           # one of the six above
+        target:    Target | None  # None for accept and report: the signature, drawn at the root
+        condition: str | None     # None fires always
+        banned:    bool = False   # a write the runbook must never make
+
+    chain: list[Edge]             # any number, coarsely ordered, rooted here
+```
 
 ## Nodes
 
@@ -46,8 +63,8 @@ more: its contract lives outside this corpus.
 | Type     | What chains do with it | How it runs | Where its declaration lives |
 | -------- | ---------------------- | ----------- | --------------------------- |
 | Standard | read                   | —           | The Standard doc-type ([Doc-Type System](/doc-types/doc-type-system.md)) |
-| Agent    | do                     | fresh context, its own permissions — a subprocess | Its own Reference chain |
-| Skill    | do                     | the calling context, the caller's permissions — in-process | Its own Reference chain |
+| Agent    | do                     | fresh context, its own permissions — a subprocess | Its own chain |
+| Skill    | do                     | the calling context, the caller's permissions — in-process | Its own chain |
 | Script   | do                     | deterministic code via the shell | The code itself |
 
 A node may also carry its permission expression and model pin as node
@@ -74,18 +91,19 @@ behavior.
 | write | change state | target is one of four buckets — `git(commit, push)` |
 | do | run a runbook or a script | — |
 | override … with … | substitute a previous clause | — |
-| never … | prohibit | wraps one write and flips it from action to ban |
-| args | take the caller's input | by name — `friction` |
+| accept | take the caller's input | by name — `friction` |
 | report | give a result back to the caller | by name and type — `outcome: str` |
+
+A write edge may be **banned**: the same edge with its polarity
+flipped, a write the runbook must never make.
 
 A write's target is one of four **buckets** — git, GitHub, local
 file, scratch — plus an optional parenthetical hint, as in
 `git(commit, push)`. The bucket list is fixed; the hint is a memory
 aid, never a type. A read's target is a file, or one of two read
 buckets when no on-disk target exists — GitHub for remote state, the
-launch prompt for material the caller assigns at dispatch. A never
-wraps one write; a git-bucket ban may also name `merge`, a verb that
-exists only inside a prohibition.
+launch prompt for material the caller assigns at dispatch. A banned
+git write may also name `merge`, which exists only inside a ban.
 
 This vocabulary is closed: the tables above are all of it. A new
 operation, node type, or bucket is an edit here before its first
@@ -95,21 +113,3 @@ use; its written form is an edit to
 Any edge may carry a **condition** — what must hold for it to fire.
 A conditional edge draws dashed; an unconditional edge draws solid.
 The condition never changes the edge's operation.
-
-## The view
-
-Every runbook collapses to its chain drawn as text: the runbook's node
-at the root, one line per edge, the verb inflected and the target
-named. `scripts/chaingen` writes every runbook's chain to
-`doc-types/runbook/chains.txt` and, with `--check`, fails on drift:
-
-```
-[adjudicator] Agent · tools: Read, Bash, model: opus, effort: xhigh
-  ├─reads───► review contract
-  ├─reads───► GitHub    every thread on the pull request
-  ├─writes──► GitHub    one reply, then the resolve
-```
-
-Rows of the generated file, excerpted. A conditional edge draws
-dashed. The prose an edge was cut from stays below the collapse, in
-the runbook.

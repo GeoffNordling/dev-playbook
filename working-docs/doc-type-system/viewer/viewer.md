@@ -36,10 +36,9 @@ reaches sits at the end of the first group under a red `Not indexed`
 row
 ([index-tree](/working-docs/doc-type-system/viewer/registry.md#index-tree)).
 The second group is a flat list by identity. Clicking a file
-opens its CLOA panel: the Reference chain for a runbook, the rules for a
-Standard, the acts, checks, and yields for a loop. A file with no CLOA
-kind opens its
-`markdown-file` panel. A panel already open comes to the top of the
+opens its CLOA panel: the chain for a runbook, the rules for a Standard,
+the acts, checks, and yields for a loop. A file with no CLOA kind opens
+its `markdown-file` panel. A panel already open comes to the top of the
 stack instead.
 
 ## Panels and the arrangement

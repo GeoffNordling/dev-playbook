@@ -2,7 +2,7 @@
 
 Each detector hand-maintains a rule-id tuple that ``--list-rules`` prints, and
 the standards-lint slice will consume ``--list-rules`` as ground truth for the
-card->rule matrix. Two ways the tuple could lie, each guarded here:
+verifier table. Two ways the tuple could lie, each guarded here:
 
 - **Literal drift.** An emission site could pass a raw string literal instead of
   a rule-id constant, so the tuple silently diverges from the emitted id. The
@@ -31,7 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = REPO_ROOT / "scripts"
 SRC = REPO_ROOT / "src"
 
-# The shape of a card-namespaced rule id: ``card.rule``, lowercase words joined
+# The shape of a directory-namespaced rule id: ``name.rule``, lowercase words joined
 # by hyphens on each side of a single dot. This distinguishes a rule-id constant
 # from any other module-level string constant (messages, paths, markers).
 RULE_ID = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z][a-z0-9]*(-[a-z0-9]+)*$")
@@ -47,6 +47,7 @@ CARRIERS = [
     (SRC / "dev_playbook" / "testing_lint.py", "Finding", 2),
     (SRC / "dev_playbook" / "decisions_lint.py", "Finding", 2),
     (SRC / "dev_playbook" / "prose_lint.py", "Finding", 2),
+    (SRC / "dev_playbook" / "verifier_table.py", "Finding", 1),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
@@ -60,6 +61,7 @@ REGISTRIES = [
     (SRC / "dev_playbook" / "testing_lint.py", "RULES"),
     (SRC / "dev_playbook" / "decisions_lint.py", "RULES"),
     (SRC / "dev_playbook" / "prose_lint.py", "RULES"),
+    (SRC / "dev_playbook" / "verifier_table.py", "RULES"),
 ]
 
 

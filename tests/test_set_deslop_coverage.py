@@ -42,10 +42,12 @@ EXEMPT: dict[Path, frozenset[str]] = {
         {
             # A set member is always a declarative document, never
             # harness-loaded, so this voice rule never binds it.
-            "imperative-and-second-person",
+            "no-first-person",
             # prose-lint enforces these deterministically.
-            "spelling",
-            "terminology-the-person-is-the-user",
+            "judgment-not-judgement",
+            "no-banned-word",
+            "no-word-the-repo-bans",
+            "the-person-is-the-user",
         }
     ),
 }

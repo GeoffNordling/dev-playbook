@@ -6,15 +6,15 @@ to enforce" is decided once, so the detectors share one definition instead of
 each hardcoding its own drifting skip list.
 
 - :func:`is_verbatim_doc` -- a document whose frontmatter marks it a verbatim
-  upstream mirror (OKF ``type: Reference``). Keying on the OKF type means the
+  upstream mirror (OKF ``type: Mirror``). Keying on the OKF type means the
   classification follows the document wherever it lives, not a path.
 
-See standards/standard/detectors.md (Verbatim content) for the norm
-this module anchors.
+The exclusion is stated in the population of standards/prose/conventions.md;
+this module is where every detector reads it.
 """
 
 # The OKF document type meaning "verbatim mirror of an external document".
-VERBATIM_DOC_TYPE = "Reference"
+VERBATIM_DOC_TYPE = "Mirror"
 
 
 def is_verbatim_doc(frontmatter: dict | None) -> bool:

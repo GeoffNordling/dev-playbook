@@ -1,10 +1,11 @@
 """Behavioral tests for the prose-lint detector, src/dev_playbook/prose_lint.py.
 
-The rule prose.judgment-spelling flags the British judgement / judgements form
-in authored Markdown; prose.banned-word flags the banned actor noun "human" in
-every tracked file, with no code-span or fence escape. This test file is listed
-in dev-playbook's own .prose-lint-exempt — its fixtures must name the word to
-test it. The scanning logic is tested with string inputs;
+The rule prose.judgment-not-judgement flags the British judgement / judgements
+form in authored Markdown; prose.no-banned-word flags the banned actor noun "human"
+in every tracked file, with no code-span or fence escape; prose.no-word-the-repo-bans
+flags a word the repo's own .prose-lint-vocabulary bans, in the directories the
+entry names. This test file is listed in dev-playbook's own .prose-lint-exempt
+— its fixtures must name the word to test it. The scanning logic is tested with string inputs;
 the discovery, exclusion, and CLI behaviors are tested over throwaway git repos
 (discovery goes through git ls-files, so every fixture is a git repo).
 """
@@ -39,7 +40,7 @@ def test_flags_british_singular() -> None:
     findings = prose_lint.scan_text("f.md", "a judgement call\n")
 
     assert len(findings) == 1
-    assert findings[0].rule == prose_lint.JUDGMENT_SPELLING
+    assert findings[0].rule == prose_lint.SPELLING
     assert findings[0].line == 1
 
 
@@ -93,7 +94,7 @@ def test_flags_banned_actor_noun() -> None:
     findings = prose_lint.scan_banned("f.md", "ask the human first\n")
 
     assert len(findings) == 1
-    assert findings[0].rule == prose_lint.BANNED_WORD
+    assert findings[0].rule == prose_lint.THE_BANNED_WORD
     assert findings[0].line == 1
 
 
@@ -141,7 +142,7 @@ def test_flags_harness_markdown(tmp_path: Path) -> None:
 def test_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {"standards/references/x.md": "---\ntype: Reference\n---\na judgement\n"},
+        {"docs/mirrors/x.md": "---\ntype: Mirror\n---\na judgement\n"},
     )
 
     assert prose_lint.audit(repo) == []
@@ -166,8 +167,8 @@ def test_skips_root_tmp_scratch_tree(tmp_path: Path) -> None:
     assert prose_lint.audit(repo) == []
 
 
-def test_flags_non_reference_doc(tmp_path: Path) -> None:
-    # Control for the verbatim exclusion: an authored (non-Reference) doc with
+def test_flags_non_mirror_doc(tmp_path: Path) -> None:
+    # Control for the verbatim exclusion: an authored (non-Mirror) doc with
     # the same body is flagged.
     repo = make_repo(
         tmp_path,
@@ -182,7 +183,7 @@ def test_flags_non_reference_doc(tmp_path: Path) -> None:
 def test_frontmatter_values_are_not_scanned_as_prose(tmp_path: Path) -> None:
     # Frontmatter is structured YAML, not prose, and a YAML scalar has no
     # backtick escape hatch — so a title/description carrying the British form in
-    # a non-Reference doc must not be flagged. Only the body is scanned.
+    # a non-Mirror doc must not be flagged. Only the body is scanned.
     repo = make_repo(
         tmp_path,
         {
@@ -228,7 +229,7 @@ def test_ban_reaches_non_markdown_files(tmp_path: Path) -> None:
     findings = prose_lint.audit(repo)
 
     assert [(f.file, f.rule) for f in findings] == [
-        ("src/tool.py", prose_lint.BANNED_WORD)
+        ("src/tool.py", prose_lint.THE_BANNED_WORD)
     ]
 
 
@@ -247,7 +248,7 @@ def test_ban_reaches_frontmatter(tmp_path: Path) -> None:
 def test_ban_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {"standards/references/spec.md": "---\ntype: Reference\n---\nhuman\n"},
+        {"docs/mirrors/spec.md": "---\ntype: Mirror\n---\nhuman\n"},
     )
 
     assert prose_lint.audit(repo) == []
@@ -312,6 +313,123 @@ def test_exempt_declaration_itself_is_never_scanned(tmp_path: Path) -> None:
     assert prose_lint.audit(repo) == []
 
 
+# --- the repo vocabulary: .prose-lint-vocabulary ---
+
+VOCABULARY = (
+    "guard:\n  say: condition\n  where:\n    - doc-types\n    - standards/doc-type\n"
+)
+
+
+def test_repo_word_is_banned_under_its_directories_only(tmp_path: Path) -> None:
+    # The ban holds in every tracked file under a named directory, of any type,
+    # and nowhere else: code outside the scope keeps its guard clauses.
+    repo = make_repo(
+        tmp_path,
+        {
+            ".prose-lint-vocabulary": VOCABULARY,
+            "doc-types/loop/definition.md": "a step's guard\n",
+            "standards/doc-type/x.md": "---\ntitle: Guards\n---\nnone\n",
+            "src/tool.py": "# an early-return guard\n",
+            "doc-types-notes.md": "guard\n",
+        },
+    )
+
+    findings = prose_lint.audit(repo)
+
+    assert [(f.file, f.line, f.rule) for f in findings] == [
+        ("doc-types/loop/definition.md", 1, prose_lint.THE_REPO_VOCABULARY),
+        ("standards/doc-type/x.md", 2, prose_lint.THE_REPO_VOCABULARY),
+    ]
+    assert "`guard` is `condition` under `doc-types/`" in findings[0].message
+
+
+def test_repo_word_matches_like_the_workspace_word() -> None:
+    # Bare or plural, any case, a hyphenated compound; a longer word that
+    # contains the sequence is not the word.
+    word = prose_lint.Word("guard", "condition", ())
+
+    hits = prose_lint.scan_banned(
+        "f.md", "Guards guard-rail\nguarded safeguard\n", (word,)
+    )
+
+    assert [(f.line) for f in hits] == [1, 1]
+
+
+def test_repo_word_with_no_where_covers_the_whole_repo(tmp_path: Path) -> None:
+    repo = make_repo(
+        tmp_path,
+        {
+            ".prose-lint-vocabulary": "utilise:\n  say: use\n",
+            "src/a.py": "# utilise\n",
+        },
+    )
+
+    findings = prose_lint.audit(repo)
+
+    assert [(f.file, f.rule) for f in findings] == [
+        ("src/a.py", prose_lint.THE_REPO_VOCABULARY)
+    ]
+    assert "in every tracked file" in findings[0].message
+
+
+def test_workspace_word_still_holds_beside_a_repo_vocabulary(tmp_path: Path) -> None:
+    # The layers add: a repo's declaration never narrows the workspace's word.
+    repo = make_repo(
+        tmp_path,
+        {
+            ".prose-lint-vocabulary": VOCABULARY,
+            "doc-types/a.md": "clean\n",
+            "standards/doc-type/a.md": "clean\n",
+            "src/a.py": "# a human\n",
+        },
+    )
+
+    assert [f.rule for f in prose_lint.audit(repo)] == [prose_lint.THE_BANNED_WORD]
+
+
+def test_vocabulary_declaration_itself_is_never_scanned(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, {".prose-lint-vocabulary": "human:\n  say: user\n"})
+    (repo / ".prose-lint-vocabulary").write_text("guard:\n  say: condition\n")
+
+    assert prose_lint.audit(repo) == []
+
+
+@pytest.mark.parametrize(
+    "declaration",
+    [
+        "- guard\n",  # not a mapping
+        "guard: condition\n",  # entry is not a mapping
+        "guard:\n  where: [doc-types]\n",  # no say
+        "guard:\n  say: condition\n  where: doc-types\n",  # where not a list
+        "guard:\n  say: condition\n  where: [nowhere]\n",  # not a directory
+        "guard:\n  say: condition\n  forms: [guards]\n",  # unknown key
+        "human:\n  say: person\n",  # the workspace's word
+        "guard: [\n",  # malformed YAML
+    ],
+)
+def test_faulty_vocabulary_exits_two(tmp_path: Path, declaration: str) -> None:
+    # Every fault in the declaration is a run failure, never a silent no-op.
+    repo = make_repo(
+        tmp_path,
+        {".prose-lint-vocabulary": declaration, "doc-types/a.md": "clean\n"},
+    )
+
+    result = run(repo)
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert ".prose-lint-vocabulary" in result.stderr
+
+
+def test_dev_playbook_bans_guard_under_the_doc_type_system() -> None:
+    repo = Path(__file__).resolve().parents[2]
+
+    words = {w.word: w for w in prose_lint.vocabulary(repo)}
+
+    assert words["guard"].say == "condition"
+    assert words["guard"].where == ("doc-types", "standards/doc-type")
+    assert not words["guard"].covers("src/dev_playbook/md.py")
+
+
 def test_binary_file_is_skipped(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, {"data/blob.bin": ""})
     (repo / "data/blob.bin").write_bytes(b"human\0human")
@@ -350,9 +468,7 @@ def skill(body: str, description: str = "Use when demoing.") -> str:
 
 
 def voice_findings(repo: Path) -> list[prose_lint.Finding]:
-    return [
-        f for f in prose_lint.audit(repo) if f.rule == prose_lint.AGENT_FACING_VOICE
-    ]
+    return [f for f in prose_lint.audit(repo) if f.rule == prose_lint.NO_FIRST_PERSON]
 
 
 def test_claude_md_first_person_fails(tmp_path: Path) -> None:
@@ -504,9 +620,10 @@ def test_list_rules_prints_the_rule_id(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     assert result.stdout.split() == [
-        "prose.agent-facing-voice",
-        "prose.banned-word",
-        "prose.judgment-spelling",
+        "prose.judgment-not-judgement",
+        "prose.no-banned-word",
+        "prose.no-first-person",
+        "prose.no-word-the-repo-bans",
     ]
 
 
@@ -524,7 +641,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1
-    assert "doc.md:1: prose.judgment-spelling " in result.stdout
+    assert "doc.md:1: prose.judgment-not-judgement " in result.stdout
 
 
 def test_dev_playbook_self_scan_is_clean() -> None:

@@ -65,10 +65,12 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
-| `harness-files-lint` | [runbook-conventions.md](/standards/harness/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
-| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
-| `standards-lint` | [standard.md](/standards/standard/card.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
-| `loop-lint` | [loop-conventions.md](/standards/knowledge-organization/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
+| `harness-files-lint` | [runbook-conventions.md](/standards/doc-type/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
+| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, the repo's own `.prose-lint-vocabulary` words over the directories each names, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
+| `standards-lint` | [tree.md](/standards/standard/tree.md), [detectors.md](/standards/standard/detectors.md) | The Standards Tree's rules over `standards/` — directory layout, the population, the catalog, hook-surface agreement, and no shadowing of an upstream directory (consumer mode); clean by construction where no `standards/` tree is present |
+| `verifier-table` | [detectors.md](/standards/standard/detectors.md) | Writes `standards/verifiers.yaml`, the map from every rule id under `standards/` to the check that decides it, and fails on a committed table that differs from a fresh write, an emitted id no rule heading declares, or a dependency address the repo lacks; `--write` regenerates |
+| `boundary-table` | [detectors.md](/standards/standard/detectors.md) | Writes `standards/boundaries.yaml`, the gates that run each address of the verifier table, read from the pre-commit config's stages, `make -n check`, and the workflows' `run` steps and `SKIP`; fails on a committed table that differs from a fresh write, or an address that runs at no gate and is not a registered ungated audit; `--write` regenerates |
+| `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
 
 `repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
 `decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
@@ -92,19 +94,9 @@ the installed `dev_playbook` package:
 - `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `prose-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook-lint` self-check). Consumed by `repo-init`.
 
-The larger surfaces are subpackages: `dev_playbook.transcript_export` (the
-Claude Code session model, classifier, and renderer behind
-`transcript-export`) and `dev_playbook.factory`, whose pieces are the
-software factory's append-only run ledger — the `ledger` table beside the
-hook-capture `events` table, its per-kind writers and its two read queries; the
-job launcher that sweeps a launch's credentials, spawns a factory node, watches
-its stream live, and writes its two job rows; and the build-region traverse that
-carries one issue from its phase label to an open pull request, behind
-`traverse-issue`. The launcher and the traverse are **Linux only**, and say so
-at import: every node the launcher spawns is set to die with it through
-`PR_SET_PDEATHSIG`, a `prctl` operation with no portable equivalent, and a
-child that could outlive its launcher is an hour of claude billed with nobody
-watching it.
+The one larger surface is a subpackage: `dev_playbook.transcript_export`,
+the Claude Code session model, classifier, and renderer behind
+`transcript-export`.
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so
@@ -136,14 +128,13 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
+| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
 | `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
 | `labelgen` | Render the label scheme as the table in [label-scheme.md](/standards/tracking/label-scheme.md); `--check` fails on drift |
 | `bump-pin` | Check whether one consumer repo's dev-playbook `rev` pin can move to the published head (`--check`, a probe that restores the config) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |
-| `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
+| `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook-lint` self-check; the GitHub tail is [bootstrap.md](/guides/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages and wire up the `~/.bashrc.d` loader |
-| `traverse-issue` | Carry one factory issue from its phase label to an open PR: `traverse-issue <owner/name> <issue> <auto\|user-rework>` — per-issue lock, worktree create-or-reuse, the `build` and `open-pr` nodes launched headless, one JSON line on stdout naming the terminal status |
 
 Run any script with `--help`; each script's docstring documents its behavior in
 full.

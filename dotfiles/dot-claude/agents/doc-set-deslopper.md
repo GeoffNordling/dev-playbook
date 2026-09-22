@@ -76,39 +76,39 @@ assigned sections, and the briefings.
 The fact slices:
 
 - **One home** —
-  [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
+  [one home per fact](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact).
 - **Terms** —
-  [terms defined once](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once),
-  [tight definitions](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#tight-definitions),
+  [crossing terms in CONTEXT.md](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd),
+  [definitions at most two sentences](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#definitions-at-most-two-sentences),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only).
 - **Placement** —
   [one rule, one place](~/workspace/dev-playbook/standards/prose/conventions.md#one-rule-one-place),
-  [point at canonical artifacts](~/workspace/dev-playbook/standards/prose/conventions.md#point-at-canonical-artifacts).
+  [the canonical file, linked not copied](~/workspace/dev-playbook/standards/prose/conventions.md#the-canonical-file-linked-not-copied).
 
 The set slices:
 
 - **Shape** —
   [an index in every directory](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory),
-  [rows inside the set](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-set),
+  [rows inside the set's concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-sets-concern),
   [distinct concerns](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns),
-  [the introduction](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#the-introduction).
+  [distinct from the parent](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-from-the-parent),
+  [introduction between H1 and listing](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#introduction-between-h1-and-listing).
 - **Body** —
   [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#body-inside-its-concern).
 - **Prose** —
-  [declarative present tense](~/workspace/dev-playbook/standards/prose/conventions.md#declarative-present-tense),
-  [declare before use](~/workspace/dev-playbook/standards/prose/conventions.md#declare-before-use),
+  [every sentence in the present tense](~/workspace/dev-playbook/standards/prose/conventions.md#every-sentence-in-the-present-tense),
+  [definition before first use](~/workspace/dev-playbook/standards/prose/conventions.md#definition-before-first-use),
   [current state and next steps only](~/workspace/dev-playbook/standards/prose/conventions.md#current-state-and-next-steps-only),
-  [open with purpose](~/workspace/dev-playbook/standards/prose/conventions.md#open-with-purpose),
-  [lead with the edge case](~/workspace/dev-playbook/standards/prose/conventions.md#lead-with-the-edge-case-when-reach-is-surprising),
-  [block form](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
-  [positive statement](~/workspace/dev-playbook/standards/prose/conventions.md#positive-statement),
+  [the opening states the purpose](~/workspace/dev-playbook/standards/prose/conventions.md#the-opening-states-the-purpose),
+  [block form fits its content](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
+  [a rule reads in the positive](~/workspace/dev-playbook/standards/prose/conventions.md#a-rule-reads-in-the-positive),
   [no slop tics](~/workspace/dev-playbook/standards/prose/conventions.md#no-slop-tics),
-  [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person)
+  [the third person, never the second](~/workspace/dev-playbook/standards/prose/conventions.md#the-third-person-never-the-second)
   — a set member is always a declarative document, never harness-loaded,
-  so imperative and second person never binds it,
-  [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
-  [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
-  [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
+  so no first person never binds it,
+  [one name, one concept](~/workspace/dev-playbook/standards/prose/conventions.md#one-name-one-concept),
+  [title case h1, sentence case below](~/workspace/dev-playbook/standards/prose/conventions.md#title-case-h1-sentence-case-below),
+  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions).
 
 A working set's differences reach the auditors through their own
 definition, which reads Working Documentation Sets whole when the

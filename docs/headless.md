@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Headless Operation
-description: Running Claude Code headless on subscription
+description: What `claude -p` guarantees on subscription — billing and the credentials that outrank the login, how stable the policy is, what a run declares about itself, what the harness loads, what the flags buy, and the path-scoped permissions that do not work
 ---
 
 # Headless Operation
@@ -37,10 +37,6 @@ subscription credential, not a metered one.
 
 `--bare` skips the keychain and the subscription login outright and demands
 an API key, and it is never passed.
-
-[`preflight`](/src/dev_playbook/factory/launcher.py) checks all twelve sources
-before every launch and refuses the whole run on a single finding. It reads
-the environment and the settings files only — never the keyring.
 
 ## How stable the policy is
 

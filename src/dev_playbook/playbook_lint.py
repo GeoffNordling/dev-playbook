@@ -49,12 +49,14 @@ DETECTORS = (
     "prose-lint",
     "standards-lint",
     "loop-lint",
+    "verifier-table",
+    "boundary-table",
 )
 
-# Audit scripts a card's Audit cell may cite that deliberately run outside the
-# commit gate (outside the gates, per standards/standard/gates.md). standards-lint's
-# hook-surfaces closure accepts these as cited-but-unenrolled; anything else
-# cited and missing from DETECTORS is an enrollment hole.
+# Detectors that deliberately run at no gate: the user invokes them by hand.
+# The boundary table (scripts/boundary-table) rows each as ``on-demand``; a
+# detector at no gate that is not registered here is its finding, so a detector
+# cannot be published without saying where it runs.
 UNGATED_AUDITS = frozenset({"workspace-lint"})
 
 # Manifest validation is not a scripts/ detector — it delegates to pre-commit's
