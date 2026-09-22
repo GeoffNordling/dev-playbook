@@ -1,7 +1,7 @@
 ---
-type: Guide
+type: General-Sheet
 title: Headless Operation
-description: Running Claude Code headless on subscription
+description: What `claude -p` guarantees on subscription — billing and the credentials that outrank the login, how stable the policy is, what a run declares about itself, what the harness loads, what the flags buy, and the path-scoped permissions that do not work
 ---
 
 # Headless Operation
