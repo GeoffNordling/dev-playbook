@@ -1,12 +1,14 @@
 ---
 type: General-Sheet
 title: Detector Fixes
-description: Step 12's input — the fourteen rules whose detector tests less than the sentence, the survey of what each detector misses, the thin-shim moves, and the one-base check, none of them touched by step 11
+description: The rewrite's input — the fourteen rules whose detector tests less than the sentence, the survey of what each detector misses, the thin-shim moves, and the one-base check, none of them touched by step 11
 ---
 
 # Detector Fixes
 
-What step 11 leaves for step 12 to close. Step 11 settles the sentences;
+What step 11 of the doc-type system leaves for the rewrite
+([Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md))
+to close. Step 11 settles the sentences;
 a detector that tests less than its sentence stays as it is, and the gap
 is recorded here rather than fixed. This sheet is the whole input: the
 rule ids, the survey behind them, and the two moves that ride along.

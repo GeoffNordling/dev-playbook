@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Doc-Type System
-description: The root of the doc-type system strand — the language of doc-types, verbs, and predicates, its principles and terms, and the worklist from the Standard's new shape through the first instance
+description: The root of the doc-type system strand — the language of doc-types, verbs, and predicates, its principles and terms, the open questions, and the completed refactor from the Standard's new shape through every rule settled
 ---
 
 # Doc-Type System
@@ -30,7 +30,7 @@ specification.
 ## Principles
 
 - **Peers first.** Wherever a choice is open, pick the one that keeps
-  the three doc-types parallel.
+  the four doc-types parallel.
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)
   holds the parallel structure, and each peer has its conventions
   Standard under `standards/doc-type/`.
@@ -110,99 +110,9 @@ specification.
 
 ## Planned
 
-- **The system.** The refactor toward the reference model and the
-  specification. The target shape of one rule, decided 2026-09-20: a heading,
-  the predicate, and a trailer line, nothing else. The predicate is
-  everything between the heading and the trailer, a list of exemptions
-  included when the check needs one, and it is written so that
-  deterministic code lifts it verbatim into a judge's prompt, alone or
-  concatenated with other stochastic rules for one judge call. A body
-  after the trailer is not part of the target: what the 232 bodies
-  hold today is enforcement wiring, which step 3 removes, pointers to
-  other Standards, which the fact base carries, and exemptions, which
-  belong inside the predicate. Reason: text that no verifier reads is
-  text the state is not held to, and the split between a checked first
-  paragraph and an unchecked body is where the prose and the verifier
-  drift apart.
-  1. *Standard takes its new shape.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  2. *The verifier table.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  3. *Boundaries: where each check runs.* Done 2026-09-20; the entry is
-     in [Completed](#completed).
-  4. *Isolate the software factory.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  5. *Guide and Explanation.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  6. *Retire the card.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  7. *Tidy the doc-type definitions.* Done 2026-09-21; the entry is in
-     [Completed](#completed).
-  8. *The specification becomes a Standard.* Done 2026-09-21; the
-     entry is in [Completed](#completed).
-  9. *Ban the word guard.* Done 2026-09-21; the entry is in
-     [Completed](#completed).
-  10. *Doc-types before migration.* Done 2026-09-21; the entries are
-     in [Completed](#completed).
-  11. *Settle every rule.* Done 2026-09-22 over five waves; the
-     entries are in [Completed](#completed). What the audit found
-     and step 11 does not close is in
-     [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md),
-     the detector suite's input.
-
-  A step once here, scrubbing every file under `docs/` into a long-term
-  home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except
-  `docs/guides/`, and the eight loose files there predate this work.
-  The one move this plan causes is named at its step, `okf-spec` at
-  step 6.
-- **The detector suite.** One holistic pass over the checking system:
-  refactor, reconsider, redesign. The detectors grew one at a time over
-  months and were never refactored together, and step 11 settled the
-  Standards they answer to, so the pass rewrites the whole Python
-  detector suite against the settled rules, from scratch where that is
-  cleaner. It must stay at least as fast as the hooks are today.
-  - **Four layers name the same rules, and no two of them agree.** At
-    step 11's close, 217 rules carry a trailer:
-
-    | Layer | What it is | Where it lives |
-    | --- | --- | --- |
-    | Family | the directory, and the id's namespace | 12 of them |
-    | Standard | the file, and the population a rule binds | 31 rule-carrying files |
-    | Detector | the script that decides the rule | 18 addresses over 98 rules; 119 rules have none |
-    | Gate | when the detector runs | commit, push, ci, or on-demand |
-
-    Family and Standard part company in 6 of the 12 families:
-    `knowledge-organization.` spans 8 files, `doc-type.` 5,
-    `tracking.` 4, `build.` 3, `harness.` and `standard.` 2 each. A
-    detector crosses both — `repo-lint` decides 20 rules from 3
-    families and 6 files, `harness-files-lint` 12 rules from 2
-    families. The gate is a fourth cut again: `workspace-lint` holds
-    14 rules and runs at no gate at all.
-  - **The id schema is designed with the scripts, not after them.** An
-    id is `<family>.<slug>`, the directory and the heading's slug, so
-    the namespace is coarser than the population it binds. One fix
-    has been proposed and measured, `<standard>.<slug>`, and the
-    evidence is against it: it moves 210 of the 217 ids, only 7 match
-    their file; it drops the word that carries the meaning
-    (`build.ciyml-byte-identical-to-canonical` becomes
-    `canonical.ciyml-…`); and it lands `prose/conventions.md`,
-    `shell/conventions.md` and `testing/conventions.md` on one
-    `conventions.` namespace. There are no slug collisions today, so
-    nothing is broken. The design rules on the schema — including
-    leaving it alone — with the layer map above in front of it,
-    because what names a group of rules and what script owns them are
-    the same question.
-  - **Its input.**
-    [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md)
-    holds what step 11 leaves unchecked: the fourteen rules whose
-    detector tests less than the sentence, with the survey behind
-    them, the thin-shim moves, the `doc-type.one-base-class` check,
-    and the H2-without-trailer condition shape. The 52 deterministic
-    rules with a null verifier are the rest of the ground.
-  - **A detector may key on something that is not an id.** `okf-lint`
-    finds the type registry by that heading's slug, so a rename of the
-    heading lands in the detector. The design gives every such
-    coupling one named place.
+None. What the step 11 audit left unchecked is the input of the
+[Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md)
+strand.
 
 ## Completed
 
@@ -216,7 +126,8 @@ specification.
   would not sit in the sentence, and both yaml tables regenerated.
   `okf-lint` found the type registry by that heading's slug and went
   blind on the rename; the slug is a named constant now, and the
-  detector suite's item carries the coupling. Dropped: trimming the body openings the
+  [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md)
+  strand carries the coupling. Dropped: trimming the body openings the
   new headings absorb, since the overlap is no finding. Commits
   b76047e, ae587cd, dedc625, 4439ea5, 0d22ed4, and this one.
 

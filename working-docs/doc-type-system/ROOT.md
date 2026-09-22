@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Synthesis Working Root
-description: The root of the unified working set — four strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
+description: The root of the unified working set — five strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
 ---
 
 # Synthesis Working Root
@@ -10,7 +10,7 @@ This set is speculative: every member writes a guess as a guess, and
 every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
 `worktree-cloa-viewer-tool-2`, which describe one theory. The set is
-four strands, each with its own root and its own worklist
+five strands, each with its own root and its own worklist
 ([One list of items, state by section](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-list-of-items-state-by-section)).
 This root holds only what crosses strands.
 
@@ -27,18 +27,24 @@ This root holds only what crosses strands.
 - **Viewer**, a selection on screen: cloa-viewer, the local visual IDE
   that draws registered views of the fact base. Root:
   [CLOA Viewer](/working-docs/doc-type-system/viewer/ROOT.md).
+- **Detector rewrite**, the checking system: one pass over the Python
+  detectors, the two tables, and the hook, against the rules the
+  doc-type system settled. Root:
+  [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md).
 
-## The four strands
+## The five strands
 
 A dependency is what one strand's plan needs from another's, never a
-runtime data flow. There are three: the doc-type system defines Loop,
-one of its three doc-types; each encoding the doc-type system writes
+runtime data flow. There are four: the doc-type system defines Loop,
+one of its four doc-types; each encoding the doc-type system writes
 defines an extractor of the fact base; every view the viewer draws is
-a selection of the fact base. Loop is a leaf.
+a selection of the fact base; the detector rewrite binds to the rules
+the doc-type system's step 11 settled. Loop and the detector rewrite
+are leaves.
 
 ```
                             ROOT.md#terms
-                      one meaning per word, all four
+                      one meaning per word, all five
                                   │
   ┌───────────────────────────────┴────────────────────────────────┐
   │  DOC-TYPE SYSTEM · the language                                │
@@ -52,7 +58,7 @@ a selection of the fact base. Loop is a leaf.
   │        · first instance, a loop that proposes predicates       │
   └────────────┬──────────────────────────────────┬────────────────┘
   Loop is one  │                                  │  each encoding
-  of its three │                                  │  defines an
+  of its four  │                                  │  defines an
   doc-types    ▼                                  ▼  extractor
   ┌────────────────────────────┐   ┌──────────────────────────────┐
   │  LOOP · the driver         │   │  FACT BASE · the compiled    │
@@ -69,17 +75,17 @@ a selection of the fact base. Loop is a leaf.
   │        and right           │   │   boundary config as declared│
   └────────────────────────────┘   │   data · findings as a       │
                                    │   stamped artifact · the     │
-                                   │   simulation as a loop       │
-                                   └──────────────┬───────────────┘
-                                                  │  a selection
-                                   ┌──────────────▼───────────────┐
-                                   │  VIEWER                      │
-                                   │  root ······· ROOT.md        │
-                                   │  on disk ···· contract.md    │
-                                   │  kinds ······ registry.md    │
-                                   │  panels ····· design.md ·    │
-                                   │               viewer.md      │
-                                   │  program ···· server.md      │
+  ┌────────────────────────────┐   │   simulation as a loop       │
+  │  DETECTOR REWRITE · the    │   └──────────────┬───────────────┘
+  │  checking system           │                  │  a selection
+  │  root ······· ROOT.md      │   ┌──────────────▼───────────────┐
+  │  input ······ detector-    │   │  VIEWER                      │
+  │               fixes.md     │   │  root ······· ROOT.md        │
+  │  binds to the rules the    │   │  on disk ···· contract.md    │
+  │  doc-type system settled   │   │  kinds ······ registry.md    │
+  │  plan: design · measure ·  │   │  panels ····· design.md ·    │
+  │   rewrite · tests · docs   │   │               viewer.md      │
+  └────────────────────────────┘   │  program ···· server.md      │
                                    │  built ······ stack.md       │
                                    │  plan: runbook design ·      │
                                    │   CLOA kinds · pinning ·     │
@@ -230,9 +236,9 @@ rules decide it with an error rate.
 ## Order
 
 The dependencies give the order. The doc-type system's refactor runs
-first, because Loop's predicates and the fact base's extractors bind
-to what it produces. Loop and the fact base then run beside each
-other. The viewer's next kinds wait on the fact base, since each is a
+first, because Loop's predicates, the fact base's extractors, and the
+detector rewrite bind to what it produces. Loop, the fact base, and
+the detector rewrite then run beside each other. The viewer's next kinds wait on the fact base, since each is a
 selection from it.
 
 ## Acronyms

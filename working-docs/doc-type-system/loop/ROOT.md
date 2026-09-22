@@ -10,7 +10,7 @@ The strand that builds the **Loop** doc-type, a third directory under
 `doc-types/` beside [runbook/](/doc-types/runbook/index.md) and
 [standard/](/doc-types/standard/index.md). Speculative, per
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
-Loop is one of the doc-type system's three doc-types
+Loop is one of the doc-type system's four doc-types
 ([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)):
 the rules every doc-type is held to are the Standard
 [Doc-Type](/standards/doc-type/doc-type.md), and a Loop's instances
