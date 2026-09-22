@@ -83,7 +83,7 @@ are leaves.
   │               fixes.md     │   │  root ······· ROOT.md        │
   │  binds to the rules the    │   │  on disk ···· contract.md    │
   │  doc-type system settled   │   │  kinds ······ registry.md    │
-  │  plan: design · measure ·  │   │  panels ····· design.md ·    │
+  │  plan: triage · measure ·  │   │  panels ····· design.md ·    │
   │   rewrite · tests · docs   │   │               viewer.md      │
   └────────────────────────────┘   │  program ···· server.md      │
                                    │  built ······ stack.md       │

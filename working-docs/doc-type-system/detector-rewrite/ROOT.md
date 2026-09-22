@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Detector Rewrite
-description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the open design questions, and the worklist
+description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the six design rulings, the one open question, and the worklist
 ---
 
 # Detector Rewrite
@@ -112,58 +112,75 @@ is one the repo complies with.
   a rule, and the key `standards/boundaries.yaml` joins on to say
   which gates run it. Today a first-party script by path, a pinned
   pre-commit hook id, or a `pyproject.toml` dependency plus its
-  subcommand. What it is on exit is the design's.
+  subcommand. Dissolves on exit: a rule's check is a function in a
+  module.
 - **Detector**, **verifier table**, **boundary table** — per
   [Detectors](/standards/standard/detectors.md), until the rewrite
   restates them.
+- **Check** — one Python function that decides one rule, registered
+  under that rule's id.
+- **Model** — the `Repo` object: the repo read once into memory, in
+  parsed form, that every check reads.
+
+## Decided
+
+- **Hook mechanism, 2026-09-22.** A `language: python` hook whose
+  entry is a console script under `[project.scripts]`; pre-commit
+  builds and caches the venv once per pin. No detector under
+  `scripts/`, no `sys.path` insert. Placeholder name: `playbook check`.
+- **Repo model, 2026-09-22.** One in-memory `Repo` object per run,
+  built from one `git ls-files`, holding each file's parsed form:
+  frontmatter, headings with slugs and line numbers, trailers, links,
+  lines outside fences; Python files as `ast` trees. Every check
+  reads the model and never touches disk or git. Plain dataclasses,
+  no framework; tests build it through the same constructor. Whether
+  markdown parsing stays hand-rolled or moves to a CommonMark library
+  is open, below.
+- **Mirrored grouping, 2026-09-22.** One check module per
+  `standards/` directory, named for it: `build/` ↔ `checks/build.py`.
+  The id keeps `<family>.<slug>`, so module and namespace coincide.
+  Where the tree cannot mirror, the tree is a candidate for change,
+  and the exception is written down.
+- **Registry, 2026-09-22.** `@rule("<id>")` on each check function
+  writes one dict entry, id to function; the runner stamps the id on
+  every finding the function yields. The rule list and the meta-test
+  read the dict. No hand-kept tuple, no `--list-rules`, no AST guard.
+- **The two tables, 2026-09-22.** `verifiers.yaml`, `boundaries.yaml`,
+  their two scripts, and the three Detectors rules that require them
+  are deleted; no code read either file. The term address dissolves.
+  - The user's view is `playbook rules`: id, module, environment tag,
+    computed live, with `--family` and `--without` filters.
+  - A boundary is a tag on the check, `@rule(id, needs=WORKSPACE)`,
+    for a check that reads sibling repos on this machine. CI runs
+    `playbook check --without workspace` in place of `SKIP: ref-lint`.
+    Untagged checks run at every gate.
+- **Data read out of a Standard, 2026-09-22.** Where a check consumes
+  data a Standard's body holds, such as the type registry table
+  under one heading of `document-types.md` or the canonical files
+  under `standards/build/canonical/`, the path and heading are named
+  constants in one module, placeholder `sources.py`. A test pins
+  each constant to its document: the path exists, the heading is
+  present. A check reads the section through the model, never by
+  scanning for the heading itself.
 
 ## Open
 
-- **The hook mechanism.** Proposed, not ruled: the suite is one
-  console script under `[project.scripts]`, and the published hook is
-  `language: python` with that script as its entry, so pre-commit
-  installs the package into a venv it caches once per pin, as ruff
-  and shellcheck-py reach the canonical config. No detector file
-  under `scripts/`, no `sys.path` insert, and no shim or hosting rule
-  in Detectors. The script's name is the design's; `playbook check`
-  is the placeholder.
-- **The registry and the model.** How a check is declared and keyed,
-  and what parsed-repo object it reads.
-- **The id schema.** An id is `<family>.<slug>`, the directory and the
-  heading's slug, so the namespace is coarser than the population it
-  binds. `<standard>.<slug>` was proposed and measured, and the
-  evidence is against it: it moves 210 of the 217 ids, only 7 match
-  their file; it drops the word that carries the meaning
-  (`build.ciyml-byte-identical-to-canonical` becomes `canonical.ciyml-…`);
-  and it lands `prose/conventions.md`, `shell/conventions.md` and
-  `testing/conventions.md` on one `conventions.` namespace. There are
-  no slug collisions, so nothing is broken. The design rules on the
-  schema, leaving it alone included, with the layer table in front of
-  it, because what names a group of rules and what module owns them
-  are the same question.
-- **A check that keys on something that is not an id.** `okf-lint`
-  finds the type registry by that heading's slug, so a rename of the
-  heading lands in the detector; the slug is a named constant since
-  step 11 wave 5. The design gives every such coupling one named
-  place.
-- **The two tables under one process.** `verifier-table` and
-  `boundary-table` are detectors today, with `--write`. Where every
-  check is in one process, whether they stay separate addresses or
-  become subcommands, and what the boundary table still records when
-  every in-process check runs at every gate.
+- **The markdown parser.** `md.py` is a hand-rolled line scanner. A
+  CommonMark library such as `markdown-it-py` gives a tested parse
+  with line numbers. Decide on the rewrite, with the dependency cost.
 
 ## Planned
 
-- **The design.** Rule on the open questions in order — the hook
-  mechanism, the registry and model, the id schema, the two tables —
-  then triage the 217 rules family by family with the greenfield eye,
-  producing the exit list: keep, rewrite, delete. The exit list is
-  the specification the package is written to.
-- **The measurement.** Time `playbook-lint` on this repo and on a
-  consumer, and the test suite, before any code moves.
+- **The triage.** The 217 rules family by family with the greenfield
+  eye, one table per family of keep, rewrite, or delete with a
+  one-line reason, each ruled on. The exit list is the specification
+  the package is written to.
+- **The measurement.** Time `playbook-lint` on this repo and the
+  test suite, before any code moves.
 - **The rewrite.** The package, module by module, against the exit
-  list; the console script; the two tables regenerated; the detector
-  files under `scripts/` deleted.
+  list; the console script; the markdown parser decided; the two
+  tables, their scripts, and the detector files under `scripts/`
+  deleted.
 - **The tests.** One test per rule id in `tests/dev_playbook/`, a
   meta-test that every registered id has one and names a heading
   under `standards/`, the 212 subprocess tests retired once the
@@ -177,7 +194,10 @@ is one the repo complies with.
 
 ## Completed
 
-Nothing yet.
+- **The design, 2026-09-22.** Six rulings in one session, recorded
+  under Decided: hook mechanism, repo model, mirrored grouping,
+  registry, the two tables, data read out of a Standard. The
+  markdown parser is the one item left open, for the rewrite.
 
 ## Acronyms
 
