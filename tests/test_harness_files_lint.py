@@ -333,6 +333,23 @@ def test_dot_directory_under_a_skill_root_is_not_a_skill(tmp_path: Path) -> None
     assert "1 internal skills" in result.stderr
 
 
+def test_synced_root_is_external_not_a_bundle(tmp_path: Path) -> None:
+    """Claude Code's cloud sync owns synced/; its contents are never audited."""
+    repo = make_repo(tmp_path, {"greet": valid_skill()})
+    synced = repo / ".claude" / "skills" / "synced" / "acct" / "pdf"
+    synced.mkdir(parents=True)
+    # No SKILL.md anywhere under it: were synced/ read as a bundle this would
+    # abort the whole scan with exit 2.
+    (synced / "SKILL.md").write_text("no front matter here\n")
+
+    result = run(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == ""
+    assert "1 internal skills" in result.stderr
+    assert "skipped 1 external" in result.stderr
+
+
 def test_a_directory_with_no_skill_md_is_an_error_state(tmp_path: Path) -> None:
     """Auditing nothing would leave it in a skill count the scan never covered."""
     repo = make_repo(tmp_path, {"greet": valid_skill()})
