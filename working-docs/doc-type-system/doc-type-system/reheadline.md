@@ -77,6 +77,13 @@ Compute the slug as GitHub does: lowercase, spaces to hyphens, drop
 every character that is not a letter, a digit, a hyphen, or a space. No
 two headings in your file may land on the same slug.
 
+The slug eats punctuation, so a filename in a heading comes out as a
+word that exists nowhere: `ROOT.md` slugs to `rootmd`, and the rule id
+reads `every-member-reached-from-rootmd`. Where a plain word says the
+same thing, write the plain word — `the set's root`, not `` `ROOT.md` ``.
+Keep the filename only where it is the thing the rule names and no
+plain word stands in for it, and accept the slug it gives.
+
 ## What you leave alone
 
 The bodies. A body keeps every word, including a lead sentence the new
