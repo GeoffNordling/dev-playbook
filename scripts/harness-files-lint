@@ -68,8 +68,8 @@ ARGUMENTS = "doc-type.arguments"
 TOOLS = "doc-type.tools"
 BODY_OPENS_WITH_AN_H1 = "doc-type.body-opens-with-an-h1"
 REFERENCES_ONE_LEVEL_DEEP = "doc-type.references-one-level-deep"
-TWO_SECTIONS = "harness.two-sections"
-REQUIRED_RULES = "harness.required-rules"
+TWO_SECTIONS = "harness.behaviors-then-principles"
+REQUIRED_RULES = "harness.two-required-rules"
 
 RULES = (
     FRONT_MATTER,

@@ -18,7 +18,7 @@ encoding.
 > **Why.** The graph is the source of truth; the paragraph before it
 > says what state the loop drives and toward what.
 
-## One graph
+## One paragraph, then one graph
 
 A document typed `Loop` holds one H1, then one paragraph, then one
 fenced `mermaid` block, in that order and with nothing else before the
@@ -26,16 +26,16 @@ fence. The block is a flowchart, opening `flowchart` or `graph`, whose
 statements are Mermaid directives, nodes, and edges between nodes, with
 no `&` fan-out.
 
-`doc-type.one-graph` · deterministic
+`doc-type.one-paragraph-then-one-graph` · deterministic
 
-## What the paragraph says
+## The paragraph names state and target
 
 In a document typed `Loop`, the paragraph before the graph names the
 state the loop drives and the target state it drives that state toward.
 
-`doc-type.what-the-paragraph-says` · stochastic
+`doc-type.the-paragraph-names-state-and-target` · stochastic
 
-## Three verb sections
+## Acts, Checks, and Yields, in that order
 
 After the graph, a document typed `Loop` holds three H2s, `Acts`,
 `Checks`, and `Yields`, in that order and no others, with nothing
@@ -44,7 +44,7 @@ every line is an entry, the node id in backticks, an em dash, then the
 entry's text, or is a line indented under an entry, which continues it;
 and no node id carries two entries.
 
-`doc-type.three-verb-sections` · deterministic
+`doc-type.acts-checks-and-yields-in-that-order` · deterministic
 
 ## Nodes and entries agree
 
@@ -54,15 +54,15 @@ no entry that an edge out of a yield leads to.
 
 `doc-type.nodes-and-entries-agree` · deterministic
 
-## Edges follow the shape
+## Edges lead to steps
 
 In a document typed `Loop`, every edge of the graph leads to a step, a
 node whose entry is an act, a check, or a yield, except an edge out of a
 yield, which leads to a step or to a receiver, a node with no entry.
 
-`doc-type.edges-follow-the-shape` · deterministic
+`doc-type.edges-lead-to-steps` · deterministic
 
-## Entries point and condition
+## Every entry states its condition
 
 Every entry of a document typed `Loop` states its condition, `fires
 when …` or `fires every iteration` for an act or a check and `yields
@@ -72,7 +72,7 @@ holds names a document typed `Loop`. Every link in an entry is
 root-absolute or relative to the document, and it resolves to a file in
 the repo.
 
-`doc-type.entries-point-and-condition` · deterministic
+`doc-type.every-entry-states-its-condition` · deterministic
 
 ## An act links a runbook
 

@@ -31,16 +31,16 @@ the set is the whole tree, strands included.
 > term of the work is defined in a `ROOT.md` rather than in the repo's
 > `CONTEXT.md` because it crosses no set while the work runs.
 
-## Speculative voice
+## A guess written as a guess
 
 Every member of a working documentation set writes a guess as a guess,
 and the set's `ROOT.md` declares the set speculative. This is the whole
 exemption from
 [every sentence in the present tense](/standards/prose/conventions.md#every-sentence-in-the-present-tense).
 
-`knowledge-organization.speculative-voice` · stochastic
+`knowledge-organization.a-guess-written-as-a-guess` · stochastic
 
-## The link tree
+## Every member reached from `ROOT.md`
 
 Every member of a working documentation set is reached from the set's
 `ROOT.md` by a path of links, a second structure over
@@ -48,9 +48,9 @@ Every member of a working documentation set is reached from the set's
 tree of sets. A row of an `index.md` that lists the member is not such a
 link.
 
-`knowledge-organization.the-link-tree` · deterministic
+`knowledge-organization.every-member-reached-from-rootmd` · deterministic
 
-## Where a set lives
+## One directory under `working-docs/`
 
 A working documentation set is one directory under `working-docs/` at
 the repo root, `working-docs/<work>/`, the one
@@ -60,7 +60,7 @@ makes, here named and placed: it holds the set's `index.md`, its
 subdirectories, except a member whose kind fixes its name (`README.md`,
 `PROMPT.md`, `SKILL.md`, `CLAUDE.md`, a Python module).
 
-`knowledge-organization.where-a-set-lives` · deterministic
+`knowledge-organization.one-directory-under-working-docs` · deterministic
 
 ## `working-docs/` holds only sets
 
@@ -71,7 +71,7 @@ nothing else.
 
 `knowledge-organization.working-docs-holds-only-sets` · deterministic
 
-## Worklist
+## One list of items, state by section
 
 The work of a working documentation set is one list of items, each item
 a bold name and a body beneath it, and an item's state is the section it
@@ -81,9 +81,9 @@ One `Planned` section and one `Completed` section sit together in one
 file: the set's `ROOT.md`, or, where the work splits into strands, the
 `ROOT.md` of each strand.
 
-`knowledge-organization.worklist` · deterministic
+`knowledge-organization.one-list-of-items-state-by-section` · deterministic
 
-## Buckets
+## Every fact under a named bucket
 
 Every fact in a member of a working documentation set sits under a named
 section, its bucket, the
@@ -100,13 +100,15 @@ buckets:
 - **Principles** — the judgment calls that guide choices.
 - **Constraints** — the hard bounds the work operates under, distinct from
   principles.
-- **Terms** — the terms the work coins ([Terms](#terms)).
-- **Planned** and **Completed** — the worklist ([Worklist](#worklist)).
+- **Terms** — the terms the work coins
+  ([A shared term in one `ROOT.md`](#a-shared-term-in-one-rootmd)).
+- **Planned** and **Completed** — the worklist
+  ([One list of items, state by section](#one-list-of-items-state-by-section)).
 - **Unfiled** — material awaiting triage.
 
-`knowledge-organization.buckets` · stochastic
+`knowledge-organization.every-fact-under-a-named-bucket` · stochastic
 
-## Terms
+## A shared term in one `ROOT.md`
 
 A term coined by the work and used in more than one member of a working
 documentation set is defined in the `Terms` bucket of one `ROOT.md`: the
@@ -115,9 +117,9 @@ the set's own root where the term crosses strands, in place of the entry
 [terms that cross sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets)
 puts in the repo's `CONTEXT.md`.
 
-`knowledge-organization.terms` · stochastic
+`knowledge-organization.a-shared-term-in-one-rootmd` · stochastic
 
-## Acronyms
+## An `Acronyms` appendix in every member
 
 Every member of a working documentation set ends with an `Acronyms`
 appendix, holding a bare `None.` where the member uses no acronym, and
@@ -125,4 +127,4 @@ an acronym is defined in the appendix of the highest member that uses
 it and in no other member's, in place of a definition above first use
 ([definition before first use](/standards/prose/conventions.md#definition-before-first-use)).
 
-`knowledge-organization.acronyms` · stochastic
+`knowledge-organization.an-acronyms-appendix-in-every-member` · stochastic

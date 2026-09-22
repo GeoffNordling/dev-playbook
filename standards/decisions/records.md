@@ -18,7 +18,7 @@ record's `description`, and follows the
 > architectural subset of this kind. A Decision Record generalizes the
 > same artifact past architecture to any hard-to-reverse decision.
 
-## The bar
+## Hard to reverse, surprising, a real trade-off
 
 A Decision Record records a decision that is hard to reverse, surprising
 without its context, and the outcome of a real trade-off, all three at
@@ -26,7 +26,7 @@ once: changing course later carries meaningful cost, a future reader
 looking at the code would wonder why it was done this way, and there
 were genuine alternatives with a specific reason for the choice.
 
-`decisions.the-bar` · stochastic
+`decisions.hard-to-reverse-surprising-a-real-trade-off` · stochastic
 
 > **Why.** Each criterion alone leaves nothing worth writing down: an
 > easy-to-reverse decision is reversed, an unsurprising one raises no
@@ -34,14 +34,14 @@ were genuine alternatives with a specific reason for the choice.
 > record earns its place by stopping the next engineer from undoing a
 > deliberate choice or re-proposing a rejected one.
 
-## The directory
+## Numbered records, index, README, nothing else
 
 The `docs/decisions/` directory holding a Decision Record holds numbered
 records, one `index.md`, and one `README.md`, and nothing else.
 
-`decisions.the-directory` · deterministic
+`decisions.numbered-records-index-readme-nothing-else` · deterministic
 
-## Sequential numbering
+## Four digits from 0001, no gaps or repeats
 
 A Decision Record's filename is `NNNN-slug.md`, where `NNNN` is the
 record's number zero-padded to four digits. The number is `0001` or
@@ -49,9 +49,9 @@ higher, no other record in the directory carries it, and every number
 from `0001` up to the highest number in the directory belongs to a
 record.
 
-`decisions.sequential-numbering` · deterministic
+`decisions.four-digits-from-0001-no-gaps-or-repeats` · deterministic
 
-## Template
+## Four frontmatter keys, title repeated as H1
 
 A Decision Record's frontmatter holds `type: Decision-Record`, a
 `title`, a `description`, and a `date`; its body opens with an H1
@@ -70,7 +70,7 @@ date: {YYYY-MM-DD}
 {1-3 sentences: what's the context, what did we decide, and why.}
 ```
 
-`decisions.template` · deterministic
+`decisions.four-frontmatter-keys-title-repeated-as-h1` · deterministic
 
 ## Context, decision, and reason
 
@@ -79,43 +79,43 @@ the decision itself, and the reason for it.
 
 `decisions.context-decision-and-reason` · stochastic
 
-## Date
+## YYYY-MM-DD date or null
 
 A Decision Record's `date` frontmatter key holds a `YYYY-MM-DD` date or
 `null`.
 
-`decisions.date` · deterministic
+`decisions.yyyy-mm-dd-date-or-null` · deterministic
 
 > **Why.** The date is the day the decision was made, not the writing
 > day, and null where that day is unrecoverable.
 
-## Status vocabulary
+## Proposed, accepted, deprecated, superseded, or absent
 
 A Decision Record either carries no `status` frontmatter key or carries
 one holding exactly one of `proposed`, `accepted`, `deprecated`, or
 `superseded by NNNN`, where `NNNN` is four digits.
 
-`decisions.status-vocabulary` · deterministic
+`decisions.proposed-accepted-deprecated-superseded-or-absent` · deterministic
 
-## Supersession target
+## Superseded by a record that exists
 
 A Decision Record whose `status` is `superseded by NNNN` sits in a
 directory that holds a record numbered `NNNN`.
 
-`decisions.supersession-target` · deterministic
+`decisions.superseded-by-a-record-that-exists` · deterministic
 
 ## External-convention evaluation
 
 A Decision Record's decision is a verdict on something outside the
 workspace: a skill, a skill collection, a framework, or a technique.
 
-### What was examined
+### Source named, SHA or version pinned
 
 A Decision Record whose decision is a verdict on something outside the
 workspace names the source and pins at least one of the repository SHA
 and the release or version examined.
 
-`decisions.what-was-examined` · stochastic
+`decisions.source-named-sha-or-version-pinned` · stochastic
 
 > **Why.** A verdict on something outside the workspace ages with its
 > subject, so the pin is what lets a later reader tell whether the

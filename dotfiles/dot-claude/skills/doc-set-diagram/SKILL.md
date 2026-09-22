@@ -45,7 +45,7 @@ Counts, tallies, statuses and dates stay out. They go stale between one
 drawing and the next.
 
 {If the set is a working set, a directory under `working-docs/`,
-{Read [the link tree](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#the-link-tree)}}
+{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#every-member-reached-from-rootmd)}}
 and draw that tree in place of the index rows: `index.md` at the top
 with one edge to `ROOT.md`, then each edge a link from one member to
 another, descending from `ROOT.md`. A file with two children spends an
@@ -105,7 +105,7 @@ child-set/
 ```
 
 A child set of a working set that holds its own `ROOT.md` is a strand
-([where a set lives](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)),
+([one directory under `working-docs/`](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-directory-under-working-docs)),
 and takes the link tree form inside its border, its `index.md` at the
 top with one edge to its `ROOT.md`. A child set with no `ROOT.md` is a
 set like any other, so it takes the bordered index-row form even

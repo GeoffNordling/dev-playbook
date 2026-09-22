@@ -11,7 +11,7 @@ every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
 `worktree-cloa-viewer-tool-2`, which describe one theory. The set is
 four strands, each with its own root and its own worklist
-([Worklist](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#worklist)).
+([One list of items, state by section](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-list-of-items-state-by-section)).
 This root holds only what crosses strands.
 
 ## Goal

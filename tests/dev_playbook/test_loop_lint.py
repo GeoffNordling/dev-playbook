@@ -123,7 +123,7 @@ def test_an_edge_the_shape_does_not_allow_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "doc-type.edges-follow-the-shape edge `flat` → `user` is check → receiver"
+        "doc-type.edges-lead-to-steps edge `flat` → `user` is check → receiver"
         in result.stdout
     )
 
@@ -136,7 +136,7 @@ def test_a_check_that_links_a_file_not_typed_standard_fails(tmp_path: Path) -> N
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "doc-type.entries-point-and-condition" in result.stdout
+    assert "doc-type.every-entry-states-its-condition" in result.stdout
     assert "a check links a file typed Standard" in result.stdout
 
 
@@ -147,7 +147,7 @@ def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "doc-type.entries-point-and-condition link '/skills/gone.md' does not resolve"
+        "doc-type.every-entry-states-its-condition link '/skills/gone.md' does not resolve"
         in result.stdout
     )
 
@@ -159,7 +159,7 @@ def test_a_yield_with_no_condition_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "doc-type.entries-point-and-condition `ask` states no condition"
+        "doc-type.every-entry-states-its-condition `ask` states no condition"
         in result.stdout
     )
 
@@ -170,7 +170,10 @@ def test_verb_sections_out_of_order_fail(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "doc-type.three-verb-sections verb sections are" in result.stdout
+    assert (
+        "doc-type.acts-checks-and-yields-in-that-order verb sections are"
+        in result.stdout
+    )
 
 
 def test_two_paragraphs_before_the_graph_fail(tmp_path: Path) -> None:
@@ -182,7 +185,10 @@ def test_two_paragraphs_before_the_graph_fail(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
-    assert "doc-type.one-graph 2 paragraphs before the graph" in result.stdout
+    assert (
+        "doc-type.one-paragraph-then-one-graph 2 paragraphs before the graph"
+        in result.stdout
+    )
 
 
 def test_a_repo_with_no_loops_tree_is_clean(tmp_path: Path) -> None:
@@ -201,9 +207,9 @@ def test_list_rules_prints_the_five_rule_ids() -> None:
 
     assert result.returncode == 0
     assert result.stdout.split() == [
-        "doc-type.edges-follow-the-shape",
-        "doc-type.entries-point-and-condition",
+        "doc-type.acts-checks-and-yields-in-that-order",
+        "doc-type.edges-lead-to-steps",
+        "doc-type.every-entry-states-its-condition",
         "doc-type.nodes-and-entries-agree",
-        "doc-type.one-graph",
-        "doc-type.three-verb-sections",
+        "doc-type.one-paragraph-then-one-graph",
     ]

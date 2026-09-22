@@ -83,10 +83,10 @@ DETERMINISTIC = "deterministic"
 # each address against the repo's hooks and dependencies.
 DEPENDENCY_RULES: Mapping[str, tuple[str, ...]] = {
     "pre-commit validate-manifest": ("distribution.a-valid-manifest",),
-    "ruff-check": ("python.docstrings",),
+    "ruff-check": ("python.every-definition-carries-a-docstring",),
     "ruff-format": ("python.formatted-by-ruff-format",),
     "shellcheck": ("shell.shellcheck-clean",),
-    "shfmt": ("shell.formatting",),
+    "shfmt": ("shell.formatted-by-shfmt",),
 }
 
 HEADER = """\

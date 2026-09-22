@@ -31,13 +31,13 @@ other code.
 > the package root, so an import path names where the object is
 > defined.
 
-## Docstrings
+## Every definition carries a docstring
 
 Every module, class, function, and method in the file carries a
 docstring, except a file named `__init__.py` and a pytest test function,
 whose name begins with `test_`.
 
-`python.docstrings` · deterministic
+`python.every-definition-carries-a-docstring` · deterministic
 
 > **Why.** A pytest test function is named `test_<behavior>`, literal
 > enough that a docstring restates the name.

@@ -46,8 +46,8 @@ from dev_playbook.findings import print_rules, render
 # whose Standard it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-SEQUENTIAL_NUMBERING = "decisions.sequential-numbering"
-STATUS_VOCABULARY = "decisions.status-vocabulary"
+SEQUENTIAL_NUMBERING = "decisions.four-digits-from-0001-no-gaps-or-repeats"
+STATUS_VOCABULARY = "decisions.proposed-accepted-deprecated-superseded-or-absent"
 
 RULES = (SEQUENTIAL_NUMBERING, STATUS_VOCABULARY)
 

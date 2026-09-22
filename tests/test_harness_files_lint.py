@@ -483,7 +483,10 @@ def test_global_claude_extra_section_fails(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.two-sections" in result.stdout
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: harness.behaviors-then-principles"
+        in result.stdout
+    )
 
 
 def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
@@ -500,7 +503,10 @@ def test_global_claude_sections_out_of_order_fails(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.two-sections" in result.stdout
+    assert (
+        "dotfiles/dot-claude/CLAUDE.md: harness.behaviors-then-principles"
+        in result.stdout
+    )
 
 
 def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
@@ -516,7 +522,7 @@ def test_global_claude_missing_workspace_rule_fails(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "dotfiles/dot-claude/CLAUDE.md: harness.required-rules" in result.stdout
+    assert "dotfiles/dot-claude/CLAUDE.md: harness.two-required-rules" in result.stdout
     assert "Navigate docs by index" in result.stdout
 
 

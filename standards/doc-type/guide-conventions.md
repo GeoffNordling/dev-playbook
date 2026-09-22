@@ -60,9 +60,9 @@ the sentence links the rule that states it.
 
 `doc-type.links-rules-states-none` · stochastic
 
-## Names its work
+## The description names the work
 
 The `description` of a document typed `Guide` names the kind of work a
 reader does after reading it.
 
-`doc-type.names-its-work` · stochastic
+`doc-type.the-description-names-the-work` · stochastic

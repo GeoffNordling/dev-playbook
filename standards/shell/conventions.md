@@ -43,12 +43,12 @@ same-line comment giving the reason the suppression is safe.
 > check this rule: a disable directive is how a file tells shellcheck
 > to stop looking, so the reason is a reviewer's to read.
 
-## Formatting
+## Formatted by shfmt
 
 A shell file's bytes are what `shfmt` writes from that file with its
 default options.
 
-`shell.formatting` · deterministic
+`shell.formatted-by-shfmt` · deterministic
 
 ## Executable scripts
 
@@ -67,12 +67,12 @@ function, declares no array, and reads no positional parameter.
 > ([Runnables live in scripts/](/standards/build/skeleton.md#runnables-live-in-scripts))
 > is testable and typed.
 
-### Strict mode
+### Strict mode first
 
 An executable script opens with the shebang `#!/usr/bin/env bash`, and its
 first command is `set -euo pipefail`.
 
-`shell.strict-mode` · deterministic
+`shell.strict-mode-first` · deterministic
 
 > **Why.** What the rule fixes is the state the shell is in once the
 > script starts working: it dies on the first failing command, on an
@@ -93,8 +93,8 @@ A sourced fragment carries neither a shebang nor `set -euo pipefail`.
 > first error, and a file nothing executes directly has no use for a
 > shebang.
 
-### Dialect directive
+### Dialect by directive
 
 A sourced fragment opens with a `# shellcheck shell=bash` directive.
 
-`shell.dialect-directive` · deterministic
+`shell.dialect-by-directive` · deterministic

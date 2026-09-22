@@ -34,20 +34,20 @@ A `CLAUDE.md` opens on its content, with no YAML frontmatter block.
 > **Why.** A `CLAUDE.md` is injected into the session as operating
 > configuration, and okf-lint never reads it.
 
-## Operational scope
+## Operational content only
 
 A `CLAUDE.md` holds only how to operate — commands, rules, and pointers
 to other docs — and carries nothing of what the project is, why it
 exists, or who develops it.
 
-`harness.operational-scope` · stochastic
+`harness.operational-content-only` · stochastic
 
-## One scope
+## One rule, one scope
 
 A nested `<dir>/CLAUDE.md` states no rule already stated in the root
 file above it.
 
-`harness.one-scope` · stochastic
+`harness.one-rule-one-scope` · stochastic
 
 > **Why.** A rule sits at the widest scope where it is true:
 > machine-wide in the global source, repo-wide in the root file, only
@@ -59,19 +59,19 @@ file above it.
 The `CLAUDE.md` sits at `dotfiles/dot-claude/CLAUDE.md`, the global
 source linked to `~/.claude/CLAUDE.md`.
 
-### Two sections
+### Behaviors, then Principles
 
 The global source's H2 headings outside fenced code blocks are exactly
 `## Behaviors` then `## Principles`, in that order.
 
-`harness.two-sections` · deterministic
+`harness.behaviors-then-principles` · deterministic
 
-### Required rules
+### Two required rules
 
 The global source carries the headings `### Read the standards` and
 `### Navigate docs by index`, both outside fenced code blocks.
 
-`harness.required-rules` · deterministic
+`harness.two-required-rules` · deterministic
 
 ### One rule per heading
 

@@ -72,7 +72,7 @@ NAME_MAPPING = "build.name-mapping"
 SHEBANG_AND_INLINE_METADATA = "build.shebang-and-inline-metadata"
 A_PUBLISHER_DOGFOODS_ITS_MANIFEST = "distribution.a-publisher-dogfoods-its-manifest"
 H1 = "knowledge-organization.h1"
-THE_LANGUAGE_SECTION = "knowledge-organization.the-language-section"
+THE_LANGUAGE_SECTION = "knowledge-organization.language-section-present"
 
 # Filenames a CANDIDATES.md replaces. Uncommitted work lives in that one
 # register, committed work in issues; see standards/build/skeleton.md.

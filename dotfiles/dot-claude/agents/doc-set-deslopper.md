@@ -79,7 +79,7 @@ The fact slices:
   [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
 - **Terms** —
   [terms that cross sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets),
-  [tight definitions](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#tight-definitions),
+  [definitions at most two sentences](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#definitions-at-most-two-sentences),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only).
 - **Placement** —
   [one rule, one place](~/workspace/dev-playbook/standards/prose/conventions.md#one-rule-one-place),

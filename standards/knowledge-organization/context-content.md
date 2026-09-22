@@ -19,19 +19,19 @@ implementation detail, no specification, and no scratch note.
 
 `knowledge-organization.glossary-only` · stochastic
 
-## Vocabulary type
+## Frontmatter declares type: Vocabulary
 
 A repo's `CONTEXT.md` declares `type: Vocabulary` in its frontmatter.
 
-`knowledge-organization.vocabulary-type` · deterministic
+`knowledge-organization.frontmatter-declares-type-vocabulary` · deterministic
 
-## The Language section
+## Language section present
 
 A repo's `CONTEXT.md` has a `## Language` section.
 
-`knowledge-organization.the-language-section` · deterministic
+`knowledge-organization.language-section-present` · deterministic
 
-## Entry shape
+## Term, definition, Avoid line
 
 An entry under `## Language` in a repo's `CONTEXT.md` is the term in
 bold on its own line, its definition on the lines beneath, and, at
@@ -64,16 +64,16 @@ A request for payment sent to a customer after delivery.
 _Avoid_: Bill, payment request
 ````
 
-`knowledge-organization.entry-shape` · deterministic
+`knowledge-organization.term-definition-avoid-line` · deterministic
 
-## Tight definitions
+## Definitions at most two sentences
 
 An entry's definition in a repo's `CONTEXT.md` is at most two
 sentences: one that says what the term is, and at most one more that
 sharpens it; where a concept document defines the term the definition
 links that document.
 
-`knowledge-organization.tight-definitions` · stochastic
+`knowledge-organization.definitions-at-most-two-sentences` · stochastic
 
 ## Project terms only
 

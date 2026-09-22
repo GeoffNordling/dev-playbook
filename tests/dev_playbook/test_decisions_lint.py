@@ -71,7 +71,7 @@ def test_gap_in_the_sequence_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "decisions.sequential-numbering" in result.stdout
+    assert "decisions.four-digits-from-0001-no-gaps-or-repeats" in result.stdout
     assert "0002" in result.stdout
 
 
@@ -102,7 +102,7 @@ def test_duplicate_number_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "decisions.sequential-numbering" in result.stdout
+    assert "decisions.four-digits-from-0001-no-gaps-or-repeats" in result.stdout
     assert "0001" in result.stdout
 
 
@@ -115,7 +115,7 @@ def test_zeroth_record_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "decisions.sequential-numbering" in result.stdout
+    assert "decisions.four-digits-from-0001-no-gaps-or-repeats" in result.stdout
     assert "docs/decisions/0000-zero.md" in result.stdout
 
 
@@ -126,7 +126,7 @@ def test_non_zero_padded_number_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "decisions.sequential-numbering" in result.stdout
+    assert "decisions.four-digits-from-0001-no-gaps-or-repeats" in result.stdout
     assert "docs/decisions/1-first.md" in result.stdout
 
 
@@ -195,7 +195,9 @@ def test_status_off_the_vocabulary_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "decisions.status-vocabulary" in result.stdout
+    assert (
+        "decisions.proposed-accepted-deprecated-superseded-or-absent" in result.stdout
+    )
     assert "docs/decisions/0001-first.md" in result.stdout
 
 
@@ -220,7 +222,9 @@ def test_superseded_without_a_padded_number_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "decisions.status-vocabulary" in result.stdout
+    assert (
+        "decisions.proposed-accepted-deprecated-superseded-or-absent" in result.stdout
+    )
 
 
 def test_status_check_ignores_non_record_files(tmp_path: Path) -> None:
@@ -267,8 +271,8 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "decisions.sequential-numbering" in ids
-    assert "decisions.status-vocabulary" in ids
+    assert "decisions.four-digits-from-0001-no-gaps-or-repeats" in ids
+    assert "decisions.proposed-accepted-deprecated-superseded-or-absent" in ids
 
 
 def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
@@ -278,4 +282,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "docs/decisions/0001-first.md: decisions.status-vocabulary " in result.stdout
+    assert (
+        "docs/decisions/0001-first.md: decisions.proposed-accepted-deprecated-superseded-or-absent "
+        in result.stdout
+    )

@@ -53,11 +53,11 @@ from dev_playbook.findings import print_rules, render
 # Every rule id this detector can emit, namespaced by the card whose question
 # it answers. Each is a module-level constant so RULES cannot drift from what
 # the detector emits.
-ONE_GRAPH = "doc-type.one-graph"
-THREE_VERB_SECTIONS = "doc-type.three-verb-sections"
+ONE_GRAPH = "doc-type.one-paragraph-then-one-graph"
+THREE_VERB_SECTIONS = "doc-type.acts-checks-and-yields-in-that-order"
 NODES_AND_ENTRIES_AGREE = "doc-type.nodes-and-entries-agree"
-EDGES_FOLLOW_THE_SHAPE = "doc-type.edges-follow-the-shape"
-ENTRIES_POINT_AND_CONDITION = "doc-type.entries-point-and-condition"
+EDGES_FOLLOW_THE_SHAPE = "doc-type.edges-lead-to-steps"
+ENTRIES_POINT_AND_CONDITION = "doc-type.every-entry-states-its-condition"
 
 RULES = (
     ONE_GRAPH,

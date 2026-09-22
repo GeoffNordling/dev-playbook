@@ -48,7 +48,7 @@ replaced it.
 
 A working documentation set, the one
 [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes a set, is present on `main`. The
-[speculative voice](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#speculative-voice)
+makes a set, is present on `main`.
+[A guess written as a guess](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#a-guess-written-as-a-guess)
 is what lets a set stand on `main`: a reader meets a guess marked as a
 guess, and the worklist shows where the work is.
