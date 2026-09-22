@@ -179,13 +179,26 @@ the `Considered Options` heading of a Decision Record is exempt.
 
 `prose.heading-casing` · stochastic
 
-## Assertion headings
+## Headings are propositions
 
-Each heading below the H1, and each name an encoding reads from a body such as a Guide step's bold run, is an assertion: one clause stating the point its section makes, `Write docstrings that say what the thing does`, not a label naming its topic, `What a docstring says`.
+Each heading below the H1, and each name an encoding reads from a body
+such as a Guide step's bold run, is a proposition the section
+establishes, written in block language, the register of headlines,
+articles and copulas dropped, in the fewest words that carry it. The
+three forms, over one rule:
 
-`prose.assertion-headings` · stochastic
+| Heading | Verdict |
+|---|---|
+| `Judgment, not judgement` | passes: the proposition, in block language |
+| `Spelling` | fails: the topic named |
+| `The prose spells judgment and never the British judgement` | fails: the predicate restated |
 
-> **Why.** A parse shows the names and nothing beneath them, so read alone and in order the assertions are the document's argument, and labels are only its table of contents. One clause keeps a name a headline rather than a second body.
+`prose.headings-are-propositions` · stochastic
+
+> **Why.** A parse shows the headings and nothing beneath them, so read
+> alone and in order the propositions are the document's argument; a
+> topic name is only its table of contents, and a restated predicate is
+> a second body.
 
 ## Grammatical parallelism
 

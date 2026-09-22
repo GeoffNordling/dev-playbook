@@ -108,7 +108,7 @@ The set slices:
   so no first person never binds it,
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
-  [assertion headings](~/workspace/dev-playbook/standards/prose/conventions.md#assertion-headings),
+  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions),
   [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
 
 A working set's differences reach the auditors through their own

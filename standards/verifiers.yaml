@@ -142,13 +142,13 @@ knowledge-organization.where-a-set-lives: null
 knowledge-organization.working-docs-holds-only-sets: null
 knowledge-organization.worklist: null
 knowledge-organization.workspace-path-for-a-stable-location: null
-prose.assertion-headings: null
 prose.block-form-fits-its-content: null
 prose.current-state-and-next-steps-only: null
 prose.declarative-present-tense: null
 prose.declare-before-use: null
 prose.grammatical-parallelism: null
 prose.heading-casing: null
+prose.headings-are-propositions: null
 prose.name-concepts-once-use-consistently: null
 prose.no-first-person: scripts/prose-lint
 prose.no-slop-tics: null

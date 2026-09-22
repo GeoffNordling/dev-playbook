@@ -176,12 +176,16 @@ specification.
      Waves 1 to 4 are done; the entries are in [Completed](#completed).
      The waves left, in order:
      - **Wave 5, reheadlining.** One agent per Guide and per Standard
-       file, in parallel: every label heading becomes an assertion per
-       `prose.assertion-headings`, one clause stating the section's
-       point, bodies untouched; links to the old anchors follow. The
-       four imperative headings of `prose/conventions.md` are wave 3's,
-       held here so one rename settles the file. Then the two tables
-       regenerate again, since a rule's id is its heading's slug.
+       file, in parallel: every heading below the H1 becomes a
+       proposition in block language per
+       `prose.headings-are-propositions`, the fewest words that carry
+       what the section establishes, so a reader of the headings alone
+       knows what the bodies say; a heading that already passes stays,
+       a file's headings stay grammatically parallel, bodies untouched;
+       links to the old anchors follow. The four imperative headings
+       of `prose/conventions.md` are wave 3's, held here so one rename
+       settles the file. Then the two tables regenerate again, since a
+       rule's id is its heading's slug.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
