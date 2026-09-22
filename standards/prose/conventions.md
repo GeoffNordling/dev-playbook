@@ -38,26 +38,26 @@ is exempt.
 > **Why.** A Decision Record is exempt because it is a dated record of
 > a past decision, frozen after merge.
 
-## Point at canonical artifacts
+## The canonical file, linked not copied
 
 Where a file is itself the standard, the document links that file rather than reproducing its contents; naming one entry as a worked example is not reproduction.
 
-`prose.point-at-canonical-artifacts` · stochastic
+`prose.the-canonical-file-linked-not-copied` · stochastic
 
 > **Why.** A restated copy drifts from the file it restates.
 
-## Open with purpose
+## The opening states the purpose
 
 The opening states what the document is for and what a reader should be able to do after reading; an `index.md` and a `README.md` answer instead to the opening-sentence and purpose-sentence rules of the knowledge-organization Standard.
 
-`prose.open-with-purpose` · stochastic
+`prose.the-opening-states-the-purpose` · stochastic
 
-## Declare before use
+## Definition before first use
 
 A concept is defined before the prose leans on it — the definition sits above
 its first use.
 
-`prose.declare-before-use` · stochastic
+`prose.definition-before-first-use` · stochastic
 
 ## Block form fits its content
 
@@ -78,18 +78,18 @@ The pairs:
 
 `prose.block-form-fits-its-content` · stochastic
 
-## Declarative present tense
+## Every sentence in the present tense
 
 Every sentence is in the present tense, except a sentence reporting a measurement or an incident that happened, and except in a member of a working documentation set, which may write a guess as a guess.
 
-`prose.declarative-present-tense` · stochastic
+`prose.every-sentence-in-the-present-tense` · stochastic
 
-## Positive statement
+## A rule reads in the positive
 
 A rule reads in the positive — what to do, where a thing lives — and a
 prohibition appears only where the prohibition itself is the rule.
 
-`prose.positive-statement` · stochastic
+`prose.a-rule-reads-in-the-positive` · stochastic
 
 ## No slop tics
 
@@ -124,7 +124,7 @@ double-quoted utterance, an inline code span, or a fenced block.
 The document is a declarative document: it is not a `CLAUDE.md`, and no
 segment of its path inside the repository is `skills`, `rules`, or `agents`.
 
-### Third person
+### The third person, never the second
 
 A declarative document speaks in the declarative mood and the third
 person, and does not address the reader as `you`. Exempt: a
@@ -132,58 +132,58 @@ double-quoted utterance, and a name an encoding reads from a body as
 an action, such as a Guide step's bold run, which speaks in the
 imperative.
 
-`prose.third-person` · stochastic
+`prose.the-third-person-never-the-second` · stochastic
 
 > **Why.** A step names an action the reader performs, and the
 > imperative is the mood that names an action; the encoding reads that
 > name out of the body, so it is a name and not the prose around it.
 
-## Name concepts once, use consistently
+## One name, one concept
 
 One name per concept holds across the document.
 
-`prose.name-concepts-once-use-consistently` · stochastic
+`prose.one-name-one-concept` · stochastic
 
-## Terminology: the person is the user
+## The person is the user
 
 One actor, the dispatcher, reviewer, and approver, is the `user` throughout the document, its frontmatter, code spans, and fenced blocks included, never a synonym, in any case, plural, or compound. A numbered Decision Record is exempt.
 
-`prose.terminology-the-person-is-the-user` · stochastic
+`prose.the-person-is-the-user` · stochastic
 
-## The banned word
+## No banned word
 
 The file does not contain a word the workspace vocabulary bans, `WORKSPACE_VOCABULARY` in `src/dev_playbook/prose_lint.py`, bare or plural, in any case, alone or in a compound, its frontmatter, code spans, and fenced blocks included.
 
-`prose.the-banned-word` · deterministic
+`prose.no-banned-word` · deterministic
 
-## The repo vocabulary
+## No word the repo bans
 
 No tracked file under a directory the repo's `.prose-lint-vocabulary`
 names for a word contains that word, bare or plural, in any case, its
 frontmatter, code spans, and fenced blocks included; a word declared
 with no directory is banned in every tracked file of the repo.
 
-`prose.the-repo-vocabulary` · deterministic
+`prose.no-word-the-repo-bans` · deterministic
 
 > **Why.** The directories an entry names hold a term to the part of
 > the tree that defines it, and leave the word alone where it means
 > something else.
 
-## Spelling
+## Judgment, not judgement
 
 The document's prose spells `judgment`, never the British `judgement` or
 `judgements`, in any case. Exempt: the frontmatter, an inline code span, and a
 fenced block.
 
-`prose.spelling` · deterministic
+`prose.judgment-not-judgement` · deterministic
 
-## Heading casing
+## Title Case H1, sentence case below
 
 The H1 is in Title Case and every heading below it is in sentence case, except
 that a proper noun or a code identifier keeps its native case at any level, and
 the `Considered Options` heading of a Decision Record is exempt.
 
-`prose.heading-casing` · stochastic
+`prose.title-case-h1-sentence-case-below` · stochastic
 
 ## Headings are propositions
 

@@ -88,9 +88,9 @@ class CannotRun(Exception):
 # Kept module-level constants so every emission site references them, never a
 # raw literal, and RULES (what --list-rules prints) cannot drift from what the
 # detector emits.
-SPELLING = "prose.spelling"
-THE_BANNED_WORD = "prose.the-banned-word"
-THE_REPO_VOCABULARY = "prose.the-repo-vocabulary"
+SPELLING = "prose.judgment-not-judgement"
+THE_BANNED_WORD = "prose.no-banned-word"
+THE_REPO_VOCABULARY = "prose.no-word-the-repo-bans"
 NO_FIRST_PERSON = "prose.no-first-person"
 
 RULES = (SPELLING, THE_BANNED_WORD, THE_REPO_VOCABULARY, NO_FIRST_PERSON)
@@ -110,7 +110,7 @@ class Word:
     ``where`` is a tuple of repo-relative directories; empty means the whole
     repo. Which rule a finding on the word carries is the layer the word came
     from: a member of :data:`WORKSPACE_VOCABULARY` answers to
-    ``prose.the-banned-word``, a repo's own word to ``prose.the-repo-vocabulary``.
+    ``prose.no-banned-word``, a repo's own word to ``prose.no-word-the-repo-bans``.
     """
 
     word: str

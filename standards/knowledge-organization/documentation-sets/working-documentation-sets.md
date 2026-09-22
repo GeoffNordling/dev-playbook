@@ -36,7 +36,7 @@ the set is the whole tree, strands included.
 Every member of a working documentation set writes a guess as a guess,
 and the set's `ROOT.md` declares the set speculative. This is the whole
 exemption from
-[declarative present tense](/standards/prose/conventions.md#declarative-present-tense).
+[every sentence in the present tense](/standards/prose/conventions.md#every-sentence-in-the-present-tense).
 
 `knowledge-organization.speculative-voice` · stochastic
 
@@ -123,6 +123,6 @@ Every member of a working documentation set ends with an `Acronyms`
 appendix, holding a bare `None.` where the member uses no acronym, and
 an acronym is defined in the appendix of the highest member that uses
 it and in no other member's, in place of a definition above first use
-([declare before use](/standards/prose/conventions.md#declare-before-use)).
+([definition before first use](/standards/prose/conventions.md#definition-before-first-use)).
 
 `knowledge-organization.acronyms` · stochastic

@@ -44,10 +44,10 @@ EXEMPT: dict[Path, frozenset[str]] = {
             # harness-loaded, so this voice rule never binds it.
             "no-first-person",
             # prose-lint enforces these deterministically.
-            "spelling",
-            "the-banned-word",
-            "the-repo-vocabulary",
-            "terminology-the-person-is-the-user",
+            "judgment-not-judgement",
+            "no-banned-word",
+            "no-word-the-repo-bans",
+            "the-person-is-the-user",
         }
     ),
 }

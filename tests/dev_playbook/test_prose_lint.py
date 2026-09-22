@@ -1,8 +1,8 @@
 """Behavioral tests for the prose-lint detector, src/dev_playbook/prose_lint.py.
 
-The rule prose.spelling flags the British judgement / judgements form
-in authored Markdown; prose.the-banned-word flags the banned actor noun "human" in
-every tracked file, with no code-span or fence escape; prose.the-repo-vocabulary
+The rule prose.judgment-not-judgement flags the British judgement / judgements
+form in authored Markdown; prose.no-banned-word flags the banned actor noun "human"
+in every tracked file, with no code-span or fence escape; prose.no-word-the-repo-bans
 flags a word the repo's own .prose-lint-vocabulary bans, in the directories the
 entry names. This test file is listed in dev-playbook's own .prose-lint-exempt
 — its fixtures must name the word to test it. The scanning logic is tested with string inputs;
@@ -620,10 +620,10 @@ def test_list_rules_prints_the_rule_id(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     assert result.stdout.split() == [
+        "prose.judgment-not-judgement",
+        "prose.no-banned-word",
         "prose.no-first-person",
-        "prose.spelling",
-        "prose.the-banned-word",
-        "prose.the-repo-vocabulary",
+        "prose.no-word-the-repo-bans",
     ]
 
 
@@ -641,7 +641,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     result = run(repo)
 
     assert result.returncode == 1
-    assert "doc.md:1: prose.spelling " in result.stdout
+    assert "doc.md:1: prose.judgment-not-judgement " in result.stdout
 
 
 def test_dev_playbook_self_scan_is_clean() -> None:

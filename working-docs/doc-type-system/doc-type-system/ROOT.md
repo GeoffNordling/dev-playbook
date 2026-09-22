@@ -167,8 +167,12 @@ specification.
      in [Completed](#completed).
   11. *Settle every rule.* Every rule ruled on, keep, rewrite,
      delete, or fold under a condition, and the rulings applied by
-     agents, one work order each; the work orders were deleted once
-     spent, and commits b5a0c08, b01d0fd, and 9000802 hold them.
+     agents, one work order each; the work orders and the audit sheets
+     that fed them were deleted once spent, and commits b5a0c08,
+     b01d0fd, and 9000802 hold them. What the audit found and step 11
+     does not close is in
+     [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md),
+     step 12's input.
      Text that is not a predicate leaves the rule: a why to the why
      block, a procedure to a Guide, a scoping definition to a
      condition. Documents only: no detector logic changes. Output: the
@@ -180,8 +184,17 @@ specification.
        proposition in block language per
        `prose.headings-are-propositions`, the fewest words that carry
        what the section establishes, so a reader of the headings alone
-       knows what the bodies say; a heading that already passes stays,
-       and bodies are untouched. The rule exempts two forms: a heading
+       knows what the bodies say; a heading that already passes stays.
+       A body is otherwise untouched, with one release: where the new
+       heading absorbs the body's opening words, the body may shed
+       them, so long as what is left still states the rule whole, which
+       `prose.one-rule-one-place` demands of every lead sentence. Where
+       shedding them would leave a fragment, and it usually will, the
+       heading recompresses instead of the body giving way — the lead
+       `One name per concept holds across the document.` keeps a
+       heading of `One name, one concept`, the idiom the file already
+       uses at `One rule, one place`, rather than a heading that is the
+       lead's first four words. The rule exempts two forms: a heading
        that states no point of its own and only scopes the sections
        under it names the case those sections bind, which is what a
        condition's H2 does, and a Guide step's bold run stays
@@ -209,7 +222,9 @@ specification.
      public APIs. Design a general, modular, extensible system of
      checking scripts from that, build it, wire it into the pre-commit
      hooks, and keep it at least as fast as the hooks are today. It
-     absorbs what step 11 leaves unchecked: the sixteen weak checks,
+     absorbs what step 11 leaves unchecked, which
+     [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md)
+     holds whole: the sixteen weak checks with the survey behind them,
      the thin-shim moves, the `doc-type.one-base` check, and the
      H2-without-trailer condition shape.
      - **The design comes first.** Before any detector is rewritten, a
