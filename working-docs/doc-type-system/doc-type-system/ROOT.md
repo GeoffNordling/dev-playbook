@@ -182,7 +182,6 @@ specification.
        four imperative headings of `prose/conventions.md` are wave 3's,
        held here so one rename settles the file. Then the two tables
        regenerate again, since a rule's id is its heading's slug.
-     - **Wave 6, the PR**, for the user to merge.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of
