@@ -198,3 +198,17 @@ Not a ruling: the list of what each detector misses, carried into the detector d
 | `tracking.wayfinder-body` | A map's body carries a `Destination`, a `Notes`, a `Decisions so far`, a `Not yet specified`, and an `Out of scope` section, and a decision ticket's body carries a `Question` section, each as a markdown heading at any level. | github | #374, a wayfinder:research harvest ticket, records a conversation instead of asking a question, so lacks `Question`; see `workspace_lint.py:784`. |
 | `tracking.structure` | Every entry sits under a `##` heading, directly or nested under a parent entry; a heading groups its entries and carries no other meaning, and a nested entry is work that achieves its parent's outcome. | other-repo | sounds/CANDIDATES.md has no `##` heading; its one entry sits directly under the `# Candidates` title |
 | `tracking.valid-labels` | A governed repo's GitHub labels are exactly the labels declared in the scheme data `src/dev_playbook/label_scheme.json`, each carrying the color and the description that data gives it. | github | lunch is missing `mode:session` and carries placeholder descriptions for its 17 labels, unlike src/dev_playbook/label_scheme.json |
+
+## Acronyms
+
+- **ADR** — Architecture Decision Record.
+- **AST** — Abstract Syntax Tree.
+- **H1** — markdown heading level one.
+- **H2** — markdown heading level two.
+- **H3** — markdown heading level three.
+- **JS** — JavaScript.
+- **NUL** — the zero byte.
+- **OKF** — Open Knowledge Format.
+- **PR** — pull request.
+- **SHA** — the hash naming one commit.
+- **URL** — Uniform Resource Locator.

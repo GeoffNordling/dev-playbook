@@ -38,3 +38,8 @@ Six more, shorter, from the same conversations:
   distribution, the predicates describe the distribution."
 - **Spec-driven development led me astray**, and Matt Pocock's specs as
   "targets in his state space."
+
+## Acronyms
+
+- **CLOA** — Correct Level Of Abstraction.
+- **LLM** — Large Language Model.

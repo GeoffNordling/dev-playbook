@@ -36,3 +36,7 @@ The work order of the `build` family agent: every rule under `standards/build/`,
 | `build.tests-present` | build/skeleton.md | keep | deterministic |  |
 | `build.javascript` | build/skeleton.md | condition |  |  |
 | `build.lockfile-committed` | build/skeleton.md | delete |  |  |
+
+## Acronyms
+
+None.

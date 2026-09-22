@@ -60,3 +60,7 @@ a finding in a file you own and report one in a file you do not.
 The file written; each rule taken and the sequence, step, or reference
 it landed in; any rule whose text did not fit the encoding and where
 its words went; and what `playbook-lint` said.
+
+## Acronyms
+
+None.

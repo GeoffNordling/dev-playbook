@@ -238,3 +238,8 @@ testing-lint stands on. `find_python_files` lists candidates through
 environment, so discovery is gitignore-aware and worktree-scoped, and
 `parse` returns `None` for a file that cannot be read or parsed, which
 makes a syntactically broken test file invisible to the two AST rules.
+
+## Acronyms
+
+- **AST** — Abstract Syntax Tree.
+- **LLM** — Large Language Model.

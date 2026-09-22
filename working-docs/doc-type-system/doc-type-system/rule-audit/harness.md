@@ -172,3 +172,9 @@ with `line.startswith("#")`, so an H2 indented by one to three spaces —
 still an H2 to GitHub — is invisible to `harness.two-sections`. The
 `GLOBAL_CLAUDE_SECTIONS` comment in the script also describes the two
 buckets in the reverse order to the tuple it annotates.
+
+## Acronyms
+
+- **H1** — markdown heading level one.
+- **H2** — markdown heading level two.
+- **YAML** — YAML Ain't Markup Language.

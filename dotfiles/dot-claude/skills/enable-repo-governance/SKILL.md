@@ -2,7 +2,7 @@
 name: enable-repo-governance
 description: Bring the repository the session is standing in into governance — wire the standards pin, work it to green, finish the GitHub tail, and enroll it.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: xhigh
 ---
 

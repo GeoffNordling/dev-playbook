@@ -15,3 +15,7 @@ Where the rules that are not predicates go. Each rule's current text is the seed
 - **`guides/repo-settings.md`** (`standards/tracking/repo-settings.md` retyped `Guide` and moved; read when creating or auditing a governed repo on GitHub). The GitHub side of tracking: origin, merge settings, branch protection, the label set bootstrap-labels mints, one tracker per repo. Takes: `tracking.github-origin`, `tracking.squash-only-merges`, `tracking.default-branch-protection`, `tracking.valid-labels`, `tracking.one-home`.
 - **`guides/governed-repo.md`** (new Guide; read when adding a repo to the workspace or writing a Decision Record). Which repos are governed and where the roster lives; what one Decision Record covers; a merged record is frozen; a working set is published on main. Takes: `distribution.the-roster`, `decisions.scope`, `decisions.immutable-after-merge`, `knowledge-organization.a-set-stands-on-main`.
 - **`guides/writing-for-agents.md`** (existing Guide; read before writing a runbook or skill). A step ends on the condition that tells the agent the work is done; it joins the reference `Steps and completion criteria`. Takes: `doc-type.steps-end-on-a-completion-criterion`.
+
+## Acronyms
+
+None.

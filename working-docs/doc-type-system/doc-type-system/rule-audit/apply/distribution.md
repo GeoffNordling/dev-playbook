@@ -15,3 +15,7 @@ The work order of the `distribution` family agent: every rule under `standards/d
 | `distribution.a-valid-manifest` | distribution/channel.md | keep | deterministic |  |
 | `distribution.a-pinned-rev` | distribution/channel.md | delete |  |  |
 | `distribution.the-roster` | distribution/channel.md | guide |  | Guide: `guides/governed-repo.md` |
+
+## Acronyms
+
+None.

@@ -220,3 +220,9 @@ have no test at all: `kebab-case-name`, `model-and-effort`,
 detector over dev-playbook itself, which is what keeps the tree green.
 `tests/test_rule_registry.py` guards the `RULES` tuple against the
 ids the module actually emits, so `--list-rules` cannot drift.
+
+## Acronyms
+
+- **H1** — markdown heading level one.
+- **H3** — markdown heading level three.
+- **YAML** — YAML Ain't Markup Language.

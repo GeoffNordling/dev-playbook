@@ -34,3 +34,7 @@ The work order of the `testing` family agent: every rule under `standards/testin
 | `testing.the-mocking-library` | testing/conventions.md | delete |  |  |
 | `testing.fixtures-for-setup-and-teardown` | testing/conventions.md | guide |  | Guide: `guides/design-and-testing.md` |
 | `testing.narrowest-fixture-scope` | testing/conventions.md | guide |  | Guide: `guides/design-and-testing.md` |
+
+## Acronyms
+
+None.

@@ -2,7 +2,7 @@
 name: update-standards-pin
 description: Bump the dev-playbook standards pin of the consumer repo this session is standing in, landing it on main when the bump stays green and on a PR when it does not.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: xhigh
 ---
 

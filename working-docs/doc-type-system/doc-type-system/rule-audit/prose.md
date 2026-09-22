@@ -462,3 +462,10 @@ tests, including `test_dev_playbook_self_scan_is_clean`, which runs the
 detector over this checkout. Nothing there tests a non-`.md`
 agent-instruction file for voice, which is the gap
 `prose.no-first-person` is escalated for above.
+
+## Acronyms
+
+- **API** — Application Programming Interface.
+- **H1** — markdown heading level one.
+- **H2** — markdown heading level two.
+- **NUL** — the zero byte.

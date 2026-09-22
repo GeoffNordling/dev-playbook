@@ -21,3 +21,7 @@ The work order of the `modules` family agent: every rule under `standards/module
 ## After the rows
 
 Every rule leaves `standards/modules/design.md`, so the family retires, and this order overrides the prompt's one-family limit for the four files it names. Move the lead's definitions of module, interface, and implementation into the lead of `guides/design-and-testing.md`, word for word, then `git rm` `standards/modules/design.md` and `standards/modules/index.md`, remove the `modules/` row from `standards/index.md`, and repoint every link to the two removed files, nine files today including four under `working-docs/software-factory/`, to `guides/design-and-testing.md`, a link with a rule anchor to the Guide heading that now holds that rule's words.
+
+## Acronyms
+
+None.

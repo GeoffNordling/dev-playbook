@@ -281,3 +281,8 @@ rules overlap theirs:
 
 `standards/boundaries.yaml` names no address for this family, which
 follows: an address appears there only once the verifier table names it.
+
+## Acronyms
+
+- **AST** — Abstract Syntax Tree.
+- **CLI** — Command-Line Interface.

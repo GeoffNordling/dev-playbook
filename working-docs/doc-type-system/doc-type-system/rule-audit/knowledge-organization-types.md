@@ -256,3 +256,11 @@ mentions, and `check_local_types`'. The code at those sites emits
 `MAPPING_ENTRY_SHAPE`, `ALPHABETICAL_KEYS` and `ADD_NEVER_SHADOW` instead.
 The ids are defined as module constants precisely so `RULES` cannot drift
 from what is emitted, and it has not; only the prose around them is stale.
+
+## Acronyms
+
+- **H1** — markdown heading level one.
+- **OKF** — Open Knowledge Format.
+- **URI** — Uniform Resource Identifier.
+- **URL** — Uniform Resource Locator.
+- **YAML** — YAML Ain't Markup Language.

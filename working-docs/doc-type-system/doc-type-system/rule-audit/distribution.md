@@ -121,3 +121,7 @@ against the `repo: local` block's detector hooks in both directions under
 manifest against the canonical template's pinned dev-playbook block under
 `standard.offered-by-the-canonical-template`. That second leg constrains
 what the manifest may publish without ever stating the count of one.
+
+## Acronyms
+
+- **URL** — Uniform Resource Locator.

@@ -19,3 +19,7 @@ The work order of the `harness` family agent: every rule under `standards/harnes
 | `harness.one-rule-per-heading` | harness/claude-content.md | keep | stochastic |  |
 | `harness.members` | harness/files.md | rewrite | deterministic | Sentence: Every file under .claude/ or dotfiles/dot-claude/ in a governed repo matches a member row of the table below.<br>Why: Claude Code fixes which files it reads; the table is the workspace's record of that set, and the predicate holds the repo to the table. |
 | `harness.location` | harness/files.md | rewrite | deterministic | Block: the tree block gains the optional `agents/` bundle line the repo already uses. |
+
+## Acronyms
+
+None.

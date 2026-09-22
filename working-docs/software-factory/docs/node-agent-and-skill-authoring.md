@@ -24,9 +24,9 @@ The body is read by an agent running one node who does not know the software fac
 
 ## Robustness
 
-- **Check, don't assume prior-phase state.** A node may be the first to run on a region — check for what you need and establish it if absent.
+- **Check, don't assume prior-phase state.** A node may be the first to run on a region — check for what the node needs and establish it if absent.
 - **Defer rather than scaffold.** An unfinished region is left undone and reported as deferred.
-- **Decide only what's yours.** A node doesn't make calls that belong to the user or an upstream node — it takes them as input; handed a scope, it neither widens nor narrows it.
+- **Decide only what the node owns.** A node doesn't make calls that belong to the user or an upstream node — it takes them as input; handed a scope, it neither widens nor narrows it.
 
 ## Mechanics
 

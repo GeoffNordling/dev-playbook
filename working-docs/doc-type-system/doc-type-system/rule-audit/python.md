@@ -358,3 +358,7 @@ decided by a reviewer. Two of them, `python.module-layout` and
 `python.helper-placement`, are deterministic and mechanical: the audit
 decided both with a short AST walk over `ast.Module.body`, which is what
 a first-party detector would run.
+
+## Acronyms
+
+- **AST** — Abstract Syntax Tree.

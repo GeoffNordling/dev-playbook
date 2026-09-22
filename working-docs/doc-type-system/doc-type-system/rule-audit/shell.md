@@ -244,3 +244,8 @@ Both hooks sit at `commit`, `push`, and `ci` in
 `standards/boundaries.yaml`. `make check` and the CI workflow both run
 `pre-commit run --all-files`, so at push and in CI the two checked rules
 are decided over the whole population, not over the staged files alone.
+
+## Acronyms
+
+- **CI** — Continuous Integration.
+- **H2** — markdown heading level two.

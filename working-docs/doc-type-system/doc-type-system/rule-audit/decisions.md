@@ -280,3 +280,11 @@ decides four rules that `decisions.template` restates:
 `type` value to name a row of the registry table, which carries a
 `Decision-Record` row; it does not require a record to carry that
 particular row.
+
+## Acronyms
+
+- **H1** — markdown heading level one.
+- **H2** — markdown heading level two.
+- **H3** — markdown heading level three.
+- **SHA** — the hash naming one commit.
+- **URL** — Uniform Resource Locator.

@@ -239,3 +239,11 @@ and filters it through `looks_python`; its results drive both
 `location:line: <rule id> message` and prints the `--list-rules` output.
 It decides no rule of this family; it fixes the shape
 `standard.finding-format` and `standard.list-rules` require.
+
+## Acronyms
+
+- **AST** — Abstract Syntax Tree.
+- **CLI** — Command-Line Interface.
+- **JS** — JavaScript.
+- **PEP** — Python Enhancement Proposal.
+- **TOML** — Tom's Obvious Minimal Language.

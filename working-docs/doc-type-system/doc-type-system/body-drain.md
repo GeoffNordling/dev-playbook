@@ -180,3 +180,9 @@ definition of a term the rules use, a diagram, a worked example, the
 reasoning behind a design choice. You delete it from the ruleset all
 the same; the session decides whether it is restored as a guide
 elsewhere. `none` where no body was teaching.
+
+## Acronyms
+
+- **H1** — markdown heading level one.
+- **H2** — markdown heading level two.
+- **H3** — markdown heading level three.

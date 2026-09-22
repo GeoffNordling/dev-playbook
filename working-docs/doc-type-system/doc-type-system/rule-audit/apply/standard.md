@@ -31,3 +31,7 @@ The work order of the `standard` family agent: every rule under `standards/stand
 | `standard.the-statement` | standard/tree.md | keep | deterministic |  |
 | `standard.the-catalog` | standard/tree.md | keep | deterministic |  |
 | `standard.no-shadowing` | standard/tree.md | keep | deterministic |  |
+
+## Acronyms
+
+None.

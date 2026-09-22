@@ -84,3 +84,7 @@ Per row, applied or not. Then: every row you could not apply, with its
 ruling and what the file shows; every `*stands.*` why block that does
 not say what the part says, with both texts; every edit a ruling needed
 outside your family; and what `playbook-lint` said.
+
+## Acronyms
+
+None.

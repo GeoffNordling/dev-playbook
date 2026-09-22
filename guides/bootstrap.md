@@ -26,9 +26,9 @@ on the same GitHub tail and roster enrollment.
    `git init -b main` and `uv lock`, stages everything, installs both
    pre-commit stages, and self-checks the result with `playbook-lint` —
    the same hook it just installed, so a scaffold that would fail its
-   own first commit never reaches you. It fails loud when the target
+   own first commit never reaches the user. It fails loud when the target
    directory already exists or the self-check reports findings.
-2. **Make the first commit.** The first commit is yours to make after
+2. **Make the first commit.** The first commit is the user's to make after
    review; the commit gate runs on it.
 
 ## The existing path: adoption

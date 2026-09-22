@@ -20,3 +20,7 @@ The work order of the `python` family agent: every rule under `standards/python/
 | `python.helper-placement` | python/style.md | delete |  |  |
 | `python.formatted-by-ruff-format` | python/style.md | keep | deterministic |  |
 | `python.annotated-signatures` | python/style.md | delete |  |  |
+
+## Acronyms
+
+None.

@@ -43,3 +43,7 @@ The work order of the `tracking` family agent: every rule under `standards/track
 | `tracking.github-origin` | tracking/repo-settings.md | guide |  | Guide: `guides/repo-settings.md` |
 | `tracking.squash-only-merges` | tracking/repo-settings.md | guide |  | Guide: `guides/repo-settings.md` |
 | `tracking.default-branch-protection` | tracking/repo-settings.md | guide |  | Guide: `guides/repo-settings.md` |
+
+## Acronyms
+
+None.

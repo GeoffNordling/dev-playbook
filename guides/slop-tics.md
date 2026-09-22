@@ -249,7 +249,7 @@ stronger writing and are usually false. The words are "everything", "never",
 **Definition.** Writing aimed at a reader who is about to misunderstand, rather
 than the one actually reading. This is unnecessary bloat.
 
-**Action.** Write for the reader in front of you — someone careful enough to
+**Action.** Write for the reader actually there — someone careful enough to
 follow a single sentence.
 
 **Examples.**

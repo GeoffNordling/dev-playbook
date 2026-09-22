@@ -183,3 +183,7 @@ of its rule ids, `tracking.one-home`, `tracking.entry-shape`, and
 `tracking.structure`, are null in `standards/verifiers.yaml`. Two of the
 family's three breaks are in that unchecked Standard, and both are
 mechanical enough for a lint over `CANDIDATES.md`.
+
+## Acronyms
+
+- **PR** — pull request.

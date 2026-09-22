@@ -2,7 +2,7 @@
 name: runbook-creator
 description: Author a new runbook — a skill bundle or an agent definition — against the workspace's runbook conventions. Use when the user says to create a skill or an agent.
 disable-model-invocation: false
-model: opus
+model: inherit
 effort: xhigh
 arguments: [idea]
 ---

@@ -30,26 +30,14 @@ The two stowed packages each install into the directory they are named for.
 Stow places a package's *contents* in the target, so targeting `$HOME` would
 scatter them one level too high — `scripts/sync-dotfiles` holds the mapping.
 
-## Settings: the live file is the authority
+## Settings
 
 `~/.claude/settings.json` is a stowed symlink to `dot-claude/settings.json`,
-and Claude Code writes settings changes through it (verified 2026-08-28 on
-version 2.1.250): toggle a setting in a session and the change lands in the
-main checkout as an ordinary uncommitted edit, on whatever branch is checked
-out there. The repo is the carrier that syncs settings between machines, not
-a source of authority to enforce — committing and pushing those edits is the
-user's, like any other change.
-
-Two consequences hold the design together:
-
-- **One file serves every machine.** A hook that must not run somewhere
-  guards itself at runtime (`hooks/play-sound`, `hooks/measure-event`)
-  instead of living in a per-machine settings variant.
-- **The one failure left is the symlink itself.** If a future Claude Code
-  version replaces the symlink with a regular file instead of writing through
-  it, the repo silently stops receiving changes —
-  `hooks/session-start-settings-link` checks for exactly that at every
-  session start.
+and Claude Code writes settings changes through it, so a setting toggled in
+a session lands in the main checkout as an ordinary uncommitted edit. Why it
+is kept that way, and the one failure mode a session-start hook watches for,
+are in
+[The Live Settings File Is the Authority](/docs/decisions/0030-the-live-settings-file-is-the-authority.md).
 
 ## Workflow
 

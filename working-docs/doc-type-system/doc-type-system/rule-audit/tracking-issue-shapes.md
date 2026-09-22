@@ -327,3 +327,9 @@ above, from `test_valid_leaf_tuple_and_brief_pass` (line 1172) through
 the fence-stripping cases that keep a quoted template from forging a
 heading. The tests match the code; where the code is weaker than the
 predicate, the tests are weaker in the same place.
+
+## Acronyms
+
+- **H2** — markdown heading level two.
+- **H3** — markdown heading level three.
+- **PR** — pull request.

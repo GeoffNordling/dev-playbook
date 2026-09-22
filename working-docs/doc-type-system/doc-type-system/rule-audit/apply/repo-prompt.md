@@ -49,3 +49,7 @@ a file you own and report one in a file you do not.
 Per bullet, the files edited or why it was left; anything a bullet
 asked for that the file did not allow, with both readings; and what
 `playbook-lint` said.
+
+## Acronyms
+
+None.

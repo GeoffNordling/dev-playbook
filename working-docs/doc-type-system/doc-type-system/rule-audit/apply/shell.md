@@ -21,3 +21,7 @@ The work order of the `shell` family agent: every rule under `standards/shell/`,
 | `shell.no-shebang-no-strict-mode` | shell/conventions.md | keep | deterministic |  |
 | `shell.dialect-directive` | shell/conventions.md | keep | deterministic |  |
 | `shell.bounded-to-shell-integration` | shell/conventions.md | guide |  | Guide: `guides/design-and-testing.md` |
+
+## Acronyms
+
+None.

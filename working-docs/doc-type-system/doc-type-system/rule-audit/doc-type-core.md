@@ -215,3 +215,9 @@ explicitly temporary. It asserts that each `contract-shape.md` holds
 exactly one `python` fence and that the four fences equal the reference
 model's text. It parses nothing as Python and tests no class structure,
 so it does not decide `doc-type.one-base`.
+
+## Acronyms
+
+- **H1** — markdown heading level one.
+- **H2** — markdown heading level two.
+- **H3** — markdown heading level three.

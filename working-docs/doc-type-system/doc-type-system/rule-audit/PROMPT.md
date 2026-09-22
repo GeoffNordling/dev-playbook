@@ -144,3 +144,7 @@ After the frontmatter the report has:
 Use the rule ids exactly as the trailers spell them. Do not invent ids.
 Make no fix yourself; a proposal is a recommendation, and the user
 decides.
+
+## Acronyms
+
+- **H3** — markdown heading level three.

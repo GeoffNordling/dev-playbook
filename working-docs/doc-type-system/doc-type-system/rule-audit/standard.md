@@ -314,3 +314,7 @@ ungated audit, a registered audit that a gate runs after all
 from a fresh render (`standard.the-boundary-table`). Its row set comes from
 the roster and the dependency map rather than from
 `standards/verifiers.yaml`.
+
+## Acronyms
+
+- **H1** — markdown heading level one.

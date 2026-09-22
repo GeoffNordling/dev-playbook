@@ -374,3 +374,9 @@ any path segment is `skills`, `rules`, or `agents`. `github_slug` computes the
 anchor target, `content_lines` and `lines_outside_fences` define what "outside
 a fenced code block" means for the whole family, and `MD_LINK_PATTERN` and
 `WORKSPACE_REF_PATTERN` decide what counts as a link and a bare citation.
+
+## Acronyms
+
+- **ATX** — markdown's `#`-prefixed heading style.
+- **H1** — markdown heading level one.
+- **H3** — markdown heading level three.
