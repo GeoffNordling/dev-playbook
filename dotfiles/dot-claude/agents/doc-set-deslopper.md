@@ -108,8 +108,7 @@ The set slices:
   so no first person never binds it,
   [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
   [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
-  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions),
-  [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
+  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions).
 
 A working set's differences reach the auditors through their own
 definition, which reads Working Documentation Sets whole when the

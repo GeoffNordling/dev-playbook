@@ -182,10 +182,13 @@ specification.
        what the section establishes, so a reader of the headings alone
        knows what the bodies say; a heading that already passes stays,
        a file's headings stay grammatically parallel, bodies untouched;
-       links to the old anchors follow. The four imperative headings
-       of `prose/conventions.md` are wave 3's, held here so one rename
-       settles the file. Then the two tables regenerate again, since a
-       rule's id is its heading's slug.
+       links to the old anchors follow. Heading mood is settled: a
+       heading speaks in the third person, so the four imperative
+       headings of `prose/conventions.md`, held here so one rename
+       settles the file, become propositions like the rest; a Guide
+       step's bold run stays imperative, which `prose.third-person`
+       exempts. Then the two tables regenerate again, since a rule's
+       id is its heading's slug.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
      never refactored together. Take every deterministic predicate of

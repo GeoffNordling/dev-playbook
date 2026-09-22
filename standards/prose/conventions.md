@@ -126,11 +126,17 @@ segment of its path inside the repository is `skills`, `rules`, or `agents`.
 
 ### Third person
 
-A declarative document speaks in the declarative mood and the third person,
-and does not address the reader as `you`, except inside a double-quoted
-utterance.
+A declarative document speaks in the declarative mood and the third
+person, and does not address the reader as `you`. Exempt: a
+double-quoted utterance, and a name an encoding reads from a body as
+an action, such as a Guide step's bold run, which speaks in the
+imperative.
 
 `prose.third-person` · stochastic
+
+> **Why.** A step names an action the reader performs, and the
+> imperative is the mood that names an action; the encoding reads that
+> name out of the body, so it is a name and not the prose around it.
 
 ## Name concepts once, use consistently
 
@@ -181,16 +187,19 @@ the `Considered Options` heading of a Decision Record is exempt.
 
 ## Headings are propositions
 
-Each heading below the H1, and each name an encoding reads from a body
-such as a Guide step's bold run, is a proposition the section
-establishes, written in block language, the register of headlines,
-articles and copulas dropped, in the fewest words that carry it. The
-three forms, over one rule:
+Each heading below the H1 is a proposition the section establishes,
+in the third person; each name an encoding reads from a body as an
+action, such as a Guide step's bold run, is the imperative that names
+the action. Both are written in block language, the register of
+headlines, articles and copulas dropped, in the fewest words that
+carry the point. The heading forms, over one rule:
 
 | Heading | Verdict |
 |---|---|
-| `Judgment, not judgement` | passes: the proposition, in block language |
+| `Judgment, not judgement` | passes: the proposition, its verb dropped |
+| `The prose spells judgment` | passes: the proposition, third person |
 | `Spelling` | fails: the topic named |
+| `Write judgment, not judgement` | fails: the imperative, which addresses the reader |
 | `The prose spells judgment and never the British judgement` | fails: the predicate restated |
 
 `prose.headings-are-propositions` · stochastic
@@ -200,12 +209,3 @@ three forms, over one rule:
 > topic name is only its table of contents, and a restated predicate is
 > a second body.
 
-## Grammatical parallelism
-
-Items that sit together take the same grammatical shape: the headings of a
-document, the bullets of a list, the clauses of a sentence.
-
-`prose.grammatical-parallelism` · stochastic
-
-> **Why.** One form holds throughout, so a break in the pattern marks a
-> break in meaning.
