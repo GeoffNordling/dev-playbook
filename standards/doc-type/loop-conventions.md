@@ -8,7 +8,7 @@ population: "a document typed Loop"
 # Loop Conventions
 
 A document typed `Loop`, under `loops/`
-([Document Types](/standards/knowledge-organization/document-types.md#typed-loop)).
+([Document Types](/standards/knowledge-organization/document-types.md#loop-lives-under-loops)).
 The [Loop doc-type](/doc-types/loop/index.md) declares what a loop is and
 the encoding its file takes,
 [Acts, Checks, and Yields Encoding](/doc-types/loop/encoding.md); a
@@ -78,6 +78,6 @@ the repo.
 
 The link an act's entry holds names a runbook, a skill bundle's
 `SKILL.md` or an agent definition
-([Runbook Conventions](/standards/harness/files.md#location)).
+([Runbook Conventions](/standards/harness/files.md#every-runbook-at-a-fixed-path)).
 
 `doc-type.an-act-links-a-runbook` · deterministic

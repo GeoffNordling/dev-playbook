@@ -229,8 +229,11 @@ specification.
      absorbs what step 11 leaves unchecked, which
      [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md)
      holds whole: the sixteen weak checks with the survey behind them,
-     the thin-shim moves, the `doc-type.one-base` check, and the
-     H2-without-trailer condition shape.
+     the thin-shim moves, the `doc-type.one-base-class` check, and the
+     H2-without-trailer condition shape. A detector may also key on a
+     heading's own text rather than on a rule id, as `okf-lint` finds
+     the type registry by its heading's slug, so the design gives every
+     such coupling one named place.
      - **The design comes first.** Before any detector is rewritten, a
        design document under this strand states the kinds of
        deterministic predicates and the proposed scripts and their

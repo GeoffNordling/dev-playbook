@@ -45,7 +45,7 @@ def test_test_file_off_its_module_mirror_is_flagged(tmp_path: Path) -> None:
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.mirror-source-structure" in result.stdout
+    assert "testing.test-tree-mirrors-the-source-tree" in result.stdout
     assert "tests/test_thing.py" in result.stdout
     assert "tests/pkg/test_thing.py" in result.stdout
 
@@ -92,7 +92,7 @@ def test_test_file_under_an_unrecognized_scope_directory_is_flagged(
     )
     result = run(repo)
     assert result.returncode == 1
-    assert "testing.mirror-source-structure" in result.stdout
+    assert "testing.test-tree-mirrors-the-source-tree" in result.stdout
     assert "tests/helpers/pkg/test_thing.py" in result.stdout
 
 
@@ -145,7 +145,10 @@ def test_mirror_finding_is_file_level_without_a_line(tmp_path: Path) -> None:
         },
     )
     result = run(repo)
-    assert "tests/test_thing.py: testing.mirror-source-structure " in result.stdout
+    assert (
+        "tests/test_thing.py: testing.test-tree-mirrors-the-source-tree "
+        in result.stdout
+    )
 
 
 # --- rule ids and finding format ---
@@ -160,4 +163,4 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    assert result.stdout.split() == ["testing.mirror-source-structure"]
+    assert result.stdout.split() == ["testing.test-tree-mirrors-the-source-tree"]

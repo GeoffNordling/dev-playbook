@@ -27,29 +27,29 @@ The declaration is the `## Types` table of
 `standards/knowledge-organization/document-types.md`, in the repo that
 carries `standards/build/canonical/`.
 
-### Row shape
+### Type name in first cell
 
 Every row of the `## Types` table below its header holds, in its first
 cell, one backticked type name in Title Case, hyphen-joined for a
 multi-word name: `Decision-Record`, `Candidate-List`, `README`.
 
-`knowledge-organization.row-shape` · deterministic
+`knowledge-organization.type-name-in-first-cell` · deterministic
 
-### Row description
+### Description in second cell
 
 Every row of the `## Types` table below its header holds, in its second
 cell, non-empty text on one line.
 
-`knowledge-organization.row-description` · deterministic
+`knowledge-organization.description-in-second-cell` · deterministic
 
 > **Why.** The second cell is a description a reader picks the type by.
 
-### Alphabetical order
+### Rows in alphabetical order
 
 The rows of the `## Types` table are in alphabetical order by type name,
 compared case-insensitively.
 
-`knowledge-organization.alphabetical-order` · deterministic
+`knowledge-organization.rows-in-alphabetical-order` · deterministic
 
 ## Local declaration
 
@@ -65,21 +65,21 @@ okf_types:
   Story: One work-experience story in SPAR form
 ```
 
-### Mapping entry shape
+### Type name to description
 
 Each entry's key is a type name in Title Case, hyphen-joined for a
 multi-word name, and its value is non-empty text on one line.
 
-`knowledge-organization.mapping-entry-shape` · deterministic
+`knowledge-organization.type-name-to-description` · deterministic
 
 > **Why.** The value is a description a reader picks the type by.
 
-### Alphabetical keys
+### Keys in alphabetical order
 
 The keys of the `okf_types` mapping are in alphabetical order by type
 name, compared case-insensitively.
 
-`knowledge-organization.alphabetical-keys` · deterministic
+`knowledge-organization.keys-in-alphabetical-order` · deterministic
 
 ### Add, never shadow
 

@@ -8,7 +8,7 @@ population: "a file typed Standard"
 # Standard Conventions
 
 A file typed `Standard`, under `standards/`
-([Document Types](/standards/knowledge-organization/document-types.md#typed-standard)):
+([Document Types](/standards/knowledge-organization/document-types.md#standard-lives-under-standards)):
 one population and its rules. The
 [Standard doc-type](/doc-types/standard/index.md) declares what a
 Standard is and the encoding its file takes,
@@ -18,26 +18,26 @@ encoding. The tree the file sits in is
 [The Standards Tree](/standards/standard/tree.md).
 
 > **Why.** The verifier table reads a rule by its trailer
-> ([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
+> ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)),
 > so a rule without one is a rule no row of that table can name. A
 > verifier, and a reader, must know the class before the first rule,
 > which is what the one frontmatter phrase gives them. And no
 > verifier, script or judge, returns one value for a predicate that
 > compares two members or asks for taste.
 
-## The population
+## The frontmatter names the population
 
 A file typed `Standard` names the population its rules bind in its
 frontmatter: a `population` key holding one phrase.
 
-`doc-type.the-population` · deterministic
+`doc-type.the-frontmatter-names-the-population` · deterministic
 
 > **Why.** standards-lint reports a Standard without a population. What
 > a detector reports is not part of the predicate, so the clause lives
 > here.
 
 
-## The rule shape
+## A rule: heading, predicate, trailer
 
 Each rule of a Standard is a heading, a first paragraph, at most one
 block or table stating the target state, and last a trailer line,
@@ -48,7 +48,7 @@ heading, is at most one block opening `> **Why.**`. A level-three
 heading sits only under a level-two heading that carries no trailer,
 which scopes it.
 
-`doc-type.the-rule-shape` · deterministic
+`doc-type.a-rule-heading-predicate-trailer` · deterministic
 
 > **Why.** The first paragraph is the predicate every member is held
 > to; the block or table is the target state it compares against. An H2
@@ -57,21 +57,21 @@ which scopes it.
 > and its definition is never repeated in the children.
 
 
-## The document's why
+## The file's why ends the opening prose
 
 The prose between a Standard's level-one heading and its first
 level-two heading ends with at most one block opening `> **Why.**`:
 the argument for the file as a whole, not for any one of its rules.
 
-`doc-type.the-documents-why` · deterministic
+`doc-type.the-files-why-ends-the-opening-prose` · deterministic
 
 
-## Decidable predicates
+## Every predicate decidable of one member
 
 Each rule's predicate is true or false of one member of the population
 at one moment, with no comparison to another member and no taste.
 
-`doc-type.decidable-predicates` · stochastic
+`doc-type.every-predicate-decidable-of-one-member` · stochastic
 
 > **Why.** A predicate is decided from the bytes of the repo at one
 > commit, by reading them or by a pure function of them such as a

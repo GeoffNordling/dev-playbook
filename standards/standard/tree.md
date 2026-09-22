@@ -21,25 +21,25 @@ typed `Standard`, one population and its rules, at
 > `standards/<name>/` on a name dev-playbook publishes would silently
 > override the workspace-scoped standard of that name.
 
-## Directory layout
+## Every subdirectory a Standard directory
 
 Every immediate subdirectory of `standards/` is a Standard directory: it
 holds at least one file typed `Standard`, and every other `.md` file
 under it, `index.md` aside, is typed `Standard`; the only flat `.md`
 files under `standards/` are `README.md` and `index.md`.
 
-`standard.directory-layout` · deterministic
+`standard.every-subdirectory-a-standard-directory` · deterministic
 
-## The statement
+## Directory index opens with the governing sentence
 
 Every Standard directory's `index.md` opens with one sentence,
 `<Name> governs <what> — <the things>`: the Standard's name, the
 question it governs, and the things its rules cover; the catalog row
 repeats that sentence.
 
-`standard.the-statement` · deterministic
+`standard.directory-index-opens-with-the-governing-sentence` · deterministic
 
-## The catalog
+## The catalog lists every directory
 
 A repo carrying a `standards/` tree has a `standards/index.md` listing
 `README.md` first and then every directory, in dev-playbook the
@@ -47,9 +47,9 @@ meta-standard's `standard/` next, the rest alphabetical by name, each
 row carrying its directory index's opening sentence verbatim less the
 period; standards-lint reports the order and a row's wording, and
 okf-lint the membership
-([The listing](/standards/knowledge-organization/indexes.md#the-listing)).
+([One entry per concept document and child directory](/standards/knowledge-organization/indexes.md#one-entry-per-concept-document-and-child-directory)).
 
-`standard.the-catalog` · deterministic
+`standard.the-catalog-lists-every-directory` · deterministic
 
 ## No shadowing
 

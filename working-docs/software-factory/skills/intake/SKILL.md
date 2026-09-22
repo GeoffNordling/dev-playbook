@@ -65,7 +65,7 @@ Per the issue conventions: the build-leaf brief for `mode:direct`, the spike bri
 
 Work routing to `design` still gets the best brief the interview supports; design re-authors it at its exit. An issue parked at `design` is not yet ready — readiness is settled at the approval that releases the issue, not here.
 
-On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#build-headings) requires except `User intent`, then {Run [/user-intent-mini-interview](~/workspace/dev-playbook/working-docs/software-factory/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
+On the **fast path** — a `mode:direct` brief complete here, so no design session will re-author it — draft every build-leaf heading [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#every-build-heading-in-bold) requires except `User intent`, then {Run [/user-intent-mini-interview](~/workspace/dev-playbook/working-docs/software-factory/skills/user-intent-mini-interview/SKILL.md) for that one}, and §5 confirms a whole brief. Work routing to `design` skips the beat and gets it there instead, and a `mode:spike` brief never carries the heading at all.
 
 ### 5. Confirm, then land
 

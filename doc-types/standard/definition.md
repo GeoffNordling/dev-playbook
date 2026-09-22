@@ -82,8 +82,8 @@ upstream standard of that name; the rule and its lint are
 
 Under `standards/`, the one tree reserved for the type; nothing outside
 it claims the label, and okf-lint's
-`knowledge-organization.typed-standard` checks it. Every immediate
+`knowledge-organization.standard-lives-under-standards` checks it. Every immediate
 subdirectory of `standards/` holds at least one file typed `Standard`.
 The layout's rule and its lint are
-[Directory layout](/standards/standard/tree.md#directory-layout); the
+[Every subdirectory a Standard directory](/standards/standard/tree.md#every-subdirectory-a-standard-directory); the
 file forms are [the encoding](/doc-types/standard/encoding.md).

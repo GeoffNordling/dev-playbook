@@ -12,7 +12,7 @@ committed to: a **Candidate** is work described but not yet decided, and
 committed work is a GitHub issue
 ([Issue Shapes](/standards/tracking/issue-shapes.md)). The file is
 optional, one per repo, at the root
-([Root-only files](/standards/build/skeleton.md#root-only-files)), typed
+([One at the root, or none](/standards/build/skeleton.md#one-at-the-root-or-none)), typed
 `Candidate-List`
 ([Document Types](/standards/knowledge-organization/document-types.md));
 its absence means nothing has been recorded yet.
@@ -22,7 +22,7 @@ its absence means nothing has been recorded yet.
 > chosen to build it, and deciding to write its brief is what ends
 > that.
 
-## Entry shape
+## One list item per entry
 
 An entry is one list item: a bolded name, an em dash, then at most two
 sentences, with no fields, no acceptance criteria, and no checkboxes.
@@ -32,14 +32,14 @@ sentences, with no fields, no acceptance criteria, and no checkboxes.
   choose which columns ship.
 ```
 
-`tracking.entry-shape` · deterministic
+`tracking.one-list-item-per-entry` · deterministic
 
 > **Why.** An approach decided this early goes stale before the work
 > starts, and brief furniture — fields, acceptance criteria,
 > checkboxes — is the signal that the brief could be written, and
 > therefore that the work belongs in an issue.
 
-## Structure
+## Every entry under a heading
 
 Every entry sits under a `##` heading, directly or nested under a parent
 entry; a heading groups its entries and carries no other meaning, and a
@@ -71,7 +71,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   nothing.
 ```
 
-`tracking.structure` · stochastic
+`tracking.every-entry-under-a-heading` · stochastic
 
 > **Why.** Neither the order of the headings nor the order of the
 > entries carries meaning, so every merge conflict in this file

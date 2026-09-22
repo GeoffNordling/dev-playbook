@@ -16,7 +16,7 @@ deleted when it ends. Every rule of Documentation Sets and of
 below is the one difference the set adds, stated against the general rule
 it qualifies, and a member is otherwise judged as any member is. A member
 whose type is not yet settled carries `type: General-Sheet`
-([Document Types](/standards/knowledge-organization/document-types.md#types)).
+([Document Types](/standards/knowledge-organization/document-types.md#type-names-a-registered-type)).
 
 The work may split into **strands**, each one line of it with its own
 worklist, held in one member or in one subdirectory with its own
@@ -24,7 +24,7 @@ worklist, held in one member or in one subdirectory with its own
 the set is the whole tree, strands included.
 
 > **Why.** The buckets are a menu,
-> [one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
+> [one home per fact](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact)
 > made navigable: a set uses the buckets its work needs, skips the
 > rest, and coins its own where none fits, so a bucket a set does not
 > use is no finding, and `Unfiled` catches what fits none of them. A
@@ -87,7 +87,7 @@ file: the set's `ROOT.md`, or, where the work splits into strands, the
 
 Every fact in a member of a working documentation set sits under a named
 section, its bucket, the
-[one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
+[one home per fact](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact)
 of that fact inside the member, and a bucket holds facts of its own type
 only; the section under the member's H1, which says what the member is
 and what it is for, is exempt.
@@ -114,7 +114,7 @@ A term coined by the work and used in more than one member of a working
 documentation set is defined in the `Terms` bucket of one `ROOT.md`: the
 root of the smallest strand that holds every member using the term, and
 the set's own root where the term crosses strands, in place of the entry
-[terms that cross sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets)
+[crossing terms in CONTEXT.md](/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd)
 puts in the repo's `CONTEXT.md`.
 
 `knowledge-organization.a-shared-term-in-one-rootmd` · stochastic

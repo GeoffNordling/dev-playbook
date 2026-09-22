@@ -22,16 +22,17 @@ restates the context of its day and is never rewritten; so is a
 `type: Mirror` mirror, upstream text vendored verbatim and never
 edited here. A member's **concern** is the one purpose its frontmatter
 `description` states
-([Document Types](/standards/knowledge-organization/document-types.md#description));
+([Document Types](/standards/knowledge-organization/document-types.md#non-empty-description-no-closing-period));
 a set's concern is its index's introduction
-([Indexes](/standards/knowledge-organization/indexes.md#the-introduction)).
+([Indexes](/standards/knowledge-organization/indexes.md#introduction-between-h1-and-listing)).
 The rules bind the set level, how the members relate to each other and
 to their concerns; what one member holds is [Doc Conventions](/standards/prose/conventions.md)'s.
 Every rule here reads one set: its index, its members, and the index one
 level up and one level down. Two reach farther by their own text,
-[one home](#one-home) into any set and
-[terms that cross sets](#terms-that-cross-sets) into the repo's
-`CONTEXT.md`; a set is otherwise judged with no neighbour's body open.
+[one home per fact](#one-home-per-fact) into any set and
+[crossing terms in CONTEXT.md](#crossing-terms-in-contextmd) into
+the repo's `CONTEXT.md`; a set is otherwise judged with no neighbour's
+body open.
 
 ## An index in every directory
 
@@ -54,22 +55,22 @@ expect.
 
 `knowledge-organization.body-inside-its-concern` · stochastic
 
-## Rows inside the set
+## Rows inside the set's concern
 
 Every row of an index, member or child set, lies inside the concern the
 introduction names: a reader who chose the set from its parent's index
 expects each row they find.
 
-`knowledge-organization.rows-inside-the-set` · stochastic
+`knowledge-organization.rows-inside-the-sets-concern` · stochastic
 
-## One home
+## One home per fact
 
 A fact, rule, or decision has one home, the member whose concern is the
 thing the fact binds and the most general such member where the fact
 still holds; every other document in this repo links there and states
 the fact without its reason.
 
-`knowledge-organization.one-home` · stochastic
+`knowledge-organization.one-home-per-fact` · stochastic
 
 > **Why.** The reason is what drifts, so it is written once, at the
 > home: a second place that argues the fact is a duplicate, while a
@@ -89,9 +90,9 @@ does not.
 
 `knowledge-organization.distinct-from-the-parent` · stochastic
 
-## Terms that cross sets
+## Crossing terms in CONTEXT.md
 
 A term the set coins and a document outside the set uses has an entry in
 the repo's `CONTEXT.md`.
 
-`knowledge-organization.terms-that-cross-sets` · stochastic
+`knowledge-organization.crossing-terms-in-contextmd` · stochastic

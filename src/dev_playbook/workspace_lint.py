@@ -65,19 +65,21 @@ from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 # raw literal, and RULES (what --list-rules prints) cannot drift from what the
 # detector actually emits.
 SQUASH_ONLY_MERGES = "tracking.squash-only-merges"
-DEFAULT_BRANCH_PROTECTION = "tracking.default-branch-protection"
-GITHUB_ORIGIN = "tracking.github-origin"
-VALID_LABELS = "tracking.valid-labels"
+DEFAULT_BRANCH_PROTECTION = (
+    "tracking.default-branch-protected-from-destructive-operations"
+)
+GITHUB_ORIGIN = "tracking.origin-on-github"
+VALID_LABELS = "tracking.exactly-the-labels-the-scheme-declares"
 CLOSED_FENCES = "tracking.closed-fences"
-BUILD_LABELS = "tracking.build-labels"
-BUILD_HEADINGS = "tracking.build-headings"
-SPIKE_LABELS = "tracking.spike-labels"
-SPIKE_HEADINGS = "tracking.spike-headings"
-SESSION_LABELS = "tracking.session-labels"
-SESSION_HEADINGS = "tracking.session-headings"
+BUILD_LABELS = "tracking.one-label-from-each-prefix"
+BUILD_HEADINGS = "tracking.every-build-heading-in-bold"
+SPIKE_LABELS = "tracking.one-label-from-each-prefix-tests-fixed-at-no"
+SPIKE_HEADINGS = "tracking.summary-question-and-deliverable"
+SESSION_LABELS = "tracking.one-category-label-no-phase-or-tests"
+SESSION_HEADINGS = "tracking.every-session-heading-in-bold"
 CATEGORY_ONLY = "tracking.category-only"
-WAYFINDER_LABELS = "tracking.wayfinder-labels"
-WAYFINDER_BODY = "tracking.wayfinder-body"
+WAYFINDER_LABELS = "tracking.one-wayfinder-label-and-nothing-else"
+WAYFINDER_BODY = "tracking.map-sections-ticket-question"
 
 RULES = (
     SQUASH_ONLY_MERGES,

@@ -21,31 +21,31 @@ when the document is relevant.
 > could copy the descriptions, but the introduction and the order are
 > the writer's judgment.
 
-## Typeless
+## No OKF type
 
 An `index.md` carries no OKF `type`.
 
-`knowledge-organization.typeless` · deterministic
+`knowledge-organization.no-okf-type` · deterministic
 
-## The introduction
+## Introduction between H1 and listing
 
 An `index.md` holds prose between its H1 and its first listed entry.
 
-`knowledge-organization.the-introduction` · deterministic
+`knowledge-organization.introduction-between-h1-and-listing` · deterministic
 
-## The opening sentence
+## Opening sentence names what the directory holds
 
 The introduction of an `index.md` opens with a single sentence naming
 what the directory holds, in that directory's own vocabulary; where the
 listing's sole entry carries a `description` that already says what the
 directory holds, the sentence says what the directory is for instead.
 
-`knowledge-organization.the-opening-sentence` · stochastic
+`knowledge-organization.opening-sentence-names-what-the-directory-holds` · stochastic
 
 > **Why.** Restating the path is no introduction: "the files in
 > `standards/`" tells a reader nothing the H1 did not.
 
-## The listing
+## One entry per concept document and child directory
 
 An `index.md` lists, as a bullet holding a root-absolute markdown link
 and exactly once each, every
@@ -53,9 +53,9 @@ concept document in its own directory and every child directory's own
 `index.md`, and lists nothing else; each concept document's entry
 carries that document's frontmatter `description` verbatim.
 
-`knowledge-organization.the-listing` · deterministic
+`knowledge-organization.one-entry-per-concept-document-and-child-directory` · deterministic
 
-## Ordering
+## Alphabetical unless declared otherwise
 
 Within each group of an `index.md`'s listing, the concept documents and
 then the child-directory links, entries are in alphabetical order by
@@ -65,7 +65,7 @@ first entry of the whole listing; an introduction line beginning
 alphabetical order of both groups and never the `README.md` entry's
 place.
 
-`knowledge-organization.ordering` · deterministic
+`knowledge-organization.alphabetical-unless-declared-otherwise` · deterministic
 
 > **Why.** A reader cannot tell unstated meaning from randomness, so
 > an order that means something declares itself.

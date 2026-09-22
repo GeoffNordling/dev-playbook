@@ -25,7 +25,7 @@ when a file changes:
 - **Node** — the filename, verbatim. A set's directory keeps its
   trailing slash.
 - **Edge** — a row of the index, in listing order
-  ([the listing](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#the-listing)):
+  ([one entry per concept document and child directory](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#one-entry-per-concept-document-and-child-directory)):
   `index.md` at the top, its members beneath it. A link never makes an
   edge, since a link reaches any file in any set.
 - **Parent** — the directory of the index one level up, as one node

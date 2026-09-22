@@ -42,45 +42,45 @@ and its directory is a row of [doc-types/index.md](/doc-types/index.md).
 > frontmatter `type`: `Skill` and `Agent definition` are rulings onto
 > Runbook.
 
-## A verb set
+## Verbs are the operations
 
 `definition.md` states the doc-type's verbs, a non-empty set of single
 words, and the `operations` of the class in `contract-shape.md` is the
 same set.
 
-`doc-type.a-verb-set` · stochastic
+`doc-type.verbs-are-the-operations` · stochastic
 
 > **Why.** The verbs are the doc-type's API. Two doc-types may share a
 > verb; the Standard says so by having no rule against it.
 
-## One base
+## One base class
 
 `contract-shape.md` holds one class that extends `DocType`, declaring
 `operations` and `frontmatter`; every other class in its block is
 nested inside that one, extends nothing, and declares no operations.
 
-`doc-type.one-base` · deterministic
+`doc-type.one-base-class` · deterministic
 
 > **Why.** One class per doc-type keeps the blocks a module a reader
 > holds in mind; a part is a class nested in its DocType, so that a
 > Rule or an Edge is never mistaken for a doc-type.
 
-## A composition rule
+## What an instance may point at
 
 `contract-shape.md` states what an instance may point at, which
 doc-types and which Targets, and how many of each.
 
-`doc-type.a-composition-rule` · stochastic
+`doc-type.what-an-instance-may-point-at` · stochastic
 
 > **Why.** What an instance may point at is what a reader, and a later
 > extractor, checks a pointer against.
 
-## An encoding
+## Each construct maps to one class part
 
 `encoding.md` maps each markdown construct an instance uses to one part
 of the class in `contract-shape.md`.
 
-`doc-type.an-encoding` · stochastic
+`doc-type.each-construct-maps-to-one-class-part` · stochastic
 
 > **Why.** Without a map from markdown to the class, an instance is
 > prose and the contract shape is decoration.
@@ -95,11 +95,11 @@ that every file of the type is a member of it.
 > **Why.** The shape never binds; a Standard does. A doc-type whose
 > instances no Standard covers has a contract nobody is held to.
 
-## One sentence
+## One sentence says what an instance is
 
 `definition.md` opens with one sentence that says what one instance is.
 
-`doc-type.one-sentence` · stochastic
+`doc-type.one-sentence-says-what-an-instance-is` · stochastic
 
 > **Why.** The sentence is the test a reader applies to a file before
 > the encoding is consulted: is this one of these.

@@ -256,13 +256,13 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert result.returncode == 0, result.stderr
     ids = set(result.stdout.split())
     assert "tracking.squash-only-merges" in ids
-    assert "tracking.github-origin" in ids
+    assert "tracking.origin-on-github" in ids
     # the tracking and software-factory rules this slice adds
-    assert "tracking.valid-labels" in ids
-    assert "tracking.build-headings" in ids
+    assert "tracking.exactly-the-labels-the-scheme-declares" in ids
+    assert "tracking.every-build-heading-in-bold" in ids
     assert "tracking.category-only" in ids
-    assert "tracking.build-labels" in ids
-    assert "tracking.session-labels" in ids
+    assert "tracking.one-label-from-each-prefix" in ids
+    assert "tracking.one-category-label-no-phase-or-tests" in ids
     assert all(
         rule.split(".")[0] in {"tracking", "distribution", "software-factory"}
         for rule in ids
@@ -480,7 +480,7 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.github-origin no GitHub origin; settings unchecked"
+        "alpha: tracking.origin-on-github no GitHub origin; settings unchecked"
         in result.stdout
     )
 
@@ -518,11 +518,11 @@ def test_unprotected_default_branch_is_two_findings(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protection main is not protected against force-push"
+        "alpha: tracking.default-branch-protected-from-destructive-operations main is not protected against force-push"
         in result.stdout
     )
     assert (
-        "alpha: tracking.default-branch-protection main is not protected against deletion"
+        "alpha: tracking.default-branch-protected-from-destructive-operations main is not protected against deletion"
         in result.stdout
     )
 
@@ -623,7 +623,7 @@ def test_unreadable_rules_are_surfaced_not_read_as_unprotected(tmp_path: Path) -
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protection rules unreachable via gh api (me/alpha)"
+        "alpha: tracking.default-branch-protected-from-destructive-operations rules unreachable via gh api (me/alpha)"
         in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -649,7 +649,7 @@ def test_bypass_actor_on_the_guarding_ruleset_is_a_finding(tmp_path: Path) -> No
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protection ruleset 'protect-main' grants bypass "
+        "alpha: tracking.default-branch-protected-from-destructive-operations ruleset 'protect-main' grants bypass "
         "to 2 actors (want none)" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -694,7 +694,7 @@ def test_protection_under_another_name_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protection main is protected by 'no-touchy', "
+        "alpha: tracking.default-branch-protected-from-destructive-operations main is protected by 'no-touchy', "
         "not by the canonical 'protect-main'" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -765,7 +765,7 @@ def test_unreadable_ruleset_is_surfaced_not_read_as_bypassless(
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protection a ruleset protecting main could not "
+        "alpha: tracking.default-branch-protected-from-destructive-operations a ruleset protecting main could not "
         "be read" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -818,13 +818,16 @@ def test_the_required_rules_may_be_split_across_rulesets(tmp_path: Path) -> None
 
 
 def test_repo_without_origin_draws_one_finding_not_two(tmp_path: Path) -> None:
-    # tracking.github-origin already says the origin is missing; protection stays quiet
+    # tracking.origin-on-github already says the origin is missing; protection stays quiet
     # rather than reporting the same absent repo a second time.
     ws = tmp_path / "ws"
     make_workspace_repo(ws, "alpha", {"README.md": "# A\n"})
     gh_dir, gh_data = make_fake_gh(tmp_path, {})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
-    assert "tracking.default-branch-protection" not in result.stdout
+    assert (
+        "tracking.default-branch-protected-from-destructive-operations"
+        not in result.stdout
+    )
     assert len(result.stdout.strip().splitlines()) == 1
 
 
@@ -860,14 +863,17 @@ def full_mode_repo(
 def test_conformant_labels_raise_no_label_finding(tmp_path: Path) -> None:
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=canonical_label_objects())
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "tracking.valid-labels" not in result.stdout
+    assert "tracking.exactly-the-labels-the-scheme-declares" not in result.stdout
 
 
 def test_missing_canonical_label_is_a_finding(tmp_path: Path) -> None:
     labels = [obj for obj in canonical_label_objects() if obj["name"] != "mode:spike"]
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.valid-labels missing label mode:spike" in result.stdout
+    assert (
+        "alpha: tracking.exactly-the-labels-the-scheme-declares missing label mode:spike"
+        in result.stdout
+    )
     assert result.returncode == 1
 
 
@@ -876,7 +882,7 @@ def test_drifted_label_color_is_a_finding(tmp_path: Path) -> None:
     labels[0] = dict(labels[0], color="ff0000")
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.valid-labels" in result.stdout
+    assert "alpha: tracking.exactly-the-labels-the-scheme-declares" in result.stdout
     assert labels[0]["name"] in result.stdout
 
 
@@ -885,7 +891,7 @@ def test_drifted_label_description_is_a_finding(tmp_path: Path) -> None:
     labels[0] = dict(labels[0], description="wrong")
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.valid-labels" in result.stdout
+    assert "alpha: tracking.exactly-the-labels-the-scheme-declares" in result.stdout
     assert labels[0]["name"] in result.stdout
 
 
@@ -896,7 +902,10 @@ def test_unexpected_label_is_a_finding(tmp_path: Path) -> None:
     ]
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.valid-labels unexpected label wip" in result.stdout
+    assert (
+        "alpha: tracking.exactly-the-labels-the-scheme-declares unexpected label wip"
+        in result.stdout
+    )
 
 
 # --- blocked labels (own rule, overlapping the closed world by design) ---
@@ -912,7 +921,8 @@ def test_blocked_label_is_an_unexpected_label(tmp_path: Path) -> None:
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
     assert (
-        "alpha: tracking.valid-labels unexpected label status:Blocked" in result.stdout
+        "alpha: tracking.exactly-the-labels-the-scheme-declares unexpected label status:Blocked"
+        in result.stdout
     )
 
 
@@ -1048,21 +1058,21 @@ def run_with_issue(tmp_path: Path, one: dict) -> subprocess.CompletedProcess:
 
 def test_valid_leaf_tuple_and_brief_pass(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(1, VALID_DIRECT, body=BUILD_BODY))
-    assert "tracking.build-labels" not in result.stdout
-    assert "tracking.build-headings" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
     assert "tracking.category-only" not in result.stdout
 
 
 def test_untriaged_issue_is_out_of_scope(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(2, ["phase:intake"], body=""))
-    assert "tracking.build-labels" not in result.stdout
-    assert "tracking.build-headings" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "tests:no", "phase:build"]
     result = run_with_issue(tmp_path, issue(7, labels, body=BUILD_BODY))
-    assert "alpha: tracking.build-labels" in result.stdout
+    assert "alpha: tracking.one-label-from-each-prefix" in result.stdout
     assert "#7" in result.stdout
     assert "mode" in result.stdout
 
@@ -1070,21 +1080,23 @@ def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
 def test_leaf_invalid_phase_value_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:direct", "tests:no", "phase:frobnicate"]
     result = run_with_issue(tmp_path, issue(8, labels, body=BUILD_BODY))
-    assert "alpha: tracking.build-labels" in result.stdout
+    assert "alpha: tracking.one-label-from-each-prefix" in result.stdout
     assert "phase" in result.stdout
 
 
 def test_leaf_invalid_mode_value_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:frobnicate", "tests:yes", "phase:build"]
     result = run_with_issue(tmp_path, issue(9, labels, body=BUILD_BODY))
-    assert "alpha: tracking.build-labels" in result.stdout
+    assert "alpha: tracking.one-label-from-each-prefix" in result.stdout
     assert "mode:frobnicate is not a scheme value" in result.stdout
 
 
 def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:yes", "phase:spike"]
     result = run_with_issue(tmp_path, issue(10, labels, body=SPIKE_BODY))
-    assert "alpha: tracking.spike-labels" in result.stdout
+    assert (
+        "alpha: tracking.one-label-from-each-prefix-tests-fixed-at-no" in result.stdout
+    )
     assert "tests:no" in result.stdout
 
 
@@ -1093,7 +1105,7 @@ def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(3, labels, sub_issues_total=4))
     assert "alpha: tracking.category-only" in result.stdout
     assert "#3" in result.stdout
-    assert "tracking.build-labels" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
@@ -1110,7 +1122,7 @@ def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(12, labels, sub_issues_total=3))
     assert "alpha: tracking.category-only" in result.stdout
     assert "#12" in result.stdout
-    assert "tracking.build-labels" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_epic_without_category_label_is_a_finding(tmp_path: Path) -> None:
@@ -1148,9 +1160,9 @@ VALID_SESSION = ["category:extension", "mode:session"]
 
 def test_wellformed_session_leaf_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(40, VALID_SESSION, body=SESSION_BODY))
-    assert "tracking.session-labels" not in result.stdout
-    assert "tracking.session-headings" not in result.stdout
-    assert "tracking.build-labels" not in result.stdout
+    assert "tracking.one-category-label-no-phase-or-tests" not in result.stdout
+    assert "tracking.every-session-heading-in-bold" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
     assert result.returncode == 0, result.stdout + result.stderr
 
 
@@ -1159,7 +1171,7 @@ def test_session_leaf_is_checked_without_a_phase_label(tmp_path: Path) -> None:
     # branch is what makes the brief visible to the audit at all.
     body = SESSION_BODY.replace("**Acceptance criteria:** a\n\n", "")
     result = run_with_issue(tmp_path, issue(41, VALID_SESSION, body=body))
-    assert "alpha: tracking.session-headings" in result.stdout
+    assert "alpha: tracking.every-session-heading-in-bold" in result.stdout
     assert "Acceptance criteria" in result.stdout
 
 
@@ -1172,35 +1184,35 @@ def test_session_leaf_never_needs_the_factory_only_headings(tmp_path: Path) -> N
 def test_session_leaf_with_phase_label_is_a_finding(tmp_path: Path) -> None:
     labels = [*VALID_SESSION, "phase:build"]
     result = run_with_issue(tmp_path, issue(43, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-labels" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "phase:build" in result.stdout
-    assert "tracking.build-labels" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_session_leaf_with_tests_label_is_a_finding(tmp_path: Path) -> None:
     labels = [*VALID_SESSION, "tests:no"]
     result = run_with_issue(tmp_path, issue(44, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-labels" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "tests:no" in result.stdout
 
 
 def test_session_leaf_with_second_mode_is_a_finding(tmp_path: Path) -> None:
     labels = [*VALID_SESSION, "mode:direct"]
     result = run_with_issue(tmp_path, issue(45, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-labels" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "mode:direct" in result.stdout
 
 
 def test_session_leaf_without_category_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(46, ["mode:session"], body=SESSION_BODY))
-    assert "alpha: tracking.session-labels" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "missing category" in result.stdout
 
 
 def test_session_leaf_with_invalid_category_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:frobnicate", "mode:session"]
     result = run_with_issue(tmp_path, issue(47, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-labels" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "category:frobnicate" in result.stdout
 
 
@@ -1210,7 +1222,7 @@ def test_epic_carrying_mode_session_is_an_epic_finding(tmp_path: Path) -> None:
         tmp_path, issue(48, VALID_SESSION, body="", sub_issues_total=2)
     )
     assert "alpha: tracking.category-only" in result.stdout
-    assert "tracking.session-labels" not in result.stdout
+    assert "tracking.one-category-label-no-phase-or-tests" not in result.stdout
 
 
 # --- wayfinder species: the map and the decision ticket ---
@@ -1226,7 +1238,7 @@ def test_wellformed_map_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(16, ["wayfinder:map"], body=MAP_BODY, sub_issues_total=3)
     )
-    assert "tracking.wayfinder-labels" not in result.stdout
+    assert "tracking.one-wayfinder-label-and-nothing-else" not in result.stdout
     assert "tracking.category-only" not in result.stdout
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -1236,8 +1248,8 @@ def test_map_is_told_by_its_label_not_by_having_children(tmp_path: Path) -> None
     result = run_with_issue(
         tmp_path, issue(17, ["wayfinder:map"], body=MAP_BODY, sub_issues_total=0)
     )
-    assert "tracking.wayfinder-labels" not in result.stdout
-    assert "tracking.build-labels" not in result.stdout
+    assert "tracking.one-wayfinder-label-and-nothing-else" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_map_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
@@ -1245,7 +1257,7 @@ def test_map_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(18, labels, body=MAP_BODY, sub_issues_total=2)
     )
-    assert "alpha: tracking.wayfinder-labels" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "#18" in result.stdout
     assert "category:extension" in result.stdout
     assert "phase:build" in result.stdout
@@ -1256,7 +1268,7 @@ def test_map_missing_a_body_section_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(19, ["wayfinder:map"], body=body, sub_issues_total=2)
     )
-    assert "alpha: tracking.wayfinder-body" in result.stdout
+    assert "alpha: tracking.map-sections-ticket-question" in result.stdout
     assert "Not yet specified" in result.stdout
 
 
@@ -1265,7 +1277,7 @@ def test_map_also_carrying_a_ticket_type_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(21, labels, body=MAP_BODY, sub_issues_total=2)
     )
-    assert "alpha: tracking.wayfinder-labels" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "a map is not a ticket" in result.stdout
 
 
@@ -1273,8 +1285,8 @@ def test_wellformed_ticket_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(22, ["wayfinder:research"], body=TICKET_BODY)
     )
-    assert "tracking.wayfinder-labels" not in result.stdout
-    assert "tracking.build-labels" not in result.stdout
+    assert "tracking.one-wayfinder-label-and-nothing-else" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
     assert result.returncode == 0, result.stdout + result.stderr
 
 
@@ -1283,21 +1295,21 @@ def test_ticket_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
     # gate entirely; it is now checked against its own contract.
     labels = ["wayfinder:grilling", "mode:direct", "tests:no"]
     result = run_with_issue(tmp_path, issue(23, labels, body=TICKET_BODY))
-    assert "alpha: tracking.wayfinder-labels" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "#23" in result.stdout
     assert "a decision ticket carries no factory label" in result.stdout
 
 
 def test_ticket_missing_its_question_section_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(24, ["wayfinder:task"], body=""))
-    assert "alpha: tracking.wayfinder-body" in result.stdout
+    assert "alpha: tracking.map-sections-ticket-question" in result.stdout
     assert "Question" in result.stdout
 
 
 def test_ticket_with_two_wayfinder_labels_is_a_finding(tmp_path: Path) -> None:
     labels = ["wayfinder:research", "wayfinder:grilling"]
     result = run_with_issue(tmp_path, issue(25, labels, body=TICKET_BODY))
-    assert "alpha: tracking.wayfinder-labels" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "multiple wayfinder labels" in result.stdout
 
 
@@ -1305,7 +1317,7 @@ def test_ticket_with_an_out_of_scheme_type_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(26, ["wayfinder:frobnicate"], body=TICKET_BODY)
     )
-    assert "alpha: tracking.wayfinder-labels" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "is not a scheme value" in result.stdout
 
 
@@ -1356,7 +1368,7 @@ def test_issue_missing_labels_key_is_surfaced_not_silently_skipped(
 def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     body = BUILD_BODY.replace("**Out of scope:** o\n", "")
     result = run_with_issue(tmp_path, issue(5, VALID_DIRECT, body=body))
-    assert "alpha: tracking.build-headings" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Out of scope" in result.stdout
 
 
@@ -1366,7 +1378,7 @@ def test_build_leaf_missing_user_intent_is_a_finding(tmp_path: Path) -> None:
     # choose among permitted fixes.
     body = BUILD_BODY.replace("**User intent:** i\n\n", "")
     result = run_with_issue(tmp_path, issue(32, VALID_DIRECT, body=body))
-    assert "alpha: tracking.build-headings" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "User intent" in result.stdout
 
 
@@ -1376,7 +1388,7 @@ def test_build_leaf_missing_prohibited_surfaces_is_a_finding(tmp_path: Path) -> 
     # second deviation limiter mechanical rather than a judgment call.
     body = BUILD_BODY.replace("**Prohibited surfaces:** none\n\n", "")
     result = run_with_issue(tmp_path, issue(37, VALID_DIRECT, body=body))
-    assert "alpha: tracking.build-headings" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Prohibited surfaces" in result.stdout
 
 
@@ -1384,7 +1396,7 @@ def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:no", "phase:spike"]
     body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
     result = run_with_issue(tmp_path, issue(6, labels, body=body))
-    assert "alpha: tracking.spike-headings" in result.stdout
+    assert "alpha: tracking.summary-question-and-deliverable" in result.stdout
     assert "Deliverable" in result.stdout
 
 
@@ -1398,7 +1410,7 @@ def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
         "**Prohibited surfaces**: none\n\n**Out of scope**: o\n"
     )
     result = run_with_issue(tmp_path, issue(31, VALID_DIRECT, body=body))
-    assert "tracking.build-headings" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def test_heading_only_inside_a_code_fence_is_a_finding(tmp_path: Path) -> None:
@@ -1409,7 +1421,7 @@ def test_heading_only_inside_a_code_fence_is_a_finding(tmp_path: Path) -> None:
         "```markdown\n**Out of scope:** the template's line\n```\n",
     )
     result = run_with_issue(tmp_path, issue(33, VALID_DIRECT, body=body))
-    assert "alpha: tracking.build-headings" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Out of scope" in result.stdout
 
 
@@ -1423,7 +1435,7 @@ def test_headings_beside_a_quoted_template_pass(tmp_path: Path) -> None:
         "**User intent:**\nWhy this issue exists.\n```\nnested fence\n```\n````\n"
     )
     result = run_with_issue(tmp_path, issue(34, VALID_DIRECT, body=body))
-    assert "tracking.build-headings" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def test_heading_inside_a_nested_fence_does_not_forge(tmp_path: Path) -> None:
@@ -1436,7 +1448,7 @@ def test_heading_inside_a_nested_fence_does_not_forge(tmp_path: Path) -> None:
         "```\n**Out of scope:** forged\n```\n````\n"
     )
     result = run_with_issue(tmp_path, issue(35, VALID_DIRECT, body=body))
-    assert "alpha: tracking.build-headings" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Out of scope" in result.stdout
 
 
@@ -1459,8 +1471,8 @@ def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(11, ["phase:build"], body="", pull_request=True)
     )
-    assert "tracking.build-labels" not in result.stdout
-    assert "tracking.build-headings" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def _add_origin(repo: Path, url: str) -> None:

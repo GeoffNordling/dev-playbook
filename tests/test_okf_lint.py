@@ -36,7 +36,7 @@ BASE_BUNDLE: dict[str, str] = {
     "standards/knowledge-organization/document-types.md": (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
-        "# Document Types\n\n## Types\n\n"
+        "# Document Types\n\n## `type` names a registered type\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Guide` | teaching |\n| `Loop` | drives |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
@@ -82,7 +82,7 @@ def run_okf_lint(
 UPSTREAM_REGISTRY = (
     "---\ntype: Standard\ntitle: Document Types\n"
     "description: The document type registry\n---\n\n"
-    "# Document Types\n\n## Types\n\n"
+    "# Document Types\n\n## `type` names a registered type\n\n"
     "| Type | What it is |\n|------|------------|\n"
     "| `Guide` | teaching |\n| `README` | landing |\n"
     "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
@@ -221,7 +221,7 @@ def test_standard_outside_standards_dir_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "knowledge-organization.typed-standard" in result.stdout
+    assert "knowledge-organization.standard-lives-under-standards" in result.stdout
     assert "ops.md" in result.stdout
     assert "'Standard' lives under standards/" in result.stdout
 
@@ -239,7 +239,7 @@ def test_guide_outside_guides_dir_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "knowledge-organization.typed-guide" in result.stdout
+    assert "knowledge-organization.guide-lives-under-guides" in result.stdout
     assert "ops.md" in result.stdout
     assert "'Guide' lives under guides/" in result.stdout
 
@@ -259,7 +259,7 @@ def test_loop_outside_loops_dir_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "knowledge-organization.typed-loop" in result.stdout
+    assert "knowledge-organization.loop-lives-under-loops" in result.stdout
     assert "tidy.md" in result.stdout
     assert "'Loop' lives under loops/" in result.stdout
 
@@ -339,7 +339,7 @@ def test_directory_of_concept_docs_without_an_index_is_flagged(tmp_path: Path) -
 
 def test_index_without_an_introduction_is_flagged(tmp_path: Path) -> None:
     """An index.md opens with prose between its H1 and its first entry; one that
-    goes straight to the listing is a `knowledge-organization.the-introduction`
+    goes straight to the listing is a `knowledge-organization.introduction-between-h1-and-listing`
     finding."""
     index = (
         "# standards/ — index\n\n"
@@ -352,7 +352,8 @@ def test_index_without_an_introduction_is_flagged(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "standards/index.md: knowledge-organization.the-introduction" in result.stdout
+        "standards/index.md: knowledge-organization.introduction-between-h1-and-listing"
+        in result.stdout
     )
 
 
@@ -371,7 +372,8 @@ def test_ordering_marker_alone_is_not_an_introduction(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "standards/index.md: knowledge-organization.the-introduction" in result.stdout
+        "standards/index.md: knowledge-organization.introduction-between-h1-and-listing"
+        in result.stdout
     )
 
 
@@ -473,7 +475,7 @@ def test_malformed_frontmatter_is_flagged_and_siblings_still_lint(
 
     assert result.returncode == 1
     assert "standards/README.md" in result.stdout
-    assert "knowledge-organization.frontmatter-block" in result.stdout
+    assert "knowledge-organization.frontmatter-a-yaml-mapping" in result.stdout
     # The malformed doc did not abort the scan: the sibling problem is caught too.
     assert "missing 'type'" in result.stdout
 
@@ -602,8 +604,11 @@ def test_consumer_mode_conformant_bundle_is_clean(tmp_path: Path) -> None:
     result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "knowledge-organization.row-shape" not in result.stdout
-    assert "knowledge-organization.ordering" not in result.stdout
+    assert "knowledge-organization.type-name-in-first-cell" not in result.stdout
+    assert (
+        "knowledge-organization.alphabetical-unless-declared-otherwise"
+        not in result.stdout
+    )
 
 
 def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
@@ -621,8 +626,11 @@ def test_consumer_mode_bogus_type_is_flagged(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "not in the registry" in result.stdout
-    assert "knowledge-organization.row-shape" not in result.stdout
-    assert "knowledge-organization.ordering" not in result.stdout
+    assert "knowledge-organization.type-name-in-first-cell" not in result.stdout
+    assert (
+        "knowledge-organization.alphabetical-unless-declared-otherwise"
+        not in result.stdout
+    )
 
 
 def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> None:
@@ -634,7 +642,7 @@ def test_consumer_mode_resolves_upstream_from_pinned_root(tmp_path: Path) -> Non
     upstream_doc = (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
-        "# Document Types\n\n## Types\n\n"
+        "# Document Types\n\n## `type` names a registered type\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Landmark` | a bespoke upstream-only type |\n| `README` | landing |\n"
     )
@@ -803,14 +811,14 @@ def test_local_type_without_a_description_is_flagged(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "index.md: knowledge-organization.mapping-entry-shape local type `Gizmo` has no "
+        "index.md: knowledge-organization.type-name-to-description local type `Gizmo` has no "
         "one-line description" in result.stdout
     ), result.stdout
 
 
 def test_local_type_key_that_is_not_a_type_name_is_flagged(tmp_path: Path) -> None:
     """A key that is not a Title-Case hyphen-joined name is a `registry-row`
-    finding, the same Row shape rule the upstream `## Types` table obeys."""
+    finding, the same Row shape rule the upstream `## `type` names a registered type` table obeys."""
     repo = make_local_types_bundle(
         tmp_path, {"index.md": root_index_declaring("  bogus name: nonsense\n")}
     )
@@ -819,14 +827,14 @@ def test_local_type_key_that_is_not_a_type_name_is_flagged(tmp_path: Path) -> No
 
     assert result.returncode == 1
     assert (
-        "index.md: knowledge-organization.mapping-entry-shape 'okf_types' key "
+        "index.md: knowledge-organization.type-name-to-description 'okf_types' key "
         "'bogus name' is not a Title-Case, hyphen-joined type name" in result.stdout
     ), result.stdout
 
 
 def test_local_types_out_of_alphabetical_order_are_flagged(tmp_path: Path) -> None:
     """okf_types keys are held to the same alphabetical order as the upstream
-    `## Types` table."""
+    `## `type` names a registered type` table."""
     repo = make_local_types_bundle(
         tmp_path,
         {
@@ -840,7 +848,7 @@ def test_local_types_out_of_alphabetical_order_are_flagged(tmp_path: Path) -> No
 
     assert result.returncode == 1
     assert (
-        "index.md: knowledge-organization.alphabetical-keys 'okf_types' keys are not "
+        "index.md: knowledge-organization.keys-in-alphabetical-order 'okf_types' keys are not "
         "in alphabetical order" in result.stdout
     ), result.stdout
 
@@ -861,7 +869,7 @@ def test_okf_types_that_is_not_a_mapping_degrades_to_a_finding(tmp_path: Path) -
 
     assert result.returncode == 1
     assert (
-        "index.md: knowledge-organization.mapping-entry-shape 'okf_types' is not a "
+        "index.md: knowledge-organization.type-name-to-description 'okf_types' is not a "
         "mapping of type name to description" in result.stdout
     ), result.stdout
     # The broken declaration did not abort the scan: the sibling bogus type is
@@ -870,7 +878,7 @@ def test_okf_types_that_is_not_a_mapping_degrades_to_a_finding(tmp_path: Path) -
 
 
 def test_apex_mode_ignores_okf_types(tmp_path: Path) -> None:
-    """okf_types is consumer-only. In apex mode the tree's own `## Types` table is
+    """okf_types is consumer-only. In apex mode the tree's own `## `type` names a registered type` table is
     the sole source of truth, so a doc typed with a name only okf_types declares
     is still not in the registry."""
     index = (
@@ -890,7 +898,7 @@ def test_apex_mode_ignores_okf_types(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "gizmo.md: knowledge-organization.types type 'Gizmo' not in the registry"
+        "gizmo.md: knowledge-organization.type-names-a-registered-type type 'Gizmo' not in the registry"
         in result.stdout
     ), result.stdout
 
@@ -907,23 +915,23 @@ def test_list_rules_prints_namespaced_ids_from_any_cwd(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stderr
     ids = result.stdout.split()
-    assert "knowledge-organization.types" in ids
-    assert "knowledge-organization.row-shape" in ids
-    assert "knowledge-organization.description" in ids
-    assert "knowledge-organization.ordering" in ids
+    assert "knowledge-organization.type-names-a-registered-type" in ids
+    assert "knowledge-organization.type-name-in-first-cell" in ids
+    assert "knowledge-organization.non-empty-description-no-closing-period" in ids
+    assert "knowledge-organization.alphabetical-unless-declared-otherwise" in ids
     assert all(rule.startswith("knowledge-organization.") for rule in ids), ids
 
 
 def test_malformed_registry_row_is_flagged_not_silently_skipped(
     tmp_path: Path,
 ) -> None:
-    """A `## Types` row without a backticked name in its first cell used to drop
-    out of the registry silently; now it is a `knowledge-organization.row-shape` finding at the
+    """A `## `type` names a registered type` row without a backticked name in its first cell used to drop
+    out of the registry silently; now it is a `knowledge-organization.type-name-in-first-cell` finding at the
     row's line."""
     doc = (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
-        "# Document Types\n\n## Types\n\n"
+        "# Document Types\n\n## `type` names a registered type\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Standard` | rules |\n| `README` | landing |\n"
         "| `Guide` | teaching |\n| `Recipe-Description` | describes code |\n"
@@ -937,7 +945,7 @@ def test_malformed_registry_row_is_flagged_not_silently_skipped(
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.row-shape",
+        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.type-name-in-first-cell",
         result.stdout,
     ), result.stdout
 
@@ -949,7 +957,7 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
     doc = (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
-        "# Document Types\n\n## Types\n\n"
+        "# Document Types\n\n## `type` names a registered type\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `Guide` | teaching |\n| `README` | landing |\n"
         "| `Recipe-Description` | describes code |\n| `Standard` | rules |\n"
@@ -964,7 +972,7 @@ def test_registry_row_with_non_title_case_name_is_flagged(tmp_path: Path) -> Non
 
     assert result.returncode == 1
     assert re.search(
-        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.row-shape",
+        r"standards/knowledge-organization/document-types\.md:\d+: knowledge-organization\.type-name-in-first-cell",
         result.stdout,
     ), result.stdout
 
@@ -995,7 +1003,10 @@ def test_ordering_marker_below_the_listing_does_not_exempt(tmp_path: Path) -> No
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: knowledge-organization.ordering" in result.stdout
+    assert (
+        "standards/index.md: knowledge-organization.alphabetical-unless-declared-otherwise"
+        in result.stdout
+    )
 
 
 def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
@@ -1018,7 +1029,10 @@ def test_description_with_trailing_period_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "standards/README.md: knowledge-organization.description" in result.stdout
+    assert (
+        "standards/README.md: knowledge-organization.non-empty-description-no-closing-period"
+        in result.stdout
+    )
 
 
 def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
@@ -1039,7 +1053,10 @@ def test_index_with_readme_not_first_is_flagged(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: knowledge-organization.ordering" in result.stdout
+    assert (
+        "standards/index.md: knowledge-organization.alphabetical-unless-declared-otherwise"
+        in result.stdout
+    )
 
 
 def test_ordering_marker_exempts_a_deviating_index(tmp_path: Path) -> None:
@@ -1090,7 +1107,10 @@ def test_ordering_marker_does_not_exempt_readme_first(tmp_path: Path) -> None:
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: knowledge-organization.ordering" in result.stdout
+    assert (
+        "standards/index.md: knowledge-organization.alphabetical-unless-declared-otherwise"
+        in result.stdout
+    )
     assert "the README.md entry must be listed first" in result.stdout
 
 
@@ -1117,16 +1137,19 @@ def test_concept_entries_out_of_alphabetical_order_are_flagged(
     result = run_okf_lint(repo)
 
     assert result.returncode == 1
-    assert "standards/index.md: knowledge-organization.ordering" in result.stdout
+    assert (
+        "standards/index.md: knowledge-organization.alphabetical-unless-declared-otherwise"
+        in result.stdout
+    )
 
 
 def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> None:
-    """document-types.md declares its `## Types` table alphabetical; a table
-    whose rows are not is a `knowledge-organization.alphabetical-order` finding."""
+    """document-types.md declares its `## `type` names a registered type` table alphabetical; a table
+    whose rows are not is a `knowledge-organization.rows-in-alphabetical-order` finding."""
     doc = (
         "---\ntype: Standard\ntitle: Document Types\n"
         "description: The document type registry\n---\n\n"
-        "# Document Types\n\n## Types\n\n"
+        "# Document Types\n\n## `type` names a registered type\n\n"
         "| Type | What it is |\n|------|------------|\n"
         "| `README` | landing |\n| `Standard` | rules |\n"
         "| `Guide` | teaching |\n| `Recipe-Description` | describes code |\n"
@@ -1139,7 +1162,7 @@ def test_types_table_out_of_alphabetical_order_is_flagged(tmp_path: Path) -> Non
 
     assert result.returncode == 1
     assert (
-        "standards/knowledge-organization/document-types.md: knowledge-organization.alphabetical-order"
+        "standards/knowledge-organization/document-types.md: knowledge-organization.rows-in-alphabetical-order"
         in result.stdout
     )
 
@@ -1156,6 +1179,6 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "standards/README.md: knowledge-organization.types missing 'type'"
+        "standards/README.md: knowledge-organization.type-names-a-registered-type missing 'type'"
         in result.stdout
     )

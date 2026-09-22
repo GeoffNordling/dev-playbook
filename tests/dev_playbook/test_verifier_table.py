@@ -345,12 +345,14 @@ def consumer(tmp_path: Path, upstream_rows: dict[str, str | None]) -> tuple[Path
 
 
 def test_consumer_asks_its_own_hooks_and_tables_only_its_rules(tmp_path: Path) -> None:
-    repo, upstream = consumer(tmp_path, {"build.ciyml": "scripts/repo-lint"})
+    repo, upstream = consumer(
+        tmp_path, {"build.ciyml-byte-identical-to-canonical": "scripts/repo-lint"}
+    )
 
     table = vt.derive(
         repo,
         fake_list_rules({"widget-lint": ["widget.alpha"]}),
-        dependencies={"ruff-format": ("build.ciyml",)},
+        dependencies={"ruff-format": ("build.ciyml-byte-identical-to-canonical",)},
         upstream_root=upstream,
     )
 

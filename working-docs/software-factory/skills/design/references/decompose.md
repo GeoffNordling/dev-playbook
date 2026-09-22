@@ -43,7 +43,7 @@ a blocker that must already exist.
 
 One `gh issue create` per slice, in dependency order, each with a full
 four-tuple and every build-leaf heading
-[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#build-headings)
+[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#every-build-heading-in-bold)
 requires from minting on — a leaf missing one is a lint finding whatever its
 phase.
 

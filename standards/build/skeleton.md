@@ -17,7 +17,7 @@ material, the source of the
 [canonical artifacts](/standards/build/canonical.md), and no tree rule
 reads it.
 
-## Required files
+## Files every repo carries
 
 `README.md`, `CLAUDE.md`, `index.md`, `.gitignore`,
 `.pre-commit-config.yaml`, and `Makefile` exist at the root, and
@@ -36,14 +36,14 @@ reads it.
 └── scripts/            # optional — shell here, gated by shellcheck and shfmt
 ```
 
-`build.required-files` · deterministic
+`build.files-every-repo-carries` · deterministic
 
-## Root-only files
+## One at the root, or none
 
 `pyproject.toml`, `CONTEXT.md`, and `CANDIDATES.md` appear at the root or
 not at all, one of each.
 
-`build.root-only-files` · deterministic
+`build.one-at-the-root-or-none` · deterministic
 
 ## No other future-work file
 
@@ -68,11 +68,11 @@ No file named `requirements.txt` exists anywhere in the tree.
 
 A repo in which `pyproject.toml` exists at the root.
 
-### uv.lock and .python-version
+### Lock file tracked, Python version pinned
 
 `uv.lock` is tracked and `.python-version` exists, both at the root.
 
-`build.uvlock-and-python-version` · deterministic
+`build.lock-file-tracked-python-version-pinned` · deterministic
 
 ## Python package
 
@@ -102,7 +102,7 @@ A Python repo in which `src/` exists.
 ### One package under src/
 
 `src/` holds exactly one entry: a directory whose name is the import
-package the [name mapping](/standards/build/python.md#name-mapping)
+package the [the repo directory names the project and package](/standards/build/python.md#the-repo-directory-names-the-project-and-package)
 names.
 
 `build.one-package-under-src` · deterministic

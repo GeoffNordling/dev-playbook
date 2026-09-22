@@ -28,7 +28,7 @@ The phrase is double-quoted, since YAML reads an unquoted `: ` as a
 nested key. The prose between the H1 and the first H2 elaborates on
 it, defines the exclusions, and links the neighbors; no lint reads it.
 The rule and its lint are
-[The population](/standards/doc-type/standard-conventions.md#the-population).
+[The frontmatter names the population](/standards/doc-type/standard-conventions.md#the-frontmatter-names-the-population).
 
 ## Rules
 
@@ -56,7 +56,7 @@ A rule is a heading; its section is the rule.
   predicate. A rule may have none.
 
 The rule and its lint are
-[The rule shape](/standards/doc-type/standard-conventions.md#the-rule-shape).
+[A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
 
 ## Conditions
 
@@ -92,7 +92,7 @@ heuristics in a guide, since each does a second thing
 A Standard is `standards/<name>/<topic>.md`, typed `Standard`, in a
 directory that holds at least one such file; the tree's rule is one
 directory, one standard, and the rule and its lint are
-[Directory layout](/standards/standard/tree.md#directory-layout). A
+[Every subdirectory a Standard directory](/standards/standard/tree.md#every-subdirectory-a-standard-directory). A
 Standard with special cases, the files that add rules for one kind of
 its member, is a directory `standards/<name>/<topic>/` holding the
 general Standard as `<topic>.md` and one file per special case,
@@ -120,4 +120,4 @@ family prefix, a new sibling on the same subject keeps it.
 Each repo that carries Standards has its own catalog at
 `standards/index.md`; in dev-playbook that is
 [standards/index.md](/standards/index.md). Its membership and order are
-[The catalog](/standards/standard/tree.md#the-catalog).
+[The catalog lists every directory](/standards/standard/tree.md#the-catalog-lists-every-directory).

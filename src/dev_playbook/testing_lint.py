@@ -37,7 +37,7 @@ from dev_playbook.findings import print_rules, render
 # whose Standard it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-MIRROR_SOURCE_STRUCTURE = "testing.mirror-source-structure"
+MIRROR_SOURCE_STRUCTURE = "testing.test-tree-mirrors-the-source-tree"
 
 RULES = (MIRROR_SOURCE_STRUCTURE,)
 

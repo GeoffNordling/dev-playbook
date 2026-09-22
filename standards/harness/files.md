@@ -15,7 +15,7 @@ concept/harness boundary is the population of
 and `classify()` in [md.py](/src/dev_playbook/md.py) encodes it. Claude
 Code is the only harness in use.
 
-## Members
+## Every harness file matches a member row
 
 Every file under `.claude/` or `dotfiles/dot-claude/` in a governed
 repo matches a member row of the table below.
@@ -30,13 +30,13 @@ repo matches a member row of the table below.
 | `hooks/` | code | run as code around harness events | none yet |
 | `.claude/workflows/*.js` | code | run as code by the Workflow tool | none yet |
 
-`harness.members` · deterministic
+`harness.every-harness-file-matches-a-member-row` · deterministic
 
 > **Why.** Claude Code fixes which files it reads; the table is the
 > workspace's record of that set, and the predicate holds the repo to
 > the table.
 
-## Location
+## Every runbook at a fixed path
 
 A skill is `<skills root>/<name>/SKILL.md` and an agent is
 `<agents root>/<name>.md`, the roots being `.claude/skills/` and
@@ -52,4 +52,4 @@ A skill is `<skills root>/<name>/SKILL.md` and an agent is
 <agents root>/<agent-name>.md
 ```
 
-`harness.location` · deterministic
+`harness.every-runbook-at-a-fixed-path` · deterministic

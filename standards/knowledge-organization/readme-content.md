@@ -12,25 +12,25 @@ document. Its floor is fixed and its depth grows with the project:
 prerequisites, a quick-start, an architecture overview, and examples
 arrive as the project earns them.
 
-## H1
+## README holds an H1
 
 A `README.md` holds an H1 heading.
 
-`knowledge-organization.h1` · deterministic
+`knowledge-organization.readme-holds-an-h1` · deterministic
 
-## The purpose sentence
+## Purpose sentence follows the H1
 
 A sentence follows the H1 of a `README.md` and says what the repo or
 the directory the file introduces holds or is for.
 
-`knowledge-organization.the-purpose-sentence` · stochastic
+`knowledge-organization.purpose-sentence-follows-the-h1` · stochastic
 
-## No agent instructions or decisions
+## No agent instructions or architecture decisions
 
 A `README.md` holds no instruction addressed to an agent and no
 architecture decision.
 
-`knowledge-organization.no-agent-instructions-or-decisions` · stochastic
+`knowledge-organization.no-agent-instructions-or-architecture-decisions` · stochastic
 
 ## No roster of harness-injected files
 

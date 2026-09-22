@@ -17,7 +17,7 @@ Work out how the issue should be built, then leave it factory-ready. Design is t
 
 Before doing anything else:
 
-- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module); small interface, deep implementation, accept dependencies, keep the surface small — the lens for weighing a solution's shape}.
+- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#a-module-is-shaped-from-the-outside-in); small interface, deep implementation, accept dependencies, keep the surface small — the lens for weighing a solution's shape}.
 - {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md) end-to-end; the brief formats, the epic body, and the relationships the decompose exit wires}.
 
 Then report: `READ: docs/guides/modules.md, issue-shapes.md`. Proceed only after.
@@ -79,7 +79,7 @@ Nothing below this line is written to GitHub before the user approves.
 
 ### Single leaf
 
-Re-author the issue's brief in place across the build-leaf headings ([issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#build-headings)), which is where the required set is fixed. A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief.
+Re-author the issue's brief in place across the build-leaf headings ([issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#every-build-heading-in-bold)), which is where the required set is fixed. A child a decomposition minted takes this exit too — its starting brief is what gets re-authored, and this is where that child's brief becomes complete. The approach lands *inside* those headings — the chosen solution shapes `Desired behavior` and `Key interfaces`, the constraining decisions become acceptance criteria, the boundary becomes `Out of scope`. There is no separate approach section: `build` reads one brief.
 
 Draft every heading except `User intent`, then {Run [/user-intent-mini-interview](~/workspace/dev-playbook/working-docs/software-factory/skills/user-intent-mini-interview/SKILL.md)} for that one: the user says their intent cold, the beat surfaces where it collides with the draft, and the reconciled paragraph lands in their own words. Run it on every single-leaf write, rework laps included — an umbrella dictated over an earlier draft may no longer fit a re-authored brief. It runs before the write, so a collision that exposes a mistaken acceptance criterion is still free to fix.
 

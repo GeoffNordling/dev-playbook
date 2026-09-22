@@ -90,4 +90,4 @@ No line of a Guide is a rule trailer,
 A Guide is `guides/<work>.md`, typed `Guide`, its filename kebab-case
 naming the work as a noun or a gerund compound (`bootstrap.md`,
 `linking-issues.md`). The registry's rule is
-[Typed Guide](/standards/knowledge-organization/document-types.md#typed-guide).
+[Guide lives under `guides/`](/standards/knowledge-organization/document-types.md#guide-lives-under-guides).

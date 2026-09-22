@@ -40,7 +40,7 @@ def standard(
 ) -> str:
     """A file typed ``Standard`` (by default) with one rule.
 
-    ``population=None`` omits the key, which ``doc-type.the-population`` flags.
+    ``population=None`` omits the key, which ``doc-type.the-frontmatter-names-the-population`` flags.
     """
     pop = "" if population is None else f'population: "{population}"\n'
     return (
@@ -74,7 +74,7 @@ def readme() -> str:
     return "---\ntype: README\ntitle: Standards\ndescription: s\n---\n\n# Standards\n"
 
 
-# --- standard.directory-layout and doc-type.the-population -----------------------
+# --- standard.every-subdirectory-a-standard-directory and doc-type.the-frontmatter-names-the-population -----------------------
 
 
 def test_well_formed_directory_passes_directory_layout(tmp_path: Path) -> None:
@@ -175,7 +175,7 @@ def test_nested_standard_counts_for_its_directory(tmp_path: Path) -> None:
     assert sa.check_directory_layout(repo) == []
 
 
-# --- standard.the-catalog -------------------------------------------------
+# --- standard.the-catalog-lists-every-directory -------------------------------------------------
 
 
 def catalog(dir_bullets: list[str], *, readme_first: bool = True) -> str:
@@ -400,7 +400,7 @@ def test_consumer_catalog_directories_out_of_order_flagged(tmp_path: Path) -> No
     assert [f.rule for f in findings] == [sa.THE_CATALOG]
 
 
-# --- standard.the-hosting-pattern -------------------------------------------------
+# --- standard.every-detector-is-reachable-and-listed -------------------------------------------------
 
 
 def _manifest(ids: list[str], system_ids: list[str] | None = None) -> str:

@@ -70,11 +70,11 @@ HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 # question it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-DIRECTORY_LAYOUT = "standard.directory-layout"
-THE_POPULATION = "doc-type.the-population"
-THE_CATALOG = "standard.the-catalog"
+DIRECTORY_LAYOUT = "standard.every-subdirectory-a-standard-directory"
+THE_POPULATION = "doc-type.the-frontmatter-names-the-population"
+THE_CATALOG = "standard.the-catalog-lists-every-directory"
 NO_SHADOWING = "standard.no-shadowing"
-THE_HOSTING_PATTERN = "standard.the-hosting-pattern"
+THE_HOSTING_PATTERN = "standard.every-detector-is-reachable-and-listed"
 OFFERED_BY_THE_CANONICAL_TEMPLATE = "standard.offered-by-the-canonical-template"
 
 RULES = (
@@ -223,7 +223,7 @@ def _dev_playbook_mode(root: Path) -> bool:
     return (root / CANONICAL_CONFIG).is_file()
 
 
-# --- standard.directory-layout and doc-type.the-population ------------------
+# --- standard.every-subdirectory-a-standard-directory and doc-type.the-frontmatter-names-the-population ------------------
 
 
 def check_directory_layout(root: Path) -> list[Finding]:
@@ -281,7 +281,7 @@ def check_directory_layout(root: Path) -> list[Finding]:
     return findings
 
 
-# --- standard.the-catalog ---------------------------------------------------
+# --- standard.the-catalog-lists-every-directory ---------------------------------------------------
 
 
 def _opening_sentence(path: Path) -> tuple[int, str] | None:
@@ -412,7 +412,7 @@ def check_catalog_order(root: Path, dev_playbook_mode: bool) -> list[Finding]:
     return findings
 
 
-# --- standard.the-hosting-pattern -------------------------------------------
+# --- standard.every-detector-is-reachable-and-listed -------------------------------------------
 
 MANIFEST = ".pre-commit-hooks.yaml"
 LOCAL_CONFIG = ".pre-commit-config.yaml"

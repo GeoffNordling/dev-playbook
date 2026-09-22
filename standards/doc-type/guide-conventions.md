@@ -8,7 +8,7 @@ population: "a document typed Guide"
 # Guide Conventions
 
 A document typed `Guide`, under `guides/`
-([Document Types](/standards/knowledge-organization/document-types.md#typed-guide)).
+([Document Types](/standards/knowledge-organization/document-types.md#guide-lives-under-guides)).
 The [Guide doc-type](/doc-types/guide/index.md) declares what a guide
 is and the encoding its file takes,
 [Instruction Encoding](/doc-types/guide/encoding.md); a doc-type binds

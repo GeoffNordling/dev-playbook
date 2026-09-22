@@ -59,7 +59,7 @@ from dev_playbook.playbook_lint import DETECTORS, UNGATED_AUDITS
 # run reads the shipped table here.
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
 
-THE_VERIFIER_TABLE = "standard.the-verifier-table"
+THE_VERIFIER_TABLE = "standard.a-declaring-repo-carries-the-generated-verifier-table"
 AN_EMITTED_ID_IS_A_RULE_HEADING = "standard.an-emitted-id-is-a-rule-heading"
 AN_ADDRESS_EXISTS = "standard.an-address-exists"
 A_CONSUMER_ADDS_ONLY_ITS_OWN_RULES = "standard.a-consumer-adds-only-its-own-rules"
@@ -82,7 +82,7 @@ DETERMINISTIC = "deterministic"
 # are checked against the declared rules like a detector's --list-rules, and
 # each address against the repo's hooks and dependencies.
 DEPENDENCY_RULES: Mapping[str, tuple[str, ...]] = {
-    "pre-commit validate-manifest": ("distribution.a-valid-manifest",),
+    "pre-commit validate-manifest": ("distribution.the-manifest-validates",),
     "ruff-check": ("python.every-definition-carries-a-docstring",),
     "ruff-format": ("python.formatted-by-ruff-format",),
     "shellcheck": ("shell.shellcheck-clean",),

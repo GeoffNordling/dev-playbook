@@ -15,7 +15,7 @@ sequence below walks all four settings in order; the values each must
 hold are the predicates of
 [GitHub Settings](/standards/tracking/github-settings.md).
 
-## Setting the GitHub side of a repo
+## Four settings, in order
 
 Set the four in this order:
 
@@ -27,7 +27,7 @@ Set the four in this order:
    [Squash-only merges](/standards/tracking/github-settings.md#squash-only-merges)
    the value that table names.
 3. **Protect the default branch.** Add the ruleset that
-   [Default branch protection](/standards/tracking/github-settings.md#default-branch-protection)
+   [Default branch protected from destructive operations](/standards/tracking/github-settings.md#default-branch-protected-from-destructive-operations)
    describes, so the default branch carries both destructive-operation
    rules in force: force pushes blocked, deletions restricted. Where
    another ruleset supplies one of those two rules, give it enforcement
@@ -42,7 +42,7 @@ Set the four in this order:
    blockers, and a minted label would drift from the truth the tracker
    already holds.
 
-## Where a unit of work lives
+## Candidate or issue, never both
 
 Keep each unit of work in one of two homes, never both: work the repo
 has not committed to is an entry in its `CANDIDATES.md`

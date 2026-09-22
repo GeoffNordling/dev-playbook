@@ -10,7 +10,7 @@ How a repository joins the workspace conforming. Entry paths — a
 **fresh** repo is scaffolded, an **existing** repo is adopted — converge
 on the same GitHub tail and roster enrollment.
 
-## The fresh path: scaffold
+## repo-init scaffolds a fresh repo
 
 [`scripts/repo-init`](/scripts/repo-init) creates the repo locally:
 
@@ -31,7 +31,7 @@ on the same GitHub tail and roster enrollment.
 2. **Make the first commit.** The first commit is the user's to make after
    review; the commit gate runs on it.
 
-## The existing path: adoption
+## Adoption brings an existing repo to green
 
 An existing repo joins by being brought to green against the pinned
 standard, in this order:
@@ -62,7 +62,7 @@ standard, in this order:
    branch and PR; either way the commit gate at the new pin is the
    verification.
 
-## The GitHub tail
+## Both paths finish on GitHub
 
 Both paths finish on GitHub, in order:
 
@@ -83,7 +83,7 @@ Both paths finish on GitHub, in order:
    [repo-settings.md](/guides/repo-settings.md) — both sit
    behind GitHub's Administration permission, so no script does this.
 
-## Enroll in the GOVERNED roster
+## The green repo enrolls in GOVERNED
 
 1. **Add the repo to `GOVERNED`.** Add the repo to workspace-lint's
    `GOVERNED` roster — a dev-playbook edit, made only once the repo is

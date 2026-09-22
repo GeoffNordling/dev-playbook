@@ -15,7 +15,7 @@ defines, hosted in the consumer repo instead of dev-playbook. The recipe
 below is the order of operations; every rule a step meets is stated once,
 in the Standard the step links.
 
-## Declare, publish, and gate the standard
+## Adoption runs tree to gate
 
 1. **Grow the `standards/` tree.** If the repo has no `standards/` tree
    yet, create its landing doc first: `standards/README.md`
@@ -31,7 +31,7 @@ in the Standard the step links.
    dev-playbook directory carries
    ([No shadowing](/standards/standard/tree.md#no-shadowing)), and the
    README-first catalog
-   ([The catalog](/standards/standard/tree.md#the-catalog)).
+   ([The catalog lists every directory](/standards/standard/tree.md#the-catalog-lists-every-directory)).
 2. **Write a contract-conforming detector.** Back the Standard's rules
    with a detector, a `scripts/<name>` shim over the repo's own reusable
    modules, obeying the first-party rules in
@@ -46,7 +46,7 @@ in the Standard the step links.
 3. **Publish the hook in the repo's own manifest.** Add the hook to the
    consumer repo's own `.pre-commit-hooks.yaml`, backed by the
    `scripts/<name>` entry, the same way dev-playbook publishes its hooks
-   ([The hosting pattern](/standards/standard/detectors.md#the-hosting-pattern)).
+   ([Every detector is reachable and listed](/standards/standard/detectors.md#every-detector-is-reachable-and-listed)).
    The repo is now the topmost instance of the hosting pattern for its
    own standard.
 4. **Mirror the hook in the local block.** Add the same hook id to the
@@ -58,10 +58,10 @@ in the Standard the step links.
 5. **Record the detector in the two tables.** The local-block wiring
    runs the detector at the **commit gate**. Which rule the detector
    decides is the verifier table, `standards/verifiers.yaml`
-   ([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
+   ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)),
    and where it runs is the boundary table, `standards/boundaries.yaml`,
    read from the wiring
-   ([The boundary table](/standards/standard/detectors.md#the-boundary-table)).
+   ([The boundary table, generated from the wiring](/standards/standard/detectors.md#the-boundary-table-generated-from-the-wiring)).
 6. **Turn the meta-standard's own policing on.** The meta-standard's
    detector, `standards-lint`, is a published dev-playbook hook. Bump
    the pin to a dev-playbook `rev` that carries it: from that rev it

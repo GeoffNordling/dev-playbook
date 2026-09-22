@@ -41,7 +41,7 @@ against its schema.
 
 Page: the type check and the renderer tests run through a local
 pre-commit hook block, the extension point the canonical config grants
-([Canonical Artifacts](/standards/build/canonical.md#pre-commit-configyaml)).
+([Canonical Artifacts](/standards/build/canonical.md#pre-commit-configyaml-holds-every-canonical-block)).
 `check` runs the whole hook suite, so it covers them without a change to
 a canonical target.
 

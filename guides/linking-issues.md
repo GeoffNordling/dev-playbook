@@ -20,18 +20,18 @@ gh api repos/{owner}/{repo}/issues/<n> --jq .id
 
 That id is neither the `#number` nor the `node_id`; passing either fails.
 
-## Add a sub-issue
+## The parent takes the sub-issue
 
 `gh api --method POST repos/{owner}/{repo}/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`
 
-## Add a blocked-by
+## The dependent takes the blocker
 
 `gh api --method POST repos/{owner}/{repo}/issues/<dependent>/dependencies/blocked_by -F issue_id=<blocker-db-id>`
 
-## Read the open blockers
+## The dependent lists its open blockers
 
 `gh api repos/{owner}/{repo}/issues/<n>/dependencies/blocked_by --jq '.[] | select(.state == "open") | .number'`
 
-## Read the open sub-issues
+## The parent lists its open sub-issues
 
 `gh api repos/{owner}/{repo}/issues/<parent>/sub_issues --jq '.[] | select(.state == "open") | .number'`

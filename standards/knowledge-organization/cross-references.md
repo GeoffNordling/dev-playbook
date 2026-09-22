@@ -78,38 +78,38 @@ document's title where the heading does not fit the citing sentence.
 > the noun phrase naming the same target, and the anchor carries the
 > precision the text drops.
 
-## Citation, another repo
+## Workspace path for another repo
 
 A reference to a file or directory in a repository other than the
 referencing file's own is an inline link whose target is the full
 workspace path, beginning `~/workspace/<repo>/`.
 
-`knowledge-organization.citation-another-repo` · deterministic
+`knowledge-organization.workspace-path-for-another-repo` · deterministic
 
 > **Why.** The full workspace path resolves to that repo's main
 > checkout, its published state, and the form is self-describing: the
 > repo name is in the path, so no external convention is needed to
 > read it.
 
-## Skill invocation
+## Slash invocation for a skill
 
 A reference to a skill names it by its slash invocation,
 `/<skill-name>`.
 
-`knowledge-organization.skill-invocation` · deterministic
+`knowledge-organization.slash-invocation-for-a-skill` · deterministic
 
 ## Fixed repo root
 
 The referencing file has a fixed repo root: no segment of its path
 inside the repository is `skills`, `rules`, or `agents`.
 
-### Link, same bundle
+### Root-absolute path in the same repo
 
 A reference to a file or directory in the referencing file's own
 repository is an inline link whose target is a root-absolute path,
 beginning `/` and naming the path from the repository root.
 
-`knowledge-organization.link-same-bundle` · deterministic
+`knowledge-organization.root-absolute-path-in-the-same-repo` · deterministic
 
 > **Why.** A root-absolute path resolves against the reader's own
 > checkout root, so it points at the copy that matches the checkout

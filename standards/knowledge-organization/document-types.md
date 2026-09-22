@@ -19,14 +19,14 @@ holds the boundary in code with its further exclusions, the transient
 `PLAN.md` and `PROGRESS.md` pair, the root `tmp/` tree, and every
 top-level `tests/` tree.
 
-## Frontmatter block
+## Frontmatter, a YAML mapping
 
 A concept document opens with a `---`-delimited frontmatter block whose
 YAML is a mapping.
 
-`knowledge-organization.frontmatter-block` · deterministic
+`knowledge-organization.frontmatter-a-yaml-mapping` · deterministic
 
-## Types
+## `type` names a registered type
 
 A concept document's frontmatter has a `type` key whose value names one
 row of the table below, or one entry of the `okf_types` mapping in the
@@ -48,40 +48,40 @@ frontmatter of the repo's own root `index.md`
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
-`knowledge-organization.types` · deterministic
+`knowledge-organization.type-names-a-registered-type` · deterministic
 
-## Title
+## Non-empty `title`
 
 A concept document's frontmatter has a `title` key with a non-empty
 value.
 
-`knowledge-organization.title` · deterministic
+`knowledge-organization.non-empty-title` · deterministic
 
-## Description
+## Non-empty `description`, no closing period
 
 A concept document's frontmatter has a `description` key whose value is
 non-empty and does not end with a period.
 
-`knowledge-organization.description` · deterministic
+`knowledge-organization.non-empty-description-no-closing-period` · deterministic
 
-## Description voice
+## The description names the document in the present tense
 
 A concept document's `description` is a sentence fragment in the present
 tense that names what the document is, what it governs, or, for a
 `Decision-Record`, the decision it records.
 
-`knowledge-organization.description-voice` · stochastic
+`knowledge-organization.the-description-names-the-document-in-the-present-tense` · stochastic
 
 > **Why.** The description is what a reader triages on and what every
 > `index.md` listing carries verbatim, so it is read far more often,
 > and far further from its document, than the document itself.
 
-## resource
+## `resource`, a repo-root path or a URI
 
 A concept document's `resource`, where present, is a repo-root path
 beginning with `/` or an external URI.
 
-`knowledge-organization.resource` · deterministic
+`knowledge-organization.resource-a-repo-root-path-or-a-uri` · deterministic
 
 ## resource names the asset
 
@@ -97,27 +97,27 @@ key.
 
 `knowledge-organization.no-tags-or-timestamp` · deterministic
 
-## Recipe-Description
+## Recipe-Description carries a `resource`
 
 A concept document typed `Recipe-Description` has a `resource` key with
 a non-empty value.
 
-`knowledge-organization.recipe-description` · deterministic
+`knowledge-organization.recipe-description-carries-a-resource` · deterministic
 
-## Typed Standard
+## Standard lives under `standards/`
 
 A concept document typed `Standard` lives under `standards/`.
 
-`knowledge-organization.typed-standard` · deterministic
+`knowledge-organization.standard-lives-under-standards` · deterministic
 
-## Typed Loop
+## Loop lives under `loops/`
 
 A concept document typed `Loop` lives under `loops/`.
 
-`knowledge-organization.typed-loop` · deterministic
+`knowledge-organization.loop-lives-under-loops` · deterministic
 
-## Typed Guide
+## Guide lives under `guides/`
 
 A concept document typed `Guide` lives under `guides/`.
 
-`knowledge-organization.typed-guide` · deterministic
+`knowledge-organization.guide-lives-under-guides` · deterministic

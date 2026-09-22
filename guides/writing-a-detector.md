@@ -15,7 +15,7 @@ leaves behind. Where the detector is published, which rule it decides,
 and which gate runs it are
 [Detectors](/standards/standard/detectors.md).
 
-## The order `main` runs in
+## `main` runs four steps in order
 
 Write `main` to do these in order:
 
@@ -26,11 +26,11 @@ Write `main` to do these in order:
    surface is optional — a `skills/`, `standards/`, or `loops/` tree —
    report no finding and exit 0 in a repo that has no such surface.
 3. **Print each finding as one line.** One line per finding, in the
-   shape [The finding line](#the-finding-line) gives.
+   shape [One finding, one line](#one-finding-one-line) gives.
 4. **Exit 0, 1, or 2.** 0 when the run is clean, 1 when it has findings,
    and 2 when it cannot run.
 
-## The finding line
+## One finding, one line
 
 A finding takes one line:
 
@@ -42,7 +42,7 @@ A colon follows the location, and the separators are single spaces. Use
 a repo-relative path for the location, or the member's name where the
 member is not a file. Omit `:line` for a finding on the whole member.
 
-## Why an absent surface is clean
+## The gap closes inside the detector
 
 The alternative, dropping the detector from the repos that lack the
 surface, would make the hook set differ from repo to repo and would
@@ -54,4 +54,4 @@ inside the detector, so the wiring stays the same everywhere.
 A detector inspects and emits findings; by itself it blocks nothing, and
 its run at a gate is the audit stationed there. Leave everything git
 tracks as you found it
-([Read-only](/standards/standard/detectors.md#read-only)).
+([Read-only without a write flag](/standards/standard/detectors.md#read-only-without-a-write-flag)).

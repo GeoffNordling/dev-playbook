@@ -15,13 +15,13 @@ at all is
 [File Skeleton](/standards/build/skeleton.md#tests-present)'s rule; what
 goes where inside it is this Standard's.
 
-## Test file naming
+## Test files carry the test prefix
 
 Every test file in the suite is named `test_*.py`.
 
-`testing.test-file-naming` · deterministic
+`testing.test-files-carry-the-test-prefix` · deterministic
 
-## Mirror source structure
+## Test tree mirrors the source tree
 
 A `test_*.py` file under `tests/` whose name, with the `test_` prefix
 removed, is the file name of a module under `src/` other than an
@@ -33,17 +33,17 @@ that same path beneath one of the two scope directories `unit` and
 belongs to more than one module under `src/`, the mirror of any one of
 them satisfies the rule.
 
-`testing.mirror-source-structure` · deterministic
+`testing.test-tree-mirrors-the-source-tree` · deterministic
 
 > **Why.** Mirroring scales with the source tree and keeps two modules
 > of the same file name from colliding.
 
-## Conftest hierarchy
+## Fixture lives in the narrowest conftest
 
 A fixture lives in the `conftest.py` of the narrowest directory whose tests
 use it.
 
-`testing.conftest-hierarchy` · deterministic
+`testing.fixture-lives-in-the-narrowest-conftest` · deterministic
 
 ## Fakes live in the test tree
 

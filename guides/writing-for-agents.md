@@ -8,7 +8,7 @@ description: The craft behind any document an agent consumes — the two loads, 
 
 The craft of writing any document an agent consumes — a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable — the agent taking the same _process_ every run, not producing the same output. [runbook-conventions.md](/standards/doc-type/runbook-conventions.md) binds the *format* a skill or agent takes and wins where the two collide; this document carries the craft. The skill-specific mechanics — the invocation choice and router skills — are in [Skill mechanics](#skill-mechanics).
 
-## The two loads
+## Every document spends context load or cognitive load
 
 Every document and pointer the writer adds spends one of two budgets:
 
@@ -17,7 +17,7 @@ Every document and pointer the writer adds spends one of two budgets:
 
 Material reached only through a pointer escapes context load at the price of the pointer's own line; material with no pointer at all rides entirely on cognitive load.
 
-## Information hierarchy
+## Information hierarchy ranks material by immediacy of need
 
 A document is built from two content types — **steps** (the ordered actions the agent performs) and **reference** (definitions, rules, facts consulted on demand) — that mix freely: all steps (a recipe), all reference (a review's rules, this document), or both. The core decision is where each piece sits on the **information hierarchy**, a ladder ranked by how immediately the agent needs the material:
 
@@ -27,19 +27,19 @@ A document is built from two content types — **steps** (the ordered actions th
 
 Push too little down and the top bloats; push too much and material the agent actually needs is hidden. That tension is the whole decision.
 
-### Progressive disclosure
+### Progressive disclosure keeps the top legible
 
 Progressive disclosure is the move down the ladder — out of the main file and behind a pointer — so the top stays legible. Not primarily a token optimisation: it is how the hierarchy is protected. Branching is the cleanest disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. When a document has steps, in-file reference that should be disclosed buries them and turns attending to them into a coin-flip — a variance lever, not just a legibility one. (For a skill, the format side of the move — the `references/` tree and its limits — is [runbook-conventions.md](/standards/doc-type/runbook-conventions.md)'s.)
 
-### Co-location
+### A concept's parts sit under one heading
 
 Co-location is the within-file companion: where the ladder decides _how far down_ a piece sits, co-location decides _what sits beside it_ once there. Keep a concept's definition, rules, and caveats under one heading rather than scattered, so reading one part brings its neighbours with it. The test: the document should read like documentation written for the agent — grouped material reads that way; scattered material does not. (Distinct from duplication: that repeats one meaning in two places; scattering fragments one meaning across many.)
 
-### Sprawl
+### Sprawl thins attention even where every line is live
 
 Sprawl is the failure mode here: a document simply too long, even when every line is live and unique. Attention thins across the excess, and every extra line is one more to keep relevant. The cure is the ladder: disclose reference behind pointers, and split by branch or sequence so each path carries only what it needs.
 
-## Context pointers
+## The pointer's wording decides when it fires
 
 A **context pointer** is a reference held in the agent's context that names some out-of-context material and encodes the condition for reaching it. A skill's description is one; a line in `AGENTS.md` naming a doc is the same object. The pointer's _wording_, not its target, decides when the agent reaches the material — and how reliably. A must-have target behind a weakly worded pointer is a variance bug: sharpen the wording first, and inline the material only if sharpening fails.
 
@@ -49,9 +49,9 @@ A pointer does two jobs — state what the material is, and list the **branches*
 - **One trigger per branch.** Synonyms that rename a single branch are one branch written twice; collapse them and keep only genuinely distinct branches.
 - **Cut identity the body already carries.**
 
-For a runbook's `description`, Runbook Conventions' [Description](/standards/doc-type/runbook-conventions.md#description) binds its shape.
+For a runbook's `description`, Runbook Conventions' [Description, two sentences or one](/standards/doc-type/runbook-conventions.md#description-two-sentences-or-one) binds its shape.
 
-## Steps and completion criteria
+## Every step ends on a completion criterion
 
 Every step ends on a **completion criterion** — the condition that tells the agent the work is done. End every step of a runbook's body on one: an agent's body is the launched subagent's system prompt, set at spawn, so nothing reaches that agent except the launching prompt, and the report travels back as the subagent's final message. A step that does not say when the work is done leaves the agent nothing else to read it from.
 
@@ -62,11 +62,11 @@ Two properties make the criterion a lever:
 
 The strongest criteria are both checkable and exhaustive.
 
-### Splitting a sequence
+### A sequence splits where later steps tempt a rush
 
 Splitting a sequence is that second defense as a document cut: split a run of steps where the post-completion steps tempt the agent to rush the one in front of it — keeping them out of view drives more legwork on the current task. Hiding only works across a real context boundary (a hand-off or a subagent dispatch; an inline call leaves the later steps in context and clears nothing), and the new document spends one of the two loads, so cut only when it earns that. Beware the reverse: merging sequences exposes each step's later steps to what follows, inviting premature completion. The other document cut — splitting off a separately *invoked* skill — is under [Skill mechanics](#skill-mechanics).
 
-## Leading words
+## A leading word anchors behaviour in one token
 
 A **leading word** is a compact concept already living in the model's pretraining that the agent thinks with while running the document (_lesson_, _fog of war_, _tracer bullets_). Repeated as a token, never as a sentence, it accumulates a distributed definition and anchors a whole region of behaviour in the fewest tokens, by recruiting priors the model already holds. Coining a new one works where the document defines it clearly, but a made-up word recruits no priors — it costs in definition tokens what a pretrained word gives free; reach for an existing word first.
 
@@ -79,11 +79,11 @@ Hunt for opportunities to refactor with leading words. A triad spelled out at th
 
 The win is double: fewer tokens, and a sharper hook for the agent to hang its thinking on. Assume every document is carrying restatements that leading words retire — go find them.
 
-### Negation
+### The positive, not the prohibition
 
 Negation is the failure mode beside this lever: steering by prohibition drags the forbidden behaviour into context and makes it _more_ available, not less. _Don't think of an elephant_, and the elephant is all there is; the negation is a weak modifier the strongly-activated concept overruns, so the ban half-reads as an instruction to do the thing. Prompt the **positive** — state the target behaviour ("write one-line comments") so the banned one is never spoken. A prohibition earns its place only as a hard guardrail that cannot be phrased positively; even then, pair it with the positive target so attention lands on what to do.
 
-## Pruning
+## Every line earns its load
 
 - Keep each meaning in a **single source of truth**: one authoritative place, so changing the behaviour is a one-place edit. **Duplication** — the same meaning in more than one place — costs maintenance and tokens, and inflates a meaning's prominence on the ladder past its real rank. (The accidental inverse of a leading word, which repeats a token on purpose, never the meaning.)
 - The **environment** is a source of truth too — `package.json` scripts, config files, the directory layout, `--help` output — and a document that restates it is a **cache**: a copy of a lookup, earning its load only when the lookup is expensive. Cache what the agent cannot find by looking: the unwritten convention, the reason behind a choice, the gotcha no config confesses. Leave the one-file, one-command lookups to the environment, where they cannot go stale.
@@ -94,21 +94,21 @@ Negation is the failure mode beside this lever: steering by prohibition drags th
 
 What changes when the document is a skill: the invocation choice and router skills. The front matter fields themselves are [runbook-conventions.md](/standards/doc-type/runbook-conventions.md)'s to define.
 
-### Model-invoked or user-invoked
+### Model-invocation buys reach at permanent context load
 
 Two choices, trading the two loads:
 
-- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously — and other skills can reach it. The user can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the user's. The description is the skill's top-level context pointer, forced to stay loaded at all times — permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: `disable-model-invocation: false`, and a model-facing description carrying the trigger branches (the [context-pointer rules](#context-pointers) apply in full).
+- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously — and other skills can reach it. The user can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the user's. The description is the skill's top-level context pointer, forced to stay loaded at all times — permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: `disable-model-invocation: false`, and a model-facing description carrying the trigger branches (the rules under [The pointer's wording decides when it fires](#the-pointers-wording-decides-when-it-fires) apply in full).
 - A **user-invoked** skill strips the description from the agent's reach: only the user typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load — the user is the index that must remember it exists. Mechanics: `disable-model-invocation: true`; the `description` becomes user-facing — a one-line summary, trigger lists stripped.
 
 Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
 
 Shared reference that two user-invoked skills both need can live in neither — with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
 
-### Splitting by invocation
+### A skill splits off where a leading word triggers it
 
-The invocation cut of splitting (the sequence cut is under [Steps and completion criteria](#steps-and-completion-criteria)): split off a model-invoked skill where a distinct leading word should trigger it on its own — a trigger word the user actually types — or another skill must reach it. The new always-loaded description costs context load, so that independent reach has to be worth it.
+The invocation cut of splitting (the sequence cut is under [Every step ends on a completion criterion](#every-step-ends-on-a-completion-criterion)): split off a model-invoked skill where a distinct leading word should trigger it on its own — a trigger word the user actually types — or another skill must reach it. The new always-loaded description costs context load, so that independent reach has to be worth it.
 
-### Router skills
+### A router skill cures piled-up cognitive load
 
 When user-invoked skills multiply past what the user can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the user has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the user can reach them.

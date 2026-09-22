@@ -23,7 +23,7 @@ Before doing anything else:
   end-to-end}.
 - {Read [software factory](~/workspace/dev-playbook/working-docs/software-factory/docs/software-factory.md)
   end-to-end}.
-- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#shaping-a-module); the
+- {Read the [Design and Testing guide](~/workspace/dev-playbook/guides/design-and-testing.md#a-module-is-shaped-from-the-outside-in); the
   qualities a good slice boundary preserves}.
 
 Then report: `READ: issue-shapes.md, software-factory.md,
@@ -101,7 +101,7 @@ A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
 tying the two at a glance. Label it `category:*` **only**. {Read
-[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#epic-headings)}
+[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#outcome-and-decomposition-rationale)}
 and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the

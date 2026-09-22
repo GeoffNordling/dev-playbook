@@ -36,4 +36,4 @@ written into its own prose as spans.
 Where the harness loads it from. The roots are
 [Claude Code Files](/standards/harness/files.md)'; the layout under them
 is Runbook Conventions'
-[Location](/standards/harness/files.md#location).
+[Every runbook at a fixed path](/standards/harness/files.md#every-runbook-at-a-fixed-path).

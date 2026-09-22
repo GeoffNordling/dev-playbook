@@ -76,9 +76,9 @@ assigned sections, and the briefings.
 The fact slices:
 
 - **One home** —
-  [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
+  [one home per fact](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact).
 - **Terms** —
-  [terms that cross sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-that-cross-sets),
+  [crossing terms in CONTEXT.md](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd),
   [definitions at most two sentences](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#definitions-at-most-two-sentences),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only).
 - **Placement** —
@@ -89,10 +89,10 @@ The set slices:
 
 - **Shape** —
   [an index in every directory](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory),
-  [rows inside the set](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-set),
+  [rows inside the set's concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-sets-concern),
   [distinct concerns](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns),
   [distinct from the parent](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-from-the-parent),
-  [the introduction](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#the-introduction).
+  [introduction between H1 and listing](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#introduction-between-h1-and-listing).
 - **Body** —
   [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#body-inside-its-concern).
 - **Prose** —

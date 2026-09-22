@@ -23,23 +23,23 @@ every address the verifier table names to the gates that run it;
 `scripts/boundary-table` writes it from the wiring and is its lint. No
 Standard says where it runs; the boundary table does.
 
-## Read-only
+## Read-only without a write flag
 
 A first-party detector run without an explicit write flag leaves
 everything git tracks as it found it; `verifier-table --write` and
 `boundary-table --write` are enforcement, and a dependency the verifier
 table names may write at its gate, `ruff-format` and `shfmt -w`.
 
-`standard.read-only` · stochastic
+`standard.read-only-without-a-write-flag` · stochastic
 
-## The verifier table
+## A declaring repo carries the generated verifier table
 
 A repo that declares a rule under `standards/` carries
 `standards/verifiers.yaml`, byte-identical to what `scripts/verifier-table`
 writes: one row per declared rule id, sorted, each carrying the address of
 the one check that decides it or null.
 
-`standard.the-verifier-table` · deterministic
+`standard.a-declaring-repo-carries-the-generated-verifier-table` · deterministic
 
 > **Why.** Question and mechanism cross-cut: several detectors check
 > one Standard, and one detector checks for several Standards, so the
@@ -71,7 +71,7 @@ dev-playbook's shipped table carries; the two tables union at read time.
 
 `standard.a-consumer-adds-only-its-own-rules` · deterministic
 
-## The boundary table
+## The boundary table, generated from the wiring
 
 A repo that asks any check, dev-playbook or a consumer whose
 `.pre-commit-config.yaml` wires a `scripts/` hook, carries
@@ -85,7 +85,7 @@ the wiring: the hooks of `.pre-commit-config.yaml` by their stages, with
 `playbook-lint` expanded to its roster, the recipe of `make check`, and
 each workflow's `run` steps less their `SKIP`.
 
-`standard.the-boundary-table` · deterministic
+`standard.the-boundary-table-generated-from-the-wiring` · deterministic
 
 > **Why.** A Standard that stated its own enforcement could be wrong
 > about it and nothing would notice, so where a check runs is read
@@ -109,14 +109,14 @@ rather than held in the repository.
 
 The detector is a script the audited repo hosts at `scripts/<name>`.
 
-### Thin shims
+### The script holds no rule logic
 
 The script holds no rule logic: apart from its shebang and inline
 metadata block, its statements are at most one that puts the host repo's
 package on `sys.path`, one import from that package, and one call of the
 imported entry point.
 
-`standard.thin-shims` · deterministic
+`standard.the-script-holds-no-rule-logic` · deterministic
 
 ### Git runs against the given root
 
@@ -131,7 +131,7 @@ A first-party detector that runs git clears the variables
 > silent: a detector told to audit one repository reads another and
 > reports on it.
 
-### The hosting pattern
+### Every detector is reachable and listed
 
 A first-party detector is reachable from its repo's published hook,
 named in the `playbook-lint` roster, wired as a `scripts/` hook its
@@ -139,7 +139,7 @@ named in the `playbook-lint` roster, wired as a `scripts/` hook its
 registered as an ungated audit, and has a row in a `scripts/README.md`
 script table where the repo has that file.
 
-`standard.the-hosting-pattern` · deterministic
+`standard.every-detector-is-reachable-and-listed` · deterministic
 
 ### Offered by the canonical template
 

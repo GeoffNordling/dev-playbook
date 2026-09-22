@@ -17,12 +17,12 @@ and identical on CI, and the clone carries the
 the standard, hook code, a canonical artifact, or a version pin, reaches a
 consumer only when its pinned `rev` moves; the release is the bump.
 
-## One published id
+## One published hook id
 
 The hook repository's `.pre-commit-hooks.yaml` publishes exactly one
 hook, `playbook-lint`.
 
-`distribution.one-published-id` · deterministic
+`distribution.one-published-hook-id` · deterministic
 
 > **Why.** One id spares a consumer the detector list, so enrollment
 > rides the pin: a detector added upstream reaches every consumer at
@@ -35,9 +35,9 @@ file publishes under a `repo: local` block of its `.pre-commit-config.yaml`.
 
 `distribution.a-publisher-dogfoods-its-manifest` · deterministic
 
-## A valid manifest
+## The manifest validates
 
 A `.pre-commit-hooks.yaml` at a governed repo's root passes
 `pre-commit validate-manifest`.
 
-`distribution.a-valid-manifest` · deterministic
+`distribution.the-manifest-validates` · deterministic

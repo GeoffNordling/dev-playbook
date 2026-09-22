@@ -42,12 +42,12 @@ heading and carried by a separate issue that carries `phase:intake`.
 
 `tracking.one-goal` · stochastic
 
-## User intent
+## User intent in the user's voice
 
 An issue's `User intent` section is written in the user's voice, not an
 agent's paraphrase.
 
-`tracking.user-intent` · stochastic
+`tracking.user-intent-in-the-users-voice` · stochastic
 
 > **Why.** Only the user can vouch for what they meant. A paraphrase
 > is an agent's reading of the intent, and the reading is what drifts,
@@ -65,15 +65,15 @@ label other than `phase:intake`, closes every code fence its body opens.
 
 The issue has no sub-issues and carries `mode:direct`.
 
-### Build labels
+### One label from each prefix
 
 A build leaf that carries a `phase:*` label other than `phase:intake`
 carries exactly one label from each of `category`, `mode`, `tests`, and
 `phase`, and each of those labels is a value of the label scheme.
 
-`tracking.build-labels` · deterministic
+`tracking.one-label-from-each-prefix` · deterministic
 
-### Build headings
+### Every build heading, in bold
 
 A build leaf that carries a `phase:*` label other than `phase:intake`
 carries every heading below in its body, each as a bold heading; a
@@ -104,30 +104,30 @@ What happens after the work, including edge cases and error conditions.
 - What this issue will not change
 ```
 
-`tracking.build-headings` · deterministic
+`tracking.every-build-heading-in-bold` · deterministic
 
-### Artifacts
+### Every artifact block in a fence
 
 Where a build leaf's body carries an `Artifacts` section, each block
 under it sits in a code fence, four backticks when the block has fences
 of its own.
 
-`tracking.artifacts` · stochastic
+`tracking.every-artifact-block-in-a-fence` · stochastic
 
 ## Spike
 
 The issue has no sub-issues and carries `mode:spike`.
 
-### Spike labels
+### One label from each prefix, tests fixed at no
 
 A spike that carries a `phase:*` label other than `phase:intake` carries
 exactly one label from each of `category`, `mode`, `tests`, and `phase`,
 each of those labels is a value of the label scheme, and its `tests:*`
 label is `tests:no`.
 
-`tracking.spike-labels` · deterministic
+`tracking.one-label-from-each-prefix-tests-fixed-at-no` · deterministic
 
-### Spike headings
+### Summary, Question, and Deliverable
 
 A spike that carries a `phase:*` label other than `phase:intake` carries
 `Summary`, `Question`, and `Deliverable` in its body, each as a bold
@@ -143,21 +143,21 @@ The specific question, narrow enough to resolve in one investigation.
 What a good answer looks like.
 ```
 
-`tracking.spike-headings` · deterministic
+`tracking.summary-question-and-deliverable` · deterministic
 
 ## Session leaf
 
 The issue has no sub-issues and carries `mode:session`.
 
-### Session labels
+### One category label, no phase or tests
 
 A session leaf carries exactly one `category:*` label, a value of the
 label scheme, and carries no `mode:*` label other than `mode:session`, no
 `tests:*` label, and no `phase:*` label.
 
-`tracking.session-labels` · deterministic
+`tracking.one-category-label-no-phase-or-tests` · deterministic
 
-### Session headings
+### Every session heading, in bold
 
 A session leaf carries `Summary`, `User intent`, `Current behavior`,
 `Desired behavior`, `Acceptance criteria`, and `Out of scope` in its
@@ -165,7 +165,7 @@ body, each as a bold heading; a heading shown inside a code fence is
 quoted, not carried. Its `Out of scope` may read
 `Unknown; dealt with when found.`
 
-`tracking.session-headings` · deterministic
+`tracking.every-session-heading-in-bold` · deterministic
 
 ### A stable body
 
@@ -190,7 +190,7 @@ scheme, and carries no `phase:*`, `mode:*`, or `tests:*` label.
 
 `tracking.category-only` · deterministic
 
-### Epic headings
+### Outcome and Decomposition rationale
 
 An epic carries `Outcome` and `Decomposition rationale` in its body, each
 as a bold heading.
@@ -203,7 +203,7 @@ The end state once every child has merged.
 Why the work was sliced this way.
 ```
 
-`tracking.epic-headings` · deterministic
+`tracking.outcome-and-decomposition-rationale` · deterministic
 
 ### No child list
 
@@ -217,30 +217,30 @@ The issue carries a `wayfinder:*` label: `wayfinder:map` makes it a
 **map**, and any other `wayfinder:*` value makes it a **decision
 ticket**.
 
-### Wayfinder labels
+### One wayfinder label and nothing else
 
 A map carries `wayfinder:map` and no other `wayfinder:*` value; a
 decision ticket carries exactly one `wayfinder:*` value, a value of the
 label scheme; and neither carries a `category:*`, `mode:*`, `tests:*`, or
 `phase:*` label.
 
-`tracking.wayfinder-labels` · deterministic
+`tracking.one-wayfinder-label-and-nothing-else` · deterministic
 
-### Wayfinder body
+### Map sections, ticket Question
 
 A map's body carries a `Destination`, a `Notes`, a `Decisions so far`, a
 `Not yet specified`, and an `Out of scope` section, and a decision
 ticket's body carries a `Question` section, each as a markdown heading at
 any level.
 
-`tracking.wayfinder-body` · deterministic
+`tracking.map-sections-ticket-question` · deterministic
 
 > **Why.** The `/wayfinder` skill owns these body shapes; the rule
 > mirrors them, so a change to the shapes the skill drives is what
 > changes the rule.
 
-### Ticket parentage
+### Ticket under a map
 
 A decision ticket is a sub-issue of a map.
 
-`tracking.ticket-parentage` · deterministic
+`tracking.ticket-under-a-map` · deterministic

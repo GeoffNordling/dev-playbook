@@ -27,7 +27,7 @@ sequences hold what is consulted rather than performed — the seams an
 interface may present, the shapes a fallback takes, what a docstring and
 a sourced fragment carry, and the tests the suite does without.
 
-## Shaping a module
+## A module is shaped from the outside in
 
 A module is shaped from the outside in:
 
@@ -55,7 +55,7 @@ A module is shaped from the outside in:
    module is not a gap in the tests but a sign that the module is the
    wrong shape.
 
-## The seams a module presents
+## Two adapters to every seam the interface presents
 
 A **seam** is a place where behaviour is altered without editing in that
 place. Keep a seam that exists only for the module's own tests inside
@@ -68,7 +68,7 @@ it, so the interface buys indirection and no leverage. The second
 adapter, a test's in-memory fake included, is the evidence that
 behaviour differs across the seam.
 
-## Fallbacks that hide a missing value
+## A missing required value raises
 
 Read a value the code requires directly, so a missing one raises. Leave
 a fallback only where the missing value is a real runtime state rather
@@ -91,12 +91,12 @@ cause, where it is much harder to diagnose. The inline comment on a
 legitimate fallback is the signal that the author weighed the missing
 value.
 
-## What a docstring says
+## A docstring says in plain English what the code does
 
 Say in plain English what the module, class, function, or method the
 docstring documents does.
 
-## What a sourced fragment holds
+## A sourced fragment holds only what mutates the parent shell
 
 Keep a sourced fragment, a shell file under `.bashrc.d/`
 ([Shell Conventions](/standards/shell/conventions.md)), to what mutates
@@ -105,7 +105,7 @@ boundary is the one job a child Python process cannot do: it cannot
 change the parent's directory, define its aliases, or register its
 completions.
 
-## Writing one test
+## One test names a capability and asserts on observable outputs
 
 One test is written in this order:
 
@@ -132,7 +132,7 @@ One test is written in this order:
    ordering is itself the contract. Call counts, argument shapes, and
    call ordering pin the implementation the contract leaves free.
 
-## Choosing a double
+## The lightest double that verifies the behaviour
 
 A dependency is doubled in this order:
 
@@ -164,7 +164,7 @@ A dependency is doubled in this order:
    - **A non-deterministic or expensive external.** The LLM client, an
      external API, a cloud service.
 
-## Setting up and tearing down
+## Setup and cleanup leave the test body
 
 Setup and cleanup leave the test body:
 
@@ -174,7 +174,7 @@ Setup and cleanup leave the test body:
    default, then class, then module, then session. State shared between
    tests causes flaky failures.
 
-## Tests to delete and tests not to write
+## One layer of coverage, and no test of a non-deterministic output
 
 Once a module is covered through its own interface, delete the unit
 tests on the smaller pieces beneath it rather than keeping them. Two

@@ -17,11 +17,11 @@ repo's state on github.com, which `scripts/workspace-lint` reads over
 > grant for a one-time toggle, so they are set by hand and the
 > Standard only audits them.
 
-## GitHub origin
+## Origin on GitHub
 
 A governed repo's `origin` remote is a repository on github.com.
 
-`tracking.github-origin` · deterministic
+`tracking.origin-on-github` · deterministic
 
 ## Squash-only merges
 
@@ -41,7 +41,7 @@ A governed repo's GitHub merge settings hold every row of this table:
 > the branch settled survives only in the tree it merges or in the
 > pull request's message.
 
-## Default branch protection
+## Default branch protected from destructive operations
 
 A governed repo's default branch carries both destructive-operation
 rules in force: force pushes are blocked, and deletions are restricted.
@@ -58,7 +58,7 @@ and an empty bypass list, and at least one of them is named
 | Restrict deletions | checked |
 | Block force pushes | checked |
 
-`tracking.default-branch-protection` · deterministic
+`tracking.default-branch-protected-from-destructive-operations` · deterministic
 
 > **Why.** Together the two rules make the branch's history
 > append-only: every commit that reaches the default branch stays

@@ -12,7 +12,7 @@ that owns them, `knowledge-organization.*`:
     each the place reserved for its label. The registry
     is two-level. In apex mode — the audited tree hosts the canonical consumer
     template (`CANONICAL_CONFIG`), i.e. dev-playbook itself — it is that tree's
-    own `## Types` table (`REGISTRY_DOC`), read and shape-checked there as the
+    own `## `type` names a registered type` table (`REGISTRY_DOC`), read and shape-checked there as the
     sole source of truth, with no union and no local declaration. In consumer
     mode — every other repo — the authoritative registry is read from this
     script's own hook clone (`UPSTREAM_REGISTRY_ROOT`), and the audited tree's
@@ -30,7 +30,7 @@ that owns them, `knowledge-organization.*`:
     concept documents carries an `index.md` of its own
     (`knowledge-organization.an-index-in-every-directory`), and every `index.md` opens with
     an introduction between its H1 and its first entry
-    (`knowledge-organization.the-introduction`) — presence only; what it says is a
+    (`knowledge-organization.introduction-between-h1-and-listing`) — presence only; what it says is a
     reviewer's judgment. The repository root `index.md` additionally declares
     `okf_version`. The prose standard for these rules lives in this repo's
     standards/ tree.
@@ -89,23 +89,25 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.
-FRONTMATTER_BLOCK = "knowledge-organization.frontmatter-block"
-TYPES = "knowledge-organization.types"
-TITLE = "knowledge-organization.title"
-DESCRIPTION = "knowledge-organization.description"
-RECIPE_DESCRIPTION = "knowledge-organization.recipe-description"
-TYPED_STANDARD = "knowledge-organization.typed-standard"
-TYPED_LOOP = "knowledge-organization.typed-loop"
-TYPED_GUIDE = "knowledge-organization.typed-guide"
-THE_INTRODUCTION = "knowledge-organization.the-introduction"
-THE_LISTING = "knowledge-organization.the-listing"
-ORDERING = "knowledge-organization.ordering"
+FRONTMATTER_BLOCK = "knowledge-organization.frontmatter-a-yaml-mapping"
+TYPES = "knowledge-organization.type-names-a-registered-type"
+TITLE = "knowledge-organization.non-empty-title"
+DESCRIPTION = "knowledge-organization.non-empty-description-no-closing-period"
+RECIPE_DESCRIPTION = "knowledge-organization.recipe-description-carries-a-resource"
+TYPED_STANDARD = "knowledge-organization.standard-lives-under-standards"
+TYPED_LOOP = "knowledge-organization.loop-lives-under-loops"
+TYPED_GUIDE = "knowledge-organization.guide-lives-under-guides"
+THE_INTRODUCTION = "knowledge-organization.introduction-between-h1-and-listing"
+THE_LISTING = (
+    "knowledge-organization.one-entry-per-concept-document-and-child-directory"
+)
+ORDERING = "knowledge-organization.alphabetical-unless-declared-otherwise"
 OKF_VERSION_DECLARED = "knowledge-organization.okf-version-declared"
 AN_INDEX_IN_EVERY_DIRECTORY = "knowledge-organization.an-index-in-every-directory"
-ROW_SHAPE = "knowledge-organization.row-shape"
-ALPHABETICAL_ORDER = "knowledge-organization.alphabetical-order"
-MAPPING_ENTRY_SHAPE = "knowledge-organization.mapping-entry-shape"
-ALPHABETICAL_KEYS = "knowledge-organization.alphabetical-keys"
+ROW_SHAPE = "knowledge-organization.type-name-in-first-cell"
+ALPHABETICAL_ORDER = "knowledge-organization.rows-in-alphabetical-order"
+MAPPING_ENTRY_SHAPE = "knowledge-organization.type-name-to-description"
+ALPHABETICAL_KEYS = "knowledge-organization.keys-in-alphabetical-order"
 ADD_NEVER_SHADOW = "knowledge-organization.add-never-shadow"
 
 RULES = (
@@ -130,6 +132,9 @@ RULES = (
 )
 
 REGISTRY_DOC = "standards/knowledge-organization/document-types.md"
+# The registry table is found by its heading's slug, so a rename of that
+# heading in REGISTRY_DOC lands here and nowhere else.
+REGISTRY_SECTION_SLUG = "type-names-a-registered-type"
 # The root-index frontmatter key a consumer declares its local document types
 # under, beside okf_version: a mapping of type name to one-line description.
 # Frontmatter rather than a document under the consumer's standards/ tree,
@@ -193,7 +198,7 @@ def _is_type_name(name: str) -> bool:
 
     ``README``, ``Guide`` and ``Recipe-Description`` pass; ``bogus name``,
     ``Bogus Name`` and ``lowercase`` do not. One implementation for the two
-    places a type name is declared — a `## Types` row's backticked first cell,
+    places a type name is declared — a `## `type` names a registered type` row's backticked first cell,
     and an `okf_types` key in a consumer's root index frontmatter — so a name
     legal in one is legal in the other.
     """
@@ -220,12 +225,12 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     ``registry_root`` is the tree carrying the registry document — the apex
     tree's own, or the hook clone's for the consumer-mode read (see
     `HOOK_REPO_ROOT`). Returns ``(names, malformed_rows)`` — the backticked type
-    names of the `## Types` table in table order (so the caller can both build
+    names of the `## `type` names a registered type` table in table order (so the caller can both build
     the registry set and check the declared alphabetical order), and the line
     numbers of the rows whose first cell is not a single backticked type name,
     which the caller turns into `knowledge-organization.registry-row` findings
     rather than silently dropping the type. Raises ToolError when no valid type
-    is parsed — the document is absent, or its `## Types` table is missing or has
+    is parsed — the document is absent, or its `## `type` names a registered type` table is missing or has
     no valid row — since a missing authoritative registry means the hook cannot
     run.
     """
@@ -240,7 +245,7 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     for line_num, line in lines:
         heading = md.HEADING_PATTERN.match(line)
         if heading:
-            in_types = md.github_slug(heading.group(1)) == "types"
+            in_types = md.github_slug(heading.group(1)) == REGISTRY_SECTION_SLUG
             seen_separator = False
             continue
         if not in_types or not line.lstrip().startswith("|"):
@@ -261,7 +266,7 @@ def parse_registry(registry_root: Path) -> tuple[list[str], list[int]]:
     if not valid:
         raise ToolError(
             f"no usable type registry at {REGISTRY_DOC}: the document is absent "
-            "or its '## Types' table has no valid rows"
+            f"or its '{REGISTRY_SECTION_SLUG}' table has no valid rows"
         )
     return valid, malformed
 
@@ -271,18 +276,18 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
 
     Owns ``parse_registry``: returns the registry set (consumed by the type-lint)
     and its own findings — a ``knowledge-organization.registry-row`` per malformed row and a
-    ``knowledge-organization.ordering`` when the `## Types` table is not alphabetical by type
+    ``knowledge-organization.alphabetical-unless-declared-otherwise`` when the `## `type` names a registered type` table is not alphabetical by type
     name (the document's intro declares it alphabetical). Called only in apex
     mode — see `main()` — since the registry's shape is dev-playbook's to fix,
     never a consumer's. Raises ToolError if the registry document or its
-    `## Types` table is absent.
+    `## `type` names a registered type` table is absent.
     """
     type_names, malformed_rows = parse_registry(registry_root)
     findings = [
         Finding(
             REGISTRY_DOC,
             ROW_SHAPE,
-            "`## Types` row's first cell is not a backticked Title Case type name",
+            "`## `type` names a registered type` row's first cell is not a backticked Title Case type name",
             line=line_num,
         )
         for line_num in malformed_rows
@@ -292,7 +297,7 @@ def check_registry(registry_root: Path) -> tuple[set[str], list[Finding]]:
             Finding(
                 REGISTRY_DOC,
                 ALPHABETICAL_ORDER,
-                "`## Types` rows are not in alphabetical order by type name",
+                "`## `type` names a registered type` rows are not in alphabetical order by type name",
             )
         )
     return set(type_names), findings

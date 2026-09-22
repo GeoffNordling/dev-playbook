@@ -58,14 +58,14 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # advisory, not a finding. Each id is a module-level constant so every
 # emission site references the constant, never a raw literal, and RULES (what
 # --list-rules prints) cannot drift from what the detector actually emits.
-FRONT_MATTER = "doc-type.front-matter"
+FRONT_MATTER = "doc-type.front-matter-holds-its-kinds-vocabulary"
 NAME_MATCHES_ITS_HOME = "doc-type.name-matches-its-home"
 KEBAB_CASE_NAME = "doc-type.kebab-case-name"
-DESCRIPTION = "doc-type.description"
-MODEL_AND_EFFORT = "doc-type.model-and-effort"
-MODEL_INVOCATION_FLAG = "doc-type.model-invocation-flag"
-ARGUMENTS = "doc-type.arguments"
-TOOLS = "doc-type.tools"
+DESCRIPTION = "doc-type.description-two-sentences-or-one"
+MODEL_AND_EFFORT = "doc-type.model-and-effort-from-closed-sets"
+MODEL_INVOCATION_FLAG = "doc-type.boolean-disable-model-invocation"
+ARGUMENTS = "doc-type.arguments-bare-kebab-case-names"
+TOOLS = "doc-type.tools-comma-separated-tool-names"
 BODY_OPENS_WITH_AN_H1 = "doc-type.body-opens-with-an-h1"
 REFERENCES_ONE_LEVEL_DEEP = "doc-type.references-one-level-deep"
 TWO_SECTIONS = "harness.behaviors-then-principles"

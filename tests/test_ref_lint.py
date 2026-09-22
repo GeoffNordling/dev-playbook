@@ -331,7 +331,7 @@ def test_same_repo_citation_in_fixed_root_file_is_wrong_form(
 
     assert result.returncode == 1
     assert "1 wrong-form" in result.stderr
-    assert "link-same-bundle" in result.stdout
+    assert "root-absolute-path-in-the-same-repo" in result.stdout
 
 
 def test_wrong_form_reported_even_when_target_missing(
@@ -813,7 +813,7 @@ def test_list_rules_prints_knowledge_organization_prefixed_ids_from_any_cwd(
     ids = result.stdout.split()
     assert "knowledge-organization.reference-resolves" in ids
     assert "knowledge-organization.fragment-anchor-matches-the-slug" in ids
-    assert "knowledge-organization.link-same-bundle" in ids
+    assert "knowledge-organization.root-absolute-path-in-the-same-repo" in ids
     assert all(rule.startswith("knowledge-organization.") for rule in ids), ids
 
 
@@ -846,7 +846,7 @@ def test_wrong_form_citation_renders_as_gnu_finding(
 
     assert result.returncode == 1
     assert re.search(
-        r"^docs\.md:\d+: knowledge-organization\.link-same-bundle ",
+        r"^docs\.md:\d+: knowledge-organization\.root-absolute-path-in-the-same-repo ",
         result.stdout,
         re.MULTILINE,
     ), result.stdout

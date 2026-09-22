@@ -53,7 +53,7 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 RULE_FOR = {
     "broken": "knowledge-organization.reference-resolves",
     "bad-anchor": "knowledge-organization.fragment-anchor-matches-the-slug",
-    "wrong-form": "knowledge-organization.link-same-bundle",
+    "wrong-form": "knowledge-organization.root-absolute-path-in-the-same-repo",
 }
 MESSAGE_FOR = {
     "broken": "reference does not resolve",

@@ -63,7 +63,7 @@ from dev_playbook.verifier_table import (
     yaml_mapping,
 )
 
-THE_BOUNDARY_TABLE = "standard.the-boundary-table"
+THE_BOUNDARY_TABLE = "standard.the-boundary-table-generated-from-the-wiring"
 EVERY_ADDRESS_RUNS_SOMEWHERE = "standard.every-address-runs-somewhere"
 
 RULES = (THE_BOUNDARY_TABLE, EVERY_ADDRESS_RUNS_SOMEWHERE)

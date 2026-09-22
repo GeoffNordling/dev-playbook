@@ -135,7 +135,7 @@ def test_missing_base_files_all_reported(tmp_path: Path) -> None:
         "Makefile",
         ".github/workflows/ci.yml",
     ):
-        assert f"{rel}: build.required-files" in result.stdout
+        assert f"{rel}: build.files-every-repo-carries" in result.stdout
 
 
 def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
@@ -145,7 +145,10 @@ def test_ci_yml_must_be_byte_identical(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert ".github/workflows/ci.yml: build.ciyml" in result.stdout
+    assert (
+        ".github/workflows/ci.yml: build.ciyml-byte-identical-to-canonical"
+        in result.stdout
+    )
 
 
 def test_root_bin_and_tools_forbidden(tmp_path: Path) -> None:
@@ -200,7 +203,7 @@ def test_drifted_ruff_rev_fails(tmp_path: Path) -> None:
     )
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "build.pre-commit-configyaml" in result.stdout
+    assert "build.pre-commit-configyaml-holds-every-canonical-block" in result.stdout
     assert "ruff-pre-commit" in result.stdout
 
 
@@ -242,7 +245,7 @@ def test_readme_without_h1_fails(tmp_path: Path) -> None:
     files = base_files()
     files["README.md"] = "Just prose, no heading.\n"
     result = run(make_repo(tmp_path, files))
-    assert "README.md: knowledge-organization.h1" in result.stdout
+    assert "README.md: knowledge-organization.readme-holds-an-h1" in result.stdout
 
 
 def test_repo_claude_md_content_is_free(tmp_path: Path) -> None:
@@ -277,7 +280,7 @@ def test_nested_context_md_forbidden(tmp_path: Path) -> None:
     files = base_files()
     files["docs/CONTEXT.md"] = "# Nested\n"
     result = run(make_repo(tmp_path, files))
-    assert "docs/CONTEXT.md: build.root-only-files" in result.stdout
+    assert "docs/CONTEXT.md: build.one-at-the-root-or-none" in result.stdout
 
 
 def test_rogue_future_work_files_forbidden_anywhere(tmp_path: Path) -> None:
@@ -306,7 +309,7 @@ def test_nested_candidates_md_forbidden(tmp_path: Path) -> None:
     files = base_files()
     files["docs/CANDIDATES.md"] = "# Nested\n"
     result = run(make_repo(tmp_path, files))
-    assert "docs/CANDIDATES.md: build.root-only-files" in result.stdout
+    assert "docs/CANDIDATES.md: build.one-at-the-root-or-none" in result.stdout
 
 
 # --- python layer ---
@@ -325,8 +328,11 @@ def test_python_repo_missing_lock_version_tests(tmp_path: Path) -> None:
     del files[".python-version"]
     del files["tests/test_sample.py"]
     result = run(make_repo(tmp_path, files))
-    assert "uv.lock: build.uvlock-and-python-version" in result.stdout
-    assert ".python-version: build.uvlock-and-python-version" in result.stdout
+    assert "uv.lock: build.lock-file-tracked-python-version-pinned" in result.stdout
+    assert (
+        ".python-version: build.lock-file-tracked-python-version-pinned"
+        in result.stdout
+    )
     assert "tests/: build.tests-present" in result.stdout
 
 
@@ -334,7 +340,10 @@ def test_python_version_must_match_canonical_pin(tmp_path: Path) -> None:
     files = python_files()
     files[".python-version"] = "3.12\n"
     result = run(make_repo(tmp_path, files))
-    assert ".python-version: build.python-version" in result.stdout
+    assert (
+        ".python-version: build.python-version-byte-identical-to-canonical"
+        in result.stdout
+    )
 
 
 def test_requirements_txt_forbidden_anywhere(tmp_path: Path) -> None:
@@ -351,7 +360,7 @@ def test_nested_pyproject_forbidden(tmp_path: Path) -> None:
     files = python_files()
     files["sub/pyproject.toml"] = "[project]\nname = 'sub'\n"
     result = run(make_repo(tmp_path, files))
-    assert "sub/pyproject.toml: build.root-only-files" in result.stdout
+    assert "sub/pyproject.toml: build.one-at-the-root-or-none" in result.stdout
 
 
 def test_project_name_must_follow_mapping(tmp_path: Path) -> None:
@@ -466,7 +475,7 @@ def test_makefile_wrong_mypy_roots_fails(tmp_path: Path) -> None:
     files = python_files(code_roots="src")
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "Makefile: build.makefile" in result.stdout
+    assert "Makefile: build.makefile-holds-its-layers-targets" in result.stdout
     assert "Makefile.python" in result.stdout
 
 
@@ -490,7 +499,7 @@ def test_makefile_dropped_artifacts_include_fails(tmp_path: Path) -> None:
     files["Makefile"] = files["Makefile"].replace("-include artifacts.mk\n", "")
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert "Makefile: build.makefile" in result.stdout
+    assert "Makefile: build.makefile-holds-its-layers-targets" in result.stdout
 
 
 # --- scripts layer ---
@@ -501,7 +510,10 @@ def test_executable_script_with_plain_shebang_fails(tmp_path: Path) -> None:
     files["scripts/tool.py"] = "#!/usr/bin/env python3\nprint('hi')\n"
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 1
-    assert "scripts/tool.py: build.shebang-and-inline-metadata" in result.stdout
+    assert (
+        "scripts/tool.py: build.executable-scripts-carry-the-uv-shebang-and-inline-metadata"
+        in result.stdout
+    )
 
 
 def test_executable_script_without_pep723_fails(tmp_path: Path) -> None:
@@ -517,7 +529,10 @@ def test_script_python_floor_mismatch_fails(tmp_path: Path) -> None:
     files["scripts/tool.py"] = UV_SCRIPT.replace('">=3.14"', '">=3.11"')
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 1
-    assert "scripts/tool.py: build.shebang-and-inline-metadata" in result.stdout
+    assert (
+        "scripts/tool.py: build.executable-scripts-carry-the-uv-shebang-and-inline-metadata"
+        in result.stdout
+    )
     assert '">=3.14"' in result.stdout
 
 
@@ -526,7 +541,10 @@ def test_script_python_floor_missing_fails(tmp_path: Path) -> None:
     files["scripts/tool.py"] = UV_SCRIPT.replace('# requires-python = ">=3.14"\n', "")
     result = run(make_repo(tmp_path, files, executable=("scripts/tool.py",)))
     assert result.returncode == 1
-    assert "scripts/tool.py: build.shebang-and-inline-metadata" in result.stdout
+    assert (
+        "scripts/tool.py: build.executable-scripts-carry-the-uv-shebang-and-inline-metadata"
+        in result.stdout
+    )
 
 
 def test_makefile_roots_require_real_py_files(tmp_path: Path) -> None:
@@ -603,7 +621,7 @@ def test_hook_repo_unknown_canonical_artifact_fails(tmp_path: Path) -> None:
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
     assert (
-        "standards/build/canonical/mystery.cfg: build.the-source-directory"
+        "standards/build/canonical/mystery.cfg: build.every-canonical-file-has-a-rule-and-every-rule-a-file"
         in result.stdout
     )
 
@@ -634,7 +652,10 @@ def test_manifest_without_canonical_dir_still_requires_pinned_block(
     files[".pre-commit-config.yaml"] = config[:start] + config[end:]
     result = run(make_repo(tmp_path, files))
     assert result.returncode == 1
-    assert ".pre-commit-config.yaml: build.pre-commit-configyaml" in result.stdout
+    assert (
+        ".pre-commit-config.yaml: build.pre-commit-configyaml-holds-every-canonical-block"
+        in result.stdout
+    )
 
 
 def test_manifest_without_canonical_dir_enforces_dogfood_mirror(
@@ -660,13 +681,13 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = set(result.stdout.split())
-    assert "build.required-files" in ids
-    assert "build.makefile" in ids
-    assert "knowledge-organization.h1" in ids
+    assert "build.files-every-repo-carries" in ids
+    assert "build.makefile-holds-its-layers-targets" in ids
+    assert "knowledge-organization.readme-holds-an-h1" in ids
     assert "build.no-other-future-work-file" in ids
     # No harness.* here: the voice rule is prose-lint's and the global CLAUDE.md
     # shape is harness-files-lint's. repo-lint checks that CLAUDE.md exists,
-    # which is build.required-files, and nothing about what it says.
+    # which is build.files-every-repo-carries, and nothing about what it says.
     assert all(
         rule.split(".")[0]
         in {"build", "distribution", "knowledge-organization", "tracking"}
@@ -678,7 +699,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, {"README.md": "# X\n"})
     result = run(repo)
     assert result.returncode == 1
-    assert "CLAUDE.md: build.required-files " in result.stdout
+    assert "CLAUDE.md: build.files-every-repo-carries " in result.stdout
 
 
 def test_global_claude_source_is_not_this_detectors_business(tmp_path: Path) -> None:
