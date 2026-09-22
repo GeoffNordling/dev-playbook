@@ -8,8 +8,7 @@ population: "a concept document"
 # Document Types
 
 The frontmatter a concept document carries, the prose `.md` file a
-reader loads to understand something
-([Concept document or harness-owned file](/standards/knowledge-organization/explanation.md#concept-document-or-harness-owned-file)). The
+reader loads to understand something. The
 boundary is drawn by exclusion from a repo's `.md` files: `index.md` is a
 typeless listing ([Indexes](/standards/knowledge-organization/indexes.md));
 the members of the Claude Code file registry
@@ -19,9 +18,6 @@ no frontmatter; and `classify()` in [md.py](/src/dev_playbook/md.py)
 holds the boundary in code with its further exclusions, the transient
 `PLAN.md` and `PROGRESS.md` pair, the root `tmp/` tree, and every
 top-level `tests/` tree.
-
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
 
 ## Frontmatter block
 
@@ -41,7 +37,6 @@ frontmatter of the repo's own root `index.md`
 |------|------------|
 | `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [Candidates](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
-| `Explanation` | The reasoning and mechanism behind one Standard's rules, rule by rule; never cited to reject work; lives at `standards/<name>/explanation.md`, one per Standard. |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
 | `Guide` | Instruction on how to do a kind of work, read before doing it and organized by the work; cites rules in passing and is never cited to reject work; lives under `guides/`, the one tree reserved for it. |
 | `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
@@ -75,6 +70,10 @@ A concept document's `description` is a sentence fragment in the present
 tense that names what the document is or what it governs.
 
 `knowledge-organization.description-voice` · stochastic
+
+> **Why.** The description is what a reader triages on and what every
+> `index.md` listing carries verbatim, so it is read far more often,
+> and far further from its document, than the document itself.
 
 ## resource
 
@@ -121,9 +120,3 @@ A concept document typed `Loop` lives under `loops/`.
 A concept document typed `Guide` lives under `guides/`.
 
 `knowledge-organization.typed-guide` · deterministic
-
-## Typed Explanation
-
-A concept document typed `Explanation` is `standards/<name>/explanation.md`.
-
-`knowledge-organization.typed-explanation` · deterministic

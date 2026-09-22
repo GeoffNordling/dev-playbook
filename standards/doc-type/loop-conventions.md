@@ -15,8 +15,8 @@ the encoding its file takes,
 doc-type binds nobody, so this Standard is what binds the file to that
 encoding.
 
-The reasoning behind the rules is
-[Doc-Type Explanation](/standards/doc-type/explanation.md#a-loops-file).
+> **Why.** The graph is the source of truth; the paragraph before it
+> says what state the loop drives and toward what.
 
 ## One graph
 

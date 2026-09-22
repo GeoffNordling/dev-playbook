@@ -11,9 +11,6 @@ A governed repo has one Python project, at the root
 ([File Skeleton](/standards/build/skeleton.md#root-only-files)); this
 Standard binds it.
 
-The reasoning behind the rules is the
-[Build Explanation](/standards/build/explanation.md).
-
 ## Name mapping
 
 The root `pyproject.toml` sets `project.name` to the repo directory's
@@ -47,3 +44,7 @@ where the repo has a root `.python-version`, that block's
 `.python-version`, `>=3.13` for a `.python-version` of `3.13`.
 
 `build.shebang-and-inline-metadata` · deterministic
+
+> **Why.** The shebang `#!/usr/bin/env -S uv run --script` is what
+> lets the file run from a bare clone with nothing installed, which a
+> pre-commit hook `entry` requires.

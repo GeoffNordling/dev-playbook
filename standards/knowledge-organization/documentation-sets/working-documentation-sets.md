@@ -23,8 +23,13 @@ worklist, held in one member or in one subdirectory with its own
 `ROOT.md`. Below, `ROOT.md` is the nearest root above the member, and
 the set is the whole tree, strands included.
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
+> **Why.** The buckets are a menu,
+> [one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home)
+> made navigable: a set uses the buckets its work needs, skips the
+> rest, and coins its own where none fits, so a bucket a set does not
+> use is no finding, and `Unfiled` catches what fits none of them. A
+> term of the work is defined in a `ROOT.md` rather than in the repo's
+> `CONTEXT.md` because it crosses no set while the work runs.
 
 ## Speculative voice
 
@@ -63,6 +68,10 @@ A working documentation set, the one
 makes a set, is present on `main`.
 
 `knowledge-organization.a-set-stands-on-main` · deterministic
+
+> **Why.** The speculative voice lets a set stand on `main`: a reader
+> meets a guess marked as a guess, and the worklist shows where the
+> work is.
 
 ## `working-docs/` holds only sets
 

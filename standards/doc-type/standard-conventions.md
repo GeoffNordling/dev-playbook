@@ -17,6 +17,14 @@ doc-type binds nobody, so this Standard is what binds the file to that
 encoding. The tree the file sits in is
 [The Standards Tree](/standards/standard/tree.md).
 
+> **Why.** The verifier table reads a rule by its trailer
+> ([The verifier table](/standards/standard/detectors.md#the-verifier-table)),
+> so a rule without one is a rule no row of that table can name. A
+> verifier, and a reader, must know the class before the first rule,
+> which is what the one frontmatter phrase gives them. And no
+> verifier, script or judge, returns one value for a predicate that
+> compares two members or asks for taste.
+
 ## The population
 
 A file typed `Standard` names the population its rules bind in its

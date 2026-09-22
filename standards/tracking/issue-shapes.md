@@ -49,6 +49,10 @@ it is the user's own words for this issue, never an agent's paraphrase.
 
 `tracking.user-intent` · stochastic
 
+> **Why.** The defect the rule catches is one epic-level block of
+> intent copied into every child: the words are the user's, but they
+> are not this issue's.
+
 ## Closed fences
 
 A leaf that carries `mode:session`, or a leaf that carries a `phase:*`
@@ -182,6 +186,11 @@ decision.
 
 `tracking.a-stable-body` · stochastic
 
+> **Why.** The plan, the open questions, and the decisions of the work
+> live in a
+> [working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+> on the branch, so the body has nothing to accrue.
+
 ## Epic
 
 The issue has sub-issues and carries no `wayfinder:*` label.
@@ -248,6 +257,10 @@ ticket's body carries a `Question` section, each as a markdown heading at
 any level.
 
 `tracking.wayfinder-body` · deterministic
+
+> **Why.** The `/wayfinder` skill owns these body shapes; the rule
+> mirrors them, so a change to the shapes the skill drives is what
+> changes the rule.
 
 ### Ticket parentage
 

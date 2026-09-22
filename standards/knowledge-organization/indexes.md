@@ -17,8 +17,9 @@ repository: an agent triages a document by its frontmatter and navigates
 between documents by the per-directory `index.md`, loading a body only
 when the document is relevant.
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
+> **Why.** An `index.md` is authored, never generated: a generator
+> could copy the descriptions, but the introduction and the order are
+> the writer's judgment.
 
 ## Typeless
 
@@ -41,6 +42,9 @@ directory holds, the sentence says what the directory is for instead.
 
 `knowledge-organization.the-opening-sentence` · stochastic
 
+> **Why.** Restating the path is no introduction: "the files in
+> `standards/`" tells a reader nothing the H1 did not.
+
 ## The listing
 
 An `index.md` lists, as a bullet holding a root-absolute markdown link
@@ -62,6 +66,9 @@ alphabetical order of both groups and never the `README.md` entry's
 place.
 
 `knowledge-organization.ordering` · deterministic
+
+> **Why.** A reader cannot tell unstated meaning from randomness, so
+> an order that means something declares itself.
 
 ## The root index
 

@@ -18,9 +18,6 @@ the two, and against the global table alone when the repo declares no
 `okf_types`. Declaring a local type is one step of
 [Adopting a Repo-Scoped Standard](/guides/consuming.md).
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
-
 ## Global table
 
 The declaration is the `## Types` table of
@@ -67,6 +64,12 @@ okf_types:
 
 `knowledge-organization.local-declaration` · deterministic
 
+> **Why.** Frontmatter, not a document under the consumer's own
+> `standards/` tree: that tree is the meta-standard's population, so a
+> registry document there could not pass, and a path that mirrors
+> dev-playbook's own folder name breaks the moment that folder is
+> renamed upstream.
+
 ### Mapping entry shape
 
 Each entry's key is a type name in Title Case, hyphen-joined for a
@@ -89,3 +92,6 @@ table, or an earlier key of the same mapping, compared
 case-insensitively.
 
 `knowledge-organization.add-never-shadow` · deterministic
+
+> **Why.** The test compares case-insensitively so a consumer cannot
+> alias an upstream `Guide` as a distinct `GUIDE`.

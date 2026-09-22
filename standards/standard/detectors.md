@@ -21,8 +21,7 @@ by its `pyproject.toml` name and the subcommand it runs, `mypy`,
 and is its lint. The **boundary table**, `standards/boundaries.yaml`, maps
 every address the verifier table names to the gates that run it;
 `scripts/boundary-table` writes it from the wiring and is its lint. No
-Standard says where it runs; the boundary table does. The reasoning
-behind the rules is the [Standard Explanation](/standards/standard/explanation.md).
+Standard says where it runs; the boundary table does.
 
 ## Read-only
 
@@ -38,6 +37,12 @@ surface.
 
 `standard.an-absent-surface-is-clean` · deterministic
 
+> **Why.** The alternative, dropping the detector from repos that
+> lack the surface, would make the hook set differ from repo to repo
+> and would leave a repo unpoliced the day it grows the surface. The
+> gap closes inside the detector, so the wiring stays the same
+> everywhere.
+
 ## The verifier table
 
 A repo that declares a rule under `standards/` carries
@@ -46,6 +51,12 @@ writes: one row per declared rule id, sorted, each carrying the address of
 the one check that decides it or null.
 
 `standard.the-verifier-table` · deterministic
+
+> **Why.** Question and mechanism cross-cut: several detectors check
+> one Standard, and one detector checks for several Standards, so the
+> one-to-one fact sits at the rule id rather than at the check. A
+> null row is an honest one: the rule is stated and no check decides
+> it.
 
 ### An emitted id is a rule heading
 
@@ -87,6 +98,10 @@ each workflow's `run` steps less their `SKIP`.
 
 `standard.the-boundary-table` · deterministic
 
+> **Why.** A Standard that stated its own enforcement could be wrong
+> about it and nothing would notice, so where a check runs is read
+> from the wiring instead.
+
 ### Every address runs somewhere
 
 Every address the verifier table names runs at a gate or is a registered
@@ -121,6 +136,12 @@ given even when its environment carries an absolute `GIT_DIR` that names
 another repository.
 
 `standard.git-runs-against-the-given-root` · deterministic
+
+> **Why.** Git exports `GIT_DIR` to a hook it runs, always when the
+> hook fires in a linked worktree, and `GIT_DIR` outranks both the
+> working directory and an explicit `git -C <root>`. The failure is
+> silent: a detector told to audit one repository reads another and
+> reports on it.
 
 ### The hosting pattern
 

@@ -18,9 +18,6 @@ That `tests/` exists at all is
 [File Skeleton](/standards/build/skeleton.md#tests-present)'s rule; what
 goes where inside it is this Standard's.
 
-The reasoning behind the rules is the
-[Test Design Explanation](/standards/testing/explanation.md).
-
 ## pytest
 
 A governed repo's Python test suite runs on pytest.
@@ -46,6 +43,9 @@ belongs to more than one module under `src/`, the mirror of any one of
 them satisfies the rule.
 
 `testing.mirror-source-structure` · deterministic
+
+> **Why.** Mirroring scales with the source tree and keeps two modules
+> of the same file name from colliding.
 
 ## Conftest hierarchy
 
@@ -77,6 +77,11 @@ within that body.
 
 `testing.no-logic-in-tests` · deterministic
 
+> **Why.** A branch or a caught exception in a test body is the test
+> deciding what it ought to be asserting. A loop, a ternary, a
+> comprehension filter, and a nested helper definition carry no such
+> decision, so the rule leaves them legal.
+
 ## Expected values come from outside the code
 
 A test's expected value is a known-good literal, a worked example, or the
@@ -84,6 +89,10 @@ spec, and never a value the test recomputes the way the code under test
 computes it.
 
 `testing.expected-values-come-from-outside-the-code` · stochastic
+
+> **Why.** A test that recomputes the expected value the way the code
+> under test computes it passes by construction and can never disagree
+> with the code.
 
 ## Access only public names
 
@@ -113,6 +122,9 @@ ordering is itself the contract.
 
 `testing.assert-on-outcomes-not-call-sequences` · stochastic
 
+> **Why.** Call counts, argument shapes, and call ordering pin the
+> implementation the contract leaves free.
+
 ## Name by capability, not mechanism
 
 A test's name states the capability under test and survives an
@@ -128,12 +140,20 @@ smaller pieces beneath it are deleted rather than kept.
 
 `testing.replace-dont-layer` · stochastic
 
+> **Why.** Two layers of coverage over one behavior is waste: the
+> lower layer pins the implementation the upper one leaves free to
+> change.
+
 ## No test of a non-deterministic decision
 
 No test asserts on the output of a non-deterministic component such as an
 LLM call, a network request, or a source of randomness.
 
 `testing.no-test-of-a-non-deterministic-decision` · stochastic
+
+> **Why.** Whether an LLM gives a good answer is an evaluation
+> question, not a test question; its measure is observability and
+> evals.
 
 ## The lightest double
 
@@ -157,6 +177,10 @@ A dependency whose state or logic the tests exercise, and a dependency
 several tests share, is faked rather than mocked.
 
 `testing.fakes-for-stateful-dependencies` · stochastic
+
+> **Why.** A fake holds real logic, simpler than the production
+> implementation's, and couples to the interface rather than the
+> implementation, so the tests that use it survive a refactor.
 
 ## One fake per interface
 
@@ -213,3 +237,5 @@ A fixture takes the narrowest scope that works: function, the default, then
 class, then module, then session.
 
 `testing.narrowest-fixture-scope` · stochastic
+
+> **Why.** State shared between tests causes flaky failures.

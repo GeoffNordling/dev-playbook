@@ -17,9 +17,6 @@ material, the source of the
 [canonical artifacts](/standards/build/canonical.md), and no tree rule
 reads it.
 
-The reasoning behind the rules is the
-[Build Explanation](/standards/build/explanation.md).
-
 ## Required files
 
 `README.md`, `CLAUDE.md`, `index.md`, `.gitignore`,
@@ -105,6 +102,11 @@ A Python repo in which `src/` exists.
 ```
 
 `build.python-package` · deterministic
+
+> **Why.** The condition is a conjunction on purpose: `src/` is the
+> default source root of most JavaScript build tools as well, so a
+> repo without `pyproject.toml` is not Python, whatever it keeps in
+> `src/`.
 
 ### One package under src/
 

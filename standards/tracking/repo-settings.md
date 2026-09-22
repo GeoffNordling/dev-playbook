@@ -9,8 +9,10 @@ population: "a governed repo's GitHub settings: its merge settings and the rules
 
 The GitHub settings every governed repo carries.
 
-The reasoning behind the rules is the
-[Tracking Explanation](/standards/tracking/explanation.md).
+> **Why.** The merge settings and the rulesets both sit behind
+> GitHub's all-or-nothing **Administration** permission, too broad to
+> grant for a one-time toggle, so they are set by hand and the
+> Standard only audits them.
 
 ## GitHub origin
 
@@ -32,6 +34,10 @@ A governed repo's GitHub merge settings hold every row of this table:
 
 `tracking.squash-only-merges` · deterministic
 
+> **Why.** The branch's own commits do not survive the squash, so what
+> the branch settled survives only in the tree it merges or in the
+> pull request's message.
+
 ## Default branch protection
 
 A governed repo's default branch carries both destructive-operation
@@ -50,3 +56,12 @@ and an empty bypass list, and at least one of them is named
 | Block force pushes | checked |
 
 `tracking.default-branch-protection` · deterministic
+
+> **Why.** Together the two rules make the branch's history
+> append-only: every commit that reaches the default branch stays
+> reachable, so a mistaken push cannot erase reviewed work and no
+> recovery depends on someone's local reflog.
+>
+> Nothing is added to the bypass list: a bypass actor would return the
+> destructive operations to whoever holds it, which is the one thing
+> the ruleset exists to deny.

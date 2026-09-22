@@ -17,8 +17,10 @@ optional, one per repo, at the root
 ([Document Types](/standards/knowledge-organization/document-types.md));
 its absence means nothing has been recorded yet.
 
-The reasoning behind the rules is the
-[Tracking Explanation](/standards/tracking/explanation.md#candidates).
+> **Why.** Commitment is a decision, not a capability: an entry may be
+> perfectly specifiable and stay a Candidate for as long as nobody has
+> chosen to build it, and deciding to write its brief is what ends
+> that.
 
 ## One home
 
@@ -38,6 +40,11 @@ checkboxes.
 ```
 
 `tracking.entry-shape` · deterministic
+
+> **Why.** An approach decided this early goes stale before the work
+> starts, and brief furniture — fields, acceptance criteria,
+> checkboxes — is the signal that the brief could be written, and
+> therefore that the work belongs in an issue.
 
 ## Structure
 
@@ -72,3 +79,7 @@ description: Uncommitted future work — described, not yet promoted to issues
 ```
 
 `tracking.structure` · stochastic
+
+> **Why.** Neither the order of the headings nor the order of the
+> entries carries meaning, so every merge conflict in this file
+> resolves by keeping both sides.

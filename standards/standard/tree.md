@@ -12,14 +12,20 @@ A repo's `standards/` tree: one directory per Standard, and the catalog,
 typed `Standard`, one population and its rules, at
 `standards/<name>/<topic>.md`; the form of that file is
 [Standard Conventions](/standards/doc-type/standard-conventions.md).
-The reasoning behind these rules is
-[Standard Explanation](/standards/standard/explanation.md#the-tree).
+
+> **Why.** One directory, one standard puts the rules of a standard
+> and the index that names them in one documentation set
+> ([Documentation Sets](/standards/knowledge-organization/documentation-sets/documentation-sets.md)),
+> so a reader who finds one file finds the rest. The names are
+> reserved against a consumer because a consumer's
+> `standards/<name>/` on a name dev-playbook publishes would silently
+> override the workspace-scoped standard of that name.
 
 ## Directory layout
 
 Every immediate subdirectory of `standards/` is a Standard directory: it
 holds at least one file typed `Standard`, and every other `.md` file
-under it, `index.md` aside, is typed `Standard` or `Explanation`; the
+under it, `index.md` aside, is typed `Standard`; the
 only flat files under `standards/` are `README.md` and `index.md`;
 standards-lint reports a departure.
 

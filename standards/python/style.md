@@ -18,9 +18,6 @@ that invoke ruff and mypy are
 conventions are
 [Testing Conventions](/standards/testing/conventions.md).
 
-The reasoning behind the rules is the
-[Python Explanation](/standards/python/explanation.md).
-
 ## Empty init
 
 A file named `__init__.py` holds no character other than whitespace: no
@@ -29,6 +26,11 @@ other code.
 
 `python.empty-init` · deterministic
 
+> **Why.** An empty init leaves each caller importing from the
+> specific submodule, `from pkg.sub import thing`, rather than from
+> the package root, so an import path names where the object is
+> defined.
+
 ## Docstrings
 
 Every module, class, function, and method in the file carries a
@@ -36,6 +38,9 @@ docstring, except a file named `__init__.py` and a pytest test function,
 whose name begins with `test_`.
 
 `python.docstrings` · deterministic
+
+> **Why.** A pytest test function is named `test_<behavior>`, literal
+> enough that a docstring restates the name.
 
 ## Docstring content
 
@@ -64,6 +69,11 @@ fallback that hides the missing value:
 
 `python.fail-loudly` · stochastic
 
+> **Why.** A fallback that hides a bug delays the failure to a place
+> far from the cause, where it is much harder to diagnose. The inline
+> comment on a legitimate fallback is the signal that the author
+> weighed the missing value.
+
 ## Module layout
 
 A module's top-level statements run in one order:
@@ -87,6 +97,10 @@ one of the file's parent directories is named `build`, `dist`, or
 `deprecated`.
 
 `python.no-future-annotations` · deterministic
+
+> **Why.** Python 3.11 and later provide every motivation for the
+> import: PEP 604 unions, `X | Y`, builtin generics, `list[int]`, and
+> string-quoted forward references.
 
 ## Helper justification
 
@@ -118,6 +132,9 @@ A helper function sits directly beneath the function that uses it, or,
 where two or more functions use it, in a `# ---` banner section.
 
 `python.helper-placement` · deterministic
+
+> **Why.** A `# ---` banner section over the shared helpers lets a
+> reader navigate the file by concern rather than by call graph.
 
 ## Formatted by ruff format
 

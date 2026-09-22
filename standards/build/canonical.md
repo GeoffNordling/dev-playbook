@@ -15,8 +15,8 @@ material, outside every tree rule
 ([File Skeleton](/standards/build/skeleton.md)); its `pyproject.toml` is a
 template.
 
-The reasoning behind the rules is the
-[Build Explanation](/standards/build/explanation.md).
+> **Why.** The source directory ships inside every hook clone, so a
+> copy is compared against its source with no network.
 
 ## ci.yml
 
@@ -24,6 +24,12 @@ The reasoning behind the rules is the
 [ci.yml](/standards/build/canonical/ci.yml).
 
 `build.ciyml` · deterministic
+
+> **Why.** The canonical workflow runs the hook suite and no tests,
+> because a test suite depends on dev-playbook as a local path
+> dependency a cloud runner does not have. It skips `ref-lint` for the
+> same reason: `ref-lint` resolves a cross-repo citation at its
+> absolute path under `~/workspace/`, a tree the runner does not have.
 
 ## .python-version
 
@@ -62,6 +68,15 @@ of files and gives each one a rule whose target is that file's path.
 
 `build.artifactsmk` · deterministic
 
+> **Why.** A gitignored build product is absent in every fresh
+> checkout and every fresh worktree, and a `check` that only reports it
+> missing turns the pre-push hook into an obstacle to bypass, so the
+> gate builds it.
+>
+> A target that is a real file lets `make` compare timestamps and
+> rebuild only what is stale, so the gate pays the build cost once per
+> checkout and nothing on later runs.
+
 ## pyproject.toml
 
 `pyproject.toml` parses as TOML and matches every value the canonical
@@ -80,6 +95,23 @@ matches the canonical one; a repo without `src/` omits `[build-system]`
 and sets `[tool.uv] package = false`. Every other value is free.
 
 `build.pyprojecttoml` · deterministic
+
+> **Why.** Each pinned value is a choice that looks reversible without
+> its reason. `uv_build` is bundled inside the uv binary, so building
+> the package, an editable install by a consumer included, needs no
+> network and no PyPI, and its default layout is this standard's,
+> `src/<package>` named from the project name. The pair
+> `disallow_untyped_defs` and `disallow_incomplete_defs` stands in for
+> `strict = true`, which also turns on `disallow_untyped_calls`,
+> choking on every untyped third-party library, and
+> `disallow_any_generics`, noisy about every bare `list` and `dict`.
+> `tool.ruff.lint.pydocstyle.convention` is not a preference: `D` on
+> its own turns on mutually exclusive members, `D203` against `D211`
+> and `D212` against `D213`, so `ruff check` is unsatisfiable unless a
+> convention selects between them. `E501` is ignored because
+> `ruff format` owns line length and the lint would report the same
+> overruns a second time, and `D401`, imperative-mood summaries,
+> because the workspace writes noun-phrase docstrings.
 
 ## .gitignore
 

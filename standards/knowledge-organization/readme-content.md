@@ -12,9 +12,6 @@ document. Its floor is fixed and its depth grows with the project:
 prerequisites, a quick-start, an architecture overview, and examples
 arrive as the project earns them.
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
-
 ## H1
 
 A `README.md` holds an H1 heading.
@@ -41,3 +38,10 @@ A `README.md` enumerates no skill and no other file the harness injects
 into a session.
 
 `knowledge-organization.no-roster-of-harness-injected-files` · stochastic
+
+> **Why.** Claude Code puts each injected file's name and description
+> into every session, so a hand-maintained roster of skills duplicates
+> what its reader already has and rots the moment a skill is added. An
+> inventory of files the harness does not inject, the executables
+> under `scripts/`, is different: nothing else hands the reader that
+> list.

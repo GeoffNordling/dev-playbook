@@ -33,9 +33,6 @@ level up and one level down. Two reach farther by their own text,
 [terms that cross sets](#terms-that-cross-sets) into the repo's
 `CONTEXT.md`; a set is otherwise judged with no neighbour's body open.
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
-
 ## An index in every directory
 
 A set's members sit in the directory of its `index.md`; every
@@ -44,6 +41,10 @@ or a `type: Reference` mirror included, carries an `index.md` of its own
 and is a child set.
 
 `knowledge-organization.an-index-in-every-directory` · deterministic
+
+> **Why.** With an index in every directory a set is exactly one
+> directory, so the tree a reader walks is the tree of sets, and each
+> directory declares its concern in an introduction of its own.
 
 ## Body inside its concern
 
@@ -71,6 +72,10 @@ reason.
 
 `knowledge-organization.one-home` · stochastic
 
+> **Why.** The reason is what drifts, so it is written once, at the
+> home: a second place that argues the fact is a duplicate, while a
+> place that names it and links the home is not.
+
 ## Distinct concerns
 
 No two rows of an index, member or child set, answer the same question:
@@ -91,6 +96,9 @@ A term is defined once, in the member whose concern it is, and every
 other use links that definition.
 
 `knowledge-organization.terms-defined-once` · stochastic
+
+> **Why.** A definition is a fact like any other, so its home follows
+> [one home](#one-home).
 
 ## Terms that cross sets
 

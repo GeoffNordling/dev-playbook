@@ -18,8 +18,10 @@ or sample output, and a reference inside it is out of scope. A numbered
 source, since a record frozen at merge goes stale as its referents
 move; references to a record are checked like any other.
 
-The reasoning behind the rules is the
-[Knowledge Organization Explanation](/standards/knowledge-organization/explanation.md).
+> **Why.** The wrapper records intent: an inline link means "go open
+> this"; inline code means "this file exists conceptually", the right
+> form for a file whose location varies between repos; a bare
+> `/<skill-name>` is how a skill is invoked.
 
 ## Reference resolves
 
@@ -49,6 +51,11 @@ heading carries in the link text.
 
 `knowledge-organization.stable-named-anchor` · deterministic
 
+> **Why.** A positional anchor, `#223-revision` or an in-prose
+> `§2.10`, breaks silently the moment its target is renumbered or
+> reordered, while a stale named anchor names a slug the file does
+> not carry.
+
 ## Citation, another repo
 
 A reference to a file or directory in a repository other than the
@@ -56,6 +63,11 @@ referencing file's own is an inline link whose target is the full
 workspace path, beginning `~/workspace/<repo>/`.
 
 `knowledge-organization.citation-another-repo` · deterministic
+
+> **Why.** The full workspace path resolves to that repo's main
+> checkout, its published state, and the form is self-describing: the
+> repo name is in the path, so no external convention is needed to
+> read it.
 
 ## Skill invocation
 
@@ -79,12 +91,22 @@ beginning `/` and naming the path from the repository root.
 
 `knowledge-organization.link-same-bundle` · deterministic
 
+> **Why.** A root-absolute path resolves against the reader's own
+> checkout root, so it points at the copy that matches the checkout
+> the reader is in, main checkout or per-issue worktree. A
+> `~/workspace/<this-repo>/` path jumps to the main checkout from
+> inside a worktree, a different and possibly stale copy.
+
 ## No fixed repo root
 
 The referencing file has no fixed repo root: a segment of its path
 inside the repository is `skills`, `rules`, or `agents`.
 
 `knowledge-organization.no-fixed-repo-root` · deterministic
+
+> **Why.** A runbook, a skill bundle, an agent definition, or a global
+> rule under `~/.claude/` is loaded from arbitrary repos, so a leading
+> `/` in one has no root to resolve against.
 
 ### Workspace path for a stable location
 

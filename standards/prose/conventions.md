@@ -15,14 +15,15 @@ it lives. A repo exempts any further path by listing it in a tracked
 words of its own, in all or part of its tree, by declaring each with its
 replacement in a tracked `.prose-lint-vocabulary` at its root.
 
-The reasoning behind the rules is the
-[Prose Explanation](/standards/prose/explanation.md).
-
 ## One rule, one place
 
 Each rule the document states lives in the lead sentence of its section.
 
 `prose.one-rule-one-place` · stochastic
+
+> **Why.** A section can stop at its lead when the lead carries the
+> whole rule, so section size matches topic size and a reader who skims
+> the leads reads every rule.
 
 ## Current state and next steps only
 
@@ -34,12 +35,17 @@ is exempt.
 
 `prose.current-state-and-next-steps-only` · stochastic
 
+> **Why.** A Decision Record is exempt because it is a dated record of
+> a past decision, frozen after merge.
+
 ## Point at canonical artifacts
 
 Where a file is itself the standard, the document references that file and
 does not restate its contents.
 
 `prose.point-at-canonical-artifacts` · stochastic
+
+> **Why.** A restated copy drifts from the file it restates.
 
 ## Open with purpose
 
@@ -115,6 +121,12 @@ double-quoted utterance, an inline code span, or a fenced block.
 
 `prose.no-first-person` · deterministic
 
+> **Why.** A harness-loaded agent instruction is addressed to the
+> executing agent, so a first-person sentence puts the document in the
+> agent's mouth and inverts who is instructing whom. The ban governs
+> the document's own voice: a quoted utterance is another speaker's,
+> while a runbook's `description` is the document speaking.
+
 ## Declarative documents
 
 The document is a declarative document: it is not a `CLAUDE.md`, and no
@@ -161,6 +173,10 @@ with no directory is banned in every tracked file of the repo.
 
 `prose.the-repo-vocabulary` · deterministic
 
+> **Why.** The directories an entry names hold a term to the part of
+> the tree that defines it, and leave the word alone where it means
+> something else.
+
 ## Spelling
 
 The document's prose spells `judgment`, never the British `judgement` or
@@ -182,3 +198,6 @@ Items that sit together take the same grammatical shape: the headings of a
 document, the bullets of a list, the clauses of a sentence.
 
 `prose.grammatical-parallelism` · stochastic
+
+> **Why.** One form holds throughout, so a break in the pattern marks a
+> break in meaning.

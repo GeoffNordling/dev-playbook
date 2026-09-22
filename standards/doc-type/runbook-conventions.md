@@ -20,8 +20,14 @@ craft of the body, the two loads, the information hierarchy, and
 pruning, is [Writing for Agents](/guides/writing-for-agents.md),
 read to write one; this Standard wins where the two collide.
 
-The reasoning behind the rules is
-[Doc-Type Explanation](/standards/doc-type/explanation.md#a-runbooks-file).
+> **Why.** A runbook is read by a program, the Claude Code harness,
+> before it is read by a model, so each rule below is about what a part
+> of the file means to the program that loads it. The rules sit here
+> and not under Harness Files because the Runbook doc-type's contract
+> shape claims the keys, `name`, `description`, `model`, `effort`, and
+> a skill's `disable-model-invocation` and `arguments`: what the file
+> declares is the doc-type's, and where the harness finds it is the
+> harness's.
 
 ## Front matter
 
@@ -57,6 +63,11 @@ tools: <Tool, Tool, ...>            # optional
 
 `doc-type.front-matter` · deterministic
 
+> **Why.** The harness reads a closed set of keys, so a key outside the
+> vocabulary is read by nothing. An agent's input is the launching
+> prompt, whole, which is why the vocabulary gives an agent no
+> `arguments`.
+
 ## Name matches its home
 
 A runbook's `name` equals the bundle directory for a skill and the file
@@ -79,6 +90,10 @@ is exactly two sentences and the second opens with the literal words
 exactly one sentence.
 
 `doc-type.description` · deterministic
+
+> **Why.** The second sentence is what the model matches a runbook
+> against. A skill only the user invokes is matched by nobody: its one
+> sentence is the summary the user reads in the slash-command list.
 
 ## Description states what and when
 
@@ -110,6 +125,12 @@ Every step of a runbook's body ends on a completion criterion: the
 condition that tells the agent the work is done.
 
 `doc-type.steps-end-on-a-completion-criterion` · stochastic
+
+> **Why.** An agent's body is the launched subagent's system prompt,
+> set at spawn: nothing reaches that agent except the launching prompt,
+> and the report travels back as the subagent's final message. A step
+> that does not say when the work is done leaves the agent nothing else
+> to read it from.
 
 ## Carries its chain
 
@@ -148,6 +169,8 @@ A skill that runs several turns with the user carries `model: inherit`.
 
 `doc-type.interactive-skills-inherit` · stochastic
 
+> **Why.** A pinned model governs only the turn that loads the skill.
+
 ### Tool fields
 
 A skill's `allowed-tools` and `disallowed-tools`, when present, are
@@ -176,6 +199,10 @@ placeholder.
 
 `doc-type.no-argument-placeholder` · deterministic
 
+> **Why.** The harness appends the input after the body as
+> `ARGUMENTS: <text>`, whole and unsplit, and the executing agent never
+> sees the argument's name, so a placeholder has nothing to expand to.
+
 ### References one level deep
 
 No `.md` file in a skill's `references/` links to another `.md` file
@@ -201,3 +228,7 @@ An agent's `tools`, when present, is a non-empty comma-separated string
 of tool names.
 
 `doc-type.tools` · deterministic
+
+> **Why.** `tools` is no cognate of a skill's `allowed-tools`: that
+> pre-approves calls inside the caller's permission flow, while a tool
+> absent from `tools` does not exist for the agent.

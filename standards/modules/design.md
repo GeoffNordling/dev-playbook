@@ -19,10 +19,9 @@ characteristics. The **implementation** is what sits inside the module, its
 body of code.
 
 The rules hold a module to one shape, deep: a large amount of behaviour behind
-a small interface, reachable through that interface. The reasoning, diagrams,
-and examples behind them are the
-[Module Design Explanation](/standards/modules/explanation.md); the tests that cross a module's
-interface are [Testing Conventions](/standards/testing/conventions.md).
+a small interface, reachable through that interface. The tests that cross a
+module's interface are
+[Testing Conventions](/standards/testing/conventions.md).
 
 ## Deep, not shallow
 
@@ -33,6 +32,12 @@ composed inside of many small, swappable parts satisfies the rule as long as
 those parts stay out of its interface.
 
 `modules.deep-not-shallow` · stochastic
+
+> **Why.** What deleting a module would cost measures its depth. A deep
+> module's complexity moves out to each of its callers and reappears
+> once per caller; a pass-through's moves once and leaves the total
+> unchanged, so its interface adds a surface to learn and takes away no
+> complexity.
 
 ## Internal seams stay inside
 
@@ -47,6 +52,11 @@ A seam a module presents carries at least two adapters, concrete things that
 satisfy the interface at that seam; a test's in-memory fake is one.
 
 `modules.two-adapters-or-no-seam` · stochastic
+
+> **Why.** One adapter makes the seam hypothetical: nothing varies
+> across it, so the interface buys indirection and no leverage. The
+> second adapter, a test's in-memory fake included, is the evidence
+> that behaviour differs across the seam.
 
 ## Dependencies are accepted, not constructed
 
@@ -71,6 +81,10 @@ a store with an in-process stand-in the tests use — needs no port.
 Every behaviour of a module is reachable through its interface.
 
 `modules.the-interface-is-the-test-surface` · stochastic
+
+> **Why.** Callers and tests cross the same seam, so a behaviour
+> reachable only from inside the module is not a gap in the tests but a
+> sign that the module is the wrong shape.
 
 ## Results are returned, not written
 
