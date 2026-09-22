@@ -174,16 +174,8 @@ specification.
      block, a procedure to a Guide, a scoping definition to a
      condition. Documents only: no detector logic changes. Output: the
      Standards say only what is true of the files.
-     Waves 1 and 2 are done; the entries are in [Completed](#completed).
+     Waves 1 to 3 are done; the entries are in [Completed](#completed).
      The waves left, in order:
-     - **Wave 3, repo changes.** One agent, the eleven bullets of
-       [Repo Change Work Orders](/working-docs/doc-type-system/doc-type-system/rule-audit/apply/repo-changes.md):
-       edits outside `standards/` that the audit found the rules
-       demand, `CLAUDE.md`, `CONTEXT.md`, three skill models, a
-       Decision Record, acronym appendices, and six more. Its first run
-       was rolled back 2026-09-22, unseen by the user; it relaunches
-       only after the user reads the eleven bullets in the terminal
-       and strikes the ones they reject.
      - **Wave 4, the orchestrator.** By hand, in the session: silence
        the emitters of the ids wave 2 deleted or conditioned, twelve
        across `testing_lint`, `workspace_lint`, `repo_lint`, `okf_lint`,
@@ -201,9 +193,10 @@ specification.
      - **Wave 5, reheadlining.** One agent per Guide and per Standard
        file, in parallel: every label heading becomes an assertion per
        `prose.assertion-headings`, one clause stating the section's
-       point, bodies untouched; links to the old anchors follow. Then
-       the two tables regenerate again, since a rule's id is its
-       heading's slug.
+       point, bodies untouched; links to the old anchors follow. The
+       four imperative headings of `prose/conventions.md` are wave 3's,
+       held here so one rename settles the file. Then the two tables
+       regenerate again, since a rule's id is its heading's slug.
      - **Wave 6, the PR**, for the user to merge.
   12. *The checking system.* A greenfield refactor, after step 11
      merges. Today's detectors grew one at a time over months and were
@@ -263,6 +256,17 @@ specification.
   file ([Principles](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles)).
 
 ## Completed
+
+- **Step 11 wave 3, 2026-09-22.** The repo changes, by hand in the
+  session rather than by agent, after the first agent run was rolled
+  back unseen. Eight of the eleven bullets landed: three skill models
+  to `inherit`, the repeatable-work rule under `CLAUDE.md`'s
+  Behaviors, acronym appendices on 35 files, two index openings, two
+  Flourish tics, two wayfinder headings recased, sixteen second-person
+  uses rewritten, and the settings-symlink design moved out of
+  `dotfiles/README.md` into record 0030. Struck: the `CONTEXT.md`
+  terms and the `ROOT.md` link tree, both duplicating what exists;
+  held for wave 5: the four prose headings. Commit 9000802.
 
 - **Step 11 waves 1 and 2, 2026-09-22.** Five Opus agents wrote four
   Guides and one reference from rule text, and moved
