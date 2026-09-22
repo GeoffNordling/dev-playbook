@@ -1,4 +1,4 @@
-"""Audit the workspace: GitHub repo settings, label/issue conformance, and pins.
+"""Audit the workspace: GitHub repo settings and label/issue conformance.
 
 The library behind the ``workspace-lint`` shim — the on-demand audit venue of
 the enforcement standard, the checks that live outside any single commit. It
@@ -29,22 +29,19 @@ in, so governance is declared rather than inferred. For each governed repo:
     shape rules of its species: a build leaf's four-tuple validity and brief
     shape, a build epic's category-only shape, and a wayfinder map's or decision
     ticket's shape. Species comes from the label set and ``sub_issues_summary``.
-  - **pin** — read the dev-playbook `rev` pinned in the repo's
-    `.pre-commit-config.yaml` and compare it against the hook repo's local
-    `main`. Stale pins are reported but are not failures: a consumer catches up
-    when its pin is deliberately bumped. No pin at all is a failure — being
-    governed is what makes the absence wrong.
 
-Every check but the pin reads GitHub, so an authenticated `gh` is a precondition
-of the run rather than a per-repo condition: the audit checks it once up front
-and refuses to start without it, because an unauthenticated `gh` degrades to
-anonymous requests instead of failing (see ``check_auth``). ``--pins-only``
-reads nothing over the network and so is exempt.
+Every check reads GitHub, so an authenticated `gh` is a precondition of the run
+rather than a per-repo condition: the audit checks it once up front and refuses
+to start without it, because an unauthenticated `gh` degrades to anonymous
+requests instead of failing (see ``check_auth``).
+
+The pin helpers ``hook_repo_url``, ``rev_line``, and ``pinned_rev`` stay here
+for ``bump_pins``, which rewrites a consumer's pin through them.
 
 Output:
     stdout — one finding per line, ``repo: name.rule message`` (the repo name
              stands in the location slot; this audit inspects repos, not files).
-    stderr — informational per-repo lines (current/absent pins) and one summary.
+    stderr — one summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 """
 
@@ -63,11 +60,10 @@ from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
 # Every rule id this detector can emit. Repo-settings drift, reachability, and
 # the live-repo tracking checks (label scheme, leaf labels and headings, epic
-# labels, wayfinder labels and body) answer the tracking Standard; a stale
-# dev-playbook pin answers the distribution Standard (non-blocking).
-# Informational pin lines carry no rule id. Each id is a module-level constant so
-# every emission site references the constant, never a raw literal, and RULES
-# (what --list-rules prints) cannot drift from what the detector actually emits.
+# labels, wayfinder labels and body) answer the tracking Standards. Each id is a
+# module-level constant so every emission site references the constant, never a
+# raw literal, and RULES (what --list-rules prints) cannot drift from what the
+# detector actually emits.
 SQUASH_ONLY_MERGES = "tracking.squash-only-merges"
 DEFAULT_BRANCH_PROTECTION = "tracking.default-branch-protection"
 GITHUB_ORIGIN = "tracking.github-origin"
@@ -82,7 +78,6 @@ SESSION_HEADINGS = "tracking.session-headings"
 CATEGORY_ONLY = "tracking.category-only"
 WAYFINDER_LABELS = "tracking.wayfinder-labels"
 WAYFINDER_BODY = "tracking.wayfinder-body"
-A_PINNED_REV = "distribution.a-pinned-rev"
 
 RULES = (
     SQUASH_ONLY_MERGES,
@@ -99,7 +94,6 @@ RULES = (
     CATEGORY_ONLY,
     WAYFINDER_LABELS,
     WAYFINDER_BODY,
-    A_PINNED_REV,
 )
 
 # The required headings of each brief format, stated here exactly as
@@ -267,18 +261,12 @@ class Line:
     """One line of the audit's output — a finding or an informational advisory."""
 
     repo: str
-    rule: str | None  # None = informational (no rule id): a stderr advisory
+    rule: str
     message: str
-    blocking: bool = False  # a real finding: sets exit 1
-
-    @property
-    def stale(self) -> bool:
-        """Whether this line reports a stale (non-blocking) dev-playbook pin."""
-        return self.rule == A_PINNED_REV and not self.blocking
+    blocking: bool = True  # every line is a finding: sets exit 1
 
     def render(self) -> str:
         """The finding rendered as ``repo: name.rule message``."""
-        assert self.rule is not None
         return render(self.repo, self.rule, self.message)
 
 
@@ -312,21 +300,6 @@ def hook_repo_url() -> str:
     if not match:
         raise ToolError(f"no pinned block in {CANONICAL_CONFIG}")
     return match.group(1)
-
-
-def hook_repo_main() -> str:
-    """The hook repo's local ``main`` commit sha."""
-    result = subprocess.run(
-        ["git", "-C", str(HOOK_REPO_ROOT), "rev-parse", "main"],
-        capture_output=True,
-        text=True,
-        env=gitrepo.no_git_env(),
-    )
-    if result.returncode != 0:
-        raise ToolError(
-            f"cannot resolve main in {HOOK_REPO_ROOT}: {result.stderr.strip()}"
-        )
-    return result.stdout.strip()
 
 
 def workspace_repos(workspace: Path, roster: tuple[str, ...]) -> list[Path]:
@@ -382,37 +355,6 @@ def pinned_rev(config_text: str, url: str) -> str | None:
     lines = config_text.splitlines()
     index = rev_line(lines, url)
     return lines[index].split(":", 1)[1].strip() if index is not None else None
-
-
-def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
-    """One pin line per consumer repo; None for the hook repo itself.
-
-    A governed repo carrying no pin at all is a finding, not an advisory: being
-    on the roster is what makes the absence wrong. A stale pin stays advisory —
-    the consumer catches up when its pin is deliberately bumped.
-    """
-    # Only dev-playbook itself is exempt, and identity is the test: it dogfoods
-    # from its working tree, so it has nothing to pin. Publishing a manifest is
-    # not the test — a consumer may publish hooks of its own and still pin
-    # dev-playbook, and reading the exemption off the manifest would drop that
-    # repo's pin from the audit entirely.
-    if repo.resolve() == HOOK_REPO_ROOT:
-        return None
-    name = repo.name
-    config = repo / ".pre-commit-config.yaml"
-    if not config.is_file():
-        return Line(name, A_PINNED_REV, "no .pre-commit-config.yaml", blocking=True)
-    rev = pinned_rev(config.read_text(encoding="utf-8"), url)
-    if rev is None:
-        return Line(name, A_PINNED_REV, "no dev-playbook pin", blocking=True)
-    current = main_sha == rev or (len(rev) >= 7 and main_sha.startswith(rev))
-    if current:
-        return Line(name, None, "pin current")
-    return Line(
-        name,
-        A_PINNED_REV,
-        f"{rev} (hook repo main is {main_sha[:12]})",
-    )
 
 
 def gh_api(path: str, *, paginate: bool = False) -> object | None:
@@ -1223,8 +1165,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="workspace-lint",
         description=(
-            "Report GitHub settings drift, label/issue/epic/tuple conformance, "
-            "and stale dev-playbook pins across the workspace."
+            "Report GitHub settings drift and label/issue/epic/tuple conformance "
+            "across the workspace."
         ),
     )
     parser.add_argument(
@@ -1244,14 +1186,12 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="print the rule ids this detector can emit, one per line, and exit",
     )
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--pins-only", action="store_true", help="skip the gh api checks")
-    mode.add_argument(
+    parser.add_argument(
         "--settings-only",
         action="store_true",
         help=(
             "run only the repo-settings checks — merge settings and default-branch "
-            "protection (skip pins and the tracking gh-api checks)"
+            "protection (skip the tracking gh-api checks)"
         ),
     )
     args = parser.parse_args(argv)
@@ -1260,36 +1200,21 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         repos = workspace_repos(args.workspace.resolve(), args.repos)
-        if not args.pins_only:
-            check_auth()
-        url = hook_repo_url()
-        main_sha = hook_repo_main() if not args.settings_only else ""
+        check_auth()
         lines: list[Line] = []
         for repo in repos:
+            slug = origin_slug(repo)
+            lines.extend(check_settings(repo, slug))
+            lines.extend(check_protection(repo, slug))
             if not args.settings_only:
-                pin = check_pin(repo, url, main_sha)
-                if pin is not None:
-                    lines.append(pin)
-            if not args.pins_only:
-                slug = origin_slug(repo)
-                lines.extend(check_settings(repo, slug))
-                lines.extend(check_protection(repo, slug))
-                if not args.settings_only:
-                    lines.extend(check_tracking(repo, slug))
+                lines.extend(check_tracking(repo, slug))
     except ToolError as err:
         print(f"workspace-lint: {err}", file=sys.stderr)
         return 2
 
     for line in lines:
-        if line.rule is not None:
-            print(line.render())
-        else:
-            print(f"workspace-lint: {line.repo}: {line.message}", file=sys.stderr)
+        print(line.render())
 
     findings = sum(1 for line in lines if line.blocking)
-    stale = sum(1 for line in lines if line.stale)
-    print(
-        f"workspace-lint: {len(repos)} repos, {findings} finding(s), {stale} stale pin(s)",
-        file=sys.stderr,
-    )
+    print(f"workspace-lint: {len(repos)} repos, {findings} finding(s)", file=sys.stderr)
     return 1 if findings else 0

@@ -2,13 +2,8 @@
 
 testing-lint is the detector behind the Python-testing Standard. It walks a repo's
 Python files once (via dev_playbook.pyast.find_python_files, so gitignore-aware
-and worktree-scoped) and applies three rules to the test files it finds:
+and worktree-scoped) and applies one rule to the test files it finds:
 
-  - **no-private-access** — a ``test_*.py`` file must not import or reach into a
-    private name (``_foo``) of a non-test module; dunders are public. The
-    finding message keeps the import-vs-attribute-reach distinction. Moved here
-    from python-lint, whose ``privacy.*`` family answered the testing standard's
-    question, not Python's.
   - **mirror-layout** — a ``test_<stem>.py`` whose stem names an existing ``src``
     module must sit at a mirror of that module: beneath ``tests/`` directly
     (``src/x/y.py`` -> ``tests/x/test_y.py``) or beneath a recognized scope
@@ -16,9 +11,6 @@ and worktree-scoped) and applies three rules to the test files it finds:
     Test files matching no module (e2e suites, flattened names),
     ``conftest.py``, and non-``test_*`` helpers are outside the rule's domain.
     Placement only, not coverage or naming.
-  - **no-logic** — no ``if``/``else`` or ``try``/``except`` statement in the body
-    of a ``test_*`` function; loops, ternary expressions, and comprehension
-    filters stay legal; nested helpers and module level are exempt.
 
 See standards/testing/conventions.md for the conventions these rules enforce.
 
@@ -33,7 +25,6 @@ Usage:
 """
 
 import argparse
-import ast
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -46,11 +37,9 @@ from dev_playbook.findings import print_rules, render
 # whose Standard it answers. Each id is a module-level constant so every emission site
 # references the constant, never a raw literal, and RULES (what --list-rules
 # prints) cannot drift from what the detector actually emits.
-ACCESS_ONLY_PUBLIC_NAMES = "testing.access-only-public-names"
 MIRROR_SOURCE_STRUCTURE = "testing.mirror-source-structure"
-NO_LOGIC_IN_TESTS = "testing.no-logic-in-tests"
 
-RULES = (ACCESS_ONLY_PUBLIC_NAMES, MIRROR_SOURCE_STRUCTURE, NO_LOGIC_IN_TESTS)
+RULES = (MIRROR_SOURCE_STRUCTURE,)
 
 # git ls-files already drops gitignored caches; this name filter also covers the
 # rare tracked copy. A test file is scanned when none of its parent directory
@@ -81,137 +70,6 @@ class Finding:
     def render(self) -> str:
         """The finding as one GNU-format line."""
         return render(self.file, self.rule, self.message, self.line)
-
-
-# --- no-private-access rule ---
-
-
-def check_no_private_access(rel: str, tree: ast.Module) -> list[Finding]:
-    """Private-name access from a test file into a non-test module."""
-    visitor = _PrivacyVisitor(rel)
-    visitor.visit(tree)
-    return visitor.findings
-
-
-def _is_private(name: str) -> bool:
-    return name.startswith("_") and not (name.startswith("__") and name.endswith("__"))
-
-
-def _is_test_module(module: str) -> bool:
-    for segment in module.split("."):
-        if segment == "tests" or segment.startswith("test_") or segment == "conftest":
-            return True
-    return False
-
-
-def _root_name(node: ast.Attribute) -> str | None:
-    current: ast.expr = node
-    while isinstance(current, ast.Attribute):
-        current = current.value
-    return current.id if isinstance(current, ast.Name) else None
-
-
-def _attribute_chain(node: ast.Attribute) -> str:
-    parts: list[str] = [node.attr]
-    current: ast.expr = node.value
-    while isinstance(current, ast.Attribute):
-        parts.append(current.attr)
-        current = current.value
-    if isinstance(current, ast.Name):
-        parts.append(current.id)
-    return ".".join(reversed(parts))
-
-
-class _PrivacyVisitor(ast.NodeVisitor):
-    """Collect private-access findings within one test file's AST.
-
-    Both the import reach and the attribute reach emit the one
-    ``testing.access-only-public-names`` rule; only the message distinguishes them.
-    """
-
-    def __init__(self, rel: str) -> None:
-        self.rel = rel
-        self.findings: list[Finding] = []
-        self._imports: dict[str, str] = {}
-
-    def visit_Import(self, node: ast.Import) -> None:
-        """Records aliases and flags private module segments in each import."""
-        for alias in node.names:
-            module = alias.name
-            local = alias.asname or alias.name.split(".")[0]
-            if not _is_test_module(module):
-                self._flag_private_segments(node, module)
-            self._imports[local] = module
-        self.generic_visit(node)
-
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        """Flags private names (and segments) imported from a non-test module."""
-        module = node.module or ""
-        if module and not _is_test_module(module):
-            self._flag_private_segments(node, module)
-            for alias in node.names:
-                if _is_private(alias.name):
-                    self._add(
-                        node,
-                        f"imports private name '{alias.name}' from "
-                        f"non-test module '{module}'",
-                    )
-        for alias in node.names:
-            local = alias.asname or alias.name
-            self._imports[local] = module
-        self.generic_visit(node)
-
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        """Shadows the function name so later attribute reaches skip it."""
-        self._imports.setdefault(node.name, "")
-        self.generic_visit(node)
-
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        """Shadows the coroutine name so later attribute reaches skip it."""
-        self._imports.setdefault(node.name, "")
-        self.generic_visit(node)
-
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        """Shadows the class name so later attribute reaches skip it."""
-        self._imports.setdefault(node.name, "")
-        self.generic_visit(node)
-
-    def visit_Assign(self, node: ast.Assign) -> None:
-        """Shadows assigned names so later attribute reaches skip them."""
-        for target in node.targets:
-            if isinstance(target, ast.Name):
-                self._imports.setdefault(target.id, "")
-        self.generic_visit(node)
-
-    def visit_Attribute(self, node: ast.Attribute) -> None:
-        """Flags reaching into a private attribute of a non-test import."""
-        if _is_private(node.attr):
-            root = _root_name(node)
-            if root is not None:
-                source_module = self._imports.get(root)
-                if source_module and not _is_test_module(source_module):
-                    self._add(
-                        node,
-                        f"reaches into private name '{node.attr}' on "
-                        f"non-test import '{root}' ({_attribute_chain(node)})",
-                    )
-        self.generic_visit(node)
-
-    def _flag_private_segments(self, node: ast.AST, module: str) -> None:
-        for segment in module.split("."):
-            if _is_private(segment):
-                self._add(
-                    node,
-                    f"imports through private module segment '{segment}' in '{module}'",
-                )
-                return
-
-    def _add(self, node: ast.AST, message: str) -> None:
-        self.findings.append(
-            Finding(
-                self.rel, getattr(node, "lineno", 0), ACCESS_ONLY_PUBLIC_NAMES, message
-            )
-        )
 
 
 # --- mirror-layout rule ---
@@ -278,60 +136,6 @@ def check_mirror_layout(rel: str, mirrors: dict[str, set[str]]) -> list[Finding]
     ]
 
 
-# --- no-logic rule ---
-
-_NESTED_SCOPES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-
-
-def check_no_logic(rel: str, tree: ast.Module) -> list[Finding]:
-    """Flag ``if``/``try`` statements in the body of a ``test_*`` function.
-
-    Only the two constructs the testing contract bans are matched; ``if``/``try``
-    inside a nested helper (its own function or class scope) are that helper's
-    concern, not the test's, and are exempt.
-    """
-    findings: list[Finding] = []
-    for node in ast.walk(tree):
-        if isinstance(
-            node, ast.FunctionDef | ast.AsyncFunctionDef
-        ) and node.name.startswith("test_"):
-            findings.extend(_logic_in_test_body(rel, node))
-    return findings
-
-
-def _logic_in_test_body(
-    rel: str, fn: ast.FunctionDef | ast.AsyncFunctionDef
-) -> list[Finding]:
-    findings: list[Finding] = []
-    for node in _body_nodes(fn):
-        if isinstance(node, ast.If):
-            findings.append(
-                Finding(
-                    rel, node.lineno, NO_LOGIC_IN_TESTS, "`if`/`else` in a test body"
-                )
-            )
-        elif isinstance(node, ast.Try):
-            findings.append(
-                Finding(
-                    rel, node.lineno, NO_LOGIC_IN_TESTS, "`try`/`except` in a test body"
-                )
-            )
-    return findings
-
-
-def _body_nodes(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> list[ast.AST]:
-    """Every node under ``fn``'s body, not descending into a nested def or class."""
-    nodes: list[ast.AST] = []
-    stack: list[ast.AST] = [n for n in fn.body if not isinstance(n, _NESTED_SCOPES)]
-    while stack:
-        node = stack.pop()
-        nodes.append(node)
-        for child in ast.iter_child_nodes(node):
-            if not isinstance(child, _NESTED_SCOPES):
-                stack.append(child)
-    return nodes
-
-
 # --- the walk ---
 
 
@@ -343,13 +147,7 @@ def scan_file(path: Path, root: Path, mirrors: dict[str, set[str]]) -> list[Find
         return []
     if _CACHES & dir_parts:
         return []
-    findings: list[Finding] = []
-    findings.extend(check_mirror_layout(rel, mirrors))
-    tree = pyast.parse(path)
-    if tree is not None:
-        findings.extend(check_no_private_access(rel, tree))
-        findings.extend(check_no_logic(rel, tree))
-    return findings
+    return check_mirror_layout(rel, mirrors)
 
 
 def main(argv: list[str] | None = None) -> int:

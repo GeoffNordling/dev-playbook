@@ -1,15 +1,12 @@
 """Behavioral tests for scripts/workspace-lint.
 
 Fixtures build a throwaway workspace of git repos and point --workspace at
-it. Settings tests put a fake ``gh`` executable on PATH that serves canned
-JSON from a file, so no test touches the network. The pinned-repo URL and
-the hook repo's ``main`` sha come from the real checkout the script lives
-in, exactly as in production.
+it. Every run puts a fake ``gh`` executable on PATH that serves canned JSON
+from a file, so no test touches the network.
 """
 
 import json
 import os
-import re
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -171,22 +168,6 @@ def protection(
     }
 
 
-def hook_repo_url() -> str:
-    text = CANONICAL_CONFIG.read_text()
-    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
-    assert match, "canonical config lost its pinned block"
-    return match.group(1)
-
-
-def main_sha() -> str:
-    return subprocess.run(
-        ["git", "-C", str(HOOK_REPO), "rev-parse", "main"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
-
-
 def make_workspace_repo(
     workspace: Path, name: str, files: dict[str, str], origin: str | None = None
 ) -> Path:
@@ -204,10 +185,6 @@ def make_workspace_repo(
             capture_output=True,
         )
     return repo
-
-
-def pin_config(rev: str) -> str:
-    return f"repos:\n  - repo: {hook_repo_url()}\n    rev: {rev}\n    hooks:\n      - id: repo-lint\n"
 
 
 def run(
@@ -280,7 +257,6 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     ids = set(result.stdout.split())
     assert "tracking.squash-only-merges" in ids
     assert "tracking.github-origin" in ids
-    assert "distribution.a-pinned-rev" in ids
     # the tracking and software-factory rules this slice adds
     assert "tracking.valid-labels" in ids
     assert "tracking.build-headings" in ids
@@ -293,99 +269,13 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     ), ids
 
 
-# --- pins ---
+# --- the workspace root ---
 
 
 def test_missing_workspace_exits_two(tmp_path: Path) -> None:
-    result = run(tmp_path / "nowhere", "--pins-only")
+    result = run(tmp_path / "nowhere")
     assert result.returncode == 2
     assert "workspace root not found" in result.stderr
-
-
-def test_pin_current_stale_and_absent(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
-    )
-    make_workspace_repo(
-        ws, "beta", {".pre-commit-config.yaml": pin_config("0000000000000000")}
-    )
-    make_workspace_repo(ws, "gamma", {"README.md": "# G\n"})
-    result = run(ws, "--pins-only")
-    assert result.returncode == 1, result.stdout + result.stderr
-    assert "alpha: pin current" in result.stderr
-    assert re.search(
-        r"beta: distribution.a-pinned-rev 0{16} \(hook repo main is \w{12}\)",
-        result.stdout,
-    )
-    assert (
-        "gamma: distribution.a-pinned-rev no .pre-commit-config.yaml" in result.stdout
-    )
-    # The stale pin is advisory and the absent one is a finding; the summary
-    # counts them apart even though both carry distribution.a-pinned-rev.
-    assert "1 finding(s), 1 stale pin(s)" in result.stderr
-
-
-def test_stale_pin_is_not_a_failure(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "beta", {".pre-commit-config.yaml": pin_config("0000000000000000")}
-    )
-    assert run(ws, "--pins-only").returncode == 0
-
-
-def test_short_sha_pin_matches_main(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha()[:10])}
-    )
-    result = run(ws, "--pins-only")
-    assert "alpha: pin current" in result.stderr
-
-
-def test_config_without_hook_repo_pin(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws,
-        "delta",
-        {
-            ".pre-commit-config.yaml": (
-                "repos:\n  - repo: https://github.com/example/other\n"
-                "    rev: v1.0.0\n    hooks:\n      - id: x\n"
-            )
-        },
-    )
-    result = run(ws, "--pins-only")
-    assert result.returncode == 1
-    assert "delta: distribution.a-pinned-rev no dev-playbook pin" in result.stdout
-
-
-def test_hook_repo_itself_has_no_pin_line() -> None:
-    # The real checkout, since the exemption is identity: dev-playbook dogfoods
-    # from its working tree and has nothing to pin.
-    result = run(HOOK_REPO.parent, "--pins-only", repos=HOOK_REPO.name)
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert HOOK_REPO.name not in result.stdout
-
-
-def test_consumer_publishing_its_own_hooks_is_still_pin_checked(
-    tmp_path: Path,
-) -> None:
-    # A consumer may publish hooks of its own; that does not make it the hook
-    # repo, and its dev-playbook pin must still be audited. Reading the
-    # exemption off the manifest instead of off identity dropped exactly this
-    # repo's pin from the sweep.
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws,
-        "publisher",
-        {
-            ".pre-commit-hooks.yaml": "- id: x\n",
-            ".pre-commit-config.yaml": pin_config("0000000000000000"),
-        },
-    )
-    result = run(ws, "--pins-only")
-    assert "publisher: distribution.a-pinned-rev 0000000000000000" in result.stdout
 
 
 # --- the governed roster ---
@@ -396,10 +286,11 @@ def test_ungoverned_repo_draws_no_output(tmp_path: Path) -> None:
     # advisory, not a line. It is simply not this audit's business.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     make_workspace_repo(ws, "stranger", {"README.md": "# not ours\n"})
-    result = run(ws, "--pins-only", repos="alpha")
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(ws, "--settings-only", repos="alpha", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 0, result.stdout + result.stderr
     assert "stranger" not in result.stdout + result.stderr
     assert "1 repos" in result.stderr
@@ -409,10 +300,8 @@ def test_governed_repo_that_is_absent_stops_the_run(tmp_path: Path) -> None:
     # The other direction does close: the roster claiming a repo that is not
     # there is a false claim, and a shorter audit must not pass for a clean one.
     ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
-    )
-    result = run(ws, "--pins-only", repos="alpha,ghost")
+    make_workspace_repo(ws, "alpha", {"README.md": "# A\n"})
+    result = run(ws, repos="alpha,ghost")
     assert result.returncode == 2
     assert "governed repo(s) not found" in result.stderr
     assert "ghost" in result.stderr
@@ -421,21 +310,27 @@ def test_governed_repo_that_is_absent_stops_the_run(tmp_path: Path) -> None:
 def test_governed_directory_without_git_is_not_a_repo(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     (ws / "plain").mkdir(parents=True)
-    result = run(ws, "--pins-only", repos="plain")
+    result = run(ws, repos="plain")
     assert result.returncode == 2
     assert "governed repo(s) not found" in result.stderr
 
 
 def test_roster_order_is_the_audit_order(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
+    drifted = dict(GOOD_SETTINGS, mergeCommitAllowed=True)
+    data: dict[str, object] = {}
     for name in ("alpha", "beta"):
         make_workspace_repo(
-            ws, name, {".pre-commit-config.yaml": pin_config(main_sha())}
+            ws, name, {"README.md": "# R\n"}, origin=f"git@github.com:me/{name}.git"
         )
-    result = run(ws, "--pins-only", repos="beta,alpha")
-    assert result.stderr.index("beta: pin current") < result.stderr.index(
-        "alpha: pin current"
+        data[f"me/{name}"] = drifted
+    gh_dir, gh_data = make_fake_gh(tmp_path, data)
+    result = run(
+        ws, "--settings-only", repos="beta,alpha", gh_dir=gh_dir, gh_data=gh_data
     )
+    assert result.stdout.index(
+        "beta: tracking.squash-only-merges"
+    ) < result.stdout.index("alpha: tracking.squash-only-merges")
 
 
 def test_default_roster_is_the_governed_constant() -> None:
@@ -472,19 +367,6 @@ def test_unauthenticated_gh_reports_ghs_own_reason(tmp_path: Path) -> None:
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
     assert "The token in default is invalid." in result.stderr
-
-
-def test_pins_only_needs_no_auth(tmp_path: Path) -> None:
-    # --pins-only reads nothing over the network, so requiring a credential
-    # would refuse a run that could answer correctly.
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
-    )
-    gh_dir, gh_data = make_fake_gh(tmp_path, {})
-    result = run(ws, "--pins-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "alpha: pin current" in result.stderr
 
 
 def test_authenticated_gh_runs_normally(tmp_path: Path) -> None:
@@ -959,13 +841,8 @@ def full_mode_repo(
     settings plus the given labels/issues, so a full-mode run surfaces only the
     label/issue findings under test."""
     ws = tmp_path / "ws"
-    # A current pin included deliberately: a governed repo carrying none is
-    # itself a finding, which would leak into every label/issue assertion here.
     make_workspace_repo(
-        ws,
-        "alpha",
-        {"README.md": "# A\n", ".pre-commit-config.yaml": pin_config(main_sha())},
-        origin="git@github.com:me/alpha.git",
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,

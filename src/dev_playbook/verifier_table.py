@@ -82,7 +82,6 @@ DETERMINISTIC = "deterministic"
 # are checked against the declared rules like a detector's --list-rules, and
 # each address against the repo's hooks and dependencies.
 DEPENDENCY_RULES: Mapping[str, tuple[str, ...]] = {
-    "mypy": ("python.annotated-signatures",),
     "pre-commit validate-manifest": ("distribution.a-valid-manifest",),
     "ruff-check": ("python.docstrings",),
     "ruff-format": ("python.formatted-by-ruff-format",),

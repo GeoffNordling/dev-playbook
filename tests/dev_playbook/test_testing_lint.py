@@ -1,8 +1,7 @@
 """Behavioral tests for scripts/testing-lint.
 
-testing-lint walks a repo's Python files once and applies three rules to the
-test files it finds: no-private-access (privacy of non-test modules),
-mirror-layout (test placement), and no-logic (no if/try in a test body).
+testing-lint walks a repo's Python files once and applies one rule to the
+test files it finds: mirror-layout (test placement).
 Discovery goes through `git ls-files`, so every fixture is a git repo; a
 directory (repo root) is the only positional argument.
 """
@@ -31,94 +30,6 @@ def make_repo(tmp_path: Path, files: dict[str, str]) -> Path:
         p.write_text(content)
     subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)
     return repo
-
-
-# --- no-private-access rule ---
-
-
-def test_import_of_private_name_from_non_test_module_is_flagged(
-    tmp_path: Path,
-) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def _secret():\n    return 1\n",
-            "tests/test_thing.py": "from mypkg.thing import _secret\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "testing.access-only-public-names" in result.stdout
-    assert "tests/test_thing.py" in result.stdout
-
-
-def test_attribute_access_into_private_name_is_flagged(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def _secret():\n    return 1\n",
-            "tests/test_thing.py": "import mypkg.thing\n\n\ndef test_it():\n    mypkg.thing._secret()\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "testing.access-only-public-names" in result.stdout
-
-
-def test_import_and_attribute_reach_share_one_rule_id(tmp_path: Path) -> None:
-    """Both reaches collapse onto testing.access-only-public-names; the message differs."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def _secret():\n    return 1\n",
-            "tests/test_import.py": "from mypkg.thing import _secret\n",
-            "tests/test_attr.py": "import mypkg.thing\n\n\ndef test_it():\n    mypkg.thing._secret()\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "privacy" not in result.stdout
-    assert "imports private name" in result.stdout
-    assert "reaches into private name" in result.stdout
-
-
-def test_dunder_access_is_public(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "class T:\n    pass\n",
-            "tests/test_thing.py": "import mypkg.thing\n\n\ndef test_it():\n    mypkg.thing.__name__\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_public_access_in_test_is_clean(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def public():\n    return 1\n",
-            "tests/test_thing.py": "from mypkg.thing import public\n\n\ndef test_it():\n    assert public() == 1\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_privacy_scans_deprecated_tree(tmp_path: Path) -> None:
-    """The privacy rule's only exclusions are caches, so deprecated/ is scanned."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "deprecated/thing.py": "def _secret():\n    return 1\n",
-            "deprecated/tests/test_thing.py": "from deprecated.thing import _secret\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "testing.access-only-public-names" in result.stdout
-    assert "deprecated/tests/test_thing.py" in result.stdout
 
 
 # --- mirror-layout rule ---
@@ -237,128 +148,6 @@ def test_mirror_finding_is_file_level_without_a_line(tmp_path: Path) -> None:
     assert "tests/test_thing.py: testing.mirror-source-structure " in result.stdout
 
 
-# --- no-logic rule ---
-
-
-def test_if_statement_in_a_test_body_is_flagged(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {"tests/test_x.py": "def test_it():\n    if True:\n        assert 1\n"},
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "testing.no-logic-in-tests" in result.stdout
-    assert "tests/test_x.py" in result.stdout
-
-
-def test_try_statement_in_a_test_body_is_flagged(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "tests/test_x.py": (
-                "def test_it():\n"
-                "    try:\n"
-                "        assert 1\n"
-                "    except AssertionError:\n"
-                "        pass\n"
-            )
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "testing.no-logic-in-tests" in result.stdout
-
-
-def test_if_nested_in_a_loop_in_a_test_body_is_flagged(tmp_path: Path) -> None:
-    """A loop is legal, but an if nested inside it is still logic in the body."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "tests/test_x.py": (
-                "def test_it():\n"
-                "    for i in range(3):\n"
-                "        if i:\n"
-                "            assert i\n"
-            )
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "testing.no-logic-in-tests" in result.stdout
-
-
-def test_if_inside_a_nested_helper_is_exempt(tmp_path: Path) -> None:
-    """A helper defined inside a test may branch; only the test body is policed."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "tests/test_x.py": (
-                "def test_it():\n"
-                "    def walk(n):\n"
-                "        if n:\n"
-                "            return walk(n - 1)\n"
-                "        return 0\n"
-                "    assert walk(3) == 0\n"
-            )
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_loops_are_legal(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "tests/test_x.py": (
-                "def test_it():\n"
-                "    total = 0\n"
-                "    for i in range(3):\n"
-                "        total += i\n"
-                "    assert total == 3\n"
-            )
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_ternary_and_comprehension_filter_are_legal(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "tests/test_x.py": (
-                "def test_it():\n"
-                "    x = 1 if True else 0\n"
-                "    ys = [n for n in range(5) if n % 2]\n"
-                "    assert x == 1 and ys == [1, 3]\n"
-            )
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_if_in_a_non_test_helper_is_exempt(tmp_path: Path) -> None:
-    """Module-level fixtures and helpers are outside the rule; only test_* funcs."""
-    repo = make_repo(
-        tmp_path,
-        {
-            "tests/test_x.py": (
-                "def build(n):\n"
-                "    if n:\n"
-                "        return n\n"
-                "    return 0\n"
-                "\n\n"
-                "def test_it():\n"
-                "    assert build(1) == 1\n"
-            )
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
 # --- rule ids and finding format ---
 
 
@@ -371,20 +160,4 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    ids = result.stdout.split()
-    assert "testing.access-only-public-names" in ids
-    assert "testing.mirror-source-structure" in ids
-    assert "testing.no-logic-in-tests" in ids
-
-
-def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
-    repo = make_repo(
-        tmp_path,
-        {
-            "mypkg/thing.py": "def _secret():\n    return 1\n",
-            "tests/test_thing.py": "from mypkg.thing import _secret\n",
-        },
-    )
-    result = run(repo)
-    assert result.returncode == 1
-    assert "tests/test_thing.py:1: testing.access-only-public-names " in result.stdout
+    assert result.stdout.split() == ["testing.mirror-source-structure"]

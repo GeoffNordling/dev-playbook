@@ -9,8 +9,6 @@ import re
 import subprocess
 from pathlib import Path
 
-import pytest
-
 OKF_LINT = Path(__file__).resolve().parents[1] / "scripts" / "okf-lint"
 
 # A minimal but valid OKF bundle: a registry doc, two concept docs, a root
@@ -863,69 +861,12 @@ def test_okf_types_that_is_not_a_mapping_degrades_to_a_finding(tmp_path: Path) -
 
     assert result.returncode == 1
     assert (
-        "index.md: knowledge-organization.local-declaration 'okf_types' is not a "
+        "index.md: knowledge-organization.mapping-entry-shape 'okf_types' is not a "
         "mapping of type name to description" in result.stdout
     ), result.stdout
     # The broken declaration did not abort the scan: the sibling bogus type is
     # still caught.
     assert "type 'Nope' not in the registry" in result.stdout
-
-
-# The document a consumer declared its local types in before okf_types, at each
-# of the two paths one ever sat at: dev-playbook's own registry path, and the
-# path a consumer landed on by mirroring that path's earlier folder name.
-LEGACY_REGISTRY_DOC = (
-    "---\ntype: Standard\ntitle: Local Types\n"
-    "description: The local type registry\n---\n\n"
-    "# Local Types\n\n## Types\n\n"
-    "| Type | What it is |\n|------|------------|\n"
-    "| `Gizmo` | a local gizmo |\n"
-)
-
-
-@pytest.mark.parametrize(
-    "legacy_dir", ["standards/knowledge-organization", "standards/docs"]
-)
-def test_legacy_registry_document_is_flagged_at_either_path(
-    tmp_path: Path, legacy_dir: str
-) -> None:
-    """A local registry document left at either historical path is one
-    `registry-location` finding naming okf_types, and the run's only finding.
-    Consumer mode no longer reads the file, so without the guard the repo would
-    silently lose every type the document declares."""
-    leaf = legacy_dir.rpartition("/")[2]
-    index = LOCAL_TYPES_INDEX + (
-        "\n## Directories\n\n- [standards/](/standards/index.md) — Local standards\n"
-    )
-    repo = make_local_types_bundle(
-        tmp_path,
-        {
-            "index.md": index,
-            "standards/README.md": (
-                "---\ntype: README\ntitle: Standards\ndescription: Standards desc\n"
-                "---\n\n# Standards\n"
-            ),
-            "standards/index.md": (
-                "# standards/ — index\n\nThe standards.\n\n"
-                "- [Standards](/standards/README.md) — Standards desc\n"
-                f"- [{leaf}/](/{legacy_dir}/index.md) — The local standards\n"
-            ),
-            f"{legacy_dir}/index.md": (
-                f"# {legacy_dir}/ — index\n\nThe local standards.\n\n"
-                f"- [Local Types](/{legacy_dir}/document-types.md) — The local type registry\n"
-            ),
-            f"{legacy_dir}/document-types.md": LEGACY_REGISTRY_DOC,
-        },
-    )
-
-    result = run_okf_lint(repo, upstream_root=make_upstream(tmp_path))
-
-    assert result.returncode == 1
-    assert result.stdout.splitlines() == [
-        f"{legacy_dir}/document-types.md: knowledge-organization.local-declaration "
-        "the local type registry now lives in the root index.md frontmatter "
-        "under 'okf_types'"
-    ], result.stdout
 
 
 def test_apex_mode_ignores_okf_types(tmp_path: Path) -> None:
@@ -952,20 +893,6 @@ def test_apex_mode_ignores_okf_types(tmp_path: Path) -> None:
         "gizmo.md: knowledge-organization.types type 'Gizmo' not in the registry"
         in result.stdout
     ), result.stdout
-
-
-def test_list_rules_includes_registry_location(tmp_path: Path) -> None:
-    """--list-rules registers the migration rule under the knowledge-organization
-    namespace."""
-    result = subprocess.run(
-        ["uv", "run", "--script", str(OKF_LINT), "--list-rules"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-    )
-
-    assert result.returncode == 0, result.stderr
-    assert "knowledge-organization.local-declaration" in result.stdout.split()
 
 
 # --- rule ids and finding format ---

@@ -20,9 +20,8 @@ that owns them, `knowledge-organization.*`:
     (`LOCAL_TYPES_KEY`), whose names union onto the upstream set (additive only
     — a local type may be added but never shadow, loosen, or drop an upstream
     one). The mapping's shape is checked so a broken declaration degrades to
-    findings on `index.md` rather than aborting the scan, and a leftover local
-    registry *document* at either historical path (`LEGACY_REGISTRY_DOCS`) is
-    itself a finding. Membership is exact-case throughout.
+    findings on `index.md` rather than aborting the scan. Membership is
+    exact-case throughout.
 
   - **Index-staleness** — every `index.md` lists exactly the concept documents
     it owns (a concept document is owned by the nearest `index.md` at or above
@@ -101,12 +100,10 @@ TYPED_GUIDE = "knowledge-organization.typed-guide"
 THE_INTRODUCTION = "knowledge-organization.the-introduction"
 THE_LISTING = "knowledge-organization.the-listing"
 ORDERING = "knowledge-organization.ordering"
-THE_ROOT_INDEX = "knowledge-organization.the-root-index"
 OKF_VERSION_DECLARED = "knowledge-organization.okf-version-declared"
 AN_INDEX_IN_EVERY_DIRECTORY = "knowledge-organization.an-index-in-every-directory"
 ROW_SHAPE = "knowledge-organization.row-shape"
 ALPHABETICAL_ORDER = "knowledge-organization.alphabetical-order"
-LOCAL_DECLARATION = "knowledge-organization.local-declaration"
 MAPPING_ENTRY_SHAPE = "knowledge-organization.mapping-entry-shape"
 ALPHABETICAL_KEYS = "knowledge-organization.alphabetical-keys"
 ADD_NEVER_SHADOW = "knowledge-organization.add-never-shadow"
@@ -123,12 +120,10 @@ RULES = (
     THE_INTRODUCTION,
     THE_LISTING,
     ORDERING,
-    THE_ROOT_INDEX,
     OKF_VERSION_DECLARED,
     AN_INDEX_IN_EVERY_DIRECTORY,
     ROW_SHAPE,
     ALPHABETICAL_ORDER,
-    LOCAL_DECLARATION,
     MAPPING_ENTRY_SHAPE,
     ALPHABETICAL_KEYS,
     ADD_NEVER_SHADOW,
@@ -148,7 +143,6 @@ LOCAL_TYPES_KEY = "okf_types"
 # landed on by mirroring that path's earlier folder name. Consumer mode reads
 # neither, so a repo still carrying one would silently lose every type it
 # declares — finding one is a migration finding naming where the types go now.
-LEGACY_REGISTRY_DOCS = (REGISTRY_DOC, "standards/docs/document-types.md")
 # The canonical consumer template — the file that puts the audited tree in APEX
 # mode. Only dev-playbook (or a fixture simulating it) hosts this template;
 # consumers copy *from* it and never carry it. This is the same probe
@@ -344,7 +338,7 @@ def check_local_types(
         return set(), [
             Finding(
                 "index.md",
-                LOCAL_DECLARATION,
+                MAPPING_ENTRY_SHAPE,
                 f"'{LOCAL_TYPES_KEY}' is not a mapping of type name to description",
             )
         ]
@@ -396,27 +390,6 @@ def check_local_types(
             )
         )
     return set(names), findings
-
-
-def check_legacy_registry(repo_root: Path) -> list[Finding]:
-    """Flag a local registry *document* left behind by the move to `okf_types`.
-
-    Consumer mode only. A consumer used to declare its local types in a registry
-    document of its own, at one of `LEGACY_REGISTRY_DOCS`. Consumer mode reads
-    neither path now, so a repo that still carries one would silently lose every
-    type it declares; one finding per leftover document says where those types
-    go instead.
-    """
-    return [
-        Finding(
-            rel,
-            LOCAL_DECLARATION,
-            "the local type registry now lives in the root index.md frontmatter "
-            f"under '{LOCAL_TYPES_KEY}'",
-        )
-        for rel in LEGACY_REGISTRY_DOCS
-        if (repo_root / rel).is_file()
-    ]
 
 
 def relpath(path: Path, repo_root: Path) -> str:
@@ -547,7 +520,9 @@ def check_indexes(
 
     if () not in index_dirs:
         return [
-            Finding("index.md", THE_ROOT_INDEX, "repository root index.md is missing")
+            Finding(
+                "index.md", OKF_VERSION_DECLARED, "repository root index.md is missing"
+            )
         ]
 
     # Expected ownership: each concept doc belongs to its nearest index; each
@@ -799,7 +774,6 @@ def main(argv: list[str] | None = None) -> int:
             registry = set(upstream_names)
             local_names, registry_findings = check_local_types(repo_root, registry)
             registry = registry | local_names
-            registry_findings.extend(check_legacy_registry(repo_root))
         all_md = [relpath(p, repo_root) for p in md.find_md_files(repo_root)]
     except (ToolError, OSError) as err:
         print(f"okf-lint: {err}", file=sys.stderr)

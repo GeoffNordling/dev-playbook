@@ -61,7 +61,6 @@ DEPENDENCIES_LIVE_IN_PYPROJECT_TOML = "build.dependencies-live-in-pyprojecttoml"
 UVLOCK_AND_PYTHON_VERSION = "build.uvlock-and-python-version"
 ONE_PACKAGE_UNDER_SRC = "build.one-package-under-src"
 TESTS_PRESENT = "build.tests-present"
-LOCKFILE_COMMITTED = "build.lockfile-committed"
 CIYML = "build.ciyml"
 PYTHON_VERSION = "build.python-version"
 PRE_COMMIT_CONFIG_YAML = "build.pre-commit-configyaml"
@@ -88,7 +87,6 @@ RULES = (
     UVLOCK_AND_PYTHON_VERSION,
     ONE_PACKAGE_UNDER_SRC,
     TESTS_PRESENT,
-    LOCKFILE_COMMITTED,
     CIYML,
     PYTHON_VERSION,
     PRE_COMMIT_CONFIG_YAML,
@@ -133,13 +131,6 @@ BASE_REQUIRED = (
     ".github/workflows/ci.yml",
 )
 MYPY_ROOTS = ("src", "tests", "scripts")
-LOCKFILES = (
-    "package-lock.json",
-    "pnpm-lock.yaml",
-    "yarn.lock",
-    "bun.lock",
-    "bun.lockb",
-)
 UV_SHEBANG = "#!/usr/bin/env -S uv run --script"
 PEP723_OPEN = "# /// script"
 CONTEXT_SECTIONS = ("## Language",)
@@ -337,14 +328,6 @@ def check_presence(
                 "tests/",
                 TESTS_PRESENT,
                 "required once src/ exists or scripts/ holds Python",
-            )
-        )
-    if layers.js and not any(name in tracked for name in LOCKFILES):
-        findings.append(
-            Finding(
-                "package.json",
-                LOCKFILE_COMMITTED,
-                "a committed lockfile must sit alongside package.json",
             )
         )
     return findings

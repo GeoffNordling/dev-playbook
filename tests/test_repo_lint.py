@@ -550,18 +550,6 @@ def test_non_executable_helper_module_not_checked(tmp_path: Path) -> None:
 # --- js layer ---
 
 
-def test_package_json_requires_committed_lockfile(tmp_path: Path) -> None:
-    files = base_files()
-    files["package.json"] = '{"name": "sample"}\n'
-    result = run(make_repo(tmp_path, files))
-    assert result.returncode == 1
-    assert "package.json: build.lockfile-committed" in result.stdout
-
-    files["package-lock.json"] = "{}\n"
-    result = run(make_repo(tmp_path, files, name="locked-repo"))
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
 def test_js_src_is_not_the_python_src_layer(tmp_path: Path) -> None:
     files = base_files()
     files["package.json"] = '{"name": "sample"}\n'
