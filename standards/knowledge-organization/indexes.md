@@ -12,7 +12,7 @@ agent see what the directory holds, and read each document's one-line
 `description`, without opening every file. A repo's agent-navigated
 documentation is one
 [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog)
-bundle per the [OKF SPEC](/docs/references/okf-spec.md), the whole
+bundle per the [OKF SPEC](/docs/mirrors/okf-spec.md), the whole
 repository: an agent triages a document by its frontmatter and navigates
 between documents by the per-directory `index.md`, loading a body only
 when the document is relevant.

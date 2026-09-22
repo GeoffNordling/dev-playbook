@@ -5,7 +5,7 @@ from dev_playbook import external
 
 class TestIsVerbatimDoc:
     def test_reference_type_is_verbatim(self) -> None:
-        assert external.is_verbatim_doc({"type": "Reference", "title": "X"})
+        assert external.is_verbatim_doc({"type": "Mirror", "title": "X"})
 
     def test_concept_type_is_not_verbatim(self) -> None:
         assert not external.is_verbatim_doc({"type": "Standard"})

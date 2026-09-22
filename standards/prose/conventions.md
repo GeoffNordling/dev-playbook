@@ -2,13 +2,13 @@
 type: Standard
 title: Doc Conventions
 description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics
-population: "an authored document, except type: Reference and the paths in .prose-lint-exempt"
+population: "an authored document, except type: Mirror and the paths in .prose-lint-exempt"
 ---
 
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Every authored
-document is bound, except one carrying `type: Reference` frontmatter — a
+document is bound, except one carrying `type: Mirror` frontmatter — a
 verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
 `.prose-lint-exempt` at its root, under a comment saying why, and bans

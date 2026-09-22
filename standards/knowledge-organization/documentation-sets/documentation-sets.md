@@ -2,7 +2,7 @@
 type: Standard
 title: Documentation Sets
 description: How the concept documents one index.md owns relate as a set — an index in every directory, a body inside its declared concern, every row inside the set, one home for every fact, distinct concerns, and terms defined once
-population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Reference mirror among them"
+population: "a documentation set, the concept documents one index.md owns, except a numbered Decision Record or a type: Mirror mirror among them"
 ---
 
 # Documentation Sets
@@ -19,7 +19,7 @@ gives. A numbered
 [Decision Record](/standards/decisions/records.md) is outside every rule
 here, as it is outside Cross-References: a record frozen at merge
 restates the context of its day and is never rewritten; so is a
-`type: Reference` mirror, upstream text vendored verbatim and never
+`type: Mirror` mirror, upstream text vendored verbatim and never
 edited here. A member's **concern** is the one purpose its frontmatter
 `description` states
 ([Document Types](/standards/knowledge-organization/document-types.md#description));
@@ -37,7 +37,7 @@ level up and one level down. Two reach farther by their own text,
 
 A set's members sit in the directory of its `index.md`; every
 subdirectory that holds a concept document, a numbered Decision Record
-or a `type: Reference` mirror included, carries an `index.md` of its own
+or a `type: Mirror` mirror included, carries an `index.md` of its own
 and is a child set.
 
 `knowledge-organization.an-index-in-every-directory` · deterministic

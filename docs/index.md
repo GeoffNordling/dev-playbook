@@ -14,5 +14,5 @@ intentions, and explorations — and the Decision Records.
 ## Directories
 
 - [decisions/](/docs/decisions/index.md) — The Decision Records directory — numbered, immutable records of decisions and their rationale
-- [references/](/docs/references/index.md) — Upstream specifications the Standards cite, vendored verbatim so the text a Standard defers to is fixed, readable offline, and never edited here
+- [mirrors/](/docs/mirrors/index.md) — Upstream specifications the Standards cite, vendored verbatim so the text a Standard defers to is fixed, readable offline, and never edited here
 - [writing-improvement-process/](/docs/writing-improvement-process/index.md) — The writing-improvement process's files — the catalog of recurring problems in Claude's document writing

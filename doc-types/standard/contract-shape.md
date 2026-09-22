@@ -15,7 +15,7 @@ checked against.
 ## The shape
 
 - **Population.** The one class of object the Standard binds, with its
-  exclusions: `an authored document, except type: Reference and the
+  exclusions: `an authored document, except type: Mirror and the
   paths in .prose-lint-exempt`. Every rule is a predicate over a member
   of this class.
 - **Rule.** An id, a kind, a predicate, a condition or none, and a

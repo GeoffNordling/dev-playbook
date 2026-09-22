@@ -1,5 +1,5 @@
 ---
-type: Reference
+type: Mirror
 title: Open Knowledge Format (OKF) Specification
 description: The verbatim mirror of the upstream OKF v0.1 spec, vendored for network-free reading
 resource: https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md

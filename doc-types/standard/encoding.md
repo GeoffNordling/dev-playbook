@@ -21,7 +21,7 @@ The frontmatter key `population` holds the population as one phrase:
 the class, then `, except` and its exclusions when it has them.
 
 ```yaml
-population: "an authored document, except type: Reference and the paths in .prose-lint-exempt"
+population: "an authored document, except type: Mirror and the paths in .prose-lint-exempt"
 ```
 
 The phrase is double-quoted, since YAML reads an unquoted `: ` as a

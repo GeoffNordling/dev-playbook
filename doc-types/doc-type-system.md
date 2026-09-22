@@ -35,9 +35,9 @@ reader must learn. A row reading *pending* is not yet ruled.
 | Guide | guides | The [Guide](/doc-types/guide/definition.md) doc-type |
 | Log | logs | Pending; the user's to rule |
 | Loop | loops | The [Loop](/doc-types/loop/definition.md) doc-type |
+| Mirror | mirrors | Pending |
 | README | readmes | Pending |
 | Recipe-Description | recipes | Pending |
-| Reference | references | Pending |
 | Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
 | Survey | surveys | Pending; the user's to rule |
 | Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |

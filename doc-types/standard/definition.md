@@ -47,7 +47,7 @@ heuristics are a guide's.
 A standard is named by the question it governs, not by the current
 answer. "How knowledge is organized in markdown" is the question; the
 OKF spec is today's answer, vendored at
-[docs/references/okf-spec.md](/docs/references/okf-spec.md). The
+[docs/mirrors/okf-spec.md](/docs/mirrors/okf-spec.md). The
 litmus: if the implementation could be swapped while the name stays
 true, the name is a standard's.
 

@@ -41,7 +41,7 @@ rules, skills; for the banned-word rule, code and config too). What is out is
 ``md.classify``'s ``"excluded"`` category: transient scratch (``PLAN.md`` /
 ``PROGRESS.md``, the root ``tmp/`` tree).
 Verbatim upstream mirrors are excluded per file via the registry's
-``is_verbatim_doc`` (``type: Reference`` documents). Symlinks are skipped: a
+``is_verbatim_doc`` (``type: Mirror`` documents). Symlinks are skipped: a
 link's content belongs to its target, which is scanned at its own path when
 it lives in the repo and is not ours when it does not. Beyond those structural
 exclusions, each repo declares its own: a tracked root-level
@@ -352,7 +352,7 @@ def audit(root: Path) -> list[Finding]:
     ``classify``'s ``"excluded"`` category is out: the ``.git`` tree and the
     transient scratch that is not authored content (``PLAN.md`` /
     ``PROGRESS.md`` and the root ``tmp/`` tree). Reusing that one boundary
-    stops the gate firing on scratch. Verbatim Reference docs are excluded per
+    stops the gate firing on scratch. Verbatim Mirror docs are excluded per
     file, the repo's ``.prose-lint-exempt`` declarations per path; symlinks and
     binary files (NUL byte) are skipped — a link's content belongs to its
     target, scanned at its own path when it lives in the repo.

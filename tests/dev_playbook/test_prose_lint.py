@@ -142,7 +142,7 @@ def test_flags_harness_markdown(tmp_path: Path) -> None:
 def test_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {"docs/references/x.md": "---\ntype: Reference\n---\na judgement\n"},
+        {"docs/mirrors/x.md": "---\ntype: Mirror\n---\na judgement\n"},
     )
 
     assert prose_lint.audit(repo) == []
@@ -167,8 +167,8 @@ def test_skips_root_tmp_scratch_tree(tmp_path: Path) -> None:
     assert prose_lint.audit(repo) == []
 
 
-def test_flags_non_reference_doc(tmp_path: Path) -> None:
-    # Control for the verbatim exclusion: an authored (non-Reference) doc with
+def test_flags_non_mirror_doc(tmp_path: Path) -> None:
+    # Control for the verbatim exclusion: an authored (non-Mirror) doc with
     # the same body is flagged.
     repo = make_repo(
         tmp_path,
@@ -183,7 +183,7 @@ def test_flags_non_reference_doc(tmp_path: Path) -> None:
 def test_frontmatter_values_are_not_scanned_as_prose(tmp_path: Path) -> None:
     # Frontmatter is structured YAML, not prose, and a YAML scalar has no
     # backtick escape hatch — so a title/description carrying the British form in
-    # a non-Reference doc must not be flagged. Only the body is scanned.
+    # a non-Mirror doc must not be flagged. Only the body is scanned.
     repo = make_repo(
         tmp_path,
         {
@@ -248,7 +248,7 @@ def test_ban_reaches_frontmatter(tmp_path: Path) -> None:
 def test_ban_skips_verbatim_reference_doc(tmp_path: Path) -> None:
     repo = make_repo(
         tmp_path,
-        {"docs/references/spec.md": "---\ntype: Reference\n---\nhuman\n"},
+        {"docs/mirrors/spec.md": "---\ntype: Mirror\n---\nhuman\n"},
     )
 
     assert prose_lint.audit(repo) == []
