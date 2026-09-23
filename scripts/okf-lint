@@ -74,8 +74,7 @@ HOOK_REPO_ROOT = Path(__file__).resolve().parents[1]
 # The tree consumer mode reads the authoritative upstream registry from —
 # HOOK_REPO_ROOT by default. Overridable via OKF_LINT_UPSTREAM_ROOT so a test can
 # pin a synthetic upstream registry rather than depend on the live dev-playbook
-# one (the same synthetic-upstream injection standards-lint does through its
-# `hook_repo_root` parameter). Only the registry read is redirected; the
+# one. Only the registry read is redirected; the
 # dev_playbook import below always resolves from the real clone.
 UPSTREAM_REGISTRY_ROOT = Path(os.environ.get("OKF_LINT_UPSTREAM_ROOT", HOOK_REPO_ROOT))
 
@@ -138,7 +137,7 @@ REGISTRY_SECTION_SLUG = "type-names-a-registered-type"
 # The root-index frontmatter key a consumer declares its local document types
 # under, beside okf_version: a mapping of type name to one-line description.
 # Frontmatter rather than a document under the consumer's standards/ tree,
-# because that tree is standards-lint's population — it wants a card in every
+# because that tree is the meta-standard's population — it wants a card in every
 # subdirectory and forbids a card named for a dev-playbook one — so a local
 # registry document there could not pass, and a path mirroring dev-playbook's
 # own folder name would break the moment that folder was renamed upstream.
@@ -151,8 +150,8 @@ LOCAL_TYPES_KEY = "okf_types"
 # The canonical consumer template — the file that puts the audited tree in APEX
 # mode. Only dev-playbook (or a fixture simulating it) hosts this template;
 # consumers copy *from* it and never carry it. This is the same probe
-# standards-lint keys its dev-playbook mode on (see CANONICAL_CONFIG in
-# src/dev_playbook/standards_lint.py).
+# the standard family's checks key dev-playbook on (see CANONICAL_CONFIG in
+# src/dev_playbook/checks/standard.py).
 CANONICAL_CONFIG = "standards/build/canonical/.pre-commit-config.yaml"
 RESOURCE_REQUIRED_TYPES = {"Recipe-Description"}
 # The types reserved to standards/. A normative conformance target lives

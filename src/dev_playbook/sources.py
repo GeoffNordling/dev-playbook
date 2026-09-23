@@ -25,6 +25,9 @@ TYPE_REGISTRY = Section(
     "type-names-a-registered-type",
 )
 
+# The table whose Ruling cells link each doc-type's directory.
+REGISTRY_RULINGS = Section("doc-types/doc-type-system.md", "registry-rulings")
+
 # The rule that names the workspace's banned word; a test asserts the word
 # there is the one the prose checks hold.
 BANNED_WORD = Section("standards/prose/conventions.md", "no-banned-word")

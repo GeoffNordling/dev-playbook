@@ -62,16 +62,13 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape, the dogfood mirror |
 | `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `harness-files-lint` | [runbook-conventions.md](/standards/doc-type/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
-| `standards-lint` | [tree.md](/standards/standard/tree.md), [detectors.md](/standards/standard/detectors.md) | The Standards Tree's rules over `standards/` — directory layout, the population, the catalog, hook-surface agreement, and no shadowing of an upstream directory (consumer mode); clean by construction where no `standards/` tree is present |
 | `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
 
 `repo-lint`, `ref-lint`,
 and `okf-lint` assert unconditionally and fail loud; they do
-not skip themselves when a target kind is absent. `harness-files-lint`,
-`standards-lint`, and `loop-lint` are optional-surface: each exits 0 silently when
-its audited surface is absent — no runbooks, no `standards/` tree, no `loops/`
-tree — and asserts only over a surface that is present. Run
+not skip themselves when a target kind is absent. `loop-lint` is
+optional-surface: it exits 0 silently when no `loops/` tree is present, and
+asserts only over a tree that is present. Run
 any script with `--help`; each script's docstring documents its behavior in
 full.
 

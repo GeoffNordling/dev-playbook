@@ -10,8 +10,7 @@ population: "a runbook: a skill bundle or an agent definition under a governed r
 A runbook: a skill bundle or an agent definition under a governed
 repo's `.claude/` or dev-playbook's `dotfiles/dot-claude/`, the harness
 files that act. A bundle whose directory is a symlink belongs to
-whatever manages its target, so it is outside the population and
-harness-files-lint skips it. The
+whatever manages its target, so it is outside the population. The
 [Runbook doc-type](/doc-types/runbook/index.md) declares a runbook's
 contract, the chain; this Standard binds the file: its front matter,
 its body's shape, and what each kind adds; where it sits is
@@ -31,35 +30,12 @@ read to write one; this Standard wins where the two collide.
 
 ## Front matter holds its kind's vocabulary
 
-A runbook opens with a YAML block between `---` lines holding exactly
-its kind's vocabulary: a skill's `name`, `description`,
-`disable-model-invocation`, `model`, and `effort`, with
-`allowed-tools`, `disallowed-tools`, and `arguments` optional; an
-agent's `name`, `description`, `model`, and `effort`, with `tools`
-optional.
-
-A skill's block:
-
-```yaml
-name: <skill-name>
-description: <what it does. Use when …>
-disable-model-invocation: <true|false>
-model: <haiku|sonnet|opus|fable|inherit>
-effort: <low|medium|high|xhigh>
-allowed-tools: <tool spec>          # optional
-disallowed-tools: <tool spec>       # optional
-arguments: [<name>, ...]            # optional
-```
-
-An agent's block:
-
-```yaml
-name: <agent-name>
-description: <what it does. Use when …>
-model: <haiku|sonnet|opus|fable|inherit>
-effort: <low|medium|high|xhigh>
-tools: <Tool, Tool, ...>            # optional
-```
+A runbook starts with YAML front matter between two `---` lines. A
+skill's keys are `name`, `description`, `disable-model-invocation`,
+`model`, and `effort`, and optionally `allowed-tools`,
+`disallowed-tools`, and `arguments`, and no other keys. An agent's
+keys are `name`, `description`, `model`, and `effort`, and
+optionally `tools`, and no other keys.
 
 `doc-type.front-matter-holds-its-kinds-vocabulary` · deterministic
 
@@ -137,8 +113,8 @@ The runbook is a skill.
 
 ### Every bundle file reached from SKILL.md
 
-Every file in a skill's `references/` is linked from its `SKILL.md`,
-and every file in its `scripts/` is invoked from its `SKILL.md`.
+Every file in a skill's `references/` or `scripts/` is the target
+of a link in its `SKILL.md`.
 
 `doc-type.every-bundle-file-reached-from-skillmd` · deterministic
 
@@ -156,13 +132,6 @@ A skill that runs several turns with the user carries `model: inherit`.
 
 > **Why.** A pinned model governs only the turn that loads the skill.
 
-### Tool fields, space-separated specs
-
-A skill's `allowed-tools` and `disallowed-tools`, when present, are
-space-separated tool specs, as in `Bash(git *) Bash(gh *)`.
-
-`doc-type.tool-fields-space-separated-specs` · deterministic
-
 ### Arguments, bare kebab-case names
 
 A skill's `arguments`, when present, is a non-empty list of bare
@@ -172,8 +141,8 @@ kebab-case names, as in `arguments: [subject]`.
 
 ### No argument placeholder
 
-A skill's body carries no `$ARGUMENTS` placeholder and no `$0`
-placeholder.
+A skill's `SKILL.md` body, after the front matter, does not contain
+the text `$ARGUMENTS` or `$0`.
 
 `doc-type.no-argument-placeholder` · deterministic
 

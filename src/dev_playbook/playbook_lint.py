@@ -42,8 +42,6 @@ DETECTORS = (
     "repo-lint",
     "ref-lint",
     "okf-lint",
-    "harness-files-lint",
-    "standards-lint",
     "loop-lint",
 )
 

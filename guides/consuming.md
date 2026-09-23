@@ -50,10 +50,10 @@ in the Standard the step links.
    repo-lint's `distribution.a-publisher-dogfoods-its-manifest` checks
    the mirror.
 5. **Turn the meta-standard's own policing on.** The meta-standard's
-   detector, `standards-lint`, is a published dev-playbook hook. Bump
-   the pin to a dev-playbook `rev` that carries it: from that rev it
-   runs the consumer-mode rules over the repo's `standards/` tree
-   (`standards-lint --list-rules` is the registry). Until the pin
+   checks run in `playbook-check`, a published dev-playbook hook. Bump
+   the pin to a dev-playbook `rev` that carries them: from that rev
+   they run over the repo's `standards/` tree
+   (`playbook checks --family standard` lists them). Until the pin
    moves, the tree is unpoliced by the meta-standard.
 6. **Register a local document type (only if the standard needs one).**
    Skip this step unless the new standard governs a **document type**
@@ -77,4 +77,4 @@ in the Standard the step links.
    [Type Registry](/standards/knowledge-organization/type-registry.md#local-declaration).
    Nothing goes under the repo's own `standards/` tree for this: that
    tree is the meta-standard's, and a registry document in it could not
-   pass standards-lint.
+   pass its checks.

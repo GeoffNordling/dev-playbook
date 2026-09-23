@@ -46,7 +46,7 @@ documenting its own external validators.
 
 **Examples.**
 
-- **Before** "This standard is binding, and harness-files-lint enforces
+- **Before** "This standard is binding, and its detector enforces
   it at the commit gate." → **After** deleted.
 
 ## Relationship meta-commentary

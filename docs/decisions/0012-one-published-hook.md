@@ -30,7 +30,7 @@ Consequential removals and reworks:
   own `SKIP` keys on config hook ids, which no longer name detectors — so the
   canonical CI workflow's `SKIP: ref-lint` and one-off developer skips keep
   their exact spelling.
-- **standards-lint's hook-surfaces rule reads the roster**, not the config,
+- **The hook-surfaces rule reads the roster**, not the config,
   as dev-playbook's detector enumeration, and gains a closure leg: a script
   cited by a card's Audit cell that is neither in the roster nor a registered
   ungated audit (workspace-lint) is a finding — a detector card cannot be
@@ -45,8 +45,8 @@ enrollment was opt-in by construction, backwards for a workspace whose
 standards ride downhill. The check that should have caught under-enrollment,
 repo-lint's canonical-block compare, ships inside the same pinned clone: at a
 stale pin it compared the consumer against the stale canonical block and
-passed. story-forge sat one release behind and never ran standards-lint or
-validate-manifest, green the whole time.
+passed. story-forge sat one release behind and never ran the meta-standard's
+detector or validate-manifest, green the whole time.
 
 With one id there is nothing to enumerate, so nothing to under-enumerate:
 the pin bump is the complete release, detectors included.

@@ -20,11 +20,11 @@ nobody, so this Standard is what binds the file to that encoding.
 
 ## A sequence is one list
 
-Every ordered list in a document typed `Guide` sits directly under a
-heading, is the only ordered list of that heading's section, starts at
-`1.`, and nests no ordered list; before it the section holds at most
-one paragraph of one sentence, and after it nothing, no paragraph and
-no nested heading.
+In a file typed `Guide`, every ordered list starts at `1.` and has
+no ordered list inside it. Between the heading above the list and the
+list there is at most one paragraph, and that paragraph is one
+sentence. After the list there is nothing until a heading at the
+same level as that heading or higher.
 
 `doc-type.a-sequence-is-one-list` · deterministic
 

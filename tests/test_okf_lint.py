@@ -15,7 +15,7 @@ OKF_LINT = Path(__file__).resolve().parents[1] / "scripts" / "okf-lint"
 # index (with okf_version) and a standards index, all internally consistent.
 # The canonical consumer template puts the bundle in APEX mode — the registry
 # document is read and shape-checked from the audited tree — the same probe
-# standards-lint keys its dev-playbook mode on. Every apex fixture rides this one
+# the standard family's checks key dev-playbook on. Every apex fixture rides this one
 # line; without it the bundle would flip to consumer mode and its registry doc
 # would be read as a local extension whose rows all shadow upstream.
 BASE_BUNDLE: dict[str, str] = {

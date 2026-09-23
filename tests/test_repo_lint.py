@@ -686,7 +686,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "knowledge-organization.readme-holds-an-h1" in ids
     assert "build.no-other-future-work-file" in ids
     # No harness.* here: the voice rule is the prose checks' and the global CLAUDE.md
-    # shape is harness-files-lint's. repo-lint checks that CLAUDE.md exists,
+    # shape is the harness checks'. repo-lint checks that CLAUDE.md exists,
     # which is build.files-every-repo-carries, and nothing about what it says.
     assert all(
         rule.split(".")[0]
@@ -703,7 +703,7 @@ def test_finding_line_is_gnu_format(tmp_path: Path) -> None:
 
 
 def test_global_claude_source_is_not_this_detectors_business(tmp_path: Path) -> None:
-    # The global file's shape moved to harness-files-lint; a misshapen one draws
+    # The global file's shape moved to the harness checks; a misshapen one draws
     # nothing here, and the file's mere presence trips no build rule either.
     files = base_files()
     files["dotfiles/dot-claude/CLAUDE.md"] = "# Global\n\n## Extras\n\nNope.\n"

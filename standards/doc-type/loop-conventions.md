@@ -20,11 +20,11 @@ encoding.
 
 ## One paragraph, then one graph
 
-A document typed `Loop` holds one H1, then one paragraph, then one
-fenced `mermaid` block, in that order and with nothing else before the
-fence. The block is a flowchart, opening `flowchart` or `graph`, whose
-statements are Mermaid directives, nodes, and edges between nodes, with
-no `&` fan-out.
+A file typed `Loop` has, after its front matter, one H1, then one
+paragraph, then one fenced `mermaid` block, and nothing else before
+the fence. The first line in the block is `flowchart` or `graph`.
+Every other line is a Mermaid directive, a node, or an edge between
+nodes, and no line uses `&`.
 
 `doc-type.one-paragraph-then-one-graph` · deterministic
 
@@ -37,20 +37,20 @@ state the loop drives and the target state it drives that state toward.
 
 ## Acts, Checks, and Yields, in that order
 
-After the graph, a document typed `Loop` holds three H2s, `Acts`,
-`Checks`, and `Yields`, in that order and no others, with nothing
-between the graph and the first of them. Each H2 holds one list whose
-every line is an entry, the node id in backticks, an em dash, then the
-entry's text, or is a line indented under an entry, which continues it;
-and no node id carries two entries.
+After the graph there are exactly three H2s, `Acts`, `Checks`, and
+`Yields`, in that order, and nothing between the graph and
+`## Acts`. Under each H2 there is one list. Each line of the list
+is an entry, `` - `<node id>` — <text> ``, or an indented line that
+continues the entry above it. No node id has two entries.
 
 `doc-type.acts-checks-and-yields-in-that-order` · deterministic
 
 ## Nodes and entries agree
 
-Every entry of a document typed `Loop` names a node of its graph, and
-every node of the graph carries an entry or is a receiver, a node with
-no entry that an edge out of a yield leads to.
+In a file typed `Loop`, the node id of every entry is a node of the
+graph. Every node of the graph has an entry, or has no entry and is
+the target of an edge from a yield. A node of the second kind is a
+receiver.
 
 `doc-type.nodes-and-entries-agree` · deterministic
 
@@ -64,20 +64,23 @@ yield, which leads to a step or to a receiver, a node with no entry.
 
 ## Every entry states its condition
 
-Every entry of a document typed `Loop` states its condition, `fires
-when …` or `fires every iteration` for an act or a check and `yields
-when …` for a yield. An act's entry holds at least one link; a check's
-entry links a document typed `Standard`; a yield's entry holds a link or the words `the user`, and every link it
-holds names a document typed `Loop`. Every link in an entry is
-root-absolute or relative to the document, and it resolves to a file in
-the repo.
+Every entry of a file typed `Loop` contains `fires when` or
+`fires every iteration` if it is an act or a check, and
+`yields when` if it is a yield. An act's entry has at least one
+link. A check's entry has a link to a file typed `Standard`. A
+yield's entry has a link or the words `the user`, and each of its
+links goes to a file typed `Loop`. Every link in an entry is
+root-absolute or relative to the file, and goes to a file that
+exists in the repo.
 
 `doc-type.every-entry-states-its-condition` · deterministic
 
 ## An act links a runbook
 
-The link an act's entry holds names a runbook, a skill bundle's
-`SKILL.md` or an agent definition
-([Runbook Conventions](/standards/harness/files.md#every-runbook-at-a-fixed-path)).
+An act's entry has a link to a runbook: a file
+`<skills root>/<name>/SKILL.md` or `<agents root>/<name>.md`, where
+the roots are those that
+[Every runbook at a fixed path](/standards/harness/files.md#every-runbook-at-a-fixed-path)
+names.
 
 `doc-type.an-act-links-a-runbook` · deterministic

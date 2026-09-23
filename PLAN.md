@@ -166,7 +166,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       gets one finding; `make check`, `scripts/playbook-lint .`, and
       `uv run playbook check .` are clean.
 
-- [ ] Step 10, family `doc-type`, retires `harness-files-lint` and
+- [x] Step 10, family `doc-type`, retires `harness-files-lint` and
       `standards-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/doc-type.md`.
       Verify: `uv run playbook checks --family doc-type` lists exactly the

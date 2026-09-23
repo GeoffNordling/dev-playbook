@@ -39,18 +39,14 @@ RULE_ID = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z][a-z0-9]*(-[a-z0-9]+)*
 CARRIERS = [
     (SCRIPTS / "okf-lint", "Finding", 1),
     (SCRIPTS / "repo-lint", "Finding", 1),
-    (SCRIPTS / "harness-files-lint", "Finding", 1),
     (SRC / "dev_playbook" / "workspace_lint.py", "Line", 1),
-    (SRC / "dev_playbook" / "standards_lint.py", "Finding", 2),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
 REGISTRIES = [
     (SCRIPTS / "okf-lint", "RULES"),
     (SCRIPTS / "repo-lint", "RULES"),
-    (SCRIPTS / "harness-files-lint", "RULES"),
     (SRC / "dev_playbook" / "workspace_lint.py", "RULES"),
-    (SRC / "dev_playbook" / "standards_lint.py", "RULES"),
 ]
 
 
