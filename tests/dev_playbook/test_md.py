@@ -183,7 +183,7 @@ class TestClassify:
             ("dotfiles/dot-claude/agents/build.md", "harness"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
-            ("tools/bin/ref-lint", "harness"),
+            ("tools/bin/some-lint", "harness"),
             ("tests/x.md", "harness"),
             ("tests/fixtures/specs/feat-01.md", "harness"),
             ("tests/spec_files/broken.md", "harness"),

@@ -175,7 +175,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       report exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-- [ ] Step 11, family `knowledge-organization`, retires `okf-lint`,
+- [x] Step 11, family `knowledge-organization`, retires `okf-lint`,
       `ref-lint`, and `repo-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`.
       Verify: `uv run playbook checks --family knowledge-organization` lists

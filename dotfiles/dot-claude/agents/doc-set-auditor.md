@@ -37,7 +37,7 @@ defined once are the two rules that cross a set's boundary: it follows
 a member's links out of the set, reads the repo's `CONTEXT.md`, and
 over a set with child sets reads them all.
 
-Skip what okf-lint checks: an index present, an introduction present,
+Skip what the index checks decide: an index present, an introduction present,
 a listing complete with each description verbatim. Judge meaning, and
 judge for precision: a finding a reader would call pedantic is a false
 positive, and a maybe goes under Questions.

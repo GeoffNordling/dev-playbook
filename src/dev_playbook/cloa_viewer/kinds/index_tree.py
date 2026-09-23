@@ -11,7 +11,7 @@ file the user needs to see.
 The harness-owned files the walk never reaches land in ``harness``, a flat list.
 
 Which group a file belongs to is ``md.classify``, the one encoding of the
-boundary, never a test of this module's own: the tree and okf-lint cannot
+boundary, never a test of this module's own: the tree and the index checks cannot
 disagree about a file's role when they ask the same function. A file that
 function calls ``excluded`` gets no row at all.
 

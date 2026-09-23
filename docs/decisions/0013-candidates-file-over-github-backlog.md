@@ -38,7 +38,7 @@ The tracking card's Enforce cell moves from `none` to the **commit gate** for
 the tree half, while GitHub itself stays unenforceable. Only the file's
 existence and OKF header are checked: `tracking.rogue-future-work-file` bans
 `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, and `IDEAS.md` anywhere in the tree, and
-okf-lint checks the `Candidate-List` frontmatter like any concept document.
+the document-type checks read the `Candidate-List` frontmatter like any concept document.
 
 Entry shape inside the file is deliberately **convention, not a checked rule**.
 An earlier design enforced a closed grammar — banning bold-colon fields,

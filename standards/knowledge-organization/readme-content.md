@@ -14,7 +14,7 @@ arrive as the project earns them.
 
 ## README holds an H1
 
-A `README.md` holds an H1 heading.
+Every `README.md` has an H1.
 
 `knowledge-organization.readme-holds-an-h1` · deterministic
 

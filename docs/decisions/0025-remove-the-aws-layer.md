@@ -14,7 +14,7 @@ layer required a `src/<package>/app.py` CDK entry, forbade a root `app.py`,
 pinned `cdk.json`'s `app` command to `uv run python -m <package>.app`, forbade
 tracked `cdk.out/`, and composed the canonical fragment
 [Makefile.aws](/standards/build/canonical/Makefile.aws) with its `synth`,
-`diff`, and `deploy` targets. [repo-lint](/scripts/repo-lint) detected,
+`diff`, and `deploy` targets. The structure detector detected,
 composed, and shape-checked it; five build documents tabled it.
 
 No governed repo has ever been in the layer. The workspace has exactly two AWS
@@ -63,7 +63,7 @@ inverse of a reinstatement.
 
 ## Consequences
 
-- `repo-lint`'s layer summary no longer prints `aws`. `wellness-check` reads
+- The structure detector's layer summary no longer prints `aws`. `wellness-check` reads
   as `base, python, src`; `JARVIS` as `base, python, scripts`.
 - The hook repo's canonical-directory self-audit flags
   `standards/build/canonical/Makefile.aws` until the file is gone, since the

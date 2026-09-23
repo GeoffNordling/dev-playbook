@@ -63,13 +63,13 @@ def pinned_rev() -> str:
 
 def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
     """Map each file the new repo needs to its content, per the skeleton."""
-    # The name becomes the CLAUDE.md H1, which repo-lint reads as agent-facing
+    # The name becomes the CLAUDE.md H1, which the prose checks read as agent-facing
     # prose. Refuse it here, before anything is written, rather than let the
     # scaffold fail its own self-check with the tree already on disk.
     fault = voice.first_fault(spec.name)
     if fault is not None:
         raise RepoInitError(
-            f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
+            f"'{spec.name}' would write a CLAUDE.md that the prose checks reject — "
             f"{fault}; choose another name"
         )
     if word_pattern(WORKSPACE_WORD).search(spec.name):

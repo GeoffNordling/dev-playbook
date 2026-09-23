@@ -21,7 +21,7 @@ the files this skill writes}. Then say `READ: ralph-loop.md` and proceed.
   inherit it, so the plan and progress files must live here and be named with
   relative paths. Ask if it isn't obvious.
 - Keep the default filenames, `PLAN.md` and `PROGRESS.md`; these become
-  the loop's `planFile` and `progressFile`. okf-lint excludes a file with
+  the loop's `planFile` and `progressFile`. The checks exclude a file with
   exactly either name from the bundle, in any directory, so the pair
   needs no frontmatter and no index row. Any other name makes them
   concept documents, and the gate then demands both.

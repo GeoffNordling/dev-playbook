@@ -37,7 +37,7 @@ A rule is a heading; its section is the rule.
 - **The name.** The heading's text, in sentence case, naming the rule:
   `Declarative present tense`, `tests/ present`, `ci.yml`. The slug is
   the heading's GitHub slug, the anchor a link to the section uses and
-  the one ref-lint resolves: inline marks stripped, lowercased, every
+  the one the anchor check resolves: inline marks stripped, lowercased, every
   character outside letters, digits, whitespace, and hyphens dropped,
   each run of whitespace one hyphen (`declarative-present-tense`,
   `tests-present`, `ciyml`, `pre-commit-configyaml`). Slugs are unique

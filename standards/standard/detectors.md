@@ -11,7 +11,7 @@ A **detector** is a read-only check that decides one or more rules under
 `standards/`: it inspects the repository against those Standards and emits
 findings, and by itself it blocks nothing; its run at a gate is the audit
 stationed there, which is Enforcement ([Vocabulary](/CONTEXT.md#governance)).
-A detector is a first-party script by its path, `scripts/repo-lint`; a
+A detector is a first-party script by its path, `scripts/loop-lint`; a
 dependency by its pinned pre-commit hook id, `ruff-format`; or a dependency
 by its `pyproject.toml` name and the subcommand it runs, `mypy`,
 `pre-commit validate-manifest`.

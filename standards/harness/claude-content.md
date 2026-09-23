@@ -32,7 +32,7 @@ The first line of a `CLAUDE.md` is not `---`.
 `harness.no-frontmatter` · deterministic
 
 > **Why.** A `CLAUDE.md` is injected into the session as operating
-> configuration, and okf-lint never reads it.
+> configuration, and no document-type check reads it.
 
 ## Operational content only
 

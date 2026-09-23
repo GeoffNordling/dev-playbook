@@ -23,13 +23,14 @@ when the document is relevant.
 
 ## No OKF type
 
-An `index.md` carries no OKF `type`.
+The frontmatter of an `index.md` has no `type` key.
 
 `knowledge-organization.no-okf-type` · deterministic
 
 ## Introduction between H1 and listing
 
-An `index.md` holds prose between its H1 and its first listed entry.
+An `index.md` has at least one line of prose between its H1 and its
+first listed entry. A heading and an `Ordering:` line are not prose.
 
 `knowledge-organization.introduction-between-h1-and-listing` · deterministic
 
@@ -47,23 +48,22 @@ directory holds, the sentence says what the directory is for instead.
 
 ## One entry per concept document and child directory
 
-An `index.md` lists, as a bullet holding a root-absolute markdown link
-and exactly once each, every
-concept document in its own directory and every child directory's own
-`index.md`, and lists nothing else; each concept document's entry
-carries that document's frontmatter `description` verbatim.
+An `index.md` has exactly one bullet for each concept document in its
+directory and one for each child directory's `index.md`, and no other
+bullet in its listing. Each bullet is a link whose target starts `/`.
+A concept document's bullet ends with ` — ` and that document's
+frontmatter `description`, character for character.
 
 `knowledge-organization.one-entry-per-concept-document-and-child-directory` · deterministic
 
 ## Alphabetical unless declared otherwise
 
-Within each group of an `index.md`'s listing, the concept documents and
-then the child-directory links, entries are in alphabetical order by
-link title, compared case-insensitively, and a `README.md` entry is the
-first entry of the whole listing; an introduction line beginning
-`Ordering:`, one before the first listed entry, releases the
-alphabetical order of both groups and never the `README.md` entry's
-place.
+In an `index.md`, the `README.md` bullet, where there is one, is the
+first bullet. The concept-document bullets come next, then the
+child-directory bullets, and each group is sorted by link text,
+ignoring case. A line that starts `Ordering:` above the first bullet
+turns off the sorting and the group order, and never moves the
+`README.md` bullet.
 
 `knowledge-organization.alphabetical-unless-declared-otherwise` · deterministic
 

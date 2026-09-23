@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Working Documentation Sets
-description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, a directory per line of work under `working-docs/` and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
+description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a directory per line of work under `working-docs/` and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -40,48 +40,42 @@ exemption from
 
 `knowledge-organization.a-guess-written-as-a-guess` · stochastic
 
-## Every member reached from `ROOT.md`
-
-Every member of a working documentation set is reached from the set's
-`ROOT.md` by a path of links, a second structure over
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)'s
-tree of sets. A row of an `index.md` that lists the member is not such a
-link.
-
-`knowledge-organization.every-member-reached-from-rootmd` · deterministic
-
 ## One directory under `working-docs/`
 
-A working documentation set is one directory under `working-docs/` at
-the repo root, `working-docs/<work>/`, the one
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes, here named and placed: it holds the set's `index.md`, its
-`ROOT.md`, and its members under lowercase kebab-case names, flat or in
-subdirectories, except a member whose kind fixes its name (`README.md`,
-`PROMPT.md`, `SKILL.md`, `CLAUDE.md`, a Python module).
+Every directory directly under `working-docs/` has an `index.md` and a
+`ROOT.md`. Every file under it has a lowercase kebab-case name, such
+as `detector-fixes.md`, except `index.md`, `ROOT.md`, `README.md`,
+`PROMPT.md`, `SKILL.md`, `CLAUDE.md`, and a Python module.
 
 `knowledge-organization.one-directory-under-working-docs` · deterministic
 
+> **Why.** The set is the one directory
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+> makes, here named and placed.
+
 ## `working-docs/` holds only sets
 
-`working-docs/` at the repo root, a plain parent to the sets
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes, holds its own `index.md` and the directories of the sets, and
-nothing else.
+`working-docs/` directly has `index.md`, directories, and no other
+file.
 
 `knowledge-organization.working-docs-holds-only-sets` · deterministic
 
+> **Why.** `working-docs/` is a plain parent to the sets
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+> makes.
+
 ## One list of items, state by section
 
-The work of a working documentation set is one list of items, each item
-a bold name and a body beneath it, and an item's state is the section it
-sits in, `Planned` or `Completed`, the one past state a member records
-([current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
-One `Planned` section and one `Completed` section sit together in one
-file: the set's `ROOT.md`, or, where the work splits into strands, the
-`ROOT.md` of each strand.
+In a working documentation set, every `ROOT.md` with no `ROOT.md` in
+a directory below it has exactly one `## Planned` and one
+`## Completed` section, and no other file of the set has either. Each
+bullet directly under them starts with a bold name.
 
 `knowledge-organization.one-list-of-items-state-by-section` · deterministic
+
+> **Why.** An item's state is the section it sits in, and `Completed`
+> is the one past state a member records
+> ([current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
 
 ## Every fact under a named bucket
 

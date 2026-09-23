@@ -47,7 +47,7 @@ in the Standard the step links.
    repo's `repo: local` block in `.pre-commit-config.yaml`, so the repo
    runs from its working tree what it publishes
    ([The local block covers the manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
-   repo-lint's `distribution.a-publisher-dogfoods-its-manifest` checks
+   `distribution.a-publisher-dogfoods-its-manifest` checks
    the mirror.
 5. **Turn the meta-standard's own policing on.** The meta-standard's
    checks run in `playbook-check`, a published dev-playbook hook. Bump
@@ -70,7 +70,7 @@ in the Standard the step links.
    ---
    ```
 
-   okf-lint unions those names onto the
+   The type check unions those names onto the
    [global registry](/standards/knowledge-organization/document-types.md).
    The mapping's rules, the entry shape, alphabetical keys,
    add-never-shadow, and name and description only, are

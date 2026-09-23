@@ -8,9 +8,8 @@ the bundle boundary, and the rootless roster are defined once here rather than
 drifting between scripts.
 
 ``yaml`` is imported lazily inside :func:`parse_frontmatter` so importers that
-only need the pure-text helpers (``ref-lint`` runs under plain ``python3``) do
-not require pyyaml on the interpreter; only frontmatter-parsing callers do, and
-those run under ``uv run --script`` with pyyaml declared.
+only need the pure-text helpers do not require pyyaml on the interpreter; only
+frontmatter-parsing callers do.
 """
 
 import functools
@@ -216,8 +215,8 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
 def has_fixed_repo_root(relpath: str) -> bool:
     """True when a source file is always read from one repo, so ``/`` resolves.
 
-    The one home for the rootless test: ``ref-lint`` decides the ``wrong-form``
-    finding with it and the file graph stamps the matching edge status, so a new
+    The one home for the rootless test: the cross-reference checks decide the
+    form findings with it and the file graph stamps the matching edge status, so a new
     rootless segment reaches both at once rather than drifting between them.
 
     A segment matches at any depth, which is what lets
@@ -301,7 +300,7 @@ def is_decision_record(relpath: str) -> bool:
     """True for a numbered Decision Record — ``docs/decisions/NNNN-slug.md``.
 
     A numbered record is immutable, so its outbound references are accepted
-    staleness: ``ref-lint`` skips one as a source, and the viewer's
+    staleness: the cross-reference checks skip one as a source, and the viewer's
     ``markdown-file`` kind badges a link out of one ``decision-record`` rather
     than ``broken``. The two callers decide it here so the check and the screen
     can never disagree.

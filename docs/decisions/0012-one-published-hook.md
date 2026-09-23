@@ -28,7 +28,7 @@ Consequential removals and reworks:
   audited repo publishes a `.pre-commit-hooks.yaml`.
 - **`SKIP` is honored by detector name inside the dispatcher** — pre-commit's
   own `SKIP` keys on config hook ids, which no longer name detectors — so the
-  canonical CI workflow's `SKIP: ref-lint` and one-off developer skips keep
+  canonical CI workflow's `SKIP` of the reference detector and one-off developer skips keep
   their exact spelling.
 - **The hook-surfaces rule reads the roster**, not the config,
   as dev-playbook's detector enumeration, and gains a closure leg: a script
@@ -43,7 +43,7 @@ Consumers subscribed to detectors by hand-listing `- id:` lines.
 detector published after a consumer's pin reached that repo only by hand —
 enrollment was opt-in by construction, backwards for a workspace whose
 standards ride downhill. The check that should have caught under-enrollment,
-repo-lint's canonical-block compare, ships inside the same pinned clone: at a
+the structure detector's canonical-block compare, ships inside the same pinned clone: at a
 stale pin it compared the consumer against the stale canonical block and
 passed. story-forge sat one release behind and never ran the meta-standard's
 detector or validate-manifest, green the whole time.
@@ -53,7 +53,7 @@ the pin bump is the complete release, detectors included.
 
 **Costs:** per-hook `SKIP` granularity and pre-commit's per-hook status lines
 move into the dispatcher (which prints per-detector summaries and names the
-red detectors in its roll-up); ref-lint's `types: [markdown]` gate is gone —
+red detectors in its roll-up); the reference detector's `types: [markdown]` gate is gone —
 it now runs on every commit like the other always-run detectors; migration is
 a hard cut — at the first pin bump past this decision, pre-commit fails loud
 on the retired ids until the consumer swaps its eleven hook lines for the one

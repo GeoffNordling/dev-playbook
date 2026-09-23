@@ -51,7 +51,7 @@ standard, in this order:
    repo-specific content beyond them.
 4. **Install the gate.** `uvx pre-commit install` — the canonical config
    declares both stages.
-5. **Lint to green.** Run dev-playbook's [`repo-lint`](/scripts/repo-lint)
+5. **Lint to green.** Run dev-playbook's `playbook check`
    over the repo; the findings are the worklist, and each rule's define doc
    is the fix's authority. Forbidden files get explicit dispositions —
    `ROADMAP.md` and kin become `CANDIDATES.md` entries or issues

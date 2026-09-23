@@ -24,7 +24,7 @@ description: Uncommitted future work — described, not yet promoted to issues
 - **Slug a code span the way GitHub does** — `github_slug` in
   `src/dev_playbook/md.py` strips backticks before emphasis, so a heading
   holding `__init__` slugs to `initpy` where GitHub keeps the underscores.
-  Protect code spans first, then run ref-lint over every anchor in the tree
+  Protect code spans first, then run the anchor check over every anchor in the tree
   to see which ones the fix moves.
 
 ## Doc-type system

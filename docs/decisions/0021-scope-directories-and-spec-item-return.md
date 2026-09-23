@@ -15,7 +15,7 @@ population still needs. A family of spec-driven consumer repos — spec-tools
 first, with more expected on the same layout — splits `tests/` into `unit/`,
 `integration/`, and `agent_review/` scope directories and types its spec
 documents `Spec-Item`; at any current pin, the test-mirror check flags every scoped
-mirror in such a repo and okf-lint flags every spec document.
+mirror in such a repo and the type check flags every spec document.
 
 ## Decision
 

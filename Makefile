@@ -16,8 +16,8 @@ check: format-check lint typecheck test
 	uvx pre-commit run --all-files
 
 # cloa-viewer page. A second .PHONY line rather than an edit to the first: the
-# canonical Makefile fragment must appear verbatim, and scripts/repo-lint
-# compares it line by line (extras may follow). Both targets reach into
+# canonical Makefile fragment must appear verbatim, and the build checks
+# compare it line by line (extras may follow). Both targets reach into
 # artifacts.mk for the rules that build what they need.
 .PHONY: web web-check
 web: $(ARTIFACTS)

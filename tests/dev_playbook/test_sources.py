@@ -1,5 +1,7 @@
 """Pins every constant in src/dev_playbook/sources.py to its document."""
 
+import re
+
 from dev_playbook import sources
 from dev_playbook.model import Repo
 
@@ -19,6 +21,40 @@ def test_type_registry_section_holds_the_table(dev_playbook_repo: Repo) -> None:
         t for _, t in doc.section(sources.TYPE_REGISTRY.heading) if t.startswith("| `")
     ]
     assert any(row.startswith("| `Standard`") for row in rows)
+
+
+def registry_rows(repo: Repo) -> list[list[str]]:
+    doc = repo.markdown[sources.TYPE_REGISTRY.path]
+    lines = [
+        t for _, t in doc.section(sources.TYPE_REGISTRY.heading) if t.startswith("|")
+    ]
+    return [[cell.strip() for cell in line.strip("|").split("|")] for line in lines[2:]]
+
+
+def test_registered_types_are_the_type_registry_rows(dev_playbook_repo: Repo) -> None:
+    names = {row[0].strip("`") for row in registry_rows(dev_playbook_repo)}
+    assert names == sources.REGISTERED_TYPES
+
+
+def test_type_registry_rows_name_a_type_in_the_first_cell(
+    dev_playbook_repo: Repo,
+) -> None:
+    type_name = re.compile(r"`[A-Z][A-Za-z0-9]*(?:-[A-Z][A-Za-z0-9]*)*`")
+    for row in registry_rows(dev_playbook_repo):
+        assert type_name.fullmatch(row[0]), row[0]
+
+
+def test_type_registry_rows_describe_the_type_in_the_second_cell(
+    dev_playbook_repo: Repo,
+) -> None:
+    for row in registry_rows(dev_playbook_repo):
+        assert len(row) == 2
+        assert row[1], row[0]
+
+
+def test_type_registry_rows_are_in_alphabetical_order(dev_playbook_repo: Repo) -> None:
+    names = [row[0].strip("`").lower() for row in registry_rows(dev_playbook_repo)]
+    assert names == sorted(names)
 
 
 def test_canonical_dir_holds_tracked_files(dev_playbook_repo: Repo) -> None:

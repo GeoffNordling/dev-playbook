@@ -14,10 +14,6 @@ ways the tuple could lie, each guarded here:
   the tuple (``--list-rules`` under-reports), or listed but never emitted
   (over-reports). The second guard asserts, per detector, that the set of
   rule-id constants the module actually emits equals the set the tuple lists.
-
-ref-lint is absent from both: its ``RULES = tuple(RULE_FOR.values())`` derives
-from the emission map, so the tuple cannot drift from what it emits by
-construction.
 """
 
 import ast
@@ -27,7 +23,6 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = REPO_ROOT / "scripts"
 SRC = REPO_ROOT / "src"
 
 # The shape of a directory-namespaced rule id: ``name.rule``, lowercase words joined
@@ -37,15 +32,11 @@ RULE_ID = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z][a-z0-9]*(-[a-z0-9]+)*
 
 # (source file, finding-carrier class name, 0-based position of the rule arg).
 CARRIERS = [
-    (SCRIPTS / "okf-lint", "Finding", 1),
-    (SCRIPTS / "repo-lint", "Finding", 1),
     (SRC / "dev_playbook" / "workspace_lint.py", "Line", 1),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
 REGISTRIES = [
-    (SCRIPTS / "okf-lint", "RULES"),
-    (SCRIPTS / "repo-lint", "RULES"),
     (SRC / "dev_playbook" / "workspace_lint.py", "RULES"),
 ]
 

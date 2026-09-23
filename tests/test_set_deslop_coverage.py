@@ -9,8 +9,8 @@ silently break the division:
   - a section added to a standard that no auditor is assigned — the new
     rule is never audited;
   - an assignment citing a section that was renamed or removed — the
-    auditor is sent to a rule that no longer exists (ref-lint also fails
-    this at the commit gate; asserted here so the whole contract lives in
+    auditor is sent to a rule that no longer exists (the anchor check also
+    fails this at the commit gate; asserted here so the whole contract lives in
     one test).
 
 A rule heading is a *leaf* ATX heading below H1 — one with no subheadings

@@ -53,7 +53,7 @@ insertion, show the user the merged result before moving on.
 
 ## 3. Lint to green
 
-{Run [repo-lint](~/workspace/dev-playbook/scripts/repo-lint)}. The findings
+{Run `uv run playbook check`}. The findings
 are the worklist; work it to empty, taking each fix's authority from the
 rule's define doc, reached through {Read
 [standards/index.md](~/workspace/dev-playbook/standards/index.md)}.

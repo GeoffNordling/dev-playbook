@@ -13,8 +13,7 @@ if any detector could not run, else 1 if any found findings, else 0.
 
 ``$SKIP`` is honored per detector name, announced on stderr. pre-commit's own
 ``SKIP`` keys on config hook ids, and no config hook id names a detector, so
-a per-detector skip can only happen here (the canonical CI workflow skips
-``ref-lint``). Names matching no roster entry are left alone: the variable is
+a per-detector skip can only happen here. Names matching no roster entry are left alone: the variable is
 shared vocabulary with pre-commit, which still reads it for the hooks outside
 this one (shellcheck, ruff).
 """
@@ -38,12 +37,7 @@ SCRIPTS_DIR = HOOK_REPO_ROOT / "scripts"
 # The commit-gate roster: every detector the published hook runs, in output
 # order. Each name is an executable ``scripts/<name>`` in this clone. Adding a
 # detector here IS enrolling it workspace-wide — there is no per-consumer step.
-DETECTORS = (
-    "repo-lint",
-    "ref-lint",
-    "okf-lint",
-    "loop-lint",
-)
+DETECTORS = ("loop-lint",)
 
 # Manifest validation is not a scripts/ detector — it delegates to pre-commit's
 # own validator and applies only where a repo publishes a manifest — so it

@@ -35,10 +35,8 @@ repo root; a set is otherwise judged with no neighbour's body open.
 
 ## An index in every directory
 
-A set's members sit in the directory of its `index.md`; every
-subdirectory that holds a concept document, a numbered Decision Record
-or a `type: Mirror` mirror included, carries an `index.md` of its own
-and is a child set.
+Every directory that has a concept document in it, a numbered Decision
+Record or a `type: Mirror` file included, has an `index.md`.
 
 `knowledge-organization.an-index-in-every-directory` · deterministic
 

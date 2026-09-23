@@ -116,7 +116,7 @@ export function IndexTree({ view, viewer }: RendererProps) {
 /**
  * The concept documents no index reaches, under a red row that names the defect.
  *
- * Nothing at all when the list is empty: okf-lint reports an unindexed document
+ * Nothing at all when the list is empty: the index checks report an unindexed document
  * as a defect, and a row saying there are none would put a permanent fixture on
  * screen for the case where there is nothing to see.
  */

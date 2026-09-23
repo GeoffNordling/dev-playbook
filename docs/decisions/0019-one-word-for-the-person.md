@@ -30,7 +30,7 @@ The split cost more than it bought, in both directions:
 - **Review friction ran both ways.** A doc using the agent-facing word and a
   skill using the declarative one were each a finding, so the convention
   generated corrections in two directions instead of one.
-- **The rule could only be enforced on half the repo.** `repo-lint` banned the
+- **The rule could only be enforced on half the repo.** The structure detector banned the
   second noun inside agent-facing files, because that is the only side where
   the correct word was unambiguous. Everywhere else the convention was prose
   the reviewer upheld by eye.
@@ -84,7 +84,7 @@ The half-repo check was replaced rather than left standing. The prose checks gai
 `prose.banned-word`, a deterministic ban over **every tracked file** of any
 type — no code-span and no fence escape, since a banned word inside backticks
 is still the word — with the vendored and verbatim-mirror exemptions above.
-`repo-lint`'s `agent-facing-voice` check narrowed to the first person it still
+The structure detector's `agent-facing-voice` check narrowed to the first person it still
 owns, and `dev_playbook.voice` narrowed with it; `repo-init` consults the ban
 before scaffolding, so a repo name carrying the noun is refused up front.
 

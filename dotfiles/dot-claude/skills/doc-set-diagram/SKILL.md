@@ -45,7 +45,7 @@ Counts, tallies, statuses and dates stay out. They go stale between one
 drawing and the next.
 
 {If the set is a working set, a directory under `working-docs/`,
-{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#every-member-reached-from-rootmd)}}
+{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)}}
 and draw that tree in place of the index rows: `index.md` at the top
 with one edge to `ROOT.md`, then each edge a link from one member to
 another, descending from `ROOT.md`. A file with two children spends an

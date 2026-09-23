@@ -25,6 +25,26 @@ TYPE_REGISTRY = Section(
     "type-names-a-registered-type",
 )
 
+# Every type name in the TYPE_REGISTRY table. A consumer runs the installed
+# package, not dev-playbook's tree, so the names ship here; the test beside
+# this module pins the set, and the table's shape, to the table.
+REGISTERED_TYPES = frozenset(
+    {
+        "Candidate-List",
+        "Decision-Record",
+        "General-Sheet",
+        "Guide",
+        "Log",
+        "Loop",
+        "Mirror",
+        "README",
+        "Recipe-Description",
+        "Standard",
+        "Survey",
+        "Vocabulary",
+    }
+)
+
 # The table whose Ruling cells link each doc-type's directory.
 REGISTRY_RULINGS = Section("doc-types/doc-type-system.md", "registry-rulings")
 

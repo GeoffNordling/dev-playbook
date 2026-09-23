@@ -49,7 +49,7 @@ def test_scaffolded_python_repo_passes_playbook_lint(tmp_path: Path) -> None:
 
 
 def test_root_index_carries_an_introduction() -> None:
-    # okf-lint's knowledge-organization.introduction-between-h1-and-listing rule: prose stands between
+    # The knowledge-organization.introduction-between-h1-and-listing rule: prose stands between
     # the H1 and the first entry.
     tree = render_tree(BASE_SPEC, REV)
 

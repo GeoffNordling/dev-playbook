@@ -60,7 +60,7 @@ The two axes a repository file sits on, its role and its content
 ([Document Types](/standards/knowledge-organization/document-types.md)).
 
 **Concept document**
-Prose a reader loads to understand something. It carries OKF frontmatter, and okf-lint reads its type.
+Prose a reader loads to understand something. It carries OKF frontmatter, and a check reads its type.
 
 **Harness-owned file**
 A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the harness-files registry enumerates. It carries no OKF frontmatter.

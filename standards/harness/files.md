@@ -9,7 +9,7 @@ population: "a file in a governed repo that the Claude Code harness consumes"
 
 A file in a governed repo that the Claude Code harness consumes: loaded
 as configuration, run as code, or injected into agent context. It
-carries no OKF frontmatter and sits outside okf-lint; the
+carries no OKF frontmatter and sits outside the document-type checks; the
 concept/harness boundary is the population of
 [Document Types](/standards/knowledge-organization/document-types.md),
 and `classify()` in [md.py](/src/dev_playbook/md.py) encodes it. Claude

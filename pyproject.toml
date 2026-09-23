@@ -21,7 +21,7 @@ build-backend = "uv_build"
 testpaths = ["tests"]
 # The suite is mostly waiting on fixture `git` subprocesses, so it shards
 # well across cores. It sits here rather than
-# in the Makefile because repo-lint holds `test:` verbatim; `uv run pytest -n0`
+# in the Makefile because the build checks hold `test:` verbatim; `uv run pytest -n0`
 # turns it off for a pdb run.
 addopts = ["-n", "auto"]
 # src/ exposes the dev_playbook package; tests/ carries a bare-imported

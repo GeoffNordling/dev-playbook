@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Document Types
-description: The frontmatter profile every concept document carries — a registered type, a title, a description, and a resource where an asset backs the document
+description: The frontmatter profile every concept document carries — a registered type, a title, a description, a resource where an asset backs the document, and the README type on a README.md alone
 population: "a concept document"
 ---
 
@@ -121,3 +121,10 @@ A concept document typed `Loop` lives under `loops/`.
 A concept document typed `Guide` lives under `guides/`.
 
 `knowledge-organization.guide-lives-under-guides` · deterministic
+
+## `README.md` is typed `README`
+
+A concept document named `README.md` has `type: README`, and a concept
+document of any other name does not.
+
+`knowledge-organization.readmemd-is-typed-readme` · deterministic
