@@ -41,21 +41,21 @@ Lands in one commit:
   markdown parser is the hand-rolled scanner from `md.py`, kept, with
   one fix: a link whose text wraps across a line break is found. The
   Python half is the standard library's `ast`.
-- **The registry.** `src/dev_playbook/registry.py`: the `@rule` decorator
+- **The registry.** `src/dev_playbook/check_registry.py`: the `@check` decorator
   writing one dict entry, the `needs=WORKSPACE` tag, and registration
   of a rule by hook name for the ones ruff, shellcheck, shfmt, and the
   manifest validator decide. Those tool-decided entries land here,
   so the `shell` family has no step in phase 3.
 - **The runner and the console script.** `playbook check` builds the
   model once, runs every registered function, stamps the id on each
-  finding, and honours `--without workspace`. `playbook rules` prints
+  finding, and honours `--without workspace`. `playbook checks` prints
   the dict. Both under `[project.scripts]` in `pyproject.toml`.
 - **The hook.** A second entry in `.pre-commit-hooks.yaml`,
   `language: python`, next to `playbook-lint`. Both entries in the
   canonical `.pre-commit-config.yaml` and in this repo's.
 - **The sources module.** `sources.py` with its first constants and
   the test that pins each to its heading.
-- **The meta-test.** `tests/dev_playbook/test_registry.py`: every
+- **The meta-test.** `tests/dev_playbook/test_check_registry.py`: every
   registered function has a test named for its id, and every
   registered id is a heading under `standards/`. The reverse
   direction, every deterministic trailer is registered, is written
@@ -127,7 +127,10 @@ the pattern of the triage prompt: the family's report is the
 specification, the model and registry are read before any code is
 written, the report is written to a file, and the agent commits
 nothing itself. The checkpoint agent between segments verifies the
-segment before releasing the next.
+segment, then the loop stops and the user reads the segment's report
+and the diff before the next segment is released. No segment starts
+without that reading. The check-in mechanics are settled when the loop
+is set up, before step 1.
 
 ### Guardrails
 
@@ -160,6 +163,20 @@ only `loop-lint`:
 - The meta-test's reverse direction stops being expected-to-fail.
 - The stopwatch: `pre-commit run --all-files` and `pytest` against
   0.89 s and 10.0 s. A miss is a finding, not a pass.
+
+## Progress
+
+- **Phase 1, 2026-09-23.** The scaffold is in the tree: `model.py`,
+  `check_registry.py`, `check_cli.py`, `sources.py`, `checks/shell.py`
+  with the two tool-decided shell rules, the `playbook-check` hook in
+  the manifest and both configs, and the four test files with the
+  meta-test. The empty run, model build included, is 0.25 s on this
+  repo; the old gate is 0.47 s. One word, check, names the concern at
+  every level: the term, the `playbook check` and `playbook checks`
+  commands, the hook id, the two modules, the `@check` decorator, and
+  the `Check` entry. The placeholders `cli.py` and `registry.py` could
+  not stand because the viewer's tests already own those basenames and
+  pytest refuses two test files of one name.
 
 ## Finish line
 

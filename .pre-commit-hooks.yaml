@@ -23,3 +23,12 @@
   language: script
   pass_filenames: false
   always_run: true
+# The rewrite's hook: pre-commit installs this package into a venv it caches
+# per pinned rev, and the entry is the console script pyproject.toml declares.
+# It runs beside playbook-lint until every detector has moved into the package.
+- id: playbook-check
+  name: playbook check
+  entry: playbook check
+  language: python
+  pass_filenames: false
+  always_run: true

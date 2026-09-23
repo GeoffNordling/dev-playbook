@@ -8,6 +8,15 @@ from pathlib import Path
 import pytest
 
 from dev_playbook import gitrepo
+from dev_playbook.model import Repo
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(scope="session")
+def dev_playbook_repo() -> Repo:
+    """This checkout's own model, built once: what the meta-tests read."""
+    return Repo.from_git(REPO_ROOT)
 
 
 @pytest.fixture(autouse=True)

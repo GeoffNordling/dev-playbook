@@ -35,6 +35,12 @@ repos:
         language: script
         pass_filenames: false
         always_run: true
+      - id: playbook-check
+        name: playbook check
+        entry: uv run playbook check
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: web-typecheck
         name: web typecheck
         entry: make web-check

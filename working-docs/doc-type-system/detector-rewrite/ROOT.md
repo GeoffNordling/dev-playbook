@@ -148,16 +148,16 @@ is one the repo complies with.
   The id keeps `<family>.<slug>`, so module and namespace coincide.
   Where the tree cannot mirror, the tree is a candidate for change,
   and the exception is written down.
-- **Registry, 2026-09-22.** `@rule("<id>")` on each check function
+- **Registry, 2026-09-22.** `@check("<id>")` on each check function
   writes one dict entry, id to function; the runner stamps the id on
   every finding the function yields. The rule list and the meta-test
   read the dict. No hand-kept tuple, no `--list-rules`, no AST guard.
 - **The two tables, 2026-09-22.** `verifiers.yaml`, `boundaries.yaml`,
   their two scripts, and the three Detectors rules that require them
   are deleted; no code read either file. The term address dissolves.
-  - The user's view is `playbook rules`: id, module, environment tag,
+  - The user's view is `playbook checks`: id, module, environment tag,
     computed live, with `--family` and `--without` filters.
-  - A boundary is a tag on the check, `@rule(id, needs=WORKSPACE)`,
+  - A boundary is a tag on the check, `@check(id, needs=WORKSPACE)`,
     for a check that reads sibling repos on this machine. CI runs
     `playbook check --without workspace` in place of `SKIP: ref-lint`.
     Untagged checks run at every gate.
@@ -171,7 +171,7 @@ is one the repo complies with.
   scanning for the heading itself.
 - **Rules a tool decides, 2026-09-22.** A rule ruff, shellcheck,
   shfmt, or pre-commit's manifest validator decides is registered
-  with the hook's name in place of a function: `playbook rules`
+  with the hook's name in place of a function: `playbook checks`
   lists it with that hook, and the meta-test asks no test of it.
   Every id in a Standard is in the registry, one way or the other.
 - **The markdown parser, 2026-09-23.** The hand-rolled scanner in
