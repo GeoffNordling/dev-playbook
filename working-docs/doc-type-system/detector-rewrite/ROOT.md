@@ -1,20 +1,20 @@
 ---
 type: General-Sheet
 title: Detector Rewrite
-description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the seven design rulings, and the worklist
+description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the state it left the tree in, the seven design rulings, and what remains
 ---
 
 # Detector Rewrite
 
-The strand that rewrites the checking system: the Python detectors,
+The strand that rewrote the checking system: the Python detectors,
 the two tables they feed, and the hook that runs them. Speculative,
 per
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
 It depends on the doc-type system strand
 ([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)),
 whose step 11 settled the rules the detectors answer to; no strand's
-plan waits on it. Its input is
-[Detector Fixes](/working-docs/doc-type-system/detector-rewrite/detector-fixes.md).
+plan waits on it. Its input was a survey of the fourteen rules whose
+detector tested less than the sentence, consumed by the triage.
 
 ## Goal
 
@@ -73,57 +73,34 @@ is one the repo complies with.
 
 ## Current state
 
-- 217 rules carry a trailer; 119 have no check. By family:
-  knowledge-organization 37 of 60 null, doc-type 26 of 42, prose 14
-  of 18, decisions 7 of 9; `python` alone is fully covered.
-- 18 addresses: 12 detectors in the `playbook-lint` roster,
-  `workspace-lint` ungated, and 5 dependencies (`ruff-check`,
-  `ruff-format`, `shellcheck`, `shfmt`, `pre-commit validate-manifest`).
-- The detectors split two ways. Five carry their logic in the script
-  itself — `okf-lint` 808 lines, `repo-lint` 781, `harness-files-lint`
-  677, `ref-lint` 287, `python-lint` 182 — against
-  `standard.the-script-holds-no-rule-logic`. The other seven are
-  24–32-line shims over `src/dev_playbook/`. Their tests split the
-  same way: 212 subprocess tests over the five, package tests over the
-  rest.
-- Dispatch is twelve subprocesses from `dev_playbook.playbook_lint`,
-  each a `uv run --script` start, each running its own `git ls-files`
-  and parsing the same markdown again. Rule ids are string constants
-  in each source; `verifier-table` learns them by spawning every
-  detector with `--list-rules`, and `tests/test_rule_registry.py`
-  guards the hand-kept tuples against the emit sites by parsing the
-  source.
-- The hook is `language: script`: pre-commit builds no environment,
-  so `scripts/playbook-lint` bootstraps itself through its
-  `uv run --script` shebang and a `sys.path` insert of `src/`.
-- Four layers name the same rules, and no two of them agree:
+The rewrite is built and cut over at `b2f8815`; what follows is the
+tree as it stands.
 
-  | Layer | What it is | Where it lives |
-  | --- | --- | --- |
-  | Family | the directory, and the id's namespace | 12 of them |
-  | Standard | the file, and the population a rule binds | 31 rule-carrying files |
-  | Detector | the script that decides the rule | 18 addresses over 98 rules; 119 rules have none |
-  | Gate | when the detector runs | commit, push, ci, or on-demand |
-
-  Family and Standard part company in 6 of the 12 families:
-  `knowledge-organization.` spans 8 files, `doc-type.` 5, `tracking.`
-  4, `build.` 3, `harness.` and `standard.` 2 each. A detector crosses
-  both — `repo-lint` decides 20 rules from 3 families and 6 files,
-  `harness-files-lint` 12 rules from 2 families. The gate is a fourth
-  cut again: `workspace-lint` holds 14 rules and runs at no gate.
+- One published hook, `playbook-check`, whose entry is the console
+  script `playbook check` in `src/dev_playbook/check_cli.py`. It
+  builds one `Repo` model from `git ls-files`, runs every registered
+  check, then two steps that are not functions over the model:
+  `loop_lint.main` and `pre-commit validate-manifest` where a manifest
+  exists. `SKIP=workspace` leaves out the checks tagged as reading
+  other repos under `~/workspace/`, and the skip is announced.
+- Twelve check modules under `src/dev_playbook/checks/`, one per
+  directory under `standards/`, with 107 check functions and 24
+  registrations of a rule a tool decides. The meta-test holds both
+  directions: every registered id is a deterministic heading under
+  `standards/`, and every deterministic heading is registered.
+- One test per rule id under `tests/dev_playbook/checks/`; 755 tests
+  in 7.5 s where 988 took 10.0 s.
+- Under `scripts/`, `loop-lint` is the one detector left, kept for the
+  loop workstream, and `workspace-lint` runs at no gate by ruling. The
+  two tables and their scripts are gone.
+- `standards/standard/detectors.md`, `standards/distribution/channel.md`,
+  and `guides/writing-a-detector.md` still describe the old world; the
+  first Planned item rewrites them.
 
 ## Terms
 
-- **Address** — the right-hand side of a row in
-  `standards/verifiers.yaml`: the name of the one check that decides
-  a rule, and the key `standards/boundaries.yaml` joins on to say
-  which gates run it. Today a first-party script by path, a pinned
-  pre-commit hook id, or a `pyproject.toml` dependency plus its
-  subcommand. Dissolves on exit: a rule's check is a function in a
-  module.
-- **Detector**, **verifier table**, **boundary table** — per
-  [Detectors](/standards/standard/detectors.md), until the rewrite
-  restates them.
+- **Detector** — per [Detectors](/standards/standard/detectors.md),
+  until the Standards-and-docs pass restates it.
 - **Check** — one Python function that decides one rule, registered
   under that rule's id.
 - **Model** — the `Repo` object: the repo read once into memory, in
@@ -189,21 +166,71 @@ None.
 
 ## Planned
 
-- **The rewrite.** The package, module by module, against the exit
-  list; the console script; the two tables, their scripts, and the
-  detector files under `scripts/` deleted. Built per
-  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md):
-  scaffold, dead weight, one family at a time, cut over.
-- **The tests.** One test per rule id in `tests/dev_playbook/`, a
-  meta-test that every registered id has one and names a heading
-  under `standards/`, the 212 subprocess tests retired once the
-  package tests cover them, `tests/test_rule_registry.py` deleted with
-  the tuples it guards.
 - **The Standards and the docs.** `standards/standard/detectors.md`,
-  `standards/distribution/channel.md`,
-  `guides/writing-a-detector.md`, `scripts/README.md`, and the
-  canonical `.pre-commit-config.yaml`, each rewritten to the state the
-  repo is then in.
+  `standards/distribution/channel.md`, and
+  `guides/writing-a-detector.md`, each rewritten to the state the repo
+  is now in; `scripts/README.md` and the canonical
+  `.pre-commit-config.yaml` were done at the cut over. Three smaller
+  contradictions the loop left because it restated only rule bodies go
+  in the same pass: the Why of `Reference resolves` in
+  `standards/knowledge-organization/cross-references.md` still says the
+  predicate binds same-repo targets only; the Why at
+  `standards/harness/claude-content.md:22` still says `### Read the
+  standards` is the first heading in the file, where `# Global` is; and
+  the intro of `standards/standard/index.md` still names the
+  boundaries, deleted in phase 2. The rulings that calibrated the
+  triage of every family hold for this pass too:
+  - **A rule about the checker itself is a test, not a rule.** Ruled on
+    `build.every-canonical-file-has-a-rule-and-every-rule-a-file`.
+    Applies to every rule whose member is dev-playbook's own checking
+    code rather than a governed repo.
+  - **A rule the user cannot read is restated plain, heading fixed,
+    meaning held.** Three of the first three escalations were
+    unreadable. Two were deleted for reasons of their own, one restated
+    as two. Unclear wording alone never deletes a rule.
+  - **A tool's own configuration is the rule.** Where ruff, shellcheck,
+    or shfmt decides a rule, the rule says the tool reports nothing
+    under the canonical configuration and names what that
+    configuration selects. A sentence that promises more than the tool
+    enforces is replaced, not kept beside it.
+  - **Fix the cause in this repo.** A gap that exists because a file
+    never reaches the tool is closed in the canonical files, not by
+    narrowing the rule. Consumer repos are not a reason to narrow.
+  - **The repo as it stands is acceptable.** Ruled 2026-09-23 on the
+    agents' escalations. The rewrite refactors rules and checks; it
+    adds no check that fails today. A new check that passes today is
+    implemented. A new check that fails today is deleted, or set aside
+    on a list of checks to add later; it does not enter the suite, and
+    its rule leaves the Standard, to live only on that list. A small
+    fix to the repo is allowed where the user approves it by name.
+  - **No rule micromanages how code is written.** Ruled 2026-09-23 on
+    `shell.glue-only`. A rule that does not shape high-level guidance
+    or comprehension goes, however sound. Also deleted on that ground:
+    `testing.fixture-lives-in-the-narrowest-conftest`, the sentence
+    limit on a candidates entry, and the two GitHub epic and ticket
+    rules.
+  - **New rules.** Ruled 2026-09-23: the global source's first `###`
+    heading is `Read the standards`, yes; `README.md` is typed
+    `README`, yes; only `CONTEXT.md` is typed `Vocabulary`, no, the
+    user wants other Vocabulary files open.
+  - **A deterministic body narrows to what the code decides.** Where
+    the sentence promises more than the check reads, the sentence
+    narrows. Where no function can decide the sentence at all, the
+    rule becomes stochastic. In doubt, delete or downgrade; the user
+    trusts the triager's judgment and rules on no more single rows.
+  - **The detector-script rules go.** Dev-playbook has no detector
+    script on exit, and consumers are not a reason to keep a rule.
+  - **Loop stays as it is.** The six Loop rules and their checks are
+    kept; the Loop workstream follows this one.
+- **The wheel a consumer installs.** pre-commit builds this repo into a
+  wheel at the pinned rev and installs it. That wheel is 108 MB in 1905
+  files, because `uv_build` packs everything under `src/dev_playbook/`,
+  and two gitignored directories live there: the viewer's
+  `cloa_viewer/web/node_modules/` and the `.ruff_cache/` ruff writes
+  beside the canonical `pyproject.toml`. The package itself is under a
+  megabyte. Predates the rewrite. One `wheel-exclude` setting under
+  `[tool.uv.build-backend]` in `pyproject.toml` leaves both out; a test
+  that builds the wheel and counts its files pins it.
 - **Scripts under ruff, after the rewrite.** Ruff never opens the
   extensionless scripts under `scripts/`. Opening them today
   reformats three and raises 48 findings, so this waits until the
@@ -230,10 +257,13 @@ None.
   `dotfiles/dot-claude/agents/` gains a quality pass: for each unit the
   segment landed, the fork reads the specification and the result side
   by side and names one case the two would treat differently, or
-  states there is none, before ticking the marker. The Sentence equals
-  code Guardrail added to
-  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
-  is this strand's copy of that pass. The case is one a repo writes
+  states there is none, before ticking the marker. This strand's copy
+  of that pass was the Sentence equals code Guardrail of its plan: for
+  each check function the segment adds or edits, the fork reads the
+  rule's sentence and the function side by side and names one input
+  the two would judge differently, or states there is none; a
+  difference is a fix task that reduces the sentence to what the code
+  tests, never one that grows the code. The case is one a repo writes
   today or a Standard names, never one constructed to break the code:
   at the Step 12c checkpoint the Opus audit returned eight findings,
   frontmatter with no final newline and a two-character `==` underline
@@ -243,24 +273,40 @@ None.
 
 ## Completed
 
+- **The rewrite and the tests, 2026-09-23.** Four phases, `8877f74` to
+  `b2f8815`, the state under Current state. Phase 1, by hand: the
+  scaffold, `model.py`, `check_registry.py`, `check_cli.py`,
+  `sources.py`, the hook in the manifest and both configs, the
+  meta-test; one word, check, at every level. Phase 2, by hand: the
+  two tables, their scripts, modules, tests, and the six table rules
+  of Detectors deleted. Phase 3, a Ralph loop of twelve family steps
+  and six rework steps, twelve checkpoints, each released by a fork
+  and the last four audited beside it by a read-only Opus agent; nine
+  scripts retired; ten rule sentences reduced to their checks under
+  the Sentence equals code Guardrail, added when the Step 12a audit
+  found four such differences and bounded to inputs a repo writes
+  today when the Step 12c audit returned eight hypotheticals. Phase 4,
+  by hand: the cut over, `playbook-lint` and its module, tests, and
+  `tests/test_rule_registry.py` deleted, `SKIP: workspace` in the
+  canonical CI and the secondary machine, the one-published-hook test
+  in. The stopwatch: `pytest` under its baseline, `pre-commit` 0.16 s
+  over, ruled not worth closing. The loop's plan, progress log,
+  prompts, and the twelve triage and twelve rewrite reports were
+  deleted at certification.
 - **The measurement, 2026-09-23.** Wall time on this repo at
   `66b1e6b`, uv cache warm, before any code moves: `playbook-lint .`
   0.47 s, the median of three runs; `pre-commit run --all-files`
   0.89 s; `pytest` 10.0 s over 988 tests on 12 workers. The rewrite
   is judged against these.
 - **The triage, 2026-09-23.** The 150 deterministic rules family by
-  family, each kept, rewritten, or deleted, in
-  [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md):
-  `build` and `python` by hand, the other ten families by one Opus
-  agent each launched with
-  [Triage Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/triage-family.md),
-  the agents' 27 escalations ruled by general rulings recorded there.
-  The twelve reports are the specification the package is written
-  to.
-- **The plan, 2026-09-23.** The parser ruled and
-  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
-  written: four phases, the family order, the old script each family
-  retires, and the checkpoint guardrails.
+  family, each kept, rewritten, or deleted: `build` and `python` by
+  hand, the other ten families by one Opus agent each, the agents' 27
+  escalations ruled by the general rulings now under the
+  Standards-and-docs Planned item. The twelve reports were the
+  specification the package was written to.
+- **The plan, 2026-09-23.** The parser ruled and the plan written:
+  four phases, the family order, the old script each family retires,
+  and the checkpoint guardrails.
 - **The design, 2026-09-22.** Six rulings in one session, recorded
   under Decided: hook mechanism, repo model, mirrored grouping,
   registry, the two tables, data read out of a Standard. The

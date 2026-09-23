@@ -90,12 +90,10 @@ From memory, not a fresh search.
   main: one function per rule in `checks/doc_type.py` reading the
   model, one test per rule id, the five `tool_check` lines and the
   docstring's last sentence removed, then the script, module, tests,
-  and legacy step deleted. The unit of work is the rewrite's phase 3
-  step, described in its
-  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
-  and its
-  [Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md).
-  Fold in the three rules below when the Standard is revised in the
+  and legacy step deleted. The unit of work is one family as the
+  rewrite did every other: the four things above in one commit, with
+  `make check` and `uv run playbook check .` clean after it. Fold in
+  the three rules below when the Standard is revised in the
   same turn, or leave them for their own.
 
 - **Three rules for Loop Conventions.** Drafted in the retired
