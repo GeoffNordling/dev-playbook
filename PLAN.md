@@ -51,6 +51,9 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 - The check gate is `make check`. The old gate, `scripts/playbook-lint .`, and
   the new one, `uv run playbook check .`, run side by side until cut over.
 - The commit step commits the family's work as one commit on this branch.
+- Since Step 3, `checks/decisions.py` decides the `docs/decisions/` directory
+  rule that `scripts/ref-lint` also checks as `UnclassifiedRecordsFile`. Both
+  run until Step 11 retires `ref-lint`; nothing moves from `ref-lint` early.
 - A deleted rule leaves no mention of its subject behind: the Standard's
   opening paragraph, its `description`, the directory `index.md` intro and
   row, and the directory's row in `standards/index.md` all say what the file
@@ -83,7 +86,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       scripts/decisions-lint` prints nothing; the report exists; the Guardrails
       of `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
 
 - [ ] Step 4, family `prose`, retires `prose-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/prose.md`.
