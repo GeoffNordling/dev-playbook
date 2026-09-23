@@ -165,38 +165,6 @@ None.
 
 ## Planned
 
-- **Signal to noise in `ralph-setup`, before the merge to main.** The
-  reading-chain review done by hand for this loop, where dropping
-  `ROOT.md` and the triage method and trimming each report's
-  Escalations halved what one iteration reads, becomes a step of the
-  `ralph-setup` skill. After the plan is designed, the agent walks
-  everything the plan tells an iteration to read, weighs each file
-  as signal for that task or noise around it, and where the noise is
-  a significant share, partners with the user to redesign the plan
-  and refactor the documents until the iteration reads mostly signal.
-- **The checkpoint fork checks quality, not just completion, before
-  the merge to main.** At the Step 12a checkpoint the fork ticked every
-  item as done and the gates green, and a read-only Opus review run
-  beside it found four rules whose sentence and check disagreed, one
-  check stricter than its sentence and three sentences silent on what
-  the code reads. The fork verified that the work was done, not that it
-  was right. The `ralph-checkpointer` agent definition under
-  `dotfiles/dot-claude/agents/` gains a quality pass: for each unit the
-  segment landed, the fork reads the specification and the result side
-  by side and names one case the two would treat differently, or
-  states there is none, before ticking the marker. This strand's copy
-  of that pass was the Sentence equals code Guardrail of its plan: for
-  each check function the segment adds or edits, the fork reads the
-  rule's sentence and the function side by side and names one input
-  the two would judge differently, or states there is none; a
-  difference is a fix task that reduces the sentence to what the code
-  tests, never one that grows the code. The case is one a repo writes
-  today or a Standard names, never one constructed to break the code:
-  at the Step 12c checkpoint the Opus review returned eight findings,
-  frontmatter with no final newline and a two-character `==` underline
-  among them, and the user ruled every one a hypothetical and the review
-  a bug hunt. An agent asked for bugs finds bugs; the pass asks for
-  use cases that break, or will soon.
 - **A skill that turns repeated fixes into predicates.** Invoked in
   any session, it reads the session's history and finds the fixes that
   repeat: the user sees stale state, asks, and the agent brings that
@@ -211,6 +179,34 @@ None.
   in the loop, all day, do not scale; predicates do.
 
 ## Completed
+
+- **The checkpoint splits finding from deciding, 2026-09-23.** At Step
+  12a the checkpoint fork ticked every task done while a fresh Opus
+  review found four rules whose sentence and check disagreed; at Step
+  12c the fresh review found eight, all hypothetical. The fork inherits
+  the conversation that designed the plan, so it reads the work kindly;
+  a fresh agent reads it cold but finds whatever it is sent to find. So
+  `/ralph-checkpoint` now runs three steps. A fresh Opus
+  [ralph-reviewer](/dotfiles/dot-claude/agents/ralph-reviewer.md)
+  reads each task and its sources against the segment's diff, runs
+  every Verify clause, scrutinizes for omission, looseness,
+  imprecision, slop, and laziness, ranks each finding by how much it
+  fails the assignment, writes the full list to scratch, and returns
+  the count and the top three. The user rules on the three. The
+  [ralph-checkpointer](/dotfiles/dot-claude/agents/ralph-checkpointer.md)
+  fork acts on the ruling: confirmed findings become fix tasks, and
+  when all three are rejected the rest are treated as rejected too.
+  `ralph-setup` now commits the plan and progress files alone, so the
+  first segment's range starts after them.
+
+- **Signal to noise in `ralph-setup`, 2026-09-23.** The reading-chain
+  review done by hand for this loop, which halved what one iteration
+  read, is step 5 of `ralph-setup`: for each task it lists every file
+  the iteration reads, from the global `CLAUDE.md` to the task's own
+  sources, classifies each line as signal or noise for that task, and
+  reports a table of line counts and proportions to the user. Above
+  one third noise is a soft tripwire to redesign the plan or refactor
+  the documents; the user decides.
 
 - **Scripts under ruff, 2026-09-23.** Ruff picks a file's language by
   its extension, so it never opened the extensionless uv scripts under

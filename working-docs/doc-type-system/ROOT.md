@@ -88,8 +88,8 @@ leaves.
   │  binds to the rules the    │   │  VIEWER                      │
   │  doc-type system settled   │   │  root ······· ROOT.md        │
   │  built: playbook check     │   │  on disk ···· contract.md    │
-  │  plan: ralph-setup signal, │
-  │        checkpoint quality  │   │  kinds ······ registry.md    │
+  │  plan: repeated fixes to   │   │                              │
+  │        predicates skill    │   │  kinds ······ registry.md    │
   │                            │   │  panels ····· design.md ·    │
   │                            │   │               viewer.md      │
   └────────────────────────────┘   │  program ···· server.md      │

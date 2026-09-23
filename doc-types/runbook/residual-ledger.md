@@ -91,11 +91,13 @@ Could not express telling the two reports apart — both render
 
 Could not express the report's name (`launch_command` rides only in
 annotation) or the mid-run `READ:` acknowledgment, which targets the
-conversation, not the invoker. Could not express the gate runs of §5 and §6 —
+conversation, not the invoker. Could not express the reads of §5's chain —
+the files vary with the plan, so no link names them — or its tripwire, a
+threshold with no primitive. Could not express the gate runs of §6 and §7 —
 a bare command in the target repo, with no on-disk link for a does edge — the
 read-back of the checkpoint markers it just wrote, which inspects the file's
 own text rather than firing an edge — or the `/ralph-checkpoint` mention in
-§7, which names a skill the user invokes and this one never runs.
+§8, which names a skill the user invokes and this one never runs.
 
 ### commit
 
@@ -228,17 +230,22 @@ and the branch name is chosen per ticket.
 
 ### ralph-checkpoint
 
-Could not express the ban on launching the next segment itself — the Never
-vocabulary carries no verb for running one. Could not express the
-blocker-versus-checkpoint branch on the workflow's return value, which is
-runtime data with no link for `{If}` to read.
+Could not express the blocker-versus-checkpoint branch on the workflow's
+return value, or the zero-findings branch on the reviewer's, both runtime
+data with no link for `{If}` to read. Could not express the `git log` runs
+that name the segment — bare commands with no on-disk link — or the wait for
+the user's ruling, which targets the conversation, not the invoker.
 
 ### ralph-checkpointer
 
-Could not express running each task's Verify clause — the clause names a
-command or artifact chosen per task, so there is no fixed target. Could not
-express the accepted/reverted/deferred ruling itself, which is a decision with
-no primitive.
+Could not express applying the user's ruling to each finding, which is a
+decision with no primitive.
+
+### ralph-reviewer
+
+Could not express running each task's Verify clause or reading each task's
+sources — both are chosen per task, so there is no fixed target — or the
+ranking itself, which is a decision with no primitive.
 
 ### prototype
 
