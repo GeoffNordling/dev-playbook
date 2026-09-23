@@ -120,6 +120,10 @@ and is answered there.
 Sessions with the user come first, each at a high level, the agent
 guiding.
 
+- **Discuss: overlap with active branches.** Paused: a large refactor is
+  in progress on `main`, and this set waits for it to finish. Then check
+  what it changed, and whether the landing PR touches any file that
+  another active, unmerged branch is also changing.
 - **Discuss: what this gives the user, and how they run it.** When this branch lands
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
@@ -140,8 +144,6 @@ guiding.
   and who revises a front's plan when the fronts disagree. Also settle the
   name "checkpoint", which the repo's shared glossary already uses for the
   Ralph loop.
-- **Discuss: overlap with active branches.** Does the landing PR touch any
-  file that another active, unmerged branch is also changing?
 - **Discuss: where the pipeline lives on main.** Where its document and
   the code in [`rig/`](/working-docs/parallel-fronts/rig/index.md) go once
   the work lands. Waits until the large refactor now running on `main`
