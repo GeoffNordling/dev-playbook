@@ -92,9 +92,10 @@ integrator is a judgment and is not.
   divergent views of the project. Which of them updates the other fronts'
   plans, and whether that is the user's act or the integrator's, is
   unsettled.
-- **What drives the laps.** [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
-  is one candidate. Whether it earns its weight against a smaller script is
-  the question that member exists to inform.
+- **How the laps are run.** Not yet defined. The question comes before any
+  tool: what value parallel fronts should deliver, and how the user wants
+  to run them. [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
+  records what one candidate offers.
 - **Whether the fence holds.** Five named problems stand between Sandcastle
   and a safe front, tracked in
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems).
@@ -122,14 +123,14 @@ guiding.
   looked at the sandbox solution. Guide them through it: the layout, the
   copies, the plug-in, the round trip, and the hook logging, with pictures
   rather than code.
-- **Discuss: what merging gets us, and what Sandcastle is for.** When this
-  branch lands on main, what does the user gain, and does it change any way
-  work is done on main today? This is where the landing PR's scope (Open,
-  above) is ruled. Then step back further: so far the work proved
-  Sandcastle's sandbox can be made safe, but sandboxing is not the
-  library's point. It coordinates agents across branches and worktrees.
-  Ideate how that would help the user get work done, since its value is not
-  yet clear. This feeds **Decide the driver** below.
+- **Discuss: what this gets us, and how we run it.** When this branch lands
+  on main, what does the user gain, and does it change any way work is done
+  on main today? This is where the landing PR's scope (Open, above) is
+  ruled. Then step back further: so far the work proved Sandcastle's
+  sandbox can be made safe, but sandboxing is not the library's point. It
+  coordinates agents across branches and worktrees. Define the question
+  first, what value parallel fronts should deliver and how the user wants
+  to run them, before choosing any tool to run them with.
 - **Discuss: overlap with active branches.** Does the landing PR touch any
   file that another active, unmerged branch is also changing?
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
@@ -139,8 +140,6 @@ guiding.
   SessionEnd hooks set to wait. The PR's scope is open above.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
-- **Decide the driver.** Choose between Sandcastle and a smaller script,
-  against what the runs above show.
 
 ## Completed
 

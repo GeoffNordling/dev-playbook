@@ -9,7 +9,7 @@ description: What Sandcastle offers the parallel-fronts shape — the driver pri
 Sandcastle is one candidate for the driver
 ([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms)).
 This member records what the tool supplies to the shape and what it leaves
-undone, so the choice between it and a smaller script rests on something
+undone, so any decision about how the laps are run rests on something
 written rather than on first impressions. The findings come from the
 project's own documentation at <https://github.com/mattpocock/sandcastle>.
 
