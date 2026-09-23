@@ -246,6 +246,17 @@ def test_root_absolute_path_in_the_same_repo() -> None:
     assert found(root_absolute_path_in_the_same_repo, {rootless: bad}) == []
 
 
+def test_root_absolute_path_in_the_same_repo_reads_link_text_and_passes_claude() -> (
+    None
+):
+    good = "[r](~/.claude/rules/r.md)\n"
+    assert found(root_absolute_path_in_the_same_repo, {"d/a.md": good}) == []
+    bad = "[~/workspace/demo/b.md](/b.md)\n"
+    assert found(root_absolute_path_in_the_same_repo, {"d/a.md": bad}) == [
+        ("d/a.md", 1)
+    ]
+
+
 def test_workspace_path_for_a_stable_location() -> None:
     good = "[a](~/workspace/demo/README.md) [b](references/x.md)\n"
     assert (
@@ -470,6 +481,33 @@ def test_one_entry_per_concept_document_and_child_directory_reads_the_ending() -
     files = {"index.md": bad, "a.md": concept()}
     assert found(one_entry_per_concept_document_and_child_directory, files) == [
         ("index.md", 5)
+    ]
+
+
+def test_one_entry_per_concept_document_and_child_directory_reads_every_heading() -> (
+    None
+):
+    good = (
+        "# I\n\nHolds.\n\n- [A](/a.md) — One doc\n\n"
+        "## Directories\n\n- [d/](/d/index.md)\n"
+    )
+    files = {"index.md": good, "a.md": concept(), "d/index.md": "# D\n"}
+    assert found(one_entry_per_concept_document_and_child_directory, files) == []
+    stray = good + "\n## Notes\n\n- a stray note\n"
+    files = {"index.md": stray, "a.md": concept(), "d/index.md": "# D\n"}
+    assert found(one_entry_per_concept_document_and_child_directory, files) == [
+        ("index.md", 13)
+    ]
+
+
+def test_alphabetical_unless_declared_otherwise_sorts_bullets_under_any_heading() -> (
+    None
+):
+    good = "# I\n\nHolds.\n\n- [a](/a.md) — A\n\n## Directories\n\n- [b/](/b/index.md)\n- [c/](/c/index.md)\n"
+    assert found(alphabetical_unless_declared_otherwise, {"index.md": good}) == []
+    bad = "# I\n\nHolds.\n\n- [a](/a.md) — A\n\n## Directories\n\n- [c/](/c/index.md)\n- [b/](/b/index.md)\n"
+    assert found(alphabetical_unless_declared_otherwise, {"index.md": bad}) == [
+        ("index.md", None)
     ]
 
 

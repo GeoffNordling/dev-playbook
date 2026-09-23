@@ -295,7 +295,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 12a fix: the knowledge-organization report catches up with the
+- [x] Step 12a fix: the knowledge-organization report catches up with the
       restored rule, and four rule sentences are brought to what their
       checks test. The ruling for every item here: the sentence of a rule
       and the code of its check say the same thing, and where the code

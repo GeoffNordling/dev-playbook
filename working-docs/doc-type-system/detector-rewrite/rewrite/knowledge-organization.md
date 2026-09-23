@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Knowledge Organization
-description: The rewrite of the knowledge-organization family's thirty-nine deterministic rules and one new rule — thirty-five checks over the model, two tagged workspace, three deleted per their escalation, one made stochastic, one set aside, eight Standards edited to the triage, and okf-lint, ref-lint, and repo-lint retired
+description: The rewrite of the knowledge-organization family's thirty-nine deterministic rules and one new rule — thirty-six checks over the model, two tagged workspace, three deleted per their escalation, one made stochastic, eight Standards edited to the triage, and okf-lint, ref-lint, and repo-lint retired
 ---
 
 # Knowledge Organization
@@ -9,7 +9,7 @@ description: The rewrite of the knowledge-organization family's thirty-nine dete
 The step built `src/dev_playbook/checks/knowledge_organization.py` and
 `tests/dev_playbook/checks/test_knowledge_organization.py` from
 [the knowledge-organization triage](/working-docs/doc-type-system/detector-rewrite/triage/knowledge-organization.md).
-The module holds thirty-five functions and no hook registration. The
+The module holds thirty-six functions and no hook registration. The
 `DETECTORS` roster in `src/dev_playbook/playbook_lint.py` now holds only
 `loop-lint`.
 
@@ -136,6 +136,22 @@ as a source.
 The file's `description` and its index row now say what it holds, the
 consumer's `okf_types` mapping; its opening no longer names the
 retired detector.
+
+## Restated
+
+- `knowledge-organization.one-entry-per-concept-document-and-child-directory`:
+  "in its listing" became "outside a fenced code block", because the
+  check reads every such bullet under any heading.
+- `knowledge-organization.reference-resolves`: a sentence on
+  `~/.claude/<rest>` targets was added, because the check reads them as
+  `dotfiles/dot-claude/<rest>` where tracked and skips them elsewhere.
+- `knowledge-organization.stable-named-anchor`: the body names the
+  anchor's form, digits then a hyphen, because the check never reads
+  the target's heading text.
+- `knowledge-organization.root-absolute-path-in-the-same-repo`: the body
+  names `~/.claude/` targets and the three positions of a
+  `~/workspace/<this repo>/` path, because the check passes the first
+  and flags all three.
 
 ## Deleted
 

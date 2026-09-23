@@ -422,7 +422,9 @@ def _bare_paths(content: tuple[tuple[int, str], ...]) -> tuple[BarePath, ...]:
                 masked[i] = " "
     found: list[BarePath] = []
     for m in md.WORKSPACE_REF_PATTERN.finditer("".join(masked)):
-        target = m.group(0).rstrip(md.BARE_PATH_TRAILER)
+        target = m.group(0)
+        if target.endswith(tuple(md.BARE_PATH_TRAILER)):
+            target = target[:-1]
         in_link = any(start <= m.start() < end for start, end in text_spans)
         found.append(BarePath(target, joined.line(m.start()), in_link))
     return tuple(found)

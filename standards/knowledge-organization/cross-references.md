@@ -28,6 +28,8 @@ move; references to a record are checked like any other.
 The target of a reference exists. A `/` target and a
 `~/workspace/<this repo>/` target are read from the checkout root; a
 relative target is read from the linking file's directory. A
+`~/.claude/<rest>` target is read as `dotfiles/dot-claude/<rest>` where
+the repo tracks that directory, and is not checked where it does not. A
 `~/workspace/<other repo>/` target is read from that repo's main
 checkout on this machine.
 
@@ -59,9 +61,9 @@ have the same GitHub slug.
 
 ## Stable named anchor
 
-The `#anchor` of a reference does not name a heading whose text
-starts with a section number, such as `3. Bundle Structure` or
-`2.2.3 Revision`.
+The `#anchor` of a reference does not have the form of a numbered
+heading's slug, a run of digits then a hyphen, such as
+`#3-bundle-structure` or `#223-revision`.
 
 `knowledge-organization.stable-named-anchor` · deterministic
 
@@ -113,8 +115,9 @@ inside the repository is `skills`, `rules`, or `agents`.
 
 In a file with a fixed repo root, a reference to a file or a directory
 of the same repo is a link whose target starts `/` and is the path
-from the repo root. A relative target, and a
-`~/workspace/<this repo>/` target in a link or bare, are findings.
+from the repo root, or `~/.claude/` for a file the harness loads from
+there. A relative target, and a `~/workspace/<this repo>/` path as a
+link's target, as a link's text, or bare, are findings.
 
 `knowledge-organization.root-absolute-path-in-the-same-repo` · deterministic
 

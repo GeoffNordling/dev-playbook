@@ -59,7 +59,6 @@ FIXED_NAMES = frozenset(
 )
 BULLET = re.compile(r"^\s*[-*+]\s")
 TOP_BULLET = re.compile(r"^[-*+]\s")
-LIST_MARKER = re.compile(r"^(?:[-*+]|\d+[.)])(?:\s|$)")
 # An index bullet: a link at the start of a bullet, then the rest of the line.
 INDEX_ENTRY = re.compile(r"^\s*[-*+]\s+\[([^\]]*)\]\(([^)\s]+)\)(.*)$")
 BOLD_TERM = re.compile(r"^\*\*[^*]+\*\*$")

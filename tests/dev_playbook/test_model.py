@@ -122,6 +122,10 @@ class TestParseMarkdown:
             "~/workspace/d/b",
         ]
 
+    def test_bare_path_drops_one_trailing_mark_at_most(self) -> None:
+        doc = parse_markdown("d.md", "See ~/workspace/demo/x/..\n")
+        assert [b.target for b in doc.bare_paths] == ["~/workspace/demo/x/."]
+
     def test_bare_path_skips_code(self) -> None:
         doc = parse_markdown(
             "d.md", "Text.\n\n    ~/workspace/o/a.md\n\n`~/workspace/o/b.md`\n"
