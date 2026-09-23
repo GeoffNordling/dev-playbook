@@ -422,4 +422,4 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       Verify: the four tests pass; `make check` green; both gates clean;
       `uv run playbook check .` still reports zero findings on this repo.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
