@@ -25,7 +25,8 @@ A governed repo's `origin` remote is a repository on github.com.
 
 ## Squash-only merges
 
-A governed repo's GitHub merge settings hold every row of this table:
+Each GitHub merge setting of a governed repo has the value this
+table gives:
 
 | Setting | Value |
 |---------|-------|
@@ -43,10 +44,10 @@ A governed repo's GitHub merge settings hold every row of this table:
 
 ## Default branch protected from destructive operations
 
-A governed repo's default branch carries both destructive-operation
-rules in force: force pushes are blocked, and deletions are restricted.
-Every ruleset supplying one of those two rules has enforcement Active
-and an empty bypass list, and at least one of them is named
+The default branch of a governed repo has two rules in force:
+force pushes are blocked and deletions are restricted. Each ruleset
+that supplies one of these two rules has enforcement Active and an
+empty bypass list, and one of those rulesets is named
 `protect-main`.
 
 | Field | Value |

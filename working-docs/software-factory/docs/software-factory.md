@@ -96,7 +96,7 @@ Nothing merges out of definition. A design session exits:
   `design` in a session of its own, which re-authors its brief and crosses it
   into the factory on its issue-review verdict. The epic body carries the
   outcome and the decomposition rationale
-  ([issue-shapes.md](/standards/tracking/issue-shapes.md#outcome-and-decomposition-rationale)).
+  ([issue-shapes.md](/standards/tracking/issue-shapes.md#no-child-list)).
 
 **`spike` — a question.** A spike is an issue whose deliverable is an answer.
 Everything it produces lands on the issue itself: the findings in its closing

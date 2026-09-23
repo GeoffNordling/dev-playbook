@@ -101,7 +101,7 @@ A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
 tying the two at a glance. Label it `category:*` **only**. {Read
-[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#outcome-and-decomposition-rationale)}
+[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#no-child-list)}
 and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the

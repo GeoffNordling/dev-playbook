@@ -95,7 +95,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       scripts/prose-lint` prints nothing; the report exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-- [ ] Step 5, family `tracking`, retires nothing; `workspace-lint` is
+- [x] Step 5, family `tracking`, retires nothing; `workspace-lint` is
       untouched. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/tracking.md`.
       Verify: `uv run playbook checks --family tracking` lists exactly the

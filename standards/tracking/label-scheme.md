@@ -38,9 +38,9 @@ renders that data as the table below. Which labels an issue carries is
 
 ## Exactly the labels the scheme declares
 
-A governed repo's GitHub labels are exactly the labels declared in the
-scheme data `src/dev_playbook/label_scheme.json`, each carrying the
-color and the description that data gives it.
+A governed repo's GitHub labels are exactly the labels in
+`src/dev_playbook/label_scheme.json`, and each label has the color
+and the description that file gives it.
 
 `tracking.exactly-the-labels-the-scheme-declares` · deterministic
 

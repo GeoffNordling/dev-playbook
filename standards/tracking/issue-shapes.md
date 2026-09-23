@@ -56,28 +56,30 @@ agent's paraphrase.
 
 ## Closed fences
 
-A leaf that carries `mode:session`, or a leaf that carries a `phase:*`
-label other than `phase:intake`, closes every code fence its body opens.
+The body of a leaf that has `mode:session`, or that has a `phase:*`
+label other than `phase:intake`, closes every code fence it opens.
 
 `tracking.closed-fences` · deterministic
 
 ## Build leaf
 
-The issue has no sub-issues and carries `mode:direct`.
+The issue has no sub-issues and has `mode:direct`.
 
 ### One label from each prefix
 
-A build leaf that carries a `phase:*` label other than `phase:intake`
-carries exactly one label from each of `category`, `mode`, `tests`, and
-`phase`, and each of those labels is a value of the label scheme.
+A build leaf with a `phase:*` label other than `phase:intake` has
+exactly one `category:*`, one `mode:*`, one `tests:*`, and one
+`phase:*` label, and each of the four is a label in
+`src/dev_playbook/label_scheme.json`.
 
 `tracking.one-label-from-each-prefix` · deterministic
 
 ### Every build heading, in bold
 
-A build leaf that carries a `phase:*` label other than `phase:intake`
-carries every heading below in its body, each as a bold heading; a
-heading shown inside a code fence is quoted, not carried.
+The body of a build leaf with a `phase:*` label other than
+`phase:intake` has each of the eight headings below as bold text
+followed by a colon, `**Summary:**` or `**Summary**:`, outside any
+code fence.
 
 ```markdown
 **Summary:** one line
@@ -116,22 +118,23 @@ of its own.
 
 ## Spike
 
-The issue has no sub-issues and carries `mode:spike`.
+The issue has no sub-issues and has `mode:spike`.
 
 ### One label from each prefix, tests fixed at no
 
-A spike that carries a `phase:*` label other than `phase:intake` carries
-exactly one label from each of `category`, `mode`, `tests`, and `phase`,
-each of those labels is a value of the label scheme, and its `tests:*`
-label is `tests:no`.
+A spike with a `phase:*` label other than `phase:intake` has
+exactly one `category:*`, one `mode:*`, one `tests:*`, and one
+`phase:*` label, each a label in
+`src/dev_playbook/label_scheme.json`, and its `tests:*` label is
+`tests:no`.
 
 `tracking.one-label-from-each-prefix-tests-fixed-at-no` · deterministic
 
 ### Summary, Question, and Deliverable
 
-A spike that carries a `phase:*` label other than `phase:intake` carries
-`Summary`, `Question`, and `Deliverable` in its body, each as a bold
-heading; a heading shown inside a code fence is quoted, not carried.
+The body of a spike with a `phase:*` label other than
+`phase:intake` has `Summary`, `Question`, and `Deliverable` as bold
+text followed by a colon, outside any code fence.
 
 ```markdown
 **Summary:** one-line framing of the question
@@ -147,23 +150,22 @@ What a good answer looks like.
 
 ## Session leaf
 
-The issue has no sub-issues and carries `mode:session`.
+The issue has no sub-issues and has `mode:session`.
 
 ### One category label, no phase or tests
 
-A session leaf carries exactly one `category:*` label, a value of the
-label scheme, and carries no `mode:*` label other than `mode:session`, no
-`tests:*` label, and no `phase:*` label.
+A session leaf has exactly one `category:*` label, a label in
+`src/dev_playbook/label_scheme.json`, no `mode:*` label other than
+`mode:session`, and no `tests:*` or `phase:*` label.
 
 `tracking.one-category-label-no-phase-or-tests` · deterministic
 
 ### Every session heading, in bold
 
-A session leaf carries `Summary`, `User intent`, `Current behavior`,
-`Desired behavior`, `Acceptance criteria`, and `Out of scope` in its
-body, each as a bold heading; a heading shown inside a code fence is
-quoted, not carried. Its `Out of scope` may read
-`Unknown; dealt with when found.`
+The body of a session leaf has `Summary`, `User intent`,
+`Current behavior`, `Desired behavior`, `Acceptance criteria`, and
+`Out of scope` as bold text followed by a colon, outside any code
+fence. `Out of scope` may read `Unknown; dealt with when found.`
 
 `tracking.every-session-heading-in-bold` · deterministic
 
@@ -181,29 +183,15 @@ decision.
 
 ## Epic
 
-The issue has sub-issues and carries no `wayfinder:*` label.
+The issue has sub-issues and has no `wayfinder:*` label.
 
 ### Category only
 
-An epic carries exactly one `category:*` label, a value of the label
-scheme, and carries no `phase:*`, `mode:*`, or `tests:*` label.
+An epic has exactly one `category:*` label, a label in
+`src/dev_playbook/label_scheme.json`, and no `phase:*`, `mode:*`, or
+`tests:*` label.
 
 `tracking.category-only` · deterministic
-
-### Outcome and Decomposition rationale
-
-An epic carries `Outcome` and `Decomposition rationale` in its body, each
-as a bold heading.
-
-```markdown
-**Outcome:**
-The end state once every child has merged.
-
-**Decomposition rationale:**
-Why the work was sliced this way.
-```
-
-`tracking.outcome-and-decomposition-rationale` · deterministic
 
 ### No child list
 
@@ -213,34 +201,28 @@ An epic's body does not list its sub-issues.
 
 ## Wayfinder map or ticket
 
-The issue carries a `wayfinder:*` label: `wayfinder:map` makes it a
+The issue has a `wayfinder:*` label: `wayfinder:map` makes it a
 **map**, and any other `wayfinder:*` value makes it a **decision
 ticket**.
 
 ### One wayfinder label and nothing else
 
-A map carries `wayfinder:map` and no other `wayfinder:*` value; a
-decision ticket carries exactly one `wayfinder:*` value, a value of the
-label scheme; and neither carries a `category:*`, `mode:*`, `tests:*`, or
-`phase:*` label.
+A map has `wayfinder:map` and no other `wayfinder:*` label. A
+decision ticket has exactly one `wayfinder:*` label, a label in
+`src/dev_playbook/label_scheme.json`. Neither has a `category:*`,
+`mode:*`, `tests:*`, or `phase:*` label.
 
 `tracking.one-wayfinder-label-and-nothing-else` · deterministic
 
 ### Map sections, ticket Question
 
-A map's body carries a `Destination`, a `Notes`, a `Decisions so far`, a
-`Not yet specified`, and an `Out of scope` section, and a decision
-ticket's body carries a `Question` section, each as a markdown heading at
-any level.
+A map's body has a markdown heading, at any level, for each of
+`Destination`, `Notes`, `Decisions so far`, `Not yet specified`,
+and `Out of scope`. A decision ticket's body has a markdown heading
+`Question`, at any level.
 
 `tracking.map-sections-ticket-question` · deterministic
 
 > **Why.** The `/wayfinder` skill owns these body shapes; the rule
 > mirrors them, so a change to the shapes the skill drives is what
 > changes the rule.
-
-### Ticket under a map
-
-A decision ticket is a sub-issue of a map.
-
-`tracking.ticket-under-a-map` · deterministic
