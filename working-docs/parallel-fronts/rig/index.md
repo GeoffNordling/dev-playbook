@@ -10,10 +10,8 @@ committed.
 
 - `setup.sh` — makes the lab: the fake real repository, the config copy with both patches applied, two fronts' throwaway copies, and the container image
 - `parallel.mjs` — runs two fronts at once and closes both at once, then checks commits, billing, hook logging, and clean up
-- `part4.mjs` — the single-front run of experiment three, part 4, as it ran, still naming that run's scratchpad folder
 - `relocated.mjs` — the plug-in: Sandcastle's podman plug-in with the work copy moved to `~/assignment/<repo>`
 - `receiver.py` — the host-side receiver that writes the container's hook events into the measurement database
-- `snapshot.sh` — records the real side before and after a run, to prove nothing changed
 - `package.json` — pins `@ai-hero/sandcastle` 0.12.0
 - `image/Containerfile` — the container image: Fedora, the `claude` binary, and the dotfile links
 - `patches/measure-event-sink.patch` — `measure-event` sends each row to the receiver when a port file is present, from the `sandbox-probe` branch

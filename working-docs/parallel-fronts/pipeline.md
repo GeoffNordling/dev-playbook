@@ -1,17 +1,18 @@
 ---
 type: Guide
 title: The Sandcastle Pipeline
-description: The pipeline as built and proven — how one front runs from open to close, the layout inside its container, what it guarantees, where each piece lives, and what it does not yet do
+description: The pipeline as built and proven — how a front runs from open to close, how fronts run in parallel, the layout inside a container, what it guarantees, where each piece lives, and what it does not yet do
 ---
 
 # The Sandcastle Pipeline
 
-The Sandcastle pipeline runs one front
+The Sandcastle pipeline runs fronts
 ([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
-from start to finish: throwaway copies go into a sealed container, one
-agent works there through Sandcastle and a plug-in of ours, and only its
-commit comes back. It is built and proven end to end with real Claude on
-the subscription. How each part was found and tested is in
+in parallel, each from start to finish in its own sealed container:
+throwaway copies go in, one agent works there through Sandcastle and a
+plug-in of ours, and only its commit comes back. It is built and proven
+with real Claude on the subscription. How
+each part was found and tested is in
 [The Sandbox](/working-docs/parallel-fronts/sandbox.md); this member
 describes the result.
 
@@ -49,6 +50,38 @@ describes the result.
 5. **Clean up.** The copies and the credential copy are deleted, and the
    receiver stops.
 
+## Fronts in parallel
+
+Every front runs these five steps on its own: its own copies, its own
+container, its own receiver. Fronts share only two things, and neither
+limits how many run:
+
+- **The real repository.** Each close writes a different branch.
+- **The measurement database.** Each receiver adds rows one at a time.
+
+```
+                 one base commit
+        ┌──────────┬───┴──────┬──────────┐
+     front-a    front-b    front-c     …        each in its own container
+        └──────────┴───┬──────┴──────────┘
+                 real repository: one branch per front
+```
+
+Proven with two fronts on one repository, started at the same moment and
+closed at the same moment, by
+[`rig/parallel.mjs`](/working-docs/parallel-fronts/rig/index.md):
+
+| Check | Result |
+|---|---|
+| Commits | Both came back at the same SHA, each on its own branch. `main` and the user's unpushed `issue-123` were unchanged. |
+| Closes at once | Both succeeded. |
+| Billing | Both runs reported the subscription (`apiKeySource: none`). |
+| Hook logging | Each session logged start, prompt, tool uses, Stop, and SessionEnd into the one database. |
+| Clean up | Both copies deleted, no container left. |
+
+Nothing in the pipeline changes between two fronts and five, so there is
+no technical reason three, four, or five cannot run at once.
+
 ## Inside the container
 
 ```
@@ -73,15 +106,14 @@ the rules it runs under.
 Sandcastle is used as published. By default it puts the repository at
 `~/workspace` itself, which breaks the workspace layout; a 20-line wrapper
 around its own podman plug-in moves the work copy to `~/assignment/<repo>`.
-The code is in
-[What experiment three settled](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled).
+The code is [`rig/relocated.mjs`](/working-docs/parallel-fronts/rig/index.md).
 
 ## What it guarantees
 
 | Problem | How the pipeline answers it |
 |---|---|
 | **Shared history** — a front could delete other branches and unpushed work | The container sees a copy with its own private history, never the real one |
-| **Relabel** — SELinux permanently changes labels on mounted files | Only the copies are mounted, and they are deleted; Sandcastle's shared label (`z`) lands on them alone |
+| **Relabel** — SELinux permanently changes labels on mounted files | Only the copies are mounted, and they are deleted |
 | **Booby trap** — a front plants a command that later runs on the host | `front-clone close` never runs git in the copy |
 | **Workspace collision** — Sandcastle's layout misnames the repository | The plug-in keeps the workspace's layout |
 | **Hook logging** — the user's hooks must keep logging | Events travel to the host receiver |
@@ -89,47 +121,26 @@ The code is in
 Also: the subscription pays (Claude reports no API key in use), and no
 front reaches GitHub, since the container holds no GitHub credential.
 
-## Running fronts together
-
-Two fronts on one fake real repository, started at the same moment, each
-told to make one small commit, on Haiku. Both were then closed into the
-real repository at the same moment. Each run took about 22 seconds.
-
-| Check | Result |
-|---|---|
-| Commits | Both came back at the same SHA, each on its own branch. `main` and the user's unpushed `issue-123` were unchanged. |
-| Closes at once | Both succeeded; git did not refuse the second. |
-| Billing | Both runs reported the subscription (`apiKeySource: none`). |
-| Hook logging | Each session logged start, prompt, both tool uses, Stop, and SessionEnd, through its own receiver into the one database. |
-| Clean up | Both copies deleted, no container left. |
-
-The subscription's limits did not show at two sessions. The run is
-[`rig/parallel.mjs`](/working-docs/parallel-fronts/rig/index.md).
-
 ## Where each piece lives
 
 | Piece | Where it is now |
 |---|---|
 | `front-clone` and its trap test | This branch, under `scripts/` and `tests/` |
-| The plug-in, the run script, the receiver, the container image | This branch, in [`rig/`](/working-docs/parallel-fronts/rig/index.md) |
-| Hook events sent from a container (`measure-event`), and the Stop and SessionEnd hooks set to wait | Patches in `rig/patches/`, not yet applied to dev-playbook |
+| The plug-in, the parallel run, the receiver, the container image | This branch, in [`rig/`](/working-docs/parallel-fronts/rig/index.md) |
+| `measure-event` sending hook events from a container, and the Stop and SessionEnd hooks set to wait | Patches in `rig/patches/`, not yet applied to dev-playbook |
 
 Everything in `rig/` stays in the set until the work lands on `main`.
 
 ## What it does not yet do
 
-These are facts about the pipeline today, each settled by a Planned item
-in [the root](/working-docs/parallel-fronts/ROOT.md#planned).
+Each is settled by a Planned item in
+[the root](/working-docs/parallel-fronts/ROOT.md#planned).
 
-- **More than two fronts at once.** Two fronts ran together and passed
-  ([Running fronts together](#running-fronts-together)); three and four
-  are untested.
-- **No schedule.** No program starts a lap's fronts and ends the lap.
-- **No home for real copies.** They must not live under
-  `/tmp/claude-<uid>/`, which collides with Claude's own temporary folder
-  inside the container.
-- **No bound on a stranded container.** Sandcastle removes the container
-  only when the run ends in an orderly way.
+- **No schedule.** No program starts a lap's fronts and ends the lap; the
+  rig starts a fixed pair.
+- **No home for real copies.** The rig keeps its copies in a scratch
+  folder. Real copies need a set place, outside `/tmp/claude-<uid>/`,
+  which is Claude's own temporary folder.
 
 ## Acronyms
 

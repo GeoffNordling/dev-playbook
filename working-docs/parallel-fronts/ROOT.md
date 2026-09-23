@@ -12,8 +12,8 @@ be split into a few lines of work that agents advance in parallel, each on
 its own branch, merged back at a point where the user takes stock. One
 part is settled: the
 [Sandcastle pipeline](/working-docs/parallel-fronts/pipeline.md), which
-runs a single front safely, is built and proven. How fronts run together,
-and what that gives the user, is still speculation.
+runs fronts safely and in parallel, is built and proven. How laps are run
+with it, and what that gives the user, is still speculation.
 
 ## Goal
 
@@ -73,9 +73,10 @@ The words of the set, one meaning each.
 - **Integrator** — the role that merges the fronts' branches at the end of
   a lap and reconciles what they conflict over. Unlike the driver, it
   judges.
-- **Sandcastle pipeline** — the working arrangement that runs one front:
-  throwaway copies go into a sealed container, one agent works there
-  through Sandcastle and our plug-in, and only its commit comes back.
+- **Sandcastle pipeline** — the working arrangement that runs fronts in
+  parallel: for each front, throwaway copies go into a sealed container,
+  one agent works there through Sandcastle and our plug-in, and only its
+  commit comes back.
   [The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md)
   describes it.
 
@@ -113,8 +114,7 @@ guiding.
   records what one candidate offers. The answer also settles what the
   pipeline does not yet do
   ([The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md#what-it-does-not-yet-do)):
-  what schedules a lap, where real copies live, and what removes a
-  stranded container.
+  what schedules a lap, and where real copies live.
 - **Discuss: the checkpoint and the integrator.** What happens at the end
   of a lap: who merges the fronts' branches (the user, an agent, or both),
   and who revises a front's plan when the fronts disagree. Also settle the
@@ -178,22 +178,20 @@ guiding.
   option B plug-in. Billing, config, and the commit's return passed at once;
   hook logging passed once the two end-of-session hooks were set to wait.
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)
-  records the run. The rig is throwaway, in the session scratchpad under
-  `exp3/` (`part4.mjs` and `receiver.py` beside parts 1 and 2's files).
+  records the run.
 - **Walk the user through the Sandcastle pipeline.** The user saw the
   copies, the plug-in, the round trip, and the hook logging, and named the
   arrangement. A front assigned to change dev-playbook keeps both copies:
   the read-only config copy answers "what does published main say", so the
   front's own unfinished edits never change the rules it runs under
   ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter)).
-- **Save the pipeline's code.** The plug-in, the run script, the receiver,
-  the image, and the two dev-playbook changes as patches moved out of the
-  session scratchpad into [`rig/`](/working-docs/parallel-fronts/rig/index.md).
+- **Save the pipeline's code.** The plug-in, the parallel run, the
+  receiver, the image, and the two dev-playbook changes as patches are
+  committed in [`rig/`](/working-docs/parallel-fronts/rig/index.md).
 - **Run fronts in parallel.** Two fronts on one fake real repository ran
-  at once and closed at once, and every check passed: both commits back at
-  the same SHA, both billed to the subscription, every hook event logged,
-  nothing left behind
-  ([Running fronts together](/working-docs/parallel-fronts/pipeline.md#running-fronts-together)).
+  at once and closed at once, and every check passed. Nothing changes
+  between two fronts and five
+  ([Fronts in parallel](/working-docs/parallel-fronts/pipeline.md#fronts-in-parallel)).
 
 ## Acronyms
 
