@@ -208,9 +208,9 @@ Standards pass.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: built as the form check only; the sentence limit is parked on
-Later Checks. Items 2 and 3: parked, each check reads GitHub, which
-the No GitHub auditing constraint puts out of scope.
+Item 1: built as the form check only; the sentence limit is deleted.
+Items 2 and 3: deleted, both micromanage and each would read GitHub,
+which the No GitHub auditing constraint puts out of scope.
 
 1. **`one-list-item-per-entry`**, `standards/tracking/candidates.md:25`.
    - Meaning: each entry in `CANDIDATES.md` is one bullet, a bold name,

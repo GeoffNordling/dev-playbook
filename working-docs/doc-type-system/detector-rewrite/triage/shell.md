@@ -86,8 +86,8 @@ default options, which is what the sentence says.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: parked on Later Checks, the rule leaves the Standard; the
-two hooks are fixed first, later.
+Item 1: deleted. The user's reason: it micromanages how code is
+written and shapes no high-level guidance or comprehension.
 
 1. **`shell.glue-only`**, `standards/shell/conventions.md:57`.
    - **Meaning.** An executable shell script only calls other

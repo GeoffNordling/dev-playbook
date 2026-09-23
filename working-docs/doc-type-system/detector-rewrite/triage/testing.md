@@ -79,8 +79,8 @@ Kept as written, the check matching the sentence: none.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: parked on Later Checks, the rule leaves the Standard; two
-fixtures fail today.
+Item 1: deleted. The user's reason: it micromanages how a conftest
+is written.
 
 1. **`fixture-lives-in-the-narrowest-conftest`**,
    `standards/testing/conventions.md:41`.

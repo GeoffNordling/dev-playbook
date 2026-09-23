@@ -350,11 +350,14 @@ Kept as written, the check matching the sentence:
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: the body narrows to what `ref-lint` reads today; relative
-targets stay unread and are parked on Later Checks. Item 2: built,
-with the Decision Record exception. Item 3: built, narrowed. Item 4:
-built, `~/.claude/` named as a target form. Item 5: stochastic, a
-prose mention is not a function's to decide. Item 6: parked. Item 7:
+Item 1: built in full, relative targets included; the two
+placeholder links became code spans, a fix the user approved by
+name. Item 2: built, with the Decision Record exception. Item 3:
+built, narrowed. Item 4: built, `~/.claude/` named as a target form.
+Item 5: stochastic, a prose mention is not a function's to decide.
+Item 6: built in full; `working-docs/software-factory/ROOT.md` gained
+a Members section linking all 26 files, a fix the user approved by
+name. Item 7:
 built, the proposal's reading. Item 8: the three rules deleted. New
 rules: `README` accepted; `Vocabulary` rejected, the user keeps other
 Vocabulary files open.

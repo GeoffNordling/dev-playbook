@@ -279,10 +279,13 @@ The population is the 30 files typed `Standard`, which have 217 rules.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: parked on Later Checks, the rule leaves the Standard. Item 2:
-built without the block limit, which is parked; the five H3 failures
-go with the two-tables deletion, so the rest passes today. Item 3:
-built, the linked form. Item 4: Loop stays as it is, all six kept.
+Item 1: deleted, too specific. Item 2: built with the block limit
+relaxed to a shape: a heading, then one paragraph, then any number of
+paragraphs, lists, fenced blocks, or quotes, then the trailer line,
+then at most one Why block; an H3 only under an H2 with no trailer.
+The five H3 failures go with the two-tables deletion, so it passes
+today. Item 3: built, the linked form. Item 4: Loop stays as it is,
+all six kept.
 
 1. **One base class: a check fails one contract shape.**
    - Heading line: `standards/doc-type/doc-type.md:56`.

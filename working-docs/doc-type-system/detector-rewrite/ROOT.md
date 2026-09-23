@@ -190,7 +190,9 @@ is one the repo complies with.
   `build` and `python` done by hand as the calibration sample; the
   other ten families by one Opus agent each, launched with
   [Triage Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/triage-family.md).
-  The exit list is the specification the package is written to.
+  The agents' 27 escalations were ruled 2026-09-23 by general
+  rulings recorded there. The exit list is the specification the
+  package is written to.
 - **The measurement.** Time `playbook-lint` on this repo and the
   test suite, before any code moves.
 - **The rewrite.** The package, module by module, against the exit
@@ -207,6 +209,13 @@ is one the repo complies with.
   `guides/writing-a-detector.md`, `scripts/README.md`, and the
   canonical `.pre-commit-config.yaml`, each rewritten to the state the
   repo is then in.
+- **Scripts under ruff, after the rewrite.** Ruff never opens the
+  extensionless scripts under `scripts/`. Opening them today
+  reformats three and raises 48 findings, so this waits until the
+  rewrite has deleted the detector scripts: clean up what remains,
+  then add `extend-include = ["scripts/*"]` to the canonical
+  `pyproject.toml` and the `executable` type to the two ruff hooks
+  in the canonical `.pre-commit-config.yaml`.
 
 ## Completed
 

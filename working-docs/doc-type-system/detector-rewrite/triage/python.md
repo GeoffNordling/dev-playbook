@@ -38,7 +38,9 @@ Kept as written, the check matching the sentence: `empty-init`.
   ruff hooks in the canonical `.pre-commit-config.yaml` gain
   `types_or: [python, pyi, executable]`. Today that reformats three
   scripts and raises 48 findings under `scripts/`, most in files the
-  rewrite deletes. Ruled 2026-09-22.
+  rewrite deletes. Ruled 2026-09-22; moved 2026-09-23 to the ROOT's
+  Planned list, after the rewrite, since the repo as it stands is
+  acceptable and this fix changes it.
 
 ## Escalations
 
