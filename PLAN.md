@@ -34,392 +34,193 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 ## Working notes
 
-- Every task is one family, done by the procedure in
-  `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`.
-  Read that file first; it names what else to read and in what order.
-- The specification of a family is its triage report,
-  `working-docs/doc-type-system/detector-rewrite/triage/<family>.md`. Its
-  Escalations section carries the user's ruling on each item.
-- A family's module is the family with hyphens as underscores:
-  `doc-type` is `src/dev_playbook/checks/doc_type.py` and
-  `tests/dev_playbook/checks/test_doc_type.py`.
-- A rule that `scripts/workspace-lint` decides today stays with it and is
-  registered `tool_check(id, hook="workspace-lint", module=__name__)`;
-  `workspace-lint` itself is not edited.
-- A new check that fails this repo today is set aside in the report, not
-  fixed in the repo. The repo as it stands is acceptable.
-- The check gate is `make check`. The old gate, `scripts/playbook-lint .`, and
-  the new one, `uv run playbook check .`, run side by side until cut over.
-- The commit step commits the family's work as one commit on this branch.
-- Since Step 3, `checks/decisions.py` decides the `docs/decisions/` directory
-  rule that `scripts/ref-lint` also checks as `UnclassifiedRecordsFile`. Both
-  run until Step 11 retires `ref-lint`; nothing moves from `ref-lint` early.
-- A deleted rule leaves no mention of its subject behind: the Standard's
-  opening paragraph, its `description`, the directory `index.md` intro and
-  row, and the directory's row in `standards/index.md` all say what the file
-  now holds. The `population` line still changes only where the report says.
-- A retired detector's package module goes even where a surviving module
-  imports it for one helper: the helper moves to the check module and the
-  import is repointed, as Step 4 did for `repo_init.py` and `prose_lint.py`.
-  The retired name then appears nowhere outside `working-docs/`.
-- Since Step 9a, the package ships `src/dev_playbook/canonical/`, a copy of
-  `standards/build/canonical/` that `test_sources.py` pins byte-identical; an
-  edit to a canonical file edits both. `Repo.canonical` and `Repo.name` carry
-  the sources and the repository's name, and a test overrides either through
-  `Repo.from_files(..., name=, canonical=)`.
+- Steps 1 to 12 are done: one check module per family under
+  `src/dev_playbook/checks/`, one test per rule id under
+  `tests/dev_playbook/checks/`, one report per family under
+  `working-docs/doc-type-system/detector-rewrite/rewrite/`, and every
+  old detector retired but `loop-lint` and `workspace-lint`. What remains
+  is rework of what the audits found.
+- A rework task names what to read; the sections Writing a check, Writing
+  a test, Editing a Standard, and Conduct of
+  `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`
+  apply to every one.
+- The sentence of a rule and the code of its check say the same thing.
+  Where the code does less than the sentence, the sentence is reduced to
+  the code, never the code grown. A rule heading never changes.
+- A check that fails this repo today is not set aside silently: the task
+  says what to do, and a judgment call goes in the progress log.
+- The check gate is `make check`. `scripts/playbook-lint .` and
+  `uv run playbook check .` run side by side until cut over; all three
+  are clean after every commit.
+- The package ships `src/dev_playbook/canonical/`, a copy of
+  `standards/build/canonical/` that `test_sources.py` pins byte-identical;
+  an edit to a canonical file edits both. `Repo.canonical` and `Repo.name`
+  carry the sources and the repository's name, and a test overrides either
+  through `Repo.from_files(..., name=, canonical=)`.
+- The commit step commits the task's work as one commit on this branch.
 
 ## Tasks
 
-- [x] Step 1, family `python`, retires `python-lint`. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/python.md`.
-      Verify: `uv run playbook checks --family python` lists exactly the
-      deterministic trailers under `standards/python/`; `git ls-files
-      scripts/python-lint` prints nothing; the report exists; the Guardrails of
-      `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
+- [x] Step 1, family `python`, retired `python-lint`.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 2, family `testing`, retires `testing-lint`. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/testing.md`.
-      Verify: `uv run playbook checks --family testing` lists exactly the
-      deterministic trailers under `standards/testing/`; `git ls-files
-      scripts/testing-lint` prints nothing; the report exists; the Guardrails
-      of `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
+- [x] Step 2, family `testing`, retired `testing-lint`.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 3, family `decisions`, retires `decisions-lint`. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/decisions.md`.
-      Verify: `uv run playbook checks --family decisions` lists exactly the
-      deterministic trailers under `standards/decisions/`; `git ls-files
-      scripts/decisions-lint` prints nothing; the report exists; the Guardrails
-      of `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
+- [x] Step 3, family `decisions`, retired `decisions-lint`.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 4, family `prose`, retires `prose-lint`. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/prose.md`.
-      Verify: `uv run playbook checks --family prose` lists exactly the
-      deterministic trailers under `standards/prose/`; `git ls-files
-      scripts/prose-lint` prints nothing; the report exists; the Guardrails of
-      `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
-
-- [x] Step 5, family `tracking`, retires nothing; `workspace-lint` is
-      untouched. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/tracking.md`.
-      Verify: `uv run playbook checks --family tracking` lists exactly the
-      deterministic trailers under `standards/tracking/`; `scripts/workspace-lint`
-      and `src/dev_playbook/workspace_lint.py` are unchanged in the range; the
-      report exists; the Guardrails of
-      `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
+- [x] Step 4, family `prose`, retired `prose-lint`.
+- [x] Step 5, family `tracking`; `workspace-lint` untouched.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 6, family `distribution`, retires nothing. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/distribution.md`.
-      Verify: `uv run playbook checks --family distribution` lists exactly the
-      deterministic trailers under `standards/distribution/`; the report
-      exists; the Guardrails of
-      `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
-
-- [x] Step 7, family `build`, retires nothing. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/build.md`.
-      Verify: `uv run playbook checks --family build` lists exactly the
-      deterministic trailers under `standards/build/`; the report exists; the
-      Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
-      hold.
-
-- [x] Step 8, family `harness`, retires nothing. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/harness.md`.
-      Verify: `uv run playbook checks --family harness` lists exactly the
-      deterministic trailers under `standards/harness/`; the report exists; the
-      Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
-      hold.
-
-- [x] Step 9, family `standard`, retires nothing. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/standard.md`.
-      Verify: `uv run playbook checks --family standard` lists exactly the
-      deterministic trailers under `standards/standard/`; the report exists;
-      the Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
-      hold.
+- [x] Step 6, family `distribution`.
+- [x] Step 7, family `build`.
+- [x] Step 8, family `harness`.
+- [x] Step 9, family `standard`.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 9a, fix: the model carries what two build checks lack. Today the
-      seven canonical checks in `src/dev_playbook/checks/build.py` read their
-      source from `standards/build/canonical/` in the model, so a repo that
-      does not track that directory gets no comparison and no finding; and
-      `names_the_project_and_package` calls `gitrepo.canonical_repo_name`, the
-      one git call in a check. For this task alone, `src/dev_playbook/model.py`
-      may be edited. `Repo` gains `canonical`, a mapping of the seven file
-      names in `sources.CANONICAL_FILES` to bytes, filled by both constructors
-      from a copy of `standards/build/canonical/` shipped inside the package,
-      so the wheel carries it; a test pins the shipped copy byte-identical to
-      the tree. `Repo` gains `name`, the repository's name, set by `from_git`
-      through `gitrepo.canonical_repo_name` and by a `from_files` argument
-      defaulting to the root's directory name. The canonical checks compare
-      against `repo.canonical`, the name check reads `repo.name`, and no
-      check imports `gitrepo`. Verify: `grep -n gitrepo
-      src/dev_playbook/checks/build.py` prints nothing; a test in
-      `tests/dev_playbook/checks/test_build.py` builds a repo with no
-      `standards/build/canonical/` and a `ci.yml` unlike the shipped one and
-      gets one finding; `make check`, `scripts/playbook-lint .`, and
-      `uv run playbook check .` are clean.
-
-- [x] Step 10, family `doc-type`, retires `harness-files-lint` and
-      `standards-lint`. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/doc-type.md`.
-      Verify: `uv run playbook checks --family doc-type` lists exactly the
-      deterministic trailers under `standards/doc-type/`; `git ls-files
-      scripts/harness-files-lint scripts/standards-lint` prints nothing; the
-      report exists; the Guardrails of
-      `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
-
-- [x] Step 11, family `knowledge-organization`, retires `okf-lint`,
-      `ref-lint`, and `repo-lint`. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`.
-      Verify: `uv run playbook checks --family knowledge-organization` lists
-      exactly the deterministic trailers under
-      `standards/knowledge-organization/`; `git ls-files scripts/okf-lint
-      scripts/ref-lint scripts/repo-lint` prints nothing; `DETECTORS` in
-      `src/dev_playbook/playbook_lint.py` holds only `"loop-lint"`; the report
-      exists; the Guardrails of
-      `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
+- [x] Step 9a, fix: the canonical sources and the repo name carried on
+      `Repo`, so no check imports `gitrepo` and a consumer repo is compared.
+- [x] Step 10, family `doc-type`, retired `harness-files-lint` and
+      `standards-lint`.
+- [x] Step 11, family `knowledge-organization`, retired `okf-lint`,
+      `ref-lint`, and `repo-lint`.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 12, family `shell`, retires nothing; the two tool-decided rules in
-      `src/dev_playbook/checks/shell.py` stay as they are. Report:
-      `working-docs/doc-type-system/detector-rewrite/rewrite/shell.md`.
-      Verify: `uv run playbook checks --family shell` lists exactly the
-      deterministic trailers under `standards/shell/`; the report exists; the
-      Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
-      hold.
+- [x] Step 12, family `shell`.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 12a, rework: the `knowledge-organization` family to its sentences.
-      A rule-by-rule audit of Step 11 found each item below; fix every one,
-      in `src/dev_playbook/checks/knowledge_organization.py`, its test file
-      `tests/dev_playbook/checks/test_knowledge_organization.py`, and the
-      family's Standards under `standards/knowledge-organization/`, and
-      nothing the item does not name. For this task alone
-      `src/dev_playbook/model.py` and `src/dev_playbook/md.py` may be edited,
-      only for items 8, 9, and 10. This is not a family build, so the five
-      steps and the report shape of
-      `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`
-      do not apply; its sections Writing a check, Writing a test, Editing a
-      Standard, and Conduct do, read them first. Then read, in this order:
-      the Standards under `standards/knowledge-organization/`; the check
-      module and its test file; `src/dev_playbook/model.py` and
-      `src/dev_playbook/md.py`; the family's triage report
-      `working-docs/doc-type-system/detector-rewrite/triage/knowledge-organization.md`,
-      whose blockquotes and Escalations are the wording and rulings the items
-      cite; and the family's rewrite report
-      `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`.
-      The retired `okf-lint` and `ref-lint` an item names are read with
-      `git show 863746d:scripts/okf-lint` and `git show 863746d:scripts/ref-lint`.
-      A test for each behaviour an item changes, one passing and one failing
-      member each. Every rule heading stays as it is. The work is one commit.
-      1. `every-member-reached-from-rootmd` is restored to
-         `standards/knowledge-organization/documentation-sets/working-documentation-sets.md`
-         with the triage's blockquote as its body, its check, and its test;
-         escalation 6 ruled it built in full, and Step 11 set it aside. The
-         one failure it reports is the twelve reports under
-         `working-docs/doc-type-system/detector-rewrite/rewrite/`, linked
-         only from their `index.md`: fix that by linking each report from its
-         family's row in the step table of
-         `working-docs/doc-type-system/detector-rewrite/plan.md`, the one
-         edit under `working-docs/` this task allows outside the report.
-         The report's Set aside becomes `None.` and Built gains the id.
-      2. Escalation 4 ruled `~/.claude/` a target form in both
-         `workspace-path-for-another-repo` and
-         `workspace-path-for-a-stable-location`; the checks accept it, the two
-         bodies in `cross-references.md` do not say so. Add it to each body.
-         And the checks stop skipping such a target: `reference-resolves` and
-         `fragment-anchor-matches-the-slug` resolve `~/.claude/<rest>` to
-         `dotfiles/dot-claude/<rest>` where the repo tracks that directory,
-         and skip it only where it does not; `stable-named-anchor` tests the
-         anchor's form on every `.md` target, in this repo or another, since
-         the form needs no file; `relative-path-inside-the-bundle` treats
-         `~/.claude/skills/<name>/` as the linking file's own bundle only when
-         that file is under `dotfiles/dot-claude/skills/<name>/`, not on a
-         name match from anywhere.
-      3. `type-registry.md`'s `population` and opening still describe a
-         `## Types` table that no file has. Both now name the registry as the
-         table under `type names a registered type` in `document-types.md`.
-      4. `indexes.md` checks, each to its sentence:
-         `introduction-between-h1-and-listing` reports an `index.md` with no
-         H1; `one-entry-per-concept-document-and-child-directory` reads only
-         the bullets of the listing, the run of bullets before the first H2,
-         not a bullet under a later heading, compares a bullet's ending with
-         ` — ` and the description, not the whole rest of the line, and finds
-         child indexes through the model's classification, not a raw
-         `index.md` basename anywhere; `alphabetical-unless-declared-otherwise`
-         honours an `Ordering:` line only above the first bullet of any kind.
-         `term-definition-avoid-line` in `context-content.md` reads the `##
-         Language` section, never an H1 of the same slug, and its test covers
-         the no-definition-line and the two-`_Avoid_:`-lines cases; the
-         `Ordering:` test asserts the group order is off too.
-      5. `one-list-of-items-state-by-section` reads only the bullets directly
-         under each `## Planned` and `## Completed`, not those under a `###`
-         inside, and every such section, not the first.
-         `one-directory-under-working-docs` tests the whole file name against
-         the rule, not the text before the first dot.
-      6. `okf-version-declared` reports a repo with no root `index.md`, the
-         case the old `okf-lint` caught, since a missing index declares
-         nothing.
-      7. `readmemd-is-typed-readme` reports a `README.md` with no `type` key.
-      8. Link scanning, in the model: a `~/workspace/` path inside a link's
-         text is read as a bare path, as `ref-lint` read it; and a list item's
-         continuation paragraph is measured from the item's content column,
-         so its links are not taken for indented code; and a bare path's
-         trailing `.`, `,`, `;`, or `:` is not part of the path, so
-         `Read ~/workspace/demo/a.md.` resolves.
-      9. Helpers duplicated across modules are hoisted to one place, `md.py`
-         or `model.py`: the kebab-case pattern in `knowledge_organization.py`
-         and `doc_type.py`; the is-this-dev-playbook test in
-         `knowledge_organization.py`, `build.py`, and `standard.py`; the
-         link-target resolver in `knowledge_organization.py` and
-         `doc_type.py`; the workspace-path pattern beside `md.py`'s; and the
-         bare-path scan that copies the model's link line mapping.
-      10. The module-level `@cache` on `_slugs_on_disk`, which reads another
-         repo's headings, is scoped to one run, keyed on the `Repo` or held on
-         it, so a long-lived process never reads a stale answer.
-      Verify: `make check` green, `scripts/playbook-lint .` and
-      `uv run playbook check .` clean; `uv run playbook checks --family
-      knowledge-organization` lists every deterministic trailer under
-      `standards/knowledge-organization/`, the restored one included; the
-      Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
-      hold.
+- [x] Step 12a, rework: ten knowledge-organization items from the Step 11
+      audit; `every-member-reached-from-rootmd` restored.
 
 <!-- [x] checkpoint -->
 
-- [x] Step 12a fix: the knowledge-organization report catches up with the
-      restored rule, and four rule sentences are brought to what their
-      checks test. The ruling for every item here: the sentence of a rule
-      and the code of its check say the same thing, and where the code
-      does less than the sentence, the sentence is reduced to the code,
-      never the code grown. Headings never change. One commit. Read first
-      the sections Writing a check, Writing a test, Editing a Standard, and
-      Conduct of
+- [x] Step 12a fix: the report's counts, four rule sentences reduced to
+      their checks, one trailing-mark fix, dead code removed.
+- [x] Step 12b, rework: non-mapping frontmatter and a list-valued `type`
+      as findings, setext headings parsed, links wrapping across two line
+      breaks found. Items 1 and 3 are reversed by Step 12c.
+
+<!-- [x] checkpoint -->
+
+- [ ] Step 12c, rework: what the Step 12b audit found. Two model defects
+      and five rule sentences that say more than their checks test. The
+      ruling for every item: the sentence of a rule and the code of its
+      check say the same thing; where the code does less than the sentence,
+      the sentence is reduced to the code; where a model feature cannot be
+      made right simply, it is deleted. Headings never change. One commit.
+      Read first the sections Writing a check, Writing a test, Editing a
+      Standard, and Conduct of
       `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`,
-      then each rule named below in its Standard and its check function in
-      `src/dev_playbook/checks/knowledge_organization.py`. Eleven items.
-      1. In `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`,
-         the frontmatter `description` says "thirty-five checks over the
-         model" and "one set aside"; it becomes "thirty-six checks over the
-         model" and the phrase ", one set aside" is dropped. The intro's
-         sentence "The module holds thirty-five functions and no hook
-         registration." becomes "The module holds thirty-six functions and
-         no hook registration."
-      2. In `working-docs/doc-type-system/detector-rewrite/rewrite/index.md`,
-         the Knowledge Organization row's text after ` — ` becomes the new
-         `description`, character for character.
-      3. In `dotfiles/dot-claude/skills/doc-set-diagram/SKILL.md`, the link
-         to `working-documentation-sets.md` whose link text is "Working
-         Documentation Sets", the one inside the `{Read ...}` directive
-         at line 48, gains the fragment
-         `#every-member-reached-from-rootmd`, the heading Step 11 cut it
-         from when the rule was set aside; the other link in that file to
-         the same Standard stays as it is.
-      4. `standards/knowledge-organization/indexes.md`, rule `One entry per
-         concept document and child directory`. The check
-         `one_entry_per_concept_document_and_child_directory` reads every
-         bullet of the index outside a fenced code block as an entry, under
-         any heading; the sentence says "in its listing", which names
-         nothing. The phrase "and no other bullet in its listing" becomes
-         "and no other bullet outside a fenced code block". No code change.
-         Add one test: an index whose only stray bullet sits under a later
-         `## Notes` heading is a finding, and an index that lists its child
-         directories under a `## Directories` heading, as
-         `standards/index.md` does, is not.
-      5. Same file, rule `Alphabetical unless declared otherwise`. The
-         check sorts the same bullets, wherever they sit. The sentence
-         already says "In an `index.md`" with no scope, so it stands; add
-         one test that child bullets under a `## Directories` heading are
-         sorted with the rest.
-      6. `standards/knowledge-organization/cross-references.md`, rule
-         `Reference resolves`. The check `reference_resolves` reads a
-         `~/.claude/<rest>` target as `dotfiles/dot-claude/<rest>` in a
-         repo that tracks that directory, and skips such a target in a
-         repo that does not; the sentence says nothing of `~/.claude/`.
-         After the sentence ending "read from the linking file's
-         directory." add: "A `~/.claude/<rest>` target is read as
-         `dotfiles/dot-claude/<rest>` where the repo tracks that
-         directory, and is not checked where it does not." No code change;
-         the tests from Step 12a item 2 cover both branches.
-      7. Same file, rule `Stable named anchor`. The check
-         `stable_named_anchor` tests the anchor's form alone, digits then a
-         hyphen, and never opens the target; the sentence speaks of the
-         heading's text, which the code does not read. The body becomes:
-         "The `#anchor` of a reference does not have the form of a numbered
-         heading's slug, a run of digits then a hyphen, such as
-         `#3-bundle-structure` or `#223-revision`." The Why blockquote
-         stays. No code change.
-      8. Same file, rule `Root-absolute path in the same repo`. The check
-         `root_absolute_path_in_the_same_repo` flags a
-         `~/workspace/<this repo>/` path found as a link's target, as a
-         link's text, or bare, and passes a `~/.claude/` target the way
-         `Workspace path for another repo` does. The sentence names only
-         "in a link or bare" and only `/`. The body becomes: "In a file
-         with a fixed repo root, a reference to a file or a directory of
-         the same repo is a link whose target starts `/` and is the path
-         from the repo root, or `~/.claude/` for a file the harness loads
-         from there. A relative target, and a `~/workspace/<this repo>/`
-         path as a link's target, as a link's text, or bare, are findings."
-         Confirm against the code that each of the three positions is
-         flagged and the `~/.claude/` target is passed before editing; where
-         the code differs, the sentence follows the code. Add one test per
-         position where none exists.
-      9. `src/dev_playbook/model.py`, the bare-path scan near
-         `rstrip(md.BARE_PATH_TRAILER)`: `rstrip` removes a run of marks,
-         so `~/workspace/demo/x/..` becomes `~/workspace/demo/x/`. Remove
-         one trailing mark at most. Test in `tests/dev_playbook/test_model.py`:
-         `See ~/workspace/demo/x/..` yields the path `~/workspace/demo/x/.`.
-      10. In `src/dev_playbook/checks/knowledge_organization.py`, delete
-          the unused `LIST_MARKER`, and replace the helper `_under` with
-          `doc.section(heading.slug)` at its one call site, since
-          `MarkdownFile.section` in `model.py` computes the same lines;
-          delete `_under`. `_directly_under` stays, as the one helper that
-          stops at a heading of any level.
-      11. In `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`,
-          the Restated list gains one line per rule whose body items 4, 6,
-          7, and 8 changed, each naming the rule and the reason in one
-          clause, so the report says what the Standard now says.
-      Verify: `grep -c "thirty-six" ` on the report prints 2 and
-      `grep -c "set aside" ` on its frontmatter prints 0; `grep -c
-      LIST_MARKER src/dev_playbook/checks/knowledge_organization.py`
-      prints 0; `uv run playbook checks --family knowledge-organization`
-      still lists 36 ids; `uv run playbook check .` reports zero findings,
-      which proves the row equals the description and the anchor resolves;
-      `make check` green with the new tests counted.
+      then `src/dev_playbook/model.py`, `src/dev_playbook/md.py`, and each
+      rule named below in its Standard beside its check function. Seven
+      items.
+      1. Setext headings leave the model. The scanner 12b added in
+         `model.py` makes false headings: `Intro.\n\n---\nText\n---\n` gives
+         an H2 "--- Text" where the first `---` is a thematic break;
+         `- item\ncontinued\n---` and `> quote\ncontinued\n---` give an H2
+         "continued"; a table with no outer pipes over `---` becomes a
+         heading. A correct scanner needs paragraph tracking the model does
+         not have, this repo holds no setext heading, no Standard names the
+         heading form, and `md.heading_slugs` reads ATX only for a file
+         in another repo, so the two readers already disagreed. The user's
+         ruling: the old form is prohibited by a rule, detected, and
+         tested; the model reads `#` headings only. Two parts.
+         (a) Delete the setext branch from `model.py`, its tests, and the
+         two lines of the module docstring that describe it; a heading to
+         the model is an ATX heading, `#` to `######`.
+         (b) Add one rule to `standards/knowledge-organization/cross-references.md`
+         directly after `## Headings slugify distinctly`, heading
+         `## ATX headings only`, body: "A heading is a line of one to six
+         `#` then a space. Outside a fenced code block and outside the
+         frontmatter block, no line made only of three or more `=` or `-`
+         sits directly under a line of text." Trailer
+         `` `knowledge-organization.atx-headings-only` · deterministic ``.
+         Why blockquote: "A `---` under a line of text is a heading to one
+         renderer and a divider to another, so the model reads `#`
+         headings only and this rule keeps the two forms apart; a divider
+         has a blank line above it." Write the check
+         `atx_headings_only` in `checks/knowledge_organization.py` reading
+         `doc.content` (the lines outside fences) and skipping the
+         frontmatter block's lines; a table separator such as
+         `| --- | --- |` holds `|` and is not "only `=` or `-`". Test: a
+         file with `Text\n---` yields one finding at the underline's line;
+         a file with `Text\n\n---` and one with a table yield none. Where
+         this repo has a line the new check flags, insert one blank line
+         above the underline, the divider the author meant, so the check
+         lands clean rather than set aside. The Standard's `description`,
+         the directory index row, and the family's report Built list say
+         what the file now holds, per the Editing a Standard section.
+         Record in `PROGRESS.md` the reversal of 12b item 3 with this
+         reason.
+      2. Frontmatter that is YAML but not a mapping, `---\n- a\n---` or
+         `---\nfoo\n---`, is read by the model as no frontmatter since 12b,
+         so `_body` in `src/dev_playbook/checks/doc_type.py` (near line
+         529) takes the `---` fence as the body's first line, and on an
+         `index.md` or `CLAUDE.md` nothing reports the bad block at all,
+         a silent skip. The user's ruling: such a file stops the run fast
+         and loud. Revert 12b item 1: the model raises `ModelError` naming
+         the file for frontmatter that is YAML but not a mapping, exactly
+         as it does for frontmatter that is not YAML; delete the
+         read-as-no-frontmatter path, the docstring lines that describe
+         it, and its tests; add one test in
+         `tests/dev_playbook/test_model.py` that `---\n- a\n---` raises
+         `ModelError` naming the path. `frontmatter-a-yaml-mapping` and its
+         sentence stay as they are: its check reports a concept document
+         with no block, and the mapping half is enforced by the model's
+         stop, which its docstring says in one line. 12b item 2, a
+         list-valued `type` as a finding, stays. Record in `PROGRESS.md`
+         the reversal of 12b item 1 with this reason.
+      3. `standards/knowledge-organization/cross-references.md`, rule
+         `Root-absolute path in the same repo`. The check passes any
+         `~/.claude/` target, `[x](~/.claude/random/notes.md)` included,
+         and passes a same-file `[b](#x)`; the sentence limits `~/.claude/`
+         to "a file the harness loads from there" and calls every relative
+         target a finding. The body becomes: "In a file with a fixed repo
+         root, a reference to a file or a directory of the same repo is a
+         link whose target starts `/` and is the path from the repo root,
+         or starts `~/.claude/`. A relative target other than a same-file
+         `#anchor`, and a `~/workspace/<this repo>/` path as a link's
+         target, as a link's text, or bare, are findings." Then read
+         `Workspace path for another repo` beside its check: where the
+         code does not test "for a file the harness loads from there", that
+         clause is reduced to "or `~/.claude/`" the same way.
+      4. Same file, rule `Reference resolves`. `[x](../../nope.md)` in
+         `d/a.md` climbs out of the repo and gets no finding from this
+         check, since `workspace-path-for-another-repo` reports it. After
+         "a relative target is read from the linking file's directory."
+         add: "A relative target that climbs above the checkout root is not
+         this rule's finding."
+      5. Same file, rule `Stable named anchor`. The check reads a `.md`
+         target or a same-file anchor only, so `[x](/dir/#3-foo)` passes.
+         The body's opening "The `#anchor` of a reference does not" becomes
+         "The `#anchor` of a reference to a `.md` file, or to a heading of
+         the same file, does not".
+      6. `standards/knowledge-organization/indexes.md`, rule `One entry per
+         concept document and child directory`. The check flags a `-`,
+         `*`, or `+` bullet at any indent, and not `> - x` in a blockquote
+         nor `1. x`. Confirm that against the code, then make the phrase
+         "and no other bullet outside a fenced code block" name exactly
+         the shapes the code flags, for example "and no other `-`, `*`, or
+         `+` bullet outside a fenced code block or a blockquote".
+      7. `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`:
+         the Restated list gains one line per rule items 2 to 6 changed,
+         each naming the rule and the reason in one clause, and the line
+         for any rule already listed there from the Step 12a fix is
+         updated rather than doubled.
+      Verify: `grep -ci setext src/dev_playbook/model.py` prints 0; the
+      tests of items 1 and 2 pass; `uv run playbook checks --family
+      knowledge-organization` lists 37 ids, `atx-headings-only` among
+      them, equal to the deterministic trailers; `uv run playbook check .`
+      reports zero findings; `make check` green; `scripts/playbook-lint .`
+      clean.
 
-- [x] Step 12b, rework: the model reads every file the way a reader does and
-      never crashes the run on a bad one. Four items, each with its own test
-      in `tests/dev_playbook/test_model.py` or the owning check's test file.
-      For this task alone `src/dev_playbook/model.py` and
-      `src/dev_playbook/md.py` may be edited. Read first the sections Writing
-      a check, Writing a test, and Conduct of
-      `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`,
-      then `src/dev_playbook/model.py`, `src/dev_playbook/md.py`, and the
-      two checks named below in `src/dev_playbook/checks/knowledge_organization.py`.
-      The parser ruling in
-      `working-docs/doc-type-system/detector-rewrite/ROOT.md` keeps the
-      hand-rolled scanner; extend it, do not replace it. The work is one
-      commit.
-      1. Frontmatter that is not a YAML mapping, `---\n- a\n---`, raises
-         `ModelError` today and stops every check; it becomes one finding on
-         that file from `frontmatter-a-yaml-mapping`, and every other check
-         runs, treating the file as one with no frontmatter.
-      2. A `type` value that is a list raises `TypeError` in
-         `type-names-a-registered-type`; it becomes one finding on that file.
-      3. A setext heading, a line of text over a line of `=` or `-`, is a
-         heading to the model, with its level, slug, and line number, so
-         `readme-holds-an-h1` and `headings-slugify-distinctly` see it.
-      4. A link whose text wraps across two or more line breaks is found, as
-         one across a single break already is.
-      Verify: the four tests pass; `make check` green; both gates clean;
-      `uv run playbook check .` still reports zero findings on this repo.
-
-<!-- [x] checkpoint -->
+<!-- [ ] checkpoint -->
