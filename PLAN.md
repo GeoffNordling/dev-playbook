@@ -110,7 +110,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 6, family `distribution`, retires nothing. Report:
+- [x] Step 6, family `distribution`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/distribution.md`.
       Verify: `uv run playbook checks --family distribution` lists exactly the
       deterministic trailers under `standards/distribution/`; the report

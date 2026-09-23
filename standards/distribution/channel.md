@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Distribution Channel
-description: How the hook repository's checks reach the governed repos — the published hook id, a valid manifest, and a publisher's local block
+description: How the hook repository's checks reach the governed repos — a valid manifest and a publisher's local block
 population: "a governed repo's share of the distribution channel: its hook manifest and its local block"
 ---
 
@@ -16,17 +16,6 @@ and identical on CI, and the clone carries the
 [canonical artifacts](/standards/build/canonical.md) with it. A change to
 the standard, hook code, a canonical artifact, or a version pin, reaches a
 consumer only when its pinned `rev` moves; the release is the bump.
-
-## One published hook id
-
-The hook repository's `.pre-commit-hooks.yaml` publishes exactly one
-hook, `playbook-lint`.
-
-`distribution.one-published-hook-id` · deterministic
-
-> **Why.** One id spares a consumer the detector list, so enrollment
-> rides the pin: a detector added upstream reaches every consumer at
-> its next pin bump with no config edit anywhere.
 
 ## A publisher dogfoods its manifest
 
