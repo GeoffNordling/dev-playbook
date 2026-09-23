@@ -62,18 +62,16 @@ them: Story, Assessment Record, Prep-unit, Work-Search Contact.
 
 ## Open
 
-- **Which subsystem first.** Interview-prep is proposed: the user's
-  priority, the richest graph, a derived state nothing surfaces, a
-  loop in prose, and one edge into role-postings. The alternative is
-  the role-postings to interview-prep chain end to end.
+- **What "ready to memorize" means in file terms.** The user ruled
+  `status: complete` a good sign, loosely applied. Whether readiness is
+  that field, the nine predicates, or a new declared fact is open.
 
 ## Planned
 
-- **One hand simulation.** For the chosen subsystem: five to eight
-  questions, the nodes and edges as a JSON file in the viewer's
-  envelope with a receipt on every row, the seven views drawn as text,
-  and the facts no extractor reaches, on the model of
-  `fact-base-ralph.{md,json}`.
+- **Operations and views over the stories fact base.** What a person
+  does with the base once it exists: the views the user asks for next,
+  the two thresholds ruled, and a Sonnet agent sent to check the
+  surrogate's assumptions against the real files before each new view.
 - **The domain layer read off the residuals.** Which node types,
   extractors, and primitives story-forge owns and dev-playbook does
   not: the first data point for the fact base's open question.
@@ -83,6 +81,12 @@ them: Story, Assessment Record, Prep-unit, Work-Search Contact.
 
 ## Completed
 
+- **The stories fact base, 2026-09-23.** The hand simulation, worked
+  backwards from the user's question about story health: seven
+  questions agreed, one Sonnet agent surveying the Story shape, one
+  acting as the extractors, 299 nodes and 537 edges with receipts, nine
+  predicates, five views, and five residuals, in
+  [Stories Fact Base](/working-docs/doc-type-system/story-forge-simulation/stories-fact-base.md).
 - **The survey, 2026-09-23.** The tree read by hand, then four Sonnet
   agents, one per slice — stories and resume, role-postings,
   interview-prep and unemployment-benefits, and the bedrock — each
