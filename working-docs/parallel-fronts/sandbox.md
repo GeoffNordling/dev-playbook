@@ -349,10 +349,9 @@ a fixed place of its own outside `~/workspace`, on the user's machine and in
 the container alike, and a repository's name is read from the note git keeps
 in the copy of where it was cloned from, which needs no network. The cost is
 a pass over every standard, skill, and setup step that assumes
-`~/workspace/dev-playbook`, and a revision of decision 0009. The user ruled
-it the fallback, tested only if option B fails: the user also runs code
-outside Sandcastle, so a standards change would cascade into workflows
-beyond this set.
+`~/workspace/dev-playbook`, and a revision of decision 0009. Rejected: the
+user also runs code outside Sandcastle, so a standards change would cascade
+into workflows beyond this set, and option B passed.
 
 **Option B — our own container plug-in.** Sandcastle accepts user-written
 sandbox plug-ins (`createBindMountSandboxProvider` is exported), and its own

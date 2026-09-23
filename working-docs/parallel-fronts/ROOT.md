@@ -39,6 +39,9 @@ inner loop, the user holds every seam between laps.
 - Sandcastle, if chosen, is used as published and never forked or
   patched. A mismatch is closed by a plug-in Sandcastle accepts, or by
   changing the workspace standards.
+- Every run needs a container, so every run happens on the Fedora machine.
+  The WSL machine this set was begun on has no container runtime and is
+  not a target.
 - Past decisions do not bind this set. A decision record that stands in the
   way is revised rather than worked around.
 
@@ -98,34 +101,25 @@ integrator is a judgment and is not.
   All five are solved and proven in test. **Hook logging**'s fix is not
   yet on main.
 
-## Planned
-
-Every run below needs a container, so every run happens on the Fedora
-machine. The WSL machine this set was begun on has no container runtime and
-is not a target, which
-[The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
-
-- **Land the sandbox changes on main.** Next, and the user decides the
-  shape. Part 4 ran on two dev-playbook changes that exist only in a
-  throwaway config copy
-  ([What part 4 settled](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)):
-  `measure-event` sending rows to the host from a sandbox, and the Stop and
-  SessionEnd hooks set to wait. Open with the user: whether the PR carries
-  only those two, or all of this branch's work (the hardened `front-clone`,
-  its trap test, and this working set), and what of the `sandbox-probe`
-  branch comes with it. No PR is opened until the user rules.
-- **Why a dev-playbook front needs two copies.** Parked by the user until
-  part 4 works. The user questions whether a front assigned to change
-  dev-playbook needs a read-only config copy beside its work copy at all.
-  The prototype's reason is recorded in
+- **What the landing PR carries.** For the user to rule before any PR
+  opens: only the two changes part 4 ran on, or all of this branch's work
+  (the hardened `front-clone`, its trap test, and this working set) with
+  them, and whether anything of the `sandbox-probe` branch comes along.
+- **Why a dev-playbook front needs two copies.** The user questions whether
+  a front assigned to change dev-playbook needs a read-only config copy
+  beside its work copy at all. The prototype's reason is recorded in
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter):
   the config copy answers "what does published main say", so it must not
-  show the front its own uncommitted edits. Revisit together.
-- **Option A.** Not run, because option B passed. The user ruled it the
-  fallback: code also runs outside Sandcastle, so a standards change would
-  cascade into workflows beyond this set.
-- **Sandcastle's other branch modes.** `branch` and `merge-to-head` run more
-  git on the host than `head` mode, and may trip the booby trap themselves.
+  show the front its own uncommitted edits. Parked until part 4 worked;
+  now due to be revisited together.
+
+## Planned
+
+- **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
+  changes that exist only in a throwaway config copy
+  ([What part 4 settled](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)):
+  `measure-event` sending rows to the host from a sandbox, and the Stop and
+  SessionEnd hooks set to wait. The PR's scope is open above.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
 - **Decide the driver.** Choose between Sandcastle and a smaller script,
