@@ -176,8 +176,8 @@ every member. The user tracks the work at the level of this table.
 | **Shared history** | Sandcastle opens the real `.git` to the front, so a front can delete other branches, other worktrees, and the user's unpushed commits | The throwaway copy | Solved, proven by experiment two |
 | **Relabel** | The SELinux restamp permanently changes the label on the real files | The throwaway copy | Solved, proven by experiment two |
 | **Booby trap** | Something a front plants in its copy's git settings runs on the host when host-side git later works in the copy | Harden `front-clone` | Solved, proven by a permanent test |
-| **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option B, a 20-line plug-in | Solved, proven by experiment three with the stand-in |
-| **Hook logging** | The user's Claude Code hooks log every event to a database, and must keep doing so from inside the sandbox | The prototype's port file, carried over | Not tested under Sandcastle |
+| **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option B, a 20-line plug-in | Solved, proven by experiment three with the stand-in and with real Claude |
+| **Hook logging** | The user's Claude Code hooks log every event to a database, and must keep doing so from inside the sandbox | The prototype's port file, plus the two end-of-session hooks set to wait | Solved and proven by part 4 in a throwaway config copy; not yet on main |
 
 ## Where Sandcastle collides
 
@@ -375,9 +375,13 @@ mount, rather than a rewrite. Experiment three confirmed it by a run.
 ## The layout inside a front
 
 Decided by the user after experiment three: **one rule for every front.**
-The work copy always sits at `~/work/<repo>`, and the config copy always at
-`~/workspace/dev-playbook`. It is the layout the `sandbox-probe` prototype
-chose, and the user named it what good looks like.
+The work copy always sits at `~/assignment/<repo>`, and the config copy
+always at `~/workspace/dev-playbook`. It is the layout the `sandbox-probe`
+prototype chose, and the user named it what good looks like. The prototype
+called the folder `work/`; the user renamed it `assignment/`, because it
+holds the one repository the agent is assigned to change during its short
+life in the sandbox, and the name should say so without the agent needing to
+know what a front is.
 
 ```
 /home/agent/
@@ -392,7 +396,7 @@ chose, and the user named it what good looks like.
             dotfiles/
             scripts/
             src/
-    work/
+    assignment/
         mission-control/   ← work copy, read-write, the front's branch
             .git/
             CLAUDE.md
@@ -401,7 +405,7 @@ chose, and the user named it what good looks like.
             tests/
 ```
 
-A front on dev-playbook differs only in the name under `work/`. Why that
+A front on dev-playbook differs only in the name under `assignment/`. Why that
 front needs a second dev-playbook at all is a question the user parked for
 after experiment three's part 4 (see the root's Planned list).
 
@@ -465,8 +469,65 @@ Sandcastle also opens the copy's `.git` a second time, at its host path.
 It is the copy's own `.git`, so it adds no reach.
 
 Case A ran at `~/workspace/mission-control`, before the user chose one rule.
-Case B2 proves the chosen `~/work/<repo>` layout; nothing in case A depends
-on which parent directory the work copy sits in.
+Case B2 proves the one-rule layout, then named `~/work/<repo>`; nothing in
+either case depends on the parent directory's name, and part 4 ran at
+`~/assignment/<repo>`.
+
+## What part 4 settled
+
+Real Claude (Sonnet 5), on the subscription, through Sandcastle's own
+`claudeCode` agent plug-in and the option B plug-in, on a mission-control
+front laid out as [The layout inside a front](#the-layout-inside-a-front)
+describes. The task: add one line to `README.md`, commit it, and name three
+skills.
+
+```
+sandbox                                          host
+/home/agent/
+    .claude/                  47 skills, 9 agents loaded
+    workspace/dev-playbook/   config copy, read-only
+    assignment/mission-control/
+        Claude commits ──────── front-clone close ──► fake real repo, same SHA
+    hook events ─────────── port file + receiver ──► measurement database
+```
+
+| Check | Result |
+|---|---|
+| Billing | Passed. `billing-lint` clean before launch; nothing handed in carried a metered key or setting; Claude's own start line reported the subscription (`apiKeySource: none`). |
+| Config | Passed. 47 skills and 9 agents loaded; Claude named three correctly. |
+| Commit | Passed. `front-clone close` returned the commit at the same SHA. Unpushed work, labels, and the user's real dev-playbook unchanged; no container left. |
+| Hook logging | Passed once the end hooks wait (below). Every row lands in the real database, its `cwd` reading `/home/agent/assignment/mission-control`, which marks it as from a sandbox. |
+
+**The end hooks.** The first runs logged the session's start, prompt, and
+every tool use, but never **Stop** or **SessionEnd**. Claude's own debug log
+showed why: both hooks are marked to run in the background, and a one-shot
+Claude starts them and exits at once, cutting them off. On the host they
+finish fast enough to win that race; in a sandbox, where the row travels out
+to the host, they lose. The `sandbox-probe` prototype had the same gap
+unnoticed. A 5-second hold after Claude exits changed nothing, since the
+hooks die with Claude, not with the container. Marking just those two
+`measure-event` hooks in `settings.json` to wait fixed it: a one-word run
+then logged all four of start, prompt, Stop, and SessionEnd. The cost is a
+few milliseconds, once per session.
+
+**What the proof ran on, not yet on main.** Two changes to dev-playbook were
+made only in the throwaway config copy:
+
+1. `measure-event` sends each row to the host receiver when the port file is
+   present, taken from the `sandbox-probe` branch.
+2. The Stop and SessionEnd `measure-event` hooks in `settings.json` wait
+   instead of running in the background.
+
+**One rig-only workaround.** The rig kept its copies under
+`/tmp/claude-1000/`, and Sandcastle opens a copy's `.git` at its host path,
+so podman created a root-owned `/tmp/claude-1000` in the sandbox. That is
+the folder Claude uses for its own temporary files, and Claude refuses one
+it does not own. The rig pointed Claude elsewhere (`CLAUDE_CODE_TMPDIR`).
+Real copies must not live under `/tmp/claude-<uid>/`.
+
+**Harmless noise.** The Stop hook also plays a sound from
+`~/workspace/sounds/`, which the sandbox lacks, so it logs "No such file"
+and carries on.
 
 ## The booby-trap fix
 
@@ -498,11 +559,12 @@ that must continue from inside the sandbox. These are Claude Code hooks, not
 git hooks, and the booby-trap fix does not touch them. The `sandbox-probe`
 prototype already routed them out through a one-line file carrying a port
 (the smaller window described under
-[The two windows that matter](#the-two-windows-that-matter)). Whether that
-survives under Sandcastle is checked in experiment three, part 4, the first
-run with real Claude. The design to carry over lives on the `sandbox-probe`
-branch: `sandbox_probe/SPEC.md`, `probe/sink.py` (the host-side receiver),
-`probe/podman.py` (the windows), and `probe/billing.py`.
+[The two windows that matter](#the-two-windows-that-matter)). Part 4 proved
+it survives under Sandcastle, once the two end-of-session hooks wait
+([What part 4 settled](#what-part-4-settled)). The design lives on the
+`sandbox-probe` branch: `sandbox_probe/SPEC.md`, `probe/sink.py` (the
+host-side receiver), `probe/podman.py` (the windows), `probe/billing.py`, and
+the changed `dotfiles/dot-claude/hooks/measure-event`.
 
 ## Open
 
@@ -514,6 +576,10 @@ branch: `sandbox_probe/SPEC.md`, `probe/sink.py` (the host-side receiver),
   enforces from inside, so a container outlives neither its lap nor a
   driver killed outright. Sandcastle cleans up only when the driver exits
   in an orderly way.
+- **Where real copies live.** Not under `/tmp/claude-<uid>/`, which
+  collides with Claude's own temporary folder inside the sandbox (see
+  [What part 4 settled](#what-part-4-settled)). The place is chosen with
+  the driver.
 
 ## Acronyms
 

@@ -95,8 +95,8 @@ integrator is a judgment and is not.
 - **Whether the fence holds.** Five named problems stand between Sandcastle
   and a safe front, tracked in
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems).
-  Four are solved and proven; **Hook logging** waits on experiment three,
-  part 4.
+  All five are solved and proven in test. **Hook logging**'s fix is not
+  yet on main.
 
 ## Planned
 
@@ -105,33 +105,15 @@ machine. The WSL machine this set was begun on has no container runtime and
 is not a target, which
 [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
 
-- **Experiment three, part 4: real Claude end to end.** Approved by the
-  user, next to run. An end-to-end proof that the solution works outside
-  the stand-in: real Claude, on the subscription, does a tiny real task in
-  a front laid out as
-  [The layout inside a front](/working-docs/parallel-fronts/sandbox.md#the-layout-inside-a-front)
-  describes, through the option B plug-in. Pass means all of:
-  - `billing-lint` passes before the container starts, and the container
-    holds no metered key.
-  - Claude sees the skills and rules.
-  - The task's commit comes back through `front-clone close` at the same SHA.
-  - Claude's hook events reach the measurement database, tagged as from the
-    sandbox. This is the first test of **Hook logging**.
-
-  The steps, carried over from the `sandbox-probe` prototype rather than
-  reinvented: read its subscription-credential window and its hook-logging
-  port file (`sandbox_probe/SPEC.md`, `probe/podman.py`, `probe/sink.py`,
-  `probe/billing.py`, `Containerfile` on the `sandbox-probe` branch); add
-  the `claude` binary to experiment three's image; pass Claude as the agent
-  (Sandcastle's own Claude agent plug-in, if it fits); run.
-
-  The rig from parts 1 and 2 is in this session's scratchpad under
-  `exp3/`: `setup.sh` (fake repos, config copy, both fronts' copies, the
-  image), `snapshot.sh` (the real side before and after), `run.mjs` (one
-  run through the plug-in), `relocated.mjs` (the plug-in),
-  `probe/probe.sh` (the stand-in), `image/Containerfile`. It is
-  throwaway; [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)
-  holds everything needed to rebuild it.
+- **Land the sandbox changes on main.** Next, and the user decides the
+  shape. Part 4 ran on two dev-playbook changes that exist only in a
+  throwaway config copy
+  ([What part 4 settled](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)):
+  `measure-event` sending rows to the host from a sandbox, and the Stop and
+  SessionEnd hooks set to wait. Open with the user: whether the PR carries
+  only those two, or all of this branch's work (the hardened `front-clone`,
+  its trap test, and this working set), and what of the `sandbox-probe`
+  branch comes with it. No PR is opened until the user rules.
 - **Why a dev-playbook front needs two copies.** Parked by the user until
   part 4 works. The user questions whether a front assigned to change
   dev-playbook needs a read-only config copy beside its work copy at all.
@@ -183,9 +165,16 @@ is not a target, which
   Sandcastle's podman plug-in closes the **Workspace collision** with no
   fork and no standards change, proven with the stand-in on a
   mission-control front and a dev-playbook front. The user then chose one
-  layout for every front, work copy at `~/work/<repo>`.
+  layout for every front, work copy at `~/assignment/<repo>`.
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)
   records the run.
+- **Experiment three, part 4: real Claude end to end.** Real Claude, on the
+  subscription, did a tiny task in a front through Sandcastle and the
+  option B plug-in. Billing, config, and the commit's return passed at once;
+  hook logging passed once the two end-of-session hooks were set to wait.
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)
+  records the run. The rig is throwaway, in the session scratchpad under
+  `exp3/` (`part4.mjs` and `receiver.py` beside parts 1 and 2's files).
 
 ## Acronyms
 
