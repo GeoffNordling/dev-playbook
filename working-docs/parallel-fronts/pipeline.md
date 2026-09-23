@@ -11,10 +11,11 @@ The Sandcastle pipeline runs fronts
 in parallel, each from start to finish in its own sealed container:
 throwaway copies go in, one agent works there through Sandcastle and a
 plug-in of ours, and only its commit comes back. It is built and proven
-with real Claude on the subscription. How
-each part was found and tested is in
-[The Sandbox](/working-docs/parallel-fronts/sandbox.md); this member
-describes the result.
+with real Claude on the subscription, and bound by the set's
+[Constraints](/working-docs/parallel-fronts/ROOT.md#constraints). How
+each part was found and tested is in the
+[Experiment Log](/working-docs/parallel-fronts/experiment-log.md); this
+member describes the result.
 
 ## The run, start to finish
 
@@ -36,8 +37,9 @@ describes the result.
    and the run itself refuses to start if anything it hands the container
    carries one.
 2. **Open.** [`front-clone`](/scripts/front-clone) `open` clones the real
-   repository into a throwaway work copy, with no shared files, on the
-   front's branch. Beside it go a copy of dev-playbook at published `main`
+   repository into a throwaway work copy, on the front's branch. The clone
+   shares no files with the real repository, checked after every clone:
+   a shared file would carry the SELinux relabel back to the real one. Beside it go a copy of dev-playbook at published `main`
    (the config copy), a copy of the subscription credential, and a small
    receiver on this machine that writes hook events into the measurement
    database.
@@ -45,8 +47,11 @@ describes the result.
    prompt, and waits for it to exit. Its own `claudeCode` agent plug-in
    runs Claude; our plug-in places the work copy (below).
 4. **Close.** `front-clone close` brings the front's commits into the real
-   repository at the same SHA. It never runs git inside the copy, and it
-   refuses, leaving the copy on disk, if the copy holds uncommitted work.
+   repository at the same SHA. The real repository fetches them without
+   force, so a branch that something else moved meanwhile is refused, not
+   overwritten. It never runs git inside the copy, and it refuses, leaving
+   the copy on disk, if the copy holds uncommitted work. Until the close,
+   the front's branch exists only in the copy.
 5. **Clean up.** The copies and the credential copy are deleted, and the
    receiver stops.
 
@@ -94,12 +99,24 @@ no technical reason three, four, or five cannot run at once.
         <repo>/               ← work copy, the front's branch, read-write
 ```
 
-The agent can write in one place only, `~/assignment/<repo>`. The config
-copy gives it the user's standards and harness exactly as published, so
-the agent behaves as it would on the user's machine. A front assigned to
-change dev-playbook holds two dev-playbook copies, the config copy and its
-work copy, and they stay separate: its own unfinished edits never change
-the rules it runs under.
+The agent can write in one place only, `~/assignment/<repo>`. Every front
+uses this one layout, whatever its repository. The folder is named
+`assignment` because it holds the one repository the agent is assigned to
+change. The work copy's own folder carries the repository's name, because
+the workspace reads a repository's name from that folder
+([Same-Repo Resolution](/docs/decisions/0009-same-repo-resolution.md)).
+
+Every front needs the config copy, for two readers:
+
+- **The harness, before the agent starts.** The links in `~/.claude/`
+  point into the config copy. Without it they dangle, and the agent runs
+  silently with no skills, rules, or hooks.
+- **The agent, during the work.** The global `CLAUDE.md` sends it to the
+  standards before its first task, and skills cite dev-playbook paths.
+
+A front assigned to change dev-playbook holds two dev-playbook copies, the
+config copy and its work copy, and they stay separate: its own unfinished
+edits never change the rules it runs under.
 
 ## The plug-in
 
@@ -107,6 +124,8 @@ Sandcastle is used as published. By default it puts the repository at
 `~/workspace` itself, which breaks the workspace layout; a 20-line wrapper
 around its own podman plug-in moves the work copy to `~/assignment/<repo>`.
 The code is [`rig/relocated.mjs`](/working-docs/parallel-fronts/rig/index.md).
+Changing the workspace standards to fit Sandcastle instead was rejected:
+the user runs code outside Sandcastle too, and the change would reach it.
 
 ## The run() call
 
@@ -134,6 +153,11 @@ over. Two arguments control the loop:
 | `completionSignal` | `<promise>COMPLETE</promise>` | Text that ends the loop early. Sandcastle never tells the agent about it, so the prompt must |
 
 The rig uses the defaults: one session per front.
+
+**The branch strategy is `head`.** The agent works directly in the copy it
+is pointed at. `front-clone` has already checked the front's branch out
+there, so Sandcastle's other strategies, which add a worktree of their own
+on that branch, would fail.
 
 ## What it guarantees
 

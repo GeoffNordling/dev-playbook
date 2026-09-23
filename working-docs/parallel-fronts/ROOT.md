@@ -41,21 +41,38 @@ inner loop, the user holds every seam between laps.
 - A front's scope is set before the lap starts, not discovered during it.
 - Between two and four fronts. Below two the shape has no purpose; above
   four the user cannot hold the merge in their head.
-- Every front reads dev-playbook at published state, whichever repository
-  it is assigned to change, and a front may be assigned to change a
-  dev-playbook branch at the same time. Both facts hold together, and
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md) is where the
-  arrangement that serves them is worked out.
-- Sandcastle, if chosen, is never forked or patched
-  ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)).
-- Every run happens on the Fedora machine
-  ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)).
+- Every front reads dev-playbook at published `main`, whichever repository
+  it is assigned to change. A front assigned to change dev-playbook reads
+  the standards as published while it writes their replacement; its own
+  edits reach a later lap. Refreshing the config between laps, or letting
+  such a front read its own branch as config, was declined.
+- Every run happens on the Fedora machine, and nowhere else. The container,
+  its image, and the `claude` binary inside it are Fedora. The WSL Ubuntu
+  machine has no container runtime and is not a target: a result measured
+  there does not count, and no effort goes to making the set portable.
+- The subscription pays for every run, and this is asserted, not assumed.
+  `billing-lint` checks four places for a metered credential: the live
+  environment, the shell startup files, `~/.claude/settings.json`, and the
+  repository's `.claude/settings.json`. It runs at the commit gate and again
+  before every run.
+- A container never mounts a real file, only copies made for the run and
+  deleted after it. Podman's SELinux option permanently relabels whatever
+  is mounted, even read-only, and a host program can then be refused its
+  own file.
+- No front reaches GitHub. The container holds no GitHub credential, so
+  only local git works inside it, and whatever pushes a front's commits
+  does so outside.
+- The user's hooks keep logging every event to the measurement database
+  from inside a container.
+- Sandcastle is never forked or patched. It is used as published, through
+  the plug-ins it accepts, since a fork would need maintaining for as long
+  as the set uses it.
 
 ## Working with the user
 
 The user holds the requirements and the approvals; the agent holds the
 technical detail. Report at the level of the problem table in
-[The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems):
+[What it guarantees](/working-docs/parallel-fronts/pipeline.md#what-it-guarantees):
 plain language, each problem and solution by its name, a concrete picture
 where one helps, such as a directory tree with enough rows to show what the
 files are. Leave out commands, flags, and mechanism unless the user asks.
@@ -129,10 +146,10 @@ guiding.
   file that another active, unmerged branch is also changing?
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
-  ([What part 4 settled](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)):
+  ([Part 4](/working-docs/parallel-fronts/experiment-log.md#part-4-real-claude)):
   `measure-event` sending rows to the host from a sandbox, and the Stop and
   SessionEnd hooks set to wait. All five problems in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems)
+  [What it guarantees](/working-docs/parallel-fronts/pipeline.md#what-it-guarantees)
   are solved in test; this is the last step to make them solved for real.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
@@ -147,49 +164,48 @@ guiding.
   [Sandcastle](/working-docs/parallel-fronts/sandcastle.md).
 - **State the sandbox requirement.** What a front's container must reach,
   and where Sandcastle collides with it, is recorded in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md).
+  [The five problems](/working-docs/parallel-fronts/experiment-log.md#the-five-problems).
 - **Assert this device holds no metered credential.** `billing-lint`
   asserts it at the commit gate, stationed by the
-  [Billing](/standards/billing/card.md) card, and
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)
-  records what it reads and the assertion still waiting on the driver.
+  [Billing](/standards/billing/card.md) card; what it reads is under
+  [Constraints](#constraints).
 - **Experiment one: the clone round-trip.** A front's commits are made in a
   throwaway clone and reach the real repository at the same SHA, or the lap
   stops. [`front-clone`](/scripts/front-clone) is the plumbing, and
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records the four
-  things the run settled. It used no container and no driver, so what it
+  [the log](/working-docs/parallel-fronts/experiment-log.md#experiment-one-the-clone-round-trip)
+  records what the run settled. It used no container and no driver, so what it
   settled is git's behavior alone.
 - **Experiment two: Sandcastle against a copy.** Sandcastle, pointed at a
   `front-clone` copy with a misbehaving stand-in agent, left the real
   repository and the user's unpushed work untouched, and the commit came
   back. It proved the throwaway copy solves **Shared history** and
   **Relabel**, and exposed the **Workspace collision** and the **Booby
-  trap**. [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)
+  trap**. [The log](/working-docs/parallel-fronts/experiment-log.md#experiment-two-sandcastle-against-a-copy)
   records the details.
 - **Experiment three, part 1: the booby-trap fix.** `front-clone close`
   never runs git in a copy, and a permanent test plants a trigger at every
   point git offers and asserts none fires.
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-booby-trap-fix)
+  [The log](/working-docs/parallel-fronts/experiment-log.md#the-booby-trap-fix)
   records how.
 - **Experiment three, part 2: option B.** A 20-line wrapper around
   Sandcastle's podman plug-in closes the **Workspace collision** with no
   fork and no standards change, proven with the stand-in on a
   mission-control front and a dev-playbook front. The user then chose one
   layout for every front, work copy at `~/assignment/<repo>`.
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)
+  [The log](/working-docs/parallel-fronts/experiment-log.md#experiment-three-the-plug-in)
   records the run.
 - **Experiment three, part 4: real Claude end to end.** Real Claude, on the
   subscription, did a tiny task in a front through Sandcastle and the
   option B plug-in. Billing, config, and the commit's return passed at once;
   hook logging passed once the two end-of-session hooks were set to wait.
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)
+  [The log](/working-docs/parallel-fronts/experiment-log.md#part-4-real-claude)
   records the run.
 - **Walk the user through the Sandcastle pipeline.** The user saw the
   copies, the plug-in, the round trip, and the hook logging, and named the
   arrangement. A front assigned to change dev-playbook keeps both copies:
   the read-only config copy answers "what does published main say", so the
   front's own unfinished edits never change the rules it runs under
-  ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter)).
+  ([Inside the container](/working-docs/parallel-fronts/pipeline.md#inside-the-container)).
 - **Save the pipeline's code.** The plug-in, the parallel run, the
   receiver, the image, and the two dev-playbook changes as patches are
   committed in [`rig/`](/working-docs/parallel-fronts/rig/index.md).

@@ -70,7 +70,7 @@ The library's headline concern is sandbox isolation: it runs each agent in
 a container and merges the commits back out. This set does want every
 front in a container, but not on the window layout Sandcastle chooses,
 which opens the real repository to the front and puts it at the wrong
-path. [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems)
+path. [The five problems](/working-docs/parallel-fronts/experiment-log.md#the-five-problems)
 records the collisions and how each was closed: a throwaway copy, a
 hardened `front-clone`, and a plug-in of our own. Together they make
 [The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md). The tool also offers
@@ -81,7 +81,7 @@ does not use it.
 
 Read from the published package, version 0.12.0, and partly confirmed by
 experiment two
-([The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)).
+([Experiment two](/working-docs/parallel-fronts/experiment-log.md#experiment-two-sandcastle-against-a-copy)).
 
 **Fixed, but only as a suggestion.** Sandcastle suggests
 `/home/agent/workspace` for the repository (`SANDBOX_REPO_DIR` in the
@@ -91,7 +91,7 @@ source of the workspace collision. But the suggestion reaches only
 the sandbox plug-in: after start, Sandcastle works wherever the plug-in
 reports the repository to be. Experiment three's 20-line plug-in moves it,
 with no fork
-([The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)).
+([Experiment three](/working-docs/parallel-fronts/experiment-log.md#experiment-three-the-plug-in)).
 
 **Bends.** The host repository is chosen per run (`cwd`), which is how a
 run is pointed at a throwaway copy. Extra read-only or read-write mounts

@@ -10,4 +10,4 @@ Ordering: the root, then reading order.
 - [The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md) — The pipeline as built and proven — how a front runs from open to close, how fronts run in parallel, the layout inside a container, how a run is told what to do, what it guarantees, where each piece lives, and what it does not yet do
 - [Sandcastle](/working-docs/parallel-fronts/sandcastle.md) — What Sandcastle offers the parallel-fronts shape — the driver primitives it supplies, what it leaves to the user, and what it does not cover
 - [rig/](/working-docs/parallel-fronts/rig/index.md) — The code that runs the Sandcastle pipeline, kept here while the set is open
-- [The Sandbox](/working-docs/parallel-fronts/sandbox.md) — How the Sandcastle pipeline was found — what a front's container must reach, the five problems Sandcastle raised, and the experiments that closed each one
+- [Experiment Log](/working-docs/parallel-fronts/experiment-log.md) — The historical record of the experiments that built the Sandcastle pipeline — for each, what was asked, what ran, and what it settled
