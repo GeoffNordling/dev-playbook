@@ -66,10 +66,6 @@ them: Story, Assessment Record, Prep-unit, Work-Search Contact.
   priority, the richest graph, a derived state nothing surfaces, a
   loop in prose, and one edge into role-postings. The alternative is
   the role-postings to interview-prep chain end to end.
-- **Whether a consumer repo carries a working set of its own.** This
-  set lives in dev-playbook because the terms, the standing, and the
-  fact base's plan live here; story-forge would be the first repo to
-  hold one.
 
 ## Planned
 
