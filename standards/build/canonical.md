@@ -27,9 +27,10 @@ template.
 
 > **Why.** The canonical workflow runs the hook suite and no tests,
 > because a test suite depends on dev-playbook as a local path
-> dependency a cloud runner does not have. It skips `ref-lint` for the
-> same reason: `ref-lint` resolves a cross-repo citation at its
-> absolute path under `~/workspace/`, a tree the runner does not have.
+> dependency a cloud runner does not have. It sets `SKIP: workspace` for
+> the same reason: the checks tagged `workspace` resolve a cross-repo
+> citation at its absolute path under `~/workspace/`, a tree the runner
+> does not have.
 
 ## .python-version byte-identical to canonical
 
@@ -61,28 +62,13 @@ follow.
 
 `build.makefile-holds-its-layers-targets` · deterministic
 
-## artifacts.mk lists every artifact and its file rule
-
-`artifacts.mk`, where it exists at the root, sets `ARTIFACTS` to a list
-of files and gives each one a rule whose target is that file's path.
-
-`build.artifactsmk-lists-every-artifact-and-its-file-rule` · deterministic
-
-> **Why.** A gitignored build product is absent in every fresh
-> checkout and every fresh worktree, and a `check` that only reports it
-> missing turns the pre-push hook into an obstacle to bypass, so the
-> gate builds it.
->
-> A target that is a real file lets `make` compare timestamps and
-> rebuild only what is stale, so the gate pays the build cost once per
-> checkout and nothing on later runs.
-
 ## pyproject.toml matches every pinned value
 
 `pyproject.toml` parses as TOML and matches every value the canonical
 [pyproject.toml](/standards/build/canonical/pyproject.toml) pins:
 `project.requires-python`, `tool.pytest.ini_options.testpaths`,
 `tool.ruff.target-version`, `tool.ruff.line-length`,
+`tool.ruff.extend-include`, `tool.ruff.extend-exclude`,
 `tool.ruff.lint.select`, `tool.ruff.lint.ignore`,
 `tool.ruff.lint.pydocstyle.convention`, and every `[tool.mypy]` key.
 Where the canonical file writes a placeholder, the copy writes its own
@@ -109,7 +95,7 @@ and sets `[tool.uv] package = false`. Every other value is free.
 > its own turns on mutually exclusive members, `D203` against `D211`
 > and `D212` against `D213`, so `ruff check` is unsatisfiable unless a
 > convention selects between them. `E501` is ignored because
-> `ruff format` owns line length and the lint would report the same
+> `ruff format` owns line length and `ruff check` would report the same
 > overruns a second time, and `D401`, imperative-mood summaries,
 > because the workspace writes noun-phrase docstrings.
 
@@ -123,18 +109,16 @@ are free, and further patterns may follow.
 
 ## One version set
 
-Every version the canonical artifacts pin in more than one file carries
-the same value in each.
+**The Python version is written once.** `.python-version` holds
+the version. `requires-python` is `>=` that version,
+`tool.ruff.target-version` is `py` plus that version with the dot
+removed, and `tool.mypy.python_version` equals it.
+
+**The ruff version is written once.** The ruff `rev` in the
+canonical `.pre-commit-config.yaml` and the `ruff>=` floor in the
+canonical `pyproject.toml` carry the same version.
 
 `build.one-version-set` · deterministic
 
 > **Why.** The pins are meant to be the latest stable releases, bumped
 > together; that is why a version pinned in two files must agree.
-
-## Every canonical file has a rule, and every rule a file
-
-Every file directly under `standards/build/canonical/` is one a rule of
-this Standard names, and every file a rule of this Standard names is
-directly under `standards/build/canonical/`.
-
-`build.every-canonical-file-has-a-rule-and-every-rule-a-file` · deterministic

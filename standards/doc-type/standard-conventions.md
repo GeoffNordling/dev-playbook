@@ -17,36 +17,38 @@ doc-type binds nobody, so this Standard is what binds the file to that
 encoding. The tree the file sits in is
 [The Standards Tree](/standards/standard/tree.md).
 
-> **Why.** The verifier table reads a rule by its trailer
-> ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)),
-> so a rule without one is a rule no row of that table can name. A
+> **Why.** A check claims a rule by its trailer's id
+> ([Checks](/standards/standard/checks.md)),
+> so a rule without one is a rule no check can name. A
 > verifier, and a reader, must know the class before the first rule,
 > which is what the one frontmatter phrase gives them. And no
-> verifier, script or judge, returns one value for a predicate that
+> verifier, check or judge, returns one value for a predicate that
 > compares two members or asks for taste.
 
 ## The frontmatter names the population
 
-A file typed `Standard` names the population its rules bind in its
-frontmatter: a `population` key holding one phrase.
+A file typed `Standard` has a `population` key in its frontmatter,
+and its value is a string that is not empty.
 
 `doc-type.the-frontmatter-names-the-population` · deterministic
 
-> **Why.** standards-lint reports a Standard without a population. What
-> a detector reports is not part of the predicate, so the clause lives
+> **Why.** A check reports a Standard without a population. What
+> a check reports is not part of the predicate, so the clause lives
 > here.
 
 
 ## A rule: heading, predicate, trailer
 
-Each rule of a Standard is a heading, a first paragraph, at most one
-block or table stating the target state, and last a trailer line,
+In a file typed `Standard`, a rule is an H2 or H3 whose section
+ends with a trailer line,
 `` `<name>.<slug>` · deterministic `` or
-`` `<name>.<slug>` · stochastic ``, where `<name>` is the directory and
-`<slug>` the heading's GitHub slug; after the trailer, before the next
-heading, is at most one block opening `> **Why.**`. A level-three
-heading sits only under a level-two heading that carries no trailer,
-which scopes it.
+`` `<name>.<slug>` · stochastic ``. `<name>` is the first
+directory under `standards/` in the file's path, and `<slug>` is
+the GitHub slug of the heading. Between the heading and the
+trailer there is one paragraph, then any number of paragraphs,
+fenced blocks, blockquotes, lists, or tables. After the trailer,
+before the next heading, there is nothing, or one blockquote that
+starts `> **Why.**`. An H3 is only under an H2 that has no trailer.
 
 `doc-type.a-rule-heading-predicate-trailer` · deterministic
 
@@ -59,9 +61,9 @@ which scopes it.
 
 ## The file's why ends the opening prose
 
-The prose between a Standard's level-one heading and its first
-level-two heading ends with at most one block opening `> **Why.**`:
-the argument for the file as a whole, not for any one of its rules.
+In a file typed `Standard`, the text between the H1 and the first
+H2 has at most one blockquote that starts `> **Why.**`. If it has
+one, that blockquote is the last block before the first H2.
 
 `doc-type.the-files-why-ends-the-opening-prose` · deterministic
 

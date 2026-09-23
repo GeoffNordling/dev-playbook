@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Population and Rules Encoding
-description: The layer below the shape — how a Standard writes its population, its rules, and its conditions so a lint reads them, where the file sits, how it is named, and the catalog that lists it
+description: The layer below the shape — how a Standard writes its population, its rules, and its conditions so a check reads them, where the file sits, how it is named, and the catalog that lists it
 ---
 
 # Population and Rules Encoding
@@ -26,8 +26,8 @@ population: "an authored document, except type: Mirror and the paths in .prose-l
 
 The phrase is double-quoted, since YAML reads an unquoted `: ` as a
 nested key. The prose between the H1 and the first H2 elaborates on
-it, defines the exclusions, and links the neighbors; no lint reads it.
-The rule and its lint are
+it, defines the exclusions, and links the neighbors; no check reads it.
+The rule and its check are
 [The frontmatter names the population](/standards/doc-type/standard-conventions.md#the-frontmatter-names-the-population).
 
 ## Rules
@@ -37,25 +37,25 @@ A rule is a heading; its section is the rule.
 - **The name.** The heading's text, in sentence case, naming the rule:
   `Declarative present tense`, `tests/ present`, `ci.yml`. The slug is
   the heading's GitHub slug, the anchor a link to the section uses and
-  the one ref-lint resolves: inline marks stripped, lowercased, every
+  the one the anchor check resolves: inline marks stripped, lowercased, every
   character outside letters, digits, whitespace, and hyphens dropped,
   each run of whitespace one hyphen (`declarative-present-tense`,
   `tests-present`, `ciyml`, `pre-commit-configyaml`). Slugs are unique
   within a Standard.
 - **The predicate.** Everything between the heading and the trailer:
-  a first paragraph that states the check whole, and after it at most
+  a first paragraph that states the rule whole, and after it at most
   one block or table stating the target state the check compares
   against.
 - **The trailer.** The section's last line,
   `` `<name>.<slug>` · deterministic `` or
   `` `<name>.<slug>` · stochastic ``, `<name>` the directory and
-  `<slug>` the heading's slug: the rule's id and kind, and the key of
-  the verifier table's row.
+  `<slug>` the heading's slug: the rule's id and kind, and the id a
+  check claims the rule by.
 - **The why.** A block after the trailer, opening `> **Why.**` and
   running to the next heading: the argument for the rule, never a
   predicate. A rule may have none.
 
-The rule and its lint are
+The rule and its check are
 [A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
 
 ## Conditions
@@ -71,7 +71,7 @@ is a rule that binds every member. An H2 with H3s beneath it is a
 condition, and its H3s are the rules. There is nothing deeper. The
 reader's map of a long Standard is its `description`, so a heading
 that only groups rules for navigation, `Voice` or `Mechanics`, is
-written as neither: a lint would read it as a condition.
+written as neither: a check would read it as a condition.
 
 ## The document's own why
 
@@ -91,7 +91,7 @@ heuristics in a guide, since each does a second thing
 
 A Standard is `standards/<name>/<topic>.md`, typed `Standard`, in a
 directory that holds at least one such file; the tree's rule is one
-directory, one standard, and the rule and its lint are
+directory, one standard, and the rule and its check are
 [Every subdirectory a Standard directory](/standards/standard/tree.md#every-subdirectory-a-standard-directory). A
 Standard with special cases, the files that add rules for one kind of
 its member, is a directory `standards/<name>/<topic>/` holding the

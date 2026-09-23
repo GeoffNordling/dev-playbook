@@ -21,7 +21,7 @@ the files this skill writes}. Then say `READ: ralph-loop.md` and proceed.
   inherit it, so the plan and progress files must live here and be named with
   relative paths. Ask if it isn't obvious.
 - Keep the default filenames, `PLAN.md` and `PROGRESS.md`; these become
-  the loop's `planFile` and `progressFile`. okf-lint excludes a file with
+  the loop's `planFile` and `progressFile`. The checks exclude a file with
   exactly either name from the bundle, in any directory, so the pair
   needs no frontmatter and no index row. Any other name makes them
   concept documents, and the gate then demands both.
@@ -87,7 +87,57 @@ sense finished.
 Present the chunked plan, its Verify clauses, and its segment boundaries for
 explicit approval — a hard gate: nothing is written until the user approves.
 
-## 5. Determine the check gate and verify loop-ready
+## 5. Weigh what an iteration reads
+
+Every iteration starts cold and reads a chain of files before it works. Each
+line in that chain that the task does not need costs context and pulls the
+agent off its task. Measure the chain for the approved plan and show it to the
+user, before anything is written.
+
+**List the chain.** For each task, list every file its iteration reads, in
+reading order, in three layers:
+
+1. **Loaded before the task.** The global `~/.claude/CLAUDE.md`, every file
+   under `~/.claude/rules/`, the repo's `CLAUDE.md`, and every file those order
+   the agent to read — the standards index the global file names, for one.
+2. **The loop's fixed reads.** The plan file, as the approved plan will write
+   it, and the progress file, as it will stand when this task starts: the
+   skeleton plus one line for each task above it.
+3. **The task's own reads.** Every file the task names, and every file those
+   order the agent to read. Follow a link only where the text says to read it;
+   a link the text only mentions is not in the chain.
+
+Count a file's lines where the iteration reads all of it, and only the named
+section's lines where the task points at a section.
+
+**Classify each line.** Signal is a line the task needs in order to act: the
+specification it implements, a rule it obeys, a fact it would otherwise get
+wrong. Noise is every other line the iteration reads. Classify by what this
+task does, not by whether the file is good: a sound Standard about something
+this task never touches is noise here.
+
+**Report the chain.** Tasks that read the same chain share one table. For each:
+
+    Tasks 1–4
+    file                                   lines   signal   noise
+    ~/.claude/CLAUDE.md                       62        8      54
+    PLAN.md                                  140      120      20
+    standards/build/skeleton.md              210       35     175
+    …
+    total                                   1480      410    1070   72% noise
+
+Name the largest noise sources under each table, in one line each: what the
+file is and why this task does not need it.
+
+**The tripwire.** A chain above one third noise is a signal to redesign: drop a
+file from the task, point the task at a section instead of a whole file, move
+the fact it needs into the plan's Working notes, or split a document. The
+tripwire is soft. The report goes to the user whatever the numbers, and the
+user decides whether to redesign the plan, refactor the documents, or go on as
+it stands. Where the user redesigns, measure the chain again and report it
+again.
+
+## 6. Determine the check gate and verify loop-ready
 
 The loop runs a **check gate** at the start and end of every iteration, and
 raises on a red entry. The gate is loop config passed as the `checkCmd` arg —
@@ -107,7 +157,7 @@ Settle it now, before writing anything:
 If the chosen gate is red, surface it and stop — scaffolding waits on a
 green tree.
 
-## 6. Write the files
+## 7. Write the files
 
 {If the user approved the criteria and the plan, and the gate is green,
 {Write the plan file; instantiate
@@ -131,7 +181,14 @@ into an unreviewed one:
 - at least one marker is present,
 - no unchecked task sits below the last marker.
 
-## 7. Hand off the launch command
+{Commit the plan and progress files, alone}; the checkpoint review takes the
+first segment's commits as everything after this one:
+
+```
+git -C <working-directory> add <plan-file> <progress-file> && git -C <working-directory> commit -m "ralph: plan and progress for <one-line goal>"
+```
+
+## 8. Hand off the launch command
 
 {Report the full launch command for the user to run; never run it yourself}.
 `planFile`, `progressFile`, and `checkCmd` are fixed by this setup; the user
@@ -144,9 +201,11 @@ Workflow({ name: "ralph-loop", args: { model: "<model>", maxIters: <n>, planFile
 `maxIters` is a rail on one segment, not on the run: size it to the longest
 segment plus a little, not to the whole task list.
 
-Then say what happens after the user starts it: the run continues on its own
-to the end of the plan. At each checkpoint the workflow returns to this
-session, [/ralph-checkpoint](~/.claude/skills/ralph-checkpoint/SKILL.md)
-reviews the finished segment in a fork, and this session launches the next
-segment on what the fork found. The user hears from it when the plan is done,
+Then say what happens after the user starts it. At each checkpoint the
+workflow returns to this session, and
+[/ralph-checkpoint](~/.claude/skills/ralph-checkpoint/SKILL.md) has a fresh
+reviewer read the finished segment. Where it finds anything, the user sees
+the count and the top three and rules on them; a fork of this session then
+adapts the plan on that ruling, and this session launches the next segment.
+Apart from those rulings, the user hears from the run when the plan is done,
 or when the loop is blocked and cannot go on.

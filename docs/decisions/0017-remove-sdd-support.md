@@ -34,7 +34,7 @@ spec-tools citations as their worked examples.
 `sdd` build layer, which composed the canonical fragment
 `standards/build/canonical/Makefile.sdd` — a `validate` target running
 `uv run spec-tools validate .`, wired into `check` — with the layer detected,
-composed, and shape-checked by [repo-lint](/scripts/repo-lint) and tabled
+composed, and shape-checked by the structure detector and tabled
 across five build standards.
 
 Retention was not free. Every change to the label scheme, the brief standard,
@@ -88,4 +88,4 @@ reinstatement.
   `tests/unit/` or `tests/integration/` is nonconformant until it flattens.
 - A repo holding `specs/` gets no build layer for it. Its `validate` target, if
   it wants one, is local Makefile business rather than a workspace-canonical
-  fragment, and repo-lint neither expects nor composes it.
+  fragment, and the structure checks neither expect nor compose it.

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Cross-References
-description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, fragment anchors that match a heading's distinct slug, and the link text that names the target
+description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, fragment anchors that match a heading's distinct slug, `#` headings only, and the link text that names the target
 population: "a reference from an authored document to a workspace file, directory, or skill, except inside a code block, fenced or indented, or from inside a numbered Decision Record"
 ---
 
@@ -25,26 +25,34 @@ move; references to a record are checked like any other.
 
 ## Reference resolves
 
-A reference names a file or a directory that exists in the referencing
-file's own repository.
+The target of a reference exists. A `/` target and a
+`~/workspace/<this repo>/` target are read from the checkout root; a
+relative target is read from the linking file's directory. A relative
+target that climbs above the checkout root is not this rule's finding. A
+`~/.claude/<rest>` target is read as `dotfiles/dot-claude/<rest>` where
+the repo tracks that directory, and is not checked where it does not. A
+`~/workspace/<other repo>/` target is read from that repo's main
+checkout on this machine.
 
 `knowledge-organization.reference-resolves` · deterministic
 
 > **Why.** A `~/workspace/<repo>/` target naming another repository
-> resolves against that repo's main checkout. A repo cannot check the
-> other side from its own files, so the predicate binds same-repo
-> targets.
+> resolves against that repo's main checkout, its published state, so
+> the predicate reads it there. That read needs the other repo on the
+> machine, so the check is tagged `workspace`, and a gate without the
+> sibling repos, such as CI, sets `SKIP: workspace`.
 
 ## Fragment anchor matches the slug
 
-A reference that appends `#anchor` to a markdown file names in that
-anchor the GitHub slug of a heading the file carries.
+In a reference to a `.md` file that ends `#anchor`, the anchor is the
+GitHub slug of a heading in that file.
 
 `knowledge-organization.fragment-anchor-matches-the-slug` · deterministic
 
 ## Headings slugify distinctly
 
-No two headings of a markdown file carry the same GitHub slug.
+No two headings in a `.md` file, a numbered Decision Record aside,
+have the same GitHub slug.
 
 `knowledge-organization.headings-slugify-distinctly` · deterministic
 
@@ -53,11 +61,25 @@ No two headings of a markdown file carry the same GitHub slug.
 > breaks the moment the file is reordered, the failure
 > [stable named anchor](#stable-named-anchor) bars.
 
+## ATX headings only
+
+A heading is a line of one to six `#` then a space. Outside a fenced
+code block and outside the frontmatter block, no line made only of
+three or more `=` or `-` sits directly under a line of text.
+
+`knowledge-organization.atx-headings-only` · deterministic
+
+> **Why.** A `---` under a line of text is a heading to one renderer
+> and a divider to another, so the model reads `#` headings only and
+> this rule keeps the two forms apart; a divider has a blank line
+> above it.
+
 ## Stable named anchor
 
-A reference's `#anchor` carries no number that is the heading's
-position in the file; where the target numbers every heading by
-position and carries no other anchor, the reference carries no anchor.
+The `#anchor` of a reference to a `.md` file, or to a heading of the
+same file, does not have the form of a numbered
+heading's slug, a run of digits then a hyphen, such as
+`#3-bundle-structure` or `#223-revision`.
 
 `knowledge-organization.stable-named-anchor` · deterministic
 
@@ -80,9 +102,11 @@ document's title where the heading does not fit the citing sentence.
 
 ## Workspace path for another repo
 
-A reference to a file or directory in a repository other than the
-referencing file's own is an inline link whose target is the full
-workspace path, beginning `~/workspace/<repo>/`.
+A reference to a file or a directory in another repo is a link whose
+target starts `~/workspace/<repo>/`, or `~/.claude/`. A bare
+`~/workspace/<other repo>/`
+path outside a link, and a relative target that goes above the repo
+root, are findings.
 
 `knowledge-organization.workspace-path-for-another-repo` · deterministic
 
@@ -96,7 +120,7 @@ workspace path, beginning `~/workspace/<repo>/`.
 A reference to a skill names it by its slash invocation,
 `/<skill-name>`.
 
-`knowledge-organization.slash-invocation-for-a-skill` · deterministic
+`knowledge-organization.slash-invocation-for-a-skill` · stochastic
 
 ## Fixed repo root
 
@@ -105,9 +129,11 @@ inside the repository is `skills`, `rules`, or `agents`.
 
 ### Root-absolute path in the same repo
 
-A reference to a file or directory in the referencing file's own
-repository is an inline link whose target is a root-absolute path,
-beginning `/` and naming the path from the repository root.
+In a file with a fixed repo root, a reference to a file or a directory
+of the same repo is a link whose target starts `/` and is the path
+from the repo root, or starts `~/.claude/`. A relative target other
+than a same-file `#anchor`, and a `~/workspace/<this repo>/` path as a
+link's target, as a link's text, or bare, are findings.
 
 `knowledge-organization.root-absolute-path-in-the-same-repo` · deterministic
 
@@ -124,9 +150,10 @@ inside the repository is `skills`, `rules`, or `agents`.
 
 ### Workspace path for a stable location
 
-A reference to a file in the referencing file's own repository is an
-inline link whose target is the full `~/workspace/<repo>/<path>` path,
-unless the target is inside the referencing file's own skill bundle.
+In a file with no fixed repo root, a reference to a file of the same
+repo, outside the file's own skill bundle, is a link whose target
+starts `~/workspace/<repo>/`, or `~/.claude/`. A `/` target, and a
+relative target that goes out of the file's own `skills/<name>/` directory, are findings.
 
 `knowledge-organization.workspace-path-for-a-stable-location` · deterministic
 
@@ -137,9 +164,10 @@ unless the target is inside the referencing file's own skill bundle.
 
 ### Relative path inside the bundle
 
-A reference to a file inside the referencing file's own skill bundle, a
-sibling, a file under `references/`, or the parent, is an inline link
-whose target is a path relative to the referencing file.
+In a skill bundle, a reference to another file of the same bundle is
+a link with a relative target. A `/`, `~/workspace/`, or `~/.claude/`
+target that resolves inside the linking file's own `skills/<name>/`
+directory is a finding.
 
 `knowledge-organization.relative-path-inside-the-bundle` · deterministic
 

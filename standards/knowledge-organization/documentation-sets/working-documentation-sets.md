@@ -42,46 +42,56 @@ exemption from
 
 ## Every member reached from `ROOT.md`
 
-Every member of a working documentation set is reached from the set's
-`ROOT.md` by a path of links, a second structure over
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)'s
-tree of sets. A row of an `index.md` that lists the member is not such a
-link.
+Every `.md` file of a working documentation set other than an
+`index.md` is reached from its `ROOT.md` by a chain of links between
+files of the set. A link in an `index.md` is not part of a chain. The
+`ROOT.md` of a file is the one in its own directory or the nearest
+directory above; the `ROOT.md` of a strand is reached from the next
+`ROOT.md` above it.
 
 `knowledge-organization.every-member-reached-from-rootmd` · deterministic
 
+> **Why.** The chain is a second structure over
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)'s
+> tree of sets: an index lists a member, and only a link from the
+> work's own members says where it sits in the work.
+
 ## One directory under `working-docs/`
 
-A working documentation set is one directory under `working-docs/` at
-the repo root, `working-docs/<work>/`, the one
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes, here named and placed: it holds the set's `index.md`, its
-`ROOT.md`, and its members under lowercase kebab-case names, flat or in
-subdirectories, except a member whose kind fixes its name (`README.md`,
-`PROMPT.md`, `SKILL.md`, `CLAUDE.md`, a Python module).
+Every directory directly under `working-docs/` has an `index.md` and a
+`ROOT.md`. Every file under it has a lowercase kebab-case name, such
+as `check-fixes.md`, except `index.md`, `ROOT.md`, `README.md`,
+`PROMPT.md`, `SKILL.md`, `CLAUDE.md`, and a Python module.
 
 `knowledge-organization.one-directory-under-working-docs` · deterministic
 
+> **Why.** The set is the one directory
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+> makes, here named and placed.
+
 ## `working-docs/` holds only sets
 
-`working-docs/` at the repo root, a plain parent to the sets
-[an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
-makes, holds its own `index.md` and the directories of the sets, and
-nothing else.
+`working-docs/` directly has `index.md`, directories, and no other
+file.
 
 `knowledge-organization.working-docs-holds-only-sets` · deterministic
 
+> **Why.** `working-docs/` is a plain parent to the sets
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+> makes.
+
 ## One list of items, state by section
 
-The work of a working documentation set is one list of items, each item
-a bold name and a body beneath it, and an item's state is the section it
-sits in, `Planned` or `Completed`, the one past state a member records
-([current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
-One `Planned` section and one `Completed` section sit together in one
-file: the set's `ROOT.md`, or, where the work splits into strands, the
-`ROOT.md` of each strand.
+In a working documentation set, every `ROOT.md` with no `ROOT.md` in
+a directory below it has exactly one `## Planned` and one
+`## Completed` section, and no other file of the set has either. Each
+bullet directly under them starts with a bold name.
 
 `knowledge-organization.one-list-of-items-state-by-section` · deterministic
+
+> **Why.** An item's state is the section it sits in, and `Completed`
+> is the one past state a member records
+> ([current state and next steps only](/standards/prose/conventions.md#current-state-and-next-steps-only)).
 
 ## Every fact under a named bucket
 

@@ -25,6 +25,6 @@ externally-managed root is added.
 
 Ruff's `extend-exclude` cannot import Python, so it keeps a literal copy of the
 externally-managed root list; a comment names `external.py` as the authority and
-the two are kept in sync by hand. Every other detector — `md.classify`,
-`python-lint`, `testing-lint`, and the new `prose-lint` — reaches the roots only
+the two are kept in sync by hand. Every other detector — `md.classify`
+and the prose checks — reaches the roots only
 through the registry.

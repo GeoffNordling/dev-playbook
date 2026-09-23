@@ -6,20 +6,19 @@
 #   - repo: https://github.com/GeoffNordling/dev-playbook
 #     rev: <commit-sha>
 #     hooks:
-#       - id: playbook-lint
+#       - id: playbook-check
 #
-# playbook-lint dispatches to every detector in its roster
-# (src/dev_playbook/playbook_lint.py), so the manifest never grows and a
-# detector added upstream reaches every consumer at its next pin bump — the
-# consumer config enumerates nothing, and enrollment rides the pin by
-# construction. pre-commit clones this repo into its cache at the pinned rev
-# and runs the hook from there, so resolution is independent of where the
-# consumer repo — or any of its worktrees — sits on disk. See
-# standards/distribution/channel.md.
+# pre-commit installs this package into a venv it caches per pinned rev and
+# runs the console script pyproject.toml declares. `playbook check` runs every
+# check the package registers (src/dev_playbook/checks/), so the manifest never
+# grows and a check added upstream reaches every consumer at its next pin bump
+# — the consumer config enumerates nothing, and enrollment rides the pin by
+# construction. Resolution is independent of where the consumer repo — or any
+# of its worktrees — sits on disk. See standards/distribution/channel.md.
 
-- id: playbook-lint
-  name: playbook-lint
-  entry: scripts/playbook-lint
-  language: script
+- id: playbook-check
+  name: playbook check
+  entry: playbook check
+  language: python
   pass_filenames: false
   always_run: true

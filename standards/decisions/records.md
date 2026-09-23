@@ -36,26 +36,25 @@ were genuine alternatives with a specific reason for the choice.
 
 ## Numbered records, index, README, nothing else
 
-The `docs/decisions/` directory holding a Decision Record holds numbered
-records, one `index.md`, and one `README.md`, and nothing else.
+When `docs/decisions/` has a record, it also has `index.md` and
+`README.md`, and every other entry in it is a file named
+`<digits>-<slug>.md`. It has no other file and no subdirectory.
 
 `decisions.numbered-records-index-readme-nothing-else` · deterministic
 
 ## Four digits from 0001, no gaps or repeats
 
-A Decision Record's filename is `NNNN-slug.md`, where `NNNN` is the
-record's number zero-padded to four digits. The number is `0001` or
-higher, no other record in the directory carries it, and every number
-from `0001` up to the highest number in the directory belongs to a
-record.
+A record's filename is `NNNN-slug.md`, where `NNNN` is its number
+in exactly four digits. Sorted, the numbers in `docs/decisions/`
+are `0001`, `0002`, and on up by one to the highest, each once.
 
 `decisions.four-digits-from-0001-no-gaps-or-repeats` · deterministic
 
 ## Four frontmatter keys, title repeated as H1
 
-A Decision Record's frontmatter holds `type: Decision-Record`, a
-`title`, a `description`, and a `date`; its body opens with an H1
-repeating the `title`.
+A record's frontmatter has `type: Decision-Record` and the keys
+`title`, `description`, and `date`. The first non-blank line after
+the frontmatter is `# ` followed by the `title` value exactly.
 
 ```md
 ---
@@ -81,8 +80,7 @@ the decision itself, and the reason for it.
 
 ## YYYY-MM-DD date or null
 
-A Decision Record's `date` frontmatter key holds a `YYYY-MM-DD` date or
-`null`.
+A record's `date` is a `YYYY-MM-DD` date or `null`.
 
 `decisions.yyyy-mm-dd-date-or-null` · deterministic
 
@@ -91,16 +89,15 @@ A Decision Record's `date` frontmatter key holds a `YYYY-MM-DD` date or
 
 ## Proposed, accepted, deprecated, superseded, or absent
 
-A Decision Record either carries no `status` frontmatter key or carries
-one holding exactly one of `proposed`, `accepted`, `deprecated`, or
-`superseded by NNNN`, where `NNNN` is four digits.
+A record's `status`, if it has one, is `proposed`, `accepted`,
+`deprecated`, or `superseded by NNNN` with `NNNN` four digits.
 
 `decisions.proposed-accepted-deprecated-superseded-or-absent` · deterministic
 
 ## Superseded by a record that exists
 
-A Decision Record whose `status` is `superseded by NNNN` sits in a
-directory that holds a record numbered `NNNN`.
+If a record's `status` is `superseded by NNNN`, `docs/decisions/`
+has a record whose filename starts `NNNN-`.
 
 `decisions.superseded-by-a-record-that-exists` · deterministic
 

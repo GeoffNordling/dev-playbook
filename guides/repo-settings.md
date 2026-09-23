@@ -7,7 +7,7 @@ description: How the GitHub side of a governed repo is set — the origin, the m
 # Repository Settings
 
 How the GitHub side of a governed repo is set, whether you are creating
-the repo or auditing one that exists. The merge settings and the
+the repo or checking one that exists. The merge settings and the
 rulesets both sit behind GitHub's all-or-nothing **Administration**
 permission, too broad to grant for a one-time toggle, so those two are
 set by hand in the browser; the labels are minted by a script. The

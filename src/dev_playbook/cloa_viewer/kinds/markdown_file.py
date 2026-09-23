@@ -89,13 +89,13 @@ def _link(source: str, target: str, tracked: set[str], repo: str) -> Link:
     """One link out: whether it leaves the checkout, lands in it, or breaks.
 
     A Citation of another repo is the status ``citation`` and is never checked:
-    a generator reads one checkout, and ``ref-lint`` already verifies those
+    a generator reads one checkout, and the reference check already verifies those
     targets on disk. A Citation of ``repo`` is a link into this checkout like
     any other, so it scores ``ok`` or ``broken`` by the file it names.
 
     A link out of a numbered Decision Record that names no tracked file is the
     status ``decision-record`` rather than ``broken``. The record is immutable,
-    so the stale reference is accepted staleness, and ``ref-lint`` skips the
+    so the stale reference is accepted staleness, and the reference check skips the
     same file as a source for the same reason: both ask
     ``md.is_decision_record``, so the screen and the check cannot disagree.
     """

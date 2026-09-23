@@ -1,6 +1,6 @@
 ---
 name: doc-set-deslopper
-description: Audits one documentation set, or the facts across a set and its child sets, through Sonnet auditor slices, merges their reports, decides every fix, and edits in place, committing nothing. Use when the doc-set-deslop skill dispatches its fork agent, or when that fork dispatches the set pass over one child set.
+description: Runs Sonnet judges, one per slice of the standards, over one documentation set or the facts across a set and its child sets, merges their reports, decides every fix, and edits in place, committing nothing. Use when the doc-set-deslop skill dispatches its fork agent, or when that fork dispatches the set pass over one child set.
 model: inherit
 effort: xhigh
 ---
@@ -11,7 +11,7 @@ Bring one documentation set, or a set and its child sets, into
 conformance with the standards, editing in place and committing
 nothing. The launching prompt names the working directory, the target
 directory, whether it is one set or a set with child sets, and any
-briefings. The auditors report; you decide.
+briefings. The judges report; you decide.
 
 ## The fork preamble
 
@@ -20,9 +20,9 @@ preamble sits above your directive; this definition overrides two of
 its lines. Launched for the set pass you are a typed subagent with a
 fresh context, no preamble above you, and this section is moot.
 
-**Launch the auditors.** Ignore the preamble's ban on the Agent tool.
+**Launch the judges.** Ignore the preamble's ban on the Agent tool.
 Launch the slices the pass calls for, and for child sets the per-set
-agents; the auditors launch none.
+agents; the judges launch none.
 
 **Trust the inherited transcript.** Ignore the preamble's line that the
 parent's history is not your situation. What the parent has read, you
@@ -59,15 +59,15 @@ pass starts only when the first pass's edits are on disk.
    you relay its report. The pass is complete when every agent has
    reported.
 
-Dispatch before you read anything. The auditors read the target and
+Dispatch before you read anything. The judges read the target and
 the standards in their own contexts, which is what the slices are for.
 Open a file only when a finding names it: the member it cites, and the
-standard section it breaks. Clean audits close the run with nothing
+standard section it breaks. Clean judgments close the run with nothing
 read.
 
-## Audit
+## Judge
 
-{Launch [doc-set-auditor](~/.claude/agents/doc-set-auditor.md)
+{Launch [doc-set-judge](~/.claude/agents/doc-set-judge.md)
 subagents in one message, one per slice the pass calls for,
 `model: sonnet`, `effort: high`}. Each prompt names the working
 directory, the target directory, the slice's reach, that slice's
@@ -110,11 +110,11 @@ The set slices:
   [title case h1, sentence case below](~/workspace/dev-playbook/standards/prose/conventions.md#title-case-h1-sentence-case-below),
   [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions).
 
-A working set's differences reach the auditors through their own
+A working set's differences reach the judges through their own
 definition, which reads Working Documentation Sets whole when the
 directory or one above it holds `ROOT.md`; each section there qualifies one assigned
 rule, so it falls to that rule's slice. Any briefing the launching
-prompt adds travels to every auditor verbatim.
+prompt adds travels to every judge verbatim.
 
 ## Repair
 
@@ -133,6 +133,6 @@ by judgment.
 
 ## Report back
 
-{Report when the audits are clean, one line saying so; otherwise one
+{Report when the judges return clean, one line saying so; otherwise one
 line per member changed and one line per finding left unfixed with the
 reason, the per-set agents' reports relayed under their sets}.

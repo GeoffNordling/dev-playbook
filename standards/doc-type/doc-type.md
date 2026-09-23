@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Doc-Type
-description: What any doc-type satisfies — a ruling and an index row, a verb set, one base class, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
+description: What any doc-type satisfies — a ruling, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
 population: "a doc-type: an immediate subdirectory of doc-types/"
 ---
 
@@ -25,14 +25,14 @@ instances of one doc-type is that doc-type's own Standard's.
 > one Standard covers them, and leaves the rest to it. A rule that
 > reads the pseudocode in `contract-shape.md` or the prose in
 > `definition.md`, never parsed as Python, is stochastic, a judge's
-> prompt; a rule that reads a table or a class header a script parses,
-> as Registered and One base do, is deterministic.
+> prompt; a rule that reads a table a script parses, as Registered
+> does, is deterministic.
 
 ## Registered
 
-The doc-type is the ruling of at least one row of the registry rulings
-table in [Doc-Type System](/doc-types/doc-type-system.md#registry-rulings),
-and its directory is a row of [doc-types/index.md](/doc-types/index.md).
+The table under `## Registry rulings` in
+`doc-types/doc-type-system.md` has a row whose Ruling cell links to
+a file in `doc-types/<name>/`.
 
 `doc-type.registered` · deterministic
 
@@ -52,18 +52,6 @@ same set.
 
 > **Why.** The verbs are the doc-type's API. Two doc-types may share a
 > verb; the Standard says so by having no rule against it.
-
-## One base class
-
-`contract-shape.md` holds one class that extends `DocType`, declaring
-`operations` and `frontmatter`; every other class in its block is
-nested inside that one, extends nothing, and declares no operations.
-
-`doc-type.one-base-class` · deterministic
-
-> **Why.** One class per doc-type keeps the blocks a module a reader
-> holds in mind; a part is a class nested in its DocType, so that a
-> Rule or an Edge is never mistaken for a doc-type.
 
 ## What an instance may point at
 

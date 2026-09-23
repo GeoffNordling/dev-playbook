@@ -1,17 +1,26 @@
-"""Behavioral tests for scripts/loop-lint.
+"""Behavioral tests for src/dev_playbook/loop_lint.py, the step playbook check runs.
 
-loop-lint walks a repo's markdown files once, keeps the ones under loops/ typed
+loop_lint walks a repo's markdown files once, keeps the ones under loops/ typed
 Loop, and checks each one's Mermaid graph against the verb sections around it
 under the five Loop Conventions rules. Discovery goes through `git ls-files`,
 so every fixture is a git repo; a directory (repo root) is the only positional
-argument. The shim declares pyyaml via PEP 723, so it is invoked the way
-pre-commit runs it: `uv run --script`.
+argument.
 """
 
 import subprocess
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from pathlib import Path
+from typing import NamedTuple
 
-SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "loop-lint"
+from dev_playbook import loop_lint
+
+
+class Result(NamedTuple):
+    returncode: int
+    stdout: str
+    stderr: str
+
 
 RUNBOOK = "---\nname: tidy\ndescription: Tidies\n---\n\nTidy the tree.\n"
 STANDARD = (
@@ -41,7 +50,7 @@ flowchart LR
 
 - `tidy` — [tidy](/skills/tidy.md), fires every iteration.
 
-## Checks
+## Verifications
 
 - `flat` — [Tidy Tree](/standards/tidy/tree.md), fires every
   iteration.
@@ -52,12 +61,11 @@ flowchart LR
 """
 
 
-def run(repo: Path) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        ["uv", "run", "--script", str(SCRIPT), str(repo)],
-        capture_output=True,
-        text=True,
-    )
+def run(*argv: str | Path) -> Result:
+    out, err = StringIO(), StringIO()
+    with redirect_stdout(out), redirect_stderr(err):
+        code = loop_lint.main([str(arg) for arg in argv])
+    return Result(code, out.getvalue(), err.getvalue())
 
 
 def make_repo(tmp_path: Path, loop: str | None = LOOP) -> Path:
@@ -100,8 +108,8 @@ def test_a_node_with_no_entry_fails(tmp_path: Path) -> None:
 
 def test_an_entry_with_no_node_fails(tmp_path: Path) -> None:
     loop = LOOP.replace(
-        "## Checks\n",
-        "## Checks\n\n- `ghost` — [Tidy Tree](/standards/tidy/tree.md), fires every iteration.\n",
+        "## Verifications\n",
+        "## Verifications\n\n- `ghost` — [Tidy Tree](/standards/tidy/tree.md), fires every iteration.\n",
     )
 
     result = run(make_repo(tmp_path, loop))
@@ -123,7 +131,7 @@ def test_an_edge_the_shape_does_not_allow_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "doc-type.edges-lead-to-steps edge `flat` → `user` is check → receiver"
+        "doc-type.edges-lead-to-steps edge `flat` → `user` is verification → receiver"
         in result.stdout
     )
 
@@ -137,7 +145,7 @@ def test_a_check_that_links_a_file_not_typed_standard_fails(tmp_path: Path) -> N
 
     assert result.returncode == 1
     assert "doc-type.every-entry-states-its-condition" in result.stdout
-    assert "a check links a file typed Standard" in result.stdout
+    assert "a verification links a file typed Standard" in result.stdout
 
 
 def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
@@ -165,13 +173,13 @@ def test_a_yield_with_no_condition_fails(tmp_path: Path) -> None:
 
 
 def test_verb_sections_out_of_order_fail(tmp_path: Path) -> None:
-    loop = LOOP.replace("## Checks", "## Measures")
+    loop = LOOP.replace("## Verifications", "## Measures")
 
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
     assert (
-        "doc-type.acts-checks-and-yields-in-that-order verb sections are"
+        "doc-type.acts-verifications-and-yields-in-that-order verb sections are"
         in result.stdout
     )
 
@@ -199,15 +207,11 @@ def test_a_repo_with_no_loops_tree_is_clean(tmp_path: Path) -> None:
 
 
 def test_list_rules_prints_the_five_rule_ids() -> None:
-    result = subprocess.run(
-        ["uv", "run", "--script", str(SCRIPT), "--list-rules"],
-        capture_output=True,
-        text=True,
-    )
+    result = run("--list-rules")
 
     assert result.returncode == 0
     assert result.stdout.split() == [
-        "doc-type.acts-checks-and-yields-in-that-order",
+        "doc-type.acts-verifications-and-yields-in-that-order",
         "doc-type.edges-lead-to-steps",
         "doc-type.every-entry-states-its-condition",
         "doc-type.nodes-and-entries-agree",

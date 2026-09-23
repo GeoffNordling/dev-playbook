@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Synthesis Working Root
-description: The root of the unified working set — four strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
+description: The root of the unified working set — five strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
 ---
 
 # Synthesis Working Root
@@ -10,7 +10,7 @@ This set is speculative: every member writes a guess as a guess, and
 every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
 `worktree-cloa-viewer-tool-2`, which describe one theory. The set is
-four strands, each with its own root and its own worklist
+five strands, each with its own root and its own worklist
 ([One list of items, state by section](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-list-of-items-state-by-section)).
 This root holds only what crosses strands.
 
@@ -27,32 +27,38 @@ This root holds only what crosses strands.
 - **Viewer**, a selection on screen: cloa-viewer, the local visual IDE
   that draws registered views of the fact base. Root:
   [CLOA Viewer](/working-docs/doc-type-system/viewer/ROOT.md).
+- **Story-forge simulation**, the trial: the doc-type system and the
+  fact base tried by hand on one consumer repo before any extractor is
+  coded. Root:
+  [Story-Forge Simulation](/working-docs/doc-type-system/story-forge-simulation/ROOT.md).
 
-## The four strands
+## The five strands
 
 A dependency is what one strand's plan needs from another's, never a
-runtime data flow. There are three: the doc-type system defines Loop,
-one of its three doc-types; each encoding the doc-type system writes
+runtime data flow. There are five: the doc-type system defines Loop,
+one of its four doc-types; each encoding the doc-type system writes
 defines an extractor of the fact base; every view the viewer draws is
-a selection of the fact base. Loop is a leaf.
+a selection of the fact base; the story-forge simulation
+takes its language from the doc-type system and its method from the
+fact base. Loop and the simulation are leaves.
 
 ```
                             ROOT.md#terms
-                      one meaning per word, all four
+                      one meaning per word, all five
                                   │
   ┌───────────────────────────────┴────────────────────────────────┐
   │  DOC-TYPE SYSTEM · the language                                │
   │  picture ······· reference-model.md                            │
   │  predicates ···· standards/doc-type/doc-type.md                │
-  │  method ········ writing-predicates.md                         │
+  │  method ········ guides/writing-predicates.md                  │
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │
-  │  plan: refactor steps 1–10 · banned words · /write-predicates │
+  │  plan: refactor steps 1–10 · banned words                      │
   │        · first instance, a loop that proposes predicates       │
   └────────────┬──────────────────────────────────┬────────────────┘
   Loop is one  │                                  │  each encoding
-  of its three │                                  │  defines an
+  of its four  │                                  │  defines an
   doc-types    ▼                                  ▼  extractor
   ┌────────────────────────────┐   ┌──────────────────────────────┐
   │  LOOP · the driver         │   │  FACT BASE · the compiled    │
@@ -62,11 +68,11 @@ a selection of the fact base. Loop is a leaf.
   │     · specifying-a-loop.md │   │      ralph.md · ralph.json   │
   │                            │   │  planned view                │
   │  drained · doc-types/loop/ │   │     · deterministic-         │
-  │     · loop-lint · loops/   │   │       separation.md          │
+  │     · loop_lint · loops/   │   │       separation.md          │
   │  plan: the objective part, │   │  plan: simulations by hand · │
   │        if any · its use by │   │   extractors chain, standard,│
   │        the two loops above │   │   loop · verifier table and  │
-  │        and right           │   │   boundary config as declared│
+  │        and right           │   │   gate config as declared    │
   └────────────────────────────┘   │   data · findings as a       │
                                    │   stamped artifact · the     │
                                    │   simulation as a loop       │
@@ -76,6 +82,7 @@ a selection of the fact base. Loop is a leaf.
                                    │  VIEWER                      │
                                    │  root ······· ROOT.md        │
                                    │  on disk ···· contract.md    │
+                                   │                              │
                                    │  kinds ······ registry.md    │
                                    │  panels ····· design.md ·    │
                                    │               viewer.md      │
@@ -132,7 +139,7 @@ the seed of the system's eventual context file.
 
 ### Verification
 
-- **Verifier** — what decides a rule for a member. A script for a
+- **Verifier** — per [CONTEXT.md](/CONTEXT.md#governance): what decides a rule for a member. A check for a
   deterministic rule, a judge for a stochastic one.
 - **Deterministic rule** — its verifier is a function. Same input,
   same answer. Hard set membership.
@@ -143,14 +150,13 @@ the seed of the system's eventual context file.
   decides it.
 - **Finding** — one member and the rule it fails. Evidence that the
   state is outside the set. What a loop carries from one step to the
-  next: a check ([Loop](/doc-types/loop/definition.md)) returns
+  next: a verification ([Loop](/doc-types/loop/definition.md)) returns
   findings and the acts read them.
-- **Audit** — per [CONTEXT.md](/CONTEXT.md#governance): here, an
-  evaluation of a spec against a state that returns the findings.
-  Zero findings means the state is in the set, up to judge error.
-- **Gate** — per [CONTEXT.md](/CONTEXT.md#governance): a boundary on
-  the path to main that blocks on an audit's findings. A loop's check
-  audits and never gates.
+- **Zero findings** — every verifier of a spec, run against a state,
+  returns nothing: the state is in the set, up to judge error.
+- **Gate** — per [CONTEXT.md](/CONTEXT.md#governance): pre-commit,
+  pre-push, or CI, blocking on its checks' findings. A loop's
+  verification runs verifiers and never gates.
 
 ### Extraction
 
@@ -201,7 +207,7 @@ the seed of the system's eventual context file.
   in the set or when a yield's condition holds first. Each sample
   starts from the last, with its findings in the prompt, so the
   samples are not independent: the trajectory is a path through state
-  space. Check audits the sample, act draws the next one, yield exits
+  space. Verify tests the sample, act draws the next one, yield exits
   to the user or another loop.
 
 Logic and statistics meet at one seam. Predicates define a set, with
@@ -218,7 +224,7 @@ rules decide it with an error rate.
 - **Whether every condition is a Rule.** A runbook edge's and a loop
   step's condition are strings; a Standard rule's condition is a
   reference to another rule. Option: every condition is a Rule with a
-  kind, so all three unify and the fact base gets one guarded-by edge.
+  kind, so all three unify and the fact base gets one condition edge.
   Cost: runbook prose conditions would need ids. Crosses the doc-type
   system and the fact base.
 - **Whether one solver or two.** Mypy over the pseudocode, an engine

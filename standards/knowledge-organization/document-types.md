@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Document Types
-description: The frontmatter profile every concept document carries — a registered type, a title, a description, and a resource where an asset backs the document
+description: The frontmatter profile every concept document carries — a registered type, a title, a description, a resource where an asset backs the document, and the README type on a README.md alone
 population: "a concept document"
 ---
 
@@ -44,7 +44,7 @@ frontmatter of the repo's own root `index.md`
 | `Mirror` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
 | `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
 | `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
-| `Standard` | One population and its rules, a normative target a reviewer or linter could cite to reject work; lives under `standards/<name>/`, the one tree reserved for it, one directory per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
+| `Standard` | One population and its rules, a normative target a reviewer or check could cite to reject work; lives under `standards/<name>/`, the one tree reserved for it, one directory per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
 
@@ -121,3 +121,10 @@ A concept document typed `Loop` lives under `loops/`.
 A concept document typed `Guide` lives under `guides/`.
 
 `knowledge-organization.guide-lives-under-guides` · deterministic
+
+## `README.md` is typed `README`
+
+A concept document named `README.md` has `type: README`, and a concept
+document of any other name does not.
+
+`knowledge-organization.readmemd-is-typed-readme` · deterministic

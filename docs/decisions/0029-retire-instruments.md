@@ -34,7 +34,7 @@ device, a reading per run, and a consumer that must name itself does not.
 
 ## Consequences
 
-- okf-lint loses one rule, `instrument.employed-by`, and the registry loses
+- The document-type detector loses one rule, `instrument.employed-by`, and the registry loses
   the type it fired on; a consumer repo that typed a document
   `Instrument-Spec` is flagged for an unregistered type once it takes this
   revision.

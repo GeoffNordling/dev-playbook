@@ -24,7 +24,7 @@ on the same GitHub tail and roster enrollment.
    [canonical artifacts](/standards/build/canonical.md), pinning the
    hook `rev` at dev-playbook's `origin/main` as of init time, then runs
    `git init -b main` and `uv lock`, stages everything, installs both
-   pre-commit stages, and self-checks the result with `playbook-lint` —
+   pre-commit stages, and self-checks the result with `playbook check` —
    the same hook it just installed, so a scaffold that would fail its
    own first commit never reaches the user. It fails loud when the target
    directory already exists or the self-check reports findings.
@@ -51,7 +51,7 @@ standard, in this order:
    repo-specific content beyond them.
 4. **Install the gate.** `uvx pre-commit install` — the canonical config
    declares both stages.
-5. **Lint to green.** Run dev-playbook's [`repo-lint`](/scripts/repo-lint)
+5. **Check to green.** Run dev-playbook's `playbook check`
    over the repo; the findings are the worklist, and each rule's define doc
    is the fix's authority. Forbidden files get explicit dispositions —
    `ROADMAP.md` and kin become `CANDIDATES.md` entries or issues
@@ -76,7 +76,7 @@ Both paths finish on GitHub, in order:
    `.github/workflows/ci.yml` and a push that adds a workflow file is
    rejected without it.
 2. **Run `bootstrap-labels`.**
-   `~/workspace/dev-playbook/scripts/bootstrap-labels` — enforce the
+   `~/workspace/dev-playbook/scripts/bootstrap-labels` — apply the
    canonical label scheme.
 3. **Set the merge and protection settings.** Set the merge settings and
    the default-branch protection ruleset by hand, per
@@ -89,5 +89,5 @@ Both paths finish on GitHub, in order:
    `GOVERNED` roster — a dev-playbook edit, made only once the repo is
    green. Inclusion is declared, never inferred from the directory listing
    ([Distribution Channel](/standards/distribution/channel.md));
-   until enrolled, the repo is not audited and its pin drift never
+   until enrolled, the repo is not checked and its pin drift never
    reported.

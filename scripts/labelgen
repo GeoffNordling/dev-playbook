@@ -38,6 +38,7 @@ def rendered(text: str) -> str:
 
 
 def main(argv: list[str]) -> int:
+    """Rewrite the table, or with ``--check`` report drift; return the exit code."""
     have = DOC.read_text(encoding="utf-8")
     want = rendered(have)
     if argv == ["--check"]:

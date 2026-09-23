@@ -1,16 +1,16 @@
-"""The deslop audit assignments stay in lockstep with the standards they slice.
+"""The deslop judge assignments stay in lockstep with the standards they slice.
 
-The doc-set-deslopper agent divides two standards among six auditors
+The doc-set-deslopper agent divides two standards among six judges
 by citing section anchors; the third, Working Documentation Sets, the
-auditor reads whole when the set's directory holds ROOT.md, filing each
+judge reads whole when the set's directory holds ROOT.md, filing each
 section under the slice of the general rule it cites. Two drifts can
 silently break the division:
 
-  - a section added to a standard that no auditor is assigned — the new
-    rule is never audited;
+  - a section added to a standard that no judge is assigned — the new
+    rule is never judged;
   - an assignment citing a section that was renamed or removed — the
-    auditor is sent to a rule that no longer exists (ref-lint also fails
-    this at the commit gate; asserted here so the whole contract lives in
+    judge is sent to a rule that no longer exists (the anchor check also
+    fails this at the commit gate; asserted here so the whole contract lives in
     one test).
 
 A rule heading is a *leaf* ATX heading below H1 — one with no subheadings
@@ -27,7 +27,7 @@ from dev_playbook.md import content_lines, github_slug
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-deslopper.md"
-AUDITOR = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-auditor.md"
+JUDGE = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-judge.md"
 WORKING_SETS = (
     REPO_ROOT
     / "standards/knowledge-organization/documentation-sets/working-documentation-sets.md"
@@ -43,10 +43,11 @@ EXEMPT: dict[Path, frozenset[str]] = {
             # A set member is always a declarative document, never
             # harness-loaded, so this voice rule never binds it.
             "no-first-person",
-            # prose-lint enforces these deterministically.
+            # The prose checks decide these deterministically.
             "judgment-not-judgement",
             "no-banned-word",
             "no-word-the-repo-bans",
+            "the-vocabulary-file-is-well-formed",
             "the-person-is-the-user",
         }
     ),
@@ -86,7 +87,7 @@ def test_every_rule_heading_is_assigned_or_exempt() -> None:
     for standard, exempt in EXEMPT.items():
         uncovered = leaf_slugs(standard) - assigned_slugs(standard) - exempt
         assert not uncovered, (
-            f"{standard.name} headings no auditor is assigned: {sorted(uncovered)} — "
+            f"{standard.name} headings no judge is assigned: {sorted(uncovered)} — "
             f"assign them in {DESLOPPER.name} or add them to EXEMPT with a reason"
         )
 
@@ -109,12 +110,12 @@ def test_exemptions_name_real_headings() -> None:
 
 
 def test_working_set_rules_are_read_whole() -> None:
-    """The auditor reads Working Documentation Sets whole, so nothing is sliced
+    """The judge reads Working Documentation Sets whole, so nothing is sliced
     there; the one thing that can drift is the link itself."""
     link = "~/workspace/dev-playbook/" + str(WORKING_SETS.relative_to(REPO_ROOT))
-    assert any(link in line for _, line in content_lines(AUDITOR)), (
-        f"{AUDITOR.name} no longer reads {WORKING_SETS.name}; a working set's "
-        "further rules reach no auditor"
+    assert any(link in line for _, line in content_lines(JUDGE)), (
+        f"{JUDGE.name} no longer reads {WORKING_SETS.name}; a working set's "
+        "further rules reach no judge"
     )
 
 
@@ -135,7 +136,7 @@ def leaf_sections(standard: Path) -> dict[str, list[str]]:
 
 
 def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
-    """The auditor routes a working-set section to the slice that owns the
+    """The judge routes a working-set section to the slice that owns the
     general rule it qualifies, so every section must cite one such rule by
     anchor, and that anchor must be one the deslopper assigns."""
     assigned = {
@@ -152,5 +153,5 @@ def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
         }
         assert cited, (
             f"{WORKING_SETS.name}#{slug} cites no rule the deslopper assigns; "
-            "an auditor has no slice to file it under"
+            "an judge has no slice to file it under"
         )

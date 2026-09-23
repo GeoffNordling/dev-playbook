@@ -33,10 +33,11 @@ A repo's `CONTEXT.md` has a `## Language` section.
 
 ## Term, definition, Avoid line
 
-An entry under `## Language` in a repo's `CONTEXT.md` is the term in
-bold on its own line, its definition on the lines beneath, and, at
-most, one final `_Avoid_:` line naming the words retired in the term's
-favor.
+Under `## Language` in `CONTEXT.md`, a paragraph whose first line
+starts `**` is an entry. Its first line is only the term in bold. One
+or more definition lines follow. A line that starts `_Avoid_:` is at
+most one, is the last line of the entry, and is never outside an
+entry.
 
 ````md
 ---

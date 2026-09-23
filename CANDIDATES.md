@@ -18,30 +18,17 @@ description: Uncommitted future work — described, not yet promoted to issues
 - **Skill mirror check** — the Harness card once claimed a
   `harness.skill-mirror` check that an authored skill under
   `dotfiles/dot-claude/skills/` matches its installed copy under
-  `~/.claude/skills/`; no detector ever emitted it. Stow makes the two one
+  `~/.claude/skills/`; no check ever emitted it. Stow makes the two one
   tree, so the check is whether every link resolves and no stray copy sits
   beside it.
 - **Slug a code span the way GitHub does** — `github_slug` in
   `src/dev_playbook/md.py` strips backticks before emphasis, so a heading
   holding `__init__` slugs to `initpy` where GitHub keeps the underscores.
-  Protect code spans first, then run ref-lint over every anchor in the tree
+  Protect code spans first, then run the anchor check over every anchor in the tree
   to see which ones the fix moves.
 
 ## Doc-type system
 
-- **The registry pass's remaining rows** — the rulings table in
-  [Doc-Type System](/doc-types/doc-type-system.md) reads *pending* on every
-  kind but Standard, Runbook, Guide, and Vocabulary; each is
-  ruled, and a thin doc-type built where the ruling says so. Log and Survey
-  are the user's: at the last count Log had 35 files (story-forge 31, of
-  which 27 are tooled Assessment Records; mission-control 3;
-  sysadmin-playbook 1) and Survey had 5 (idea-tree 2, sounds 1, media-tools
-  1, one stray worktree).
-- **The doc-type build loop over Guides** — Guide has no doc-type. Run the loop there, new doc-types as peers of Standard and Runbook, possibly more than
-  one level; with Standard and Runbook as exemplars, Fable proposes the
-  abstractions, the user accepts, rejects, and steers, and the instruction
-  states the constraints outright, above all that every CLOA object is 100%
-  deterministic.
 - **General-Sheet's replacement** — the deliberately-broad placeholder type
   is replaced, and the type working-set files carry is settled with it.
 - **The doc-type family's own type** — the files under `doc-types/` carry
@@ -52,7 +39,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   reality disagree; the prototype parser `chaingen` is deleted, kept in
   git history at commit `b266ce4`, and the fact base's `chain` extractor
   is its planned successor.
-  The same work settles runbook shadowing: a lint parallel to
+  The same work settles runbook shadowing: a check parallel to
   `standard.no-shadowing`, and a home for the no-shadowing rule,
   which sits in the Standard definition's Scope today. Hierarchical
   imports across repositories are the mechanism under both.
@@ -70,22 +57,22 @@ description: Uncommitted future work — described, not yet promoted to issues
 
 ## Documentation quality
 
-- **Markdown complexity detectors** — static analyzers for markdown, exactly
+- **Markdown complexity checks** — static analyzers for markdown, exactly
   as code has them, 100% deterministic: size, line count, headings and their
-  depth, and the cross-reference complexity the already-linted link graph
+  depth, and the cross-reference complexity the already-checked link graph
   makes extractable. Reports before gates, since a report points at hot
   spots even where it produces no understanding; the prediction is that the
   software factory tops the list.
-- **Duplication detectors** — the document twin of complexity: find the same
+- **Duplication checks** — the document twin of complexity: find the same
   content or vocabulary declared in more than one place and reduce it. The
   grammar triplication, three files declaring one vocabulary and caught only
   by hand, is the case study.
-- **Concern counting** — an audit trigger on significant change to a
+- **Concern counting** — a judge triggered by significant change to a
   document that forces the question of how many concerns the file now
   holds. No static analyzer can count concerns, and pointing an agent at
   every document is too expensive.
-- **Doc linters, re-aimed** — the existing linters check that certain
-  headings are present; decide what is worth linting for and design toward
+- **Doc checks, re-aimed** — the existing checks test that certain
+  headings are present; decide what is worth checking for and design toward
   that.
 - **Deslop regression gate** — something that keeps a rewritten document
   from sliding back into slop. Deterministic rules cannot judge prose
@@ -96,10 +83,6 @@ description: Uncommitted future work — described, not yet promoted to issues
   not accrete unexamined.
 - **CLOA change discipline** — the same discipline for every term used in a
   CLOA communication.
-- **The document-writing flywheel** — each major document the AI writes
-  takes several corrective passes before it reads well; every pass is a
-  chance to codify rules, procedures, and algorithms for writing the next
-  one correctly, and no flywheel exists today.
 - **OKF traces** — "OKF trace" has no definition; decide whether a
   trace is the chain or something more.
 
@@ -112,7 +95,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   A **gray module** is one whose tests the user understands and which pass;
   that is an approximate understanding of the code beneath, and the
   campaign refactors what the reports condemn.
-  - **ruff `C901`** — over-complex functions fail lint; no new dependency.
+  - **ruff `C901`** — over-complex functions fail `ruff check`; no new dependency.
   - **mypy, tightened** — exact flags undecided, not necessarily full
     `--strict`.
   - **import-linter** — a declared contract over module dependencies,
@@ -138,5 +121,5 @@ description: Uncommitted future work — described, not yet promoted to issues
   worth shoehorning in.
 - **Mermaid sequence diagrams** — cheap to generate when tracing one
   operation.
-- **coverage.py as a detector** — not a percentage: uncovered code is code
+- **coverage.py as a check** — not a percentage: uncovered code is code
   nothing forces to be correct.

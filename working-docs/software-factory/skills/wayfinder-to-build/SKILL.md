@@ -38,7 +38,7 @@ the map:
   later, every child brief — carry everything their reader needs in their own
   text.
 - **Resolutions are linked as provenance.** "Per the
-  [Deviation regime resolution](…)" lets an auditor walk backwards to the
+  `[Deviation regime resolution](…)`" lets an auditor walk backwards to the
   why; the link is bookkeeping.
 - **Divergence is declared inline where it happens** — "*(adapted from the
   resolution's push-the-branch step: build agents cannot push)*".
@@ -101,11 +101,11 @@ A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
 tying the two at a glance. Label it `category:*` **only**. {Read
-[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#outcome-and-decomposition-rationale)}
+[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#no-child-list)}
 and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the
-  [<map name>](url)"), then states the end state in prose that stands alone.
+  `[<map name>](url)`"), then states the end state in prose that stands alone.
 - **Decomposition rationale** — the slicing decision and its ordering
   reasons, standalone, with the resolutions that informed it linked as
   provenance.

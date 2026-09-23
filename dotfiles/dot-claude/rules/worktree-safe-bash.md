@@ -6,7 +6,7 @@ not `git` appears in the call. The refused shapes:
 
 - a loop variable as the command: `for l in …; do scripts/$l; done`,
   `… | while read l; do scripts/$l; done`
-- command substitution as the command: `$(echo scripts/okf-lint)`
+- command substitution as the command: `$(echo scripts/labelgen)`
 - `eval`
 - `xargs` building a command: `… | xargs -I{} scripts/{}`
 
@@ -16,12 +16,12 @@ same call; a loop or subshell whose body names its commands literally.
 
 Wrong:
 
-    for l in okf-lint ref-lint repo-lint; do scripts/$l; done
+    for l in bump-pin workspace-lint labelgen; do scripts/$l; done
 
 Right:
 
-    scripts/okf-lint; scripts/ref-lint; scripts/repo-lint
+    scripts/bump-pin; scripts/workspace-lint; scripts/labelgen
 
 The loop saves nothing: the literal chain is the same length and runs.
 Where a repo has one entry point for the whole set, dev-playbook's
-`scripts/playbook-lint` for every commit-gate detector, call that.
+`uv run playbook check` for every commit-gate check, call that.

@@ -58,12 +58,12 @@ from dev_playbook import gitrepo, md
 from dev_playbook.findings import print_rules, render
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
 
-# Every rule id this detector can emit. Repo-settings drift, reachability, and
+# Every rule id this command can emit. Repo-settings drift, reachability, and
 # the live-repo tracking checks (label scheme, leaf labels and headings, epic
 # labels, wayfinder labels and body) answer the tracking Standards. Each id is a
 # module-level constant so every emission site references the constant, never a
 # raw literal, and RULES (what --list-rules prints) cannot drift from what the
-# detector actually emits.
+# command actually emits.
 SQUASH_ONLY_MERGES = "tracking.squash-only-merges"
 DEFAULT_BRANCH_PROTECTION = (
     "tracking.default-branch-protected-from-destructive-operations"
@@ -1186,7 +1186,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--list-rules",
         action="store_true",
-        help="print the rule ids this detector can emit, one per line, and exit",
+        help="print the rule ids this command can emit, one per line, and exit",
     )
     parser.add_argument(
         "--settings-only",

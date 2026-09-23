@@ -1,19 +1,19 @@
 """Check every Loop's Mermaid graph against the prose around it.
 
-loop-lint is the detector behind Loop Conventions
+loop-lint holds the checks of Loop Conventions
 (standards/doc-type/loop-conventions.md), the Standard that
 binds a document typed ``Loop`` to the Loop doc-type's encoding
 (doc-types/loop/encoding.md). It walks a repo's markdown files once (via
 dev_playbook.md.find_md_files, so gitignore-aware and worktree-scoped),
 keeps the files under ``loops/`` typed ``Loop``, and reads each one the
 way the encoding cuts it: one paragraph, one fenced ``mermaid`` flowchart,
-then three H2s, ``Acts``, ``Checks``, ``Yields``, each a list with one entry
+then three H2s, ``Acts``, ``Verifications``, ``Yields``, each a list with one entry
 per node, ``- `id` — <link>, fires when … / yields when …``. A node under
 no heading is a receiver, the user or another loop a yield hands control
 to. Five rules:
 
   - **loop-graph** — one paragraph before one ``mermaid`` flowchart the
-    detector can read; nothing else before the graph.
+    check can read; nothing else before the graph.
   - **loop-sections** — the three verb H2s, in order, and nothing else
     after the graph; every list line is an entry with a backticked node
     id, each id once.
@@ -21,15 +21,15 @@ to. Five rules:
     entry or is a receiver some yield leads to.
   - **loop-edges** — a step leads to a step; only a yield leads to a
     receiver; a receiver leads to a step.
-  - **loop-entries** — an act links a file; a check links a file typed
+  - **loop-entries** — an act links a file; a verification links a file typed
     ``Standard``; a yield names the user or links a Loop; every entry
     states its condition.
 
-The detector stops at a file's first disagreement, since each rule reads
+The run stops at a file's first disagreement, since each rule reads
 the cut the one before it made, and goes on to the next file. It writes
 nothing: a Loop's view is the graph GitHub renders. A repo with no
 ``loops/`` tree is clean by construction, the optional-surface shape
-(standards/standard/detectors.md).
+(standards/standard/checks.md).
 
 Output:
     stdout — one finding per line, ``file: doc-type.loop-… message``.
@@ -50,11 +50,11 @@ from pathlib import Path
 from dev_playbook import md
 from dev_playbook.findings import print_rules, render
 
-# Every rule id this detector can emit, namespaced by the card whose question
+# Every rule id this module can emit, namespaced by the card whose question
 # it answers. Each is a module-level constant so RULES cannot drift from what
-# the detector emits.
+# the module emits.
 ONE_GRAPH = "doc-type.one-paragraph-then-one-graph"
-THREE_VERB_SECTIONS = "doc-type.acts-checks-and-yields-in-that-order"
+THREE_VERB_SECTIONS = "doc-type.acts-verifications-and-yields-in-that-order"
 NODES_AND_ENTRIES_AGREE = "doc-type.nodes-and-entries-agree"
 EDGES_FOLLOW_THE_SHAPE = "doc-type.edges-lead-to-steps"
 ENTRIES_POINT_AND_CONDITION = "doc-type.every-entry-states-its-condition"
@@ -70,20 +70,20 @@ RULES = (
 LOOPS_DIR = "loops"
 LOOP_TYPE = "Loop"
 STANDARD_TYPE = "Standard"
-VERBS = ("Acts", "Checks", "Yields")
-VERB_OF = {"Acts": "act", "Checks": "check", "Yields": "yield"}
+VERBS = ("Acts", "Verifications", "Yields")
+VERB_OF = {"Acts": "act", "Verifications": "verification", "Yields": "yield"}
 RECEIVER = "receiver"
 # What each kind of node may lead to. A receiver is a node under no heading.
-STEPS = {"act", "check", "yield"}
+STEPS = {"act", "verification", "yield"}
 MAY_LEAD_TO = {
     "act": STEPS,
-    "check": STEPS,
+    "verification": STEPS,
     "yield": STEPS | {RECEIVER},
     RECEIVER: STEPS,
 }
 CONDITION_OF = {
     "act": ("fires when", "fires every iteration"),
-    "check": ("fires when", "fires every iteration"),
+    "verification": ("fires when", "fires every iteration"),
     "yield": ("yields when",),
 }
 
@@ -101,7 +101,7 @@ NODE_RE = re.compile(
 )
 # An arrow between two node terms, with an optional |label|.
 ARROW_RE = re.compile(r"\s*(?:-->|-\.->|==>|---|-\.-|===)(?:\|[^|]*\|)?\s*")
-# Statements that draw nothing the detector reads.
+# Statements that draw nothing the check reads.
 DIRECTIVE_RE = re.compile(
     r"^(%%|subgraph\b|end$|direction\b|classDef\b|class\b|style\b|linkStyle\b)"
 )
@@ -307,10 +307,10 @@ def check_entry(node: str, verb: str, rest: str, loop_path: Path, root: Path) ->
         what = "runbook" if verb == "act" else "Standard"
         raise Disagreement(ENTRIES_POINT_AND_CONDITION, f"`{node}` links no {what}")
     target = _resolve(links[0], loop_path, root)
-    if verb == "check" and _type_of(target) != STANDARD_TYPE:
+    if verb == "verification" and _type_of(target) != STANDARD_TYPE:
         raise Disagreement(
             ENTRIES_POINT_AND_CONDITION,
-            f"`{node}` checks {links[0]!r}; a check links a file typed Standard",
+            f"`{node}` verifies {links[0]!r}; a verification links a file typed Standard",
         )
 
 
@@ -375,7 +375,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--list-rules",
         action="store_true",
-        help="print the rule ids this detector can emit, one per line, and exit",
+        help="print the rule ids this module can emit, one per line, and exit",
     )
     args = parser.parse_args(argv)
     if args.list_rules:

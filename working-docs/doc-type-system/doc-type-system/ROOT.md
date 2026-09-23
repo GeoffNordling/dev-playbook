@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Doc-Type System
-description: The root of the doc-type system strand — the language of doc-types, verbs, and predicates, its principles and terms, and the worklist from the Standard's new shape through the first instance
+description: The root of the doc-type system strand — the language of doc-types, verbs, and predicates, its principles and terms, the open questions, and the completed refactor from the Standard's new shape through every rule settled
 ---
 
 # Doc-Type System
@@ -9,7 +9,7 @@ description: The root of the doc-type system strand — the language of doc-type
 The strand that holds the language: what a doc-type is, its verbs, its
 rules as predicates, its encodings as grammar. Speculative, per
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
-It defines Loop, one of its three doc-types
+It defines Loop, one of its four doc-types
 ([Loop](/working-docs/doc-type-system/loop/ROOT.md)), and each
 encoding it writes defines an extractor of the fact base
 ([Fact Base Strand](/working-docs/doc-type-system/fact-base/ROOT.md)).
@@ -19,7 +19,7 @@ for use outside the set.
 
 ## Goal
 
-Five DocTypes, twelve verbs, in
+Four DocTypes, eleven verbs, in
 [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md),
 the picture of the target state; the Standard
 [Doc-Type](/standards/doc-type/doc-type.md) is the same state as
@@ -30,7 +30,7 @@ specification.
 ## Principles
 
 - **Peers first.** Wherever a choice is open, pick the one that keeps
-  the three doc-types parallel.
+  the four doc-types parallel.
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)
   holds the parallel structure, and each peer has its conventions
   Standard under `standards/doc-type/`.
@@ -45,47 +45,29 @@ specification.
   [Terms](/working-docs/doc-type-system/ROOT.md#terms), one
   meaning each.
 - **Predicates are written one way.**
-  [Writing Predicates](/working-docs/doc-type-system/doc-type-system/writing-predicates.md)
-  is how; it may become the Standard that governs it.
-- **A predicate is a test over state.** It is decided from the bytes
-  of the repo at one commit, by reading them or by a pure function of
-  them such as a formatter. It is not a test over run-time behaviour
-  (what a script exits or prints), not an instruction to an author
-  (where a helper sits, which double a test uses), not a fact held
-  outside the files (the day a decision was made, the latest upstream
-  release, a GitHub setting, git history, another repo), and not a
-  definition that scopes other rules. Behaviour and instruction go to
-  a Guide; the why goes to a `> **Why.**` block; a scoping definition
-  is an H2 with no trailer. The step 11 sort found each of these
-  mis-filed as a rule.
-- **Kind is judged from the sentence, not the trailer.** A sentence a
-  script decides from the files with no judgment call is
-  deterministic; a sentence with a judgment word ("describes",
-  "names the concept", "small against") is stochastic. Where a
-  sentence mixes the two, the mechanical part stays deterministic and
-  the judgment moves to the why block. Whether a check exists yet
-  is a separate question; an unchecked predicate of either kind is
-  allowed until the detector rewrite lands.
-- **A scoping heading is not a rule.** An H2 with no trailer names
-  which members the H3 rules under it bind. It is one shape whether
-  it has one child or eleven, and its definition is never repeated in
-  the children.
-- **The why sits with the rule it argues, in the same file.** A
-  `> **Why.**` block after a rule's trailer argues that rule; one
-  ending the opening prose argues the file. The block is optional — a
-  rule may have none, and none is written for a rule whose why nobody
-  holds — and it states no predicate. Text that argues no rule is not
-  a why: a definition goes to the Standard's lead or the glossary, a
-  procedure to a Guide, and the rest is deleted. The Explanation type
-  is deleted, because the user cannot read a rule and its why across
-  two files. Decided 2026-09-21 from the scrub in step 10; the rules
-  are in
-  [Standard Conventions](/standards/doc-type/standard-conventions.md).
+  [Writing Predicates](/guides/writing-predicates.md)
+  is how.
+- **A predicate is a test over state, and kind is judged from the
+  sentence.** The rule and its argument are
+  [Every predicate decidable of one member](/standards/doc-type/standard-conventions.md#every-predicate-decidable-of-one-member);
+  the step 11 sort found behaviour, instruction, outside facts, and
+  scoping definitions each mis-filed as a rule. Whether a check exists
+  yet is a separate question; an unchecked predicate of either kind is
+  allowed.
+- **A scoping heading is not a rule.** An H2 with no trailer is a
+  condition, per
+  [A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
+- **The why sits with the rule it argues, in the same file.** The
+  block's form is
+  [A why states no predicate](/standards/doc-type/standard-conventions.md#a-why-states-no-predicate);
+  a rule may have none. Decided 2026-09-21 from the scrub in step 10,
+  which is why the Explanation type is deleted: the user cannot read a
+  rule and its why across two files.
 - **Three working policies** that shaped the step 11 rulings and hold
-  for any later audit: repo change is the expensive way out; no credit for rule count, so
+  for any later review: repo change is the expensive way out; no credit for rule count, so
   delete is the default for a rule that restates another or binds
-  something too small to matter; and "keep it because a detector
-  emits the id" is backwards, since the detector follows the rule.
+  something too small to matter; and "keep it because a check
+  emits the id" is backwards, since the check follows the rule.
 - **Stochasticity is a continuous scale per file.** A markdown file
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
@@ -128,99 +110,7 @@ specification.
 
 ## Planned
 
-- **The system.** The refactor toward the reference model and the
-  specification. The target shape of one rule, decided 2026-09-20: a heading,
-  the predicate, and a trailer line, nothing else. The predicate is
-  everything between the heading and the trailer, a list of exemptions
-  included when the check needs one, and it is written so that
-  deterministic code lifts it verbatim into a judge's prompt, alone or
-  concatenated with other stochastic rules for one judge call. A body
-  after the trailer is not part of the target: what the 232 bodies
-  hold today is enforcement wiring, which step 3 removes, pointers to
-  other Standards, which the fact base carries, and exemptions, which
-  belong inside the predicate. Reason: text that no verifier reads is
-  text the state is not held to, and the split between a checked first
-  paragraph and an unchecked body is where the prose and the verifier
-  drift apart.
-  1. *Standard takes its new shape.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  2. *The verifier table.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  3. *Boundaries: where each check runs.* Done 2026-09-20; the entry is
-     in [Completed](#completed).
-  4. *Isolate the software factory.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  5. *Guide and Explanation.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  6. *Retire the card.* Done 2026-09-20; the entry is in
-     [Completed](#completed).
-  7. *Tidy the doc-type definitions.* Done 2026-09-21; the entry is in
-     [Completed](#completed).
-  8. *The specification becomes a Standard.* Done 2026-09-21; the
-     entry is in [Completed](#completed).
-  9. *Ban the word guard.* Done 2026-09-21; the entry is in
-     [Completed](#completed).
-  10. *Doc-types before migration.* Done 2026-09-21; the entries are
-     in [Completed](#completed).
-  11. *Settle every rule.* Done 2026-09-22 over five waves; the
-     entries are in [Completed](#completed). What the audit found
-     and step 11 does not close is in
-     [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md),
-     the detector suite's input.
-
-  A step once here, scrubbing every file under `docs/` into a long-term
-  home, is dropped 2026-09-20: step 1 sent nothing to `docs/` except
-  `docs/guides/`, and the eight loose files there predate this work.
-  The one move this plan causes is named at its step, `okf-spec` at
-  step 6.
-- **The detector suite.** One holistic pass over the checking system:
-  refactor, reconsider, redesign. The detectors grew one at a time over
-  months and were never refactored together, and step 11 settled the
-  Standards they answer to, so the pass rewrites the whole Python
-  detector suite against the settled rules, from scratch where that is
-  cleaner. It must stay at least as fast as the hooks are today.
-  - **Four layers name the same rules, and no two of them agree.** At
-    step 11's close, 217 rules carry a trailer:
-
-    | Layer | What it is | Where it lives |
-    | --- | --- | --- |
-    | Family | the directory, and the id's namespace | 12 of them |
-    | Standard | the file, and the population a rule binds | 31 rule-carrying files |
-    | Detector | the script that decides the rule | 18 addresses over 98 rules; 119 rules have none |
-    | Gate | when the detector runs | commit, push, ci, or on-demand |
-
-    Family and Standard part company in 6 of the 12 families:
-    `knowledge-organization.` spans 8 files, `doc-type.` 5,
-    `tracking.` 4, `build.` 3, `harness.` and `standard.` 2 each. A
-    detector crosses both — `repo-lint` decides 20 rules from 3
-    families and 6 files, `harness-files-lint` 12 rules from 2
-    families. The gate is a fourth cut again: `workspace-lint` holds
-    14 rules and runs at no gate at all.
-  - **The id schema is designed with the scripts, not after them.** An
-    id is `<family>.<slug>`, the directory and the heading's slug, so
-    the namespace is coarser than the population it binds. One fix
-    has been proposed and measured, `<standard>.<slug>`, and the
-    evidence is against it: it moves 210 of the 217 ids, only 7 match
-    their file; it drops the word that carries the meaning
-    (`build.ciyml-byte-identical-to-canonical` becomes
-    `canonical.ciyml-…`); and it lands `prose/conventions.md`,
-    `shell/conventions.md` and `testing/conventions.md` on one
-    `conventions.` namespace. There are no slug collisions today, so
-    nothing is broken. The design rules on the schema — including
-    leaving it alone — with the layer map above in front of it,
-    because what names a group of rules and what script owns them are
-    the same question.
-  - **Its input.**
-    [Detector Fixes](/working-docs/doc-type-system/doc-type-system/detector-fixes.md)
-    holds what step 11 leaves unchecked: the sixteen rules whose
-    detector tests less than the sentence, with the survey behind
-    them, the thin-shim moves, the `doc-type.one-base-class` check,
-    and the H2-without-trailer condition shape. The 52 deterministic
-    rules with a null verifier are the rest of the ground.
-  - **A detector may key on something that is not an id.** `okf-lint`
-    finds the type registry by that heading's slug, so a rename of the
-    heading lands in the detector. The design gives every such
-    coupling one named place.
+None.
 
 ## Completed
 
@@ -234,7 +124,7 @@ specification.
   would not sit in the sentence, and both yaml tables regenerated.
   `okf-lint` found the type registry by that heading's slug and went
   blind on the rename; the slug is a named constant now, and the
-  detector suite's item carries the coupling. Dropped: trimming the body openings the
+  check rewrite carried the coupling. Dropped: trimming the body openings the
   new headings absorb, since the overlap is no finding. Commits
   b76047e, ae587cd, dedc625, 4439ea5, 0d22ed4, and this one.
 
@@ -297,14 +187,13 @@ specification.
   `Explanation`, four DocTypes now. `Standard.Rule` and `Standard`
   each gained a `why: str | None`, a `> **Why.**` block after a
   rule's trailer or after the lead, never a predicate; the predicate
-  stays heading to trailer, so no detector or judge prompt changed.
+  stays heading to trailer, so no check or judge prompt changed.
   `standards/doc-type/doc-type.md` carries the ten Reasons sorted for
   the deleted Explanation, folded in as the test of the encoding.
 - **Explanations migrated, the type deleted, 2026-09-21.** Step 10,
   fourth part. Thirteen Opus agents, one per family, sorted each
   `explanation.md` into rule whys, the Standard's own why, or a
-  delete, per
-  [Migrate Explanations](/working-docs/doc-type-system/doc-type-system/migrate-explanations.md).
+  delete, per the Migrate Explanations prompt, since deleted.
   The Explanation type, its registry rows, rule, okf-lint check, and
   `ADMITTED_TYPES` entry are gone; 22 inbound links repointed. The
   predicates the agents left out are in their reports, for step 11.
@@ -312,12 +201,10 @@ specification.
   are Sequence, Step, and Reference; the parse is the headings and
   the step names. The verbatim-mirror type became `Mirror` and
   Runbook's chain the chain to free the word. Five Opus agents
-  rewrote the Guides per
-  [Migrate Guides](/working-docs/doc-type-system/doc-type-system/migrate-guides.md);
+  rewrote the Guides per the Migrate Guides prompt, since deleted;
   `headless.md` moved to `docs/` as a General-Sheet. The residual
   ledger holds five entries.
 
 ## Acronyms
 
-- **CI** — Continuous Integration.
-- **PR** — Pull Request.
+None.

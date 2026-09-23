@@ -5,8 +5,7 @@ log — what it did and what is next — newest at the bottom. A fresh agent rea
 this before starting, to see what earlier iterations did.
 
 Two writers, two audiences. Iterations write judgment calls for the checkpoint
-reviewer to read at the next checkpoint. The reviewer writes decisions for the
-user to read at PR time.
+to read. The checkpoint fork writes decisions for the user to read at PR time.
 
 ## Recording a judgment call
 
@@ -20,21 +19,21 @@ One line, every time. The entry is a pointer, not the evidence: whoever reviews
 reads the diff and the artifact anyway.
 
 Write one even when you are fairly sure. The cost of a recorded call is a line;
-the cost of a silent wrong turn is every task built on top of it. A reviewer
-rules on each call at the next checkpoint and writes the ruling into the plan —
+the cost of a silent wrong turn is every task built on top of it. Each call is
+ruled on at the next checkpoint and the ruling written into the plan —
 accepted calls become Working notes, reverted ones become a fix task.
 
 ## Decisions
 
-Written by the checkpoint reviewer, never by an iteration. One line for each
+Written by the checkpoint fork, never by an iteration. One line for each
 change that moved the plan away from the shape the user approved at setup, and
-for anything the reviewer chose not to do that the user would expect. The user
+for anything the fork chose not to do that the user would expect. The user
 reads this at PR time and nowhere earlier, so it is the whole account of how
 the run drifted from what was agreed.
 
     - <checkpoint>: <what changed in the plan> — <what made it change>
 
-<!-- the reviewer appends below this line -->
+<!-- the checkpoint fork appends below this line -->
 
 ## Log
 

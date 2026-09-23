@@ -52,7 +52,7 @@ def canonical_labels() -> list[tuple[str, str, str]]:
 
     The closed-world label set: ``<dimension>:<value>`` for every value of every
     dimension, its dimension's color, and the value's description. This is what
-    bootstrap-labels mints and what the label-scheme audit checks a repo against
+    bootstrap-labels mints and what workspace-lint checks a repo against
     at full parity.
     """
     return [

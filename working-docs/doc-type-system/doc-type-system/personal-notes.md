@@ -41,5 +41,4 @@ Six more, shorter, from the same conversations:
 
 ## Acronyms
 
-- **CLOA** — Correct Level Of Abstraction.
 - **LLM** — Large Language Model.

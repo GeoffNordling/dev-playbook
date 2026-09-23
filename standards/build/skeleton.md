@@ -58,6 +58,20 @@ No `bin/` directory and no `tools/` directory exists at the root.
 
 `build.runnables-live-in-scripts` · deterministic
 
+## scripts/ holds only scripts
+
+Every file under `scripts/` has a name ending in `.py`, `.sh`, or `.md`,
+or a name with no dot and `#!/usr/bin/env -S uv run --script` as its
+first line.
+
+`build.scripts-holds-only-scripts` · deterministic
+
+> **Why.** The canonical
+> [pyproject.toml](/standards/build/canonical/pyproject.toml) has ruff
+> read every file under `scripts/` as Python except a `.sh` file and a
+> `.md` file, so a name with no dot says the file is a uv Python script,
+> and a file of any other kind lives elsewhere.
+
 ## Dependencies live in pyproject.toml
 
 No file named `requirements.txt` exists anywhere in the tree.

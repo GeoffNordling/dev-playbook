@@ -1,6 +1,6 @@
 ---
 name: doc-set-deslop
-description: Audit a documentation set, or a set and its child sets, with Sonnet auditors each assigned a slice of the standards, then fix what they find, leaving every edit uncommitted for diff review.
+description: Judge a documentation set, or a set and its child sets, with Sonnet judges each assigned a slice of the standards, then fix what they find, leaving every edit uncommitted for diff review.
 disable-model-invocation: true
 model: inherit
 effort: high
@@ -9,9 +9,9 @@ arguments: [set-hint]
 
 # Doc Set Deslop
 
-Audit one documentation set, or a set and its child sets, against
-the standards and fix what the audits find, editing in place and
-committing nothing. The auditors only report; a fork of this session
+Judge one documentation set, or a set and its child sets, against
+the standards and fix what the judges find, editing in place and
+committing nothing. The judges only report; a fork of this session
 decides and edits; the session dispatches and reviews.
 
 ## Target

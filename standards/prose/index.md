@@ -6,4 +6,4 @@ structure, and brevity. Start at
 
 Ordering: reading order.
 
-- [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics
+- [Doc Conventions](/standards/prose/conventions.md) — How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics, and the form of the repo's vocabulary file

@@ -20,31 +20,28 @@ Output that diverges from the user's intent, or that the user cannot read.
 
 ### Governance
 
-Five words once swirled around one idea — the thing that inspects the
-repository and may block it. They are separated here into five roles.
+How a Standard's rules are decided, in the terms of the Standard's
+shape ([Population and Rules](/doc-types/standard/contract-shape.md)).
 
-**Audit**
-The umbrella term for the Standard's read-only checking process: a run of one or more detectors; read-only — it never mutates the repository and never blocks by itself.
-_Avoid_: check (too broad — a check may block; an audit never does).
+**Rule**
+One heading of a Standard, its predicate, and its trailer: an id, `<family>.<slug>`, and a kind, deterministic or stochastic.
 
-**Lint**
-A Detector implemented as deterministic code — the `*-lint` scripts under `scripts/`. Every detector is a lint, and every lint is part of the audit process (lint ⊂ audit), never the reverse.
-_Avoid_: audit, for a detector — the audit is the run; the lint is what runs in it.
+**Verifier**
+What decides one rule over a member and returns findings: a check or a judge. It reads and never writes.
 
-**Detector**
-The read-only check that inspects the repository against one or more standards and emits findings; it never mutates the repository. Every detector is deterministic code — a lint.
-_Avoid_: audit, for the check itself — an audit is a *run* of one or more detectors.
+**Check**
+A verifier for a deterministic rule: a function registered under the rule's id, which `playbook check` runs, or a tool such as ruff registered by its hook.
+_Avoid_: detector, lint.
 
-**Verifier table**
-`standards/verifiers.yaml`: the generated map from every rule id declared under `standards/` to the address of the one check that decides it — a detector by path, a dependency by hook id or name — or null where no check does. `scripts/verifier-table` writes it and fails where the committed file, a detector's `--list-rules`, or an address disagrees.
+**Judge**
+A verifier for a stochastic rule: a model prompted with the rule's predicate.
+
+**Finding**
+What a verifier returns for a member that fails a rule: the member, the rule's id, and a message.
 
 **Gate**
-An automatic, unmanned blocking point on the path to main, continuously in effect. An audit never blocks; a gate is what blocks.
-_Avoid_: venue (retired — say **gate**, or a rung name).
-
-**Enforcement**
-What compels conformance, in one of two modes: an audit stationed at a gate, whose findings block the path to main there, or a tool invoked on demand, which rewrites the object into conformance.
-_Avoid_: audit, where the blocking or the rewriting is the point — an audit only reports, however it is run.
+A point where findings block work: pre-commit, pre-push, or CI.
+_Avoid_: audit, enforcement, venue.
 
 ### Documentation sets
 
@@ -63,7 +60,7 @@ The two axes a repository file sits on, its role and its content
 ([Document Types](/standards/knowledge-organization/document-types.md)).
 
 **Concept document**
-Prose a reader loads to understand something. It carries OKF frontmatter, and okf-lint reads its type.
+Prose a reader loads to understand something. It carries OKF frontmatter, and a check reads its type.
 
 **Harness-owned file**
 A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the harness-files registry enumerates. It carries no OKF frontmatter.

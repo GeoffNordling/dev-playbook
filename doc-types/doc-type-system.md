@@ -95,10 +95,10 @@ its contract — is a Standard's job, and the four sit together under
 [standards/doc-type/](/standards/doc-type/index.md): Runbook's
 obligation rides
 [Runbook Conventions](/standards/doc-type/runbook-conventions.md),
-audited by `scripts/harness-files-lint`; Loop's rides
-[Loop Conventions](/standards/doc-type/loop-conventions.md), audited
-by `scripts/loop-lint`; Standard's rides
+checked by `playbook check`; Loop's rides
+[Loop Conventions](/standards/doc-type/loop-conventions.md), checked
+by `playbook check`; Standard's rides
 [Standard Conventions](/standards/doc-type/standard-conventions.md),
-audited by `scripts/standards-lint`; Guide's rides
+checked by `playbook check`; Guide's rides
 [Guide Conventions](/standards/doc-type/guide-conventions.md). The
 shape is never itself a Standard, so the four remain peers.

@@ -106,8 +106,8 @@ In order; each produces what the next needs.
   reads a Loop document's Mermaid block
   ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned));
   one refresh writes one fact base per checkout; the shims go. The `card` extractor and `cardgen` are
-  struck: the doc-type system retires Standard-Card, Retire the card in
-  [Planned](/working-docs/doc-type-system/doc-type-system/ROOT.md#planned).
+  struck: the doc-type system retired Standard-Card at step 6 of its
+  plan.
 - **Docs follow the moves.** The `doc-types/` indexes and pages that
   name the text files and the shims, and `scripts/index.md`.
 - **Verifier table and boundary config as declared data.** The rule id

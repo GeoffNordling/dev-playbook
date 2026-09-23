@@ -24,8 +24,8 @@ its absence means nothing has been recorded yet.
 
 ## One list item per entry
 
-An entry is one list item: a bolded name, an em dash, then at most two
-sentences, with no fields, no acceptance criteria, and no checkboxes.
+Every list item in `CANDIDATES.md`, nested or not, starts
+`**<name>** — `.
 
 ```markdown
 - **Column selection** — the export is all-or-nothing today; users want to

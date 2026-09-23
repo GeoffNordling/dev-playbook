@@ -13,7 +13,7 @@ here on 2026-09-20 by the doc-type system refactor
 that no step of that work trips over it. The factory is out of that
 work's scope, and its future, a rewrite or deletion, is a later
 session's decision. Until then nothing in the repo links to, imports,
-runs, tests, stows, or lints as a harness file any member of this set.
+runs, tests, stows, or checks as a harness file any member of this set.
 Each member is as it was on the day of the move, except that links
 among the members follow the move.
 
@@ -45,6 +45,42 @@ that decides its fate has every piece in one place.
   for them alone: `StoredRow`, `ledger_rows`, `write_definition`,
   `process_state`. The modules also import `init_repo` and `commit_all`
   from the shared conftest, which stayed.
+
+## Members
+
+Every document of the set, so that each is reached from here.
+
+- Docs:
+  [README](/working-docs/software-factory/docs/README.md),
+  [Software Factory](/working-docs/software-factory/docs/software-factory.md),
+  [Factory Operations](/working-docs/software-factory/docs/factory-operations.md),
+  [Deviation Contract](/working-docs/software-factory/docs/deviation-contract.md),
+  [Review Contract](/working-docs/software-factory/docs/review-contract.md),
+  [PR Feedback](/working-docs/software-factory/docs/pr-feedback.md),
+  [Refactor Catalogue](/working-docs/software-factory/docs/refactor-catalogue.md),
+  [TDD](/working-docs/software-factory/docs/tdd.md),
+  [User Checkpoints](/working-docs/software-factory/docs/user-checkpoints.md),
+  [Node Agent and Skill Authoring](/working-docs/software-factory/docs/node-agent-and-skill-authoring.md).
+- Agents:
+  [adjudicator](/working-docs/software-factory/agents/adjudicator.md),
+  [bug-pr-review](/working-docs/software-factory/agents/bug-pr-review.md),
+  [build](/working-docs/software-factory/agents/build.md),
+  [code-pr-review](/working-docs/software-factory/agents/code-pr-review.md),
+  [doc-pr-review](/working-docs/software-factory/agents/doc-pr-review.md),
+  [open-pr](/working-docs/software-factory/agents/open-pr.md).
+- Skills:
+  [issue-overwatch](/working-docs/software-factory/skills/issue-overwatch/SKILL.md),
+  [agent-view-overwatch](/working-docs/software-factory/skills/agent-view-overwatch/SKILL.md),
+  [issue-review-claims](/working-docs/software-factory/skills/issue-review-claims/SKILL.md),
+  [issue-review-simulation](/working-docs/software-factory/skills/issue-review-simulation/SKILL.md),
+  [wayfinder-to-build](/working-docs/software-factory/skills/wayfinder-to-build/SKILL.md),
+  [intake](/working-docs/software-factory/skills/intake/SKILL.md),
+  [design](/working-docs/software-factory/skills/design/SKILL.md)
+  with its references
+  [decompose](/working-docs/software-factory/skills/design/references/decompose.md)
+  and
+  [design-it-twice](/working-docs/software-factory/skills/design/references/design-it-twice.md),
+  [user-intent-mini-interview](/working-docs/software-factory/skills/user-intent-mini-interview/SKILL.md).
 
 ## What stayed in the tree
 

@@ -1,7 +1,7 @@
 ---
 type: Recipe-Description
 title: Ralph loop
-description: Grinding a large task to done by booting a fresh agent each iteration, with plan and progress carried on disk and a reviewing fork at every checkpoint
+description: Grinding a large task to done by booting a fresh agent each iteration, with plan and progress carried on disk, and at every checkpoint a fresh reviewer, the user's ruling, and a fork that adapts the plan
 resource: /dotfiles/dot-claude/workflows/ralph-loop.js
 ---
 
@@ -45,8 +45,15 @@ decides whether the loop ends.
 ## Checkpoints
 
 A plan is cut into segments by checkpoint markers, and the loop runs one
-segment per launch. At each stop the launching session forks itself to review
-what landed before releasing the next segment.
+segment per launch. At each stop a fresh reviewer reads what landed, the user
+rules on its top findings, and the launching session forks itself to adapt the
+plan before releasing the next segment.
+
+The review is split because one context cannot do both jobs. A fork inherits
+the conversation that designed the plan, so it knows what the plan meant, and
+for the same reason it reads the work kindly and fills its gaps with that
+intent. A reviewer with none of that context reads only the plan and the diff.
+So the fresh reviewer finds, the user rules, and the fork decides.
 
 How many checkpoints a plan carries is decided with the user at setup. The
 floor is one, placed after the last task. Every checkpoint above the floor buys
@@ -57,7 +64,7 @@ There is no mode switch and no argument for any of this. The markers are in the
 plan, the iteration agent reads the plan, and an argument could only ever
 disagree with the file.
 
-Three agents and a runtime, in four different positions:
+Four agents and a runtime, in five different positions:
 
 ```
                                   USER
@@ -109,14 +116,27 @@ segment │    task│  └───────────────┬─�
         │   └───────────────────────┬──────────────────────────────────┘
         │                           ▼
         │   ┌──────────────────────────────────────────────────────────┐
+        │   │ REVIEWER — fresh Opus, none of SESSION's context         │
+        │   │            agents/ralph-reviewer.md                      │
+        │   │                                                          │
+        │   │   read the tasks + their sources ▸ read the diff         │
+        │   │   ▸ run every Verify ▸ at the last checkpoint, also      │
+        │   │     PLAN's ## Done when ▸ scrutinize ▸ rank by the       │
+        │   │     assignment ▸ full list to scratch                    │
+        │   │   ▸ report the count + the top three                     │
+        │   └───────────────────────┬──────────────────────────────────┘
+        │                           ▼
+        │                USER rules on the top three
+        │                (skipped when there are no findings)
+        │                           ▼
+        │   ┌──────────────────────────────────────────────────────────┐
         │   │ FORK — inherits SESSION's context                        │
         │   │        agents/ralph-checkpointer.md                      │
         │   │                                                          │
-        │   │   verify what landed ▸ take stock against the goal      │
-        │   │   ▸ adapt the tasks ahead ▸ write PLAN, log decisions   │
+        │   │   apply the ruling ▸ take stock against the goal         │
+        │   │   ▸ adapt the tasks ahead ▸ write PLAN, log decisions    │
         │   │   ▸ [ ] → [x] on the marker ▸ commit                     │
-        │   │   ▸ at the last checkpoint, also check                   │
-        │   │     PLAN's ## Done when ▸ report ≤ 10 lines              │
+        │   │   ▸ report ≤ 10 lines                                    │
         │   └───────────────────────┬──────────────────────────────────┘
         │                           │
         │     unchecked tasks left? │
@@ -129,14 +149,16 @@ segment │    task│  └───────────────┬─�
 The two loops sit at different levels. The **inner** one is a `while` in
 `ralph-loop.js`, held by no context window, turning over one Ralph per task.
 The **outer** one is the session's own turn-taking, turning over one segment per
-checkpoint. The fork sits in the outer loop, which is why a twelve-segment run
-still fits in one session: only ten lines come back from each review.
+checkpoint. The reviewer and the fork sit in the outer loop, which is why a
+twelve-segment run still fits in one session: the full findings stay in a
+scratch file, and only the top three and the fork's ten lines come back.
 
 | | `PLAN.md` | `PROGRESS.md` | git | session context |
 |---|---|---|---|---|
-| `/ralph-setup` | writes | writes | — | — |
+| `/ralph-setup` | writes | writes | commits both | — |
 | runtime | — | — | — | none, by construction |
 | Ralph | read + check off | read + append | commits | none |
+| reviewer | read | read | reads the segment's diff | none, by construction |
 | fork | read + write | read + decisions | commits | inherits the session's |
 | session | — | — | — | owns it |
 
@@ -211,8 +233,8 @@ deciding what to do next.
 `maxIters` rails one segment, not the run, so size it to the longest segment.
 At each stop the launching session runs
 [`/ralph-checkpoint`](/dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md),
-which reviews the finished segment in a fork and launches the next segment on
-what the fork found. The session drives the whole plan this way without the
-user in between, and the last review checks the finished plan against its
-`## Done when` criteria. The user hears from the run when the plan is done or
-when a blocker stops it.
+which has a fresh reviewer read the finished segment, takes the user's ruling
+on its top three findings, and has a fork adapt the plan before it launches
+the next segment. The last review checks the finished plan against its
+`## Done when` criteria. Apart from those rulings, the user hears from the run
+when the plan is done or when a blocker stops it.

@@ -38,7 +38,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 gotchas, conventions, settled decisions. The progress log is the chronological
 one-line-per-iteration record; this is the curated, current knowledge base.
 Seed any facts known from setup; the loop keeps it tight and current as it
-learns. A checkpoint reviewer writes its accepted rulings here as plain facts. -->
+learns. The checkpoint fork writes its accepted rulings here as plain facts. -->
 
 - <fact a later iteration would otherwise have to rediscover, or empty at setup>
 

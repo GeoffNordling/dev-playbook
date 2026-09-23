@@ -18,7 +18,7 @@ anywhere else is a bug. And **a check may be skipped on a machine only where
 its input is machine-local rather than held in the repository**, because there
 the detector would report the environment as a defect in the code.
 
-Two checks qualify, and only two: `ref-lint` resolves Citations against sibling
+Two checks qualify, and only two: the reference detector resolves Citations against sibling
 repos a secondary deliberately does not clone, and the judgments cache gate
 reads a `~/.cache/skipcache` seen-set that only the primary fills. Both
 announce the skip on every run. The primary carries every repo and the cache,

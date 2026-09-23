@@ -45,7 +45,7 @@ deliberately outside the ontology until a ruling is reversed.
   context means; ruled not accounted.
 - **Behavior-mode setting** — a runbook whose body installs standing
   behavior in the session's ephemeral context and fires no edge at
-  invocation. Ruled residual; admitting it later requires a lintable,
+  invocation. Ruled residual; admitting it later requires a checkable,
   deterministic form.
 - **Presentation gestures** — opening an already-written artifact for
   the user (improve-codebase-architecture's `xdg-open` on its report);
@@ -79,8 +79,8 @@ no frontmatter or spans, so the does edge ends at the file.
 
 ### deslopper
 
-Could not express being a Standard's enforce arm (flattened to a plain
-read) or an agent's inputs — agents have no `arguments` frontmatter.
+Could not express being the runbook that fixes a Standard's findings
+(flattened to a plain read) or an agent's inputs — agents have no `arguments` frontmatter.
 
 ### handoff
 
@@ -91,11 +91,13 @@ Could not express telling the two reports apart — both render
 
 Could not express the report's name (`launch_command` rides only in
 annotation) or the mid-run `READ:` acknowledgment, which targets the
-conversation, not the invoker. Could not express the gate runs of §5 and §6 —
+conversation, not the invoker. Could not express the reads of §5's chain —
+the files vary with the plan, so no link names them — or its tripwire, a
+threshold with no primitive. Could not express the gate runs of §6 and §7 —
 a bare command in the target repo, with no on-disk link for a does edge — the
 read-back of the checkpoint markers it just wrote, which inspects the file's
 own text rather than firing an edge — or the `/ralph-checkpoint` mention in
-§7, which names a skill the user invokes and this one never runs.
+§8, which names a skill the user invokes and this one never runs.
 
 ### commit
 
@@ -140,7 +142,7 @@ verb for acting.
 ### runbook-creator
 
 Could not express the interview loop of steps 2 and 6 (no primitive
-for a question-and-answer round), the `scripts/harness-files-lint` run (bare
+for a question-and-answer round), the `uv run playbook check` run (bare
 command, no link for a does edge), or the step-completion gates (no
 control-flow primitive).
 
@@ -158,7 +160,7 @@ which no primitive covers.
 Could not express step 2's "only if something stands out" condition —
 the condition primitive gates a whole span, not a report's own contents.
 
-### set-auditor
+### set-judge
 
 Could not express the set-member reads — the root and its linked working
 files are runtime-bound (named in the launching prompt), so `{Read}`'s one
@@ -228,17 +230,22 @@ and the branch name is chosen per ticket.
 
 ### ralph-checkpoint
 
-Could not express the ban on launching the next segment itself — the Never
-vocabulary carries no verb for running one. Could not express the
-blocker-versus-checkpoint branch on the workflow's return value, which is
-runtime data with no link for `{If}` to read.
+Could not express the blocker-versus-checkpoint branch on the workflow's
+return value, or the zero-findings branch on the reviewer's, both runtime
+data with no link for `{If}` to read. Could not express the `git log` runs
+that name the segment — bare commands with no on-disk link — or the wait for
+the user's ruling, which targets the conversation, not the invoker.
 
 ### ralph-checkpointer
 
-Could not express running each task's Verify clause — the clause names a
-command or artifact chosen per task, so there is no fixed target. Could not
-express the accepted/reverted/deferred ruling itself, which is a decision with
-no primitive.
+Could not express applying the user's ruling to each finding, which is a
+decision with no primitive.
+
+### ralph-reviewer
+
+Could not express running each task's Verify clause or reading each task's
+sources — both are chosen per task, so there is no fixed target — or the
+ranking itself, which is a decision with no primitive.
 
 ### prototype
 

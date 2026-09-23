@@ -118,7 +118,7 @@ carries none of them.
 
 Could not express the contiguity half of Sequential numbering over one
 member: a gap is a property of the whole directory, which is why
-decisions-lint reports it against `docs/decisions/` and not a file.
+the numbering check reports it against `docs/decisions/` and not a file.
 Could not express The directory over the member: its object is the
 directory that holds the population, the way Repository Settings'
 GitHub origin binds the clone. Could not express the obligation that a
@@ -138,11 +138,4 @@ it out.
 Could not express the invocation mode as a condition without three
 restated conditions, so the fork sits inside Description's predicate.
 Could not give the no-`SKILL.md` directory and the 500-line advisory a
-lint partner: both emit no rule id.
-
-### standard/detectors
-
-Could not express Verbatim content over a consumer's script: it names
-`src/dev_playbook/external.py`, which only dev-playbook imports. Could
-not express the optional-surface fork of Wired throughout its scope as
-a condition: it is a fact about the population, not the detector.
+check: both emit no rule id.
