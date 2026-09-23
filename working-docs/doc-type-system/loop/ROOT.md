@@ -74,6 +74,30 @@ From memory, not a fresh search.
 
 ## Planned
 
+- **Retire `loop-lint` and move its five checks into the check
+  package.** The detector rewrite
+  ([Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md))
+  retired every detector script but this one, by the user's ruling
+  that the loop family waits for this workstream. What it left: the
+  script `scripts/loop-lint`, its module `src/dev_playbook/loop_lint.py`,
+  its tests, and the legacy step by which `playbook check` calls that
+  module once the rewrite's phase 4 cuts over; five deterministic rules of
+  [Loop Conventions](/standards/doc-type/loop-conventions.md) registered
+  in `src/dev_playbook/checks/doc_type.py` by `tool_check` with
+  `hook="loop-lint"`, so `playbook checks` lists them and the meta-test
+  passes; the sixth, `an-act-links-a-runbook`, already a function
+  there. This workstream owns the rest, after the rewrite merges to
+  main: one function per rule in `checks/doc_type.py` reading the
+  model, one test per rule id, the five `tool_check` lines and the
+  docstring's last sentence removed, then the script, module, tests,
+  and legacy step deleted. The unit of work is the rewrite's phase 3
+  step, described in its
+  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
+  and its
+  [Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md).
+  Fold in the three rules below when the Standard is revised in the
+  same turn, or leave them for their own.
+
 - **Three rules for Loop Conventions.** Drafted in the retired
   specification, deleted with it at step 8 of the doc-type system:
   every step points at a Runbook, a Standard, a Loop, or the user that
