@@ -62,14 +62,13 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape, the dogfood mirror |
 | `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
 | `harness-files-lint` | [runbook-conventions.md](/standards/doc-type/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
 | `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, the repo's own `.prose-lint-vocabulary` words over the directories each names, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
 | `standards-lint` | [tree.md](/standards/standard/tree.md), [detectors.md](/standards/standard/detectors.md) | The Standards Tree's rules over `standards/` — directory layout, the population, the catalog, hook-surface agreement, and no shadowing of an upstream directory (consumer mode); clean by construction where no `standards/` tree is present |
 | `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
 
 `repo-lint`, `ref-lint`, `okf-lint`,
-`decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
+and `prose-lint` assert unconditionally and fail loud; they do
 not skip themselves when a target kind is absent. `harness-files-lint`,
 `standards-lint`, and `loop-lint` are optional-surface: each exits 0 silently when
 its audited surface is absent — no runbooks, no `standards/` tree, no `loops/`

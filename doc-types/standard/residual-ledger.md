@@ -118,7 +118,7 @@ carries none of them.
 
 Could not express the contiguity half of Sequential numbering over one
 member: a gap is a property of the whole directory, which is why
-decisions-lint reports it against `docs/decisions/` and not a file.
+the numbering check reports it against `docs/decisions/` and not a file.
 Could not express The directory over the member: its object is the
 directory that holds the population, the way Repository Settings'
 GitHub origin binds the clone. Could not express the obligation that a

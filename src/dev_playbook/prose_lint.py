@@ -77,8 +77,8 @@ from dev_playbook.findings import print_rules, render
 class CannotRun(Exception):
     """A file the detector cannot process — surfaced as exit 2, not a traceback.
 
-    Matches the sibling frontmatter-parsing detectors (decisions-lint,
-    standards-lint): a malformed ``.md`` is a run failure to report, never an
+    Matches the sibling frontmatter-parsing detector (standards-lint): a
+    malformed ``.md`` is a run failure to report, never an
     uncaught YAML error that blocks every commit.
     """
 

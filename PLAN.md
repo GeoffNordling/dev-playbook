@@ -76,7 +76,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 3, family `decisions`, retires `decisions-lint`. Report:
+- [x] Step 3, family `decisions`, retires `decisions-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/decisions.md`.
       Verify: `uv run playbook checks --family decisions` lists exactly the
       deterministic trailers under `standards/decisions/`; `git ls-files
