@@ -120,7 +120,7 @@ and is answered there.
 Sessions with the user come first, each at a high level, the agent
 guiding.
 
-- **Discuss: overlap with active branches.** Paused: a large refactor is
+- **Wait: overlap with active branches.** Paused: a large refactor is
   in progress on `main`, and this set waits for it to finish. Then check
   what it changed, and whether the landing PR touches any file that
   another active, unmerged branch is also changing.
