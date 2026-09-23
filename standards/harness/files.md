@@ -17,8 +17,12 @@ Code is the only harness in use.
 
 ## Every harness file matches a member row
 
-Every file under `.claude/` or `dotfiles/dot-claude/` in a governed
-repo matches a member row of the table below.
+Every tracked file under `.claude/` or `dotfiles/dot-claude/` has
+one of these paths below that directory: `CLAUDE.md`,
+`skills/<name>/` and any file under it, `agents/<name>.md`,
+`rules/<name>.md`, `settings.json`, `settings.local.json`,
+`hooks/` and any file under it, `workflows/<name>.js`,
+`statusline.sh`.
 
 | Member | Class | Role | Content standard |
 |---|---|---|---|
@@ -28,7 +32,8 @@ repo matches a member row of the table below.
 | `rules/*.md` | context | injected into every session | none yet |
 | `settings.json`, `settings.local.json` | configuration | read as configuration | none yet |
 | `hooks/` | code | run as code around harness events | none yet |
-| `.claude/workflows/*.js` | code | run as code by the Workflow tool | none yet |
+| `workflows/*.js` | code | run as code by the Workflow tool | none yet |
+| `statusline.sh` | code | run as code to draw the status line | none yet |
 
 `harness.every-harness-file-matches-a-member-row` · deterministic
 
@@ -38,10 +43,11 @@ repo matches a member row of the table below.
 
 ## Every runbook at a fixed path
 
-A skill is `<skills root>/<name>/SKILL.md` and an agent is
-`<agents root>/<name>.md`, the roots being `.claude/skills/` and
-`.claude/agents/`, and `dotfiles/dot-claude/skills/` and
-`dotfiles/dot-claude/agents/` where those directories exist.
+Every directory directly under `.claude/skills/` or
+`dotfiles/dot-claude/skills/` has a `SKILL.md`, and has nothing
+else in it but `references/`, `scripts/`, and `agents/`. Every
+file under `.claude/agents/` or `dotfiles/dot-claude/agents/` is
+a `.md` file directly in that directory.
 
 ```
 <skills root>/<skill-name>/

@@ -7,4 +7,4 @@ CLAUDE.md's content.
 Ordering: alphabetical by title.
 
 - [Claude Code Files](/standards/harness/files.md) — The registry of repo files the Claude Code harness consumes — each member's class, role, and content standard, and where a runbook sits
-- [CLAUDE.md Content](/standards/harness/claude-content.md) — What a CLAUDE.md carries — no frontmatter, operational content at one scope, and the two sections and required rules of the global source in dev-playbook
+- [CLAUDE.md Content](/standards/harness/claude-content.md) — What a CLAUDE.md carries — no frontmatter, operational content at one scope, and the two sections, the required rules, and the first rule of the global source in dev-playbook

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: CLAUDE.md Content
-description: What a CLAUDE.md carries — no frontmatter, operational content at one scope, and the two sections and required rules of the global source in dev-playbook
+description: What a CLAUDE.md carries — no frontmatter, operational content at one scope, and the two sections, the required rules, and the first rule of the global source in dev-playbook
 population: "a CLAUDE.md: a repo's root file, a nested <dir>/CLAUDE.md, or in dev-playbook the global source dotfiles/dot-claude/CLAUDE.md"
 ---
 
@@ -27,7 +27,7 @@ loads is [Claude Code Files](/standards/harness/files.md); the voice a
 
 ## No frontmatter
 
-A `CLAUDE.md` opens on its content, with no YAML frontmatter block.
+The first line of a `CLAUDE.md` is not `---`.
 
 `harness.no-frontmatter` · deterministic
 
@@ -68,10 +68,17 @@ The global source's H2 headings outside fenced code blocks are exactly
 
 ### Two required rules
 
-The global source carries the headings `### Read the standards` and
+The global source has the headings `### Read the standards` and
 `### Navigate docs by index`, both outside fenced code blocks.
 
 `harness.two-required-rules` · deterministic
+
+### Read the standards first
+
+`### Read the standards` is the first `###` heading of the global
+source, outside fenced code blocks.
+
+`harness.read-the-standards-first` · deterministic
 
 ### One rule per heading
 

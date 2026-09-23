@@ -124,7 +124,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
 
-- [ ] Step 8, family `harness`, retires nothing. Report:
+- [x] Step 8, family `harness`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/harness.md`.
       Verify: `uv run playbook checks --family harness` lists exactly the
       deterministic trailers under `standards/harness/`; the report exists; the
