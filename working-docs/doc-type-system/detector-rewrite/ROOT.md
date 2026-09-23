@@ -183,8 +183,6 @@ is one the repo complies with.
 
 ## Planned
 
-- **The measurement.** Time `playbook-lint` on this repo and the
-  test suite, before any code moves.
 - **The rewrite.** The package, module by module, against the exit
   list; the console script; the markdown parser decided; the two
   tables, their scripts, and the detector files under `scripts/`
@@ -209,6 +207,11 @@ is one the repo complies with.
 
 ## Completed
 
+- **The measurement, 2026-09-23.** Wall time on this repo at
+  `66b1e6b`, uv cache warm, before any code moves: `playbook-lint .`
+  0.47 s, the median of three runs; `pre-commit run --all-files`
+  0.89 s; `pytest` 10.0 s over 988 tests on 12 workers. The rewrite
+  is judged against these.
 - **The triage, 2026-09-23.** The 150 deterministic rules family by
   family, each kept, rewritten, or deleted, in
   [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md):
