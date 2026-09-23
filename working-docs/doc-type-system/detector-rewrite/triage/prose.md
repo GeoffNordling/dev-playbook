@@ -78,45 +78,15 @@ blocks and inline code spans removed, `\bjudgements?\b` in any case.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: built; the Standard names the word, the code keeps it as a
-constant, a test asserts the two agree, and the population line
-gains the two word rules over every tracked file. This report does
-not spell the word, so the gate passes. The new rule is accepted.
+The number is the one the rows above cite.
 
-1. **`no-banned-word`**, `standards/prose/conventions.md:156`.
-   - **What it means.** No tracked file, of any type, contains the
-     banned word or its plural, in any case, anywhere in the file.
-   - **Proposal.** The body in the row above. It names the word, and it
-     says "whole word" with four examples in place of "alone or in a
-     compound".
-   - **Against today's sentence.** Today's body names no word. It
-     points at the constant `WORKSPACE_VOCABULARY` in
-     `src/dev_playbook/prose_lint.py`, a file the rewrite deletes, so
-     the pointer goes stale on exit. The proposal writes the word in the
-     Standard. `standards/prose/conventions.md` is already in
-     `.prose-lint-exempt`, under the comment "The three files that must
-     name the banned word in order to ban it"; today the file has 0
-     occurrences, so the proposal makes that comment true again. "In a
-     compound" read wide also bans a closed compound such as
-     `superhuman`; the proposal passes it. This is the meaning change.
-     An earlier amendment chose the pointer over the word, so the user
-     rules on it.
-   - **Against today's enforcement.** None. `Word.pattern`,
-     `prose_lint.py:121`, is `\bhumans?\b` in any case: a hyphen or a
-     space ends the word, a letter does not. An underscore does not
-     either, so `human_review` passes today; the proposal keeps that.
-   - **Measured.** 0 findings today. 1 occurrence of the word inside
-     a longer word in the tracked files outside `.prose-lint-exempt`,
-     `docs/decisions/0022-prose-lint-exempt-file.md:18`. It passes
-     under both readings.
-   - **One more gap, for the same ruling.** The Standard's `population`
-     is "an authored document, except type: Mirror and the paths in
-     .prose-lint-exempt" (`conventions.md:5`). This rule and
-     `no-word-the-repo-bans` bind every tracked file: 97 `.py`, 13
-     `.yaml`, 27 extensionless files, and more. The proposal adds to the
-     `population` line: "and, for the two word rules, every tracked
-     file". The check already reads every file, so the repo does not
-     move.
+1. `no-banned-word`, `standards/prose/conventions.md:156`: built; the
+   Standard names the word, the code keeps it as a constant, a test
+   asserts the two agree, and the `population` line gains "and, for
+   the two word rules, every tracked file". This report does not spell
+   the word, so the gate passes.
+
+The new rule below is accepted.
 
 ## New rules
 

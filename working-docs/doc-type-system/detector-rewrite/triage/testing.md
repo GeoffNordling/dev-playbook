@@ -79,50 +79,11 @@ Kept as written, the check matching the sentence: none.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: deleted. The user's reason: it micromanages how a conftest
-is written.
+The number is the one the rows above cite.
 
-1. **`fixture-lives-in-the-narrowest-conftest`**,
-   `standards/testing/conventions.md:41`.
-   - **What it means.** Put a shared pytest fixture in the conftest
-     closest to the tests that use it. Do not put it in a higher
-     conftest, where tests that never use it can also see it.
-   - **Proposal.** The quoted body in the row above. Check: collect
-     every function decorated `@pytest.fixture` in a `conftest.py`.
-     For each one, find the files that use its name as a parameter or
-     in `usefixtures`. Take the deepest directory that contains all
-     of those files and compare it with the conftest's directory.
-     Report a fixture that no file uses as a finding too.
-   - **How it differs from today's sentence.** The old sentence
-     requires every fixture to be in a `conftest.py`, even one used by
-     only one test module. The proposal lets a test module define its
-     own fixtures, because pytest shows those fixtures only to that
-     module, and a module is narrower than any directory. The old
-     sentence does not say what happens to an `autouse` fixture, which
-     no test names. The proposal exempts it: all tests below the
-     conftest use it, so its conftest is already the narrowest. The
-     old sentence also does not say what happens to a fixture that
-     nothing uses. The proposal reports it, because it has no
-     "narrowest directory whose tests use it".
-   - **How it differs from today's enforcement.** No check today:
-     `standards/verifiers.yaml:194` gives `null`. The check matches by
-     name only. It does not follow a nested conftest that defines a
-     fixture with the same name, `request.getfixturevalue`, or
-     indirect parametrization. None of these occurs in this repo
-     today.
-   - **Measured.** 63 fixtures in the tracked `.py` files: 3 in
-     `tests/conftest.py`, 60 in 13 `test_*.py` files, and none in
-     `working-docs/software-factory/tests/conftest.py` that fails. Under
-     the proposal, 2 fail:
-     - `ambient_git_dir`, `tests/conftest.py:67`, is used only by five
-       files under `tests/dev_playbook/`, so it belongs in
-       `tests/dev_playbook/conftest.py`, which does not exist.
-     - `make_repo`, `tests/conftest.py:94`, is used by no file.
-       `tests/test_harness_files_lint.py:60` defines its own plain
-       function with the same name.
-
-     Under the old sentence read literally, all 60 fixtures defined in
-     test modules also fail.
+1. `fixture-lives-in-the-narrowest-conftest`,
+   `standards/testing/conventions.md:41`: deleted. The user's reason:
+   it micromanages how a conftest is written.
 
 ## New rules
 

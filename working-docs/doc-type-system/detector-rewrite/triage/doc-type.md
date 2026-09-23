@@ -279,109 +279,22 @@ The population is the 30 files typed `Standard`, which have 217 rules.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: deleted, too specific. Item 2: built with the block limit
-relaxed to a shape: a heading, then one paragraph, then any number of
-paragraphs, lists, fenced blocks, or quotes, then the trailer line,
-then at most one Why block; an H3 only under an H2 with no trailer.
-The five H3 failures go with the two-tables deletion, so it passes
-today. Item 3: built, the linked form. Item 4: Loop stays as it is,
-all six kept.
+The number is the one the rows above cite.
 
-1. **One base class: a check fails one contract shape.**
-   - Heading line: `standards/doc-type/doc-type.md:56`.
-   - What it means: each doc-type's pseudocode block has one class
-     that extends `DocType`. Every other class is nested in that
-     class.
-   - Proposal: restate the rule as in the row above, and add the
-     check. Make the repo comply: nest `class Finding` in
-     `class Standard` as `Standard.Finding`, in
-     `doc-types/standard/contract-shape.md` and in
-     `working-docs/doc-type-system/doc-type-system/reference-model.md`,
-     which `tests/test_pseudocode_sync.py` keeps identical to it. Then
-     change `from standard import Finding, Standard` and
-     `list[Finding]` in `doc-types/loop/contract-shape.md:44` and
-     `:58`.
-   - Difference from today's sentence: none. The restatement uses
-     simpler words.
-   - Difference from today's enforcement: today no check exists
-     (`verifiers.yaml:65`, `null`). `detector-fixes.md` lists this rule
-     as one that gains its check.
-   - Measured: 1 of 4 contract shapes fails.
-     `doc-types/standard/contract-shape.md:76` has a top-level
-     `class Finding:`. The loop block (`doc-types/loop/contract-shape.md`)
-     is not valid Python, so the check must read class header lines
-     and cannot use `ast.parse`. The alternative is to relax the rule
-     so that a top-level class with no base and no `operations` is
-     allowed. That is a meaning change, and it makes the rule weaker.
-
-2. **A rule: heading, predicate, trailer: a check fails eight places
-   in four files.**
-   - Heading line: `standards/doc-type/standard-conventions.md:40`.
-   - What it means: each rule section is a heading, one paragraph, at
-     most one other block, a trailer that has the correct id, and at
-     most one Why block. An H3 is only under an H2 that has no
-     trailer.
-   - Proposal: restate the rule as in the row above, and add the
-     check. The check makes the repo fail in eight places. This report
-     fixes one of them, in the row for
-     `front-matter-holds-its-kinds-vocabulary`. The triage of each
-     other family fixes its own failures.
-   - Difference from today's sentence: "the directory" becomes "the
-     first directory under `standards/`", which is what all 217
-     trailers already use. "Block or table" becomes a list of the four
-     block kinds.
-   - Difference from today's enforcement: today no check exists
-     (`verifiers.yaml:37`, `null`). `scripts/verifier-table` reads
-     trailers only to learn the ids.
-   - Measured: 217 rules in 30 Standards. The failures:
-     - Too many blocks before the trailer:
-       `standards/doc-type/runbook-conventions.md:32` (5 blocks),
-       `standards/knowledge-organization/documentation-sets/working-documentation-sets.md:86`
-       (3 blocks: two paragraphs and a list), and
-       `standards/prose/conventions.md:191` (7 blocks).
-     - An H3 under an H2 that has a trailer:
-       `standards/standard/detectors.md:50`, `:59`, and `:67`, under
-       `:35`; `:94` and `:101`, under `:74`. The ruling "The two
-       tables" deletes both parent rules, and probably these five H3s
-       too. The standard family's triage decides.
-
-3. **Every bundle file reached from SKILL.md: "invoked" becomes
-   "linked".**
-   - Heading line: `standards/doc-type/runbook-conventions.md:138`.
-   - What it means: `SKILL.md` must lead to every file in the bundle,
-     so the model can find each file.
-   - Proposal: "Every file in a skill's `references/` or `scripts/` is
-     the target of a link in its `SKILL.md`."
-   - Difference from today's sentence: "invoked from its `SKILL.md`"
-     becomes "linked from its `SKILL.md`". A function cannot decide
-     "invoked". A link is a fact that a function can decide. Under
-     the new sentence, a script that appears only in a code span
-     fails. Under the old sentence, the same script passes if the
-     text tells the model to run it.
-   - Difference from today's enforcement: today no check exists
-     (`verifiers.yaml:52`, `null`).
-   - Measured: the bundles have 8 files, 6 in `references/` and 2 in
-     `scripts/`. All 8 are linked from their `SKILL.md` today, so no
-     file fails.
-
-4. **Loop Conventions: six rules and a detector, and no Loop file.**
-   - Heading lines: `standards/doc-type/loop-conventions.md:21`,
-     `:38`, `:49`, `:57`, `:65`, and `:77`.
-   - What they mean: a `loops/*.md` file typed `Loop` is one
-     paragraph, one Mermaid graph, and the Acts, Checks, and Yields
-     lists. The graph and the lists agree.
-   - Proposal: keep all six, restated as in the rows above. The Loop
-     doc-type is built, and `loops/index.md` expects instances. A
-     governed repo that writes a Loop can fail these rules, so the
-     reason "binds nothing" does not apply. The alternative is to
-     delete the six rules and `loop_lint.py` until the first Loop is
-     written. That follows "delete is the default".
-   - Difference from today's sentence: wording only, in five rows.
-   - Difference from today's enforcement: the three gaps named in
-     the rows get closed, and `an-act-links-a-runbook` gets a check.
-   - Measured: 0 files typed `Loop` in this repo or in any
-     `~/workspace` repo. `src/dev_playbook/loop_lint.py` is 412 lines,
-     and `tests/dev_playbook/test_loop_lint.py` is 215 lines.
+1. `one-base-class`, `standards/doc-type/doc-type.md:56`: deleted, too
+   specific.
+2. `a-rule-heading-predicate-trailer`,
+   `standards/doc-type/standard-conventions.md:40`: built, with the
+   block limit in the row's blockquote relaxed to a shape: a heading,
+   then one paragraph, then any number of paragraphs, lists, fenced
+   blocks, or quotes, then the trailer line, then at most one Why
+   block; an H3 only under an H2 with no trailer. The five H3 failures
+   went with the two-tables deletion, so it passes today.
+3. `every-bundle-file-reached-from-skillmd`,
+   `standards/doc-type/runbook-conventions.md:138`: built, the linked
+   form in the row's blockquote.
+4. The six Loop rules of `standards/doc-type/loop-conventions.md`:
+   Loop stays as it is, all six kept.
 
 ## New rules
 

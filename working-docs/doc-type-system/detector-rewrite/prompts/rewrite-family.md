@@ -35,24 +35,21 @@ Work in the current directory, a checkout of dev-playbook.
 
 ## What you read, in this order
 
-1. [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md):
-   Principles, Constraints, Decided.
-2. [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md),
-   Rulings that calibrate the rest; then the family's report,
+1. The family's report,
    `working-docs/doc-type-system/detector-rewrite/triage/<family>.md`,
    whole, Escalations included: each escalation carries its ruling.
-3. The scaffold you build on: `src/dev_playbook/model.py`,
+2. The scaffold you build on: `src/dev_playbook/model.py`,
    `src/dev_playbook/check_registry.py`, `src/dev_playbook/sources.py`,
    `src/dev_playbook/checks/shell.py`, and
    `tests/dev_playbook/test_check_registry.py`. Read them before
    writing any code.
-4. The family's Standards, every `.md` under `standards/<family>/`,
+3. The family's Standards, every `.md` under `standards/<family>/`,
    and the rule shape they obey,
    [A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
-5. Today's checks, the functions the report cites by `path:line`.
+4. Today's checks, the functions the report cites by `path:line`.
    Read each one before replacing it, so the new function decides
    what the old one decided and the report's restatement.
-6. Where the family's report cites
+5. Where the family's report cites
    [Detector Fixes](/working-docs/doc-type-system/detector-rewrite/detector-fixes.md),
    the rows it cites.
 

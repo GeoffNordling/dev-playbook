@@ -350,155 +350,42 @@ Kept as written, the check matching the sentence:
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: built in full, relative targets included; the two
-placeholder links became code spans, a fix the user approved by
-name. Item 2: built, with the Decision Record exception. Item 3:
-built, narrowed. Item 4: built, `~/.claude/` named as a target form.
-Item 5: stochastic, a prose mention is not a function's to decide.
-Item 6: built in full; `working-docs/software-factory/ROOT.md` gained
-a Members section linking all 26 files, a fix the user approved by
-name. Item 7:
-built, the proposal's reading. Item 8: the three rules deleted. New
-rules: `README` accepted; `Vocabulary` rejected, the user keeps other
-Vocabulary files open.
+The number is the one the rows above cite.
 
-1. **`reference-resolves`**, `standards/knowledge-organization/cross-references.md:26`.
-   - Means: the target of a same-repo reference exists. The Why at lines
-     33–36 puts a cross-repo target out of scope, since a repo cannot
-     check another repo from its own files.
-   - Proposal: the restated body above, whose last sentence adds the
-     cross-repo target, read from that repo's main checkout. The check
-     for that sentence has the tag `needs=WORKSPACE`, so CI skips it, as
-     the design's ruling on the two tables expects for this detector.
-     The Why at lines 33–36 is deleted.
-   - Against today's sentence: adds the cross-repo target, and says how
-     each target form is read.
-   - Against today's enforcement: `ref-lint` (`scan_file`,
-     `scripts/ref-lint:187-205`) already checks the cross-repo target on
-     disk (`citation_actual`, `scripts/ref-lint:124`), so the sentence
-     moves to the check. The check gains relative targets, which it skips.
-     The other choice is to keep the sentence and drop the cross-repo leg
-     from the check.
-   - Measured: 3 cross-repo links and 4 bare cross-repo paths, all
-     resolve; the 4 bare paths are the ones the
-     `workspace-path-for-another-repo` row explains.
-     14 relative links, 2 broken:
-     `working-docs/software-factory/skills/wayfinder-to-build/SKILL.md:41`
-     `[…](…)` and `:108` `[<map name>](url)`, both placeholders in prose.
-     `~/.claude/` targets are escalation 4.
-2. **`headings-slugify-distinctly`**, `standards/knowledge-organization/cross-references.md:45`.
-   - Means: no two headings of one `.md` file have the same GitHub slug,
-     so no anchor depends on the position GitHub adds to a repeat.
-   - Proposal: the restated body above, which leaves out a numbered
-     Decision Record.
-   - Against today's sentence: adds the Decision Record exception. The
-     Standard's population leaves out references from a record, but this
-     rule is about a file's headings, not a reference.
-   - Against today's enforcement: none, the rule is `null`; the check is
-     new.
-   - Measured: 1 of 244 `.md` files fails,
-     `docs/decisions/0002-compounding-with-ai.md` (two headings with the
-     slug `decision`). It is a frozen record, so without the exception the
-     repo cannot comply without editing it.
-3. **`stable-named-anchor`**, `standards/knowledge-organization/cross-references.md:56`.
-   - Means: an `#anchor` must not use a number that is the heading's
-     position in the file, because the anchor breaks when the headings
-     are renumbered. The second clause, no anchor where every heading is
-     numbered, follows from the first.
-   - Proposal: the restated body above; the anchor must not name a
-     heading whose text starts with a section number.
-   - Against today's sentence: narrower. A position number that is not at
-     the start of the heading, as in `Phase 1 — Build a feedback loop`, is
-     out. The second clause is dropped as a consequence of the first.
-   - Against today's enforcement: none, the rule is `null`. A repeated
-     slug's `-1` suffix already fails `fragment-anchor-matches-the-slug`,
-     since `heading_slugs` (`src/dev_playbook/md.py:170`) adds no suffix.
-   - Measured: 20 files have headings that start with a number:
-     `docs/mirrors/okf-spec.md`, with 19, and 19 skills and agent
-     definitions, such as `1. Load context`. 0 of 314
-     anchored links to a `.md` file name one. The other choice is delete:
-     the rule fails nothing today.
-4. **`~/.claude/` targets**, for `workspace-path-for-a-stable-location`
-   (`standards/knowledge-organization/cross-references.md:125`) and
-   `workspace-path-for-another-repo` (`:81`).
-   - Means: the two rules give `~/workspace/<repo>/` as the one form of a
-     target that a file loaded from any repo can resolve. A `~/.claude/`
-     path is not named.
-   - Proposal: name `~/.claude/` as the target form for a harness file,
-     a skill, an agent, or a rule, in both rules. This is the form
-     `doc-types/runbook/encoding.md:112` requires for a runbook's
-     does-link.
-   - Against today's sentence: meaning changed. Read literally, a
-     `~/.claude/skills/commit/SKILL.md` link in a dev-playbook skill is a
-     same-repo reference in the wrong form, since `~/.claude/skills` is
-     the stow link into `dotfiles/dot-claude/skills/`; in a consumer
-     repo, the same link is a reference to another repo in the wrong form.
-   - Against today's enforcement: `ref-lint` reads no `~/.claude/` target
-     (`scripts/ref-lint:191-195`), so none is resolved or form-checked.
-     With the proposal, `reference-resolves` resolves `~/.claude/` from
-     the home directory, a `needs=WORKSPACE` check.
-   - Measured: 27 `~/.claude/` links in 14 files, all from files with no
-     fixed repo root; 11 distinct targets, all resolve on this machine.
-     Without the proposal, 27 findings.
-5. **`slash-invocation-for-a-skill`**, `standards/knowledge-organization/cross-references.md:94`.
-   - Means: a reference to a skill names it as `/<skill-name>`, the way
-     the user runs it.
-   - Proposal: the restated body above; only a link whose target is a
-     skill's `SKILL.md` is checked, by its link text.
-   - Against today's sentence: narrower. A prose mention such as "the
-     grilling skill" is out; no function can tell it from other prose.
-   - Against today's enforcement: none, the rule is `null`.
-   - Measured: 28 links target a `SKILL.md`; 26 have `/<name>` as text.
-     The 2 that fail are `harness-recipes/recipes/ralph-loop.md:194` and
-     `:213`, whose text is `` `ralph-setup` `` and `` `ralph-checkpoint` ``.
-     The other choice is a stochastic verdict for the sentence as it is.
-6. **`every-member-reached-from-rootmd`**, `standards/knowledge-organization/documentation-sets/working-documentation-sets.md:43`.
-   - Means: a reader who starts at `ROOT.md` and follows links, not
-     index rows, reaches every file of the set.
-   - Proposal: the restated body above, with a check.
-   - Against today's sentence: none.
-   - Against today's enforcement: none, the rule is `null`. The new check
-     moves the repo out of compliance.
-   - Measured: `working-docs/doc-type-system/` passes. In
-     `working-docs/software-factory/`, 26 files fail: 10 under `docs/`, 6
-     under `agents/`, and 10 under `skills/`. Its `ROOT.md` names the
-     directories in inline code and links none of them. Fix by adding
-     links to that `ROOT.md`, or rule on the set, whose future is a
-     rewrite or a delete.
-7. **`alphabetical-unless-declared-otherwise`**, `standards/knowledge-organization/indexes.md:58`.
-   - Means: an index is in a predictable order unless it says it is not.
-   - Proposal: the restated body above. The concept-document group comes
-     before the child-directory group, and an `Ordering:` line turns off
-     that group order too.
-   - Against today's sentence: "the concept documents and then the
-     child-directory links" can be read as a group order or only as a
-     list of the two groups. The sentence says `Ordering:` turns off the
-     alphabetical order of both groups; it does not say the group order.
-     The proposal picks the group order, and lets `Ordering:` turn it off.
-   - Against today's enforcement: `check_index_ordering`
-     (`scripts/okf-lint:717`) tests the `README.md` place inside the
-     concept group only and never tests the group order.
-   - Measured: 41 `index.md` files. With the proposal, 0 fail. Under the
-     other reading, where `Ordering:` does not turn off the group order,
-     `working-docs/doc-type-system/detector-rewrite/index.md` fails: its
-     `Ordering:` line puts `Detector Fixes` after two child directories.
-8. **The global table: `type-name-in-first-cell`, `description-in-second-cell`, `rows-in-alphabetical-order`**, `standards/knowledge-organization/type-registry.md:30`, `:38`, `:47`.
-   - Means: the rows of the type table in `document-types.md` each have a
-     backticked type name, then one line of description, in alphabetical
-     order.
-   - Proposal: delete all three. The table is data the checker reads
-     for `type-names-a-registered-type`, from dev-playbook only. By the
-     ruling on data read out of a Standard, a named constant in
-     `sources.py` points at it, and a test parses it. That test asserts
-     the three shapes.
-   - Against today's sentence: all three bodies go. They also name a
-     `## Types` table, a heading no file has; the table sits under
-     `` `type` names a registered type ``.
-   - Against today's enforcement: `check_registry`
-     (`scripts/okf-lint:274`) decides the first and third, in apex mode
-     only; no check decides the second. The test replaces
-     `check_registry`.
-   - Measured: 12 rows, 0 fail any of the three.
+1. `reference-resolves`,
+   `standards/knowledge-organization/cross-references.md:26`: built in
+   full, relative targets included; the two placeholder links became
+   code spans, a fix the user approved by name.
+2. `headings-slugify-distinctly`,
+   `standards/knowledge-organization/cross-references.md:45`: built,
+   with the Decision Record exception.
+3. `stable-named-anchor`,
+   `standards/knowledge-organization/cross-references.md:56`: built,
+   narrowed to the row's blockquote.
+4. `workspace-path-for-a-stable-location` and
+   `workspace-path-for-another-repo`,
+   `standards/knowledge-organization/cross-references.md:125` and
+   `:81`: built, `~/.claude/` named as a target form in both.
+5. `slash-invocation-for-a-skill`,
+   `standards/knowledge-organization/cross-references.md:94`:
+   stochastic, a prose mention is not a function's to decide.
+6. `every-member-reached-from-rootmd`,
+   `standards/knowledge-organization/documentation-sets/working-documentation-sets.md:43`:
+   built in full; `working-docs/software-factory/ROOT.md` gained a
+   Members section linking all 26 files, a fix the user approved by
+   name.
+7. `alphabetical-unless-declared-otherwise`,
+   `standards/knowledge-organization/indexes.md:58`: built, the row's
+   reading: the concept-document group before the child-directory
+   group, and an `Ordering:` line turns that group order off too.
+8. `type-name-in-first-cell`, `description-in-second-cell`, and
+   `rows-in-alphabetical-order`,
+   `standards/knowledge-organization/type-registry.md:30`, `:38`, and
+   `:47`: the three rules deleted; the test on the `sources.py`
+   constant asserts the three shapes.
+
+New rules below: `README` accepted; `Vocabulary` rejected, the user
+keeps other Vocabulary files open.
 
 ## New rules
 

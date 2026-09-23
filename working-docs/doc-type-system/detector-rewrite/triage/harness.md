@@ -87,65 +87,16 @@ which is the rule's population. It passes today: the file has
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: built, with the table brought to the repo as it stands, a
-`statusline.sh` row and the workflows row over both roots. Item 2:
-built, the tree read as a closed list. The new rule is accepted.
+The number is the one the rows above cite.
 
-1. **`every-harness-file-matches-a-member-row`**,
-   `standards/harness/files.md:18`.
-   - Meaning: every tracked file under a harness root is one of the
-     file kinds that the table lists.
-   - Proposal: the path list above. Add a table row for
-     `statusline.sh`: class code, role "run by the `statusLine`
-     setting", content standard none yet. Change the workflows row
-     from `.claude/workflows/*.js` to `workflows/*.js`, relative to
-     either root like the other rows.
-   - Difference from today's sentence: "matches a member row" becomes
-     nine literal path patterns. "Skill bundles" becomes
-     `skills/<name>/` and any file under it. The workflows row covers
-     both roots, not `.claude/` only. The table gains one row.
-     "Tracked" is added, because the repo model reads only
-     `git ls-files` (Decided, Repo model). The untracked harness state
-     under the roots, such as `.claude/worktrees/` and the
-     `dotfiles/dot-claude/` runtime directories that `.gitignore:12-32`
-     lists, is then out of scope.
-   - Difference from today's enforcement: no check exists. The new
-     check starts to run.
-   - Measured: 59 tracked files under `dotfiles/dot-claude/`, none
-     under `.claude/`. Under the proposal, 0 fail. Under today's
-     sentence read literally, 3 fail:
-     `dotfiles/dot-claude/statusline.sh`, which no row names (it is
-     run from `dotfiles/dot-claude/settings.json:204`), and the two
-     files in `dotfiles/dot-claude/workflows/`, which the
-     `.claude/`-only row does not cover. If the rule gets a check with
-     no change to its sentence, the repo goes out of compliance.
-2. **`every-runbook-at-a-fixed-path`**, `standards/harness/files.md:39`.
-   - Meaning: a skill is a directory under a skills root that has a
-     `SKILL.md`, and an agent is a `.md` file directly under an agents
-     root.
-   - Proposal: the restatement above.
-   - Difference from today's sentence: the sentence and its tree block
-     say where a runbook sits. They do not say whether a bundle can
-     have an entry that is not in the tree, such as `assets/`. The
-     restatement reads the tree as a closed list. If the user reads it
-     as open, remove "and has nothing else in it but `references/`,
-     `scripts/`, and `agents/`", and the remaining restatement is
-     `wording only`.
-   - Difference from today's enforcement: a missing `SKILL.md` is an
-     exit-2 error state today (`scripts/harness-files-lint:459`) and
-     becomes a finding under this id. A bundle entry outside the three
-     directories, and a non-`.md` file or a subdirectory under an
-     agents root, are not reported today. With the proposal, they are
-     reported. Today the detector skips a symlinked bundle and
-     `synced/` (`discover_internal_skills`, `:556-579`). Git tracks a
-     symlink as a file, not a directory, so the proposal does not
-     select one. `synced/` is in `.gitignore:32`, so the model does not
-     read it.
-   - Measured: 27 directories under `dotfiles/dot-claude/skills/`,
-     each with a tracked `SKILL.md`. The 16 other bundle files are all
-     under `references/` (6), `scripts/` (2), or `agents/` (8,
-     each `openai.yaml`). The 4 files under `dotfiles/dot-claude/agents/`
-     are `.md` at depth 1. 0 tracked symlinks. So 0 fail.
+1. `every-harness-file-matches-a-member-row`,
+   `standards/harness/files.md:18`: built, with the table brought to
+   the repo as it stands, a `statusline.sh` row and the workflows row
+   over both roots.
+2. `every-runbook-at-a-fixed-path`, `standards/harness/files.md:39`:
+   built, the tree read as a closed list.
+
+The new rule below is accepted.
 
 ## New rules
 

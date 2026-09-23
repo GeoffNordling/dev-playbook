@@ -148,145 +148,28 @@ Kept as written: none.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Items 1 to 3: deleted; consumers are no reason to keep a rule. Item
-4: built, the shape check, 12 of 12 pass.
+The number is the one the rows above cite.
 
-Items 1 to 3 share one question. The calibration ruling "a rule
-about the checker itself is a test, not a rule" covers dev-playbook's
-own checking code only. After the rewrite, dev-playbook has no
-detector under `scripts/` (Hook mechanism, Decided). But two
-consumer repos host their own first-party detectors and are bound
-by these three rules today: `mission-control` wires `ideas-lint`,
-and `story-forge` wires five, `interview-prep-lint`, `stories-lint`,
-`role-postings-lint`, `unemployment-lint`, and `resume-lint`. Each
-is a `scripts/` entry in both `.pre-commit-hooks.yaml` and the
-`repo: local` block of `.pre-commit-config.yaml`. The question is
-whether the Detectors Standard keeps governing a consumer's own
-detector scripts once dev-playbook has none.
+1. `the-script-holds-no-rule-logic`,
+   `standards/standard/detectors.md:112`: deleted; consumers are no
+   reason to keep a rule.
+2. `git-runs-against-the-given-root`,
+   `standards/standard/detectors.md:121`: deleted, the same reason.
+3. `every-detector-is-reachable-and-listed`,
+   `standards/standard/detectors.md:134`: deleted, the same reason.
+4. `directory-index-opens-with-the-governing-sentence`,
+   `standards/standard/tree.md:33`: built, the shape check, 12 of 12
+   pass today. The body:
 
-1. **`the-script-holds-no-rule-logic`**,
-   `standards/standard/detectors.md:112`.
-   - Means: a detector script under `scripts/` is only a launcher. It
-     puts the repo's package on `sys.path`, imports one entry point,
-     and calls it. All logic is in the package.
-   - Proposal: delete. In dev-playbook the member stops existing on
-     the rewrite. A consumer's detector is that repo's own checking
-     code, which its own tests cover.
-   - Alternative: keep it for consumers, restated with the statements
-     a shim really has, `meaning changed`: "Apart from its shebang,
-     inline metadata block, and docstring, a detector script under
-     `scripts/` has only `import sys`, `from pathlib import Path`, one
-     `sys.path.insert` of the repo's `src/`, one import from the
-     repo's package, and one `if __name__ == "__main__":` block that
-     calls the imported name."
-   - Difference from today's sentence: delete removes the rule. The
-     alternative names the five statements every shim has. Read
-     literally, the current sentence fails every shim, because each
-     shim also has `import sys`, `from pathlib import Path`, a
-     docstring, and an `if __name__` guard. Example:
-     `scripts/standards-lint`.
-   - Difference from today's enforcement: none. The verifier row is
-     `null` (`standards/verifiers.yaml:192`).
-   - Measured: in dev-playbook, five scripts fail today, all removed
-     by the rewrite: `scripts/okf-lint` 808 lines, `scripts/repo-lint`
-     781, `scripts/harness-files-lint` 677, `scripts/ref-lint` 287,
-     `scripts/python-lint` 182. In consumers,
-     `mission-control/scripts/ideas-lint` fails (482 lines). The five
-     `story-forge` scripts are 27 to 30 line shims, which pass the
-     alternative.
+   > The first sentence after the H1 of each `standards/<name>/index.md`
+   > has the form `<Name> governs <what> — <the things>`: the
+   > Standard's name, the word `governs`, the question it governs, an
+   > em dash, and the things its rules cover.
 
-2. **`git-runs-against-the-given-root`**,
-   `standards/standard/detectors.md:121`.
-   - Means: when a detector starts a `git` child process, it removes
-     every variable that `git rev-parse --local-env-vars` lists from
-     that process's environment. This stops an exported `GIT_DIR`
-     from redirecting the child to another repo.
-   - Proposal: delete. After the rewrite, dev-playbook's only git call
-     is the model builder's one `git ls-files`. A test that builds
-     the model under a foreign `GIT_DIR` covers it: dev-playbook's
-     own checker, per the calibration ruling. A consumer's detector
-     is that repo's own code.
-   - Alternative: keep it for consumers, with an `ast` check that every
-     `subprocess` call whose argv starts `"git"` passes an `env=`
-     argument. This is a weaker test than the sentence, because the
-     check cannot see what the `env` mapping contains. That gap is a
-     `meaning changed` narrowing.
-   - Difference from today's sentence: delete removes the rule, and
-     the Why moves to the test's docstring.
-   - Difference from today's enforcement: none. The verifier row is
-     `null` (`standards/verifiers.yaml:186`). The practice lives in
-     `gitrepo.no_git_env`, `src/dev_playbook/gitrepo.py:47`.
-     `mission-control/scripts/ideas-lint:84` has its own copy.
-   - Measured: no check exists, so no count of failing call sites.
-
-3. **`every-detector-is-reachable-and-listed`**,
-   `standards/standard/detectors.md:134`.
-   - Means: some hook path runs every detector script: the
-     `playbook-lint` roster, a `scripts/` hook in both
-     `.pre-commit-config.yaml` and `.pre-commit-hooks.yaml`, or the
-     ungated-audit list. Each detector also has a row in a table of
-     `scripts/README.md` where that file exists.
-   - Proposal: delete. After the rewrite, dev-playbook has no roster
-     and no detector scripts, and the registry meta-test covers
-     reachability of every check. For consumers, the manifest-to-local
-     half is `distribution.a-publisher-dogfoods-its-manifest`
-     (`standards/distribution/channel.md:31`).
-   - Alternative: keep it for consumers, `meaning changed` because the
-     roster and ungated-audit branches dissolve: "Every hook in the
-     `repo: local` block of `.pre-commit-config.yaml` whose `entry`
-     starts `scripts/` is also in `.pre-commit-hooks.yaml`, and it
-     has a row in a table of `scripts/README.md` where that file
-     exists."
-   - Difference from today's sentence: delete removes the rule. The
-     alternative drops the roster and ungated-audit branches.
-   - Difference from today's enforcement: `check_hook_surfaces`,
-     `src/dev_playbook/standards_lint.py:524`, checks less than the
-     sentence. Its mirror leg (`:559`) compares the `scripts/`-entry
-     ids of the manifest and the local block, and its README leg
-     (`:582`) matches the roster, or the consumer's local detector
-     hooks, against any backticked first cell of any table in
-     `scripts/README.md` (`_readme_table_names`, `:490`). It never
-     lists the detectors that `verifiers.yaml` names, so it does not
-     flag a detector script that no hook reaches.
-     `every-address-runs-somewhere` flags that case today.
-   - Measured: both consumers pass today. `story-forge` has 5 of 5
-     detectors mirrored and `mission-control` has 1 of 1. Neither
-     repo has `scripts/README.md`, so the README leg does not apply
-     to them.
-
-4. **`directory-index-opens-with-the-governing-sentence`**,
-   `standards/standard/tree.md:33`.
-   - Means: the first sentence of each Standard directory's
-     `index.md` names the Standard, the question it governs, and what
-     its rules cover, in the pattern `<Name> governs <what> — <the
-     things>`. The catalog row repeats that sentence.
-   - Proposal: rewrite, `meaning changed`, gaining a check:
-
-     > The first sentence after the H1 of each `standards/<name>/index.md`
-     > has the form `<Name> governs <what> — <the things>`: the
-     > Standard's name, the word `governs`, the question it governs, an
-     > em dash, and the things its rules cover.
-
-     Check: take `_opening_sentence`
-     (`src/dev_playbook/standards_lint.py:287`) of each directory
-     index and match `^\S.* governs \S.* — \S.*$`.
-   - Difference from today's sentence: the clause "the catalog row
-     repeats that sentence" is dropped because it restates
-     `the-catalog-lists-every-directory`, which requires each row to
-     have that sentence verbatim. This is not a cut at an "and", so
-     the meaning changes for this rule alone. The two rules together
-     still decide the same states. The check decides the shape only.
-     Whether `<Name>` is the Standard's name and `<what>` is its
-     question is not decidable: no file records a Standard's name.
-     For example, `standards/testing/index.md` opens "Python Testing
-     governs", and no title, directory name, or frontmatter field has
-     "Python Testing".
-   - Difference from today's enforcement: the verifier row is `null`
-     (`standards/verifiers.yaml:182`), so the rule gains its first
-     check.
-   - Measured: 12 of 12 Standard directory indexes match the pattern
-     today, and `standards_lint.audit` reports 0 findings, so every
-     catalog row repeats its sentence.
+   Check: the opening sentence of each directory index matches
+   `^\S.* governs \S.* — \S.*$`. The clause "the catalog row repeats
+   that sentence" is dropped; `the-catalog-lists-every-directory`
+   already requires it.
 
 ## New rules
 

@@ -208,73 +208,23 @@ Standards pass.
 
 Ruled 2026-09-23 under the general rulings in
 [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md#rulings-that-calibrate-the-rest).
-Item 1: built as the form check only; the sentence limit is deleted.
-Items 2 and 3: deleted, both micromanage and each would read GitHub,
-which the No GitHub auditing constraint puts out of scope.
+The number is the one the rows above cite.
 
-1. **`one-list-item-per-entry`**, `standards/tracking/candidates.md:25`.
-   - Meaning: each entry in `CANDIDATES.md` is one bullet, a bold name,
-     an em dash, and one or two sentences; no brief furniture.
-   - Proposal: rewrite, add a check over the model.
+1. `one-list-item-per-entry`, `standards/tracking/candidates.md:25`:
+   built as the form check only; the sentence limit is deleted. The
+   body:
 
-     > Every list item in `CANDIDATES.md`, nested or not, starts
-     > `**<name>** — ` and has at most two sentences after the em dash.
+   > Every list item in `CANDIDATES.md`, nested or not, starts
+   > `**<name>** — `.
 
-     The check: a sentence ends at `.`, `?`, or `!` followed by a space
-     and a capital letter, `*`, `` ` ``, `[`, or `(`.
-   - Difference from today's sentence: `meaning changed`. "No fields,
-     no acceptance criteria, no checkboxes" becomes the form itself. A
-     field line, a checkbox item, or a criteria bullet fails because it
-     does not start `**<name>** — `. One sentence of criteria written
-     inside an entry's own text passes, where the old sentence fails it.
-   - Difference from today's enforcement: none today; the verifier row
-     is `null`.
-   - Measured: 31 list items in `CANDIDATES.md`, 30 pass. One fails:
-     `The parser's trigger`, `CANDIDATES.md:51`, has three sentences.
-     The repo leaves compliance until that entry is cut to two.
-
-2. **`outcome-and-decomposition-rationale`**,
-   `standards/tracking/issue-shapes.md:193`.
-   - Meaning: an epic's body has the two bold headings `Outcome` and
-     `Decomposition rationale`.
-   - Proposal: keep, restated, and add the check to `workspace-lint`
-     as a named exception to the "No GitHub auditing" Constraint.
-     `_epic_findings` calls `_heading_findings` with the two headings,
-     as the leaves do.
-
-     > The body of an epic has `Outcome` and `Decomposition rationale`
-     > as bold text followed by a colon, outside any code fence.
-
-     The other way: the rule stays `null` out of this strand's scope,
-     against the Constraint "The null rows are in". Delete does not
-     fit: an epic without the headings is a state a governed repo can
-     fail.
-   - Difference from today's sentence: `wording only`. "Outside any
-     code fence" only states what "bold heading" already means: a
-     heading shown in a fence is quoted, as the build and spike rules
-     say.
-   - Difference from today's enforcement: no check today;
-     `_epic_findings`, `src/dev_playbook/workspace_lint.py:856`, reads
-     labels only.
-   - Measured, read-only over `gh api` with `fetch_issues`: 25 open
-     issues in the 8 governed repos with a GitHub origin (`lunch` and
-     `date-tree` have none), 0 open epics, 0 failures.
-
-3. **`ticket-under-a-map`**, `standards/tracking/issue-shapes.md:242`.
-   - Meaning: an issue with a `wayfinder:*` label other than
-     `wayfinder:map` has a parent issue, and that parent has
-     `wayfinder:map`.
-   - Proposal: keep the body as written, and add the check to
-     `workspace-lint` as the same named exception as number 2. The
-     issues list that `fetch_issues` reads has no parent field; GraphQL
-     `Issue.parent` has it, one query per decision ticket, or one
-     `sub_issues` read per open map. The other way is as in number 2.
-   - Difference from today's sentence: none.
-   - Difference from today's enforcement: no check today;
-     `_ticket_findings`, `src/dev_playbook/workspace_lint.py:803`,
-     reads labels and body only.
-   - Measured, same read as number 2: 0 open maps, 0 open decision
-     tickets, 0 failures.
+   A field line, a checkbox item, or a criteria bullet fails because
+   it does not start `**<name>** — `. 31 list items today, 0 fail.
+2. `outcome-and-decomposition-rationale`,
+   `standards/tracking/issue-shapes.md:193`: deleted; it micromanages
+   and would read GitHub, which the No GitHub auditing constraint puts
+   out of scope.
+3. `ticket-under-a-map`, `standards/tracking/issue-shapes.md:242`:
+   deleted, the same reason.
 
 ## New rules
 
