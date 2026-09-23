@@ -113,7 +113,7 @@ The code is [`rig/relocated.mjs`](/working-docs/parallel-fronts/rig/index.md).
 The pipeline calls one Sandcastle function, `run()`, which runs one agent
 from start to finish. Sandcastle's other functions wait until a need
 proves them
-([Constraints](/working-docs/parallel-fronts/ROOT.md#constraints)).
+([Principles](/working-docs/parallel-fronts/ROOT.md#principles)).
 
 **Instructions go in as `prompt`.** The driver reads the task from a file,
 such as `PROMPT.md`, and passes the text as `run()`'s `prompt` argument.

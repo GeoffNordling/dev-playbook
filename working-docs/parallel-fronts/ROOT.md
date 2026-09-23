@@ -26,6 +26,13 @@ and no single lap is expected to produce a result fit for `main`.
 The point is delegation with the user still in charge: the agents hold the
 inner loop, the user holds every seam between laps.
 
+## Principles
+
+- Bias for simplicity: take the simpler way until a more complex one
+  proves its need.
+- Past decisions do not bind this set. A decision record that stands in the
+  way is revised rather than worked around.
+
 ## Constraints
 
 - The user aligns at every checkpoint. No lap reaches `main` unattended.
@@ -43,10 +50,6 @@ inner loop, the user holds every seam between laps.
   ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)).
 - Every run happens on the Fedora machine
   ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)).
-- Bias for simplicity: take the simpler way until a more complex one
-  proves its need.
-- Past decisions do not bind this set. A decision record that stands in the
-  way is revised rather than worked around.
 
 ## Working with the user
 
