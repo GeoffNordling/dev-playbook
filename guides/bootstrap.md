@@ -24,7 +24,7 @@ on the same GitHub tail and roster enrollment.
    [canonical artifacts](/standards/build/canonical.md), pinning the
    hook `rev` at dev-playbook's `origin/main` as of init time, then runs
    `git init -b main` and `uv lock`, stages everything, installs both
-   pre-commit stages, and self-checks the result with `playbook-lint` —
+   pre-commit stages, and self-checks the result with `playbook check` —
    the same hook it just installed, so a scaffold that would fail its
    own first commit never reaches the user. It fails loud when the target
    directory already exists or the self-check reports findings.

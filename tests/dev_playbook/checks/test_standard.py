@@ -118,13 +118,13 @@ repos:
   - repo: https://github.com/GeoffNordling/dev-playbook
     rev: x
     hooks:
-      - id: playbook-lint
+      - id: playbook-check
       - id: extra
   - repo: local
     hooks:
-      - id: playbook-check
+      - id: other
 """
-MANIFEST = b"- id: playbook-lint\n- id: playbook-check\n"
+MANIFEST = b"- id: playbook-check\n- id: other\n"
 
 
 def test_offered_by_the_canonical_template() -> None:
@@ -134,7 +134,7 @@ def test_offered_by_the_canonical_template() -> None:
         Path("/r"), {CANONICAL: OFFERING, ".pre-commit-hooks.yaml": MANIFEST}
     )
     assert [f.message for f in check(repo)] == [
-        "published hook playbook-check is not in the dev-playbook block",
+        "published hook other is not in the dev-playbook block",
         "dev-playbook block hook extra is not published in .pre-commit-hooks.yaml",
     ]
     assert found(check, {CANONICAL: b"repos: [\n"}) == [(CANONICAL, None)]

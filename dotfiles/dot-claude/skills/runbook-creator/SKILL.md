@@ -44,10 +44,9 @@ approved.
 
 ## 3. Check, then hand off
 
-{Run [playbook-lint](~/workspace/dev-playbook/scripts/playbook-lint)} over the
-dev-playbook **repo root**, and fix what it reports. {Run `uv run playbook check`}
-over the same root, and fix what it reports: it holds the runbook checks, and
-aimed narrower it finds no runbooks and passes vacuously.
+{Run `uv run playbook check`} over the dev-playbook **repo root**, and fix
+what it reports: it holds the runbook checks, and aimed narrower it finds no
+runbooks and passes vacuously.
 
 Leave the clean result uncommitted — the user reviews the working-tree diff in
 their IDE.

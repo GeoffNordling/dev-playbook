@@ -241,6 +241,51 @@ only `loop-lint`:
   on the way: the registry maps a family to its module with hyphens
   as underscores, since `doc-type` and `knowledge-organization`
   cannot name a module.
+- **Phase 3, 2026-09-23.** The loop ran the twelve families and six
+  rework steps, `d870d5a` to `fb9ff9b`, twelve checkpoints, every one
+  released by a fork and the last four audited beside it by a read-only
+  Opus agent. The tree holds one module per family under `checks/`,
+  107 check functions and 24 hook registrations, and nine scripts are
+  gone: `python-lint`, `testing-lint`, `decisions-lint`, `prose-lint`,
+  `harness-files-lint`, `standards-lint`, `okf-lint`, `ref-lint`,
+  `repo-lint`. `loop-lint` stays for the loop workstream
+  ([Loop](/working-docs/doc-type-system/loop/ROOT.md)) and
+  `workspace-lint` by ruling. Step 9a gave the model the canonical
+  sources and the repo name so no check reads this checkout. Step 12b
+  read non-mapping frontmatter and setext headings into the model, and
+  Step 12c reversed both: bad frontmatter stops the run again, and the
+  old heading form is a rule, `atx-headings-only`, that Step 12d taught
+  to skip a frozen Decision Record. Ten rule sentences were reduced
+  to their checks under the Sentence equals code Guardrail, which the
+  Step 12a audit's four findings added and the Step 12c audit's eight
+  hypotheticals bounded to inputs a repo writes today.
+- **Phase 4, 2026-09-23.** The cut over, by hand: the manifest publishes
+  `playbook-check` alone, the `playbook-lint` blocks are gone from both
+  configs, `scripts/playbook-lint`, `playbook_lint.py`, their tests,
+  and `tests/test_rule_registry.py` are deleted, `repo-init`'s
+  self-check calls `run_check` in process, and `playbook check` runs
+  the two legacy steps itself: `loop_lint.main` and
+  `pre-commit validate-manifest` where a manifest exists. One judgment:
+  the canonical `ci.yml` keeps its one-line shape, `SKIP: workspace`,
+  and `playbook check` reads that variable for tag names, so the
+  runner needs no second step repeating the pinned sha; the secondary
+  machine's `machine-env.sh` exports the same name, and a skip is
+  announced on stderr as `ref-lint` announced its own. The
+  one-published-hook test the distribution triage deferred to this
+  phase is in, `test_manifest.py`. The stopwatch: `pytest` 7.5 s over
+  754 tests, under the 10.0 s baseline; `pre-commit run --all-files`
+  1.05 s against 0.89 s, a miss of 0.16 s. `playbook check` alone is
+  0.61 s where `playbook-lint` was 0.47 s: 0.21 s builds the model, of
+  which 0.14 s is pure-Python YAML over 228 frontmatter blocks, 0.25 s
+  runs the 107 checks, `no-banned-word` the largest at 0.07 s, 0.09 s
+  spawns `uvx` for the manifest, and 0.06 s is interpreter start. The
+  two cheap cuts, PyYAML's C loader and the manifest step in process,
+  would return the number to the baseline; neither is made here. Found
+  on the way and left for a ruling: the wheel a consumer's pre-commit
+  installs is 108 MB in 1905 files because `uv_build` packs
+  `cloa_viewer/web/node_modules/` and the `.ruff_cache/` ruff writes
+  beside the canonical `pyproject.toml`; it predates the rewrite and
+  one `wheel-exclude` line in `pyproject.toml` ends it.
 
 ## Finish line
 

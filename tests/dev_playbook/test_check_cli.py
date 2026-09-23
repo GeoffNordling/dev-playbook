@@ -1,5 +1,6 @@
 """Tests for the playbook console script, src/dev_playbook/check_cli.py."""
 
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -128,3 +129,73 @@ class TestCheck:
     ) -> None:
         assert check_cli.main(["check", str(tmp_path)]) == 2
         assert "cannot build the model" in capsys.readouterr().err
+
+
+FAKE_UVX = """\
+#!/bin/sh
+echo "$@" > "$FAKE_UVX_LOG"
+echo 'bad manifest' >&2
+exit 1
+"""
+
+
+class TestSteps:
+    def test_skip_names_a_tag(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        # SKIP=workspace, the line a CI file sets, is --without workspace.
+        root = a_repo(tmp_path, {"README.md": "# R\n"})
+        fake_registry(
+            monkeypatch,
+            Check("fam.a", needs_workspace, None, frozenset({WORKSPACE}), "m.fam"),
+        )
+        monkeypatch.setenv("SKIP", "ruff-check,workspace")
+        assert check_cli.main(["check", str(root)]) == 0
+        captured = capsys.readouterr()
+        assert captured.out == ""
+        assert "playbook check: without workspace" in captured.err
+
+    def test_loop_lint_runs_as_a_step(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        root = a_repo(tmp_path, {"README.md": "# R\n"})
+        fake_registry(monkeypatch)
+        assert check_cli.main(["check", str(root)]) == 0
+        assert "loop-lint: clean (0 loop(s)" in capsys.readouterr().err
+
+    def test_validate_manifest_runs_where_a_manifest_exists(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        # A fake uvx on PATH stands in for pre-commit: it records its argv and
+        # fails, so the step's exit reaches the aggregate.
+        bin_dir = tmp_path / "bin"
+        bin_dir.mkdir()
+        fake = bin_dir / "uvx"
+        fake.write_text(FAKE_UVX)
+        fake.chmod(0o755)
+        log = tmp_path / "uvx.log"
+        monkeypatch.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
+        monkeypatch.setenv("FAKE_UVX_LOG", str(log))
+        fake_registry(monkeypatch)
+        plain = a_repo(tmp_path / "a", {"README.md": "# R\n"})
+        assert check_cli.main(["check", str(plain)]) == 0
+        assert not log.exists()
+        publisher = a_repo(
+            tmp_path / "b", {"README.md": "# R\n", ".pre-commit-hooks.yaml": "[]\n"}
+        )
+        assert check_cli.main(["check", str(publisher)]) == 1
+        assert log.read_text().split() == [
+            "pre-commit",
+            "validate-manifest",
+            str(publisher / ".pre-commit-hooks.yaml"),
+        ]
+        capsys.readouterr()

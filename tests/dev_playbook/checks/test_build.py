@@ -68,7 +68,7 @@ repos:
   - repo: https://github.com/GeoffNordling/dev-playbook
     rev: <pinned-sha>
     hooks:
-      - id: playbook-lint
+      - id: playbook-check
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:

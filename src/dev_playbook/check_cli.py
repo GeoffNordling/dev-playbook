@@ -1,22 +1,32 @@
 """The ``playbook`` console script: ``check`` runs the checks, ``checks`` lists them.
 
 ``playbook check [DIR]`` builds the model once, runs every registered check
-function, prints each finding in GNU format with its rule id, and exits 1 on
-any finding, 2 when the model cannot be built. ``--without TAG`` leaves out
-the checks tagged as needing that environment; CI runs
-``playbook check --without workspace``.
+function, prints each finding in GNU format with its rule id, then runs the
+two steps that are not functions over the model: the loop family's
+``loop_lint`` module, kept whole for the loop workstream, and ``pre-commit
+validate-manifest`` where the repo publishes a ``.pre-commit-hooks.yaml``.
+It exits 1 on any finding, 2 when the model cannot be built or a step cannot
+run. ``--without TAG`` leaves out the checks tagged as needing that
+environment, and says so on stderr on every run, so a skip never goes
+silent. ``SKIP``, the variable pre-commit reads for hook ids, is read
+here for tag names too: ``SKIP=workspace`` is ``--without workspace``, so a
+CI file leaves the tagged checks out with the one variable it already sets,
+and pre-commit ignores a name that is no hook id of its own.
 
 ``playbook checks`` prints the registry: id, module, and the hook or tag,
 computed live. ``--family`` and ``--without`` filter it.
 """
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
 
-from dev_playbook import check_registry, findings
+from dev_playbook import check_registry, findings, loop_lint
 from dev_playbook.model import ModelError, Repo
+
+MANIFEST = ".pre-commit-hooks.yaml"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -51,8 +61,15 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     if args.command == "check":
-        return run_check(Path(args.directory).resolve(), frozenset(args.without))
+        without = frozenset(args.without) | skipped_tags()
+        return run_check(Path(args.directory).resolve(), without)
     return list_checks(args.family, frozenset(args.without))
+
+
+def skipped_tags() -> frozenset[str]:
+    """The environment tags ``SKIP`` names, each one a ``--without``."""
+    names = {name.strip() for name in os.environ.get("SKIP", "").split(",")}
+    return frozenset({check_registry.WORKSPACE} & names)
 
 
 def selected(
@@ -67,12 +84,18 @@ def selected(
 
 
 def run_check(root: Path, without: frozenset[str]) -> int:
-    """Build the model, run the checks, print the findings; exit 0, 1, or 2."""
+    """Build the model, run the checks and the two steps; exit 0, 1, or 2."""
     try:
         repo = Repo.from_git(root)
     except (ModelError, subprocess.CalledProcessError) as err:
         print(f"playbook check: cannot build the model: {err}", file=sys.stderr)
         return 2
+    if without:
+        print(
+            f"playbook check: without {', '.join(sorted(without))}, the checks "
+            "tagged so are left out",
+            file=sys.stderr,
+        )
     enabled = [c for c in selected(without) if c.function is not None]
     count = 0
     for c in enabled:
@@ -86,7 +109,22 @@ def run_check(root: Path, without: frozenset[str]) -> int:
         f"{count} finding(s)",
         file=sys.stderr,
     )
-    return 1 if count else 0
+    steps = [loop_lint.main([str(root)])]
+    if (root / MANIFEST).is_file():
+        steps.append(validate_manifest(root / MANIFEST))
+    if 2 in steps:
+        return 2
+    return 1 if count or 1 in steps else 0
+
+
+def validate_manifest(manifest: Path) -> int:
+    """Run ``pre-commit validate-manifest`` over ``manifest``; 2 when it cannot run."""
+    argv = ["uvx", "pre-commit", "validate-manifest", str(manifest)]
+    try:
+        return subprocess.run(argv, check=False).returncode
+    except OSError as err:
+        print(f"playbook check: cannot run {argv[0]}: {err}", file=sys.stderr)
+        return 2
 
 
 def list_checks(family: str | None, without: frozenset[str]) -> int:

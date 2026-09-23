@@ -44,9 +44,10 @@ the repository, would report the environment as a defect in the code when
 run on a secondary. It is skipped there, and announces the skip on every
 run.
 
-- **`ref-lint`.** Cross-repo Citations resolve only where the cited repo is
-  cloned, and a secondary deliberately carries only some of the workspace's
-  repos. `SKIP=ref-lint` stands the detector down.
+- **The checks tagged `workspace`.** Cross-repo Citations resolve only
+  where the cited repo is cloned, and a secondary deliberately carries only
+  some of the workspace's repos. `SKIP=workspace` stands those checks down;
+  `playbook checks` lists them by their tag.
 
 The primary carries every repo and runs every check, so nothing goes
 permanently unchecked. Which gates each check reaches is the committed

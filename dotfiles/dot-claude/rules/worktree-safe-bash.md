@@ -24,4 +24,4 @@ Right:
 
 The loop saves nothing: the literal chain is the same length and runs.
 Where a repo has one entry point for the whole set, dev-playbook's
-`scripts/playbook-lint` for every commit-gate detector, call that.
+`uv run playbook check` for every commit-gate check, call that.

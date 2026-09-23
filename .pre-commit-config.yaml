@@ -1,7 +1,7 @@
-# dev-playbook runs its own hooks from the working tree, so edits to the
-# scripts/ hooks are testable in place before release. Consumer repos do NOT
-# use this file — they reference the published manifest (.pre-commit-hooks.yaml)
-# by URL + pinned rev. dev-playbook is the hook repo itself, so the canonical
+# dev-playbook runs its own hook from the working tree, so an edit to the
+# checks is testable in place before release. Consumer repos do NOT use this
+# file — they reference the published manifest (.pre-commit-hooks.yaml) by URL
+# + pinned rev. dev-playbook is the hook repo itself, so the canonical
 # template's pinned dev-playbook block is replaced here by the `- repo: local`
 # dogfood block below; it mirrors that manifest, so keep the two in sync.
 # See standards/distribution/channel.md.
@@ -29,12 +29,6 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [pre-push]
-      - id: playbook-lint
-        name: playbook-lint
-        entry: scripts/playbook-lint
-        language: script
-        pass_filenames: false
-        always_run: true
       - id: playbook-check
         name: playbook check
         entry: uv run playbook check

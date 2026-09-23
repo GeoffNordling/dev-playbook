@@ -3,7 +3,7 @@
 One rule is decided by a function over the model: a repo that publishes a
 ``.pre-commit-hooks.yaml`` runs every id it publishes from a ``repo: local``
 block of its ``.pre-commit-config.yaml``. The manifest's validity is decided
-by ``pre-commit validate-manifest``, which ``playbook-lint`` runs as its
+by ``pre-commit validate-manifest``, which ``playbook check`` runs as its
 ``validate-manifest`` step only where the manifest exists, and is registered
 by that name.
 """

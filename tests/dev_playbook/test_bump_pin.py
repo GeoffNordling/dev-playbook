@@ -25,7 +25,7 @@ repos:
   - repo: https://github.com/GeoffNordling/dev-playbook
     rev: 6cf8a2b554db3b22edcbca40186bdc12b71a1e41
     hooks:
-      - id: playbook-lint
+      - id: playbook-check
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
     hooks:
@@ -35,7 +35,7 @@ repos:
 OLD = "6cf8a2b554db3b22edcbca40186bdc12b71a1e41"
 NEW = "44848f72aecd73a64e9a0a4487e1e2ded0305199"
 
-PASSED = "playbook-lint Passed"
+PASSED = "playbook check Passed"
 FINDINGS = "CLAUDE.md: harness.shape bad heading"
 CRASH = "An unexpected error has occurred: Proxy CONNECT aborted"
 
