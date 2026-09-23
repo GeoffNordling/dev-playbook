@@ -58,7 +58,7 @@ class Check:
 
     @property
     def family(self) -> str:
-        """The part of the id before the dot, and the name of its module."""
+        """The part of the id before the dot; :func:`module_name` names its module."""
         return self.id.partition(".")[0]
 
     @property
@@ -68,6 +68,15 @@ class Check:
 
 
 CHECKS: dict[str, Check] = {}
+
+
+def module_name(family: str) -> str:
+    """The module a family's checks live in: the family with hyphens as underscores.
+
+    ``doc-type`` is ``dev_playbook.checks.doc_type``, and its tests are
+    ``tests/dev_playbook/checks/test_doc_type.py``.
+    """
+    return family.replace("-", "_")
 
 
 def check(
@@ -103,10 +112,11 @@ def add(entry: Check, registry: dict[str, Check] = CHECKS) -> None:
         raise RegistryError(f"{entry.id}: not <family>.<slug>")
     if entry.id in registry:
         raise RegistryError(f"{entry.id}: registered twice")
-    module_name = entry.module.rpartition(".")[2]
-    if module_name != entry.family:
+    registered_from = entry.module.rpartition(".")[2]
+    if registered_from != module_name(entry.family):
         raise RegistryError(
-            f"{entry.id}: registered from module {module_name}, not {entry.family}"
+            f"{entry.id}: registered from module {registered_from}, "
+            f"not {module_name(entry.family)}"
         )
     registry[entry.id] = entry
 

@@ -53,6 +53,19 @@ class TestRegistration:
         with pytest.raises(check_registry.RegistryError, match="not other"):
             check_registry.check("other.one", registry=reg)(a_function)
 
+    def test_hyphenated_family_registers_from_underscored_module(self) -> None:
+        reg: dict[str, Check] = {}
+        check_registry.tool_check(
+            "doc-type.one",
+            hook="h",
+            module="dev_playbook.checks.doc_type",
+            registry=reg,
+        )
+        assert reg["doc-type.one"].family == "doc-type"
+        assert check_registry.module_name("knowledge-organization") == (
+            "knowledge_organization"
+        )
+
     @pytest.mark.parametrize("bad", ["noslug", "Fam.x", "fam.x_y", "fam."])
     def test_bad_id_raises(self, bad: str) -> None:
         reg: dict[str, Check] = {}
@@ -117,7 +130,9 @@ class TestEveryRegisteredCheck:
         for entry in registered.values():
             if entry.function is None:
                 continue
-            test_file = CHECK_TESTS / f"test_{entry.family}.py"
+            test_file = (
+                CHECK_TESTS / f"test_{check_registry.module_name(entry.family)}.py"
+            )
             name = "test_" + entry.slug.replace("-", "_")
             if not test_file.is_file() or name not in collected_test_names(test_file):
                 missing.append(f"{entry.id}: {test_file.name}::{name}")

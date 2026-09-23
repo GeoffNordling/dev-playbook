@@ -121,32 +121,58 @@ their gate.
 
 ### Delegation
 
-A Ralph loop, one segment per step, an Opus agent per segment
-launched from `prompts/rewrite-family.md`, written before step 1 in
-the pattern of the triage prompt: the family's report is the
-specification, the model and registry are read before any code is
-written, the report is written to a file, and the agent commits
-nothing itself. The checkpoint agent between segments verifies the
-segment, then the loop stops and the user reads the segment's report
-and the diff before the next segment is released. No segment starts
-without that reading. The check-in mechanics are settled when the loop
-is set up, before step 1.
+A Ralph loop ([Ralph loop](/harness-recipes/recipes/ralph-loop.md)),
+one segment per step. `PLAN.md` at the checkout root holds the eleven
+tasks with a checkpoint marker after each one; `PROGRESS.md` is the
+log. Each launch runs one Opus iteration, whose task line points it
+at
+[Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md):
+the family's triage report is the specification, the scaffold is read
+before any code is written, the report goes to
+`rewrite/<family>.md`, and the iteration commits its family as one
+commit, as the loop requires. The launch, the same for every step:
+
+```
+Workflow({ name: "ralph-loop", args: { model: "opus", maxIters: 1, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
+```
+
+At each checkpoint, three things in order, the third a stop:
+
+1. **The fork verifies.** `/ralph-checkpoint` forks the session; the
+   fork runs the Guardrails below against the tree, writes a fix task
+   at the front of the next segment where one fails, checks the
+   marker off, and commits the two loop files.
+2. **The session relays.** The fork's report, the report file, and
+   the range to diff, in a few lines.
+3. **The user reads and releases.** The user reads
+   `rewrite/<family>.md` and the segment's diff, and says go, or names
+   the fix. The next launch waits for that word; nothing else starts
+   it. A rejected segment is reverted or fixed by hand before the
+   next launch.
 
 ### Guardrails
 
-What the checkpoint agent checks, all mechanical:
+What the fork checks, each against the tree, with the segment's
+commits as the range:
 
-- **No heading drifted.** The diff of heading lines under
-  `standards/` is exactly the report's deleted and new rules.
-- **Bodies match.** Every restated body equals its report blockquote.
-- **The repo passes.** `playbook check` and the old gate are both
-  clean; `make check` is green; no check was added that fails.
-- **Coverage.** Every deterministic trailer in the family's Standards
-  is a registered id, and every registered id has its test.
-- **The retirement happened.** The old script named in the table for
-  this step is gone, with its tests and roster line.
-- **The worklist moved.** The step is recorded in this file's
-  progress and in the ROOT.
+- **No heading drifted.** The heading lines added and removed under
+  `standards/<family>/` in the range are exactly the report's deleted
+  and new rules.
+- **Bodies match.** Each restated rule's body equals its blockquote
+  in `triage/<family>.md`.
+- **The repo passes.** `make check`, `scripts/playbook-lint .`, and
+  `uv run playbook check .` are all clean.
+- **Coverage.** `uv run playbook checks --family <family>` lists
+  exactly the deterministic trailers under `standards/<family>/`; the
+  meta-test in `make check` says every function has its test.
+- **The retirement happened.** Each script the step retires is gone
+  from `git ls-files`, and its name appears nowhere outside
+  `working-docs/`.
+- **The worklist moved.** `rewrite/<family>.md` exists, its index row
+  is in, and Progress below has the step's entry.
+- **No drift.** The judgment calls in `PROGRESS.md` are each a gap the
+  report left, not a departure from it; a call that overrode the
+  report is a fix task.
 
 ## Phase 4: cut over
 
@@ -190,6 +216,14 @@ only `loop-lint`:
   named the tables or linked the deleted headings, and each sentence
   was repointed at Detectors or dropped, so `ref-lint` and the index
   check stay clean. The three gates are green with 42 fewer tests.
+- **Phase 3 set up, 2026-09-23.** The loop is ready and unlaunched:
+  `PLAN.md` with the eleven tasks and a checkpoint after each,
+  `PROGRESS.md` empty,
+  [Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md)
+  written, and `rewrite/` waiting for the reports. One scaffold fix
+  on the way: the registry maps a family to its module with hyphens
+  as underscores, since `doc-type` and `knowledge-organization`
+  cannot name a module.
 
 ## Finish line
 
