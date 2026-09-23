@@ -87,9 +87,9 @@ leaves.
   │  root ······· ROOT.md      │   ┌──────────────▼───────────────┐
   │  binds to the rules the    │   │  VIEWER                      │
   │  doc-type system settled   │   │  root ······· ROOT.md        │
-  │  built: playbook check     │   │  on disk ···· contract.md    │
-  │  plan: repeated fixes to   │   │                              │
-  │        predicates skill    │   │  kinds ······ registry.md    │
+  │  built: playbook check ·   │   │  on disk ···· contract.md    │
+  │    /escape-the-slop-trench │   │                              │
+  │  plan: none                │   │  kinds ······ registry.md    │
   │                            │   │  panels ····· design.md ·    │
   │                            │   │               viewer.md      │
   └────────────────────────────┘   │  program ···· server.md      │
