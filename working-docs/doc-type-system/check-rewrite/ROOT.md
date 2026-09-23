@@ -220,6 +220,18 @@ None.
   among them, and the user ruled every one a hypothetical and the review
   a bug hunt. An agent asked for bugs finds bugs; the pass asks for
   use cases that break, or will soon.
+- **A skill that turns repeated fixes into predicates.** Invoked in
+  any session, it reads the session's history and finds the fixes that
+  repeat: the user sees stale state, asks, and the agent brings that
+  state back into line by hand. Each such fix is a sign of a missing
+  predicate. For each one, the skill proposes a rule in a Standard,
+  existing or new, that states the more abstract property, so that a
+  check stops the problem at a gate, or at least an agent can bring the
+  state back into line with the rule with no user in the loop. Example
+  from this strand: "detector" was swept out of 68 files by hand; the
+  rule "no authored document uses a word `CONTEXT.md` lists under
+  _Avoid_" would have caught every one at commit. Fixes with the user
+  in the loop, all day, do not scale; predicates do.
 
 ## Completed
 
