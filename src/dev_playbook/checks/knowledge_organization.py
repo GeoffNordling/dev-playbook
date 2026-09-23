@@ -320,8 +320,9 @@ def atx_headings_only(repo: Repo) -> Iterator[Finding]:
 
     Reads the lines outside fences and the frontmatter block, so a line
     directly above is text only where it is the previous content line.
+    A numbered Decision Record is frozen and exempt, as ``_sources`` reads.
     """
-    for doc in repo.markdown.values():
+    for doc in _sources(repo):
         previous: tuple[int, str] | None = None
         for number, text in doc.content:
             if (

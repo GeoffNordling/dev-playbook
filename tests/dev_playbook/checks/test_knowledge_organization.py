@@ -312,6 +312,8 @@ def test_atx_headings_only() -> None:
     assert found(atx_headings_only, {"a.md": "# A\n\nText\n\n---\n"}) == []
     table = "# A\n\n| a | b |\n| --- | --- |\n| 1 | 2 |\n"
     assert found(atx_headings_only, {"a.md": table}) == []
+    record = {"docs/decisions/0001-x.md": "# A\n\nText\n---\n"}
+    assert found(atx_headings_only, record) == []
 
 
 def test_type_names_a_registered_type_reports_a_list_type() -> None:

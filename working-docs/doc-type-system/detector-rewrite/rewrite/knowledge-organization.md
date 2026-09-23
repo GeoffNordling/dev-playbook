@@ -46,7 +46,9 @@ as a source.
   blockquote.
 - `knowledge-organization.atx-headings-only`: function
   `atx_headings_only`, new in Step 12c, when the model stopped reading
-  setext headings. No line of this repo was flagged.
+  setext headings. No line of this repo was flagged. A numbered
+  Decision Record is exempt, as the Standard's population says, since a
+  record is frozen.
 - `knowledge-organization.stable-named-anchor`: function
   `stable_named_anchor`, new, over targets in this repo. The body is
   the triage blockquote.
@@ -162,6 +164,9 @@ retired detector.
 - `knowledge-organization.workspace-path-for-another-repo`: "for a file
   the harness loads from there" was cut, because the check passes every
   `~/.claude/` target.
+- `knowledge-organization.workspace-path-for-a-stable-location`: "for a
+  file the harness loads from there" was cut, because the check passes
+  every `~/.claude/` target.
 
 ## Deleted
 

@@ -117,7 +117,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 12d, fix: two things the checkpoint after Step 12c found in
+- [x] Step 12d, fix: two things the checkpoint after Step 12c found in
       `standards/knowledge-organization/cross-references.md` beside
       `src/dev_playbook/checks/knowledge_organization.py`. The ruling as
       before: the sentence of a rule and the code of its check say the
