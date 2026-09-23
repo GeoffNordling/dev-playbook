@@ -125,9 +125,10 @@ their gate.
 A Ralph loop ([Ralph loop](/harness-recipes/recipes/ralph-loop.md)),
 one segment per one to four steps. `PLAN.md` at the checkout root
 holds the twelve tasks with checkpoint markers after steps 1, 2, 3,
-5, 9, 11, and 12, the first three from when every step had one;
-`PROGRESS.md` is the log. Each launch runs up to four Opus
-iterations, one per step, and stops at the next marker. Each
+5, 9, and 11, and after every step from 12 on, the rework steps the
+Step 11 audit added included; `PROGRESS.md` is the log. Each launch
+runs up to four Opus iterations, one per step, and stops at the next
+marker. Each
 iteration's task line points it at
 [Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md):
 the family's triage report is the specification, the scaffold is read
