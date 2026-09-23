@@ -94,17 +94,26 @@ and is answered there.
 
 ## Planned
 
-Sessions with the user come first, each at a high level, the agent
-guiding.
+The parallel test comes first: without fronts running together there is
+no solution at all. Sessions with the user follow, each at a high level,
+the agent guiding.
 
+- **Run fronts in parallel.** Two fronts on one fake real repository,
+  started at the same moment, each making one tiny commit on Haiku. It
+  passes when both commits come back at the right SHA, both sessions' hook
+  events are logged, both runs bill the subscription, and no container is
+  left. It tests the risks that appear only together: two closes into one
+  repository at once, several Claude sessions against the subscription's
+  limits, and several receivers writing one database. A login that expires
+  during a long run is noted and not tested here.
 - **Discuss: what this gives the user, and how they run it.** When this branch lands
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
   part 4 ran on, or all of this branch's work (the hardened `front-clone`,
   its trap test, and this working set) with them, whether anything of
-  the `sandbox-probe` branch comes along, and where the pipeline's pieces
-  that now live only in the session scratchpad are kept
-  ([Where each piece lives](/working-docs/parallel-fronts/pipeline.md#where-each-piece-lives)). Then step back further: so far
+  the `sandbox-probe` branch comes along, and where the pipeline's code
+  in [`rig/`](/working-docs/parallel-fronts/rig/index.md) finally lives.
+  Then step back further: so far
   the work proved Sandcastle's sandbox can be made safe, but sandboxing is
   not the library's point. It coordinates agents across branches and
   worktrees. Define the question first, what value parallel fronts should
@@ -113,7 +122,7 @@ guiding.
   records what one candidate offers. The answer also settles what the
   pipeline does not yet do
   ([The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md#what-it-does-not-yet-do)):
-  running fronts together, where real copies live, and what removes a
+  what schedules a lap, where real copies live, and what removes a
   stranded container.
 - **Discuss: the checkpoint and the integrator.** What happens at the end
   of a lap: who merges the fronts' branches (the user, an agent, or both),
@@ -186,6 +195,9 @@ guiding.
   the read-only config copy answers "what does published main say", so the
   front's own unfinished edits never change the rules it runs under
   ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter)).
+- **Save the pipeline's code.** The plug-in, the run script, the receiver,
+  the image, and the two dev-playbook changes as patches moved out of the
+  session scratchpad into [`rig/`](/working-docs/parallel-fronts/rig/index.md).
 
 ## Acronyms
 

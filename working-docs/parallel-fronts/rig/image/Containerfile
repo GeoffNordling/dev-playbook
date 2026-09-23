@@ -1,0 +1,23 @@
+# Experiment three's image: the stand-in agent's world, laid out as the
+# workspace standard lays out the user's machine. Build context is a
+# git-archive of dev-playbook's published main, staged beside this file.
+FROM fedora:latest
+RUN dnf install -y git stow jq python3 && dnf clean all
+RUN curl -LsSf https://astral.sh/uv/install.sh \
+    | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
+RUN groupadd -g 1000 agent && useradd -u 1000 -g 1000 -m -d /home/agent agent
+# Part 4: the host's claude binary, staged into the build context by setup.sh.
+COPY claude /usr/local/bin/claude
+USER 1000:1000
+ENV HOME=/home/agent
+WORKDIR /home/agent
+# Part 4: an identity for the agent's commits.
+RUN git config --global user.name "sandbox agent" && git config --global user.email "agent@example.invalid"
+# Only so sync-dotfiles can run at build time; at run time the read-only
+# config mount covers this directory with the config copy.
+COPY --chown=1000:1000 src      /home/agent/workspace/dev-playbook/src
+COPY --chown=1000:1000 scripts  /home/agent/workspace/dev-playbook/scripts
+COPY --chown=1000:1000 dotfiles /home/agent/workspace/dev-playbook/dotfiles
+COPY --chown=1000:1000 pyproject.toml /home/agent/workspace/dev-playbook/pyproject.toml
+RUN /home/agent/workspace/dev-playbook/scripts/sync-dotfiles
+ENTRYPOINT ["sleep", "infinity"]

@@ -93,13 +93,11 @@ front reaches GitHub, since the container holds no GitHub credential.
 
 | Piece | Where it is now |
 |---|---|
-| `front-clone` and its trap test | This branch |
-| Hook events sent from a container (`measure-event`) | The `sandbox-probe` branch only |
-| Stop and SessionEnd hooks set to wait | A throwaway config copy only |
-| The plug-in, the run script, the receiver, the container image | The session scratchpad only, under `exp3/` |
+| `front-clone` and its trap test | This branch, under `scripts/` and `tests/` |
+| The plug-in, the run script, the receiver, the container image | This branch, in [`rig/`](/working-docs/parallel-fronts/rig/index.md) |
+| Hook events sent from a container (`measure-event`), and the Stop and SessionEnd hooks set to wait | Patches in `rig/patches/`, not yet applied to dev-playbook |
 
-The last row is the risk: the scratchpad is temporary, and the pieces in
-it exist nowhere else.
+Everything in `rig/` stays in the set until the work lands on `main`.
 
 ## What it does not yet do
 
@@ -107,7 +105,8 @@ These are facts about the pipeline today, each settled by a Planned item
 in [the root](/working-docs/parallel-fronts/ROOT.md#planned).
 
 - **One front at a time.** It has run one front per lap, never two or more
-  at once, and no program schedules a lap.
+  at once. This is tested first, since without it there is no solution.
+- **No schedule.** No program starts a lap's fronts and ends the lap.
 - **No home for real copies.** They must not live under
   `/tmp/claude-<uid>/`, which collides with Claude's own temporary folder
   inside the container.
