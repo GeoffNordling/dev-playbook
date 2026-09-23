@@ -2,7 +2,7 @@
 type: Standard
 title: Doc Conventions
 description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics, and the form of the repo's vocabulary file
-population: "an authored document and, for the two word rules, every tracked file, except type: Mirror and the paths in .prose-lint-exempt"
+population: "an authored document and, for the two word rules, every tracked text file, except type: Mirror, the paths in .prose-lint-exempt, and the two declaration files .prose-lint-exempt and .prose-lint-vocabulary"
 ---
 
 # Doc Conventions
@@ -13,7 +13,10 @@ verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
 `.prose-lint-exempt` at its root, under a comment saying why, and bans
 words of its own, in all or part of its tree, by declaring each with its
-replacement in a tracked `.prose-lint-vocabulary` at its root.
+replacement in a tracked `.prose-lint-vocabulary` at its root. The two
+word rules read every tracked file except those two declaration files,
+which must spell the words they ban, and except a binary file, one
+holding a zero byte.
 
 ## One rule, one place
 
