@@ -65,6 +65,10 @@ the specimen is surveyed in
   base by `[redacted, N words]` so the row keeps its shape and the
   receipt its line; story `title` attrs and the resume filenames were
   seen and allowed.
+- **Views render locally.** A view too large for the terminal is a
+  `.html` file written on the user's machine, which the user opens in
+  their own browser. It is never a Claude artifact or any other hosted
+  page, so no story-forge row leaves the machine to be drawn.
 - **Slow and iterative.** One subsystem at a time, each step shown to
   the user before the next.
 
