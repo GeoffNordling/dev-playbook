@@ -49,6 +49,20 @@ the specimen is surveyed in
   questions a person asks, hand-write the rows with a receipt on every
   one, draw the seven views, record the residuals, and write no
   extractor until the simulations cover the use cases.
+- **The specimen stays private.** dev-playbook is public and
+  story-forge is not. What this strand commits about story-forge is
+  its structure, never its content. Allowed: paths, ids, counts, line
+  numbers, frontmatter keys and enumerated values such as `status`,
+  tag names, relations, and the shape of a rule. Not allowed: the body
+  text of any story, resume, or prep unit; a frontmatter `description`
+  or `title` beyond the one needed to show a form; and any third party
+  named in the files, an employer, an interviewer, a posting id, a
+  contact. The line is drawn in file terms because the user's sense of
+  what is private is latent, so it is ruled case by case: before a
+  commit, the session lists every verbatim field the diff carries, the
+  user rules each, and a ruling becomes a bullet here. First rulings,
+  2026-09-23: the fact base's `title` and `description` attrs and the
+  resume filenames were seen and allowed.
 - **Slow and iterative.** One subsystem at a time, each step shown to
   the user before the next.
 
