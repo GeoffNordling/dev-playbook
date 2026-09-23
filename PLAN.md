@@ -63,7 +63,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 2, family `testing`, retires `testing-lint`. Report:
+- [x] Step 2, family `testing`, retires `testing-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/testing.md`.
       Verify: `uv run playbook checks --family testing` lists exactly the
       deterministic trailers under `standards/testing/`; `git ls-files

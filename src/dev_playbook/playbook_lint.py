@@ -40,7 +40,6 @@ SCRIPTS_DIR = HOOK_REPO_ROOT / "scripts"
 # detector here IS enrolling it workspace-wide — there is no per-consumer step.
 DETECTORS = (
     "repo-lint",
-    "testing-lint",
     "ref-lint",
     "okf-lint",
     "decisions-lint",
