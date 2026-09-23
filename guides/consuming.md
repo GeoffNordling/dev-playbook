@@ -38,15 +38,9 @@ in the Standard the step links.
    [Detectors](/standards/standard/detectors.md#a-first-party-detector):
    read-only, one finding per line in GNU format with rule-heading ids,
    answering `--list-rules`, exit 0 clean, 1 findings, 2 cannot run.
-   The one clause invisible until a hook runs is
-   [Git runs against the given root](/standards/standard/detectors.md#git-runs-against-the-given-root):
-   the commit gate is a git hook, and from a linked worktree it exports
-   an absolute `GIT_DIR`, so anyone working the way this workspace does
-   meets the clause immediately.
 3. **Publish the hook in the repo's own manifest.** Add the hook to the
    consumer repo's own `.pre-commit-hooks.yaml`, backed by the
-   `scripts/<name>` entry, the same way dev-playbook publishes its hooks
-   ([Every detector is reachable and listed](/standards/standard/detectors.md#every-detector-is-reachable-and-listed)).
+   `scripts/<name>` entry, the same way dev-playbook publishes its hooks.
    The repo is now the topmost instance of the hosting pattern for its
    own standard.
 4. **Mirror the hook in the local block.** Add the same hook id to the

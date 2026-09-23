@@ -6,5 +6,5 @@ boundaries.
 
 Ordering: alphabetical by title.
 
-- [Detectors](/standards/standard/detectors.md) — The check contract — read-only, and the shim, git-root, hosting, and canonical-template rules a first-party script obeys
+- [Detectors](/standards/standard/detectors.md) — The check contract — read-only, skipped only for machine state, and the canonical template offering the hooks the manifest publishes
 - [The Standards Tree](/standards/standard/tree.md) — A repo's standards/ tree — one directory per Standard, the statement each directory's index opens with, the catalog that lists the directories, and no shadowing of an upstream directory

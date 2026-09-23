@@ -23,38 +23,38 @@ typed `Standard`, one population and its rules, at
 
 ## Every subdirectory a Standard directory
 
-Every immediate subdirectory of `standards/` is a Standard directory: it
-holds at least one file typed `Standard`, and every other `.md` file
-under it, `index.md` aside, is typed `Standard`; the only flat `.md`
-files under `standards/` are `README.md` and `index.md`.
+Every `.md` file under a directory in `standards/`, at any depth
+and except a file named `index.md`, has `type: Standard`, and each
+directory directly in `standards/` has at least one such file. The
+only `.md` files directly in `standards/` are `README.md` and
+`index.md`.
 
 `standard.every-subdirectory-a-standard-directory` · deterministic
 
 ## Directory index opens with the governing sentence
 
-Every Standard directory's `index.md` opens with one sentence,
-`<Name> governs <what> — <the things>`: the Standard's name, the
-question it governs, and the things its rules cover; the catalog row
-repeats that sentence.
+The first sentence after the H1 of each `standards/<name>/index.md`
+has the form `<Name> governs <what> — <the things>`: the
+Standard's name, the word `governs`, the question it governs, an
+em dash, and the things its rules cover.
 
 `standard.directory-index-opens-with-the-governing-sentence` · deterministic
 
 ## The catalog lists every directory
 
-A repo carrying a `standards/` tree has a `standards/index.md` listing
-`README.md` first and then every directory, in dev-playbook the
-meta-standard's `standard/` next, the rest alphabetical by name, each
-row carrying its directory index's opening sentence verbatim less the
-period; standards-lint reports the order and a row's wording, and
-okf-lint the membership
-([One entry per concept document and child directory](/standards/knowledge-organization/indexes.md#one-entry-per-concept-document-and-child-directory)).
+`standards/index.md` lists `README.md` first, then the `index.md`
+of every directory directly in `standards/`, and nothing else. The
+directories are in alphabetical order by name, except that in
+dev-playbook `standard/` comes first. Each directory's entry has,
+after its link, the first sentence of that directory's `index.md`
+without its final period.
 
 `standard.the-catalog-lists-every-directory` · deterministic
 
 ## No shadowing
 
-A repo-scoped Standard directory's name is one no directory dev-playbook
-publishes under `standards/` carries; standards-lint reports the
-collision at the consumer's commit gate.
+In a repo other than dev-playbook, no directory directly in
+`standards/` has the name of a directory directly in `standards/`
+of the dev-playbook version the repo pins.
 
 `standard.no-shadowing` · deterministic

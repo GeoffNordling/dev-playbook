@@ -36,3 +36,14 @@ def test_canonical_files_are_the_files_directly_under_the_dir(
         if path.startswith(prefix) and "/" not in path.removeprefix(prefix)
     }
     assert present == sources.CANONICAL_FILES
+
+
+def test_standard_directories_are_the_directories_under_standards(
+    dev_playbook_repo: Repo,
+) -> None:
+    present = {
+        parts[1]
+        for path in dev_playbook_repo.files
+        if len(parts := path.split("/")) >= 3 and parts[0] == "standards"
+    }
+    assert present == sources.STANDARD_DIRECTORIES

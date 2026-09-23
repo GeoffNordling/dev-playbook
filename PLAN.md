@@ -131,7 +131,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
 
-- [ ] Step 9, family `standard`, retires nothing. Report:
+- [x] Step 9, family `standard`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/standard.md`.
       Verify: `uv run playbook checks --family standard` lists exactly the
       deterministic trailers under `standards/standard/`; the report exists;

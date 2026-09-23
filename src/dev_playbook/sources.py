@@ -47,6 +47,27 @@ CANONICAL_FILES = frozenset(
 )
 
 
+# Every directory directly under standards/ that dev-playbook publishes. A
+# consumer runs the installed package, not dev-playbook's tree, so the names
+# ship here; the test beside this module pins the set.
+STANDARD_DIRECTORIES = frozenset(
+    {
+        "build",
+        "decisions",
+        "distribution",
+        "doc-type",
+        "harness",
+        "knowledge-organization",
+        "prose",
+        "python",
+        "shell",
+        "standard",
+        "testing",
+        "tracking",
+    }
+)
+
+
 def sections() -> dict[str, Section]:
     """Every :class:`Section` constant in this module, by name."""
     return {
