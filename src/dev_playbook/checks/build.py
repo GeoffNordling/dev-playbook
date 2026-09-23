@@ -152,6 +152,23 @@ def runnables_live_in_scripts(repo: Repo) -> Iterator[Finding]:
             )
 
 
+@check("build.scripts-holds-only-scripts")
+def scripts_holds_only_scripts(repo: Repo) -> Iterator[Finding]:
+    """Each file under ``scripts/`` is ``.py``, ``.sh``, ``.md``, or a uv script."""
+    for path in repo.files:
+        if not path.startswith("scripts/"):
+            continue
+        name = PurePosixPath(path).name
+        if name.endswith((".py", ".sh", ".md")):
+            continue
+        if "." in name:
+            yield Finding(path, None, "scripts/ holds only .py, .sh, .md, uv scripts")
+        elif repo.contents[path].split(b"\n", 1)[0].rstrip() != UV_SHEBANG.encode():
+            yield Finding(
+                path, 1, f"a file with no extension opens with '{UV_SHEBANG}'"
+            )
+
+
 @check("build.dependencies-live-in-pyprojecttoml")
 def dependencies_live_in_pyprojecttoml(repo: Repo) -> Iterator[Finding]:
     """No file named ``requirements.txt`` exists anywhere in the tree."""
@@ -316,6 +333,8 @@ def pyprojecttoml_matches_every_pinned_value(repo: Repo) -> Iterator[Finding]:
             "tool.pytest.ini_options.testpaths",
             "tool.ruff.target-version",
             "tool.ruff.line-length",
+            "tool.ruff.extend-include",
+            "tool.ruff.extend-exclude",
             "tool.ruff.lint.select",
             "tool.ruff.lint.ignore",
             "tool.ruff.lint.pydocstyle.convention",

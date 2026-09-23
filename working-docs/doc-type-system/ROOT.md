@@ -74,7 +74,7 @@ leaves.
   │     · specifying-a-loop.md │   │      ralph.md · ralph.json   │
   │                            │   │  planned view                │
   │  drained · doc-types/loop/ │   │     · deterministic-         │
-  │     · loop-lint · loops/   │   │       separation.md          │
+  │     · loop_lint · loops/   │   │       separation.md          │
   │  plan: the objective part, │   │  plan: simulations by hand · │
   │        if any · its use by │   │   extractors chain, standard,│
   │        the two loops above │   │   loop · verifier table and  │
@@ -88,7 +88,8 @@ leaves.
   │  binds to the rules the    │   │  VIEWER                      │
   │  doc-type system settled   │   │  root ······· ROOT.md        │
   │  built: playbook check     │   │  on disk ···· contract.md    │
-  │  plan: scripts under ruff  │   │  kinds ······ registry.md    │
+  │  plan: ralph-setup signal, │
+  │        checkpoint quality  │   │  kinds ······ registry.md    │
   │                            │   │  panels ····· design.md ·    │
   │                            │   │               viewer.md      │
   └────────────────────────────┘   │  program ···· server.md      │

@@ -68,6 +68,7 @@ follow.
 [pyproject.toml](/standards/build/canonical/pyproject.toml) pins:
 `project.requires-python`, `tool.pytest.ini_options.testpaths`,
 `tool.ruff.target-version`, `tool.ruff.line-length`,
+`tool.ruff.extend-include`, `tool.ruff.extend-exclude`,
 `tool.ruff.lint.select`, `tool.ruff.lint.ignore`,
 `tool.ruff.lint.pydocstyle.convention`, and every `[tool.mypy]` key.
 Where the canonical file writes a placeholder, the copy writes its own

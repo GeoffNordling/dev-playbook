@@ -92,9 +92,10 @@ tree as it stands.
   deterministic heading is registered.
 - One test per rule id under `tests/dev_playbook/checks/`; 763 tests
   in 7.6 s where 988 took 10.0 s.
-- Under `scripts/`, `loop-lint` is the one check script left, kept for the
-  loop workstream, and `workspace-lint` runs at no gate by ruling. The
-  two tables and their scripts are gone.
+- No check script is left under `scripts/`: the loop checks run as
+  `playbook check`'s `loop_lint` step, kept for the loop workstream, and
+  `workspace-lint` runs at no gate by ruling. The two tables and their
+  scripts are gone.
 
 ## Terms
 
@@ -164,13 +165,6 @@ None.
 
 ## Planned
 
-- **Scripts under ruff, after the rewrite.** Ruff never opens the
-  extensionless scripts under `scripts/`. Opening them today
-  reformats three and raises 48 findings, so this waits until the
-  rewrite has deleted the check scripts: clean up what remains,
-  then add `extend-include = ["scripts/*"]` to the canonical
-  `pyproject.toml` and the `executable` type to the two ruff hooks
-  in the canonical `.pre-commit-config.yaml`.
 - **Signal to noise in `ralph-setup`, before the merge to main.** The
   reading-chain review done by hand for this loop, where dropping
   `ROOT.md` and the triage method and trimming each report's
@@ -217,6 +211,23 @@ None.
   in the loop, all day, do not scale; predicates do.
 
 ## Completed
+
+- **Scripts under ruff, 2026-09-23.** Ruff picks a file's language by
+  its extension, so it never opened the extensionless uv scripts under
+  `scripts/`. The root cause was that an extensionless file does not
+  say its language, so a new rule states it:
+  [scripts/ holds only scripts](/standards/build/skeleton.md#scripts-holds-only-scripts),
+  where a name with no dot is a uv Python script and every other file
+  is `.py`, `.sh`, or `.md`. On that rule the canonical
+  `pyproject.toml` pins `extend-include = ["scripts/*"]` less `.sh`
+  and `.md`, and the two canonical ruff hooks run over the repo by
+  that config, `pass_filenames: false` and `always_run: true`, since
+  pre-commit hands them only files it tags as Python and CI runs only
+  pre-commit. The scripts stay extensionless, as commands run by name.
+  Eight docstrings and one reformat made them clean.
+  `scripts/loop-lint` was deleted, since `playbook check` calls its
+  module directly. `bayes-lab-sim`'s `scripts/vulcan_system1.png`
+  breaks the rule, to be deleted there.
 
 - **A consumer's checks, 2026-09-23.** A consumer repo writes its
   checks where dev-playbook keeps its own, `src/<package>/checks/` and

@@ -22,6 +22,7 @@ from dev_playbook.label_scheme import canonical_labels  # noqa: E402
 
 
 def existing() -> dict[str, dict[str, str]]:
+    """The current repo's labels, by name, with their color and description."""
     out = subprocess.run(
         ["gh", "label", "list", "--json", "name,color,description", "--limit", "200"],
         check=True,
@@ -35,6 +36,7 @@ def existing() -> dict[str, dict[str, str]]:
 
 
 def main() -> int:
+    """Create, update, and delete labels until the repo holds the canonical set."""
     have = existing()
     labels = canonical_labels()
     canonical = {name for name, _, _ in labels}

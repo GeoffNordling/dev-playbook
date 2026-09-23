@@ -1,14 +1,14 @@
 ---
 type: README
 title: Scripts
-description: The executable surface of published hook entry points and local dev scripts, with shared library code in src/dev_playbook/
+description: The local dev scripts, thin shims over the library code in src/dev_playbook/, and how the published playbook hook relates to them
 ---
 
 # Scripts
 
-The repo's executable surface: the published pre-commit hook entry points and
-the local dev CLIs. Each file here is a thin shim over the library code in
-`src/dev_playbook/`.
+The repo's local dev CLIs. The one published hook is the `playbook`
+console script, not a file here. Each file here is a thin shim over the
+library code in `src/dev_playbook/`.
 
 > *"The perfect race car crosses the finish line in first place and then falls to pieces."*  
 > — Ferdinand Porsche
@@ -21,7 +21,6 @@ the local dev CLIs. Each file here is a thin shim over the library code in
 
 ## What belongs here
 
-- Published hook entry points — the scripts consumer repos run via pre-commit.
 - Local dev CLIs that automate workspace tasks across repos, run ad hoc.
 
 Every file is an executable shim: it puts `src/` on `sys.path` and calls into
@@ -50,23 +49,15 @@ The commit gate is `playbook check` — the one published hook, the console
 script `pyproject.toml` declares. It builds one model of the repository
 from `git ls-files`, runs every check the package registers
 (`src/dev_playbook/checks/`, one module per `standards/` directory), then
-two steps that are not functions over the model: `loop-lint` below, and
-`pre-commit validate-manifest` where the repo publishes a manifest. It
-exits 0 on success / 1 on findings / 2 when the model cannot be built or a
-step cannot run, writes findings to stdout one per line, and a summary to
-stderr. `playbook checks` lists the registry. Consumer repos run the hook
-from a venv pre-commit installs at the pinned rev (see
+two steps that are not functions over the model: the
+[Loop Conventions](/standards/doc-type/loop-conventions.md) checks in
+`dev_playbook.loop_lint`, until the loop workstream moves them into the
+package, and `pre-commit validate-manifest` where the repo publishes a
+manifest. It exits 0 on success / 1 on findings / 2 when the model cannot
+be built or a step cannot run, writes findings to stdout one per line, and
+a summary to stderr. `playbook checks` lists the registry. Consumer repos
+run the hook from a venv pre-commit installs at the pinned rev (see
 [Distribution Channel](/standards/distribution/channel.md)).
-
-| Script | Standard | Purpose |
-|--------|----------|---------|
-| `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Verifications, and Yields sections; clean by construction where no `loops/` tree is present. The one check still a script; `playbook check` calls its module as a step until the loop workstream moves its rules into the package |
-
-`loop-lint` is
-optional-surface: it exits 0 silently when no `loops/` tree is present, and
-asserts only over a tree that is present. Run
-any script with `--help`; each script's docstring documents its behavior in
-full.
 
 ## Shared libraries (`src/dev_playbook/`)
 

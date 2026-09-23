@@ -74,14 +74,14 @@ From memory, not a fresh search.
 
 ## Planned
 
-- **Retire `loop-lint` and move its five checks into the check
+- **Retire `loop_lint` and move its five checks into the check
   package.** The check rewrite
   ([Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md))
-  retired every checking script but this one, by the user's ruling
-  that the loop family waits for this workstream. What it left: the
-  script `scripts/loop-lint`, its module `src/dev_playbook/loop_lint.py`,
-  its tests, and the legacy step by which `playbook check` calls that
-  module once the rewrite's phase 4 cuts over; five deterministic rules of
+  moved every other check into the package, by the user's ruling
+  that the loop family waits for this workstream, and deleted the
+  script `scripts/loop-lint`. What it left: the module
+  `src/dev_playbook/loop_lint.py`, its tests, and the legacy step by
+  which `playbook check` calls that module; five deterministic rules of
   [Loop Conventions](/standards/doc-type/loop-conventions.md) registered
   in `src/dev_playbook/checks/doc_type.py` by `tool_check` with
   `hook="loop-lint"`, so `playbook checks` lists them and the meta-test
@@ -89,8 +89,8 @@ From memory, not a fresh search.
   there. This workstream owns the rest, after the rewrite merges to
   main: one function per rule in `checks/doc_type.py` reading the
   model, one test per rule id, the five `tool_check` lines and the
-  docstring's last sentence removed, then the script, module, tests,
-  and legacy step deleted. The unit of work is one family as the
+  docstring's last sentence removed, then the module, tests, and
+  legacy step deleted. The unit of work is one family as the
   rewrite did every other: the four things above in one commit, with
   `make check` and `uv run playbook check .` clean after it. Fold in
   the three rules below when the Standard is revised in the
@@ -139,11 +139,11 @@ From memory, not a fresh search.
   binds `Loop` to `loops/`; the `Loop` row and the Typed Loop rule are
   in `document-types.md`; the registry ruling and the roster entry are
   in `doc-type-system.md`; `loops/` exists with an empty index.
-- **Obligation.** `scripts/loop-lint` holds the checks of
+- **Obligation.** `src/dev_playbook/loop_lint.py` holds the checks of
   [Loop Conventions](/standards/doc-type/loop-conventions.md),
-  the Standard that binds a `Loop` file to the encoding; enrolled in the
-  `playbook check` run, so a bad Loop file cannot be committed. Logic in
-  `src/dev_playbook/loop_lint.py`, tests beside it.
+  the Standard that binds a `Loop` file to the encoding; a step of the
+  `playbook check` run, so a bad Loop file cannot be committed. Tests
+  in `tests/dev_playbook/test_loop_lint.py`.
 
 ## Acronyms
 

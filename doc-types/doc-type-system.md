@@ -97,7 +97,7 @@ obligation rides
 [Runbook Conventions](/standards/doc-type/runbook-conventions.md),
 checked by `playbook check`; Loop's rides
 [Loop Conventions](/standards/doc-type/loop-conventions.md), checked
-by `scripts/loop-lint`; Standard's rides
+by `playbook check`; Standard's rides
 [Standard Conventions](/standards/doc-type/standard-conventions.md),
 checked by `playbook check`; Guide's rides
 [Guide Conventions](/standards/doc-type/guide-conventions.md). The

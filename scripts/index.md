@@ -1,10 +1,9 @@
 # scripts/ — index
 
-Everything the repo can run: the hook entry points it publishes to consumer
-repos and the dev scripts it keeps for itself, with the logic behind both in
+The dev scripts the repo keeps for itself, with the logic behind them in
 `src/dev_playbook/`. Start at [Scripts](/scripts/README.md).
 
-- [Scripts](/scripts/README.md) — The executable surface of published hook entry points and local dev scripts, with shared library code in src/dev_playbook/
+- [Scripts](/scripts/README.md) — The local dev scripts, thin shims over the library code in src/dev_playbook/, and how the published playbook hook relates to them
 
 `labelgen` regenerates the label table in
 `standards/tracking/label-scheme.md`, rendered from `label_scheme.json`,

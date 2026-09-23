@@ -23,6 +23,7 @@ from dev_playbook.checks.build import (
     pyprojecttoml_matches_every_pinned_value,
     python_version_byte_identical,
     runnables_live_in_scripts,
+    scripts_holds_only_scripts,
 )
 from dev_playbook.model import Repo
 
@@ -148,6 +149,31 @@ def test_runnables_live_in_scripts() -> None:
     assert found(runnables_live_in_scripts, {"bin/go": b"", "tools/x/y": b""}) == [
         ("bin/", None),
         ("tools/", None),
+    ]
+
+
+def test_scripts_holds_only_scripts() -> None:
+    uv = b"#!/usr/bin/env -S uv run --script\nx = 1\n"
+    clean = {
+        "scripts/go": uv,
+        "scripts/sub/go": uv,
+        "scripts/lib.py": b"",
+        "scripts/run.sh": b"#!/usr/bin/env bash\n",
+        "scripts/README.md": b"",
+        "docs/diagram.png": b"\x89PNG",
+    }
+    assert found(scripts_holds_only_scripts, clean) == []
+    dirty = {
+        "scripts/diagram.png": b"\x89PNG",
+        "scripts/data.json": b"{}",
+        "scripts/deploy": b"#!/usr/bin/env bash\n",
+        "scripts/empty": b"",
+    }
+    assert found(scripts_holds_only_scripts, dirty) == [
+        ("scripts/data.json", None),
+        ("scripts/deploy", 1),
+        ("scripts/diagram.png", None),
+        ("scripts/empty", 1),
     ]
 
 
