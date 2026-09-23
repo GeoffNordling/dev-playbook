@@ -89,6 +89,23 @@ The code is in
 Also: the subscription pays (Claude reports no API key in use), and no
 front reaches GitHub, since the container holds no GitHub credential.
 
+## Running fronts together
+
+Two fronts on one fake real repository, started at the same moment, each
+told to make one small commit, on Haiku. Both were then closed into the
+real repository at the same moment. Each run took about 22 seconds.
+
+| Check | Result |
+|---|---|
+| Commits | Both came back at the same SHA, each on its own branch. `main` and the user's unpushed `issue-123` were unchanged. |
+| Closes at once | Both succeeded; git did not refuse the second. |
+| Billing | Both runs reported the subscription (`apiKeySource: none`). |
+| Hook logging | Each session logged start, prompt, both tool uses, Stop, and SessionEnd, through its own receiver into the one database. |
+| Clean up | Both copies deleted, no container left. |
+
+The subscription's limits did not show at two sessions. The run is
+[`rig/parallel.mjs`](/working-docs/parallel-fronts/rig/index.md).
+
 ## Where each piece lives
 
 | Piece | Where it is now |
@@ -104,8 +121,9 @@ Everything in `rig/` stays in the set until the work lands on `main`.
 These are facts about the pipeline today, each settled by a Planned item
 in [the root](/working-docs/parallel-fronts/ROOT.md#planned).
 
-- **One front at a time.** It has run one front per lap, never two or more
-  at once. This is tested first, since without it there is no solution.
+- **More than two fronts at once.** Two fronts ran together and passed
+  ([Running fronts together](#running-fronts-together)); three and four
+  are untested.
 - **No schedule.** No program starts a lap's fronts and ends the lap.
 - **No home for real copies.** They must not live under
   `/tmp/claude-<uid>/`, which collides with Claude's own temporary folder

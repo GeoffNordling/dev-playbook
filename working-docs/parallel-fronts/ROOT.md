@@ -94,18 +94,9 @@ and is answered there.
 
 ## Planned
 
-The parallel test comes first: without fronts running together there is
-no solution at all. Sessions with the user follow, each at a high level,
-the agent guiding.
+Sessions with the user come first, each at a high level, the agent
+guiding.
 
-- **Run fronts in parallel.** Two fronts on one fake real repository,
-  started at the same moment, each making one tiny commit on Haiku. It
-  passes when both commits come back at the right SHA, both sessions' hook
-  events are logged, both runs bill the subscription, and no container is
-  left. It tests the risks that appear only together: two closes into one
-  repository at once, several Claude sessions against the subscription's
-  limits, and several receivers writing one database. A login that expires
-  during a long run is noted and not tested here.
 - **Discuss: what this gives the user, and how they run it.** When this branch lands
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
@@ -198,6 +189,11 @@ the agent guiding.
 - **Save the pipeline's code.** The plug-in, the run script, the receiver,
   the image, and the two dev-playbook changes as patches moved out of the
   session scratchpad into [`rig/`](/working-docs/parallel-fronts/rig/index.md).
+- **Run fronts in parallel.** Two fronts on one fake real repository ran
+  at once and closed at once, and every check passed: both commits back at
+  the same SHA, both billed to the subscription, every hook event logged,
+  nothing left behind
+  ([Running fronts together](/working-docs/parallel-fronts/pipeline.md#running-fronts-together)).
 
 ## Acronyms
 
