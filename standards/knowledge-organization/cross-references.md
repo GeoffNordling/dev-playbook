@@ -37,9 +37,10 @@ checkout on this machine.
 `knowledge-organization.reference-resolves` · deterministic
 
 > **Why.** A `~/workspace/<repo>/` target naming another repository
-> resolves against that repo's main checkout. A repo cannot check the
-> other side from its own files, so the predicate binds same-repo
-> targets.
+> resolves against that repo's main checkout, its published state, so
+> the predicate reads it there. That read needs the other repo on the
+> machine, so the check is tagged `workspace`, and a gate without the
+> sibling repos, such as CI, sets `SKIP: workspace`.
 
 ## Fragment anchor matches the slug
 

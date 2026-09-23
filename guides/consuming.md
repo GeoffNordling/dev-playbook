@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Adopting a Repo-Scoped Standard
-description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish a conforming detector, mirror it, and gate it
+description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish its checks as one hook, mirror it, and gate it
 ---
 
 # Adopting a Repo-Scoped Standard
@@ -32,21 +32,20 @@ in the Standard the step links.
    ([No shadowing](/standards/standard/tree.md#no-shadowing)), and the
    README-first catalog
    ([The catalog lists every directory](/standards/standard/tree.md#the-catalog-lists-every-directory)).
-2. **Write a contract-conforming detector.** Back the Standard's rules
-   with a detector, a `scripts/<name>` shim over the repo's own reusable
-   modules, obeying the first-party rules in
-   [Detectors](/standards/standard/detectors.md#a-first-party-detector):
-   read-only, one finding per line in GNU format with rule-heading ids,
-   answering `--list-rules`, exit 0 clean, 1 findings, 2 cannot run.
-3. **Publish the hook in the repo's own manifest.** Add the hook to the
-   consumer repo's own `.pre-commit-hooks.yaml`, backed by the
-   `scripts/<name>` entry, the same way dev-playbook publishes its hooks.
-   The repo is now the topmost instance of the hosting pattern for its
-   own standard.
+2. **Write the checks.** Back each deterministic rule of the Standard
+   with a check in the shape
+   [Writing a Detector](/guides/writing-a-detector.md#a-consumer-repos-checks-take-the-same-shape)
+   gives: one function per rule id, one test per id, and one command
+   that runs them all, prints one line per finding, and exits 0 clean,
+   1 on findings, 2 when it cannot run.
+3. **Publish the hook in the repo's own manifest.** Add that command as
+   one hook to the consumer repo's own `.pre-commit-hooks.yaml`, the
+   same way dev-playbook publishes `playbook-check`. The repo is now
+   the topmost instance of the hosting pattern for its own standard.
 4. **Mirror the hook in the local block.** Add the same hook id to the
    repo's `repo: local` block in `.pre-commit-config.yaml`, so the repo
    runs from its working tree what it publishes
-   ([The local block covers the manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
+   ([A publisher dogfoods its manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
    `distribution.a-publisher-dogfoods-its-manifest` checks
    the mirror.
 5. **Turn the meta-standard's own policing on.** The meta-standard's

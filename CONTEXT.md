@@ -28,7 +28,7 @@ The umbrella term for the Standard's read-only checking process: a run of one or
 _Avoid_: check (too broad — a check may block; an audit never does).
 
 **Lint**
-A Detector implemented as deterministic code — the `*-lint` scripts under `scripts/`. Every detector is a lint, and every lint is part of the audit process (lint ⊂ audit), never the reverse.
+A Detector implemented as deterministic code — in dev-playbook, the check functions `playbook check` runs. Every detector is a lint, and every lint is part of the audit process (lint ⊂ audit), never the reverse.
 _Avoid_: audit, for a detector — the audit is the run; the lint is what runs in it.
 
 **Detector**

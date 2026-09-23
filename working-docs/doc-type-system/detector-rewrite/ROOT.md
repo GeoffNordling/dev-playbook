@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Detector Rewrite
-description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the state it left the tree in, the seven design rulings, and what remains
+description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the state it left the tree in, the eight design rulings, and what remains
 ---
 
 # Detector Rewrite
@@ -93,9 +93,9 @@ tree as it stands.
 - Under `scripts/`, `loop-lint` is the one detector left, kept for the
   loop workstream, and `workspace-lint` runs at no gate by ruling. The
   two tables and their scripts are gone.
-- `standards/standard/detectors.md`, `standards/distribution/channel.md`,
-  and `guides/writing-a-detector.md` still describe the old world; the
-  first Planned item rewrites them.
+- `standards/standard/detectors.md`, `guides/writing-a-detector.md`,
+  `guides/consuming.md`, and `CONTEXT.md` still describe detector
+  scripts; the first Planned item rewrites them.
 
 ## Terms
 
@@ -111,15 +111,14 @@ tree as it stands.
 - **Hook mechanism, 2026-09-22.** A `language: python` hook whose
   entry is a console script under `[project.scripts]`; pre-commit
   builds and caches the venv once per pin. No detector under
-  `scripts/`, no `sys.path` insert. Placeholder name: `playbook check`.
+  `scripts/`, no `sys.path` insert. The console script is
+  `playbook check`.
 - **Repo model, 2026-09-22.** One in-memory `Repo` object per run,
   built from one `git ls-files`, holding each file's parsed form:
   frontmatter, headings with slugs and line numbers, trailers, links,
   lines outside fences; Python files as `ast` trees. Every check
   reads the model and never touches disk or git. Plain dataclasses,
-  no framework; tests build it through the same constructor. Whether
-  markdown parsing stays hand-rolled or moves to a CommonMark library
-  is open, below.
+  no framework; tests build it through the same constructor.
 - **Mirrored grouping, 2026-09-22.** One check module per
   `standards/` directory, named for it: `build/` ↔ `checks/build.py`.
   The id keeps `<family>.<slug>`, so module and namespace coincide.
@@ -135,14 +134,15 @@ tree as it stands.
   - The user's view is `playbook checks`: id, module, environment tag,
     computed live, with `--family` and `--without` filters.
   - A boundary is a tag on the check, `@check(id, needs=WORKSPACE)`,
-    for a check that reads sibling repos on this machine. CI runs
-    `playbook check --without workspace` in place of `SKIP: ref-lint`.
+    for a check that reads sibling repos on this machine. CI sets
+    `SKIP: workspace` in place of `SKIP: ref-lint`, and `playbook
+    check` reads the tag from `SKIP`.
     Untagged checks run at every gate.
 - **Data read out of a Standard, 2026-09-22.** Where a check consumes
   data a Standard's body holds, such as the type registry table
   under one heading of `document-types.md` or the canonical files
   under `standards/build/canonical/`, the path and heading are named
-  constants in one module, placeholder `sources.py`. A test pins
+  constants in one module, `sources.py`. A test pins
   each constant to its document: the path exists, the heading is
   present. A check reads the section through the model, never by
   scanning for the heading itself.
@@ -166,62 +166,27 @@ None.
 
 ## Planned
 
-- **The Standards and the docs.** `standards/standard/detectors.md`,
-  `standards/distribution/channel.md`, and
-  `guides/writing-a-detector.md`, each rewritten to the state the repo
-  is now in; `scripts/README.md` and the canonical
-  `.pre-commit-config.yaml` were done at the cut over. Three smaller
-  contradictions the loop left because it restated only rule bodies go
-  in the same pass: the Why of `Reference resolves` in
-  `standards/knowledge-organization/cross-references.md` still says the
-  predicate binds same-repo targets only; the Why at
-  `standards/harness/claude-content.md:22` still says `### Read the
-  standards` is the first heading in the file, where `# Global` is; and
-  the intro of `standards/standard/index.md` still names the
-  boundaries, deleted in phase 2. The rulings that calibrated the
-  triage of every family hold for this pass too:
-  - **A rule about the checker itself is a test, not a rule.** Ruled on
-    `build.every-canonical-file-has-a-rule-and-every-rule-a-file`.
-    Applies to every rule whose member is dev-playbook's own checking
-    code rather than a governed repo.
-  - **A rule the user cannot read is restated plain, heading fixed,
-    meaning held.** Three of the first three escalations were
-    unreadable. Two were deleted for reasons of their own, one restated
-    as two. Unclear wording alone never deletes a rule.
-  - **A tool's own configuration is the rule.** Where ruff, shellcheck,
-    or shfmt decides a rule, the rule says the tool reports nothing
-    under the canonical configuration and names what that
-    configuration selects. A sentence that promises more than the tool
-    enforces is replaced, not kept beside it.
-  - **Fix the cause in this repo.** A gap that exists because a file
-    never reaches the tool is closed in the canonical files, not by
-    narrowing the rule. Consumer repos are not a reason to narrow.
-  - **The repo as it stands is acceptable.** Ruled 2026-09-23 on the
-    agents' escalations. The rewrite refactors rules and checks; it
-    adds no check that fails today. A new check that passes today is
-    implemented. A new check that fails today is deleted, or set aside
-    on a list of checks to add later; it does not enter the suite, and
-    its rule leaves the Standard, to live only on that list. A small
-    fix to the repo is allowed where the user approves it by name.
-  - **No rule micromanages how code is written.** Ruled 2026-09-23 on
-    `shell.glue-only`. A rule that does not shape high-level guidance
-    or comprehension goes, however sound. Also deleted on that ground:
-    `testing.fixture-lives-in-the-narrowest-conftest`, the sentence
-    limit on a candidates entry, and the two GitHub epic and ticket
-    rules.
-  - **New rules.** Ruled 2026-09-23: the global source's first `###`
-    heading is `Read the standards`, yes; `README.md` is typed
-    `README`, yes; only `CONTEXT.md` is typed `Vocabulary`, no, the
-    user wants other Vocabulary files open.
-  - **A deterministic body narrows to what the code decides.** Where
-    the sentence promises more than the check reads, the sentence
-    narrows. Where no function can decide the sentence at all, the
-    rule becomes stochastic. In doubt, delete or downgrade; the user
-    trusts the triager's judgment and rules on no more single rows.
-  - **The detector-script rules go.** Dev-playbook has no detector
-    script on exit, and consumers are not a reason to keep a rule.
-  - **Loop stays as it is.** The six Loop rules and their checks are
-    kept; the Loop workstream follows this one.
+- **The Standards and the docs.** Four documents still describe
+  detector scripts, each rewritten to the state the repo is now in:
+  `standards/standard/detectors.md`, `guides/writing-a-detector.md`,
+  `guides/consuming.md`, and the Governance terms of `CONTEXT.md`. The
+  guide also says what shape a consumer repo's own checks take; each
+  consumer rewrites its scripts to that shape, and nothing about its
+  scripts today is held. Whether "detector" gives way to "check" in
+  all four is decided after the rewrite lands.
+  - **A sentence narrows to what its check does, and headings do not
+    change.** Where the sentence promises more than the check reads,
+    the sentence narrows; the code never grows to match it.
+- **The check package as a library, trade-offs to discuss.** A
+  consumer repo writes checks for its own Standards. Today it copies
+  dev-playbook's pattern: its own registry, model, and command, per
+  `guides/writing-a-detector.md`. The alternative is that it imports
+  `Repo`, `@check`, and the finding printer from `dev_playbook` and
+  registers its checks into one `playbook check` run. That needs code
+  that does not exist: `check_registry.load()` imports only
+  `dev_playbook.checks`, and `run_check` takes no other registry. To
+  weigh: a public API that consumers pin against, against every
+  consumer keeping a copy that drifts.
 - **The wheel a consumer installs.** pre-commit builds this repo into a
   wheel at the pinned rev and installs it. That wheel is 108 MB in 1905
   files, because `uv_build` packs everything under `src/dev_playbook/`,
