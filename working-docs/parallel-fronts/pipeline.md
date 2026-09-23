@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: The Sandcastle Pipeline
-description: The pipeline as built and proven — how a front runs from open to close, how fronts run in parallel, the layout inside a container, what it guarantees, where each piece lives, and what it does not yet do
+description: The pipeline as built and proven — how a front runs from open to close, how fronts run in parallel, the layout inside a container, how a run is told what to do, what it guarantees, where each piece lives, and what it does not yet do
 ---
 
 # The Sandcastle Pipeline
@@ -107,6 +107,33 @@ Sandcastle is used as published. By default it puts the repository at
 `~/workspace` itself, which breaks the workspace layout; a 20-line wrapper
 around its own podman plug-in moves the work copy to `~/assignment/<repo>`.
 The code is [`rig/relocated.mjs`](/working-docs/parallel-fronts/rig/index.md).
+
+## The run() call
+
+The pipeline calls one Sandcastle function, `run()`, which runs one agent
+from start to finish. Sandcastle's other functions wait until a need
+proves them
+([Constraints](/working-docs/parallel-fronts/ROOT.md#constraints)).
+
+**Instructions go in as `prompt`.** The driver reads the task from a file,
+such as `PROMPT.md`, and passes the text as `run()`'s `prompt` argument.
+Sandcastle hands it to the agent exactly as written. The other way,
+`promptFile`, fills in `{{KEY}}` placeholders and runs `` !`command` ``
+lines inside the container first; that is Sandcastle syntax the pipeline
+does not need. Where a value such as the front's name belongs in the
+text, the driver puts it there with ordinary code.
+
+**An iteration is one fresh Claude session.** Claude takes as many turns as
+it needs, commits, and exits. A next iteration starts a new session with
+the same prompt and no memory of the last; only the repository carries
+over. Two arguments control the loop:
+
+| Argument | Default | Meaning |
+|---|---|---|
+| `maxIterations` | 1 | The most sessions a run starts |
+| `completionSignal` | `<promise>COMPLETE</promise>` | Text that ends the loop early. Sandcastle never tells the agent about it, so the prompt must |
+
+The rig uses the defaults: one session per front.
 
 ## What it guarantees
 
