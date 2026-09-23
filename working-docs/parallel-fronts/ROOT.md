@@ -80,39 +80,8 @@ integrator is a judgment and is not.
 
 ## Open
 
-- **Whether a front converges.** A front given a budget of iterations may
-  finish its useful work early and then invent more. The guess is that a
-  front needs a way to declare itself done that the driver can read, and
-  that the budget is a ceiling rather than a target. Untested.
-- **Who integrates.** The integrator may be an agent, or it may be the
-  user with an agent assisting. The guess is that the first few laps are
-  integrated by hand, because that is where the shape's real failure modes
-  show.
-- **How a front's plan is revised.** A lap ends with three or four
-  divergent views of the project. Which of them updates the other fronts'
-  plans, and whether that is the user's act or the integrator's, is
-  unsettled.
-- **How the laps are run.** Not yet defined. The question comes before any
-  tool: what value parallel fronts should deliver, and how the user wants
-  to run them. [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
-  records what one candidate offers.
-- **Whether the fence holds.** Five named problems stand between Sandcastle
-  and a safe front, tracked in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems).
-  All five are solved and proven in test. **Hook logging**'s fix is not
-  yet on main.
-
-- **What the landing PR carries.** For the user to rule before any PR
-  opens: only the two changes part 4 ran on, or all of this branch's work
-  (the hardened `front-clone`, its trap test, and this working set) with
-  them, and whether anything of the `sandbox-probe` branch comes along.
-- **Why a dev-playbook front needs two copies.** The user questions whether
-  a front assigned to change dev-playbook needs a read-only config copy
-  beside its work copy at all. The prototype's reason is recorded in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter):
-  the config copy answers "what does published main say", so it must not
-  show the front its own uncommitted edits. Parked until part 4 worked;
-  now due to be revisited together.
+None. Every question the set has met is carried by an item in Planned,
+and is answered there.
 
 ## Planned
 
@@ -122,24 +91,43 @@ guiding.
 - **Walk the user through the working prototype.** The user has not yet
   looked at the sandbox solution. Guide them through it: the layout, the
   copies, the plug-in, the round trip, and the hook logging, with pictures
-  rather than code.
+  rather than code. Settle here whether a front assigned to change
+  dev-playbook needs a read-only config copy beside its work copy at all.
+  The prototype's reason is recorded in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter):
+  the config copy answers "what does published main say", so it must not
+  show the front its own uncommitted edits.
 - **Discuss: what this gets us, and how we run it.** When this branch lands
   on main, what does the user gain, and does it change any way work is done
-  on main today? This is where the landing PR's scope (Open, above) is
-  ruled. Then step back further: so far the work proved Sandcastle's
-  sandbox can be made safe, but sandboxing is not the library's point. It
-  coordinates agents across branches and worktrees. Define the question
-  first, what value parallel fronts should deliver and how the user wants
-  to run them, before choosing any tool to run them with.
+  on main today? Rule what the landing PR carries: only the two changes
+  part 4 ran on, or all of this branch's work (the hardened `front-clone`,
+  its trap test, and this working set) with them, and whether anything of
+  the `sandbox-probe` branch comes along. Then step back further: so far
+  the work proved Sandcastle's sandbox can be made safe, but sandboxing is
+  not the library's point. It coordinates agents across branches and
+  worktrees. Define the question first, what value parallel fronts should
+  deliver and how the user wants to run them, before choosing any tool to
+  run them with. [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
+  records what one candidate offers.
 - **Discuss: overlap with active branches.** Does the landing PR touch any
   file that another active, unmerged branch is also changing?
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
   ([What part 4 settled](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)):
   `measure-event` sending rows to the host from a sandbox, and the Stop and
-  SessionEnd hooks set to wait. The PR's scope is open above.
+  SessionEnd hooks set to wait. All five problems in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems)
+  are solved in test; this is the last step to make them solved for real.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
+  The lap answers three questions about the shape:
+  - Whether a front converges, or finishes its useful work and then invents
+    more. The guess: a front needs a way to declare itself done, and its
+    budget is a ceiling, not a target.
+  - Who integrates. The guess: the user, with an agent assisting, for the
+    first few laps, because that is where the real failure modes show.
+  - How a front's plan is revised when a lap ends with divergent views, and
+    whether that is the user's act or the integrator's.
 
 ## Completed
 
