@@ -1,8 +1,7 @@
 """Drift guards tying each detector's ``--list-rules`` to what it actually emits.
 
-Each detector hand-maintains a rule-id tuple that ``--list-rules`` prints, and
-the standards-lint slice will consume ``--list-rules`` as ground truth for the
-verifier table. Two ways the tuple could lie, each guarded here:
+Each detector hand-maintains a rule-id tuple that ``--list-rules`` prints. Two
+ways the tuple could lie, each guarded here:
 
 - **Literal drift.** An emission site could pass a raw string literal instead of
   a rule-id constant, so the tuple silently diverges from the emitted id. The
@@ -47,7 +46,6 @@ CARRIERS = [
     (SRC / "dev_playbook" / "testing_lint.py", "Finding", 2),
     (SRC / "dev_playbook" / "decisions_lint.py", "Finding", 2),
     (SRC / "dev_playbook" / "prose_lint.py", "Finding", 2),
-    (SRC / "dev_playbook" / "verifier_table.py", "Finding", 1),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
@@ -61,7 +59,6 @@ REGISTRIES = [
     (SRC / "dev_playbook" / "testing_lint.py", "RULES"),
     (SRC / "dev_playbook" / "decisions_lint.py", "RULES"),
     (SRC / "dev_playbook" / "prose_lint.py", "RULES"),
-    (SRC / "dev_playbook" / "verifier_table.py", "RULES"),
 ]
 
 

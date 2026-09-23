@@ -17,9 +17,9 @@ doc-type binds nobody, so this Standard is what binds the file to that
 encoding. The tree the file sits in is
 [The Standards Tree](/standards/standard/tree.md).
 
-> **Why.** The verifier table reads a rule by its trailer
-> ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)),
-> so a rule without one is a rule no row of that table can name. A
+> **Why.** A detector claims a rule by its trailer's id
+> ([Detectors](/standards/standard/detectors.md)),
+> so a rule without one is a rule no detector can name. A
 > verifier, and a reader, must know the class before the first rule,
 > which is what the one frontmatter phrase gives them. And no
 > verifier, script or judge, returns one value for a predicate that

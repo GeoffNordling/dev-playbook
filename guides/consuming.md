@@ -55,20 +55,13 @@ in the Standard the step links.
    ([The local block covers the manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
    repo-lint's `distribution.a-publisher-dogfoods-its-manifest` checks
    the mirror.
-5. **Record the detector in the two tables.** The local-block wiring
-   runs the detector at the **commit gate**. Which rule the detector
-   decides is the verifier table, `standards/verifiers.yaml`
-   ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)),
-   and where it runs is the boundary table, `standards/boundaries.yaml`,
-   read from the wiring
-   ([The boundary table, generated from the wiring](/standards/standard/detectors.md#the-boundary-table-generated-from-the-wiring)).
-6. **Turn the meta-standard's own policing on.** The meta-standard's
+5. **Turn the meta-standard's own policing on.** The meta-standard's
    detector, `standards-lint`, is a published dev-playbook hook. Bump
    the pin to a dev-playbook `rev` that carries it: from that rev it
    runs the consumer-mode rules over the repo's `standards/` tree
    (`standards-lint --list-rules` is the registry). Until the pin
    moves, the tree is unpoliced by the meta-standard.
-7. **Register a local document type (only if the standard needs one).**
+6. **Register a local document type (only if the standard needs one).**
    Skip this step unless the new standard governs a **document type**
    the global OKF registry does not carry. If it does, declare the type
    in the frontmatter of the repo's root `index.md`, an `okf_types`

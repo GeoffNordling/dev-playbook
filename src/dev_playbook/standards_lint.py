@@ -28,15 +28,9 @@ rules, each the id of its heading in standards/standard/tree.md:
     scripts/README.md validation-table row when that file is present — "every
     detector" meaning the playbook-lint roster in dev-playbook mode (consumers
     wire one aggregate hook, so the roster, not the config, enumerates what
-    runs) and the local detector hooks in consumer mode. Where each detector
-    runs is the boundary table's question, not this module's
-    (``scripts/boundary-table``).
+    runs) and the local detector hooks in consumer mode.
   - **no-shadowing** — in consumer mode, no local Standard directory may reuse
     an upstream directory's name drawn from this hook's own pinned clone.
-
-Which check decides which rule is the verifier table,
-``standards/verifiers.yaml``; ``scripts/verifier-table`` writes it from this
-module's ``--list-rules`` and lints it.
 
 Output:
     stdout — one finding per line, ``file:line: standard.rule message``.
@@ -538,10 +532,7 @@ def check_hook_surfaces(
     that file is present -- runs over the set that actually enumerates what the
     commit gate runs. In consumer mode that is the local detector hooks; in
     dev-playbook mode it is ``roster`` (the playbook-lint dispatch list -- the
-    local block carries only the aggregate hook, which owns no rules). Which
-    rule a detector decides is the verifier table's (``scripts/verifier-table``),
-    and whether it runs anywhere the boundary table's (``scripts/boundary-table``),
-    not legs here.
+    local block carries only the aggregate hook, which owns no rules).
     """
     manifest_all, manifest = _manifest_ids(root)
     local = _scripts_entry_ids(_local_hooks(root))

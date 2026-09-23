@@ -49,8 +49,8 @@ A rule is a heading; its section is the rule.
 - **The trailer.** The section's last line,
   `` `<name>.<slug>` · deterministic `` or
   `` `<name>.<slug>` · stochastic ``, `<name>` the directory and
-  `<slug>` the heading's slug: the rule's id and kind, and the key of
-  the verifier table's row.
+  `<slug>` the heading's slug: the rule's id and kind, and the id a
+  detector claims the rule by.
 - **The why.** A block after the trailer, opening `> **Why.**` and
   running to the next heading: the argument for the rule, never a
   predicate. A rule may have none.

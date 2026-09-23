@@ -35,9 +35,6 @@ _Avoid_: audit, for a detector — the audit is the run; the lint is what runs i
 The read-only check that inspects the repository against one or more standards and emits findings; it never mutates the repository. Every detector is deterministic code — a lint.
 _Avoid_: audit, for the check itself — an audit is a *run* of one or more detectors.
 
-**Verifier table**
-`standards/verifiers.yaml`: the generated map from every rule id declared under `standards/` to the address of the one check that decides it — a detector by path, a dependency by hook id or name — or null where no check does. `scripts/verifier-table` writes it and fails where the committed file, a detector's `--list-rules`, or an address disagrees.
-
 **Gate**
 An automatic, unmanned blocking point on the path to main, continuously in effect. An audit never blocks; a gate is what blocks.
 _Avoid_: venue (retired — say **gate**, or a rung name).

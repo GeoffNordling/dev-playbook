@@ -9,7 +9,3 @@ repos and the dev scripts it keeps for itself, with the logic behind both in
 `labelgen` regenerates the label table in
 `standards/tracking/label-scheme.md`, rendered from `label_scheme.json`,
 and fails on drift via `--check`.
-`verifier-table` does the same for `standards/verifiers.yaml`, the map from
-every rule id to the check that decides it, and runs in the commit gate.
-`boundary-table` does the same for `standards/boundaries.yaml`, the gates
-that run each of those checks, read from the wiring itself.

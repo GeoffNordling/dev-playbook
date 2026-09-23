@@ -177,6 +177,19 @@ only `loop-lint`:
   the `Check` entry. The placeholders `cli.py` and `registry.py` could
   not stand because the viewer's tests already own those basenames and
   pytest refuses two test files of one name.
+- **Phase 2, 2026-09-23.** The dead weight is gone: the two tables,
+  their two scripts, `verifier_table.py`, `boundary_table.py`, their
+  two tests, and the two roster lines. The rules deleted from
+  `standards/standard/detectors.md` are six, not three, as the
+  standard family's triage read the ruling: the two H2 table rules
+  and the four H3 rules under them, each stating a property of a
+  table row or an address. The two stochastic rules stay; the skip
+  rule moves up to H2 with its parent gone, its id unchanged. The
+  dead `UNGATED_AUDITS` set left `playbook_lint.py` with the boundary
+  table, its only reader. Fourteen files outside the working set
+  named the tables or linked the deleted headings, and each sentence
+  was repointed at Detectors or dropped, so `ref-lint` and the index
+  check stay clean. The three gates are green with 42 fewer tests.
 
 ## Finish line
 

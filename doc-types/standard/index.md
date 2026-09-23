@@ -7,8 +7,8 @@ okf_version: "0.1"
 The Standard doc-type: the object a population is held to, one file of
 a population and its rules — its definition, contract shape, encoding,
 and residual ledger. The rules a Standard, its directory, and the
-catalog obey, and the detector contract behind the verifier and
-boundary tables, stay with the Meta-Standard, under
+catalog obey, and the detector contract, stay with the Meta-Standard,
+under
 [standards/standard/](/standards/standard/index.md).
 
 - [Population and Rules](/doc-types/standard/contract-shape.md) — Standard's contract shape — one population and its rules, each a predicate with an id and a kind, under a condition or none — in prose and as code

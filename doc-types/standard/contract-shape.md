@@ -20,7 +20,7 @@ checked against.
   of this class.
 - **Rule.** An id, a kind, a predicate, a condition or none, and a
   why or none. The id, `<name>.<slug>`, is the rule's identity, the
-  atom the verifier and boundary tables join on. The kind is
+  atom a detector claims the rule by. The kind is
   deterministic or stochastic. The predicate is the check whole: a
   reader with only that text can apply it, and for a stochastic rule
   it is the judge's prompt. The why is the argument for the rule,
@@ -37,8 +37,8 @@ checked against.
 
 The composition rule: exactly one population, any number of rules,
 each under one condition or none. A Standard carries no pointer to a
-verifier or a gate, since the verifier table and the boundary table
-hold those, keyed by rule id
+verifier or a gate; a detector claims a rule by its id, and the wiring
+says where the detector runs
 ([Detectors](/standards/standard/detectors.md)). A rule's why, and
 the Standard's own, sit beside what they argue for, not in a
 separate file.

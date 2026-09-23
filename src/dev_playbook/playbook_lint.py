@@ -49,15 +49,7 @@ DETECTORS = (
     "prose-lint",
     "standards-lint",
     "loop-lint",
-    "verifier-table",
-    "boundary-table",
 )
-
-# Detectors that deliberately run at no gate: the user invokes them by hand.
-# The boundary table (scripts/boundary-table) rows each as ``on-demand``; a
-# detector at no gate that is not registered here is its finding, so a detector
-# cannot be published without saying where it runs.
-UNGATED_AUDITS = frozenset({"workspace-lint"})
 
 # Manifest validation is not a scripts/ detector — it delegates to pre-commit's
 # own validator and applies only where a repo publishes a manifest — so it

@@ -26,8 +26,7 @@ def print_rules(rules: Iterable[str]) -> int:
     """Print a detector's rule ids, one per line, sorted and deduplicated.
 
     The shared body of every detector's ``--list-rules`` flag: it needs no
-    repository and runs from any cwd, so the verifier table's generator can
-    enumerate the fleet's rules. Returns 0, the flag's exit code.
+    repository and runs from any cwd. Returns 0, the flag's exit code.
     """
     for rule in sorted(set(rules)):
         print(rule)

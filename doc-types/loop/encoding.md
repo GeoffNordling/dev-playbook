@@ -41,9 +41,9 @@ cannot carry:
   every iteration`.
 - **A check** links the Standard it measures against, a file typed
   `Standard` at `standards/<name>/<topic>.md`, then states its
-  condition the same way. What the check runs is the verifier of each
+  condition the same way. What the check runs is the detector of each
   of that Standard's rules, never a gate
-  ([A declaring repo carries the generated verifier table](/standards/standard/detectors.md#a-declaring-repo-carries-the-generated-verifier-table)).
+  ([Detectors](/standards/standard/detectors.md)).
 - **A yield** names its receiver, the user or a linked Loop, then
   states its condition: `yields when …`.
 

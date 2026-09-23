@@ -15,9 +15,7 @@ Every directory here is one standard: the files typed `Standard` that
 state its rules, one population each (`build/skeleton.md`,
 `build/canonical.md`, `build/python.md`), each rule carrying its own
 why, and an `index.md` whose opening sentence is
-the standard's remit. Which check decides each rule is
-[the verifier table](/standards/verifiers.yaml), and where each check
-runs is [the boundary table](/standards/boundaries.yaml). The rule is
+the standard's remit. The rule is
 the tree: **one directory, one standard**. The contract behind a
 Standard file is the Standard doc-type
 ([doc-types/standard/](/doc-types/standard/index.md)).

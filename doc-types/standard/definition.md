@@ -15,8 +15,8 @@ out of it; driving toward it is [Loop](/doc-types/loop/definition.md)'s.
 
 One: **hold** — the standard holds every member of its population to
 its rules. Who checks a rule and where the check runs are not the
-standard's to say: the verifier table names the check for each rule
-id and the boundary table the gates that run it
+standard's to say: a detector claims each rule by its id, and the
+wiring says the gates that run it
 ([Detectors](/standards/standard/detectors.md)); what brings a
 repository into the state the first time is a guide's or a runbook's.
 
