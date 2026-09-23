@@ -185,8 +185,12 @@ def package_name(repo_name: str) -> str:
 
 
 def in_canonical(rel: str) -> bool:
-    """True for paths under standards/build/canonical/ — quoted material, not tree."""
-    return rel.startswith("standards/build/canonical/")
+    """True for paths under standards/build/canonical/ or its shipped copy.
+
+    Both are quoted material, not tree; the package ships the copy under
+    src/dev_playbook/canonical/.
+    """
+    return rel.startswith(("standards/build/canonical/", "src/dev_playbook/canonical/"))
 
 
 def canonical_text(name: str) -> str:

@@ -4,6 +4,10 @@ Every check reads a :class:`Repo` and nothing else: no disk, no git. The
 model is built once per run from one ``git ls-files`` (:meth:`Repo.from_git`)
 or, in a test, from a mapping of paths to bytes (:meth:`Repo.from_files`).
 Both go through the same constructor, so a test's repo is the real thing.
+The model also carries what no tracked file of a consumer holds: the
+repository's name and the canonical files a repo copies, read from the copy
+shipped inside this package, so a check needs neither git nor dev-playbook's
+tree.
 
 A markdown file is parsed into frontmatter, headings with slugs and line
 numbers, rule trailers, links, and the lines outside code fences. A Python
@@ -18,12 +22,14 @@ import re
 import subprocess
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+from functools import cache
+from importlib import resources
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 import yaml
 
-from dev_playbook import gitrepo, md
+from dev_playbook import gitrepo, md, sources
 
 # A rule trailer: the whole line is a code span holding `<family>.<slug>`,
 # then ` · ` and the kind.
@@ -39,6 +45,8 @@ PYTHON_SHEBANG_PREFIXES = (
 )
 REGULAR_FILE = "100644"
 EXECUTABLE_FILE = "100755"
+# The package directory that ships a copy of sources.CANONICAL_DIR.
+SHIPPED_CANONICAL = "canonical"
 
 
 class ModelError(Exception):
@@ -143,14 +151,21 @@ class PythonFile:
 
 @dataclass(frozen=True)
 class Repo:
-    """One checkout in memory: every tracked file, the parsed ones by kind."""
+    """One checkout in memory: every tracked file, the parsed ones by kind.
+
+    ``name`` is the repository's name. ``canonical`` maps each name in
+    ``sources.CANONICAL_FILES`` to the bytes of the copy shipped in this
+    package.
+    """
 
     root: Path
+    name: str
     files: tuple[str, ...]
     contents: Mapping[str, bytes]
     executable: frozenset[str]
     markdown: Mapping[str, MarkdownFile]
     python: Mapping[str, PythonFile]
+    canonical: Mapping[str, bytes]
 
     @classmethod
     def from_files(
@@ -158,8 +173,14 @@ class Repo:
         root: Path,
         contents: Mapping[str, bytes],
         executable: Iterable[str] = (),
+        name: str | None = None,
+        canonical: Mapping[str, bytes] | None = None,
     ) -> Repo:
-        """Build the model from ``{repo-relative path: bytes}``."""
+        """Build the model from ``{repo-relative path: bytes}``.
+
+        ``name`` defaults to the root's directory name and ``canonical`` to
+        the shipped copy; a test passes either to pin its own.
+        """
         markdown: dict[str, MarkdownFile] = {}
         python: dict[str, PythonFile] = {}
         for path in sorted(contents):
@@ -170,11 +191,13 @@ class Repo:
                 python[path] = parse_python(path, decode(path, data))
         return cls(
             root=root,
+            name=root.name if name is None else name,
             files=tuple(sorted(contents)),
             contents=dict(contents),
             executable=frozenset(executable),
             markdown=markdown,
             python=python,
+            canonical=shipped_canonical() if canonical is None else dict(canonical),
         )
 
     @classmethod
@@ -184,7 +207,8 @@ class Repo:
         One ``git ls-files`` lists the index with each entry's mode, so the
         listing is worktree-scoped and gitignore is moot. Symlinks and
         submodules are not files and are left out; an entry deleted from the
-        working tree is skipped.
+        working tree is skipped. The name is the directory holding the shared
+        ``.git``, the same from the main checkout and every worktree.
         """
         result = subprocess.run(
             ["git", "-C", str(root), "ls-files", "--cached", "--stage", "-z"],
@@ -208,11 +232,20 @@ class Repo:
             contents[path] = full.read_bytes()
             if mode == EXECUTABLE_FILE:
                 executable.add(path)
-        return cls.from_files(root, contents, executable)
+        return cls.from_files(
+            root, contents, executable, name=gitrepo.canonical_repo_name(root)
+        )
 
     def text(self, path: str) -> str:
         """The UTF-8 text of one tracked file."""
         return decode(path, self.contents[path])
+
+
+@cache
+def shipped_canonical() -> Mapping[str, bytes]:
+    """Each canonical file name to the bytes of the copy shipped in this package."""
+    shipped = resources.files("dev_playbook") / SHIPPED_CANONICAL
+    return {name: (shipped / name).read_bytes() for name in sources.CANONICAL_FILES}
 
 
 def decode(path: str, data: bytes) -> str:

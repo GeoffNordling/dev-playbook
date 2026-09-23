@@ -1,12 +1,20 @@
 """Unit tests for the repo model, src/dev_playbook/model.py."""
 
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
 from conftest import commit_all, init_repo
 
-from dev_playbook.model import ModelError, Repo, parse_markdown, parse_python
+from dev_playbook import sources
+from dev_playbook.model import (
+    ModelError,
+    Repo,
+    parse_markdown,
+    parse_python,
+    shipped_canonical,
+)
 
 DOC = """---
 type: Standard
@@ -124,6 +132,18 @@ class TestRepoFromFiles:
         assert repo.executable == frozenset({"scripts/tool"})
         assert repo.text("Makefile") == "all:\n"
 
+    def test_name_defaults_to_the_root_directory(self, tmp_path: Path) -> None:
+        root = tmp_path / "My-Repo"
+        assert Repo.from_files(root, {}).name == "My-Repo"
+        assert Repo.from_files(root, {}, name="other").name == "other"
+
+    def test_canonical_defaults_to_the_shipped_copy(self, tmp_path: Path) -> None:
+        repo = Repo.from_files(tmp_path, {})
+        assert set(repo.canonical) == sources.CANONICAL_FILES
+        assert repo.canonical == shipped_canonical()
+        pinned = Repo.from_files(tmp_path, {}, canonical={"ci.yml": b"x\n"})
+        assert pinned.canonical == {"ci.yml": b"x\n"}
+
     def test_non_utf8_markdown_names_the_file(self, tmp_path: Path) -> None:
         with pytest.raises(ModelError, match="b.md: not UTF-8"):
             Repo.from_files(tmp_path, {"b.md": b"\xff\xfe"})
@@ -142,6 +162,21 @@ class TestRepoFromGit:
         assert repo.files == ("doc.md", "run")
         assert repo.executable == frozenset({"run"})
         assert repo.markdown["doc.md"].headings[0].slug == "doc"
+        assert repo.canonical == shipped_canonical()
+
+    def test_name_is_the_repository_from_a_worktree(self, tmp_path: Path) -> None:
+        root = tmp_path / "My-Repo"
+        init_repo(root)
+        (root / "doc.md").write_text("# Doc\n")
+        commit_all(root)
+        worktree = tmp_path / "elsewhere"
+        subprocess.run(
+            ["git", "-C", str(root), "worktree", "add", "-q", str(worktree)],
+            check=True,
+            capture_output=True,
+        )
+        assert Repo.from_git(root).name == "My-Repo"
+        assert Repo.from_git(worktree).name == "My-Repo"
 
     def test_tracked_file_deleted_from_the_working_tree_is_skipped(
         self, tmp_path: Path

@@ -2,12 +2,11 @@
 
 Every rule is decided by a function over the model. The skeleton rules read
 the tracked paths; a directory exists when a tracked file sits under it. The
-canonical rules compare a repo's copy against its source under
-``sources.CANONICAL_DIR``, read from the same model, so they compare only in
-a repo that carries that directory. The Python project rules read the root
-``pyproject.toml``; the import package is its ``project.name`` with each
-hyphen an underscore, and only the name-mapping rule holds that name to the
-repository's directory.
+canonical rules compare a repo's copy against ``repo.canonical``, the copy of
+``sources.CANONICAL_DIR`` the package ships, so they compare in every repo.
+The Python project rules read the root ``pyproject.toml``; the import package
+is its ``project.name`` with each hyphen an underscore, and only the
+name-mapping rule holds that name to ``repo.name``.
 """
 
 import ast
@@ -19,7 +18,7 @@ from typing import Any
 
 import yaml
 
-from dev_playbook import gitrepo, sources
+from dev_playbook import sources
 from dev_playbook.check_registry import Finding, check
 from dev_playbook.model import Repo
 
@@ -52,8 +51,10 @@ CI_YML = ".github/workflows/ci.yml"
 
 
 def _in_canonical(path: str) -> bool:
-    """True for a path under the canonical directory, quoted material."""
-    return path.startswith(sources.CANONICAL_DIR + "/")
+    """True for a path under the canonical directory or its shipped copy, quoted material."""
+    return path.startswith(
+        (sources.CANONICAL_DIR + "/", sources.SHIPPED_CANONICAL_DIR + "/")
+    )
 
 
 def _has_dir(repo: Repo, name: str) -> bool:
@@ -76,11 +77,14 @@ def _scripts_hold_python(repo: Repo) -> bool:
     return any(path.startswith("scripts/") for path in repo.python)
 
 
-def _canonical(repo: Repo, name: str) -> str | None:
-    """The text of one canonical source file, or None where the repo lacks the dir."""
-    if not any(_in_canonical(path) for path in repo.files):
-        return None
-    return repo.text(f"{sources.CANONICAL_DIR}/{name}")
+def _carries_canonical(repo: Repo) -> bool:
+    """True for the repo that tracks the canonical directory, dev-playbook."""
+    return any(path.startswith(sources.CANONICAL_DIR + "/") for path in repo.files)
+
+
+def _canonical(repo: Repo, name: str) -> str:
+    """The text of one canonical source file, from the copy the model carries."""
+    return repo.canonical[name].decode("utf-8")
 
 
 def _pyproject(repo: Repo) -> dict[str, Any] | None:
@@ -204,8 +208,7 @@ def has_tests(repo: Repo) -> Iterator[Finding]:
 
 def _byte_compare(repo: Repo, path: str, name: str) -> Iterator[Finding]:
     """A finding when ``path`` exists and differs from the canonical ``name``."""
-    source = _canonical(repo, name)
-    if source is not None and path in repo.contents and repo.text(path) != source:
+    if path in repo.contents and repo.text(path) != _canonical(repo, name):
         yield Finding(path, None, f"must be byte-identical to the canonical {name}")
 
 
@@ -258,15 +261,15 @@ def holds_every_canonical_block(repo: Repo) -> Iterator[Finding]:
     """``.pre-commit-config.yaml`` holds every canonical block verbatim and in order.
 
     The repo that carries the canonical directory is exempt from the block
-    holding the dev-playbook ``rev``, and only such a repo has the source.
+    holding the dev-playbook ``rev``.
     """
-    source = _canonical(repo, PRE_COMMIT_CONFIG)
-    if source is None or PRE_COMMIT_CONFIG not in repo.contents:
+    if PRE_COMMIT_CONFIG not in repo.contents:
         return
+    exempt = _carries_canonical(repo)
     lines = repo.text(PRE_COMMIT_CONFIG).splitlines()
     position = 0
-    for block in _config_blocks(source):
-        if any(REV_PLACEHOLDER in line for line in block):
+    for block in _config_blocks(_canonical(repo, PRE_COMMIT_CONFIG)):
+        if exempt and any(REV_PLACEHOLDER in line for line in block):
             continue
         found = _find_run(lines, block, position)
         if found is None:
@@ -283,9 +286,9 @@ def holds_every_canonical_block(repo: Repo) -> Iterator[Finding]:
 def makefile_holds_its_layers_targets(repo: Repo) -> Iterator[Finding]:
     """``Makefile`` holds its layer's canonical fragment verbatim and unbroken."""
     name = "Makefile.python" if _is_python(repo) else "Makefile.base"
-    source = _canonical(repo, name)
-    if source is None or "Makefile" not in repo.contents:
+    if "Makefile" not in repo.contents:
         return
+    source = _canonical(repo, name)
     roots = " ".join(
         root
         for root in CODE_ROOTS
@@ -310,10 +313,7 @@ def pyprojecttoml_matches_every_pinned_value(repo: Repo) -> Iterator[Finding]:
     except tomllib.TOMLDecodeError as err:
         yield Finding(PYPROJECT, None, f"does not parse: {err}")
         return
-    source = _canonical(repo, PYPROJECT)
-    if source is None:
-        return
-    canon = tomllib.loads(source)
+    canon = tomllib.loads(_canonical(repo, PYPROJECT))
     expected: dict[str, object] = {
         key: _get(canon, key)
         for key in (
@@ -365,11 +365,10 @@ def _patterns(text: str) -> list[str]:
 @check("build.gitignore-holds-every-canonical-pattern")
 def gitignore_holds_every_canonical_pattern(repo: Repo) -> Iterator[Finding]:
     """``.gitignore`` holds every pattern of the canonical ``.gitignore``."""
-    source = _canonical(repo, ".gitignore")
-    if source is None or ".gitignore" not in repo.contents:
+    if ".gitignore" not in repo.contents:
         return
     have = set(_patterns(repo.text(".gitignore")))
-    for pattern in _patterns(source):
+    for pattern in _patterns(_canonical(repo, ".gitignore")):
         if pattern not in have:
             yield Finding(".gitignore", None, f"missing baseline pattern '{pattern}'")
 
@@ -388,13 +387,10 @@ def _ruff_rev(config: object) -> str | None:
 @check("build.one-version-set")
 def one_version_set(repo: Repo) -> Iterator[Finding]:
     """The canonical Python version and ruff version are each written once."""
-    version_text = _canonical(repo, PYTHON_VERSION)
-    if version_text is None:
-        return
     pyproject_path = f"{sources.CANONICAL_DIR}/{PYPROJECT}"
     config_path = f"{sources.CANONICAL_DIR}/{PRE_COMMIT_CONFIG}"
-    version = version_text.strip()
-    canon = tomllib.loads(repo.text(pyproject_path))
+    version = _canonical(repo, PYTHON_VERSION).strip()
+    canon = tomllib.loads(_canonical(repo, PYPROJECT))
     for key, value in (
         ("project.requires-python", f">={version}"),
         ("tool.ruff.target-version", "py" + version.replace(".", "")),
@@ -408,7 +404,7 @@ def one_version_set(repo: Repo) -> Iterator[Finding]:
                 f"{key} must be {value!r} for .python-version {version}, "
                 f"got {actual!r}",
             )
-    rev = _ruff_rev(yaml.safe_load(repo.text(config_path)))
+    rev = _ruff_rev(yaml.safe_load(_canonical(repo, PRE_COMMIT_CONFIG)))
     dev = _get(canon, "dependency-groups.dev")
     floors = [
         entry.removeprefix("ruff>=")
@@ -431,14 +427,13 @@ def one_version_set(repo: Repo) -> Iterator[Finding]:
 def names_the_project_and_package(repo: Repo) -> Iterator[Finding]:
     """``project.name`` is the repository's directory name lowercased.
 
-    The repository's name is the directory holding the shared ``.git``, so
-    the same from the main checkout and every worktree; the model does not
-    carry it, so it is asked of git.
+    The repository's name is ``repo.name``, the same from the main checkout
+    and every worktree.
     """
     pyproject = _pyproject(repo)
     if pyproject is None:
         return
-    expected = gitrepo.canonical_repo_name(repo.root).lower()
+    expected = repo.name.lower()
     actual = _get(pyproject, "project.name")
     if actual != expected:
         yield Finding(

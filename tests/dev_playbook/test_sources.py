@@ -38,6 +38,22 @@ def test_canonical_files_are_the_files_directly_under_the_dir(
     assert present == sources.CANONICAL_FILES
 
 
+def test_shipped_canonical_copy_is_byte_identical_to_the_tree(
+    dev_playbook_repo: Repo,
+) -> None:
+    def tracked(directory: str) -> dict[str, bytes]:
+        prefix = directory + "/"
+        return {
+            path.removeprefix(prefix): data
+            for path, data in dev_playbook_repo.contents.items()
+            if path.startswith(prefix)
+        }
+
+    tree = tracked(sources.CANONICAL_DIR)
+    assert tracked(sources.SHIPPED_CANONICAL_DIR) == tree
+    assert dict(dev_playbook_repo.canonical) == tree
+
+
 def test_standard_directories_are_the_directories_under_standards(
     dev_playbook_repo: Repo,
 ) -> None:

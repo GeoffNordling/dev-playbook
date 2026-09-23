@@ -1,0 +1,50 @@
+[project]
+name = "<repo>"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.0",
+    "pytest>=9.0",
+    "ruff>=0.15.20",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF", "D"]
+# D401 (imperative-mood summaries) is excluded to keep the workspace's
+# noun-phrase docstring voice.
+ignore = ["E501", "D401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+# Test functions carry no docstrings by convention; __init__.py stays empty, so
+# D104 (missing package docstring) would contradict python.empty-init.
+"tests/**" = ["D"]
+"__init__.py" = ["D104"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["<package>"]
+
+[tool.mypy]
+python_version = "3.14"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disable_error_code = ["import-untyped"]

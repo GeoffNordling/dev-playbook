@@ -62,6 +62,11 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
   imports it for one helper: the helper moves to the check module and the
   import is repointed, as Step 4 did for `repo_init.py` and `prose_lint.py`.
   The retired name then appears nowhere outside `working-docs/`.
+- Since Step 9a, the package ships `src/dev_playbook/canonical/`, a copy of
+  `standards/build/canonical/` that `test_sources.py` pins byte-identical; an
+  edit to a canonical file edits both. `Repo.canonical` and `Repo.name` carry
+  the sources and the repository's name, and a test overrides either through
+  `Repo.from_files(..., name=, canonical=)`.
 
 ## Tasks
 
@@ -140,7 +145,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 9a, fix: the model carries what two build checks lack. Today the
+- [x] Step 9a, fix: the model carries what two build checks lack. Today the
       seven canonical checks in `src/dev_playbook/checks/build.py` read their
       source from `standards/build/canonical/` in the model, so a repo that
       does not track that directory gets no comparison and no finding; and

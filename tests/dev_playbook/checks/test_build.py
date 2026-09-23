@@ -3,8 +3,6 @@
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
-from conftest import init_repo
-
 from dev_playbook.check_registry import Finding
 from dev_playbook.checks.build import (
     carry_the_uv_shebang,
@@ -80,15 +78,19 @@ repos:
       - id: make-check
 """
 
-CANON = {
-    C + ".gitignore": b"# caches\n__pycache__/\n.venv/\n",
-    C + ".pre-commit-config.yaml": CANON_CONFIG,
-    C + ".python-version": b"3.14\n",
-    C + "Makefile.base": b"check:\n\tuvx pre-commit run --all-files\n",
-    C + "Makefile.python": b"typecheck:\n\tuv run mypy <code-roots>\n",
-    C + "ci.yml": b"name: ci\n",
-    C + "pyproject.toml": CANON_PYPROJECT,
+# The canonical sources a test repo's model carries in place of the shipped copy.
+SOURCES = {
+    ".gitignore": b"# caches\n__pycache__/\n.venv/\n",
+    ".pre-commit-config.yaml": CANON_CONFIG,
+    ".python-version": b"3.14\n",
+    "Makefile.base": b"check:\n\tuvx pre-commit run --all-files\n",
+    "Makefile.python": b"typecheck:\n\tuv run mypy <code-roots>\n",
+    "ci.yml": b"name: ci\n",
+    "pyproject.toml": CANON_PYPROJECT,
 }
+
+# The same sources tracked as dev-playbook tracks them.
+CANON = {C + name: data for name, data in SOURCES.items()}
 
 GOOD_PYPROJECT = CANON_PYPROJECT.replace(b"<repo>", b"my-repo").replace(
     b"<package>", b"my_repo"
@@ -96,9 +98,12 @@ GOOD_PYPROJECT = CANON_PYPROJECT.replace(b"<repo>", b"my-repo").replace(
 
 
 def found(
-    run: Check, contents: dict[str, bytes], executable: tuple[str, ...] = ()
+    run: Check,
+    contents: dict[str, bytes],
+    executable: tuple[str, ...] = (),
+    canonical: dict[str, bytes] = SOURCES,
 ) -> list[tuple[str, int | None]]:
-    repo = Repo.from_files(Path("/r"), contents, executable)
+    repo = Repo.from_files(Path("/r"), contents, executable, canonical=canonical)
     return [(f.path, f.line) for f in run(repo)]
 
 
@@ -187,11 +192,18 @@ def test_tests_present() -> None:
 
 
 def test_ciyml_byte_identical_to_canonical() -> None:
-    same = {**CANON, ".github/workflows/ci.yml": b"name: ci\n"}
+    same = {".github/workflows/ci.yml": b"name: ci\n"}
     assert found(ciyml_byte_identical, same) == []
-    assert found(ciyml_byte_identical, {".github/workflows/ci.yml": b"x\n"}) == []
-    differs = {**CANON, ".github/workflows/ci.yml": b"name: ci \n"}
+    differs = {".github/workflows/ci.yml": b"name: ci \n"}
     assert found(ciyml_byte_identical, differs) == [(".github/workflows/ci.yml", None)]
+
+
+def test_a_repo_without_the_canonical_dir_compares_against_the_shipped_copy() -> None:
+    consumer = Repo.from_files(Path("/r"), {".github/workflows/ci.yml": b"x\n"})
+    assert not any(path.startswith(C) for path in consumer.files)
+    assert [(f.path, f.line) for f in ciyml_byte_identical(consumer)] == [
+        (".github/workflows/ci.yml", None)
+    ]
 
 
 def test_python_version_byte_identical_to_canonical() -> None:
@@ -213,6 +225,20 @@ def test_pre_commit_configyaml_holds_every_canonical_block() -> None:
     dropped = CANON_CONFIG.replace(b"    rev: v0.15.20\n", b"    rev: v0.1.0\n")
     assert found(
         holds_every_canonical_block, {**CANON, ".pre-commit-config.yaml": dropped}
+    ) == [(".pre-commit-config.yaml", None)]
+    no_playbook = b"repos:\n" + CANON_CONFIG.split(b"\n", 5)[5]
+    assert (
+        found(
+            holds_every_canonical_block,
+            {**CANON, ".pre-commit-config.yaml": no_playbook},
+        )
+        == []
+    )
+    pinned = CANON_CONFIG.replace(b"<pinned-sha>", b"abc123")
+    consumer = {".pre-commit-config.yaml": pinned}
+    assert found(holds_every_canonical_block, consumer) == []
+    assert found(
+        holds_every_canonical_block, {".pre-commit-config.yaml": no_playbook}
     ) == [(".pre-commit-config.yaml", None)]
 
 
@@ -261,11 +287,11 @@ def test_one_version_set() -> None:
     assert found(one_version_set, CANON) == []
     assert found(one_version_set, {"pyproject.toml": b"["}) == []
     off = {
-        **CANON,
-        C + ".python-version": b"3.13\n",
-        C + ".pre-commit-config.yaml": CANON_CONFIG.replace(b"v0.15.20", b"v0.16.0"),
+        **SOURCES,
+        ".python-version": b"3.13\n",
+        ".pre-commit-config.yaml": CANON_CONFIG.replace(b"v0.15.20", b"v0.16.0"),
     }
-    assert found(one_version_set, off) == [
+    assert found(one_version_set, {}, canonical=off) == [
         (C + "pyproject.toml", None),
         (C + "pyproject.toml", None),
         (C + "pyproject.toml", None),
@@ -273,13 +299,12 @@ def test_one_version_set() -> None:
     ]
 
 
-def test_the_repo_directory_names_the_project_and_package(tmp_path: Path) -> None:
-    root = tmp_path / "My-Repo"
-    init_repo(root)
-    good = Repo.from_files(root, {"pyproject.toml": GOOD_PYPROJECT})
+def test_the_repo_directory_names_the_project_and_package() -> None:
+    root = Path("/worktrees/elsewhere")
+    good = Repo.from_files(root, {"pyproject.toml": GOOD_PYPROJECT}, name="My-Repo")
     assert list(names_the_project_and_package(good)) == []
     renamed = GOOD_PYPROJECT.replace(b'name = "my-repo"', b'name = "My-Repo"')
-    bad = Repo.from_files(root, {"pyproject.toml": renamed})
+    bad = Repo.from_files(root, {"pyproject.toml": renamed}, name="My-Repo")
     assert [(f.path, f.line) for f in names_the_project_and_package(bad)] == [
         ("pyproject.toml", None)
     ]

@@ -32,6 +32,10 @@ BANNED_WORD = Section("standards/prose/conventions.md", "no-banned-word")
 # The directory of canonical files a repo copies as they are.
 CANONICAL_DIR = "standards/build/canonical"
 
+# The copy of CANONICAL_DIR the package ships, so an installed package carries
+# the sources; the test beside this module pins it byte-identical to the tree.
+SHIPPED_CANONICAL_DIR = "src/dev_playbook/canonical"
+
 # Every file directly under CANONICAL_DIR, each the source a build check
 # compares a repo's copy against; the test beside this module pins the set.
 CANONICAL_FILES = frozenset(
