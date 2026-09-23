@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Synthesis Working Root
-description: The root of the unified working set — five strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
+description: The root of the unified working set — six strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
 ---
 
 # Synthesis Working Root
@@ -10,7 +10,7 @@ This set is speculative: every member writes a guess as a guess, and
 every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
 `worktree-cloa-viewer-tool-2`, which describe one theory. The set is
-five strands, each with its own root and its own worklist
+six strands, each with its own root and its own worklist
 ([One list of items, state by section](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-list-of-items-state-by-section)).
 This root holds only what crosses strands.
 
@@ -31,16 +31,22 @@ This root holds only what crosses strands.
   detectors, the two tables, and the hook, against the rules the
   doc-type system settled. Root:
   [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md).
+- **Story-forge simulation**, the trial: the doc-type system and the
+  fact base tried by hand on one consumer repo before any extractor is
+  coded. Root:
+  [Story-Forge Simulation](/working-docs/doc-type-system/story-forge-simulation/ROOT.md).
 
-## The five strands
+## The six strands
 
 A dependency is what one strand's plan needs from another's, never a
-runtime data flow. There are four: the doc-type system defines Loop,
+runtime data flow. There are six: the doc-type system defines Loop,
 one of its four doc-types; each encoding the doc-type system writes
 defines an extractor of the fact base; every view the viewer draws is
 a selection of the fact base; the detector rewrite binds to the rules
-the doc-type system's step 11 settled. Loop and the detector rewrite
-are leaves.
+the doc-type system's step 11 settled; the story-forge simulation
+takes its language from the doc-type system and its method from the
+fact base. Loop, the detector rewrite, and the simulation are
+leaves.
 
 ```
                             ROOT.md#terms
