@@ -65,10 +65,16 @@ the specimen is surveyed in
   base by `[redacted, N words]` so the row keeps its shape and the
   receipt its line; story `title` attrs and the resume filenames were
   seen and allowed.
-- **Views render locally.** A view too large for the terminal is a
-  `.html` file written on the user's machine, which the user opens in
-  their own browser. It is never a Claude artifact or any other hosted
-  page, so no story-forge row leaves the machine to be drawn.
+- **Views render locally.** Every view is a `.html` file in this set,
+  which the user opens in their own browser or in VS Code, never the
+  terminal and never a Claude artifact or any other hosted page, so no
+  story-forge row leaves the machine to be drawn.
+- **Code and pages are committed.** Every script and page the strand
+  writes lives in this set, in git, the scripts under `code/`: the
+  extractor `extract.py`, the queries `fact_base.py`, and `render.py`,
+  which writes `stories-views.html` from `stories-fact-base.json` alone.
+  The one exception is the extractor's output, which carries
+  unredacted descriptions and is written outside the repo.
 - **Slow and iterative.** One subsystem at a time, each step shown to
   the user before the next.
 

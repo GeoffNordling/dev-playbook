@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Stories Pipeline</title><style>
+body{background:#fff;color:#222;font:14px system-ui,sans-serif;margin:24px}
+.row{display:flex;align-items:center;gap:6px;margin:8px 0 28px}
+.lab{width:60px;font-weight:bold}
+.b{border:2px solid;border-radius:8px;padding:8px 10px;text-align:center;min-width:92px}
+.b small{display:block;color:#555;font-size:12px}
+.D{background:#dff3e6;border-color:#1a9e5c} .S{background:#fde2c8;border-color:#c9731a} .H{background:#e3e3ff;border-color:#5a5ad0}
+.x{border-style:dashed;background:#fff;color:#999;border-color:#bbb}
+.a{color:#999;font-size:20px} .key span{margin-right:14px}
+</style></head><body>
+<h2>Stories pipeline, read backwards from the question</h2>
+<div class="row"><div class="lab">Now</div>
+<div class="b H">question<small>you</small></div><span class="a">←</span>
+<div class="b D">views<small>my script</small></div><span class="a">←</span>
+<div class="b S">queries<small>chosen in chat</small></div><span class="a">←</span>
+<div class="b S">redaction<small>me</small></div><span class="a">←</span>
+<div class="b D">fact base .json</div><span class="a">←</span>
+<div class="b S">extractors<small>Sonnet agent</small></div><span class="a">←</span>
+<div class="b x">encoding<small>implicit</small></div><span class="a">←</span>
+<div class="b H">story files<small>you</small></div>
+</div>
+<div class="row"><div class="lab">Final</div>
+<div class="b H">question<small>you</small></div><span class="a">←</span>
+<div class="b D">views<small>CLOA viewer</small></div><span class="a">←</span>
+<div class="b H">queries<small>any angle, ad hoc</small></div><span class="a">←</span>
+<div class="b x">redaction<small>gone</small></div><span class="a">←</span>
+<div class="b D">fact base .json</div><span class="a">←</span>
+<div class="b D">extractors<small>code</small></div><span class="a">←</span>
+<div class="b H">encoding<small>Story doc-type</small></div><span class="a">←</span>
+<div class="b H">story files<small>you</small></div>
+</div>
+<p style="color:#555;max-width:760px">A query is a question asked of the graph to learn how the system behaves, for example "which <code>complete</code> stories have no quantitative results?" It checks nothing. Enforcement is a separate path that does not go through the viewer:</p>
+<div class="row"><div class="lab"></div>
+<div class="b H">Standard<small>predicates</small></div><span class="a">→</span>
+<div class="b D">pre-commit, CI<small>lint, verifier</small></div><span class="a">→</span>
+<div class="b H">story files<small>block or pass</small></div>
+</div>
+<div class="key"><span class="b D">deterministic</span> <span class="b S">stochastic</span> <span class="b H">authored</span> <span class="b x">missing</span></div>
+</body></html>
