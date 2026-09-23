@@ -60,7 +60,7 @@ leaves.
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │
-  │  plan: refactor steps 1–10 · banned words · /write-predicates │
+  │  plan: refactor steps 1–10 · banned words                      │
   │        · first instance, a loop that proposes predicates       │
   └────────────┬──────────────────────────────────┬────────────────┘
   Loop is one  │                                  │  each encoding
