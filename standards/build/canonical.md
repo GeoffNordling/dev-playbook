@@ -61,22 +61,6 @@ follow.
 
 `build.makefile-holds-its-layers-targets` · deterministic
 
-## artifacts.mk lists every artifact and its file rule
-
-`artifacts.mk`, where it exists at the root, sets `ARTIFACTS` to a list
-of files and gives each one a rule whose target is that file's path.
-
-`build.artifactsmk-lists-every-artifact-and-its-file-rule` · deterministic
-
-> **Why.** A gitignored build product is absent in every fresh
-> checkout and every fresh worktree, and a `check` that only reports it
-> missing turns the pre-push hook into an obstacle to bypass, so the
-> gate builds it.
->
-> A target that is a real file lets `make` compare timestamps and
-> rebuild only what is stale, so the gate pays the build cost once per
-> checkout and nothing on later runs.
-
 ## pyproject.toml matches every pinned value
 
 `pyproject.toml` parses as TOML and matches every value the canonical
@@ -123,18 +107,16 @@ are free, and further patterns may follow.
 
 ## One version set
 
-Every version the canonical artifacts pin in more than one file carries
-the same value in each.
+**The Python version is written once.** `.python-version` holds
+the version. `requires-python` is `>=` that version,
+`tool.ruff.target-version` is `py` plus that version with the dot
+removed, and `tool.mypy.python_version` equals it.
+
+**The ruff version is written once.** The ruff `rev` in the
+canonical `.pre-commit-config.yaml` and the `ruff>=` floor in the
+canonical `pyproject.toml` carry the same version.
 
 `build.one-version-set` · deterministic
 
 > **Why.** The pins are meant to be the latest stable releases, bumped
 > together; that is why a version pinned in two files must agree.
-
-## Every canonical file has a rule, and every rule a file
-
-Every file directly under `standards/build/canonical/` is one a rule of
-this Standard names, and every file a rule of this Standard names is
-directly under `standards/build/canonical/`.
-
-`build.every-canonical-file-has-a-rule-and-every-rule-a-file` · deterministic

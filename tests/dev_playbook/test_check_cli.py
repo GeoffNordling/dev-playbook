@@ -27,6 +27,10 @@ def first_line_of_every_markdown(repo: Repo) -> Iterator[Finding]:
         yield Finding(path, 1, "flagged")
 
 
+def nothing_found(repo: Repo) -> Iterator[Finding]:
+    yield from ()
+
+
 def needs_workspace(repo: Repo) -> Iterator[Finding]:
     yield Finding("README.md", None, "needs the workspace")
 
@@ -61,9 +65,16 @@ class TestChecks:
 
 class TestCheck:
     def test_clean_repo_exits_0(
-        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         root = a_repo(tmp_path, {"README.md": "# R\n"})
+        fake_registry(
+            monkeypatch,
+            Check("fam.n", nothing_found, None, frozenset(), "m.fam"),
+        )
         assert check_cli.main(["check", str(root)]) == 0
         captured = capsys.readouterr()
         assert captured.out == ""

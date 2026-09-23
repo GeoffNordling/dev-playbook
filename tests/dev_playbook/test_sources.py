@@ -24,3 +24,15 @@ def test_type_registry_section_holds_the_table(dev_playbook_repo: Repo) -> None:
 def test_canonical_dir_holds_tracked_files(dev_playbook_repo: Repo) -> None:
     prefix = sources.CANONICAL_DIR + "/"
     assert any(path.startswith(prefix) for path in dev_playbook_repo.files)
+
+
+def test_canonical_files_are_the_files_directly_under_the_dir(
+    dev_playbook_repo: Repo,
+) -> None:
+    prefix = sources.CANONICAL_DIR + "/"
+    present = {
+        path.removeprefix(prefix)
+        for path in dev_playbook_repo.files
+        if path.startswith(prefix) and "/" not in path.removeprefix(prefix)
+    }
+    assert present == sources.CANONICAL_FILES

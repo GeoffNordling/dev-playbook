@@ -117,7 +117,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-- [ ] Step 7, family `build`, retires nothing. Report:
+- [x] Step 7, family `build`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/build.md`.
       Verify: `uv run playbook checks --family build` lists exactly the
       deterministic trailers under `standards/build/`; the report exists; the
