@@ -160,3 +160,13 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
 <!-- [ ] checkpoint -->
+
+- [ ] Step 12, family `shell`, retires nothing; the two tool-decided rules in
+      `src/dev_playbook/checks/shell.py` stay as they are. Report:
+      `working-docs/doc-type-system/detector-rewrite/rewrite/shell.md`.
+      Verify: `uv run playbook checks --family shell` lists exactly the
+      deterministic trailers under `standards/shell/`; the report exists; the
+      Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
+      hold.
+
+<!-- [ ] checkpoint -->

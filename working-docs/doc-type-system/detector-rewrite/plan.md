@@ -44,8 +44,8 @@ Lands in one commit:
 - **The registry.** `src/dev_playbook/check_registry.py`: the `@check` decorator
   writing one dict entry, the `needs=WORKSPACE` tag, and registration
   of a rule by hook name for the ones ruff, shellcheck, shfmt, and the
-  manifest validator decide. Those tool-decided entries land here,
-  so the `shell` family has no step in phase 3.
+  manifest validator decide. The two tool-decided shell entries land
+  here; the shell family's three other rules are phase 3's last step.
 - **The runner and the console script.** `playbook check` builds the
   model once, runs every registered function, stamps the id on each
   finding, and honours `--without workspace`. `playbook checks` prints
@@ -106,6 +106,7 @@ The order, smallest first, with what each step retires:
 | 9 | standard | nothing yet |
 | 10 | doc-type | `harness-files-lint`, `standards-lint` |
 | 11 | knowledge-organization | `okf-lint`, `ref-lint`, `repo-lint` |
+| 12 | shell | nothing; its two tool-decided rules landed in phase 1 |
 
 A name in the last column means the script under `scripts/`, its
 package module where it has one, its tests, and its roster line.
@@ -122,7 +123,7 @@ their gate.
 ### Delegation
 
 A Ralph loop ([Ralph loop](/harness-recipes/recipes/ralph-loop.md)),
-one segment per step. `PLAN.md` at the checkout root holds the eleven
+one segment per step. `PLAN.md` at the checkout root holds the twelve
 tasks with a checkpoint marker after each one; `PROGRESS.md` is the
 log. Each launch runs one Opus iteration, whose task line points it
 at
@@ -217,7 +218,8 @@ only `loop-lint`:
   was repointed at Detectors or dropped, so `ref-lint` and the index
   check stay clean. The three gates are green with 42 fewer tests.
 - **Phase 3 set up, 2026-09-23.** The loop is ready and unlaunched:
-  `PLAN.md` with the eleven tasks and a checkpoint after each,
+  `PLAN.md` with the twelve tasks and a checkpoint after each, shell
+  last since its three function-decided rules had no step,
   `PROGRESS.md` empty,
   [Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md)
   written, and `rewrite/` waiting for the reports. One scaffold fix
