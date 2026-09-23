@@ -36,6 +36,8 @@ the run drifted from what was agreed.
 
 <!-- the reviewer appends below this line -->
 
+- Checkpoint after Step 9: Step 9a added before Step 10, the model gaining the canonical sources and the repository's name, with leave to edit `model.py` for it — Step 7 built the seven canonical checks to compare nothing in a repo without `standards/build/canonical/`, which every consumer is, and put a git call in one check; both leave the approved shape, model-only checks that work wherever the package runs, unless the model carries the two inputs before Step 11 retires `repo-lint`.
+
 ## Log
 
 <!-- iterations append one line each below this line -->

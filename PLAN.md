@@ -138,7 +138,28 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       the Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
+
+- [ ] Step 9a, fix: the model carries what two build checks lack. Today the
+      seven canonical checks in `src/dev_playbook/checks/build.py` read their
+      source from `standards/build/canonical/` in the model, so a repo that
+      does not track that directory gets no comparison and no finding; and
+      `names_the_project_and_package` calls `gitrepo.canonical_repo_name`, the
+      one git call in a check. For this task alone, `src/dev_playbook/model.py`
+      may be edited. `Repo` gains `canonical`, a mapping of the seven file
+      names in `sources.CANONICAL_FILES` to bytes, filled by both constructors
+      from a copy of `standards/build/canonical/` shipped inside the package,
+      so the wheel carries it; a test pins the shipped copy byte-identical to
+      the tree. `Repo` gains `name`, the repository's name, set by `from_git`
+      through `gitrepo.canonical_repo_name` and by a `from_files` argument
+      defaulting to the root's directory name. The canonical checks compare
+      against `repo.canonical`, the name check reads `repo.name`, and no
+      check imports `gitrepo`. Verify: `grep -n gitrepo
+      src/dev_playbook/checks/build.py` prints nothing; a test in
+      `tests/dev_playbook/checks/test_build.py` builds a repo with no
+      `standards/build/canonical/` and a `ci.yml` unlike the shipped one and
+      gets one finding; `make check`, `scripts/playbook-lint .`, and
+      `uv run playbook check .` are clean.
 
 - [ ] Step 10, family `doc-type`, retires `harness-files-lint` and
       `standards-lint`. Report:
