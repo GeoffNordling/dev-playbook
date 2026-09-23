@@ -293,7 +293,31 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
+
+- [ ] Step 12a fix: the knowledge-organization report's counts and one link
+      catch up with the restored rule. Three edits, one commit, nothing else.
+      1. In `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`,
+         the frontmatter `description` says "thirty-five checks over the
+         model" and "one set aside"; it becomes "thirty-six checks over the
+         model" and the phrase ", one set aside" is dropped. The intro's
+         sentence "The module holds thirty-five functions and no hook
+         registration." becomes "The module holds thirty-six functions and
+         no hook registration."
+      2. In `working-docs/doc-type-system/detector-rewrite/rewrite/index.md`,
+         the Knowledge Organization row's text after ` — ` becomes the new
+         `description`, character for character.
+      3. In `dotfiles/dot-claude/skills/doc-set-diagram/SKILL.md`, the link
+         to `working-documentation-sets.md` whose link text is "Working
+         Documentation Sets", the one inside the `{Read ...}` directive
+         at line 48, gains the fragment
+         `#every-member-reached-from-rootmd`, the heading Step 11 cut it
+         from when the rule was set aside; the other link in that file to
+         the same Standard stays as it is.
+      Verify: `grep -c "thirty-six" ` on the report prints 2 and
+      `grep -c "set aside" ` on its frontmatter prints 0; `uv run playbook
+      check .` reports zero findings, which proves the row equals the
+      description and the anchor resolves; `make check` green.
 
 - [ ] Step 12b, rework: the model reads every file the way a reader does and
       never crashes the run on a bad one. Four items, each with its own test
