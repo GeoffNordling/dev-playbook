@@ -196,7 +196,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
 
 - [ ] Step 12a, rework: the `knowledge-organization` family to its sentences.
       A rule-by-rule audit of Step 11 found each item below; fix every one,

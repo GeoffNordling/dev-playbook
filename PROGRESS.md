@@ -37,6 +37,7 @@ the run drifted from what was agreed.
 <!-- the reviewer appends below this line -->
 
 - Checkpoint after Step 9: Step 9a added before Step 10, the model gaining the canonical sources and the repository's name, with leave to edit `model.py` for it — Step 7 built the seven canonical checks to compare nothing in a repo without `standards/build/canonical/`, which every consumer is, and put a git call in one check; both leave the approved shape, model-only checks that work wherever the package runs, unless the model carries the two inputs before Step 11 retires `repo-lint`.
+- Checkpoint after Step 12: no task changed; the strict `xfail` on `test_every_deterministic_rule_is_registered` came off in Step 12 instead of at cut over — with the shell family registered, every deterministic trailer outside the loop family is registered, and a strict `xfail` that passes fails the gate; the phase 4 bullet for it in `working-docs/doc-type-system/detector-rewrite/plan.md` is already done.
 
 ## Log
 
