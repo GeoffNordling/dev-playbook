@@ -73,6 +73,29 @@ records the collision and the guess at a resolution. The tool also offers
 a no-sandbox provider that runs the agent directly on the host; this set
 does not use it.
 
+## What it fixes, and where it bends
+
+Read from the published package, version 0.12.0, and partly confirmed by
+experiment two
+([The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)).
+
+**Fixed.** The repository always lands at `/home/agent/workspace` inside
+the container, and the podman plug-in always sets the agent's home to
+`/home/agent`. No option changes either. This is the source of the
+workspace collision.
+
+**Bends.** The host repository is chosen per run (`cwd`), which is how a
+run is pointed at a throwaway copy. Extra read-only or read-write mounts
+are declared per plug-in. The agent is a plug-in too: any object that turns
+a prompt into a shell command, which is how experiment two ran a stand-in
+with no tokens. And the sandbox itself is a plug-in: the library exports
+the builder its own podman and docker plug-ins are made from, so a plug-in
+of ours is a supported extension rather than a fork.
+
+**Branch modes.** `head` runs the agent directly in the repository it is
+pointed at, and is the mode that fits a throwaway copy. `branch` and
+`merge-to-head` add a worktree of their own, and run more git on the host.
+
 ## Acronyms
 
 - **CI** — Continuous Integration.

@@ -36,6 +36,22 @@ inner loop, the user holds every seam between laps.
   dev-playbook branch at the same time. Both facts hold together, and
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md) is where the
   arrangement that serves them is worked out.
+- Sandcastle, if chosen, is used as published and never forked or
+  patched. A mismatch is closed by a plug-in Sandcastle accepts, or by
+  changing the workspace standards.
+- Past decisions do not bind this set. A decision record that stands in the
+  way is revised rather than worked around.
+
+## Working with the user
+
+The user holds the requirements and the approvals; the agent holds the
+technical detail. Report at the level of the problem table in
+[The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems):
+plain language, each problem and solution by its name, a concrete picture
+where one helps, such as a directory tree with enough rows to show what the
+files are. Leave out commands, flags, and mechanism unless the user asks.
+Describe a test plan and get approval before running it, and discuss results
+before acting on them.
 
 ## Terms
 
@@ -76,10 +92,10 @@ integrator is a judgment and is not.
 - **What drives the laps.** [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
   is one candidate. Whether it earns its weight against a smaller script is
   the question that member exists to inform.
-- **Whether the fence holds.** The arrangement in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md) is read from
-  Sandcastle's source and has not been run. That member carries its own
-  Open bucket, and every item in it is a guess awaiting a test.
+- **Whether the fence holds.** Five named problems stand between Sandcastle
+  and a safe front, tracked in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems).
+  Two are solved and proven; three are not.
 
 ## Planned
 
@@ -88,19 +104,36 @@ machine. The WSL machine this set was begun on has no container runtime and
 is not a target, which
 [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
 
+- **Experiment three.** Designed at the problem-table level, to be
+  confirmed with the user and then run. Parts 1 to 3 use the stand-in agent
+  and cost no tokens; part 4 uses real Claude briefly.
+  1. *Booby-trap fix.* Build the approved fix into `front-clone`, and add a
+     permanent test that plants a trap at every point and asserts none
+     fires on `close`.
+  2. *Option B.* Write our own container plug-in and run the stand-in
+     through it. It must report the repository at
+     `~/workspace/mission-control`, dev-playbook at
+     `~/workspace/dev-playbook`, the repository name `mission-control`, and
+     the skill and rule links resolving; experiment two's safety checks run
+     again.
+  3. *Option A.* Sandcastle's own podman plug-in, with dev-playbook at a
+     fixed place of its own and the name read from the copy's clone note,
+     the standards change made on this branch only. Same four reports, same
+     safety checks.
+  4. *Real Claude.* A tiny task on each option that passed: the agent has
+     its skills and rules, its hook events reach the measurement database,
+     and the billing check passes before launch.
+
+  The output is, per option, whether it worked and what it costs: for B the
+  plug-in's size, for A the standards that change. The user then chooses.
 - **Two windows, one container.** Open dev-playbook twice for one front —
   read-only as the config source, read-write as the work checkout — and
   confirm an edit in one does not appear in the other and the front still
   loads its skills. This is the case where a front is assigned to change
-  dev-playbook itself, which the prototype specified and never ran.
-- **Sandcastle against a clone.** Point the driver at a throwaway clone and
-  watch where it opens its windows: whether it stays inside the clone, and
-  whether the restamp stays off the real repository.
-- **Close the two smaller collisions.** The SELinux restamp reaching real
-  files, and Sandcastle placing the work checkout at a path not named for
-  its repository, are both expected to be solvable and must not be dropped.
-  Each is described in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#where-sandcastle-collides).
+  dev-playbook itself, which the prototype specified and never ran. It may
+  fold into experiment three, part 2 or 3.
+- **Sandcastle's other branch modes.** `branch` and `merge-to-head` run more
+  git on the host than `head` mode, and may trip the booby trap themselves.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
 - **Decide the driver.** Choose between Sandcastle and a smaller script,
@@ -124,6 +157,13 @@ is not a target, which
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records the four
   things the run settled. It used no container and no driver, so what it
   settled is git's behavior alone.
+- **Experiment two: Sandcastle against a copy.** Sandcastle, pointed at a
+  `front-clone` copy with a misbehaving stand-in agent, left the real
+  repository and the user's unpushed work untouched, and the commit came
+  back. It proved the throwaway copy solves **Shared history** and
+  **Relabel**, and exposed the **Workspace collision** and the **Booby
+  trap**. [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)
+  records the details.
 
 ## Acronyms
 
