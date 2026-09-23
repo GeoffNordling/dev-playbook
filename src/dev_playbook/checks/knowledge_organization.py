@@ -50,6 +50,8 @@ CLAUDE_SOURCE = "dotfiles/dot-claude"
 # The slug of a heading that starts with a section number: `3. Bundle` slugs
 # to `3-bundle`, `2.2.3 Revision` to `223-revision`.
 NUMBERED_SLUG = re.compile(r"^\d+-")
+# A line made only of three or more ``=`` or ``-``: a setext underline or a divider.
+UNDERLINE = re.compile(r"^\s*(={3,}|-{3,})\s*$")
 # A type name: Title Case, hyphen-joined for a multi-word name.
 TYPE_NAME = re.compile(r"[A-Z][A-Za-z0-9]*(?:-[A-Z][A-Za-z0-9]*)*")
 # A file name's extension: lowercase letters and digits after the last dot.
@@ -312,6 +314,31 @@ def headings_slugify_distinctly(repo: Repo) -> Iterator[Finding]:
             seen.add(heading.slug)
 
 
+@check("knowledge-organization.atx-headings-only")
+def atx_headings_only(repo: Repo) -> Iterator[Finding]:
+    """No line of only ``=`` or ``-`` sits directly under a line of text.
+
+    Reads the lines outside fences and the frontmatter block, so a line
+    directly above is text only where it is the previous content line.
+    """
+    for doc in repo.markdown.values():
+        previous: tuple[int, str] | None = None
+        for number, text in doc.content:
+            if (
+                UNDERLINE.match(text)
+                and previous is not None
+                and previous[0] == number - 1
+                and previous[1].strip()
+            ):
+                yield Finding(
+                    doc.path,
+                    number,
+                    "a line of '=' or '-' under text is a setext heading; "
+                    "put a blank line above a divider",
+                )
+            previous = (number, text)
+
+
 @check("knowledge-organization.stable-named-anchor")
 def stable_named_anchor(repo: Repo) -> Iterator[Finding]:
     """A reference's ``#anchor`` does not have the form of a numbered heading's slug.
@@ -478,7 +505,10 @@ def _registry(repo: Repo) -> frozenset[str]:
 
 @check("knowledge-organization.frontmatter-a-yaml-mapping")
 def frontmatter_a_yaml_mapping(repo: Repo) -> Iterator[Finding]:
-    """A concept document opens with a ``---`` frontmatter block whose YAML is a mapping."""
+    """A concept document opens with a ``---`` frontmatter block whose YAML is a mapping.
+
+    The mapping half is the model's: frontmatter that is not a mapping stops the run.
+    """
     for doc in _concept_documents(repo):
         if doc.frontmatter is None:
             yield Finding(doc.path, None, "no frontmatter mapping")

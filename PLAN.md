@@ -111,7 +111,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 12c, rework: what the Step 12b audit found. Two model defects
+- [x] Step 12c, rework: what the Step 12b audit found. Two model defects
       and five rule sentences that say more than their checks test. The
       ruling for every item: the sentence of a rule and the code of its
       check say the same thing; where the code does less than the sentence,

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Cross-References
-description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, fragment anchors that match a heading's distinct slug, and the link text that names the target
+description: The cross-reference grammar — root-absolute Links in-bundle, workspace Citations across repos, the rootless forms, fragment anchors that match a heading's distinct slug, `#` headings only, and the link text that names the target
 population: "a reference from an authored document to a workspace file, directory, or skill, except inside a code block, fenced or indented, or from inside a numbered Decision Record"
 ---
 
@@ -27,7 +27,8 @@ move; references to a record are checked like any other.
 
 The target of a reference exists. A `/` target and a
 `~/workspace/<this repo>/` target are read from the checkout root; a
-relative target is read from the linking file's directory. A
+relative target is read from the linking file's directory. A relative
+target that climbs above the checkout root is not this rule's finding. A
 `~/.claude/<rest>` target is read as `dotfiles/dot-claude/<rest>` where
 the repo tracks that directory, and is not checked where it does not. A
 `~/workspace/<other repo>/` target is read from that repo's main
@@ -59,9 +60,23 @@ have the same GitHub slug.
 > breaks the moment the file is reordered, the failure
 > [stable named anchor](#stable-named-anchor) bars.
 
+## ATX headings only
+
+A heading is a line of one to six `#` then a space. Outside a fenced
+code block and outside the frontmatter block, no line made only of
+three or more `=` or `-` sits directly under a line of text.
+
+`knowledge-organization.atx-headings-only` · deterministic
+
+> **Why.** A `---` under a line of text is a heading to one renderer
+> and a divider to another, so the model reads `#` headings only and
+> this rule keeps the two forms apart; a divider has a blank line
+> above it.
+
 ## Stable named anchor
 
-The `#anchor` of a reference does not have the form of a numbered
+The `#anchor` of a reference to a `.md` file, or to a heading of the
+same file, does not have the form of a numbered
 heading's slug, a run of digits then a hyphen, such as
 `#3-bundle-structure` or `#223-revision`.
 
@@ -87,8 +102,8 @@ document's title where the heading does not fit the citing sentence.
 ## Workspace path for another repo
 
 A reference to a file or a directory in another repo is a link whose
-target starts `~/workspace/<repo>/`, or `~/.claude/` for a file the
-harness loads from there. A bare `~/workspace/<other repo>/`
+target starts `~/workspace/<repo>/`, or `~/.claude/`. A bare
+`~/workspace/<other repo>/`
 path outside a link, and a relative target that goes above the repo
 root, are findings.
 
@@ -115,8 +130,8 @@ inside the repository is `skills`, `rules`, or `agents`.
 
 In a file with a fixed repo root, a reference to a file or a directory
 of the same repo is a link whose target starts `/` and is the path
-from the repo root, or `~/.claude/` for a file the harness loads from
-there. A relative target, and a `~/workspace/<this repo>/` path as a
+from the repo root, or starts `~/.claude/`. A relative target other
+than a same-file `#anchor`, and a `~/workspace/<this repo>/` path as a
 link's target, as a link's text, or bare, are findings.
 
 `knowledge-organization.root-absolute-path-in-the-same-repo` · deterministic

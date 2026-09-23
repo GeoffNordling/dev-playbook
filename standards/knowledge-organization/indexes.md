@@ -50,7 +50,7 @@ directory holds, the sentence says what the directory is for instead.
 
 An `index.md` has exactly one bullet for each concept document in its
 directory and one for each child directory's `index.md`, and no other
-bullet outside a fenced code block. Each bullet is a link whose target starts `/`.
+`-`, `*`, or `+` bullet outside a fenced code block or a blockquote. Each bullet is a link whose target starts `/`.
 A concept document's bullet ends with ` — ` and that document's
 frontmatter `description`, character for character.
 

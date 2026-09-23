@@ -99,18 +99,11 @@ class TestParseMarkdown:
         with pytest.raises(ModelError, match="x.md: frontmatter is not YAML"):
             parse_markdown("x.md", "---\na: [\n---\nbody\n")
 
-    def test_frontmatter_that_is_not_a_mapping_reads_as_none(self) -> None:
-        doc = parse_markdown("x.md", "---\n- item\n---\n# Body\n")
-        assert doc.frontmatter is None
-        assert [(h.slug, h.line) for h in doc.headings] == [("body", 4)]
-
-    def test_setext_headings_carry_level_slug_and_line(self) -> None:
-        text = "Top\n===\n\nTwo\nlines\n---\n\n- item\n---\n\n    code\n    ---\n"
-        got = [
-            (h.level, h.text, h.slug, h.line)
-            for h in parse_markdown("s.md", text).headings
-        ]
-        assert got == [(1, "Top", "top", 1), (2, "Two lines", "two-lines", 4)]
+    def test_frontmatter_that_is_yaml_but_not_a_mapping_names_the_file(
+        self,
+    ) -> None:
+        with pytest.raises(ModelError, match="x.md: frontmatter is not a mapping"):
+            parse_markdown("x.md", "---\n- a\n---\n")
 
     def test_link_text_wraps_across_several_breaks_not_a_blank_line(self) -> None:
         text = "A [one\ntwo\nthree](/a.md) and [x\n\ny](/b.md)\n"

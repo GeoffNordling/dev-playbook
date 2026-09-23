@@ -10,6 +10,7 @@ from dev_playbook.checks.knowledge_organization import (
     add_never_shadow,
     alphabetical_unless_declared_otherwise,
     an_index_in_every_directory,
+    atx_headings_only,
     every_member_reached_from_rootmd,
     fragment_anchor_matches_the_slug,
     frontmatter_a_yaml_mapping,
@@ -306,10 +307,11 @@ def test_frontmatter_a_yaml_mapping() -> None:
     ) == [("a.md", None)]
 
 
-def test_frontmatter_a_yaml_mapping_reports_a_list_and_other_checks_run() -> None:
-    files = {"a.md": "---\n- a\n---\n\n# A\n", "b.md": concept()}
-    assert found(frontmatter_a_yaml_mapping, files) == [("a.md", None)]
-    assert found(headings_slugify_distinctly, files) == []
+def test_atx_headings_only() -> None:
+    assert found(atx_headings_only, {"a.md": "# A\n\nText\n---\n"}) == [("a.md", 4)]
+    assert found(atx_headings_only, {"a.md": "# A\n\nText\n\n---\n"}) == []
+    table = "# A\n\n| a | b |\n| --- | --- |\n| 1 | 2 |\n"
+    assert found(atx_headings_only, {"a.md": table}) == []
 
 
 def test_type_names_a_registered_type_reports_a_list_type() -> None:
@@ -565,23 +567,6 @@ def test_readme_holds_an_h1() -> None:
     assert found(readme_holds_an_h1, {"d/README.md": concept("README")}) == []
     no_h1 = doc("type: README\ntitle: R\ndescription: D\n", "## Only an H2\n")
     assert found(readme_holds_an_h1, {"d/README.md": no_h1}) == [("d/README.md", None)]
-
-
-def test_readme_holds_an_h1_reads_a_setext_h1() -> None:
-    front = "type: README\ntitle: R\ndescription: D\n"
-    setext = doc(front, "Title\n=====\n")
-    assert found(readme_holds_an_h1, {"d/README.md": setext}) == []
-    setext_h2 = doc(front, "Title\n-----\n")
-    assert found(readme_holds_an_h1, {"d/README.md": setext_h2}) == [
-        ("d/README.md", None)
-    ]
-
-
-def test_headings_slugify_distinctly_reads_setext_headings() -> None:
-    assert found(headings_slugify_distinctly, {"a.md": "# A\n\nB\n---\n"}) == []
-    assert found(headings_slugify_distinctly, {"a.md": "# A\n\nA\n===\n"}) == [
-        ("a.md", 3)
-    ]
 
 
 # --- type-registry.md ---

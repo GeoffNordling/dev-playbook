@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Knowledge Organization
-description: The rewrite of the knowledge-organization family's thirty-nine deterministic rules and one new rule — thirty-six checks over the model, two tagged workspace, three deleted per their escalation, one made stochastic, eight Standards edited to the triage, and okf-lint, ref-lint, and repo-lint retired
+description: The rewrite of the knowledge-organization family's thirty-nine deterministic rules and two new rules — thirty-seven checks over the model, two tagged workspace, three deleted per their escalation, one made stochastic, eight Standards edited to the triage, and okf-lint, ref-lint, and repo-lint retired
 ---
 
 # Knowledge Organization
@@ -9,7 +9,7 @@ description: The rewrite of the knowledge-organization family's thirty-nine dete
 The step built `src/dev_playbook/checks/knowledge_organization.py` and
 `tests/dev_playbook/checks/test_knowledge_organization.py` from
 [the knowledge-organization triage](/working-docs/doc-type-system/detector-rewrite/triage/knowledge-organization.md).
-The module holds thirty-six functions and no hook registration. The
+The module holds thirty-seven functions and no hook registration. The
 `DETECTORS` roster in `src/dev_playbook/playbook_lint.py` now holds only
 `loop-lint`.
 
@@ -44,6 +44,9 @@ as a source.
 - `knowledge-organization.headings-slugify-distinctly`: function
   `headings_slugify_distinctly`, new. The body is the triage
   blockquote.
+- `knowledge-organization.atx-headings-only`: function
+  `atx_headings_only`, new in Step 12c, when the model stopped reading
+  setext headings. No line of this repo was flagged.
 - `knowledge-organization.stable-named-anchor`: function
   `stable_named_anchor`, new, over targets in this repo. The body is
   the triage blockquote.
@@ -140,18 +143,25 @@ retired detector.
 ## Restated
 
 - `knowledge-organization.one-entry-per-concept-document-and-child-directory`:
-  "in its listing" became "outside a fenced code block", because the
-  check reads every such bullet under any heading.
+  "in its listing" became "no other `-`, `*`, or `+` bullet outside a
+  fenced code block or a blockquote", because the check reads every such
+  bullet at any indent and under any heading, and no numbered item.
 - `knowledge-organization.reference-resolves`: a sentence on
   `~/.claude/<rest>` targets was added, because the check reads them as
-  `dotfiles/dot-claude/<rest>` where tracked and skips them elsewhere.
+  `dotfiles/dot-claude/<rest>` where tracked and skips them elsewhere; a
+  sentence says a relative target above the checkout root is not its
+  finding, because `workspace-path-for-another-repo` reports it.
 - `knowledge-organization.stable-named-anchor`: the body names the
-  anchor's form, digits then a hyphen, because the check never reads
-  the target's heading text.
+  anchor's form, digits then a hyphen, and only a reference to a `.md`
+  file or a same-file heading, because the check never reads the
+  target's heading text and reads no other target.
 - `knowledge-organization.root-absolute-path-in-the-same-repo`: the body
-  names `~/.claude/` targets and the three positions of a
-  `~/workspace/<this repo>/` path, because the check passes the first
-  and flags all three.
+  names every `~/.claude/` target, a same-file `#anchor` as no finding,
+  and the three positions of a `~/workspace/<this repo>/` path, because
+  the check passes the first two and flags all three.
+- `knowledge-organization.workspace-path-for-another-repo`: "for a file
+  the harness loads from there" was cut, because the check passes every
+  `~/.claude/` target.
 
 ## Deleted
 
