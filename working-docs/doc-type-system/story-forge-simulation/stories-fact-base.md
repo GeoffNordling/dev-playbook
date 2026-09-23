@@ -58,7 +58,7 @@ row came from an extractor.
 
 | Node type | Count | Id | Extractor |
 |---|---|---|---|
-| Story | 32 | `stories/<stem>.md` | frontmatter, line 1 |
+| Story | 32 | `stories/<stem>.md` | frontmatter, line 1; `description` redacted to its word count |
 | Section | 224 | `<story>#<heading-slug>` | headings, the H2's line |
 | Tag | 31 | `tag:<name>` | yaml over `stories/tags.yaml` |
 | Resume | 5 | path | frontmatter |

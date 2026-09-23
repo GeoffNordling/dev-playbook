@@ -60,9 +60,11 @@ the specimen is surveyed in
   contact. The line is drawn in file terms because the user's sense of
   what is private is latent, so it is ruled case by case: before a
   commit, the session lists every verbatim field the diff carries, the
-  user rules each, and a ruling becomes a bullet here. First rulings,
-  2026-09-23: the fact base's `title` and `description` attrs and the
-  resume filenames were seen and allowed.
+  user rules each, and a ruling becomes a bullet here. Rulings,
+  2026-09-23: a story's `description` is out, replaced in the fact
+  base by `[redacted, N words]` so the row keeps its shape and the
+  receipt its line; story `title` attrs and the resume filenames were
+  seen and allowed.
 - **Slow and iterative.** One subsystem at a time, each step shown to
   the user before the next.
 

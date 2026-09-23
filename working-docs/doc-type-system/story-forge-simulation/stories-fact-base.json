@@ -20,7 +20,7 @@
         "attrs": {
           "stem": "abstraction-ladder",
           "title": "Abstraction Ladder - Multi-Repo Standards Governance",
-          "description": "Promoting repeated agent instructions into skills, then into mechanically enforced Standard Cards across a multi-repo workspace",
+          "description": "[redacted, 16 words]",
           "status": "needs-detail",
           "tags": [
             "generative-ai",
@@ -153,7 +153,7 @@
         "attrs": {
           "stem": "agentic-practice-since-amazon",
           "title": "Seven Months of Agentic Practice Since Amazon",
-          "description": "Seven months of solo experiments in getting good work out of coding agents unwatched, by moving deterministic structure until the human can read what the agent did",
+          "description": "[redacted, 27 words]",
           "status": "complete",
           "tags": [
             "generative-ai",
@@ -291,7 +291,7 @@
         "attrs": {
           "stem": "agentic-software-factory",
           "title": "Agentic Software Factory",
-          "description": "A software factory that carries a GitHub issue from intake to merged PR with the user present only at judgment points",
+          "description": "[redacted, 21 words]",
           "status": "needs-detail",
           "tags": [
             "generative-ai",
@@ -425,7 +425,7 @@
         "attrs": {
           "stem": "asap-ship-option",
           "title": "Originator of the 'As Soon as Possible' Ship Option",
-          "description": "Originating the As Soon As Possible ship option at Amazon, from the founding analysis through pilot launch",
+          "description": "[redacted, 17 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -552,7 +552,7 @@
         "attrs": {
           "stem": "batman-grocery-delivery-zones",
           "title": "Automated Grocery Delivery Zone Splitting (Batman)",
-          "description": "Automating grocery delivery zone splitting with clustering and assignment optimization, replacing an unscalable manual Excel process",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "optimization",
@@ -684,7 +684,7 @@
         "attrs": {
           "stem": "bayes-in-the-lab",
           "title": "Bayes in the Lab",
-          "description": "Introducing Bayesian methods to a frequentist physics lab so a low-data team could make distributional claims",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -813,7 +813,7 @@
         "attrs": {
           "stem": "block-length-optimization",
           "title": "Block Length Optimization for Whole Foods",
-          "description": "A randomized controlled trial and adaptive system that set driver shift lengths site by site across 350+ Whole Foods sites",
+          "description": "[redacted, 20 words]",
           "status": "needs-detail",
           "tags": [
             "causal-inference",
@@ -945,7 +945,7 @@
         "attrs": {
           "stem": "computer-vision-labor-tracking",
           "title": "Computer Vision System for Labor Tracking",
-          "description": "A computer vision pipeline that counts deployment labor from existing security cameras, replacing manual on-site counting",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "computer-vision",
@@ -1074,7 +1074,7 @@
         "attrs": {
           "stem": "difficult-colleague-collaboration",
           "title": "Navigating Collaboration with a Challenging Peer",
-          "description": "Making a working relationship effective with a blunt, stream-of-consciousness engineer who ignored input and shipped generated slop",
+          "description": "[redacted, 17 words]",
           "status": "needs-detail",
           "tags": [
             "interpersonal",
@@ -1203,7 +1203,7 @@
         "attrs": {
           "stem": "distributional-simulation-outputs",
           "title": "Distributional Simulation Outputs",
-          "description": "Converting deterministic deployment simulation models to Monte Carlo so estimates carry a range instead of false precision",
+          "description": "[redacted, 17 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -1337,7 +1337,7 @@
         "attrs": {
           "stem": "edu-customer-complaint",
           "title": "Handling Customer Complaint from a Difficult Peer",
-          "description": "Handling a complaint from a peer and internal customer at Amazon Robotics through a difficult interpersonal dynamic",
+          "description": "[redacted, 17 words]",
           "status": "draft",
           "tags": [
             "interpersonal"
@@ -1463,7 +1463,7 @@
         "attrs": {
           "stem": "gam-tree-methodology-adoption",
           "title": "GAM and Tree Methodology Adoption for Simulation Model Interpretation",
-          "description": "Adopting GAM and tree methods with partial dependence plots to make five black-box simulation models interpretable",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -1593,7 +1593,7 @@
         "attrs": {
           "stem": "gp-school-project",
           "title": "Sparse Gaussian Process School Project",
-          "description": "Comparing three Gaussian process formulations in PyMC on New York City housing data, sparse approximations included",
+          "description": "[redacted, 16 words]",
           "status": "needs-detail",
           "tags": [
             "bayes",
@@ -1720,7 +1720,7 @@
         "attrs": {
           "stem": "hiring-and-mentorship",
           "title": "Hiring and Mentorship of Data Scientists",
-          "description": "Career-spanning hiring and mentorship of data scientists, with methodologies for evaluating science breadth and depth",
+          "description": "[redacted, 15 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -1848,7 +1848,7 @@
         "attrs": {
           "stem": "intent-extraction-pipeline",
           "title": "Three-Stage Intent Extraction Pipeline",
-          "description": "A three-stage pipeline that carries a raw idea to a factory-ready GitHub issue, trading human time for computation",
+          "description": "[redacted, 18 words]",
           "status": "needs-detail",
           "tags": [
             "generative-ai",
@@ -1980,7 +1980,7 @@
         "attrs": {
           "stem": "jarvis-grocery-delivery-coverage",
           "title": "Automated Grocery Delivery Coverage Worldwide",
-          "description": "Automating grocery delivery coverage maps worldwide, replacing nested Excel pivot tables and hand-drawn Tableau maps",
+          "description": "[redacted, 15 words]",
           "status": "complete",
           "tags": [
             "optimization",
@@ -2110,7 +2110,7 @@
         "attrs": {
           "stem": "large-scale-data-fluency",
           "title": "Large Scale Data Fluency",
-          "description": "Turning hundreds of undocumented Redshift and data lake tables into trusted datasets in the pre-AI era",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "data-wrangling"
@@ -2238,7 +2238,7 @@
         "attrs": {
           "stem": "llm-as-tool-not-brain",
           "title": "Pushing back on an LLM's premature design closure",
-          "description": "Rejecting an LLM's tidy design closure and unbundling two conflated responsibilities in a specification standard",
+          "description": "[redacted, 15 words]",
           "status": "draft",
           "tags": [
             "architecture",
@@ -2368,7 +2368,7 @@
         "attrs": {
           "stem": "production-python-collaboration",
           "title": "Production Python Collaboration",
-          "description": "Writing production Python as an individual contributor alongside two software engineers in an 11K-line simulation module",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "production",
@@ -2503,7 +2503,7 @@
         "attrs": {
           "stem": "profiling-performance-optimization",
           "title": "Profiling and Performance Optimization",
-          "description": "Profiling an 11K-line simulation module systematically and cutting portal wait times once the architecture had stabilized",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "software-engineering"
@@ -2631,7 +2631,7 @@
         "attrs": {
           "stem": "project-plan-simulator",
           "title": "Project Plan Simulator",
-          "description": "Simulating deterministic project plans under uncertainty, so resource contention and cascading delays become probabilistic completion times",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "simulation",
@@ -2763,7 +2763,7 @@
         "attrs": {
           "stem": "project-roar-mall-delivery",
           "title": "Project Roar Mall Delivery",
-          "description": "Choosing which of 1,600 candidate malls to open for direct-from-mall delivery, with demand cannibalization modeled linearly",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "optimization"
@@ -2889,7 +2889,7 @@
         "attrs": {
           "stem": "rdm-strategic-vision",
           "title": "RDM Strategic Vision",
-          "description": "Setting the vision, roadmap, and technical approach for the Robotics Deployment Model simulation platform",
+          "description": "[redacted, 14 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -3016,7 +3016,7 @@
         "attrs": {
           "stem": "resource-constrained-scheduling-cp",
           "title": "Resource Constrained Scheduling - Constraint Programming",
-          "description": "Scheduling hundreds of interdependent deployment tasks under labor, equipment, and space constraints with constraint programming",
+          "description": "[redacted, 15 words]",
           "status": "complete",
           "tags": [
             "optimization"
@@ -3147,7 +3147,7 @@
         "attrs": {
           "stem": "resource-constrained-scheduling-dp-tree-search",
           "title": "Resource Constrained Scheduling - DP - Tree Search",
-          "description": "Scheduling resource-constrained deployment projects with dynamic programming and a softmax-scored tree search over candidate actions",
+          "description": "[redacted, 15 words]",
           "status": "complete",
           "tags": [
             "optimization"
@@ -3278,7 +3278,7 @@
         "attrs": {
           "stem": "retrofit-games",
           "title": "Retrofit Games",
-          "description": "Tabletop games that walked six cross-functional groups through a retrofit plan before anyone executed it",
+          "description": "[redacted, 15 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -3406,7 +3406,7 @@
         "attrs": {
           "stem": "simpy-pod-production",
           "title": "Simpy Pod Production",
-          "description": "A discrete event simulation of pod production with a finite buffer and a lift carrying two failure modes",
+          "description": "[redacted, 18 words]",
           "status": "complete",
           "tags": [
             "simulation"
@@ -3532,7 +3532,7 @@
         "attrs": {
           "stem": "spec-tools",
           "title": "Spec-Tools - Machine-Checked Specification Graphs",
-          "description": "A toolkit that turns prose specifications into machine-checked graphs, making an implementing agent's constraint surface explicit",
+          "description": "[redacted, 16 words]",
           "status": "draft",
           "tags": [
             "generative-ai",
@@ -3664,7 +3664,7 @@
         "attrs": {
           "stem": "tech-club-knowledge-sharing",
           "title": "Tech Club Knowledge Sharing",
-          "description": "Founding and leading a monthly technology seminar for an organization of program managers and PhD physicists",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -3792,7 +3792,7 @@
         "attrs": {
           "stem": "warehouse-operations-manager",
           "title": "Warehouse Operations Manager and Process Engineer",
-          "description": "The pre-data-science years running warehouse operations and process engineering for 280+ associates in fulfillment logistics",
+          "description": "[redacted, 15 words]",
           "status": "complete",
           "tags": [
             "leadership",
@@ -3920,7 +3920,7 @@
         "attrs": {
           "stem": "web-portal-tool-deployment",
           "title": "Productionizing Data Science Tools on Internal Web Portal",
-          "description": "Deploying and operating two grocery planning tools on an internal web portal for 30+ planners worldwide",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "production",
@@ -4053,7 +4053,7 @@
         "attrs": {
           "stem": "wfm-time-series-forecasting",
           "title": "WFM Time Series Forecasting",
-          "description": "Replacing a 30% MAPE Excel trailing average with a programmatic order volume forecast across 350+ sites",
+          "description": "[redacted, 16 words]",
           "status": "complete",
           "tags": [
             "machine-learning"

@@ -2,5 +2,3 @@
 # The two files that must name the banned word in order to ban it.
 src/dev_playbook/checks/prose.py
 standards/prose/conventions.md
-# A fact base quotes another repo verbatim; its rows are that repo's words.
-working-docs/doc-type-system/story-forge-simulation/stories-fact-base.json
