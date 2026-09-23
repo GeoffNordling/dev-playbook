@@ -356,10 +356,11 @@ beyond this set.
 
 **Option B — our own container plug-in.** Sandcastle accepts user-written
 sandbox plug-ins (`createBindMountSandboxProvider` is exported), and its own
-podman plug-in is one of them, about 300 lines. A plug-in of ours would put
-the repository at `~/workspace/mission-control` and the config copy at
-`~/workspace/dev-playbook`, so the container matches the user's machine and
-no standard changes. The cost is owning that plug-in.
+podman plug-in is one of them, about 300 lines. A plug-in of ours puts the
+work copy in a directory named for its repository and the config copy at
+`~/workspace/dev-playbook`, so the container keeps the names the standards
+rely on and no standard changes. The cost is owning that plug-in. The
+layout it uses is under [The layout inside a front](#the-layout-inside-a-front).
 
 The plug-in interface is public and documented: the README's "Custom
 Sandbox Providers" section, with the builders and their types exported from
@@ -369,8 +370,40 @@ the container starts, every git call, the agent's working directory, and
 the commit collection use the location the plug-in reports back. The podman
 plug-in itself finds its location that way. So option B can be a thin
 wrapper around Sandcastle's own podman plug-in that moves the repository's
-mount to `~/workspace/mission-control`, rather than a rewrite. Experiment
-three confirmed it by a run.
+mount, rather than a rewrite. Experiment three confirmed it by a run.
+
+## The layout inside a front
+
+Decided by the user after experiment three: **one rule for every front.**
+The work copy always sits at `~/work/<repo>`, and the config copy always at
+`~/workspace/dev-playbook`. It is the layout the `sandbox-probe` prototype
+chose, and the user named it what good looks like.
+
+```
+/home/agent/
+    .claude/               ← eight links into the config copy
+        skills  -> ../workspace/dev-playbook/dotfiles/dot-claude/skills
+        rules   -> ../workspace/dev-playbook/dotfiles/dot-claude/rules
+        hooks   -> ../workspace/dev-playbook/dotfiles/dot-claude/hooks
+        ...
+    workspace/
+        dev-playbook/      ← config copy, read-only, published main
+            standards/
+            dotfiles/
+            scripts/
+            src/
+    work/
+        mission-control/   ← work copy, read-write, the front's branch
+            .git/
+            CLAUDE.md
+            README.md
+            src/
+            tests/
+```
+
+A front on dev-playbook differs only in the name under `work/`. Why that
+front needs a second dev-playbook at all is a question the user parked for
+after experiment three's part 4 (see the root's Planned list).
 
 ## What experiment three settled
 
@@ -395,6 +428,11 @@ silently.
 **Case B2, the same front, work copy at `~/work/dev-playbook`.** Passed
 every check, as case A, with the name `dev-playbook` and the two copies
 separate. This is the layout the `sandbox-probe` prototype already chose.
+
+The image bakes the eight `~/.claude/` links at build time by running
+`sync-dotfiles` against a copy of published main. Stow makes them relative
+(`../workspace/dev-playbook/…`), and they resolved in every case, so the
+earlier worry that they might dangle after the move is closed.
 
 On the real side the only changes were the returned branches, their
 objects, and the empty `refs/front-clone/` folder the holding step leaves.
@@ -426,9 +464,9 @@ export const relocated = ({ repoPath, ...podmanOptions }) => {
 Sandcastle also opens the copy's `.git` a second time, at its host path.
 It is the copy's own `.git`, so it adds no reach.
 
-Open from this run: whether every front's work copy should sit at
-`~/work/<repo>`, one rule for all, or at `~/workspace/<repo>` with
-dev-playbook fronts the exception. The user decides.
+Case A ran at `~/workspace/mission-control`, before the user chose one rule.
+Case B2 proves the chosen `~/work/<repo>` layout; nothing in case A depends
+on which parent directory the work copy sits in.
 
 ## The booby-trap fix
 
@@ -461,14 +499,13 @@ git hooks, and the booby-trap fix does not touch them. The `sandbox-probe`
 prototype already routed them out through a one-line file carrying a port
 (the smaller window described under
 [The two windows that matter](#the-two-windows-that-matter)). Whether that
-survives under Sandcastle is checked in the first run with real Claude.
+survives under Sandcastle is checked in experiment three, part 4, the first
+run with real Claude. The design to carry over lives on the `sandbox-probe`
+branch: `sandbox_probe/SPEC.md`, `probe/sink.py` (the host-side receiver),
+`probe/podman.py` (the windows), and `probe/billing.py`.
 
 ## Open
 
-- **Whether the image survives the move.** The eight symlinks are baked at
-  image build time and point at an absolute path. Where that path lands
-  depends on which option closes the workspace collision; the failure mode
-  if it is wrong is the silent one, a front that starts with no skills.
 - **Whether a shared SELinux label matters.** Sandcastle labels every
   window as shared (`z`), where the prototype labeled them private (`Z`).
   Experiment two showed the shared label lands only on the copies, so it

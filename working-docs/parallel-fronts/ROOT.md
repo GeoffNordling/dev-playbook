@@ -95,7 +95,8 @@ integrator is a judgment and is not.
 - **Whether the fence holds.** Five named problems stand between Sandcastle
   and a safe front, tracked in
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems).
-  Two are solved and proven; three are not.
+  Four are solved and proven; **Hook logging** waits on experiment three,
+  part 4.
 
 ## Planned
 
@@ -104,30 +105,43 @@ machine. The WSL machine this set was begun on has no container runtime and
 is not a target, which
 [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
 
-- **Experiment three.** Approved by the user, in progress. Parts 1 and 2
-  use the stand-in agent and cost no tokens; part 4 uses real Claude
-  briefly.
-  1. *Booby-trap fix.* Done: see
-     [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-booby-trap-fix).
-  2. *Option B.* Done, passed: see
-     [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled).
-     One choice left to the user: where every front's work copy sits.
-     Our own container plug-in, a thin wrapper around
-     Sandcastle's podman plug-in, run with the stand-in. Six checks: the
-     name reads `mission-control`; dev-playbook sits at
-     `~/workspace/dev-playbook` and the eight links resolve; the real
-     repository and unpushed work are untouched; the commit comes back at
-     the same SHA; the planted traps do not fire; and **two windows, one
-     container** — a front assigned to change dev-playbook gets a
-     read-only copy to read from and a copy to edit, and an edit to one
-     does not appear in the other. The last is the check most likely to
-     break option B, since both copies want `~/workspace/dev-playbook`.
-  3. *Option A.* Only if option B fails. The user ruled it the fallback:
-     code also runs outside Sandcastle, so a standards change would cascade
-     into workflows beyond this set.
-  4. *Real Claude.* An end-to-end proof on the option that passed: a tiny
-     real task, with the billing check passing before launch, the skills
-     and rules loaded, and hook events reaching the measurement database.
+- **Experiment three, part 4: real Claude end to end.** Approved by the
+  user, next to run. An end-to-end proof that the solution works outside
+  the stand-in: real Claude, on the subscription, does a tiny real task in
+  a front laid out as
+  [The layout inside a front](/working-docs/parallel-fronts/sandbox.md#the-layout-inside-a-front)
+  describes, through the option B plug-in. Pass means all of:
+  - `billing-lint` passes before the container starts, and the container
+    holds no metered key.
+  - Claude sees the skills and rules.
+  - The task's commit comes back through `front-clone close` at the same SHA.
+  - Claude's hook events reach the measurement database, tagged as from the
+    sandbox. This is the first test of **Hook logging**.
+
+  The steps, carried over from the `sandbox-probe` prototype rather than
+  reinvented: read its subscription-credential window and its hook-logging
+  port file (`sandbox_probe/SPEC.md`, `probe/podman.py`, `probe/sink.py`,
+  `probe/billing.py`, `Containerfile` on the `sandbox-probe` branch); add
+  the `claude` binary to experiment three's image; pass Claude as the agent
+  (Sandcastle's own Claude agent plug-in, if it fits); run.
+
+  The rig from parts 1 and 2 is in this session's scratchpad under
+  `exp3/`: `setup.sh` (fake repos, config copy, both fronts' copies, the
+  image), `snapshot.sh` (the real side before and after), `run.mjs` (one
+  run through the plug-in), `relocated.mjs` (the plug-in),
+  `probe/probe.sh` (the stand-in), `image/Containerfile`. It is
+  throwaway; [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)
+  holds everything needed to rebuild it.
+- **Why a dev-playbook front needs two copies.** Parked by the user until
+  part 4 works. The user questions whether a front assigned to change
+  dev-playbook needs a read-only config copy beside its work copy at all.
+  The prototype's reason is recorded in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter):
+  the config copy answers "what does published main say", so it must not
+  show the front its own uncommitted edits. Revisit together.
+- **Option A.** Not run, because option B passed. The user ruled it the
+  fallback: code also runs outside Sandcastle, so a standards change would
+  cascade into workflows beyond this set.
 - **Sandcastle's other branch modes.** `branch` and `merge-to-head` run more
   git on the host than `head` mode, and may trip the booby trap themselves.
 - **One lap by hand.** Run the shape once with two fronts and no driver
@@ -160,6 +174,18 @@ is not a target, which
   **Relabel**, and exposed the **Workspace collision** and the **Booby
   trap**. [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)
   records the details.
+- **Experiment three, part 1: the booby-trap fix.** `front-clone close`
+  never runs git in a copy, and a permanent test plants a trigger at every
+  point git offers and asserts none fires.
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-booby-trap-fix)
+  records how.
+- **Experiment three, part 2: option B.** A 20-line wrapper around
+  Sandcastle's podman plug-in closes the **Workspace collision** with no
+  fork and no standards change, proven with the stand-in on a
+  mission-control front and a dev-playbook front. The user then chose one
+  layout for every front, work copy at `~/work/<repo>`.
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)
+  records the run.
 
 ## Acronyms
 

@@ -67,9 +67,10 @@ front works on next is outside the library entirely.
 The library's headline concern is sandbox isolation: it runs each agent in
 a container and merges the commits back out. This set does want every
 front in a container, but not on the window layout Sandcastle chooses,
-which opens the real repository to the front.
-[The Sandbox](/working-docs/parallel-fronts/sandbox.md#where-sandcastle-collides)
-records the collision and the guess at a resolution. The tool also offers
+which opens the real repository to the front and puts it at the wrong
+path. [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems)
+records the collisions and how each was closed: a throwaway copy, a
+hardened `front-clone`, and a plug-in of our own. The tool also offers
 a no-sandbox provider that runs the agent directly on the host; this set
 does not use it.
 
@@ -79,10 +80,14 @@ Read from the published package, version 0.12.0, and partly confirmed by
 experiment two
 ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)).
 
-**Fixed.** The repository always lands at `/home/agent/workspace` inside
-the container, and the podman plug-in always sets the agent's home to
-`/home/agent`. No option changes either. This is the source of the
-workspace collision.
+**Fixed, but only as a suggestion.** Sandcastle suggests
+`/home/agent/workspace` for the repository, and its podman plug-in always
+sets the agent's home to `/home/agent`. No run option changes either, which
+is the source of the workspace collision. But the suggestion reaches only
+the sandbox plug-in: after start, Sandcastle works wherever the plug-in
+reports the repository to be. Experiment three's 20-line plug-in moves it,
+with no fork
+([The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled)).
 
 **Bends.** The host repository is chosen per run (`cwd`), which is how a
 run is pointed at a throwaway copy. Extra read-only or read-write mounts
