@@ -138,10 +138,6 @@ class TestEveryRegisteredCheck:
                 missing.append(f"{entry.id}: {test_file.name}::{name}")
         assert missing == []
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="until cut over: the old scripts still decide the unported rules",
-    )
     def test_every_deterministic_rule_is_registered(
         self, registered: dict[str, Check], dev_playbook_repo: Repo
     ) -> None:

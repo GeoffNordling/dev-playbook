@@ -20,6 +20,6 @@ alphabetical.
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — Knowledge Organization governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and documentation sets
 - [prose/](/standards/prose/index.md) — Prose governs how prose is written in every workspace document — voice, structure, and brevity
 - [python/](/standards/python/index.md) — Python governs how Python source is written — empty initializers, docstrings, banned future imports, and formatting
-- [shell/](/standards/shell/index.md) — Shell governs how shell is written — the glue-only boundary, strict mode, declared bash, and the shellcheck and shfmt bars every file clears
+- [shell/](/standards/shell/index.md) — Shell governs how shell is written — strict mode, declared bash, and the shellcheck and shfmt bars every file clears
 - [testing/](/standards/testing/index.md) — Python Testing governs where a repo's Python test files and fakes live — test file naming, the mirror layout, and the home of a fake
 - [tracking/](/standards/tracking/index.md) — Tracking governs how work is tracked — the Candidate register, the issue shapes, the label scheme, and the GitHub settings
