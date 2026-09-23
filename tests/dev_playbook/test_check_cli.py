@@ -37,7 +37,9 @@ def needs_workspace(repo: Repo) -> Iterator[Finding]:
 
 
 def fake_registry(monkeypatch: pytest.MonkeyPatch, *entries: Check) -> None:
-    monkeypatch.setattr(check_registry, "load", lambda: {e.id: e for e in entries})
+    monkeypatch.setattr(
+        check_registry, "load", lambda repo=None: {e.id: e for e in entries}
+    )
 
 
 class TestChecks:
@@ -51,16 +53,20 @@ class TestChecks:
         assert capsys.readouterr().out == ""
 
     def test_without_filter_and_tags(
-        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
+        root = str(a_repo(tmp_path, {"README.md": "# R\n"}))
         fake_registry(
             monkeypatch,
             Check("fam.a", needs_workspace, None, frozenset({WORKSPACE}), "m.fam"),
             Check("fam.b", first_line_of_every_markdown, None, frozenset(), "m.fam"),
         )
-        assert check_cli.main(["checks"]) == 0
+        assert check_cli.main(["checks", root]) == 0
         assert capsys.readouterr().out == "fam.a\tm.fam\tworkspace\nfam.b\tm.fam\t-\n"
-        assert check_cli.main(["checks", "--without", "workspace"]) == 0
+        assert check_cli.main(["checks", root, "--without", "workspace"]) == 0
         assert capsys.readouterr().out == "fam.b\tm.fam\t-\n"
 
 
@@ -129,6 +135,95 @@ class TestCheck:
     ) -> None:
         assert check_cli.main(["check", str(tmp_path)]) == 2
         assert "cannot build the model" in capsys.readouterr().err
+
+
+RULES = """\
+# Local
+
+## No todo
+
+No tracked text file holds the word TODO.
+
+`local.no-todo` · deterministic
+"""
+
+LOCAL_CHECKS = """\
+from dev_playbook.check_registry import Finding, check
+
+
+@check("local.no-todo")
+def no_todo(repo):
+    for path in repo.files:
+        if b"TODO" in repo.contents[path] and path.startswith("notes/"):
+            yield Finding(path, None, "holds TODO")
+"""
+
+LOCAL_TESTS = "def test_no_todo():\n    pass\n"
+
+PYPROJECT = '[project]\nname = "local-repo"\n'
+
+
+class TestRepoChecks:
+    def test_the_repo_checks_run_beside_dev_playbooks(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        root = a_repo(
+            tmp_path,
+            {
+                "pyproject.toml": PYPROJECT,
+                "standards/local/rules.md": RULES,
+                "src/local_repo/checks/local.py": LOCAL_CHECKS,
+                "tests/local_repo/checks/test_local.py": LOCAL_TESTS,
+                "notes/a.txt": "TODO\n",
+            },
+        )
+        assert check_cli.main(["check", str(root)]) == 1
+        assert "notes/a.txt: local.no-todo holds TODO\n" in capsys.readouterr().out
+        assert check_cli.main(["checks", str(root), "--family", "local"]) == 0
+        assert capsys.readouterr().out == "local.no-todo\tlocal_repo.checks.local\t-\n"
+
+    def test_a_rule_with_no_check_exits_2(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        root = a_repo(tmp_path, {"standards/local/rules.md": RULES})
+        assert check_cli.main(["check", str(root)]) == 2
+        assert (
+            "playbook check: local.no-todo: the rule in standards/local/rules.md "
+            "has no check" in capsys.readouterr().err
+        )
+
+    def test_a_check_with_no_test_exits_2(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        root = a_repo(
+            tmp_path,
+            {
+                "pyproject.toml": PYPROJECT,
+                "standards/local/rules.md": RULES,
+                "src/local_repo/checks/local.py": LOCAL_CHECKS,
+            },
+        )
+        assert check_cli.main(["check", str(root)]) == 2
+        assert (
+            "local.no-todo: no test_no_todo in tests/local_repo/checks/test_local.py"
+            in capsys.readouterr().err
+        )
+
+    def test_a_module_that_cannot_register_exits_2(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        root = a_repo(
+            tmp_path,
+            {
+                "pyproject.toml": PYPROJECT,
+                "src/local_repo/checks/other.py": LOCAL_CHECKS,
+            },
+        )
+        assert check_cli.main(["check", str(root)]) == 2
+        assert (
+            "cannot load repo's checks: local.no-todo: registered from module "
+            "other, not local" in capsys.readouterr().err
+        )
 
 
 FAKE_UVX = """\

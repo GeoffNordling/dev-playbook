@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Adopting a Repo-Scoped Standard
-description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write and publish its checks as one hook, mirror it, and gate it
+description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write its checks where dev-playbook keeps its own, and bump the pin that runs them
 ---
 
 # Adopting a Repo-Scoped Standard
@@ -33,28 +33,17 @@ in the Standard the step links.
    README-first catalog
    ([The catalog lists every directory](/standards/standard/tree.md#the-catalog-lists-every-directory)).
 2. **Write the checks.** Back each deterministic rule of the Standard
-   with a check in the shape
-   [Writing a Check](/guides/writing-a-check.md#a-consumer-repos-checks-take-the-same-shape)
-   gives: one function per rule id, one test per id, and one command
-   that runs them all, prints one line per finding, and exits 0 clean,
-   1 on findings, 2 when it cannot run.
-3. **Publish the hook in the repo's own manifest.** Add that command as
-   one hook to the consumer repo's own `.pre-commit-hooks.yaml`, the
-   same way dev-playbook publishes `playbook-check`. The repo is now
-   the topmost instance of the hosting pattern for its own standard.
-4. **Mirror the hook in the local block.** Add the same hook id to the
-   repo's `repo: local` block in `.pre-commit-config.yaml`, so the repo
-   runs from its working tree what it publishes
-   ([A publisher dogfoods its manifest](/standards/distribution/channel.md#a-publisher-dogfoods-its-manifest));
-   `distribution.a-publisher-dogfoods-its-manifest` checks
-   the mirror.
-5. **Turn the meta-standard's own policing on.** The meta-standard's
-   checks run in `playbook-check`, a published dev-playbook hook. Bump
-   the pin to a dev-playbook `rev` that carries them: from that rev
-   they run over the repo's `standards/` tree
-   (`playbook checks --family standard` lists them). Until the pin
-   moves, the tree is unpoliced by the meta-standard.
-6. **Register a local document type (only if the standard needs one).**
+   with a check in `src/<package>/checks/<name>.py` and its test in
+   `tests/<package>/checks/test_<name>.py`, the same places dev-playbook
+   keeps its own
+   ([Writing a Check](/guides/writing-a-check.md)).
+3. **Bump the pin.** The `playbook-check` hook the repo already pins
+   runs dev-playbook's checks, the meta-standard's among them, and the
+   repo's own beside them. Bump the pin to a dev-playbook `rev` that
+   loads a consumer's checks: from that rev they run over the repo, and
+   `playbook checks --family <name>` lists them. Until the pin moves,
+   the new Standard is unchecked.
+4. **Register a local document type (only if the standard needs one).**
    Skip this step unless the new standard governs a **document type**
    the global OKF registry does not carry. If it does, declare the type
    in the frontmatter of the repo's root `index.md`, an `okf_types`

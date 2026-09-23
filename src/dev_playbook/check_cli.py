@@ -1,11 +1,13 @@
 """The ``playbook`` console script: ``check`` runs the checks, ``checks`` lists them.
 
-``playbook check [DIR]`` builds the model once, runs every registered check
-function, prints each finding in GNU format with its rule id, then runs the
+``playbook check [DIR]`` builds the model once, loads dev-playbook's checks and
+those the repo hosts in ``src/<package>/checks/``, runs every check function, prints
+each finding in GNU format with its rule id, then runs the
 two steps that are not functions over the model: the loop family's
 ``loop_lint`` module, kept whole for the loop workstream, and ``pre-commit
 validate-manifest`` where the repo publishes a ``.pre-commit-hooks.yaml``.
-It exits 1 on any finding, 2 when the model cannot be built or a step cannot
+It exits 1 on any finding, 2 when the model or the repo's checks cannot be
+loaded, the repo's checks and its Standards do not match, or a step cannot
 run. ``--without TAG`` leaves out the checks tagged as needing that
 environment, and says so on stderr on every run, so a skip never goes
 silent. ``SKIP``, the variable pre-commit reads for hook ids, is read
@@ -13,14 +15,15 @@ here for tag names too: ``SKIP=workspace`` is ``--without workspace``, so a
 CI file leaves the tagged checks out with the one variable it already sets,
 and pre-commit ignores a name that is no hook id of its own.
 
-``playbook checks`` prints the registry: id, module, and the hook or tag,
-computed live. ``--family`` and ``--without`` filter it.
+``playbook checks [DIR]`` prints the registry, both layers: id, module, and
+the hook or tag, computed live. ``--family`` and ``--without`` filter it.
 """
 
 import argparse
 import os
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 from dev_playbook import check_registry, findings, loop_lint
@@ -50,6 +53,12 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     listing = commands.add_parser("checks", help="list the registered checks")
+    listing.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="repository whose own checks join the list (default: current directory)",
+    )
     listing.add_argument("--family", help="only this family")
     listing.add_argument(
         "--without",
@@ -63,7 +72,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "check":
         without = frozenset(args.without) | skipped_tags()
         return run_check(Path(args.directory).resolve(), without)
-    return list_checks(args.family, frozenset(args.without))
+    return list_checks(
+        Path(args.directory).resolve(), args.family, frozenset(args.without)
+    )
 
 
 def skipped_tags() -> frozenset[str]:
@@ -73,30 +84,67 @@ def skipped_tags() -> frozenset[str]:
 
 
 def selected(
-    without: frozenset[str], family: str | None = None
+    registry: dict[str, check_registry.Check],
+    without: frozenset[str],
+    family: str | None = None,
 ) -> list[check_registry.Check]:
     """The registered checks in id order, minus the filtered ones."""
     return [
         c
-        for c in sorted(check_registry.load().values(), key=lambda c: c.id)
+        for c in sorted(registry.values(), key=lambda c: c.id)
         if not (c.needs & without) and (family is None or c.family == family)
     ]
+
+
+class CannotLoad(Exception):
+    """The model or the checks cannot be loaded; each arg is one line to print."""
+
+
+def load(root: Path) -> tuple[Repo, dict[str, check_registry.Check]]:
+    """The model of ``root`` and both layers of checks.
+
+    Raises :class:`CannotLoad` when the model cannot be built, a module of
+    the repo's own checks cannot run or register, or the repo's checks and
+    its Standards do not match (:func:`check_registry.layer_problems`).
+    """
+    try:
+        repo = Repo.from_git(root)
+    except (ModelError, subprocess.CalledProcessError) as err:
+        raise CannotLoad(f"cannot build the model: {err}") from err
+    try:
+        registry = check_registry.load(repo)
+    except (
+        check_registry.RegistryError,
+        tomllib.TOMLDecodeError,
+        SyntaxError,
+        ImportError,
+    ) as err:
+        raise CannotLoad(f"cannot load {repo.name}'s checks: {err}") from err
+    if problems := check_registry.layer_problems(registry, repo):
+        raise CannotLoad(*problems)
+    return repo, registry
+
+
+def cannot_load(command: str, err: CannotLoad) -> int:
+    """Print why ``command`` cannot run; return 2, its exit code."""
+    for line in err.args:
+        print(f"{command}: {line}", file=sys.stderr)
+    return 2
 
 
 def run_check(root: Path, without: frozenset[str]) -> int:
     """Build the model, run the checks and the two steps; exit 0, 1, or 2."""
     try:
-        repo = Repo.from_git(root)
-    except (ModelError, subprocess.CalledProcessError) as err:
-        print(f"playbook check: cannot build the model: {err}", file=sys.stderr)
-        return 2
+        repo, registry = load(root)
+    except CannotLoad as err:
+        return cannot_load("playbook check", err)
     if without:
         print(
             f"playbook check: without {', '.join(sorted(without))}, the checks "
             "tagged so are left out",
             file=sys.stderr,
         )
-    enabled = [c for c in selected(without) if c.function is not None]
+    enabled = [c for c in selected(registry, without) if c.function is not None]
     count = 0
     for c in enabled:
         assert c.function is not None
@@ -127,9 +175,13 @@ def validate_manifest(manifest: Path) -> int:
         return 2
 
 
-def list_checks(family: str | None, without: frozenset[str]) -> int:
-    """Print one line per check: id, module, and its hook or tags."""
-    for c in selected(without, family):
+def list_checks(root: Path, family: str | None, without: frozenset[str]) -> int:
+    """Print one line per check of both layers: id, module, and its hook or tags."""
+    try:
+        _, registry = load(root)
+    except CannotLoad as err:
+        return cannot_load("playbook checks", err)
+    for c in selected(registry, without, family):
         how = c.hook if c.hook else ",".join(sorted(c.needs)) or "-"
         print(f"{c.id}\t{c.module}\t{how}")
     return 0

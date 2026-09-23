@@ -85,11 +85,13 @@ tree as it stands.
   other repos under `~/workspace/`, and the skip is announced.
 - Twelve check modules under `src/dev_playbook/checks/`, one per
   directory under `standards/`, with 107 check functions and 24
-  registrations of a rule a tool decides. The meta-test holds both
-  directions: every registered id is a deterministic heading under
-  `standards/`, and every deterministic heading is registered.
-- One test per rule id under `tests/dev_playbook/checks/`; 755 tests
-  in 7.5 s where 988 took 10.0 s.
+  registrations of a rule a tool decides. A consumer repo's own checks
+  in `src/<package>/checks/` load beside them. The layer test holds
+  both directions over a repo's own checks: every one is a
+  deterministic heading under `standards/` with its test, and every
+  deterministic heading is registered.
+- One test per rule id under `tests/dev_playbook/checks/`; 763 tests
+  in 7.6 s where 988 took 10.0 s.
 - Under `scripts/`, `loop-lint` is the one check script left, kept for the
   loop workstream, and `workspace-lint` runs at no gate by ruling. The
   two tables and their scripts are gone.
@@ -162,25 +164,6 @@ None.
 
 ## Planned
 
-- **The check package as a library, trade-offs to discuss.** A
-  consumer repo writes checks for its own Standards. Today it copies
-  dev-playbook's pattern: its own registry, model, and command, per
-  `guides/writing-a-check.md`. The alternative is that it imports
-  `Repo`, `@check`, and the finding printer from `dev_playbook` and
-  registers its checks into one `playbook check` run. That needs code
-  that does not exist: `check_registry.load()` imports only
-  `dev_playbook.checks`, and `run_check` takes no other registry. To
-  weigh: a public API that consumers pin against, against every
-  consumer keeping a copy that drifts.
-- **The wheel a consumer installs.** pre-commit builds this repo into a
-  wheel at the pinned rev and installs it. That wheel is 108 MB in 1905
-  files, because `uv_build` packs everything under `src/dev_playbook/`,
-  and two gitignored directories live there: the viewer's
-  `cloa_viewer/web/node_modules/` and the `.ruff_cache/` ruff writes
-  beside the canonical `pyproject.toml`. The package itself is under a
-  megabyte. Predates the rewrite. One `wheel-exclude` setting under
-  `[tool.uv.build-backend]` in `pyproject.toml` leaves both out; a test
-  that builds the wheel and counts its files pins it.
 - **Scripts under ruff, after the rewrite.** Ruff never opens the
   extensionless scripts under `scripts/`. Opening them today
   reformats three and raises 48 findings, so this waits until the
@@ -234,6 +217,20 @@ None.
   in the loop, all day, do not scale; predicates do.
 
 ## Completed
+
+- **A consumer's checks, 2026-09-23.** A consumer repo writes its
+  checks where dev-playbook keeps its own, `src/<package>/checks/` and
+  `tests/<package>/checks/`, importing `@check`, `Finding`, and `Repo`
+  from `dev_playbook`; the `playbook-check` hook it already pins loads
+  them beside dev-playbook's, so it publishes no hook of its own. The
+  meta-test's directions became the layer test, which `playbook check`
+  runs over the repo's own checks and exits 2 on. Chosen over each
+  consumer copying the registry, model, and command, since every repo
+  runs dev-playbook's checks and only adds its own, as with Standards;
+  one layer of consumers, no deeper. The wheel item was dropped:
+  pre-commit builds from a clone at the pinned rev, which holds no
+  gitignored directory, and that wheel is 189 KB in 101 files; the
+  108 MB came only from building this working checkout.
 
 - **The terms and the docs, 2026-09-23.** One vocabulary from the
   Standard pseudocode: rule, verifier, check, judge, finding, gate, in

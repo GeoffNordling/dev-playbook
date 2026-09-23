@@ -88,9 +88,9 @@ leaves.
   │  binds to the rules the    │   │  VIEWER                      │
   │  doc-type system settled   │   │  root ······· ROOT.md        │
   │  built: playbook check     │   │  on disk ···· contract.md    │
-  │  plan: docs · library ·    │   │  kinds ······ registry.md    │
-  │   wheel · scripts under    │   │  panels ····· design.md ·    │
-  │   ruff                     │   │               viewer.md      │
+  │  plan: scripts under ruff  │   │  kinds ······ registry.md    │
+  │                            │   │  panels ····· design.md ·    │
+  │                            │   │               viewer.md      │
   └────────────────────────────┘   │  program ···· server.md      │
                                    │  built ······ stack.md       │
                                    │  plan: runbook design ·      │

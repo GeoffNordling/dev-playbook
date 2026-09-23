@@ -1,6 +1,5 @@
 """Unit tests for the check registry, and the meta-test over every registered check."""
 
-import ast
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -8,10 +7,7 @@ import pytest
 
 from dev_playbook import check_registry
 from dev_playbook.check_registry import WORKSPACE, Check, Finding
-from dev_playbook.model import Repo, Trailer
-
-REPO_ROOT = Path(__file__).resolve().parents[2]
-CHECK_TESTS = REPO_ROOT / "tests" / "dev_playbook" / "checks"
+from dev_playbook.model import Repo
 
 
 def a_function(repo: Repo) -> Iterator[Finding]:
@@ -84,40 +80,9 @@ def registered() -> dict[str, Check]:
     return check_registry.load()
 
 
-def standards_trailers(repo: Repo) -> dict[str, tuple[str, Trailer]]:
-    """Every rule trailer under standards/, by id, with the file it is in."""
-    return {
-        t.id: (path, t)
-        for path, doc in repo.markdown.items()
-        if path.startswith("standards/")
-        for t in doc.trailers
-    }
-
-
-def collected_test_names(path: Path) -> set[str]:
-    """Every test function name in a test file, at module level or in a class."""
-    names: set[str] = set()
-    for node in ast.walk(ast.parse(path.read_text())):
-        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
-            names.add(node.name)
-    return names
-
-
 class TestEveryRegisteredCheck:
     def test_load_is_idempotent(self, registered: dict[str, Check]) -> None:
         assert check_registry.load() is registered
-
-    def test_is_a_deterministic_rule_heading_of_its_family(
-        self, registered: dict[str, Check], dev_playbook_repo: Repo
-    ) -> None:
-        trailers = standards_trailers(dev_playbook_repo)
-        for entry in registered.values():
-            assert entry.id in trailers, f"{entry.id}: no trailer under standards/"
-            path, trailer = trailers[entry.id]
-            assert trailer.kind == "deterministic", entry.id
-            assert trailer.heading is not None, entry.id
-            assert trailer.heading.slug == entry.slug, entry.id
-            assert path.split("/")[1] == entry.family, f"{entry.id} in {path}"
 
     def test_has_a_function_or_a_hook_never_both(
         self, registered: dict[str, Check]
@@ -125,25 +90,102 @@ class TestEveryRegisteredCheck:
         for entry in registered.values():
             assert (entry.function is None) != (entry.hook is None), entry.id
 
-    def test_every_function_has_a_test(self, registered: dict[str, Check]) -> None:
-        missing = []
-        for entry in registered.values():
-            if entry.function is None:
-                continue
-            test_file = (
-                CHECK_TESTS / f"test_{check_registry.module_name(entry.family)}.py"
-            )
-            name = "test_" + entry.slug.replace("-", "_")
-            if not test_file.is_file() or name not in collected_test_names(test_file):
-                missing.append(f"{entry.id}: {test_file.name}::{name}")
-        assert missing == []
-
-    def test_every_deterministic_rule_is_registered(
+    def test_matches_the_standards_and_the_tests(
         self, registered: dict[str, Check], dev_playbook_repo: Repo
     ) -> None:
-        unregistered = sorted(
-            t.id
-            for _, t in standards_trailers(dev_playbook_repo).values()
-            if t.kind == "deterministic" and t.id not in registered
+        # Each check is a deterministic rule of its family with its test, and
+        # each deterministic rule under standards/ has a check.
+        assert check_registry.layer_problems(registered, dev_playbook_repo) == []
+
+
+RULES = """\
+# Fam
+
+## One
+
+A predicate.
+
+`fam.one` · deterministic
+
+## Two
+
+A predicate.
+
+`fam.two` · stochastic
+"""
+
+FAM = """\
+from dev_playbook.check_registry import check
+
+
+@check("fam.one")
+def one(repo):
+    yield from ()
+"""
+
+
+def a_consumer(files: dict[str, str]) -> Repo:
+    """A consumer repo whose import package is ``a_consumer``."""
+    files = {"pyproject.toml": '[project]\nname = "a-consumer"\n'} | files
+    return Repo.from_files(
+        Path("/r"), {path: text.encode() for path, text in files.items()}
+    )
+
+
+class TestRepoLayer:
+    def test_runs_the_repo_checks_into_their_own_layer(self) -> None:
+        repo = a_consumer(
+            {"src/a_consumer/checks/fam.py": FAM, "src/a_consumer/fam.py": FAM}
         )
-        assert unregistered == []
+        registry = check_registry.load(repo)
+        assert registry["fam.one"].module == "a_consumer.checks.fam"
+        assert "fam.one" not in check_registry.CHECKS
+        assert registry.keys() - check_registry.CHECKS.keys() == {"fam.one"}
+
+    def test_a_second_load_runs_the_modules_again(self) -> None:
+        repo = a_consumer({"src/a_consumer/checks/fam.py": FAM})
+        assert "fam.one" in check_registry.load(repo)
+        assert "fam.one" in check_registry.load(repo)
+
+    def test_dev_playbook_hosts_no_second_layer(self, dev_playbook_repo: Repo) -> None:
+        assert check_registry.load(dev_playbook_repo) == check_registry.CHECKS
+
+    def test_an_id_both_layers_register_raises(self) -> None:
+        shadow = FAM.replace("fam.one", "standard.no-shadowing")
+        repo = a_consumer({"src/a_consumer/checks/standard.py": shadow})
+        with pytest.raises(check_registry.RegistryError, match="by dev-playbook"):
+            check_registry.load(repo)
+
+
+class TestLayerProblems:
+    def problems(self, files: dict[str, str]) -> list[str]:
+        repo = a_consumer(files)
+        return check_registry.layer_problems(check_registry.load(repo), repo)
+
+    def test_a_matching_layer_has_none(self) -> None:
+        files = {
+            "standards/fam/rules.md": RULES,
+            "src/a_consumer/checks/fam.py": FAM,
+            "tests/a_consumer/checks/test_fam.py": "def test_one():\n    pass\n",
+        }
+        assert self.problems(files) == []
+
+    def test_each_mismatch_is_named(self) -> None:
+        other = RULES.replace("## One", "## Uno").replace("fam.two", "fam.three")
+        files = {
+            "standards/fam/rules.md": other,
+            "standards/other/rules.md": "## Four\n\nP.\n\n`fam.four` · deterministic\n",
+            "src/a_consumer/checks/fam.py": FAM
+            + '\n\n@check("fam.three")\ndef three(repo):\n    yield from ()\n'
+            + '\n\n@check("fam.five")\ndef five(repo):\n    yield from ()\n',
+        }
+        tests = "tests/a_consumer/checks/test_fam.py"
+        assert self.problems(files) == [
+            "fam.five: no rule under standards/ has this id",
+            "fam.one: the rule's heading in standards/fam/rules.md is not one",
+            f"fam.one: no test_one in {tests}",
+            "fam.three: the rule in standards/fam/rules.md is stochastic",
+            "fam.three: the rule's heading in standards/fam/rules.md is not three",
+            f"fam.three: no test_three in {tests}",
+            "fam.four: the rule in standards/other/rules.md has no check",
+        ]
