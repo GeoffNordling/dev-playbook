@@ -154,7 +154,8 @@ In the second case the container holds two directories named dev-playbook,
 and they are separate copies: an edit in the work checkout does not appear
 in the config source. That is the point rather than an accident — the
 config source answers "what does the published version say", so it must
-not show the front its own uncommitted work.
+not show the front its own uncommitted work. The user confirmed both
+copies stay.
 
 Smaller windows complete the set: the subscription credential, and a
 one-line file carrying a port so the agent's own hook events reach this

@@ -70,6 +70,9 @@ The words of the set, one meaning each.
 - **Integrator** — the role that merges the fronts' branches at the end of
   a lap and reconciles what they conflict over. Unlike the driver, it
   judges.
+- **Sandcastle pipeline** — the working arrangement that runs one front:
+  throwaway copies go into a sealed container, one agent works there
+  through Sandcastle and our plug-in, and only its commit comes back.
 
 Checkpoint and integrator are working names. What each is, and who fills
 it, waits for the discussion of them in Planned.
@@ -89,15 +92,6 @@ and is answered there.
 Sessions with the user come first, each at a high level, the agent
 guiding.
 
-- **Walk the user through the working prototype.** The user has not yet
-  looked at the sandbox solution. Guide them through it: the layout, the
-  copies, the plug-in, the round trip, and the hook logging, with pictures
-  rather than code. Settle here whether a front assigned to change
-  dev-playbook needs a read-only config copy beside its work copy at all.
-  The prototype's reason is recorded in
-  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter):
-  the config copy answers "what does published main say", so it must not
-  show the front its own uncommitted edits.
 - **Discuss: what this gives the user, and how they run it.** When this branch lands
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
@@ -175,6 +169,12 @@ guiding.
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)
   records the run. The rig is throwaway, in the session scratchpad under
   `exp3/` (`part4.mjs` and `receiver.py` beside parts 1 and 2's files).
+- **Walk the user through the Sandcastle pipeline.** The user saw the
+  copies, the plug-in, the round trip, and the hook logging, and named the
+  arrangement. A front assigned to change dev-playbook keeps both copies:
+  the read-only config copy answers "what does published main say", so the
+  front's own unfinished edits never change the rules it runs under
+  ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter)).
 
 ## Acronyms
 
