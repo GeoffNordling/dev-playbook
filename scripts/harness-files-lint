@@ -5,7 +5,7 @@ The detector for the registry members that carry a content standard
 (standards/harness/files.md): the runbooks — skills and agents — against
 standards/doc-type/runbook-conventions.md, and the global CLAUDE.md source
 against claude-content.md. Their voice is not checked here; the first-person ban is one
-rule over all authored text and lives with prose-lint.
+rule over all authored text and lives with the prose checks.
 
 Two skill roots and two agent roots are checked when present in the target
 directory:

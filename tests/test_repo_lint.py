@@ -685,7 +685,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "build.makefile-holds-its-layers-targets" in ids
     assert "knowledge-organization.readme-holds-an-h1" in ids
     assert "build.no-other-future-work-file" in ids
-    # No harness.* here: the voice rule is prose-lint's and the global CLAUDE.md
+    # No harness.* here: the voice rule is the prose checks' and the global CLAUDE.md
     # shape is harness-files-lint's. repo-lint checks that CLAUDE.md exists,
     # which is build.files-every-repo-carries, and nothing about what it says.
     assert all(

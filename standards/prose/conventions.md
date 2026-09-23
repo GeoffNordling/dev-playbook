@@ -1,8 +1,8 @@
 ---
 type: Standard
 title: Doc Conventions
-description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics
-population: "an authored document, except type: Mirror and the paths in .prose-lint-exempt"
+description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics, and the form of the repo's vocabulary file
+population: "an authored document and, for the two word rules, every tracked file, except type: Mirror and the paths in .prose-lint-exempt"
 ---
 
 # Doc Conventions
@@ -109,10 +109,9 @@ a segment of its path inside the repository is `skills`, `rules`, or
 
 ### No first person
 
-A harness-loaded agent instruction never speaks in the first person: the
-words `I`, `me`, and `my` appear nowhere in it, its frontmatter included,
-except `I` in the abbreviation `I/O` and any of the three inside a
-double-quoted utterance, an inline code span, or a fenced block.
+The document does not contain the word `I`, `me`, or `my`, in its
+frontmatter or its body. Exempt: `I` in `I/O`, and a word inside
+double quotes, an inline code span, or a fenced block.
 
 `prose.no-first-person` · deterministic
 
@@ -155,22 +154,43 @@ One actor, the dispatcher, reviewer, and approver, is the `user` throughout the 
 
 ## No banned word
 
-The file does not contain a word the workspace vocabulary bans, `WORKSPACE_VOCABULARY` in `src/dev_playbook/prose_lint.py`, bare or plural, in any case, alone or in a compound, its frontmatter, code spans, and fenced blocks included.
+The file does not contain the workspace's banned word, singular
+or plural, in any case, frontmatter, code spans, and fenced blocks
+included. The match is a whole word: the word joined to another
+by a hyphen or a space fails, the word inside a longer word passes.
 
 `prose.no-banned-word` · deterministic
 
+> **Why.** The banned word is `human`, the synonym for the `user` that
+> recurs; a ban over every tracked file holds the line in code and
+> config, where the stochastic rule on the person's name is not run.
+
 ## No word the repo bans
 
-No tracked file under a directory the repo's `.prose-lint-vocabulary`
-names for a word contains that word, bare or plural, in any case, its
-frontmatter, code spans, and fenced blocks included; a word declared
-with no directory is banned in every tracked file of the repo.
+For each word in the repo's `.prose-lint-vocabulary`, no tracked
+file under a directory listed for that word contains the word, bare
+or plural, in any case, frontmatter, code spans, and fenced blocks
+included. A word with no directory listed is banned in every
+tracked file.
 
 `prose.no-word-the-repo-bans` · deterministic
 
 > **Why.** The directories an entry names hold a term to the part of
 > the tree that defines it, and leave the word alone where it means
 > something else.
+
+## The vocabulary file is well formed
+
+`.prose-lint-vocabulary`, where the repo has one, is a YAML
+mapping. Each key is a word the workspace does not already ban. Each
+value has a `say` string and, optionally, a `where` list of
+directories that exist in the repo, and no other key.
+
+`prose.the-vocabulary-file-is-well-formed` · deterministic
+
+> **Why.** An entry the check cannot read bans nothing, so a malformed
+> file would pass every file it meant to hold; the fault is reported
+> where the entry sits instead.
 
 ## Judgment, not judgement
 

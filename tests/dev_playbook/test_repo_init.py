@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from dev_playbook.checks.prose import WORKSPACE_WORD
 from dev_playbook.repo_init import (
     PLAYBOOK_ROOT,
     RepoInitError,
@@ -130,6 +131,16 @@ def test_name_carrying_an_agent_facing_voice_word_is_refused(
     spec = RepoSpec(name=name, description="A demo repo", python=False)
 
     with pytest.raises(RepoInitError, match=re.escape(f"'{word}'")):
+        render_tree(spec, REV)
+
+
+@pytest.mark.parametrize(
+    "name", [f"the-{WORKSPACE_WORD}", f"{WORKSPACE_WORD}-readable"]
+)
+def test_name_carrying_the_banned_word_is_refused(name: str) -> None:
+    spec = RepoSpec(name=name, description="A demo repo", python=False)
+
+    with pytest.raises(RepoInitError, match="the prose checks reject"):
         render_tree(spec, REV)
 
 

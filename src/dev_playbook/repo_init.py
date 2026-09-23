@@ -14,7 +14,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import prose_lint, voice
+from dev_playbook import voice
+from dev_playbook.checks.prose import WORKSPACE_WORD, word_pattern
 
 PLAYBOOK_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_DIR = PLAYBOOK_ROOT / "standards" / "build" / "canonical"
@@ -71,9 +72,9 @@ def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
             f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
             f"{fault}; choose another name"
         )
-    if any(w.pattern.search(spec.name) for w in prose_lint.WORKSPACE_VOCABULARY):
+    if word_pattern(WORKSPACE_WORD).search(spec.name):
         raise RepoInitError(
-            f"'{spec.name}' would write a CLAUDE.md that prose-lint rejects — "
+            f"'{spec.name}' would write a CLAUDE.md that the prose checks reject — "
             f"the person is the 'user'; choose another name"
         )
     if spec.python and not spec.package.isidentifier():

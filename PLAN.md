@@ -88,7 +88,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 4, family `prose`, retires `prose-lint`. Report:
+- [x] Step 4, family `prose`, retires `prose-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/prose.md`.
       Verify: `uv run playbook checks --family prose` lists exactly the
       deterministic trailers under `standards/prose/`; `git ls-files

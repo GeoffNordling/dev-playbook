@@ -25,6 +25,10 @@ TYPE_REGISTRY = Section(
     "type-names-a-registered-type",
 )
 
+# The rule that names the workspace's banned word; a test asserts the word
+# there is the one the prose checks hold.
+BANNED_WORD = Section("standards/prose/conventions.md", "no-banned-word")
+
 # The directory of canonical files a repo copies as they are.
 CANONICAL_DIR = "standards/build/canonical"
 

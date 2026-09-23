@@ -49,7 +49,7 @@ from dev_playbook.findings import print_rules, render  # noqa: E402
 # rogue future-work filenames answer the tracking card, and the dogfood mirror
 # answers the distribution card. CLAUDE.md is
 # structure here — its presence, nothing about its content: the voice rule is
-# prose-lint's and the global file's shape is harness-files-lint's.
+# the prose checks' and the global file's shape is harness-files-lint's.
 # Each id is a module-level constant so every emission site references the
 # constant, never a raw literal, and RULES (what --list-rules prints) cannot
 # drift from what the detector actually emits.

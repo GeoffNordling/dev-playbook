@@ -11,7 +11,7 @@ pre-commit stages, and self-checks the result with playbook-lint — the same
 hook it just installed. The remaining
 GitHub-side steps are the bootstrap procedure
 (standards/build/bootstrap.md). pyyaml is declared below because the module
-imports dev_playbook.prose_lint, which parses frontmatter.
+imports dev_playbook.checks.prose, whose repo model parses frontmatter.
 """
 # /// script
 # requires-python = ">=3.14"

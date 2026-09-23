@@ -63,12 +63,11 @@ through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
 | `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
 | `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
 | `harness-files-lint` | [runbook-conventions.md](/standards/doc-type/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
-| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, the repo's own `.prose-lint-vocabulary` words over the directories each names, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
 | `standards-lint` | [tree.md](/standards/standard/tree.md), [detectors.md](/standards/standard/detectors.md) | The Standards Tree's rules over `standards/` — directory layout, the population, the catalog, hook-surface agreement, and no shadowing of an upstream directory (consumer mode); clean by construction where no `standards/` tree is present |
 | `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
 
-`repo-lint`, `ref-lint`, `okf-lint`,
-and `prose-lint` assert unconditionally and fail loud; they do
+`repo-lint`, `ref-lint`,
+and `okf-lint` assert unconditionally and fail loud; they do
 not skip themselves when a target kind is absent. `harness-files-lint`,
 `standards-lint`, and `loop-lint` are optional-surface: each exits 0 silently when
 its audited surface is absent — no runbooks, no `standards/` tree, no `loops/`
@@ -81,11 +80,11 @@ full.
 The scripts share their markdown and Python primitives through the library —
 the installed `dev_playbook` package:
 
-- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, the OKF concept-doc/harness-owned path classification, and the agent-instruction test behind the voice rule. Consumed by `ref-lint`, `okf-lint`, and `prose-lint`.
+- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, the OKF concept-doc/harness-owned path classification, and the agent-instruction test behind the voice rule. Consumed by `ref-lint`, `okf-lint`, and the prose checks.
 - `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `repo-lint`.
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
-- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `prose-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
+- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by the prose checks, which enforce it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.checks.prose`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook-lint` self-check). Consumed by `repo-init`.
 
 The one larger surface is a subpackage: `dev_playbook.transcript_export`,

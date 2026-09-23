@@ -6,11 +6,11 @@ abbreviation), "me", and "my". Only "I" carries an exemption -- nothing in the
 workspace's vocabulary spells "me" or "my" as anything but the first person, so
 neither gets a speculative guard. Each pattern carries its own message. (The
 other voice rule -- one word for the person, the ``user`` -- is repo-wide
-rather than agent-facing-specific, and lives in ``dev_playbook.prose_lint``;
+rather than agent-facing-specific, and lives in ``dev_playbook.checks.prose``;
 conventions.md -- Terminology: the person is the user.)
 
 Two actors read this vocabulary, so it lives here rather than in either of
-them: ``dev_playbook.prose_lint`` enforces it over every harness-loaded agent
+them: ``dev_playbook.checks.prose`` enforces it over every harness-loaded agent
 instruction file (``md.is_agent_instruction`` decides which), and
 ``dev_playbook.repo_init`` refuses a repo name that carries one of these words,
 since the name becomes the H1 of the CLAUDE.md a fresh scaffold writes. Masking

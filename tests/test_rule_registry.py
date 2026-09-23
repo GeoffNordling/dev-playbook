@@ -42,7 +42,6 @@ CARRIERS = [
     (SCRIPTS / "harness-files-lint", "Finding", 1),
     (SRC / "dev_playbook" / "workspace_lint.py", "Line", 1),
     (SRC / "dev_playbook" / "standards_lint.py", "Finding", 2),
-    (SRC / "dev_playbook" / "prose_lint.py", "Finding", 2),
 ]
 
 # (source file, name of the rule-id tuple that --list-rules prints).
@@ -52,7 +51,6 @@ REGISTRIES = [
     (SCRIPTS / "harness-files-lint", "RULES"),
     (SRC / "dev_playbook" / "workspace_lint.py", "RULES"),
     (SRC / "dev_playbook" / "standards_lint.py", "RULES"),
-    (SRC / "dev_playbook" / "prose_lint.py", "RULES"),
 ]
 
 

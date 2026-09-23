@@ -43,7 +43,6 @@ DETECTORS = (
     "ref-lint",
     "okf-lint",
     "harness-files-lint",
-    "prose-lint",
     "standards-lint",
     "loop-lint",
 )
