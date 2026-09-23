@@ -16,7 +16,7 @@ them whenever you learn something a future iteration would otherwise rediscover.
 - `make check`, `scripts/playbook-lint .`, and `uv run playbook check .` are
   clean on the repo as it stands.
 - `working-docs/doc-type-system/detector-rewrite/rewrite/` holds one report per
-  task, each listed in its `index.md` and linked from the plan's Progress.
+  task, each listed in its `index.md`.
 
 ## When the sources do not settle it
 

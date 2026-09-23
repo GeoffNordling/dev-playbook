@@ -170,10 +170,8 @@ Write `<report path>`, one file, in the shape of the triage reports:
 
 Then add one row for the file to
 `working-docs/doc-type-system/detector-rewrite/rewrite/index.md`, in
-alphabetical order, and one entry to the Progress list of
-[Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md),
-`**Step <n>, <family>, <date>.**`, that links the report and states
-in two or three sentences what landed.
+alphabetical order. The loop's own files, `PLAN.md` and
+`PROGRESS.md`, are the only other record of the step.
 
 ## The answer to the loop
 
@@ -190,7 +188,7 @@ sources win over a better idea.
   `src/dev_playbook/sources.py` and its test, the new test file,
   `standards/<family>/`, the retired files and the sentences that
   named them, links `ref-lint` reports, the report, its index row,
-  the plan's Progress, `PLAN.md`, and `PROGRESS.md`. Nothing else
+  `PLAN.md`, and `PROGRESS.md`. Nothing else
   under `working-docs/`; never the triage report; never the ROOT;
   never a checkpoint marker.
 - Never edit a rule's heading, `model.py`, or `check_registry.py`.

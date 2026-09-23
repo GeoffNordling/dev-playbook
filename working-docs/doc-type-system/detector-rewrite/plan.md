@@ -145,11 +145,12 @@ At each checkpoint, three things in order, the third a stop:
    marker off, and commits the two loop files.
 2. **The session relays.** The fork's report, the report file, and
    the range to diff, in a few lines.
-3. **The user reads and releases.** The user reads
-   `rewrite/<family>.md` and the segment's diff, and says go, or names
-   the fix. The next launch waits for that word; nothing else starts
-   it. A rejected segment is reverted or fixed by hand before the
-   next launch.
+3. **The session ranks and releases.** The session sorts the
+   segment's deviations, judgment calls and Guardrail misses alike,
+   by how much they matter, shows the user the top two, and launches
+   the next segment. A deviation the session cannot rule on itself
+   stops the run for the user's word, and a rejected segment is
+   reverted or fixed by hand before the next launch.
 
 ### Guardrails
 
@@ -169,8 +170,8 @@ commits as the range:
 - **The retirement happened.** Each script the step retires is gone
   from `git ls-files`, and its name appears nowhere outside
   `working-docs/`.
-- **The worklist moved.** `rewrite/<family>.md` exists, its index row
-  is in, and Progress below has the step's entry.
+- **The worklist moved.** `rewrite/<family>.md` exists and its index
+  row is in.
 - **No drift.** The judgment calls in `PROGRESS.md` are each a gap the
   report left, not a departure from it; a call that overrode the
   report is a fix task.
@@ -226,13 +227,6 @@ only `loop-lint`:
   on the way: the registry maps a family to its module with hyphens
   as underscores, since `doc-type` and `knowledge-organization`
   cannot name a module.
-- **Step 1, python, 2026-09-23.**
-  [Python](/working-docs/doc-type-system/detector-rewrite/rewrite/python.md):
-  `checks/python.py` decides `empty-init` and `no-future-annotations`
-  over the model, and registers the docstring and formatting rules to
-  the `ruff-check` and `ruff-format` hooks. `standards/python/style.md`
-  takes the docstring rule's restated body and loses the future-import
-  exception. `python-lint` is retired with its test and roster line.
 
 ## Finish line
 
