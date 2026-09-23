@@ -223,4 +223,55 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       reports zero findings; `make check` green; `scripts/playbook-lint .`
       clean.
 
+<!-- [x] checkpoint -->
+
+- [ ] Step 12d, fix: three things the checkpoint after Step 12c found in
+      `standards/knowledge-organization/cross-references.md` beside
+      `src/dev_playbook/checks/knowledge_organization.py`. The ruling as
+      before: the sentence of a rule and the code of its check say the
+      same thing; a sentence is reduced to its check. Headings never
+      change. One commit. Read first the sections Writing a check,
+      Writing a test, Editing a Standard, and Conduct of
+      `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`.
+      Three items.
+      1. Rule `ATX headings only`, check `atx_headings_only`. The check
+         reads `repo.markdown.values()`, every markdown file, a numbered
+         Decision Record (`docs/decisions/NNNN-slug.md`) included; the
+         Standard's `population` exempts a record, and a record is frozen,
+         so a finding in one demands an edit the repo forbids. The loop
+         reads `_sources(repo)` instead, as every other check of this
+         Standard does, and the docstring says so in one line. Test: add
+         to `test_atx_headings_only` that
+         `{"docs/decisions/0001-x.md": "# A\n\nText\n---\n"}` yields no
+         finding. The sentence: the check flags a `---` under any
+         non-blank content line, `Text\n---\n---\n` at both underlines,
+         so "sits directly under a line of text" becomes "sits directly
+         under a line that is not blank".
+      2. Rule `Root-absolute path in the same repo`. `[x](../../nope.md)`
+         in `d/a.md` climbs above the checkout root and gets no finding
+         from this check (`_resolve` returns kind `outside`, not `repo`);
+         `workspace-path-for-another-repo` reports it. The body's "A
+         relative target other than a same-file `#anchor`," becomes "A
+         relative target other than a same-file `#anchor` or one that
+         climbs above the checkout root,".
+      3. Rule `Workspace path for a stable location`, check
+         `workspace_path_for_a_stable_location`. A `~/.claude/` target
+         resolves into the repo, starts neither `/` nor a relative path,
+         so the check passes every one and never tests "for a file the
+         harness loads from there". The body's "or `~/.claude/` for a
+         file the harness loads from there" becomes "or `~/.claude/`",
+         the cut Step 12c made to `Workspace path for another repo`.
+      Then in
+      `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`
+      the Restated list: the `root-absolute-path-in-the-same-repo` line
+      gains the climb clause, a `workspace-path-for-a-stable-location`
+      line is added, and the `atx-headings-only` Built line notes the
+      record exemption.
+      Verify: `grep -c "loads from there"
+      standards/knowledge-organization/cross-references.md` prints 0;
+      `grep -c "repo.markdown.values" src/dev_playbook/checks/knowledge_organization.py`
+      prints 0 (it prints 1 before the task); the test of item 1 passes;
+      `uv run playbook check .` reports zero findings; `make check` green;
+      `scripts/playbook-lint .` clean.
+
 <!-- [ ] checkpoint -->
