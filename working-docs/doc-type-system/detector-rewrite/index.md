@@ -6,7 +6,8 @@ it starts from. Start at the root.
 
 Ordering: the root, then reading order.
 
-- [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md) — The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the six design rulings, the one open question, and the worklist
+- [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md) — The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the seven design rulings, and the worklist
+- [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md) — The implementation plan of the detector rewrite — four phases, the family order and which old script each family retires, how each phase is delegated and checked, and the finish line
 - [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md) — The method of the detector rewrite's triage — the verdicts, how a row is escalated, the user's rulings that calibrate every family, and the one report per family
 - [triage/](/working-docs/doc-type-system/detector-rewrite/triage/index.md) — One triage report per family: every deterministic rule of the family kept, rewritten, or deleted, with its escalations
 - [prompts/](/working-docs/doc-type-system/detector-rewrite/prompts/index.md) — The launch prompts the rewrite hands to its agents, one file per agent role

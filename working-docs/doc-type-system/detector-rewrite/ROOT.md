@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Detector Rewrite
-description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the six design rulings, the one open question, and the worklist
+description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the current state it starts from, the seven design rulings, and the worklist
 ---
 
 # Detector Rewrite
@@ -174,19 +174,26 @@ is one the repo complies with.
   with the hook's name in place of a function: `playbook rules`
   lists it with that hook, and the meta-test asks no test of it.
   Every id in a Standard is in the registry, one way or the other.
+- **The markdown parser, 2026-09-23.** The hand-rolled scanner in
+  `md.py` stays, with one fix: a link whose text wraps across a line
+  break is found, which today hides five targets from `ref-lint`. A
+  spike by one Opus agent parsed all 254 tracked markdown files with
+  `markdown-it-py` and got the same headings, trailers, frontmatter,
+  and fenced lines, at 0.27 s against 0.03 s, two dependencies, and a
+  private-attribute hook for link line numbers. Not an easy win. The
+  parser sits behind one function, so the swap stays cheap.
 
 ## Open
 
-- **The markdown parser.** `md.py` is a hand-rolled line scanner. A
-  CommonMark library such as `markdown-it-py` gives a tested parse
-  with line numbers. Decide on the rewrite, with the dependency cost.
+None.
 
 ## Planned
 
 - **The rewrite.** The package, module by module, against the exit
-  list; the console script; the markdown parser decided; the two
-  tables, their scripts, and the detector files under `scripts/`
-  deleted.
+  list; the console script; the two tables, their scripts, and the
+  detector files under `scripts/` deleted. Built per
+  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md):
+  scaffold, dead weight, one family at a time, cut over.
 - **The tests.** One test per rule id in `tests/dev_playbook/`, a
   meta-test that every registered id has one and names a heading
   under `standards/`, the 212 subprocess tests retired once the
@@ -221,10 +228,14 @@ is one the repo complies with.
   the agents' 27 escalations ruled by general rulings recorded there.
   The twelve reports are the specification the package is written
   to.
+- **The plan, 2026-09-23.** The parser ruled and
+  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
+  written: four phases, the family order, the old script each family
+  retires, and the checkpoint guardrails.
 - **The design, 2026-09-22.** Six rulings in one session, recorded
   under Decided: hook mechanism, repo model, mirrored grouping,
   registry, the two tables, data read out of a Standard. The
-  markdown parser is the one item left open, for the rewrite.
+  markdown parser was left open, and ruled the day after.
 
 ## Acronyms
 
