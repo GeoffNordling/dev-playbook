@@ -211,6 +211,15 @@ None.
   then add `extend-include = ["scripts/*"]` to the canonical
   `pyproject.toml` and the `executable` type to the two ruff hooks
   in the canonical `.pre-commit-config.yaml`.
+- **Signal to noise in `ralph-setup`, before the merge to main.** The
+  reading-chain audit done by hand for this loop, where dropping
+  `ROOT.md` and the triage method and trimming each report's
+  Escalations halved what one iteration reads, becomes a step of the
+  `ralph-setup` skill. After the plan is designed, the agent walks
+  everything the plan tells an iteration to read, weighs each file
+  as signal for that task or noise around it, and where the noise is
+  a significant share, partners with the user to redesign the plan
+  and refactor the documents until the iteration reads mostly signal.
 
 ## Completed
 

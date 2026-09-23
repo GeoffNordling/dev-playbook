@@ -9,9 +9,7 @@ population: "a governed repo's Python test suite: the test_*.py files anywhere i
 
 A governed repo's Python test suite is one object: every `test_*.py` file
 anywhere in the tree, together with the `conftest.py` files and the fake
-modules under `tests/`. A rule about where a fixture or a fake lives binds
-the suite as surely as a rule about a test body does. That `tests/` exists
-at all is
+modules under `tests/`. That `tests/` exists at all is
 [File Skeleton](/standards/build/skeleton.md#tests-present)'s rule; what
 goes where inside it is this Standard's.
 

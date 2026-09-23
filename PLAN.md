@@ -95,8 +95,6 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       scripts/prose-lint` prints nothing; the report exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-<!-- [ ] checkpoint -->
-
 - [ ] Step 5, family `tracking`, retires nothing; `workspace-lint` is
       untouched. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/tracking.md`.
@@ -115,8 +113,6 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-<!-- [ ] checkpoint -->
-
 - [ ] Step 7, family `build`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/build.md`.
       Verify: `uv run playbook checks --family build` lists exactly the
@@ -124,16 +120,12 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
 
-<!-- [ ] checkpoint -->
-
 - [ ] Step 8, family `harness`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/harness.md`.
       Verify: `uv run playbook checks --family harness` lists exactly the
       deterministic trailers under `standards/harness/`; the report exists; the
       Guardrails of `working-docs/doc-type-system/detector-rewrite/plan.md`
       hold.
-
-<!-- [ ] checkpoint -->
 
 - [ ] Step 9, family `standard`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/standard.md`.
@@ -152,8 +144,6 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       scripts/harness-files-lint scripts/standards-lint` prints nothing; the
       report exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
-
-<!-- [ ] checkpoint -->
 
 - [ ] Step 11, family `knowledge-organization`, retires `okf-lint`,
       `ref-lint`, and `repo-lint`. Report:

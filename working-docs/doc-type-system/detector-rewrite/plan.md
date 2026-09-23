@@ -123,10 +123,12 @@ their gate.
 ### Delegation
 
 A Ralph loop ([Ralph loop](/harness-recipes/recipes/ralph-loop.md)),
-one segment per step. `PLAN.md` at the checkout root holds the twelve
-tasks with a checkpoint marker after each one; `PROGRESS.md` is the
-log. Each launch runs one Opus iteration, whose task line points it
-at
+one segment per one to four steps. `PLAN.md` at the checkout root
+holds the twelve tasks with checkpoint markers after steps 1, 2, 3,
+5, 9, 11, and 12, the first three from when every step had one;
+`PROGRESS.md` is the log. Each launch runs up to four Opus
+iterations, one per step, and stops at the next marker. Each
+iteration's task line points it at
 [Rewrite Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md):
 the family's triage report is the specification, the scaffold is read
 before any code is written, the report goes to
@@ -134,7 +136,7 @@ before any code is written, the report goes to
 commit, as the loop requires. The launch, the same for every step:
 
 ```
-Workflow({ name: "ralph-loop", args: { model: "opus", maxIters: 1, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
+Workflow({ name: "ralph-loop", args: { model: "opus", maxIters: 4, planFile: "PLAN.md", progressFile: "PROGRESS.md", checkCmd: "make check" } })
 ```
 
 At each checkpoint, three things in order, the third a stop:
