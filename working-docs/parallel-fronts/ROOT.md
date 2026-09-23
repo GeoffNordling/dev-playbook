@@ -124,10 +124,8 @@ guiding.
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
   part 4 ran on, or all of this branch's work (the hardened `front-clone`,
-  its trap test, and this working set) with them, whether anything of
-  the `sandbox-probe` branch comes along, and where the pipeline's code
-  in [`rig/`](/working-docs/parallel-fronts/rig/index.md) finally lives.
-  Then step back further: so far
+  its trap test, and this working set) with them, and whether anything of
+  the `sandbox-probe` branch comes along. Then step back further: so far
   the work proved Sandcastle's sandbox can be made safe, but sandboxing is
   not the library's point. It coordinates agents across branches and
   worktrees. Define the question first, what value parallel fronts should
@@ -144,6 +142,10 @@ guiding.
   Ralph loop.
 - **Discuss: overlap with active branches.** Does the landing PR touch any
   file that another active, unmerged branch is also changing?
+- **Discuss: where the pipeline lives on main.** Where its document and
+  the code in [`rig/`](/working-docs/parallel-fronts/rig/index.md) go once
+  the work lands. Waits until the large refactor now running on `main`
+  finishes, since that refactor may move the places they would go.
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
   ([Part 4](/working-docs/parallel-fronts/experiment-log.md#part-4-real-claude)):
