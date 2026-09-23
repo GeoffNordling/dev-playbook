@@ -165,20 +165,28 @@ None.
 
 ## Planned
 
-- **A skill that turns repeated fixes into predicates.** Invoked in
-  any session, it reads the session's history and finds the fixes that
-  repeat: the user sees stale state, asks, and the agent brings that
-  state back into line by hand. Each such fix is a sign of a missing
-  predicate. For each one, the skill proposes a rule in a Standard,
-  existing or new, that states the more abstract property, so that a
-  check stops the problem at a gate, or at least an agent can bring the
-  state back into line with the rule with no user in the loop. Example
-  from this strand: "detector" was swept out of 68 files by hand; the
-  rule "no authored document uses a word `CONTEXT.md` lists under
-  _Avoid_" would have caught every one at commit. Fixes with the user
-  in the loop, all day, do not scale; predicates do.
+None.
 
 ## Completed
+
+- **A skill that turns step lists into predicates, 2026-09-23.**
+  Work driven by a list of actions, the user watching each one, does
+  not scale; a target state that a verifier decides does. Example from
+  this strand: "detector" was swept out of 68 files by hand; the rule
+  "no authored document uses a word `CONTEXT.md` lists under _Avoid_"
+  would have caught every one at commit.
+  [escape-the-slop-trench](/dotfiles/dot-claude/skills/escape-the-slop-trench/SKILL.md)
+  reads the session as work done and picks the one stretch that ran as
+  a list of steps where a target state would help most. It states that
+  target as falsifiable rules, each marked for a check or a judge,
+  before it reads any standards index, so the existing standards do not
+  narrow what it finds. It then places each rule, in dev-playbook or in
+  the consumer's own standards, explains why no existing standard fits
+  where it proposes a new one, and ends the turn. On the user's ruling
+  it reads each home standard in full to confirm it, tests each rule
+  against [Writing Predicates](/guides/writing-predicates.md), and
+  writes it. Each phase is a separate file read only when reached, so
+  the agent works on one phase at a time.
 
 - **The checkpoint splits finding from deciding, 2026-09-23.** At Step
   12a the checkpoint fork ticked every task done while a fresh Opus
