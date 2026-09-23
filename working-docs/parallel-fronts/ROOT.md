@@ -124,21 +124,12 @@ guiding.
   in progress on `main`, and this set waits for it to finish. Then check
   what it changed, and whether the landing PR touches any file that
   another active, unmerged branch is also changing.
-- **Discuss: what this gives the user, and how they run it.** When this branch lands
-  on main, what does the user gain, and does it change any way work is done
-  on main today? Rule what the landing PR carries: only the two changes
-  part 4 ran on, or all of this branch's work (the hardened `front-clone`,
-  its trap test, and this working set) with them, and whether anything of
-  the `sandbox-probe` branch comes along. Then step back further: so far
-  the work proved Sandcastle's sandbox can be made safe, but sandboxing is
-  not the library's point. It coordinates agents across branches and
-  worktrees. Define the question first, what value parallel fronts should
-  deliver and how the user wants to run them, before choosing any tool to
-  run them with. [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
-  records what one candidate offers. The answer also settles what the
-  pipeline does not yet do
+- **Design the invocation and the control code.** How the user starts a
+  run, and the program around `run()` that decides what runs and when.
+  This settles what the pipeline does not yet do
   ([The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md#what-it-does-not-yet-do)):
-  what schedules a lap, and where real copies live.
+  what schedules a lap, and where real copies live. Waits on the overlap
+  discussion above.
 - **Discuss: the checkpoint and the integrator.** What happens at the end
   of a lap: who merges the fronts' branches (the user, an agent, or both),
   and who revises a front's plan when the fronts disagree. Also settle the
@@ -146,7 +137,10 @@ guiding.
   Ralph loop.
 - **Discuss: where the pipeline lives on main.** Where its document and
   the code in [`rig/`](/working-docs/parallel-fronts/rig/index.md) go once
-  the work lands. Waits until the large refactor now running on `main`
+  the work lands, and what the landing PR carries: only the two changes
+  part 4 ran on, or all of this branch's work (the hardened `front-clone`,
+  its trap test, and this working set) with them, and whether anything of
+  the `sandbox-probe` branch comes along. Waits until the large refactor now running on `main`
   finishes, since that refactor may move the places they would go.
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
@@ -217,6 +211,12 @@ guiding.
   at once and closed at once, and every check passed. Nothing changes
   between two fronts and five
   ([Fronts in parallel](/working-docs/parallel-fronts/pipeline.md#fronts-in-parallel)).
+- **Discuss: what this gives the user.** The ability to call Sandcastle's
+  `run()` and carry out any prompt inside a sealed container, holding the
+  assigned repository and a read-only copy of published dev-playbook.
+  Sandcastle offers more; the set uses only `run()`, with instructions
+  passed as `prompt`, until more proves its need
+  ([The run() call](/working-docs/parallel-fronts/pipeline.md#the-run-call)).
 
 ## Acronyms
 
