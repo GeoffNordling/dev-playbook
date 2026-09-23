@@ -29,19 +29,6 @@ description: Uncommitted future work — described, not yet promoted to issues
 
 ## Doc-type system
 
-- **The registry pass's remaining rows** — the rulings table in
-  [Doc-Type System](/doc-types/doc-type-system.md) reads *pending* on every
-  kind but Standard, Runbook, Guide, and Vocabulary; each is
-  ruled, and a thin doc-type built where the ruling says so. Log and Survey
-  are the user's: at the last count Log had 35 files (story-forge 31, of
-  which 27 are tooled Assessment Records; mission-control 3;
-  sysadmin-playbook 1) and Survey had 5 (idea-tree 2, sounds 1, media-tools
-  1, one stray worktree).
-- **The doc-type build loop over Guides** — Guide has no doc-type. Run the loop there, new doc-types as peers of Standard and Runbook, possibly more than
-  one level; with Standard and Runbook as exemplars, Fable proposes the
-  abstractions, the user accepts, rejects, and steers, and the instruction
-  states the constraints outright, above all that every CLOA object is 100%
-  deterministic.
 - **General-Sheet's replacement** — the deliberately-broad placeholder type
   is replaced, and the type working-set files carry is settled with it.
 - **The doc-type family's own type** — the files under `doc-types/` carry
@@ -96,10 +83,6 @@ description: Uncommitted future work — described, not yet promoted to issues
   not accrete unexamined.
 - **CLOA change discipline** — the same discipline for every term used in a
   CLOA communication.
-- **The document-writing flywheel** — each major document the AI writes
-  takes several corrective passes before it reads well; every pass is a
-  chance to codify rules, procedures, and algorithms for writing the next
-  one correctly, and no flywheel exists today.
 - **OKF traces** — "OKF trace" has no definition; decide whether a
   trace is the chain or something more.
 

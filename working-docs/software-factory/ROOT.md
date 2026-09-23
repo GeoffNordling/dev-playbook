@@ -13,7 +13,7 @@ here on 2026-09-20 by the doc-type system refactor
 that no step of that work trips over it. The factory is out of that
 work's scope, and its future, a rewrite or deletion, is a later
 session's decision. Until then nothing in the repo links to, imports,
-runs, tests, stows, or lints as a harness file any member of this set.
+runs, tests, stows, or checks as a harness file any member of this set.
 Each member is as it was on the day of the move, except that links
 among the members follow the move.
 

@@ -75,9 +75,7 @@ From memory, not a fresh search.
 ## Planned
 
 - **Retire `loop_lint` and move its five checks into the check
-  package.** The check rewrite
-  ([Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md))
-  moved every other check into the package, by the user's ruling
+  package.** The check rewrite moved every other check into the package, by the user's ruling
   that the loop family waits for this workstream, and deleted the
   script `scripts/loop-lint`. What it left: the module
   `src/dev_playbook/loop_lint.py`, its tests, and the legacy step by

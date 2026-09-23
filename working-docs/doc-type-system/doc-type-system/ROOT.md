@@ -53,7 +53,7 @@ specification.
   the step 11 sort found behaviour, instruction, outside facts, and
   scoping definitions each mis-filed as a rule. Whether a check exists
   yet is a separate question; an unchecked predicate of either kind is
-  allowed until the check rewrite lands.
+  allowed.
 - **A scoping heading is not a rule.** An H2 with no trailer is a
   condition, per
   [A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
@@ -110,9 +110,7 @@ specification.
 
 ## Planned
 
-None. What the step 11 review left unchecked is the input of the
-[Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md)
-strand.
+None.
 
 ## Completed
 
@@ -126,8 +124,7 @@ strand.
   would not sit in the sentence, and both yaml tables regenerated.
   `okf-lint` found the type registry by that heading's slug and went
   blind on the rename; the slug is a named constant now, and the
-  [Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md)
-  strand carries the coupling. Dropped: trimming the body openings the
+  check rewrite carried the coupling. Dropped: trimming the body openings the
   new headings absorb, since the overlap is no finding. Commits
   b76047e, ae587cd, dedc625, 4439ea5, 0d22ed4, and this one.
 

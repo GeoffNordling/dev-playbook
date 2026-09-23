@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Synthesis Working Root
-description: The root of the unified working set — six strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
+description: The root of the unified working set — five strands and their plan dependencies, the terms every strand uses, the open cross-strand questions, and the run order
 ---
 
 # Synthesis Working Root
@@ -10,7 +10,7 @@ This set is speculative: every member writes a guess as a guess, and
 every member inherits that voice. It unifies the working sets of two
 branches, `worktree-loop-document-type` and
 `worktree-cloa-viewer-tool-2`, which describe one theory. The set is
-six strands, each with its own root and its own worklist
+five strands, each with its own root and its own worklist
 ([One list of items, state by section](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-list-of-items-state-by-section)).
 This root holds only what crosses strands.
 
@@ -27,26 +27,20 @@ This root holds only what crosses strands.
 - **Viewer**, a selection on screen: cloa-viewer, the local visual IDE
   that draws registered views of the fact base. Root:
   [CLOA Viewer](/working-docs/doc-type-system/viewer/ROOT.md).
-- **Check rewrite**, the checking system: one pass over the Python
-  checks, the two tables, and the hook, against the rules the
-  doc-type system settled. Root:
-  [Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md).
 - **Story-forge simulation**, the trial: the doc-type system and the
   fact base tried by hand on one consumer repo before any extractor is
   coded. Root:
   [Story-Forge Simulation](/working-docs/doc-type-system/story-forge-simulation/ROOT.md).
 
-## The six strands
+## The five strands
 
 A dependency is what one strand's plan needs from another's, never a
-runtime data flow. There are six: the doc-type system defines Loop,
+runtime data flow. There are five: the doc-type system defines Loop,
 one of its four doc-types; each encoding the doc-type system writes
 defines an extractor of the fact base; every view the viewer draws is
-a selection of the fact base; the check rewrite binds to the rules
-the doc-type system's step 11 settled; the story-forge simulation
+a selection of the fact base; the story-forge simulation
 takes its language from the doc-type system and its method from the
-fact base. Loop, the check rewrite, and the simulation are
-leaves.
+fact base. Loop and the simulation are leaves.
 
 ```
                             ROOT.md#terms
@@ -81,18 +75,18 @@ leaves.
   │        and right           │   │   gate config as declared    │
   └────────────────────────────┘   │   data · findings as a       │
                                    │   stamped artifact · the     │
-  ┌────────────────────────────┐   │   simulation as a loop       │
-  │  CHECK REWRITE · the       │   └──────────────┬───────────────┘
-  │  checking system           │                  │  a selection
-  │  root ······· ROOT.md      │   ┌──────────────▼───────────────┐
-  │  binds to the rules the    │   │  VIEWER                      │
-  │  doc-type system settled   │   │  root ······· ROOT.md        │
-  │  built: playbook check ·   │   │  on disk ···· contract.md    │
-  │    /escape-the-slop-trench │   │                              │
-  │  plan: none                │   │  kinds ······ registry.md    │
-  │                            │   │  panels ····· design.md ·    │
-  │                            │   │               viewer.md      │
-  └────────────────────────────┘   │  program ···· server.md      │
+                                   │   simulation as a loop       │
+                                   └──────────────┬───────────────┘
+                                                  │  a selection
+                                   ┌──────────────▼───────────────┐
+                                   │  VIEWER                      │
+                                   │  root ······· ROOT.md        │
+                                   │  on disk ···· contract.md    │
+                                   │                              │
+                                   │  kinds ······ registry.md    │
+                                   │  panels ····· design.md ·    │
+                                   │               viewer.md      │
+                                   │  program ···· server.md      │
                                    │  built ······ stack.md       │
                                    │  plan: runbook design ·      │
                                    │   CLOA kinds · pinning ·     │
@@ -230,7 +224,7 @@ rules decide it with an error rate.
 - **Whether every condition is a Rule.** A runbook edge's and a loop
   step's condition are strings; a Standard rule's condition is a
   reference to another rule. Option: every condition is a Rule with a
-  kind, so all three unify and the fact base gets one guarded-by edge.
+  kind, so all three unify and the fact base gets one condition edge.
   Cost: runbook prose conditions would need ids. Crosses the doc-type
   system and the fact base.
 - **Whether one solver or two.** Mypy over the pseudocode, an engine
@@ -242,9 +236,9 @@ rules decide it with an error rate.
 ## Order
 
 The dependencies give the order. The doc-type system's refactor runs
-first, because Loop's predicates, the fact base's extractors, and the
-check rewrite bind to what it produces. Loop, the fact base, and
-the check rewrite then run beside each other. The viewer's next kinds wait on the fact base, since each is a
+first, because Loop's predicates and the fact base's extractors bind
+to what it produces. Loop and the fact base then run beside each
+other. The viewer's next kinds wait on the fact base, since each is a
 selection from it.
 
 ## Acronyms
