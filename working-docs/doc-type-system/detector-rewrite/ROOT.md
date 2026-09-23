@@ -233,7 +233,13 @@ None.
   states there is none, before ticking the marker. The Sentence equals
   code Guardrail added to
   [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
-  is this strand's copy of that pass.
+  is this strand's copy of that pass. The case is one a repo writes
+  today or a Standard names, never one constructed to break the code:
+  at the Step 12c checkpoint the Opus audit returned eight findings,
+  frontmatter with no final newline and a two-character `==` underline
+  among them, and the user ruled every one a hypothetical and the audit
+  a bug hunt. An agent asked for bugs finds bugs; the pass asks for
+  use cases that break, or will soon.
 
 ## Completed
 

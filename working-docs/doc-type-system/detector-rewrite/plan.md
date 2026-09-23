@@ -181,10 +181,14 @@ commits as the range:
 - **Sentence equals code.** For each check function the range adds or
   edits, the fork reads the rule's sentence and the function side by
   side and names one input the two would judge differently, or states
-  there is none. A difference is a fix task that reduces the sentence
-  to what the code tests, never one that grows the code. Added after
-  Step 12a, where a read-only Opus audit found four such differences
-  the checkpoint fork had passed.
+  there is none. The input is one this repo or a consumer repo writes
+  today, a file in the tree or a shape a Standard names, never one
+  constructed to break the code: a file with no final newline or a
+  two-character underline is not a finding. A difference is a fix task
+  that reduces the sentence to what the code tests, never one that
+  grows the code. Added after Step 12a, where a read-only Opus audit
+  found four such differences the checkpoint fork had passed; bounded
+  after Step 12c, where the same audit returned eight hypotheticals.
 
 ## Phase 4: cut over
 
