@@ -58,6 +58,10 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
   opening paragraph, its `description`, the directory `index.md` intro and
   row, and the directory's row in `standards/index.md` all say what the file
   now holds. The `population` line still changes only where the report says.
+- A retired detector's package module goes even where a surviving module
+  imports it for one helper: the helper moves to the check module and the
+  import is repointed, as Step 4 did for `repo_init.py` and `prose_lint.py`.
+  The retired name then appears nowhere outside `working-docs/`.
 
 ## Tasks
 
@@ -104,7 +108,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       report exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
 
 - [ ] Step 6, family `distribution`, retires nothing. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/distribution.md`.
