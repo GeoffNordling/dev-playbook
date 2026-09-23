@@ -103,7 +103,7 @@ The words of the set, one meaning each.
   describes it.
 
 Checkpoint and integrator are working names. What each is, and who fills
-it, waits for the discussion of them in Planned.
+it, waits for the control-code design in Planned.
 
 The word *orchestrator* covers the driver and the integrator both, which is
 why the set uses the two narrower names instead. The distinction is the one
@@ -125,16 +125,15 @@ guiding.
   what it changed, and whether the landing PR touches any file that
   another active, unmerged branch is also changing.
 - **Design the invocation and the control code.** How the user starts a
-  run, and the program around `run()` that decides what runs and when.
-  This settles what the pipeline does not yet do
+  lap, the program around `run()` that decides what runs and when, and
+  what happens at the lap's end: who merges the fronts' branches (the
+  user, an agent, or both), and who revises a front's plan when the fronts
+  disagree. This settles what the pipeline does not yet do
   ([The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md#what-it-does-not-yet-do)):
-  what schedules a lap, and where real copies live. Waits on the overlap
+  what schedules a lap, and where real copies live. It also settles the
+  names checkpoint and integrator; "checkpoint" is already used in the
+  repo's shared glossary for the Ralph loop. Waits on the overlap
   discussion above.
-- **Discuss: the checkpoint and the integrator.** What happens at the end
-  of a lap: who merges the fronts' branches (the user, an agent, or both),
-  and who revises a front's plan when the fronts disagree. Also settle the
-  name "checkpoint", which the repo's shared glossary already uses for the
-  Ralph loop.
 - **Discuss: where the pipeline lives on main.** Where its document and
   the code in [`rig/`](/working-docs/parallel-fronts/rig/index.md) go once
   the work lands, and what the landing PR carries: only the two changes
@@ -151,7 +150,7 @@ guiding.
   are solved in test; this is the last step to make them solved for real.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
-  The lap tests what the checkpoint discussion decided, and answers
+  The lap tests what the control-code design decided, and answers
   whether a front converges or finishes its useful work and then invents
   more. The guess: a front needs a way to declare itself done, and its
   budget is a ceiling, not a target.
