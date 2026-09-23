@@ -155,4 +155,4 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       `uv run playbook check .` reports zero findings; `make check` green;
       `scripts/playbook-lint .` clean.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
