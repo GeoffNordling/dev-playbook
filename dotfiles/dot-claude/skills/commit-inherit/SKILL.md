@@ -5,7 +5,7 @@ disable-model-invocation: true
 model: inherit
 effort: low
 arguments: [target]
-allowed-tools: Bash(git *)
+allowed-tools: Bash(git *), Read, Edit
 ---
 
 # Commit
@@ -23,6 +23,14 @@ Off `main`: commit to the branch checked out.
 On `main`, no target: stop and ask, per the global rule.
 
 Target given that doesn't match the branch checked out: fail loud, don't commit.
+
+## Worklist
+
+If the diff touches a working documentation set, a directory under
+`working-docs/`, read the `Planned` list of that set's `ROOT.md`, or
+of the strand's `ROOT.md` where the work has strands. Any item the
+diff finishes moves to `Completed` with today's date, in this commit.
+An item is finished when the state its body describes is in the tree.
 
 ## Staging
 

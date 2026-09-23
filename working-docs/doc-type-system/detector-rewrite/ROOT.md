@@ -183,16 +183,6 @@ is one the repo complies with.
 
 ## Planned
 
-- **The triage.** The 150 deterministic rules family by family with
-  the greenfield eye, each kept, rewritten, or deleted, the hard rows
-  escalated and ruled on, in
-  [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md).
-  `build` and `python` done by hand as the calibration sample; the
-  other ten families by one Opus agent each, launched with
-  [Triage Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/triage-family.md).
-  The agents' 27 escalations were ruled 2026-09-23 by general
-  rulings recorded there. The exit list is the specification the
-  package is written to.
 - **The measurement.** Time `playbook-lint` on this repo and the
   test suite, before any code moves.
 - **The rewrite.** The package, module by module, against the exit
@@ -219,6 +209,15 @@ is one the repo complies with.
 
 ## Completed
 
+- **The triage, 2026-09-23.** The 150 deterministic rules family by
+  family, each kept, rewritten, or deleted, in
+  [Triage](/working-docs/doc-type-system/detector-rewrite/triage.md):
+  `build` and `python` by hand, the other ten families by one Opus
+  agent each launched with
+  [Triage Family Prompt](/working-docs/doc-type-system/detector-rewrite/prompts/triage-family.md),
+  the agents' 27 escalations ruled by general rulings recorded there.
+  The twelve reports are the specification the package is written
+  to.
 - **The design, 2026-09-22.** Six rulings in one session, recorded
   under Decided: hook mechanism, repo model, mirrored grouping,
   registry, the two tables, data read out of a Standard. The
