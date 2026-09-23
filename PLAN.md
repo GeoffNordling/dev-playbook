@@ -395,7 +395,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       which proves the row equals the description and the anchor resolves;
       `make check` green with the new tests counted.
 
-- [ ] Step 12b, rework: the model reads every file the way a reader does and
+- [x] Step 12b, rework: the model reads every file the way a reader does and
       never crashes the run on a bad one. Four items, each with its own test
       in `tests/dev_playbook/test_model.py` or the owning check's test file.
       For this task alone `src/dev_playbook/model.py` and

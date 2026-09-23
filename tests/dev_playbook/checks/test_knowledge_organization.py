@@ -306,6 +306,17 @@ def test_frontmatter_a_yaml_mapping() -> None:
     ) == [("a.md", None)]
 
 
+def test_frontmatter_a_yaml_mapping_reports_a_list_and_other_checks_run() -> None:
+    files = {"a.md": "---\n- a\n---\n\n# A\n", "b.md": concept()}
+    assert found(frontmatter_a_yaml_mapping, files) == [("a.md", None)]
+    assert found(headings_slugify_distinctly, files) == []
+
+
+def test_type_names_a_registered_type_reports_a_list_type() -> None:
+    files = {"a.md": concept("[Guide, Standard]"), "b.md": concept("Guide")}
+    assert found(type_names_a_registered_type, files) == [("a.md", None)]
+
+
 def test_type_names_a_registered_type() -> None:
     assert found(type_names_a_registered_type, {"a.md": concept("Guide")}) == []
     files = {"a.md": concept("Bogus"), "b.md": doc("title: B\ndescription: D\n")}
@@ -554,6 +565,23 @@ def test_readme_holds_an_h1() -> None:
     assert found(readme_holds_an_h1, {"d/README.md": concept("README")}) == []
     no_h1 = doc("type: README\ntitle: R\ndescription: D\n", "## Only an H2\n")
     assert found(readme_holds_an_h1, {"d/README.md": no_h1}) == [("d/README.md", None)]
+
+
+def test_readme_holds_an_h1_reads_a_setext_h1() -> None:
+    front = "type: README\ntitle: R\ndescription: D\n"
+    setext = doc(front, "Title\n=====\n")
+    assert found(readme_holds_an_h1, {"d/README.md": setext}) == []
+    setext_h2 = doc(front, "Title\n-----\n")
+    assert found(readme_holds_an_h1, {"d/README.md": setext_h2}) == [
+        ("d/README.md", None)
+    ]
+
+
+def test_headings_slugify_distinctly_reads_setext_headings() -> None:
+    assert found(headings_slugify_distinctly, {"a.md": "# A\n\nB\n---\n"}) == []
+    assert found(headings_slugify_distinctly, {"a.md": "# A\n\nA\n===\n"}) == [
+        ("a.md", 3)
+    ]
 
 
 # --- type-registry.md ---

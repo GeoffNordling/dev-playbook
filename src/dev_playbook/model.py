@@ -14,6 +14,8 @@ numbers, rule trailers, links, and the lines outside code fences. A Python
 file is parsed into an ``ast`` tree. Everything else is bytes. A file the
 model cannot parse raises :class:`ModelError` naming it: a fence nothing
 closes or frontmatter that is not YAML is surfaced, never skipped.
+Frontmatter that is YAML but not a mapping is read as no frontmatter, so
+``frontmatter-a-yaml-mapping`` reports it and every other check runs.
 """
 
 import ast
@@ -36,8 +38,12 @@ from dev_playbook import gitrepo, md, sources
 TRAILER_PATTERN = re.compile(
     r"^`([a-z][a-z0-9-]*\.[a-z0-9][a-z0-9-]*)` · (deterministic|stochastic)$"
 )
-# An inline link whose text may wrap across one line break.
-LINK_PATTERN = re.compile(r"\[([^\]\n]*(?:\n[^\]\n]*)?)\]\(([^)\s]+)\)")
+# An inline link whose text may wrap across line breaks, but not a blank line.
+LINK_PATTERN = re.compile(r"\[([^\]\n]*(?:\n(?![ \t]*\n)[^\]\n]*)*)\]\(([^)\s]+)\)")
+# A setext underline: a run of ``=`` (level 1) or ``-`` (level 2).
+SETEXT_UNDERLINE = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
+# A line that cannot be a setext heading's text: blank-free block starts.
+NOT_PARAGRAPH = re.compile(r"^ {0,3}(#{1,6}(\s|$)|>|[-*+](\s|$)|\d+[.)](\s|$)|\|)")
 # A list item's marker and the spaces after it, which set its content column.
 LIST_ITEM = re.compile(r"^( *)([-*+]|\d+[.)])( +|$)")
 PYTHON_SHEBANG_PREFIXES = (
@@ -324,8 +330,6 @@ def parse_markdown(path: str, text: str) -> MarkdownFile:
         frontmatter, body = md.parse_frontmatter(text)
     except yaml.YAMLError as err:
         raise ModelError(path, f"frontmatter is not YAML: {err}") from None
-    if frontmatter is None and body is not text:
-        raise ModelError(path, "frontmatter is not a mapping")
     first_body_line = text[: len(text) - len(body)].count("\n") + 1
     try:
         content = tuple(
@@ -335,17 +339,13 @@ def parse_markdown(path: str, text: str) -> MarkdownFile:
         )
     except md.UnclosedFence as err:
         raise ModelError(path, str(err)) from None
-    headings = tuple(
-        Heading(len(m.group(1)), m.group(2), md.github_slug(m.group(2)), n)
-        for n, line in content
-        if (m := _HEADING.match(line))
-    )
+    code = _indented_code(content)
+    headings = _headings(content, code)
     trailers = tuple(
         Trailer(m.group(1), m.group(2), n, _heading_above(headings, n))
         for n, line in content
         if (m := TRAILER_PATTERN.match(line))
     )
-    code = _indented_code(content)
     return MarkdownFile(
         path=path,
         text=text,
@@ -360,6 +360,40 @@ def parse_markdown(path: str, text: str) -> MarkdownFile:
 
 
 _HEADING = re.compile(r"^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$")
+
+
+def _headings(
+    content: tuple[tuple[int, str], ...], code: frozenset[int]
+) -> tuple[Heading, ...]:
+    """Every ATX and setext heading in the content lines, in order.
+
+    A setext heading is a paragraph, one or more lines of text, over a line
+    of ``=`` (level 1) or ``-`` (level 2); its line is the paragraph's first.
+    """
+    found: list[Heading] = []
+    paragraph: list[tuple[int, str]] = []
+    previous = 0
+    for number, line in content:
+        if number != previous + 1:
+            paragraph = []
+        previous = number
+        if number in code or not line.strip():
+            paragraph = []
+        elif m := _HEADING.match(line):
+            found.append(
+                Heading(len(m.group(1)), m.group(2), md.github_slug(m.group(2)), number)
+            )
+            paragraph = []
+        elif (u := SETEXT_UNDERLINE.match(line)) and paragraph:
+            text = " ".join(t.strip() for _, t in paragraph)
+            level = 1 if u.group(1)[0] == "=" else 2
+            found.append(Heading(level, text, md.github_slug(text), paragraph[0][0]))
+            paragraph = []
+        elif NOT_PARAGRAPH.match(line) or TRAILER_PATTERN.match(line):
+            paragraph = []
+        else:
+            paragraph.append((number, line))
+    return tuple(found)
 
 
 def _heading_above(headings: tuple[Heading, ...], line: int) -> Heading | None:

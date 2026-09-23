@@ -494,6 +494,8 @@ def type_names_a_registered_type(repo: Repo) -> Iterator[Finding]:
         doctype = doc.frontmatter.get("type")
         if doctype is None:
             yield Finding(doc.path, None, "missing 'type'")
+        elif not isinstance(doctype, str):
+            yield Finding(doc.path, None, f"type {doctype!r} is not one name")
         elif doctype not in registry:
             yield Finding(doc.path, None, f"type '{doctype}' is not registered")
 
