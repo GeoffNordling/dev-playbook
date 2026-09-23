@@ -176,7 +176,7 @@ every member. The user tracks the work at the level of this table.
 | **Shared history** | Sandcastle opens the real `.git` to the front, so a front can delete other branches, other worktrees, and the user's unpushed commits | The throwaway copy | Solved, proven by experiment two |
 | **Relabel** | The SELinux restamp permanently changes the label on the real files | The throwaway copy | Solved, proven by experiment two |
 | **Booby trap** | Something a front plants in its copy's git settings runs on the host when host-side git later works in the copy | Harden `front-clone` | Solved, proven by a permanent test |
-| **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option B; option A only if B fails | B under test |
+| **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option B, a 20-line plug-in | Solved, proven by experiment three with the stand-in |
 | **Hook logging** | The user's Claude Code hooks log every event to a database, and must keep doing so from inside the sandbox | The prototype's port file, carried over | Not tested under Sandcastle |
 
 ## Where Sandcastle collides
@@ -369,8 +369,66 @@ the container starts, every git call, the agent's working directory, and
 the commit collection use the location the plug-in reports back. The podman
 plug-in itself finds its location that way. So option B can be a thin
 wrapper around Sandcastle's own podman plug-in that moves the repository's
-mount to `~/workspace/mission-control`, rather than a rewrite. Confirmed by
-reading; not yet by a run.
+mount to `~/workspace/mission-control`, rather than a rewrite. Experiment
+three confirmed it by a run.
+
+## What experiment three settled
+
+Option B as a 20-line wrapper around Sandcastle's podman plug-in, run with
+the stand-in agent in three cases.
+
+**Case A, a front on mission-control, repository at
+`~/workspace/mission-control`.** Passed every check. The repository's name
+came out `mission-control`; `~/workspace` held `dev-playbook` and
+`mission-control` side by side; all eight `~/.claude/` links resolved and
+27 skills were visible; the config copy refused a write and never showed the
+front's file. The commit came back at the same SHA, the user's unpushed
+`issue-123` commit survived, the planted hooks, fsmonitor and filter never
+fired, and no container was left.
+
+**Case B1, a front on dev-playbook, work copy at
+`~/workspace/dev-playbook`.** Refused at launch: podman will not open two
+windows onto one folder ("duplicate mount destination"). The clash between
+the config copy and the work copy is real, and it fails loud rather than
+silently.
+
+**Case B2, the same front, work copy at `~/work/dev-playbook`.** Passed
+every check, as case A, with the name `dev-playbook` and the two copies
+separate. This is the layout the `sandbox-probe` prototype already chose.
+
+On the real side the only changes were the returned branches, their
+objects, and the empty `refs/front-clone/` folder the holding step leaves.
+Labels stayed `user_tmp_t`, and the user's own dev-playbook was untouched.
+
+The plug-in as run, whole:
+
+```js
+import { createBindMountSandboxProvider } from "@ai-hero/sandcastle";
+import { podman } from "@ai-hero/sandcastle/sandboxes/podman";
+
+export const relocated = ({ repoPath, ...podmanOptions }) => {
+  const inner = podman(podmanOptions);
+  return createBindMountSandboxProvider({
+    name: "podman-relocated",
+    env: inner.env,
+    sandboxHomedir: inner.sandboxHomedir,
+    create: (options) =>
+      inner.create({
+        ...options,
+        mounts: options.mounts.map((m) =>
+          m.hostPath === options.worktreePath ? { ...m, sandboxPath: repoPath } : m,
+        ),
+      }),
+  });
+};
+```
+
+Sandcastle also opens the copy's `.git` a second time, at its host path.
+It is the copy's own `.git`, so it adds no reach.
+
+Open from this run: whether every front's work copy should sit at
+`~/work/<repo>`, one rule for all, or at `~/workspace/<repo>` with
+dev-playbook fronts the exception. The user decides.
 
 ## The booby-trap fix
 

@@ -109,7 +109,10 @@ is not a target, which
   briefly.
   1. *Booby-trap fix.* Done: see
      [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-booby-trap-fix).
-  2. *Option B.* Our own container plug-in, a thin wrapper around
+  2. *Option B.* Done, passed: see
+     [The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-experiment-three-settled).
+     One choice left to the user: where every front's work copy sits.
+     Our own container plug-in, a thin wrapper around
      Sandcastle's podman plug-in, run with the stand-in. Six checks: the
      name reads `mission-control`; dev-playbook sits at
      `~/workspace/dev-playbook` and the eight links resolve; the real
