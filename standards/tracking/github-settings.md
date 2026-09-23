@@ -15,7 +15,7 @@ repo's state on github.com, which `scripts/workspace-lint` reads over
 > **Why.** The merge settings and the rulesets both sit behind
 > GitHub's all-or-nothing **Administration** permission, too broad to
 > grant for a one-time toggle, so they are set by hand and the
-> Standard only audits them.
+> Standard only reads them.
 
 ## Origin on GitHub
 

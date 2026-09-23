@@ -23,7 +23,7 @@ Frank Coyle, "Agents and Ontologies," recorded in mission-control at
 recorded. The claim: a formal ontology outside the model as logical
 guardrails, probabilistic reasoning inside, logic outside. Pydantic at
 the door, ontology at the ledger; a failed check loops back to the
-model or escalates to the owner. That last sentence is act, check,
+model or escalates to the owner. That last sentence is act, verify,
 yield.
 
 ## The theory, in industry terms
@@ -44,7 +44,7 @@ yield.
   behind a contradiction, is available and slower.
 - **SHACL.** Closed-world validation, a shape per node type, a report
   naming node, shape, property, and message per violation. A Standard's
-  rules are shapes; audit is the SHACL run; a violation is a finding
+  rules are shapes; verification is the SHACL run; a violation is a finding
   with a receipt.
 - **The open-world caveat.** An OWL reasoner treats an unstated fact
   as unknown, not false, and infers around a missing field. Checks

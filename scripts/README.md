@@ -60,7 +60,7 @@ from a venv pre-commit installs at the pinned rev (see
 
 | Script | Standard | Purpose |
 |--------|----------|---------|
-| `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present. The one detector still a script; `playbook check` calls its module as a step until the loop workstream moves its rules into the package |
+| `loop-lint` | [loop-conventions.md](/standards/doc-type/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Verifications, and Yields sections; clean by construction where no `loops/` tree is present. The one check still a script; `playbook check` calls its module as a step until the loop workstream moves its rules into the package |
 
 `loop-lint` is
 optional-surface: it exits 0 silently when no `loops/` tree is present, and
@@ -76,7 +76,7 @@ the installed `dev_playbook` package:
 - `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, the OKF concept-doc/harness-owned path classification, and the agent-instruction test behind the voice rule. Consumed by the repo model and the checks.
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by the repo model.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
-- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by the prose checks, which enforce it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.checks.prose`).
+- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by the prose checks, which check prose against it, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.checks.prose`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook check` self-check). Consumed by `repo-init`.
 
 The one larger surface is a subpackage: `dev_playbook.transcript_export`,
@@ -108,8 +108,8 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
-| `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
+| `workspace-lint` | On-demand workspace check via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
+| `bootstrap-labels` | Apply the GitHub label scheme to the current repo — run by hand, after a scheme change or when adopting a repo |
 | `labelgen` | Render the label scheme as the table in [label-scheme.md](/standards/tracking/label-scheme.md); `--check` fails on drift |
 | `bump-pin` | Check whether one consumer repo's dev-playbook `rev` pin can move to the published head (`--check`, a probe that restores the config) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook check` self-check; the GitHub tail is [bootstrap.md](/guides/bootstrap.md) |

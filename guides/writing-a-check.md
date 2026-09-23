@@ -1,14 +1,14 @@
 ---
 type: Guide
-title: Writing a Detector
+title: Writing a Check
 description: How a check that decides one rule is written — in dev-playbook a function registered under the rule's id, with its test, and in a consumer repo the same shape behind the repo's own hook; read before writing a check
 ---
 
-# Writing a Detector
+# Writing a Check
 
-A detector decides one or more deterministic rules
-([Detectors](/standards/standard/detectors.md)). In dev-playbook each
-one is a check: one Python function that decides one rule, registered
+A check is the verifier of one deterministic rule
+([Checks](/standards/standard/checks.md)). In dev-playbook each
+check is one Python function, registered
 under that rule's id, which `playbook check` runs over the repo model.
 The first sequence adds a check to dev-playbook; the sections after it
 say what the registry, the meta-test, and `playbook check` do with it,
@@ -100,9 +100,9 @@ hook or tag; `--family` and `--without` filter the list.
 ## A check writes nothing
 
 A check reads the model, which holds every tracked file in memory, and
-yields findings; by itself it blocks nothing, and its run at a gate is
-the audit stationed there
-([Read-only without a write flag](/standards/standard/detectors.md#read-only-without-a-write-flag)).
+yields findings; by itself it blocks nothing, and a gate is what
+blocks
+([Read-only without a write flag](/standards/standard/checks.md#read-only-without-a-write-flag)).
 
 ## A consumer repo's checks take the same shape
 

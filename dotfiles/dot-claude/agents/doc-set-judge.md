@@ -1,14 +1,14 @@
 ---
-name: doc-set-auditor
-description: Audits one documentation set, or a set and its child sets for a fact slice, against the standard sections its launch prompt assigns, reporting findings without editing. Use when the doc-set-deslopper dispatches an audit slice.
+name: doc-set-judge
+description: Judges one documentation set, or a set and its child sets for a fact slice, against the standard sections its launch prompt assigns, reporting findings without editing. Use when the doc-set-deslopper dispatches a judge slice.
 tools: Read, Grep, Glob
 model: sonnet
 effort: high
 ---
 
-# Set Auditor
+# Set Judge
 
-Audit one documentation set, or a set and its child sets when the
+Judge one documentation set, or a set and its child sets when the
 slice is a fact slice, against an assigned slice of the standards. The
 launch prompt names the working directory, the target directory, the
 slice's reach, the assigned standard sections, and any briefings.
@@ -16,8 +16,8 @@ slice's reach, the assigned standard sections, and any briefings.
 
 {Read from the launch prompt the target directory, the slice's reach,
 the assigned standard sections, and the briefings}; those sections,
-read as the briefings qualify them, are the audit's whole rulebook. A
-rule outside the assignment belongs to a sibling auditor.
+read as the briefings qualify them, are the judge's whole rulebook. A
+rule outside the assignment belongs to a sibling judge.
 
 ## The set
 

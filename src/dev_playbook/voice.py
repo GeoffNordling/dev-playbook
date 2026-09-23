@@ -10,12 +10,12 @@ rather than agent-facing-specific, and lives in ``dev_playbook.checks.prose``;
 conventions.md -- Terminology: the person is the user.)
 
 Two actors read this vocabulary, so it lives here rather than in either of
-them: ``dev_playbook.checks.prose`` enforces it over every harness-loaded agent
+them: ``dev_playbook.checks.prose`` checks it over every harness-loaded agent
 instruction file (``md.is_agent_instruction`` decides which), and
 ``dev_playbook.repo_init`` refuses a repo name that carries one of these words,
 since the name becomes the H1 of the CLAUDE.md a fresh scaffold writes. Masking
 prose before matching -- inline code, fenced blocks, quoted speech -- is the
-enforcing detector's job, not this module's.
+check's job, not this module's.
 """
 
 import re
@@ -28,7 +28,7 @@ VOICE_PATTERNS = (
 
 
 def first_fault(text: str) -> str | None:
-    """The fault ``text`` trips, worded as the detector words it, else ``None``.
+    """The fault ``text`` trips, worded as the check words it, else ``None``.
 
     Matches the raw string: callers passing prose mask it first.
     """

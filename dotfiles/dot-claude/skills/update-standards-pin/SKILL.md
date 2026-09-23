@@ -9,7 +9,7 @@ effort: xhigh
 # Update Standards Pin
 
 A consumer repo runs the standards as of the dev-playbook `rev` it pins, and
-nothing else: a detector added upstream, a rule tightened, a canonical artifact
+nothing else: a check added upstream, a rule tightened, a canonical artifact
 changed — none of it reaches that repo until the pin moves. {Read
 [Distribution Channel](~/workspace/dev-playbook/standards/distribution/channel.md);
 the bump *is* the release}.
@@ -26,7 +26,7 @@ decision is judgment, and that is the half this skill owns.
 for the `GOVERNED` roster}: governance is declared there, never inferred from a
 repo sitting under the workspace root. {If the roster omits this repo, {Report
 that it is ungoverned, and that /enable-repo-governance is what adopts it} and
-stop} — bumping an unenrolled repo installs a standard nothing audits.
+stop} — bumping an unenrolled repo installs a standard nothing checks.
 
 Done when the repo's name is in the roster.
 
@@ -102,7 +102,7 @@ the dev-playbook checkout, whose Standard files hold the rule under the
 heading the slug names. {Read
 [the standards index](~/workspace/dev-playbook/standards/index.md); it
 lists every directory} to reach it. Take the fix from that rule rather
-than from the detector's message, which states the symptom.
+than from the check's message, which states the symptom.
 
 Three shapes account for most of what a bump reddens:
 
@@ -111,10 +111,10 @@ Three shapes account for most of what a bump reddens:
   finding the moment the pin moves. Re-seed the block from
   `~/workspace/dev-playbook/standards/build/canonical/` — confirm that checkout
   sits at the target sha first — and merge it into the repo's file. The
-  canonical copy wins; never edit the repo's copy to satisfy the detector by
+  canonical copy wins; never edit the repo's copy to satisfy the check by
   hand.
-- **A detector reaching this repo for the first time.** Enrollment rides the
-  pin, so a detector added upstream runs here with no config edit anywhere. Adapt
+- **A check reaching this repo for the first time.** Enrollment rides the
+  pin, so a check added upstream runs here with no config edit anywhere. Adapt
   the repo to the rule, authority as above.
 - **A requirement retired upstream.** This one shows up as silence, not as a
   finding: the rule is gone from the new pin, so the adaptation the repo still

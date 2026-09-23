@@ -53,4 +53,4 @@ The primary carries every repo and runs every check, so nothing goes
 permanently unchecked. Which gates each check reaches is the committed
 wiring, `.pre-commit-config.yaml`, `make check`, and the workflows; a
 machine's skip is not in it, and is recorded here instead
-([A skip is machine state](/standards/standard/detectors.md#a-skip-is-machine-state)).
+([A skip is machine state](/standards/standard/checks.md#a-skip-is-machine-state)).

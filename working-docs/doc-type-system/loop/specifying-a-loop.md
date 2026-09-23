@@ -19,9 +19,9 @@ A predicate says what is true of a member. It does not say why, which
 is the rule's reason, and it does not say how to fix it, which is a
 runbook's.
 
-The verifier is a script or a judge; a rule a judge decides is
-stochastic and still a predicate. A loop's check audits it like any
-other; whether a repo boundary also runs it is that boundary's wiring.
+The verifier is a check or a judge; a rule a judge decides is
+stochastic and still a predicate. A loop's verification runs it like
+any other; a gate runs only checks.
 [Writing Predicates](/guides/writing-predicates.md)
 is how one is written.
 
@@ -46,7 +46,7 @@ The doc-type system so far has neither written, and the standing kind
 is the one it is short on.
 
 When an idea arrives, the move is to write its form, not to do the fix.
-The fix follows from an accepted predicate failing its check, and a loop or
+The fix follows from an accepted predicate failing its verifier, and a loop or
 an agent does it later.
 
 ## The loop that proposes
@@ -62,10 +62,10 @@ two motions against it:
         ┌──────────────────────────────────────────────┐
         │  STANDARD  the accepted predicates, as rules │
         └──────┬───────────────────────────▲───────────┘
-               │ checks read               │ an accepted predicate lands
+               │ verifiers read            │ an accepted predicate lands
    ┌───────────┼───────────────────────────┼─────────────┐
    │  LOOP     ▼                           │             │
-   │   apply: act on failing checks,       │             │
+   │   apply: act on the findings,         │             │
    │          edit only what a failing     │             │
    │          predicate authorizes         │             │
    │   propose: draft candidate predicates,│             │
@@ -81,7 +81,7 @@ two motions against it:
 
 - **Soft guidance and hard predicates go to different acts.** Words such
   as *parallel* and *parsimonious* reach only the proposing act, as what
-  kind of candidates to draft. The applying act sees only failing checks.
+  kind of candidates to draft. The applying act sees only findings.
 - **Proposals are predicates, never edits.** Rejecting a predicate
   costs the user five lines; rejecting a diff costs an hour. The loop
   cannot change the system without a predicate authorizing it.

@@ -51,7 +51,7 @@ the hook stages. The canonical artifacts live in
 merges into a file the repo already has and the merge is more than mechanical
 insertion, show the user the merged result before moving on.
 
-## 3. Lint to green
+## 3. Check to green
 
 {Run `uv run playbook check`}. The findings
 are the worklist; work it to empty, taking each fix's authority from the

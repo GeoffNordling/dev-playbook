@@ -45,7 +45,7 @@ deliberately outside the ontology until a ruling is reversed.
   context means; ruled not accounted.
 - **Behavior-mode setting** — a runbook whose body installs standing
   behavior in the session's ephemeral context and fires no edge at
-  invocation. Ruled residual; admitting it later requires a lintable,
+  invocation. Ruled residual; admitting it later requires a checkable,
   deterministic form.
 - **Presentation gestures** — opening an already-written artifact for
   the user (improve-codebase-architecture's `xdg-open` on its report);
@@ -79,8 +79,8 @@ no frontmatter or spans, so the does edge ends at the file.
 
 ### deslopper
 
-Could not express being a Standard's enforce arm (flattened to a plain
-read) or an agent's inputs — agents have no `arguments` frontmatter.
+Could not express being the runbook that fixes a Standard's findings
+(flattened to a plain read) or an agent's inputs — agents have no `arguments` frontmatter.
 
 ### handoff
 
@@ -158,7 +158,7 @@ which no primitive covers.
 Could not express step 2's "only if something stands out" condition —
 the condition primitive gates a whole span, not a report's own contents.
 
-### set-auditor
+### set-judge
 
 Could not express the set-member reads — the root and its linked working
 files are runtime-bound (named in the launching prompt), so `{Read}`'s one

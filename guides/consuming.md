@@ -9,7 +9,7 @@ description: The consumer-repo recipe for a first repo-scoped standard — grow 
 Most standards a repo runs are workspace-scoped: inherited from
 dev-playbook through its published hooks, governing every repo alike. A
 repo with a convention no other repo shares declares its own
-**repo-scoped** standard, the same tree-and-detector machinery the
+**repo-scoped** standard, the same tree-and-check machinery the
 meta-standard ([standards/standard/](/standards/standard/index.md))
 defines, hosted in the consumer repo instead of dev-playbook. The recipe
 below is the order of operations; every rule a step meets is stated once,
@@ -34,7 +34,7 @@ in the Standard the step links.
    ([The catalog lists every directory](/standards/standard/tree.md#the-catalog-lists-every-directory)).
 2. **Write the checks.** Back each deterministic rule of the Standard
    with a check in the shape
-   [Writing a Detector](/guides/writing-a-detector.md#a-consumer-repos-checks-take-the-same-shape)
+   [Writing a Check](/guides/writing-a-check.md#a-consumer-repos-checks-take-the-same-shape)
    gives: one function per rule id, one test per id, and one command
    that runs them all, prints one line per finding, and exits 0 clean,
    1 on findings, 2 when it cannot run.

@@ -7,7 +7,7 @@ description: What a standard is — a normative target a population is held to �
 # Standard
 
 A **standard** is a normative target: a state some class of object is
-held to, that a reviewer or a lint could cite to reject work. A
+held to, that a reviewer or a check could cite to reject work. A
 standard has no notion of moving toward the state, only of being in or
 out of it; driving toward it is [Loop](/doc-types/loop/definition.md)'s.
 
@@ -15,9 +15,9 @@ out of it; driving toward it is [Loop](/doc-types/loop/definition.md)'s.
 
 One: **hold** — the standard holds every member of its population to
 its rules. Who checks a rule and where the check runs are not the
-standard's to say: a detector claims each rule by its id, and the
+standard's to say: a check claims each rule by its id, and the
 wiring says the gates that run it
-([Detectors](/standards/standard/detectors.md)); what brings a
+([Checks](/standards/standard/checks.md)); what brings a
 repository into the state the first time is a guide's or a runbook's.
 
 ## The file
@@ -75,7 +75,7 @@ repo, never an intermediate group.
 **No shadowing.** A repo-scoped standard's directory name is one no
 workspace-scoped standard carries, since a consumer's
 `standards/<name>/` on an upstream name would silently override the
-upstream standard of that name; the rule and its lint are
+upstream standard of that name; the rule and its check are
 [No shadowing](/standards/standard/tree.md#no-shadowing).
 
 ## Where a standard lives
@@ -84,6 +84,6 @@ Under `standards/`, the one tree reserved for the type; nothing outside
 it claims the label, and
 `knowledge-organization.standard-lives-under-standards` checks it. Every
 immediate subdirectory of `standards/` holds at least one file typed `Standard`.
-The layout's rule and its lint are
+The layout's rule and its check are
 [Every subdirectory a Standard directory](/standards/standard/tree.md#every-subdirectory-a-standard-directory); the
 file forms are [the encoding](/doc-types/standard/encoding.md).

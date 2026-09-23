@@ -77,6 +77,23 @@ the specimen is surveyed in
   unredacted descriptions and is written outside the repo.
 - **Slow and iterative.** One subsystem at a time, each step shown to
   the user before the next.
+- **A hand-wave stands in for code, never for magic.** A simulation
+  may put an agent where a script will go only when the agent's
+  output is something deterministic code can produce later, and the
+  agent must name what it assumed. Sanity check of 2026-09-23: every
+  assumption in `code/extract.py` is a regex over a convention a
+  doc-type can declare, so none is magic.
+- **An extractor is the inverse of a declared encoding.** An agent
+  that writes an extractor also writes the doc-type it read from, in
+  the reference model's pseudocode, so its assumptions are inspected
+  as a short class and not as the parsing code.
+- **Permissions, rules, and views read one fact base.** The ontology
+  grants which kinds may point at which; a rule checks one fact, such
+  as whether a `related` target exists; a view draws the facts. A
+  dangling edge violates a rule, never the ontology.
+- **Views are code, registered by name.** Each view is a function in
+  `code/render.py` with one stated question it answers; the code is
+  the spec, and the question is the only prose it needs.
 
 ## Terms
 

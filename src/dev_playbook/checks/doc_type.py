@@ -22,7 +22,7 @@ from dev_playbook.model import TRAILER_PATTERN, MarkdownFile, Repo
 
 for _loop_rule in (
     "doc-type.one-paragraph-then-one-graph",
-    "doc-type.acts-checks-and-yields-in-that-order",
+    "doc-type.acts-verifications-and-yields-in-that-order",
     "doc-type.nodes-and-entries-agree",
     "doc-type.edges-lead-to-steps",
     "doc-type.every-entry-states-its-condition",

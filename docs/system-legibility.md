@@ -94,7 +94,7 @@ Documentation has three readers, in priority order:
    commands the agent in natural imperative English; nothing may
    clutter that.
 2. **The user** — reads the file as plain English.
-3. **Deterministic code** — the parsers and linters. A light touch
+3. **Deterministic code** — the parsers and checks. A light touch
    needed; we prioritize the agent and the user.
 
 ### The bedrock of determinism
@@ -105,7 +105,7 @@ deterministic code, firm and strong, where a claim is checked by
 running something that is 100% consistent. The boundary is where
 documentation stops and code begins: documentation is the stochastic
 thing, code the deterministic one. Code is written above the bedrock
-in support of documentation — a parser, a lint — but that support
+in support of documentation — a parser, a check — but that support
 stands on the bedrock; it does not move the boundary. Abstractions
 continue below the bedrock — call graphs, import graphs, industry
 tooling — but the mode flips: above, machinery is invented
@@ -128,9 +128,9 @@ one to its caller.
 
 - **Deterministic backpressure over stochastic functions.**
   Stochastic functions — user/AI conversations, prompts, models, agents — are powerful but
-  expensive and create slop if not handled carefully. Deterministic backpressure — detectors, linters, gates,
+  expensive and create slop if not handled carefully. Deterministic backpressure — checks, gates,
   plain contact with reality — is inviolable and efficient. Prefer it
-  wherever it can reach, and prefer claims a lint can check: "skill X
+  wherever it can reach, and prefer claims a check can decide: "skill X
   references skill Y" is greppable; "skill X is clean" is not. Keep
   agentic backpressure tools simple and loop-friendly — a status code
   beats a detailed report.
@@ -141,7 +141,7 @@ one to its caller.
   through reduced forms designed for user understanding. A constraint on
   form amortizes reading — learn the shape once, read every instance
   fast — makes location and absence meaningful, and yields rules a
-  lint can hold.
+  check can hold.
 - **A document does one thing.** It does that thing predictably and
   in a structured way. What the thing is, and the structure it takes,
   is fixed at the CLOA by the document's type: each doc-type has its

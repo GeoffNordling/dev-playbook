@@ -1,24 +1,23 @@
 ---
 type: Standard
-title: Detectors
+title: Checks
 description: The check contract — read-only, skipped only for machine state, and the canonical template offering the hooks the manifest publishes
 population: "a check that decides a rule under standards/, first-party by its rule id or a dependency by its pinned hook id or pyproject.toml name"
 ---
 
-# Detectors
+# Checks
 
-A **detector** is a read-only check that decides one or more rules under
-`standards/`: it inspects the repository against those Standards and emits
-findings, and by itself it blocks nothing; its run at a gate is the audit
-stationed there, which is Enforcement ([Vocabulary](/CONTEXT.md#governance)).
-A detector is first-party by the rule id it is registered under,
+A **check** is the verifier of a deterministic rule under `standards/`
+([Vocabulary](/CONTEXT.md#governance)): it reads the repository and
+returns findings, and by itself it blocks nothing; a gate is what
+blocks. A check is first-party by the rule id it is registered under,
 `standard.no-shadowing`; a dependency by its pinned pre-commit hook id,
 `ruff-format`; or a dependency by its `pyproject.toml` name and the
 subcommand it runs, `mypy`, `pre-commit validate-manifest`.
 
 ## Read-only without a write flag
 
-A first-party detector run without an explicit write flag leaves
+A first-party check run without an explicit write flag leaves
 everything git tracks as it found it; a dependency may write at its gate,
 `ruff-format` and `shfmt -w`.
 
@@ -26,15 +25,15 @@ everything git tracks as it found it; a dependency may write at its gate,
 
 ## A skip is machine state
 
-A detector is skipped at a gate only where its input is machine-local
+A check is skipped at a gate only where its input is machine-local
 rather than held in the repository.
 
 `standard.a-skip-is-machine-state` · stochastic
 
-## A first-party detector
+## A first-party check
 
-The detector is code the publishing repo hosts. dev-playbook's are the
-check functions `playbook check` runs, one per rule id.
+The check is code the publishing repo hosts. dev-playbook's are the
+functions `playbook check` runs, one per rule id.
 
 ### Offered by the canonical template
 

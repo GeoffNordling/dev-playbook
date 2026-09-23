@@ -103,7 +103,7 @@ def ambient_git_dir(
 def make_repo(tmp_path: Path) -> Callable[[dict[str, str]], Path]:
     """Write a throwaway repo from a {relative path: contents} map; return its root.
 
-    Used by the lint tests to stand up a fixture repo -- source files,
+    Used by the check tests to stand up a fixture repo -- source files,
     Standards, and whatever else a rule reads -- against ``tmp_path``.
     """
 

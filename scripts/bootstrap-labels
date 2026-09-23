@@ -1,5 +1,5 @@
 #!/usr/bin/env -S uv run --script
-"""bootstrap-labels — enforce the workspace's GitHub label scheme in the current repo.
+"""bootstrap-labels — apply the workspace's GitHub label scheme to the current repo.
 
 Closed-world: labels in the canonical set are created or updated to match;
 labels not in the canonical set are deleted. Idempotent. The canonical scheme is

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Loop Conventions
-description: The form a document typed Loop takes — one paragraph, one Mermaid graph, and the Acts, Checks, and Yields sections that agree with it
+description: The form a document typed Loop takes — one paragraph, one Mermaid graph, and the Acts, Verifications, and Yields sections that agree with it
 population: "a document typed Loop"
 ---
 
@@ -11,7 +11,7 @@ A document typed `Loop`, under `loops/`
 ([Document Types](/standards/knowledge-organization/document-types.md#loop-lives-under-loops)).
 The [Loop doc-type](/doc-types/loop/index.md) declares what a loop is and
 the encoding its file takes,
-[Acts, Checks, and Yields Encoding](/doc-types/loop/encoding.md); a
+[Acts, Verifications, and Yields Encoding](/doc-types/loop/encoding.md); a
 doc-type binds nobody, so this Standard is what binds the file to that
 encoding.
 
@@ -35,15 +35,15 @@ state the loop drives and the target state it drives that state toward.
 
 `doc-type.the-paragraph-names-state-and-target` · stochastic
 
-## Acts, Checks, and Yields, in that order
+## Acts, Verifications, and Yields, in that order
 
-After the graph there are exactly three H2s, `Acts`, `Checks`, and
-`Yields`, in that order, and nothing between the graph and
-`## Acts`. Under each H2 there is one list. Each line of the list
-is an entry, `` - `<node id>` — <text> ``, or an indented line that
-continues the entry above it. No node id has two entries.
+After the graph there are exactly three H2s, `Acts`,
+`Verifications`, and `Yields`, in that order, and nothing between the
+graph and `## Acts`. Under each H2 there is one list. Each line of the
+list is an entry, `` - `<node id>` — <text> ``, or an indented line
+that continues the entry above it. No node id has two entries.
 
-`doc-type.acts-checks-and-yields-in-that-order` · deterministic
+`doc-type.acts-verifications-and-yields-in-that-order` · deterministic
 
 ## Nodes and entries agree
 
@@ -57,7 +57,7 @@ receiver.
 ## Edges lead to steps
 
 In a document typed `Loop`, every edge of the graph leads to a step, a
-node whose entry is an act, a check, or a yield, except an edge out of a
+node whose entry is an act, a verification, or a yield, except an edge out of a
 yield, which leads to a step or to a receiver, a node with no entry.
 
 `doc-type.edges-lead-to-steps` · deterministic
@@ -65,9 +65,9 @@ yield, which leads to a step or to a receiver, a node with no entry.
 ## Every entry states its condition
 
 Every entry of a file typed `Loop` contains `fires when` or
-`fires every iteration` if it is an act or a check, and
+`fires every iteration` if it is an act or a verification, and
 `yields when` if it is a yield. An act's entry has at least one
-link. A check's entry has a link to a file typed `Standard`. A
+link. A verification's entry has a link to a file typed `Standard`. A
 yield's entry has a link or the words `the user`, and each of its
 links goes to a file typed `Loop`. Every link in an entry is
 root-absolute or relative to the file, and goes to a file that

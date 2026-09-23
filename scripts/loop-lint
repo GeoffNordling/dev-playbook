@@ -1,5 +1,5 @@
 #!/usr/bin/env -S uv run --script
-"""loop-lint — the detector behind Loop Conventions: every Loop's graph agrees with its prose.
+"""loop-lint — the checks of Loop Conventions: every Loop's graph agrees with its prose.
 
 Thin shim over dev_playbook.loop_lint.main: it puts the checkout's ``src/``
 on ``sys.path`` and calls the module, which walks the repo's ``loops/`` files

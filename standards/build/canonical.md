@@ -94,7 +94,7 @@ and sets `[tool.uv] package = false`. Every other value is free.
 > its own turns on mutually exclusive members, `D203` against `D211`
 > and `D212` against `D213`, so `ruff check` is unsatisfiable unless a
 > convention selects between them. `E501` is ignored because
-> `ruff format` owns line length and the lint would report the same
+> `ruff format` owns line length and `ruff check` would report the same
 > overruns a second time, and `D401`, imperative-mood summaries,
 > because the workspace writes noun-phrase docstrings.
 

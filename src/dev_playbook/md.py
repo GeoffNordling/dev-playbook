@@ -295,7 +295,7 @@ def is_agent_instruction(relpath: str) -> bool:
     The set the agent-facing voice rule governs (prose/conventions.md — Voice,
     person of address): every ``CLAUDE.md`` at any depth, plus every file under a
     skills, rules, or agents root. Scope is stated once here rather than in each
-    detector that needs it.
+    check that needs it.
 
     Membership is decided by :data:`ROOTLESS_SEGMENTS` at any depth, the same
     roster and the same at-any-depth test :func:`has_fixed_repo_root` uses — so a
@@ -320,7 +320,7 @@ def classify(relpath: str) -> str:
     - ``"index"`` — a directory listing (``index.md``): typeless, validated as
       an index rather than as a concept document.
     - ``"concept"`` — a prose concept document that carries OKF frontmatter and
-      is subject to the type-lint.
+      is subject to the type checks.
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
       ``references/``/``scripts/``, ``agents/``, ``rules/``, every top-level

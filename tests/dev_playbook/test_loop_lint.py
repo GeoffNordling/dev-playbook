@@ -41,7 +41,7 @@ flowchart LR
 
 - `tidy` — [tidy](/skills/tidy.md), fires every iteration.
 
-## Checks
+## Verifications
 
 - `flat` — [Tidy Tree](/standards/tidy/tree.md), fires every
   iteration.
@@ -100,8 +100,8 @@ def test_a_node_with_no_entry_fails(tmp_path: Path) -> None:
 
 def test_an_entry_with_no_node_fails(tmp_path: Path) -> None:
     loop = LOOP.replace(
-        "## Checks\n",
-        "## Checks\n\n- `ghost` — [Tidy Tree](/standards/tidy/tree.md), fires every iteration.\n",
+        "## Verifications\n",
+        "## Verifications\n\n- `ghost` — [Tidy Tree](/standards/tidy/tree.md), fires every iteration.\n",
     )
 
     result = run(make_repo(tmp_path, loop))
@@ -123,7 +123,7 @@ def test_an_edge_the_shape_does_not_allow_fails(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert (
-        "doc-type.edges-lead-to-steps edge `flat` → `user` is check → receiver"
+        "doc-type.edges-lead-to-steps edge `flat` → `user` is verification → receiver"
         in result.stdout
     )
 
@@ -137,7 +137,7 @@ def test_a_check_that_links_a_file_not_typed_standard_fails(tmp_path: Path) -> N
 
     assert result.returncode == 1
     assert "doc-type.every-entry-states-its-condition" in result.stdout
-    assert "a check links a file typed Standard" in result.stdout
+    assert "a verification links a file typed Standard" in result.stdout
 
 
 def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
@@ -165,13 +165,13 @@ def test_a_yield_with_no_condition_fails(tmp_path: Path) -> None:
 
 
 def test_verb_sections_out_of_order_fail(tmp_path: Path) -> None:
-    loop = LOOP.replace("## Checks", "## Measures")
+    loop = LOOP.replace("## Verifications", "## Measures")
 
     result = run(make_repo(tmp_path, loop))
 
     assert result.returncode == 1
     assert (
-        "doc-type.acts-checks-and-yields-in-that-order verb sections are"
+        "doc-type.acts-verifications-and-yields-in-that-order verb sections are"
         in result.stdout
     )
 
@@ -207,7 +207,7 @@ def test_list_rules_prints_the_five_rule_ids() -> None:
 
     assert result.returncode == 0
     assert result.stdout.split() == [
-        "doc-type.acts-checks-and-yields-in-that-order",
+        "doc-type.acts-verifications-and-yields-in-that-order",
         "doc-type.edges-lead-to-steps",
         "doc-type.every-entry-states-its-condition",
         "doc-type.nodes-and-entries-agree",

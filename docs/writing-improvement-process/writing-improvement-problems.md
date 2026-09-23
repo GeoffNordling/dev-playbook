@@ -36,17 +36,17 @@ to be reminded.
   injection, hooks, etc.), see the official skill and subagent
   documentation." → **After** deleted.
 
-## Enforcement meta-commentary
+## Verifier meta-commentary
 
-**Definition.** Declaring the document binding, or naming the lint that
-enforces it.
+**Definition.** Declaring the document binding, or naming the check that
+decides it.
 
 **Action.** Delete the sentence. The purpose of a document does not include
-documenting its own external validators.
+documenting its own verifiers.
 
 **Examples.**
 
-- **Before** "This standard is binding, and its detector enforces
+- **Before** "This standard is binding, and its check runs
   it at the commit gate." → **After** deleted.
 
 ## Relationship meta-commentary

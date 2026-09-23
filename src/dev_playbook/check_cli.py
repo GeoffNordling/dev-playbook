@@ -39,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
         "directory",
         nargs="?",
         default=".",
-        help="repository root to audit (default: current directory)",
+        help="repository root to check (default: current directory)",
     )
     run.add_argument(
         "--without",

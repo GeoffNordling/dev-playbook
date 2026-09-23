@@ -162,7 +162,7 @@ targets.
   one server that never has to be restarted to change repo or branch.
 - The viewer classifies nothing itself. Which files are concept
   documents, harness-owned, or excluded, and which link sources are
-  immutable, comes from the same functions the repo's linters use, so the
+  immutable, comes from the same functions the repo's checks use, so the
   screen and the checks can never disagree.
 
 ## Working agreements

@@ -84,8 +84,8 @@ annotation
 [Nodes and Edges Encoding](/doc-types/runbook/encoding.md)); for a
 Standard, its population and its rules with their conditions
 ([Population and Rules Encoding](/doc-types/standard/encoding.md));
-for a loop, its acts, checks, and yields, read from the Mermaid block
-([Acts, Checks, and Yields](/doc-types/loop/contract-shape.md),
+for a loop, its acts, verifications, and yields, read from the Mermaid block
+([Acts, Verifications, and Yields](/doc-types/loop/contract-shape.md),
 [encoding](/doc-types/loop/encoding.md)). A
 runbook also has a control flow view, the same edges with order and
 condition kept.

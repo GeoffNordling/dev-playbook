@@ -11,7 +11,7 @@ alphabetical.
 
 ## Directories
 
-- [standard/](/standards/standard/index.md) — Meta-Standard governs how the workspace's standards are laid out, found, and kept honest — the tree, the catalog, and the detectors
+- [standard/](/standards/standard/index.md) — Meta-Standard governs how the workspace's standards are laid out, found, and kept honest — the tree, the catalog, and the checks
 - [build/](/standards/build/index.md) — Build governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 - [decisions/](/standards/decisions/index.md) — Decision Records governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, and status vocabulary
 - [distribution/](/standards/distribution/index.md) — Distribution governs how dev-playbook's checks reach the governed repos — a publisher's hook manifest and its local block

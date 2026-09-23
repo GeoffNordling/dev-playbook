@@ -60,7 +60,7 @@ directory above; the `ROOT.md` of a strand is reached from the next
 
 Every directory directly under `working-docs/` has an `index.md` and a
 `ROOT.md`. Every file under it has a lowercase kebab-case name, such
-as `detector-fixes.md`, except `index.md`, `ROOT.md`, `README.md`,
+as `check-fixes.md`, except `index.md`, `ROOT.md`, `README.md`,
 `PROMPT.md`, `SKILL.md`, `CLAUDE.md`, and a Python module.
 
 `knowledge-organization.one-directory-under-working-docs` · deterministic

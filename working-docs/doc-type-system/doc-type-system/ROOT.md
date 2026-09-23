@@ -53,7 +53,7 @@ specification.
   the step 11 sort found behaviour, instruction, outside facts, and
   scoping definitions each mis-filed as a rule. Whether a check exists
   yet is a separate question; an unchecked predicate of either kind is
-  allowed until the detector rewrite lands.
+  allowed until the check rewrite lands.
 - **A scoping heading is not a rule.** An H2 with no trailer is a
   condition, per
   [A rule: heading, predicate, trailer](/standards/doc-type/standard-conventions.md#a-rule-heading-predicate-trailer).
@@ -64,10 +64,10 @@ specification.
   which is why the Explanation type is deleted: the user cannot read a
   rule and its why across two files.
 - **Three working policies** that shaped the step 11 rulings and hold
-  for any later audit: repo change is the expensive way out; no credit for rule count, so
+  for any later review: repo change is the expensive way out; no credit for rule count, so
   delete is the default for a rule that restates another or binds
-  something too small to matter; and "keep it because a detector
-  emits the id" is backwards, since the detector follows the rule.
+  something too small to matter; and "keep it because a check
+  emits the id" is backwards, since the check follows the rule.
 - **Stochasticity is a continuous scale per file.** A markdown file
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
@@ -110,8 +110,8 @@ specification.
 
 ## Planned
 
-None. What the step 11 audit left unchecked is the input of the
-[Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md)
+None. What the step 11 review left unchecked is the input of the
+[Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md)
 strand.
 
 ## Completed
@@ -126,7 +126,7 @@ strand.
   would not sit in the sentence, and both yaml tables regenerated.
   `okf-lint` found the type registry by that heading's slug and went
   blind on the rename; the slug is a named constant now, and the
-  [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md)
+  [Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md)
   strand carries the coupling. Dropped: trimming the body openings the
   new headings absorb, since the overlap is no finding. Commits
   b76047e, ae587cd, dedc625, 4439ea5, 0d22ed4, and this one.
@@ -190,7 +190,7 @@ strand.
   `Explanation`, four DocTypes now. `Standard.Rule` and `Standard`
   each gained a `why: str | None`, a `> **Why.**` block after a
   rule's trailer or after the lead, never a predicate; the predicate
-  stays heading to trailer, so no detector or judge prompt changed.
+  stays heading to trailer, so no check or judge prompt changed.
   `standards/doc-type/doc-type.md` carries the ten Reasons sorted for
   the deleted Explanation, folded in as the test of the encoding.
 - **Explanations migrated, the type deleted, 2026-09-21.** Step 10,

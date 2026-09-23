@@ -79,7 +79,7 @@ class Standard(DocType):
     class Rule:                   # a part: an H2, or an H3 under a condition
         id:        RuleId
         kind:      deterministic | stochastic
-        predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
+        predicate: str            # everything between the heading and the trailer, the rule whole; a stochastic rule's judge prompt
         condition: Condition | None   # None binds every member
         why:       str | None     # a block after the trailer, running to the next heading; never a predicate
 
@@ -122,31 +122,31 @@ from standard import Finding, Standard
 
 
 class Loop(DocType):
-    """Acts, checks, and yields, iterated. Drives."""
-    operations  = {act, check, yield}
+    """Acts, verifications, and yields, iterated. Drives."""
+    operations  = {act, verify, yield}
     frontmatter = DocType.frontmatter | {type, title}
 
     class Act:
         runbook:   Runbook
         condition: str | None     # None fires every iteration
-    class Check:
+    class Verification:
         standard:  Standard
         condition: str | None
-        findings:  list[Finding]  # what the check returns; the next act and a yield read them
+        findings:  list[Finding]  # what its verifiers return; the next act and a yield read them
     class Yield:
         receiver:  "Loop | User"
         condition: str | None     # "yields when …"
 
-    steps: list[Act | Check | Yield]   # in iteration order; a step whose condition holds fires
+    steps: list[Act | Verification | Yield]   # in iteration order; a step whose condition holds fires
 ```
 
 ### The toolchain
 
 ```python
-verifiers: dict[RuleId, Script | Judge]      # the one sync point: every rule id has a verifier
+verifiers: dict[RuleId, Check | Judge]       # the one sync point: every rule id has a verifier
 extractors: dict[type[DocType], Extractor]   # each encoding defines one: written form to rows
-def audit(standard, state) -> list[Finding]  # parse the file, route each id, skip where the condition fails, collect failures
-boundary: commit hook | make check | CI | a loop's check     # each names the rule ids it runs
+def verify(standard, state) -> list[Finding] # parse the file, route each id to its verifier, skip where the condition fails, collect failures
+gate: pre-commit | pre-push | CI             # each runs the checks, never a judge
 ```
 
 Runbook is invoked, Standard is held to, Guide instructs, Loop drives.
@@ -159,31 +159,32 @@ part has none.
 Loop ─act───▶ Runbook ─do────▶ Runbook | Script
   │                   ─read──▶ Standard
   │                   ─write─▶ state
-  ├─check─▶ audit(Standard) ─▶ Findings ─▶ the next act, or a yield
+  ├─verify─▶ verify(Standard) ─▶ Findings ─▶ the next act, or a yield
   └─yield─▶ User | Loop
 
 Guide ─instruct─▶ User | Runbook   links a Standard's rules and states none
 
-Gate = a boundary on the path to main that blocks on the findings of its audit
+Gate = pre-commit, pre-push, or CI: blocks on the findings of the checks it runs
 ```
 
-Audit and gate are the words of [CONTEXT.md](/CONTEXT.md#governance);
-a loop's check audits and never gates.
+Verifier, check, judge, and gate are the words of
+[CONTEXT.md](/CONTEXT.md#governance); a loop's verification runs
+verifiers and never gates.
 
 A loop points at the other two and contains neither. Nothing points
 at a loop except another loop's yield. A stochastic rule certifies at
-a loop's check the same way a deterministic one does: zero findings.
-Which rule ids run at a repo boundary is that boundary's wiring, not
-the standard's.
+a loop's verification the same way a deterministic one does: zero
+findings. Which checks run at a gate is that gate's wiring, not the
+standard's.
 
 ## What goes where
 
 What the picture has no place for, and where each thing goes:
 
 - **Standard-Card and its four cells.** Define is the Standard files
-  themselves, listed by the directory index. Audit is the verifier
-  table. Enforce is each boundary's list of rule ids, read from
-  config. Adopt is not a primitive; its pointers today are build's
+  themselves, listed by the directory index. Audit is the verifiers,
+  one per rule id. Enforce is the gates, each running the checks.
+  Adopt is not a primitive; its pointers today are build's
   bootstrap guide and skill, a runbook that stays where it is and is
   reached from the directory index; harness's and modules's pointers,
   runbooks that were never adoptions and stay runbooks with no pointer

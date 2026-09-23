@@ -138,11 +138,4 @@ it out.
 Could not express the invocation mode as a condition without three
 restated conditions, so the fork sits inside Description's predicate.
 Could not give the no-`SKILL.md` directory and the 500-line advisory a
-lint partner: both emit no rule id.
-
-### standard/detectors
-
-Could not express Verbatim content over a consumer's script: it names
-`src/dev_playbook/external.py`, which only dev-playbook imports. Could
-not express the optional-surface fork of Wired throughout its scope as
-a condition: it is a fact about the population, not the detector.
+check: both emit no rule id.

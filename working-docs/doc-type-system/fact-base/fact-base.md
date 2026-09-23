@@ -60,7 +60,7 @@ Deterministic code can only show what is extractable or declared.
 
 Everything a model would otherwise infer at view time, what a file is
 for, which files form a subsystem, is already forced into declared form
-in this workspace and held there by lints. The judgment was paid at
+in this workspace and held there by checks. The judgment was paid at
 authoring time. That is why the view can be deterministic: the
 declarations are.
 

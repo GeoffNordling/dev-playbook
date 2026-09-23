@@ -3,10 +3,10 @@
 The mechanical half of the release described by
 [Distribution Channel](/standards/distribution/channel.md), where *the rev bump
 is the release*. A consumer runs the standard as of its pinned ``rev`` and
-nothing else: a detector added upstream, a rule tightened, a canonical artifact
+nothing else: a check added upstream, a rule tightened, a canonical artifact
 changed, none of it reaches that repo until its pin moves.
 
-The fallout is not mechanical. A bump can newly redden a repo — a detector that
+The fallout is not mechanical. A bump can newly redden a repo — a check that
 never ran there before now runs, a canonical artifact it copies has changed —
 and deciding what each finding means is a judgment call. So this tool answers
 one question and makes one edit, and stops there:
@@ -62,7 +62,7 @@ from dev_playbook.workspace_lint import HOOK_REPO_ROOT, ToolError
 
 # The consumer's commit gate, verbatim as the canonical Makefile's `check`
 # target spells it. This is the surface the pin controls: every dev-playbook
-# detector reaches a consumer through pre-commit and nothing else. The repo's
+# check reaches a consumer through pre-commit and nothing else. The repo's
 # own mypy/pytest targets are unaffected by the pin and are left to `make check`.
 GATE = ("uvx", "pre-commit", "run", "--all-files")
 
@@ -181,7 +181,7 @@ def consumer_root(start: Path) -> Path:
 
     dev-playbook runs the published hook from its own working tree through its
     ``repo: local`` block, so it carries no pin and there is nothing here to
-    move. Identity is the test, exactly as it is in the audit.
+    move. Identity is the test, exactly as it is in workspace-lint.
     """
     root = Path(git_out(start, "rev-parse", "--show-toplevel"))
     if root.resolve() == HOOK_REPO_ROOT:

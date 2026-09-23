@@ -27,10 +27,10 @@ This root holds only what crosses strands.
 - **Viewer**, a selection on screen: cloa-viewer, the local visual IDE
   that draws registered views of the fact base. Root:
   [CLOA Viewer](/working-docs/doc-type-system/viewer/ROOT.md).
-- **Detector rewrite**, the checking system: one pass over the Python
-  detectors, the two tables, and the hook, against the rules the
+- **Check rewrite**, the checking system: one pass over the Python
+  checks, the two tables, and the hook, against the rules the
   doc-type system settled. Root:
-  [Detector Rewrite](/working-docs/doc-type-system/detector-rewrite/ROOT.md).
+  [Check Rewrite](/working-docs/doc-type-system/check-rewrite/ROOT.md).
 - **Story-forge simulation**, the trial: the doc-type system and the
   fact base tried by hand on one consumer repo before any extractor is
   coded. Root:
@@ -42,10 +42,10 @@ A dependency is what one strand's plan needs from another's, never a
 runtime data flow. There are six: the doc-type system defines Loop,
 one of its four doc-types; each encoding the doc-type system writes
 defines an extractor of the fact base; every view the viewer draws is
-a selection of the fact base; the detector rewrite binds to the rules
+a selection of the fact base; the check rewrite binds to the rules
 the doc-type system's step 11 settled; the story-forge simulation
 takes its language from the doc-type system and its method from the
-fact base. Loop, the detector rewrite, and the simulation are
+fact base. Loop, the check rewrite, and the simulation are
 leaves.
 
 ```
@@ -78,19 +78,19 @@ leaves.
   │  plan: the objective part, │   │  plan: simulations by hand · │
   │        if any · its use by │   │   extractors chain, standard,│
   │        the two loops above │   │   loop · verifier table and  │
-  │        and right           │   │   boundary config as declared│
+  │        and right           │   │   gate config as declared    │
   └────────────────────────────┘   │   data · findings as a       │
                                    │   stamped artifact · the     │
   ┌────────────────────────────┐   │   simulation as a loop       │
-  │  DETECTOR REWRITE · the    │   └──────────────┬───────────────┘
+  │  CHECK REWRITE · the       │   └──────────────┬───────────────┘
   │  checking system           │                  │  a selection
   │  root ······· ROOT.md      │   ┌──────────────▼───────────────┐
-  │  input ······ detector-    │   │  VIEWER                      │
-  │               fixes.md     │   │  root ······· ROOT.md        │
-  │  binds to the rules the    │   │  on disk ···· contract.md    │
-  │  doc-type system settled   │   │  kinds ······ registry.md    │
-  │  plan: triage · measure ·  │   │  panels ····· design.md ·    │
-  │   rewrite · tests · docs   │   │               viewer.md      │
+  │  binds to the rules the    │   │  VIEWER                      │
+  │  doc-type system settled   │   │  root ······· ROOT.md        │
+  │  built: playbook check     │   │  on disk ···· contract.md    │
+  │  plan: docs · library ·    │   │  kinds ······ registry.md    │
+  │   wheel · scripts under    │   │  panels ····· design.md ·    │
+  │   ruff                     │   │               viewer.md      │
   └────────────────────────────┘   │  program ···· server.md      │
                                    │  built ······ stack.md       │
                                    │  plan: runbook design ·      │
@@ -144,7 +144,7 @@ the seed of the system's eventual context file.
 
 ### Verification
 
-- **Verifier** — what decides a rule for a member. A script for a
+- **Verifier** — per [CONTEXT.md](/CONTEXT.md#governance): what decides a rule for a member. A check for a
   deterministic rule, a judge for a stochastic one.
 - **Deterministic rule** — its verifier is a function. Same input,
   same answer. Hard set membership.
@@ -155,14 +155,13 @@ the seed of the system's eventual context file.
   decides it.
 - **Finding** — one member and the rule it fails. Evidence that the
   state is outside the set. What a loop carries from one step to the
-  next: a check ([Loop](/doc-types/loop/definition.md)) returns
+  next: a verification ([Loop](/doc-types/loop/definition.md)) returns
   findings and the acts read them.
-- **Audit** — per [CONTEXT.md](/CONTEXT.md#governance): here, an
-  evaluation of a spec against a state that returns the findings.
-  Zero findings means the state is in the set, up to judge error.
-- **Gate** — per [CONTEXT.md](/CONTEXT.md#governance): a boundary on
-  the path to main that blocks on an audit's findings. A loop's check
-  audits and never gates.
+- **Zero findings** — every verifier of a spec, run against a state,
+  returns nothing: the state is in the set, up to judge error.
+- **Gate** — per [CONTEXT.md](/CONTEXT.md#governance): pre-commit,
+  pre-push, or CI, blocking on its checks' findings. A loop's
+  verification runs verifiers and never gates.
 
 ### Extraction
 
@@ -213,7 +212,7 @@ the seed of the system's eventual context file.
   in the set or when a yield's condition holds first. Each sample
   starts from the last, with its findings in the prompt, so the
   samples are not independent: the trajectory is a path through state
-  space. Check audits the sample, act draws the next one, yield exits
+  space. Verify tests the sample, act draws the next one, yield exits
   to the user or another loop.
 
 Logic and statistics meet at one seam. Predicates define a set, with
@@ -243,8 +242,8 @@ rules decide it with an error rate.
 
 The dependencies give the order. The doc-type system's refactor runs
 first, because Loop's predicates, the fact base's extractors, and the
-detector rewrite bind to what it produces. Loop, the fact base, and
-the detector rewrite then run beside each other. The viewer's next kinds wait on the fact base, since each is a
+check rewrite bind to what it produces. Loop, the fact base, and
+the check rewrite then run beside each other. The viewer's next kinds wait on the fact base, since each is a
 selection from it.
 
 ## Acronyms

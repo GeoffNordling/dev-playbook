@@ -20,8 +20,9 @@ checked against.
   of this class.
 - **Rule.** An id, a kind, a predicate, a condition or none, and a
   why or none. The id, `<name>.<slug>`, is the rule's identity, the
-  atom a detector claims the rule by. The kind is
-  deterministic or stochastic. The predicate is the check whole: a
+  atom a verifier claims the rule by. The kind is
+  deterministic or stochastic: a check decides a deterministic rule,
+  a judge a stochastic one. The predicate is the rule whole: a
   reader with only that text can apply it, and for a stochastic rule
   it is the judge's prompt. The why is the argument for the rule,
   never itself a predicate.
@@ -37,9 +38,9 @@ checked against.
 
 The composition rule: exactly one population, any number of rules,
 each under one condition or none. A Standard carries no pointer to a
-verifier or a gate; a detector claims a rule by its id, and the wiring
-says where the detector runs
-([Detectors](/standards/standard/detectors.md)). A rule's why, and
+verifier or a gate; a check claims a rule by its id, and the wiring
+says where the check runs
+([Checks](/standards/standard/checks.md)). A rule's why, and
 the Standard's own, sit beside what they argue for, not in a
 separate file.
 
@@ -64,7 +65,7 @@ class Standard(DocType):
     class Rule:                   # a part: an H2, or an H3 under a condition
         id:        RuleId
         kind:      deterministic | stochastic
-        predicate: str            # everything between the heading and the trailer, the check whole; a stochastic rule's judge prompt
+        predicate: str            # everything between the heading and the trailer, the rule whole; a stochastic rule's judge prompt
         condition: Condition | None   # None binds every member
         why:       str | None     # a block after the trailer, running to the next heading; never a predicate
 

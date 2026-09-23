@@ -28,8 +28,8 @@ passes when:
   it is taste, and taste is an objective or a judgment call, not a
   predicate.
 
-Ask of every draft: how would the linter work? If the answer is a
-script, the rule is deterministic. If the answer is a judge with a
+Ask of every draft: what would verify it? If the answer is a
+check, the rule is deterministic. If the answer is a judge with a
 prompt, the rule is stochastic and the predicate is the prompt. If
 there is no answer, it is not yet a predicate.
 
@@ -58,10 +58,10 @@ pattern, write the pattern: `doc-types/<name>/`.
 
 The first paragraph is the predicate and says what is true of the
 member. The reason goes after it. The fix goes in a runbook. A
-predicate that says "a detector rejects…" or "the commit hook
-blocks…" has slipped into enforcement, which is the wiring of a
-boundary and is never written in a rule. Cut it and write the
-condition the detector would decide: "every instance parses under
+predicate that says "a check rejects…" or "the commit hook
+blocks…" has slipped into the wiring of a
+gate and is never written in a rule. Cut it and write the
+condition the check would decide: "every instance parses under
 `encoding.md` into one object of the class".
 
 Replace a vague relation with a decidable one. "States how prose

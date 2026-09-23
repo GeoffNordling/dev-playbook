@@ -1,25 +1,25 @@
 ---
 type: General-Sheet
-title: Detector Rewrite
-description: The root of the detector rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the state it left the tree in, the eight design rulings, and what remains
+title: Check Rewrite
+description: The root of the check rewrite strand — one pass over the checking system against the settled Standards, its principles and constraints, the state it left the tree in, the eight design rulings, and what remains
 ---
 
-# Detector Rewrite
+# Check Rewrite
 
-The strand that rewrote the checking system: the Python detectors,
+The strand that rewrote the checking system: the Python checks,
 the two tables they feed, and the hook that runs them. Speculative,
 per
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
 It depends on the doc-type system strand
 ([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)),
-whose step 11 settled the rules the detectors answer to; no strand's
+whose step 11 settled the rules the checks answer to; no strand's
 plan waits on it. Its input was a survey of the fourteen rules whose
-detector tested less than the sentence, consumed by the triage.
+check tested less than the sentence, consumed by the triage.
 
 ## Goal
 
 One holistic pass over the checking system: refactor, reconsider,
-redesign. The detectors grew one at a time over months and were never
+redesign. The checks grew one at a time over months and were never
 refactored together, so the pass rewrites the whole suite against the
 settled rules, from scratch where that is cleaner, into
 `src/dev_playbook/`, grouped by module. On exit, every deterministic
@@ -41,10 +41,10 @@ is one the repo complies with.
   `language: python` with a console script instead of a self-
   bootstrapping file; a registry of checks keyed by rule id instead
   of hand-kept id tuples; one parsed repo model instead of one walk
-  per detector; `--select` and `--ignore` by rule id with one config
+  per check; `--select` and `--ignore` by rule id with one config
   surface; one test per rule id with a meta-test over the registry.
 - **Delete is the default.** Per the doc-type system's three working
-  policies: no credit for rule count, and a detector never keeps a
+  policies: no credit for rule count, and a check never keeps a
   rule alive.
 - **Simple.** Fewer moving parts beats a clever one.
 - **Plain rules.** On exit every rule body reads plain, direct, and
@@ -53,7 +53,7 @@ is one the repo complies with.
   restated with its meaning held and its heading fixed, since the
   heading is the id and every heading is approved. Unclear wording is
   never a reason to delete. A proposal on screen states how it
-  differs from today's sentence and from today's enforcement.
+  differs from today's sentence and from today's check.
 
 ## Constraints
 
@@ -62,13 +62,13 @@ is one the repo complies with.
 - **Deterministic rules only.** Stochastic rules, a judge, and any
   runner for one are out. The trailer's kind is the only slot they
   keep.
-- **No GitHub auditing.** `scripts/workspace-lint` and everything it
+- **No GitHub checks.** `scripts/workspace-lint` and everything it
   decides over `gh api` is untouched.
 - **The null rows are in.** The 52 deterministic rules with no check
   gain one on this pass, or are deleted.
 - **This repo only.** The design is judged in dev-playbook. A generic
   repo on this machine bumps its pin and refactors itself to meet the
-  new detectors, as it does today; nothing else about consumer repos
+  new checks, as it does today; nothing else about consumer repos
   is held.
 
 ## Current state
@@ -90,19 +90,15 @@ tree as it stands.
   `standards/`, and every deterministic heading is registered.
 - One test per rule id under `tests/dev_playbook/checks/`; 755 tests
   in 7.5 s where 988 took 10.0 s.
-- Under `scripts/`, `loop-lint` is the one detector left, kept for the
+- Under `scripts/`, `loop-lint` is the one check script left, kept for the
   loop workstream, and `workspace-lint` runs at no gate by ruling. The
   two tables and their scripts are gone.
-- `standards/standard/detectors.md`, `guides/writing-a-detector.md`,
-  `guides/consuming.md`, and `CONTEXT.md` still describe detector
-  scripts; the first Planned item rewrites them.
 
 ## Terms
 
-- **Detector** — per [Detectors](/standards/standard/detectors.md),
-  until the Standards-and-docs pass restates it.
-- **Check** — one Python function that decides one rule, registered
-  under that rule's id.
+- **Rule**, **Verifier**, **Check**, **Judge**, **Finding**, **Gate**
+  — per [Vocabulary](/CONTEXT.md#governance). Detector, lint, audit,
+  and enforcement are retired.
 - **Model** — the `Repo` object: the repo read once into memory, in
   parsed form, that every check reads.
 
@@ -110,7 +106,7 @@ tree as it stands.
 
 - **Hook mechanism, 2026-09-22.** A `language: python` hook whose
   entry is a console script under `[project.scripts]`; pre-commit
-  builds and caches the venv once per pin. No detector under
+  builds and caches the venv once per pin. No check script under
   `scripts/`, no `sys.path` insert. The console script is
   `playbook check`.
 - **Repo model, 2026-09-22.** One in-memory `Repo` object per run,
@@ -129,11 +125,11 @@ tree as it stands.
   every finding the function yields. The rule list and the meta-test
   read the dict. No hand-kept tuple, no `--list-rules`, no AST guard.
 - **The two tables, 2026-09-22.** `verifiers.yaml`, `boundaries.yaml`,
-  their two scripts, and the three Detectors rules that require them
+  their two scripts, and the three rules of Checks that require them
   are deleted; no code read either file. The term address dissolves.
   - The user's view is `playbook checks`: id, module, environment tag,
     computed live, with `--family` and `--without` filters.
-  - A boundary is a tag on the check, `@check(id, needs=WORKSPACE)`,
+  - A machine dependency is a tag on the check, `@check(id, needs=WORKSPACE)`,
     for a check that reads sibling repos on this machine. CI sets
     `SKIP: workspace` in place of `SKIP: ref-lint`, and `playbook
     check` reads the tag from `SKIP`.
@@ -166,21 +162,10 @@ None.
 
 ## Planned
 
-- **The Standards and the docs.** Four documents still describe
-  detector scripts, each rewritten to the state the repo is now in:
-  `standards/standard/detectors.md`, `guides/writing-a-detector.md`,
-  `guides/consuming.md`, and the Governance terms of `CONTEXT.md`. The
-  guide also says what shape a consumer repo's own checks take; each
-  consumer rewrites its scripts to that shape, and nothing about its
-  scripts today is held. Whether "detector" gives way to "check" in
-  all four is decided after the rewrite lands.
-  - **A sentence narrows to what its check does, and headings do not
-    change.** Where the sentence promises more than the check reads,
-    the sentence narrows; the code never grows to match it.
 - **The check package as a library, trade-offs to discuss.** A
   consumer repo writes checks for its own Standards. Today it copies
   dev-playbook's pattern: its own registry, model, and command, per
-  `guides/writing-a-detector.md`. The alternative is that it imports
+  `guides/writing-a-check.md`. The alternative is that it imports
   `Repo`, `@check`, and the finding printer from `dev_playbook` and
   registers its checks into one `playbook check` run. That needs code
   that does not exist: `check_registry.load()` imports only
@@ -199,12 +184,12 @@ None.
 - **Scripts under ruff, after the rewrite.** Ruff never opens the
   extensionless scripts under `scripts/`. Opening them today
   reformats three and raises 48 findings, so this waits until the
-  rewrite has deleted the detector scripts: clean up what remains,
+  rewrite has deleted the check scripts: clean up what remains,
   then add `extend-include = ["scripts/*"]` to the canonical
   `pyproject.toml` and the `executable` type to the two ruff hooks
   in the canonical `.pre-commit-config.yaml`.
 - **Signal to noise in `ralph-setup`, before the merge to main.** The
-  reading-chain audit done by hand for this loop, where dropping
+  reading-chain review done by hand for this loop, where dropping
   `ROOT.md` and the triage method and trimming each report's
   Escalations halved what one iteration reads, becomes a step of the
   `ralph-setup` skill. After the plan is designed, the agent walks
@@ -214,7 +199,7 @@ None.
   and refactor the documents until the iteration reads mostly signal.
 - **The checkpoint fork checks quality, not just completion, before
   the merge to main.** At the Step 12a checkpoint the fork ticked every
-  item as done and the gates green, and a read-only Opus audit run
+  item as done and the gates green, and a read-only Opus review run
   beside it found four rules whose sentence and check disagreed, one
   check stricter than its sentence and three sentences silent on what
   the code reads. The fork verified that the work was done, not that it
@@ -230,13 +215,22 @@ None.
   difference is a fix task that reduces the sentence to what the code
   tests, never one that grows the code. The case is one a repo writes
   today or a Standard names, never one constructed to break the code:
-  at the Step 12c checkpoint the Opus audit returned eight findings,
+  at the Step 12c checkpoint the Opus review returned eight findings,
   frontmatter with no final newline and a two-character `==` underline
-  among them, and the user ruled every one a hypothetical and the audit
+  among them, and the user ruled every one a hypothetical and the review
   a bug hunt. An agent asked for bugs finds bugs; the pass asks for
   use cases that break, or will soon.
 
 ## Completed
+
+- **The terms and the docs, 2026-09-23.** One vocabulary from the
+  Standard pseudocode: rule, verifier, check, judge, finding, gate, in
+  `CONTEXT.md`; detector, lint, audit, and enforcement retired
+  everywhere but proper names and Decision Records. Detectors became
+  [Checks](/standards/standard/checks.md), the guide
+  [Writing a Check](/guides/writing-a-check.md) with the shape of a
+  consumer's own checks, Loop's `check` became `verify`, and this
+  strand became the check rewrite.
 
 - **The rewrite and the tests, 2026-09-23.** Four phases, `8877f74` to
   `b2f8815`, the state under Current state. Phase 1, by hand: the
@@ -244,13 +238,13 @@ None.
   `sources.py`, the hook in the manifest and both configs, the
   meta-test; one word, check, at every level. Phase 2, by hand: the
   two tables, their scripts, modules, tests, and the six table rules
-  of Detectors deleted. Phase 3, a Ralph loop of twelve family steps
+  of Checks deleted. Phase 3, a Ralph loop of twelve family steps
   and six rework steps, twelve checkpoints, each released by a fork
-  and the last four audited beside it by a read-only Opus agent; nine
+  and the last four reviewed beside it by a read-only Opus agent; nine
   scripts retired; ten rule sentences reduced to their checks under
-  the Sentence equals code Guardrail, added when the Step 12a audit
+  the Sentence equals code Guardrail, added when the Step 12a review
   found four such differences and bounded to inputs a repo writes
-  today when the Step 12c audit returned eight hypotheticals. Phase 4,
+  today when the Step 12c review returned eight hypotheticals. Phase 4,
   by hand: the cut over, `playbook-lint` and its module, tests, and
   `tests/test_rule_registry.py` deleted, `SKIP: workspace` in the
   canonical CI and the secondary machine, the one-published-hook test

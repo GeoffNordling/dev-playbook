@@ -619,7 +619,7 @@ def test_one_directory_under_working_docs() -> None:
     good = {
         "working-docs/w/index.md": "# I\n",
         "working-docs/w/ROOT.md": "# R\n",
-        "working-docs/w/sub/detector-fixes.md": "# D\n",
+        "working-docs/w/sub/check-fixes.md": "# D\n",
         "working-docs/w/code/My_Module.py": "x = 1\n",
     }
     assert found(one_directory_under_working_docs, good) == []
