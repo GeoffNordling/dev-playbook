@@ -34,20 +34,23 @@ other code.
 
 ## Every definition carries a docstring
 
-Every module, class, function, and method in the file carries a
-docstring, except a file named `__init__.py` and a pytest test function,
-whose name begins with `test_`.
+**Ruff check reports nothing.** `ruff check` over the file reports
+no finding under the canonical configuration: the nine families
+`tool.ruff.lint.select` pins, `pep257` docstrings, line length and
+imperative-mood summaries ignored, no docstrings required under
+`tests/`.
 
 `python.every-definition-carries-a-docstring` · deterministic
 
-> **Why.** A pytest test function is named `test_<behavior>`, literal
-> enough that a docstring restates the name.
+> **Why.** Every module, class, function, and method in the file
+> carries a docstring, except a file named `__init__.py` and a pytest
+> test function, whose name begins with `test_`. A pytest test function
+> is named `test_<behavior>`, literal enough that a docstring restates
+> the name.
 
 ## No future annotations
 
-`from __future__ import annotations` does not appear in the file, unless
-one of the file's parent directories is named `build`, `dist`, or
-`deprecated`.
+`from __future__ import annotations` does not appear in the file.
 
 `python.no-future-annotations` · deterministic
 

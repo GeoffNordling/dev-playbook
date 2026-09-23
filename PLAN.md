@@ -54,7 +54,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 ## Tasks
 
-- [ ] Step 1, family `python`, retires `python-lint`. Report:
+- [x] Step 1, family `python`, retires `python-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/python.md`.
       Verify: `uv run playbook checks --family python` lists exactly the
       deterministic trailers under `standards/python/`; `git ls-files

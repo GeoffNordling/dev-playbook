@@ -39,3 +39,10 @@ the run drifted from what was agreed.
 ## Log
 
 <!-- iterations append one line each below this line -->
+
+- Step 1, python: `checks/python.py` with two functions and two ruff hook registrations, `test_python.py`, `style.md` edited to the triage, `python-lint` retired, report `rewrite/python.md` written; next is Step 2, testing, after the checkpoint.
+    - judgment: the docstring rule's old Why was not addressed by the triage → kept it after the old sentence in the new Why, because it explains the `test_` exception that the old sentence names.
+    - judgment: the triage drops the future-import exception but gives no blockquote → cut the `unless ...` clause and kept the rest of the sentence as written, because that is the smallest edit that matches the ruling.
+    - judgment: the hook names for the two ruff rules → `ruff-check` and `ruff-format`, the hook ids in `.pre-commit-config.yaml`, because the triage names only the tool.
+    - judgment: `docs/decisions/0011` names `python-lint` in its Consequences → dropped the name from its list, because the prompt says to remove every mention outside `working-docs/`; an Accepted record now has a changed body.
+    - judgment: `pyast.py` stays, since `testing-lint` and `repo-lint` import it → rewrote its module docstring without the retired name.

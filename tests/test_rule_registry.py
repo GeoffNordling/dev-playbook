@@ -38,7 +38,6 @@ RULE_ID = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z][a-z0-9]*(-[a-z0-9]+)*
 # (source file, finding-carrier class name, 0-based position of the rule arg).
 CARRIERS = [
     (SCRIPTS / "okf-lint", "Finding", 1),
-    (SCRIPTS / "python-lint", "Finding", 2),
     (SCRIPTS / "repo-lint", "Finding", 1),
     (SCRIPTS / "harness-files-lint", "Finding", 1),
     (SRC / "dev_playbook" / "workspace_lint.py", "Line", 1),
@@ -51,7 +50,6 @@ CARRIERS = [
 # (source file, name of the rule-id tuple that --list-rules prints).
 REGISTRIES = [
     (SCRIPTS / "okf-lint", "RULES"),
-    (SCRIPTS / "python-lint", "RULES"),
     (SCRIPTS / "repo-lint", "RULES"),
     (SCRIPTS / "harness-files-lint", "RULES"),
     (SRC / "dev_playbook" / "workspace_lint.py", "RULES"),
@@ -134,9 +132,9 @@ def _call_argument_names(tree: ast.Module) -> set[str]:
 
     A rule-id constant reaches ``--list-rules``'s ground truth only by being
     emitted, i.e. passed to a finding carrier -- directly, or through a helper
-    that forwards it (python-lint's private-access findings go through ``_add``,
-    whose constant argument is captured here). This over-approximates emission by
-    any call argument, which is exactly the rule-id constants at emission sites,
+    that forwards it, whose constant argument is captured here. This
+    over-approximates emission by any call argument, which is exactly the
+    rule-id constants at emission sites,
     since a rule-id constant is referenced nowhere else but the rule tuple.
     """
     names: set[str] = set()

@@ -226,6 +226,13 @@ only `loop-lint`:
   on the way: the registry maps a family to its module with hyphens
   as underscores, since `doc-type` and `knowledge-organization`
   cannot name a module.
+- **Step 1, python, 2026-09-23.**
+  [Python](/working-docs/doc-type-system/detector-rewrite/rewrite/python.md):
+  `checks/python.py` decides `empty-init` and `no-future-annotations`
+  over the model, and registers the docstring and formatting rules to
+  the `ruff-check` and `ruff-format` hooks. `standards/python/style.md`
+  takes the docstring rule's restated body and loses the future-import
+  exception. `python-lint` is retired with its test and roster line.
 
 ## Finish line
 
