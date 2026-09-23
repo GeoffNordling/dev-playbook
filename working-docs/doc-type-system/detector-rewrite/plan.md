@@ -178,6 +178,13 @@ commits as the range:
 - **No drift.** The judgment calls in `PROGRESS.md` are each a gap the
   report left, not a departure from it; a call that overrode the
   report is a fix task.
+- **Sentence equals code.** For each check function the range adds or
+  edits, the fork reads the rule's sentence and the function side by
+  side and names one input the two would judge differently, or states
+  there is none. A difference is a fix task that reduces the sentence
+  to what the code tests, never one that grows the code. Added after
+  Step 12a, where a read-only Opus audit found four such differences
+  the checkpoint fork had passed.
 
 ## Phase 4: cut over
 

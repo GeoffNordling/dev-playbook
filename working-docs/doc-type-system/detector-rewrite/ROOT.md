@@ -220,6 +220,20 @@ None.
   as signal for that task or noise around it, and where the noise is
   a significant share, partners with the user to redesign the plan
   and refactor the documents until the iteration reads mostly signal.
+- **The checkpoint fork checks quality, not just completion, before
+  the merge to main.** At the Step 12a checkpoint the fork ticked every
+  item as done and the gates green, and a read-only Opus audit run
+  beside it found four rules whose sentence and check disagreed, one
+  check stricter than its sentence and three sentences silent on what
+  the code reads. The fork verified that the work was done, not that it
+  was right. The `ralph-checkpointer` agent definition under
+  `dotfiles/dot-claude/agents/` gains a quality pass: for each unit the
+  segment landed, the fork reads the specification and the result side
+  by side and names one case the two would treat differently, or
+  states there is none, before ticking the marker. The Sentence equals
+  code Guardrail added to
+  [Rewrite Plan](/working-docs/doc-type-system/detector-rewrite/plan.md)
+  is this strand's copy of that pass.
 
 ## Completed
 

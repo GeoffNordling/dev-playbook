@@ -295,8 +295,17 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 12a fix: the knowledge-organization report's counts and one link
-      catch up with the restored rule. Three edits, one commit, nothing else.
+- [ ] Step 12a fix: the knowledge-organization report catches up with the
+      restored rule, and four rule sentences are brought to what their
+      checks test. The ruling for every item here: the sentence of a rule
+      and the code of its check say the same thing, and where the code
+      does less than the sentence, the sentence is reduced to the code,
+      never the code grown. Headings never change. One commit. Read first
+      the sections Writing a check, Writing a test, Editing a Standard, and
+      Conduct of
+      `working-docs/doc-type-system/detector-rewrite/prompts/rewrite-family.md`,
+      then each rule named below in its Standard and its check function in
+      `src/dev_playbook/checks/knowledge_organization.py`. Eleven items.
       1. In `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`,
          the frontmatter `description` says "thirty-five checks over the
          model" and "one set aside"; it becomes "thirty-six checks over the
@@ -314,10 +323,77 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
          `#every-member-reached-from-rootmd`, the heading Step 11 cut it
          from when the rule was set aside; the other link in that file to
          the same Standard stays as it is.
+      4. `standards/knowledge-organization/indexes.md`, rule `One entry per
+         concept document and child directory`. The check
+         `one_entry_per_concept_document_and_child_directory` reads every
+         bullet of the index outside a fenced code block as an entry, under
+         any heading; the sentence says "in its listing", which names
+         nothing. The phrase "and no other bullet in its listing" becomes
+         "and no other bullet outside a fenced code block". No code change.
+         Add one test: an index whose only stray bullet sits under a later
+         `## Notes` heading is a finding, and an index that lists its child
+         directories under a `## Directories` heading, as
+         `standards/index.md` does, is not.
+      5. Same file, rule `Alphabetical unless declared otherwise`. The
+         check sorts the same bullets, wherever they sit. The sentence
+         already says "In an `index.md`" with no scope, so it stands; add
+         one test that child bullets under a `## Directories` heading are
+         sorted with the rest.
+      6. `standards/knowledge-organization/cross-references.md`, rule
+         `Reference resolves`. The check `reference_resolves` reads a
+         `~/.claude/<rest>` target as `dotfiles/dot-claude/<rest>` in a
+         repo that tracks that directory, and skips such a target in a
+         repo that does not; the sentence says nothing of `~/.claude/`.
+         After the sentence ending "read from the linking file's
+         directory." add: "A `~/.claude/<rest>` target is read as
+         `dotfiles/dot-claude/<rest>` where the repo tracks that
+         directory, and is not checked where it does not." No code change;
+         the tests from Step 12a item 2 cover both branches.
+      7. Same file, rule `Stable named anchor`. The check
+         `stable_named_anchor` tests the anchor's form alone, digits then a
+         hyphen, and never opens the target; the sentence speaks of the
+         heading's text, which the code does not read. The body becomes:
+         "The `#anchor` of a reference does not have the form of a numbered
+         heading's slug, a run of digits then a hyphen, such as
+         `#3-bundle-structure` or `#223-revision`." The Why blockquote
+         stays. No code change.
+      8. Same file, rule `Root-absolute path in the same repo`. The check
+         `root_absolute_path_in_the_same_repo` flags a
+         `~/workspace/<this repo>/` path found as a link's target, as a
+         link's text, or bare, and passes a `~/.claude/` target the way
+         `Workspace path for another repo` does. The sentence names only
+         "in a link or bare" and only `/`. The body becomes: "In a file
+         with a fixed repo root, a reference to a file or a directory of
+         the same repo is a link whose target starts `/` and is the path
+         from the repo root, or `~/.claude/` for a file the harness loads
+         from there. A relative target, and a `~/workspace/<this repo>/`
+         path as a link's target, as a link's text, or bare, are findings."
+         Confirm against the code that each of the three positions is
+         flagged and the `~/.claude/` target is passed before editing; where
+         the code differs, the sentence follows the code. Add one test per
+         position where none exists.
+      9. `src/dev_playbook/model.py`, the bare-path scan near
+         `rstrip(md.BARE_PATH_TRAILER)`: `rstrip` removes a run of marks,
+         so `~/workspace/demo/x/..` becomes `~/workspace/demo/x/`. Remove
+         one trailing mark at most. Test in `tests/dev_playbook/test_model.py`:
+         `See ~/workspace/demo/x/..` yields the path `~/workspace/demo/x/.`.
+      10. In `src/dev_playbook/checks/knowledge_organization.py`, delete
+          the unused `LIST_MARKER`, and replace the helper `_under` with
+          `doc.section(heading.slug)` at its one call site, since
+          `MarkdownFile.section` in `model.py` computes the same lines;
+          delete `_under`. `_directly_under` stays, as the one helper that
+          stops at a heading of any level.
+      11. In `working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md`,
+          the Restated list gains one line per rule whose body items 4, 6,
+          7, and 8 changed, each naming the rule and the reason in one
+          clause, so the report says what the Standard now says.
       Verify: `grep -c "thirty-six" ` on the report prints 2 and
-      `grep -c "set aside" ` on its frontmatter prints 0; `uv run playbook
-      check .` reports zero findings, which proves the row equals the
-      description and the anchor resolves; `make check` green.
+      `grep -c "set aside" ` on its frontmatter prints 0; `grep -c
+      LIST_MARKER src/dev_playbook/checks/knowledge_organization.py`
+      prints 0; `uv run playbook checks --family knowledge-organization`
+      still lists 36 ids; `uv run playbook check .` reports zero findings,
+      which proves the row equals the description and the anchor resolves;
+      `make check` green with the new tests counted.
 
 - [ ] Step 12b, rework: the model reads every file the way a reader does and
       never crashes the run on a bad one. Four items, each with its own test
