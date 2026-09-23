@@ -62,20 +62,17 @@ it is the first thing a hand-run lap should test.
 It also has no notion of a front's plan surviving a lap. Revising what a
 front works on next is outside the library entirely.
 
-## What does not apply
+## Its container
 
 The library's headline concern is sandbox isolation: it runs each agent in
-a container and merges the commits back out. That is not what this set
-wants from it, and the tool does not force it — a no-sandbox provider runs
-the agent directly on the host, accepted everywhere a container provider
-is. The project's own decision record for that change names the reason:
-users on a subscription plan, or already inside an isolated environment,
-"had no path to AFK orchestration" while the restriction stood.
-
-The weight to judge is therefore the library's, minus the part of it this
-set will not use.
+a container and merges the commits back out. This set does want every
+front in a container, but not on the window layout Sandcastle chooses,
+which opens the real repository to the front.
+[The Sandbox](/working-docs/parallel-fronts/sandbox.md#where-sandcastle-collides)
+records the collision and the guess at a resolution. The tool also offers
+a no-sandbox provider that runs the agent directly on the host; this set
+does not use it.
 
 ## Acronyms
 
-- **AFK** — Away From Keyboard.
 - **CI** — Continuous Integration.

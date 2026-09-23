@@ -83,8 +83,8 @@ integrator is a judgment and is not.
 
 ## Planned
 
-All three runs below need a container, so all three happen on the Fedora
-machine. The WSL machine this set was written on has no container runtime and
+Every run below needs a container, so every run happens on the Fedora
+machine. The WSL machine this set was begun on has no container runtime and
 is not a target, which
 [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
 
@@ -96,6 +96,11 @@ is not a target, which
 - **Sandcastle against a clone.** Point the driver at a throwaway clone and
   watch where it opens its windows: whether it stays inside the clone, and
   whether the restamp stays off the real repository.
+- **Close the two smaller collisions.** The SELinux restamp reaching real
+  files, and Sandcastle placing the work checkout at a path not named for
+  its repository, are both expected to be solvable and must not be dropped.
+  Each is described in
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#where-sandcastle-collides).
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
 - **Decide the driver.** Choose between Sandcastle and a smaller script,

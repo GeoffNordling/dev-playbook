@@ -39,10 +39,14 @@ is spent making it portable.
 **This device holds no metered credential, and something checks.** Every
 lap bills the subscription. A billing mistake is the quietest failure in
 the set, because the run succeeds and the cost arrives later, so the
-absence of a metered credential is asserted rather than assumed. Three
-surfaces carry one: the live environment, the shell startup files, and
-`~/.claude/settings.json`. The check runs on this device, before a lap
-launches, and refuses to launch rather than reporting a finding. A check
+absence of a metered credential is asserted rather than assumed. No such
+credential exists on this device today; the check is there so that stays
+true. Four surfaces could carry one: the live environment, the shell
+startup files, `~/.claude/settings.json`, and the repository's
+`.claude/settings.json`. `billing-lint` reads all four at the commit gate
+and refuses rather than reporting a finding; the same check is to run on
+this device immediately before a lap launches, once a driver exists to
+carry it. A check
 that runs where there is no device passes without asserting anything,
 which is the failure it exists to prevent.
 
@@ -173,6 +177,17 @@ write to every branch and every other worktree, not only its own. This is
 the finding that matters most, because it contradicts the prototype's
 recorded blast radius, which was measured against a different window
 layout.
+
+Concretely: the user holds unpushed commits on a worktree `issue-123`,
+and a lap runs two fronts in the same repository. Front A runs
+`git branch -D issue-123`, or a `git gc` that prunes what it judges
+unreachable, and the unpushed commits are gone. Branch protection on
+GitHub does not help, because nothing was pushed. The same `.git` also
+holds `hooks/` and `config`, which the host's own git executes: a front
+that writes `.git/hooks/pre-commit`, or sets `core.fsmonitor`, runs a
+command on the host the next time the user commits or runs `git status`
+outside the container. So the reach is not only other branches' work but
+code the host runs.
 
 **The work checkout lands at a fixed path.** Sandcastle mounts it at a
 directory not named for the repository, which is what the section above
