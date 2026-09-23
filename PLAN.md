@@ -61,7 +61,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       scripts/python-lint` prints nothing; the report exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
 
 - [ ] Step 2, family `testing`, retires `testing-lint`. Report:
       `working-docs/doc-type-system/detector-rewrite/rewrite/testing.md`.
