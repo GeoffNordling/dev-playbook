@@ -1,6 +1,6 @@
 """The knowledge-organization family: the rules of ``standards/knowledge-organization/``.
 
-Thirty-five rules, each decided by a function over the model. Three hold the
+Thirty-six rules, each decided by a function over the model. Three hold the
 root ``CONTEXT.md`` to its type, its ``## Language`` section, and the shape of
 an entry. Eight hold a reference in a markdown file to the cross-reference
 grammar: it resolves, its anchor names a distinct, unnumbered heading, and its
@@ -8,24 +8,22 @@ form fits where the target lives and whether the file has a fixed repo root.
 Eleven hold a concept document to its frontmatter, one a directory of concept
 documents to its ``index.md``, five an ``index.md`` to its listing, one a
 ``README.md`` to its H1, three a consumer's ``okf_types`` mapping to its shape,
-and three ``working-docs/`` to its sets.
+and four ``working-docs/`` to its sets.
 
 Two checks, the ones that read a ``~/workspace/<other repo>/`` target, read
 that repo's main checkout on this machine and are tagged ``WORKSPACE``.
 """
 
-import bisect
 import posixpath
 import re
 from collections.abc import Iterator
 from dataclasses import dataclass
-from functools import cache
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 from dev_playbook import md, sources
 from dev_playbook.check_registry import WORKSPACE, Finding, check
-from dev_playbook.model import LINK_PATTERN, Heading, MarkdownFile, Repo
+from dev_playbook.model import Heading, MarkdownFile, Repo
 
 CONTEXT = "CONTEXT.md"
 ROOT_INDEX = "index.md"
@@ -47,18 +45,15 @@ LIVES_UNDER = {
     "Loop": "loops/",
     "Guide": "guides/",
 }
-CANONICAL_PREFIX = sources.CANONICAL_DIR + "/"
-WORKSPACE_PREFIX = "~/workspace/"
-CLAUDE_PREFIX = "~/.claude/"
-# A URI: a scheme, then a colon.
-URI = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
-# A bare `~/workspace/...` path outside a link and outside code.
-WORKSPACE_PATH = re.compile(r"~/workspace/[^\s)`]+")
-# A heading that starts with a section number, such as `3. Bundle` or `2.2.3 X`.
-NUMBERED_HEADING = re.compile(r"^\d+(\.\d+)*\.?\s")
+# Where the harness files ``~/.claude/`` holds are tracked, in dev-playbook.
+CLAUDE_SOURCE = "dotfiles/dot-claude"
+# The slug of a heading that starts with a section number: `3. Bundle` slugs
+# to `3-bundle`, `2.2.3 Revision` to `223-revision`.
+NUMBERED_SLUG = re.compile(r"^\d+-")
 # A type name: Title Case, hyphen-joined for a multi-word name.
 TYPE_NAME = re.compile(r"[A-Z][A-Za-z0-9]*(?:-[A-Z][A-Za-z0-9]*)*")
-KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+# A file name's extension: lowercase letters and digits after the last dot.
+EXTENSION = re.compile(r"^[a-z0-9]*$")
 FIXED_NAMES = frozenset(
     {INDEX, ROOT_NOTE, README, "PROMPT.md", "SKILL.md", "CLAUDE.md"}
 )
@@ -73,13 +68,17 @@ BOLD_START = re.compile(r"^[-*+]\s+\*\*")
 
 @dataclass(frozen=True)
 class Reference:
-    """One reference in a markdown file: a link target or a bare workspace path."""
+    """One reference in a markdown file: a link target or a bare workspace path.
+
+    ``in_link`` is True for a bare path that sits in a link's text.
+    """
 
     source: str
     line: int
     target: str
     text: str
     bare: bool
+    in_link: bool = False
 
     @property
     def path(self) -> str:
@@ -92,20 +91,6 @@ class Reference:
         return self.target.partition("#")[2]
 
 
-@dataclass(frozen=True)
-class Resolved:
-    """Where a reference points: this repo's path, another repo's, or nowhere read.
-
-    ``kind`` is ``repo`` (``path`` is repo-relative, ``""`` the root), ``other``
-    (``path`` is the full path on this machine), ``outside`` (a relative target
-    above the repo root), or ``skip`` (a URI, a ``~/.claude/`` path, or any form
-    the grammar does not resolve).
-    """
-
-    kind: str
-    path: str
-
-
 # --- shared: references --------------------------------------------------
 
 
@@ -116,86 +101,37 @@ def _sources(repo: Repo) -> Iterator[MarkdownFile]:
             yield doc
 
 
-def _indented_code(doc: MarkdownFile) -> frozenset[int]:
-    """The line numbers of the indented code blocks in a file.
-
-    A line opens or continues one when it follows a blank line or another
-    such line, is indented four columns past the last prose line before the
-    blank, and is not a list item.
-    """
-    found: set[int] = set()
-    base = 0
-    after_blank = False
-    in_block = False
-    for number, text in doc.content:
-        if not text.strip():
-            after_blank = True
-            continue
-        indent = len(text) - len(text.lstrip(" "))
-        stripped = text.lstrip(" ")
-        opens = (after_blank or in_block) and indent >= base + 4
-        if opens and not LIST_MARKER.match(stripped):
-            found.add(number)
-            in_block = True
-        else:
-            in_block = False
-            base = indent
-        after_blank = False
-    return frozenset(found)
-
-
 def _references(doc: MarkdownFile) -> list[Reference]:
     """Every reference in one file, outside fenced and indented code.
 
     A reference is an inline link's target, or a ``~/workspace/`` path
-    outside a link. Inline code spans are not read. The lines are joined so a
-    link whose text wraps a line break is one link.
+    outside a link's target, as the model reads both.
     """
-    code = _indented_code(doc)
     refs = [
         Reference(doc.path, link.line, link.target, link.text, False)
         for link in doc.links
-        if link.line not in code
+        if link.line not in doc.indented_code
     ]
-    kept = [(n, t) for n, t in doc.content if n not in code]
-    stripped = [md.INLINE_CODE_PATTERN.sub("", t) for _, t in kept]
-    starts = [0]
-    for text in stripped[:-1]:
-        starts.append(starts[-1] + len(text) + 1)
-    joined = "\n".join(stripped)
-    # A link becomes spaces of its own length, so every offset still maps to its line.
-    masked = LINK_PATTERN.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), joined)
-    for m in WORKSPACE_PATH.finditer(masked):
-        line = kept[bisect.bisect_right(starts, m.start()) - 1][0]
-        refs.append(Reference(doc.path, line, m.group(0), "", True))
+    refs.extend(
+        Reference(doc.path, bare.line, bare.target, "", True, bare.in_link)
+        for bare in doc.bare_paths
+    )
     return refs
 
 
-def _resolve(repo: Repo, ref: Reference) -> Resolved:
-    """Where one reference points, read from the linking file's repo."""
-    path = ref.path
-    if not path:
-        return Resolved("repo", ref.source) if ref.anchor else Resolved("skip", "")
-    if URI.match(path) or path.startswith(CLAUDE_PREFIX):
-        return Resolved("skip", "")
-    if path.startswith(WORKSPACE_PREFIX):
-        name, _, rest = path.removeprefix(WORKSPACE_PREFIX).partition("/")
-        if name == repo.name:
-            return Resolved("repo", _normal(rest))
-        return Resolved("other", str(Path.home() / "workspace" / name / rest))
-    if path.startswith("~"):
-        return Resolved("skip", "")
-    if path.startswith("/"):
-        return Resolved("repo", _normal(path.lstrip("/")))
-    joined = posixpath.normpath(posixpath.join(posixpath.dirname(ref.source), path))
-    if joined == ".." or joined.startswith("../"):
-        return Resolved("outside", joined)
-    return Resolved("repo", _normal(joined))
+def _resolve(repo: Repo, ref: Reference) -> md.Target:
+    """Where one reference points, read from the linking file's repo.
+
+    A ``~/.claude/`` target resolves into ``dotfiles/dot-claude/`` where the
+    repo tracks that directory, and is skipped where it does not.
+    """
+    claude_root = CLAUDE_SOURCE if _has_dir(repo, CLAUDE_SOURCE) else None
+    return md.resolve_target(ref.source, ref.target, repo.name, claude_root)
 
 
-def _normal(path: str) -> str:
-    normal = posixpath.normpath(path) if path else ""
-    return "" if normal == "." else normal
+def _has_dir(repo: Repo, directory: str) -> bool:
+    prefix = directory + "/"
+    return any(f.startswith(prefix) for f in repo.files)
 
 
 def _exists(repo: Repo, path: str) -> bool:
@@ -206,20 +142,7 @@ def _exists(repo: Repo, path: str) -> bool:
     return any(f.startswith(prefix) for f in repo.files)
 
 
-@cache
-def _slugs_on_disk(path: str) -> frozenset[str]:
-    return md.heading_slugs(Path(path))
-
-
-def _heading(repo: Repo, resolved: Resolved, anchor: str) -> Heading | None:
-    """The heading of an in-repo ``.md`` target whose slug is ``anchor``."""
-    doc = repo.markdown.get(resolved.path)
-    if doc is None:
-        return None
-    return next((h for h in doc.headings if h.slug == anchor), None)
-
-
-def _is_repo_md(repo: Repo, resolved: Resolved) -> bool:
+def _is_repo_md(repo: Repo, resolved: md.Target) -> bool:
     return resolved.kind == "repo" and resolved.path in repo.markdown
 
 
@@ -271,8 +194,23 @@ def term_definition_avoid_line(repo: Repo) -> Iterator[Finding]:
     )
     if section is None:
         return
-    for paragraph in _paragraphs(doc.section(section.slug)):
+    for paragraph in _paragraphs(_under(doc, section)):
         yield from _entry_findings(paragraph)
+
+
+def _under(doc: MarkdownFile, heading: Heading) -> tuple[tuple[int, str], ...]:
+    """The content lines under ``heading``, to the next heading of its level or higher."""
+    end = next(
+        (
+            h.line
+            for h in doc.headings
+            if h.line > heading.line and h.level <= heading.level
+        ),
+        None,
+    )
+    return tuple(
+        (n, t) for n, t in doc.content if n > heading.line and (end is None or n < end)
+    )
 
 
 def _paragraphs(
@@ -349,7 +287,7 @@ def fragment_anchor_matches_the_slug(repo: Repo) -> Iterator[Finding]:
                 and resolved.path.endswith(".md")
                 and Path(resolved.path).is_file()
             ):
-                slugs = set(_slugs_on_disk(resolved.path))
+                slugs = set(repo.slugs_on_disk(resolved.path))
             else:
                 continue
             if ref.anchor not in slugs:
@@ -377,16 +315,16 @@ def headings_slugify_distinctly(repo: Repo) -> Iterator[Finding]:
 
 @check("knowledge-organization.stable-named-anchor")
 def stable_named_anchor(repo: Repo) -> Iterator[Finding]:
-    """A reference's ``#anchor`` does not name a heading that starts with a section number."""
+    """A reference's ``#anchor`` does not have the form of a numbered heading's slug.
+
+    The form needs no file, so every ``.md`` target is read, in this repo or
+    another, and a same-file anchor too.
+    """
     for doc in _sources(repo):
         for ref in _references(doc):
-            if not ref.anchor:
+            if not ref.anchor or not (not ref.path or ref.path.endswith(".md")):
                 continue
-            resolved = _resolve(repo, ref)
-            if not _is_repo_md(repo, resolved):
-                continue
-            heading = _heading(repo, resolved, ref.anchor)
-            if heading is not None and NUMBERED_HEADING.match(heading.text):
+            if NUMBERED_SLUG.match(ref.anchor):
                 yield Finding(
                     ref.source,
                     ref.line,
@@ -400,7 +338,7 @@ def workspace_path_for_another_repo(repo: Repo) -> Iterator[Finding]:
     for doc in _sources(repo):
         for ref in _references(doc):
             resolved = _resolve(repo, ref)
-            if ref.bare and resolved.kind == "other":
+            if ref.bare and not ref.in_link and resolved.kind == "other":
                 yield Finding(
                     ref.source,
                     ref.line,
@@ -436,8 +374,8 @@ def root_absolute_path_in_the_same_repo(repo: Repo) -> Iterator[Finding]:
 
 
 def _is_this_workspace(repo: Repo, ref: Reference) -> bool:
-    return ref.path.startswith(f"{WORKSPACE_PREFIX}{repo.name}/") or (
-        ref.path == f"{WORKSPACE_PREFIX}{repo.name}"
+    return ref.path.startswith(f"{md.WORKSPACE_PREFIX}{repo.name}/") or (
+        ref.path == f"{md.WORKSPACE_PREFIX}{repo.name}"
     )
 
 
@@ -447,7 +385,7 @@ def _is_relative(ref: Reference) -> bool:
         not ref.bare
         and bool(path)
         and not path.startswith(("/", "~"))
-        and not URI.match(path)
+        and not md.URI_PATTERN.match(path)
     )
 
 
@@ -501,12 +439,13 @@ def relative_path_inside_the_bundle(repo: Repo) -> Iterator[Finding]:
 
 
 def _bundle_target(repo: Repo, ref: Reference, bundle: str) -> bool:
-    """True where a ``/``, ``~/workspace/``, or ``~/.claude/`` target lands in ``bundle``."""
-    path = ref.path
-    if path.startswith(CLAUDE_PREFIX):
-        skill = "skills/" + PurePosixPath(bundle).name
-        return _inside(_normal(path.removeprefix(CLAUDE_PREFIX)), skill)
-    if not path.startswith(("/", WORKSPACE_PREFIX)):
+    """True where a ``/``, ``~/workspace/``, or ``~/.claude/`` target lands in ``bundle``.
+
+    A ``~/.claude/skills/<name>/`` target lands in the file's own bundle only
+    where that bundle is ``dotfiles/dot-claude/skills/<name>/``, the copy
+    ``~/.claude/`` holds.
+    """
+    if not ref.path.startswith(("/", md.WORKSPACE_PREFIX, md.CLAUDE_PREFIX)):
         return False
     resolved = _resolve(repo, ref)
     return resolved.kind == "repo" and _inside(resolved.path, bundle)
@@ -521,13 +460,9 @@ def _concept_documents(repo: Repo) -> Iterator[MarkdownFile]:
             yield doc
 
 
-def _is_dev_playbook(repo: Repo) -> bool:
-    return any(path.startswith(CANONICAL_PREFIX) for path in repo.files)
-
-
 def _local_types(repo: Repo) -> dict[Any, Any] | None:
     """The root index's ``okf_types`` mapping, where a consumer declares one."""
-    if _is_dev_playbook(repo):
+    if repo.is_dev_playbook:
         return None
     index = repo.markdown.get(ROOT_INDEX)
     if index is None or index.frontmatter is None:
@@ -593,7 +528,7 @@ def resource_a_repo_root_path_or_a_uri(repo: Repo) -> Iterator[Finding]:
             continue
         resource = doc.frontmatter["resource"]
         if not isinstance(resource, str) or not (
-            resource.startswith("/") or URI.match(resource)
+            resource.startswith("/") or md.URI_PATTERN.match(resource)
         ):
             yield Finding(
                 doc.path, None, f"resource {resource!r} is not a '/' path or a URI"
@@ -654,10 +589,10 @@ def guide_lives_under_guides(repo: Repo) -> Iterator[Finding]:
 def readmemd_is_typed_readme(repo: Repo) -> Iterator[Finding]:
     """A concept document is named ``README.md`` exactly where it has ``type: README``."""
     for doc in _concept_documents(repo):
-        if doc.frontmatter is None or "type" not in doc.frontmatter:
+        if doc.frontmatter is None:
             continue
         named = PurePosixPath(doc.path).name == README
-        typed = doc.frontmatter["type"] == README_TYPE
+        typed = doc.frontmatter.get("type") == README_TYPE
         if named and not typed:
             yield Finding(
                 doc.path, None, f"a {README} does not have type: {README_TYPE}"
@@ -702,16 +637,21 @@ def no_okf_type(repo: Repo) -> Iterator[Finding]:
 
 @check("knowledge-organization.introduction-between-h1-and-listing")
 def introduction_between_h1_and_listing(repo: Repo) -> Iterator[Finding]:
-    """An ``index.md`` has a line of prose between its H1 and its first listed entry."""
+    """An ``index.md`` has a line of prose between its H1 and its first listed entry.
+
+    An ``index.md`` with no H1 above its first entry has no such line.
+    """
     for doc in _indexes(repo):
+        h1 = False
         prose = False
         for _, text in doc.content:
             stripped = text.strip()
             if BULLET.match(text):
                 break
             if stripped.startswith("# "):
+                h1 = True
                 prose = False
-            elif stripped and not stripped.startswith(("#", ORDERING)):
+            elif h1 and stripped and not stripped.startswith(("#", ORDERING)):
                 prose = True
         if not prose:
             yield Finding(
@@ -730,6 +670,7 @@ class Entry:
 
 
 def _entries(doc: MarkdownFile) -> list[Entry]:
+    """The bullets of the listing: every bullet outside fences."""
     entries: list[Entry] = []
     for number, text in doc.content:
         if not BULLET.match(text):
@@ -744,14 +685,12 @@ def _entries(doc: MarkdownFile) -> list[Entry]:
 
 
 def _child_indexes(repo: Repo, directory: str) -> set[str]:
-    """The ``index.md`` of each directory directly under ``directory``."""
+    """The index of each directory directly under ``directory``, as the model classifies it."""
     prefix = directory + "/" if directory else ""
     return {
-        path
-        for path in repo.contents
-        if path.startswith(prefix)
-        and path.count("/") == prefix.count("/") + 1
-        and PurePosixPath(path).name == INDEX
+        doc.path
+        for doc in _indexes(repo)
+        if doc.path.startswith(prefix) and doc.path.count("/") == prefix.count("/") + 1
     }
 
 
@@ -787,7 +726,9 @@ def one_entry_per_concept_document_and_child_directory(
             if concept is None or concept.frontmatter is None:
                 continue
             description = concept.frontmatter.get("description")
-            if isinstance(description, str) and entry.rest != f" — {description}":
+            if isinstance(description, str) and not entry.rest.endswith(
+                f" — {description}"
+            ):
                 yield Finding(
                     doc.path,
                     entry.line,
@@ -809,7 +750,7 @@ def alphabetical_unless_declared_otherwise(repo: Repo) -> Iterator[Finding]:
             yield Finding(
                 doc.path, entries[readmes[0]].line, "the README.md entry is not first"
             )
-        if _declares_order(doc, entries[0].line):
+        if _declares_order(doc):
             continue
         groups = [_group(e) for e in entries]
         if groups != sorted(groups):
@@ -833,19 +774,25 @@ def _group(entry: Entry) -> int:
     return 2 if name == INDEX else 1
 
 
-def _declares_order(doc: MarkdownFile, first_entry: int) -> bool:
-    return any(
-        text.strip().startswith(ORDERING)
-        for number, text in doc.content
-        if number < first_entry
-    )
+def _declares_order(doc: MarkdownFile) -> bool:
+    """True where an ``Ordering:`` line sits above the file's first bullet of any kind."""
+    for _, text in doc.content:
+        if BULLET.match(text):
+            return False
+        if text.strip().startswith(ORDERING):
+            return True
+    return False
 
 
 @check("knowledge-organization.okf-version-declared")
 def okf_version_declared(repo: Repo) -> Iterator[Finding]:
-    """The ``index.md`` at the repository root declares ``okf_version``."""
+    """The ``index.md`` at the repository root declares ``okf_version``.
+
+    A repo with no root ``index.md`` declares nothing, so it is a finding too.
+    """
     doc = repo.markdown.get(ROOT_INDEX)
     if doc is None:
+        yield Finding(ROOT_INDEX, None, f"no root index.md to declare {OKF_VERSION}")
         return
     if doc.frontmatter is None or OKF_VERSION not in doc.frontmatter:
         yield Finding(ROOT_INDEX, None, f"root index.md does not declare {OKF_VERSION}")
@@ -870,7 +817,7 @@ def readme_holds_an_h1(repo: Repo) -> Iterator[Finding]:
 @check("knowledge-organization.type-name-to-description")
 def type_name_to_description(repo: Repo) -> Iterator[Finding]:
     """Each ``okf_types`` key is a type name and its value one non-empty line."""
-    if _is_dev_playbook(repo):
+    if repo.is_dev_playbook:
         return
     index = repo.markdown.get(ROOT_INDEX)
     if index is None or index.frontmatter is None:
@@ -961,7 +908,10 @@ def one_directory_under_working_docs(repo: Repo) -> Iterator[Finding]:
             name = PurePosixPath(path).name
             if name in FIXED_NAMES or name.endswith(".py"):
                 continue
-            if not KEBAB.match(name.partition(".")[0]):
+            stem, dot, extension = name.rpartition(".")
+            if not dot:
+                stem, extension = name, ""
+            if not (md.KEBAB_CASE.match(stem) and EXTENSION.match(extension)):
                 yield Finding(path, None, "the file name is not lowercase kebab-case")
 
 
@@ -1004,11 +954,77 @@ def _worklist_findings(doc: MarkdownFile, leaf: bool) -> Iterator[Finding]:
                 yield Finding(
                     doc.path, heading.line, f"a '## {name}' outside a leaf ROOT.md"
                 )
-        for heading in headings[:1] if leaf else ():
-            for number, text in doc.section(heading.slug):
+        for heading in headings if leaf else ():
+            for number, text in _directly_under(doc, heading):
                 if TOP_BULLET.match(text) and not BOLD_START.match(text):
                     yield Finding(
                         doc.path,
                         number,
                         "a worklist item does not start with a bold name",
                     )
+
+
+def _directly_under(doc: MarkdownFile, heading: Heading) -> tuple[tuple[int, str], ...]:
+    """The content lines under ``heading``, to the next heading of any level."""
+    end = next((h.line for h in doc.headings if h.line > heading.line), None)
+    return tuple(
+        (n, t) for n, t in doc.content if n > heading.line and (end is None or n < end)
+    )
+
+
+@check("knowledge-organization.every-member-reached-from-rootmd")
+def every_member_reached_from_rootmd(repo: Repo) -> Iterator[Finding]:
+    """Every ``.md`` file of a set but an ``index.md`` is reached from its ``ROOT.md`` by links."""
+    for directory in _sets(repo):
+        members = {
+            path
+            for path in repo.markdown
+            if path.startswith(directory + "/") and PurePosixPath(path).name != INDEX
+        }
+        graph = {path: _set_links(repo, path, members) for path in members}
+        for path in sorted(members):
+            root = _root_of(repo, directory, path)
+            if root is not None and path not in _reached(graph, root):
+                yield Finding(path, None, f"not reached by links from {root}")
+
+
+def _set_links(repo: Repo, path: str, members: set[str]) -> set[str]:
+    """The members of the set that one member's links point at."""
+    doc = repo.markdown[path]
+    targets: set[str] = set()
+    for ref in _references(doc):
+        if ref.bare:
+            continue
+        resolved = _resolve(repo, ref)
+        if resolved.kind == "repo" and resolved.path in members:
+            targets.add(resolved.path)
+    return targets
+
+
+def _root_of(repo: Repo, directory: str, path: str) -> str | None:
+    """The ``ROOT.md`` a member is reached from; None for the set's own root.
+
+    A file's is the one in its own directory or the nearest above; a
+    ``ROOT.md``'s is the next one above its own.
+    """
+    here = posixpath.dirname(path)
+    if PurePosixPath(path).name == ROOT_NOTE:
+        here = posixpath.dirname(here)
+    while _inside(here, directory):
+        candidate = f"{here}/{ROOT_NOTE}"
+        if candidate in repo.markdown:
+            return candidate
+        here = posixpath.dirname(here)
+    return None
+
+
+def _reached(graph: dict[str, set[str]], root: str) -> set[str]:
+    """Every member a chain of links leads to from ``root``, ``root`` included."""
+    seen = {root}
+    frontier = [root]
+    while frontier:
+        for target in graph.get(frontier.pop(), set()):
+            if target not in seen:
+                seen.add(target)
+                frontier.append(target)
+    return seen

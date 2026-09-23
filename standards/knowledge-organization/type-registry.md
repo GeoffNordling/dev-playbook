@@ -2,15 +2,15 @@
 type: Standard
 title: Type Registry
 description: The document-type vocabulary a consumer adds to — the okf_types mapping in its root index, each entry's shape, the order of its keys, and no key that shadows a type
-population: "a document-type declaration: dev-playbook's `## Types` table, or a consumer's root-index `okf_types` mapping"
+population: "a document-type declaration: the table under `` `type` names a registered type `` in dev-playbook's `document-types.md`, or a consumer's root-index `okf_types` mapping"
 ---
 
 # Type Registry
 
-Where a document type is declared. The global registry is the `## Types`
-table of
-[Document Types](/standards/knowledge-organization/document-types.md) in
-dev-playbook, the vocabulary every repo inherits. A consumer repo that
+Where a document type is declared. The global registry is the table
+under
+[`type` names a registered type](/standards/knowledge-organization/document-types.md#type-names-a-registered-type)
+in dev-playbook's Document Types, the vocabulary every repo inherits. A consumer repo that
 carries a document type no other repo shares declares it in the
 frontmatter of its own root `index.md`, an `okf_types` mapping beside
 `okf_version`; a check resolves a document's `type` against the union of

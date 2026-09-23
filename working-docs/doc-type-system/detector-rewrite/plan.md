@@ -95,18 +95,18 @@ The order, smallest first, with what each step retires:
 
 | Step | Family | Retires |
 | --- | --- | --- |
-| 1 | python | `python-lint` |
-| 2 | testing | `testing-lint` |
-| 3 | decisions | `decisions-lint` |
-| 4 | prose | `prose-lint` |
-| 5 | tracking | nothing; `workspace-lint` is untouched |
-| 6 | distribution | nothing yet |
-| 7 | build | nothing yet |
-| 8 | harness | nothing yet |
-| 9 | standard | nothing yet |
-| 10 | doc-type | `harness-files-lint`, `standards-lint` |
-| 11 | knowledge-organization | `okf-lint`, `ref-lint`, `repo-lint` |
-| 12 | shell | nothing; its two tool-decided rules landed in phase 1 |
+| 1 | [python](/working-docs/doc-type-system/detector-rewrite/rewrite/python.md) | `python-lint` |
+| 2 | [testing](/working-docs/doc-type-system/detector-rewrite/rewrite/testing.md) | `testing-lint` |
+| 3 | [decisions](/working-docs/doc-type-system/detector-rewrite/rewrite/decisions.md) | `decisions-lint` |
+| 4 | [prose](/working-docs/doc-type-system/detector-rewrite/rewrite/prose.md) | `prose-lint` |
+| 5 | [tracking](/working-docs/doc-type-system/detector-rewrite/rewrite/tracking.md) | nothing; `workspace-lint` is untouched |
+| 6 | [distribution](/working-docs/doc-type-system/detector-rewrite/rewrite/distribution.md) | nothing yet |
+| 7 | [build](/working-docs/doc-type-system/detector-rewrite/rewrite/build.md) | nothing yet |
+| 8 | [harness](/working-docs/doc-type-system/detector-rewrite/rewrite/harness.md) | nothing yet |
+| 9 | [standard](/working-docs/doc-type-system/detector-rewrite/rewrite/standard.md) | nothing yet |
+| 10 | [doc-type](/working-docs/doc-type-system/detector-rewrite/rewrite/doc-type.md) | `harness-files-lint`, `standards-lint` |
+| 11 | [knowledge-organization](/working-docs/doc-type-system/detector-rewrite/rewrite/knowledge-organization.md) | `okf-lint`, `ref-lint`, `repo-lint` |
+| 12 | [shell](/working-docs/doc-type-system/detector-rewrite/rewrite/shell.md) | nothing; its two tool-decided rules landed in phase 1 |
 
 A name in the last column means the script under `scripts/`, its
 package module where it has one, its tests, and its roster line.

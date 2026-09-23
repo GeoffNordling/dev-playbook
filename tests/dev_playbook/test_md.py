@@ -297,6 +297,26 @@ class TestHeadingSlugs:
         assert md.heading_slugs(f) == frozenset({"top", "mid", "deep"})
 
 
+class TestResolveTarget:
+    def test_forms(self) -> None:
+        def got(target: str, claude: str | None = None) -> tuple[str, str]:
+            resolved = md.resolve_target("d/a.md", target, "demo", claude)
+            return resolved.kind, resolved.path
+
+        assert got("/b.md#x") == ("repo", "b.md")
+        assert got("c.md") == ("repo", "d/c.md")
+        assert got("#x") == ("repo", "d/a.md")
+        assert got("../../up.md") == ("outside", "../up.md")
+        assert got("~/workspace/demo/b.md") == ("repo", "b.md")
+        assert got("~/workspace/other/b.md")[0] == "other"
+        assert got("https://example.com") == ("skip", "")
+        assert got("~/.claude/rules/r.md") == ("skip", "")
+        assert got("~/.claude/rules/r.md", "dotfiles/dot-claude") == (
+            "repo",
+            "dotfiles/dot-claude/rules/r.md",
+        )
+
+
 class TestFindMdFiles:
     def test_ambient_git_dir_does_not_redirect_discovery(
         self, tmp_path: Path, ambient_git_dir: Callable[[str], Path]

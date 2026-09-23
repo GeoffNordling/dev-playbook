@@ -77,11 +77,6 @@ def _scripts_hold_python(repo: Repo) -> bool:
     return any(path.startswith("scripts/") for path in repo.python)
 
 
-def _carries_canonical(repo: Repo) -> bool:
-    """True for the repo that tracks the canonical directory, dev-playbook."""
-    return any(path.startswith(sources.CANONICAL_DIR + "/") for path in repo.files)
-
-
 def _canonical(repo: Repo, name: str) -> str:
     """The text of one canonical source file, from the copy the model carries."""
     return repo.canonical[name].decode("utf-8")
@@ -265,7 +260,7 @@ def holds_every_canonical_block(repo: Repo) -> Iterator[Finding]:
     """
     if PRE_COMMIT_CONFIG not in repo.contents:
         return
-    exempt = _carries_canonical(repo)
+    exempt = repo.is_dev_playbook
     lines = repo.text(PRE_COMMIT_CONFIG).splitlines()
     position = 0
     for block in _config_blocks(_canonical(repo, PRE_COMMIT_CONFIG)):

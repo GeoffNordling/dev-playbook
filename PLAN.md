@@ -198,7 +198,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
 
 <!-- [x] checkpoint -->
 
-- [ ] Step 12a, rework: the `knowledge-organization` family to its sentences.
+- [x] Step 12a, rework: the `knowledge-organization` family to its sentences.
       A rule-by-rule audit of Step 11 found each item below; fix every one,
       in `src/dev_playbook/checks/knowledge_organization.py`, its test file
       `tests/dev_playbook/checks/test_knowledge_organization.py`, and the

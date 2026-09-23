@@ -115,7 +115,7 @@ def the_catalog_lists_every_directory(repo: Repo) -> Iterator[Finding]:
         if directories:
             yield Finding(CATALOG, None, "a `standards/` tree has a catalog here")
         return
-    lead = [META_DIR] if _in_dev_playbook(repo) and META_DIR in directories else []
+    lead = [META_DIR] if repo.is_dev_playbook and META_DIR in directories else []
     names = lead + sorted(directories - set(lead))
     expected = [README] + [f"{STANDARDS}/{name}/{INDEX}" for name in names]
     entries = _entries(repo.markdown[CATALOG])
@@ -158,7 +158,7 @@ def the_catalog_lists_every_directory(repo: Repo) -> Iterator[Finding]:
 @check("standard.no-shadowing")
 def no_shadowing(repo: Repo) -> Iterator[Finding]:
     """Outside dev-playbook, no ``standards/`` directory has a name dev-playbook's has."""
-    if _in_dev_playbook(repo):
+    if repo.is_dev_playbook:
         return
     for name in sorted(_directories(repo) & sources.STANDARD_DIRECTORIES):
         yield Finding(
@@ -171,7 +171,7 @@ def no_shadowing(repo: Repo) -> Iterator[Finding]:
 @check("standard.offered-by-the-canonical-template")
 def offered_by_the_canonical_template(repo: Repo) -> Iterator[Finding]:
     """The canonical config's dev-playbook block offers exactly the manifest's hook ids."""
-    if not _in_dev_playbook(repo):
+    if not repo.is_dev_playbook or CANONICAL_CONFIG not in repo.contents:
         return
     canonical, fault = _load(repo, CANONICAL_CONFIG)
     if fault is not None:
@@ -197,11 +197,6 @@ def offered_by_the_canonical_template(repo: Repo) -> Iterator[Finding]:
             None,
             f"dev-playbook block hook {hook} is not published in {MANIFEST}",
         )
-
-
-def _in_dev_playbook(repo: Repo) -> bool:
-    """Whether the repo tracks the canonical pre-commit config only dev-playbook hosts."""
-    return CANONICAL_CONFIG in repo.contents
 
 
 def _directories(repo: Repo) -> set[str]:

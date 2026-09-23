@@ -10,6 +10,7 @@ from dev_playbook.checks.knowledge_organization import (
     add_never_shadow,
     alphabetical_unless_declared_otherwise,
     an_index_in_every_directory,
+    every_member_reached_from_rootmd,
     fragment_anchor_matches_the_slug,
     frontmatter_a_yaml_mapping,
     frontmatter_declares_type_vocabulary,
@@ -46,6 +47,7 @@ from dev_playbook.checks.knowledge_organization import (
 from dev_playbook.model import Repo
 
 SKILL = "dotfiles/dot-claude/skills/demo"
+CLAUDE_RULE = "dotfiles/dot-claude/rules/r.md"
 CANONICAL = "standards/build/canonical/.gitignore"
 
 
@@ -113,6 +115,24 @@ def test_term_definition_avoid_line() -> None:
     ]
 
 
+def test_term_definition_avoid_line_counts_definitions_and_avoid_lines() -> None:
+    bad = "## Language\n\n**Order**\n_Avoid_: X\n\n**Bill**\nA bill.\n_Avoid_: Y\n_Avoid_: Z\n"
+    assert found(term_definition_avoid_line, {"CONTEXT.md": context(bad)}) == [
+        ("CONTEXT.md", 11),
+        ("CONTEXT.md", 17),
+    ]
+
+
+def test_term_definition_avoid_line_reads_the_h2_not_an_h1_of_its_slug() -> None:
+    body = "# Language\n\n**Loose** words\n\n## Language\n\n**Order**\nA thing.\n"
+    assert (
+        found(
+            term_definition_avoid_line, {"CONTEXT.md": doc("type: Vocabulary\n", body)}
+        )
+        == []
+    )
+
+
 # --- cross-references.md ---
 
 
@@ -132,6 +152,13 @@ def test_reference_resolves(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
         ("a.md", 2),
         ("a.md", 3),
     ]
+
+
+def test_reference_resolves_reads_claude_targets_where_tracked() -> None:
+    link = "[r](~/.claude/rules/r.md)\n[g](~/.claude/rules/gone.md)\n"
+    files = {"a.md": link, CLAUDE_RULE: "# R\n"}
+    assert found(reference_resolves, files) == [("a.md", 2)]
+    assert found(reference_resolves, {"a.md": link}) == []
 
 
 def test_reference_resolves_skips_a_numbered_decision_record() -> None:
@@ -159,6 +186,12 @@ def test_fragment_anchor_matches_the_slug(
     ]
 
 
+def test_fragment_anchor_matches_the_slug_reads_claude_targets() -> None:
+    links = "[a](~/.claude/rules/r.md#part)\n[b](~/.claude/rules/r.md#nope)\n"
+    files = {"a.md": links, CLAUDE_RULE: "# R\n\n## Part\n"}
+    assert found(fragment_anchor_matches_the_slug, files) == [("a.md", 2)]
+
+
 def test_headings_slugify_distinctly() -> None:
     assert found(headings_slugify_distinctly, {"a.md": "# A\n\n## B\n"}) == []
     assert found(headings_slugify_distinctly, {"a.md": "# A\n\n## B\n\n## `B`\n"}) == [
@@ -176,6 +209,13 @@ def test_stable_named_anchor() -> None:
     assert found(stable_named_anchor, {"a.md": bad, "t.md": target}) == [("a.md", 1)]
 
 
+def test_stable_named_anchor_reads_the_form_of_any_md_target() -> None:
+    good = "[a](~/workspace/other/t.md#named) [b](/dir#2-x) [c](#top)\n"
+    assert found(stable_named_anchor, {"a.md": good}) == []
+    bad = "[a](~/workspace/other/t.md#223-revision)\n[b](#3-bundle)\n"
+    assert found(stable_named_anchor, {"a.md": bad}) == [("a.md", 1), ("a.md", 2)]
+
+
 def test_workspace_path_for_another_repo() -> None:
     good = "[x](~/workspace/other/a.md)\n\n    ~/workspace/other/in-code.md\n"
     assert found(workspace_path_for_another_repo, {"a.md": good}) == []
@@ -184,6 +224,13 @@ def test_workspace_path_for_another_repo() -> None:
         ("d/a.md", 1),
         ("d/a.md", 2),
     ]
+
+
+def test_workspace_path_for_another_repo_accepts_a_path_in_link_text() -> None:
+    good = "[~/workspace/other/a.md](~/workspace/other/a.md)\n"
+    assert found(workspace_path_for_another_repo, {"a.md": good}) == []
+    bad = "Read ~/workspace/other/a.md.\n"
+    assert found(workspace_path_for_another_repo, {"a.md": bad}) == [("a.md", 1)]
 
 
 def test_root_absolute_path_in_the_same_repo() -> None:
@@ -228,6 +275,14 @@ def test_relative_path_inside_the_bundle() -> None:
         (f"{SKILL}/SKILL.md", 2),
         (f"{SKILL}/SKILL.md", 3),
     ]
+
+
+def test_relative_path_inside_the_bundle_reads_claude_only_for_its_copy() -> None:
+    link = "[c](~/.claude/skills/demo/references/x.md)\n"
+    consumer = ".claude/skills/demo/SKILL.md"
+    assert found(relative_path_inside_the_bundle, {consumer: link}) == []
+    files = {f"{SKILL}/SKILL.md": link, f"{SKILL}/references/x.md": "# X\n"}
+    assert found(relative_path_inside_the_bundle, files) == [(f"{SKILL}/SKILL.md", 1)]
 
 
 # --- document-types.md ---
@@ -332,6 +387,11 @@ def test_readmemd_is_typed_readme() -> None:
     assert found(readmemd_is_typed_readme, bad) == [("README.md", None), ("a.md", None)]
 
 
+def test_readmemd_is_typed_readme_reports_a_readme_with_no_type() -> None:
+    untyped = {"d/README.md": doc("title: R\ndescription: D\n")}
+    assert found(readmemd_is_typed_readme, untyped) == [("d/README.md", None)]
+
+
 # --- documentation-sets.md ---
 
 
@@ -368,6 +428,13 @@ def test_introduction_between_h1_and_listing() -> None:
     ]
 
 
+def test_introduction_between_h1_and_listing_reports_no_h1() -> None:
+    no_h1 = "What this holds.\n\n- [A](/a.md) — One doc\n"
+    assert found(introduction_between_h1_and_listing, {"index.md": no_h1}) == [
+        ("index.md", None)
+    ]
+
+
 def test_one_entry_per_concept_document_and_child_directory() -> None:
     good = "# I\n\nHolds.\n\n- [A](/a.md) — One doc\n- [d/](/d/index.md) — the d set\n"
     files = {"index.md": good, "a.md": concept(), "d/index.md": "# D\n"}
@@ -395,6 +462,17 @@ def test_one_entry_per_concept_document_and_child_directory() -> None:
     ]
 
 
+def test_one_entry_per_concept_document_and_child_directory_reads_the_ending() -> None:
+    good = "# I\n\nHolds.\n\n- [A](/a.md) (draft) — One doc\n"
+    files = {"index.md": good, "a.md": concept(), "tests/x/index.md": "# T\n"}
+    assert found(one_entry_per_concept_document_and_child_directory, files) == []
+    bad = "# I\n\nHolds.\n\n- [A](/a.md) — One doc, more\n"
+    files = {"index.md": bad, "a.md": concept()}
+    assert found(one_entry_per_concept_document_and_child_directory, files) == [
+        ("index.md", 5)
+    ]
+
+
 def test_alphabetical_unless_declared_otherwise() -> None:
     good = (
         "# I\n\nHolds.\n\n- [Readme](/README.md) — R\n- [a](/a.md) — A\n"
@@ -406,9 +484,21 @@ def test_alphabetical_unless_declared_otherwise() -> None:
         ("index.md", None),
         ("index.md", None),
     ]
-    declared = "# I\n\nHolds.\n\nOrdering: reading order.\n\n- [B](/b.md) — B\n- [Readme](/README.md) — R\n"
+    declared = (
+        "# I\n\nHolds.\n\nOrdering: reading order.\n\n- [c/](/c/index.md)\n"
+        "- [B](/b.md) — B\n- [Readme](/README.md) — R\n"
+    )
     assert found(alphabetical_unless_declared_otherwise, {"index.md": declared}) == [
-        ("index.md", 8)
+        ("index.md", 9)
+    ]
+
+
+def test_alphabetical_unless_declared_otherwise_reads_ordering_above_any_bullet() -> (
+    None
+):
+    late = "# I\n\nHolds.\n\n- a note\n\nOrdering: late.\n\n- [B](/b.md) — B\n- [a](/a.md) — A\n"
+    assert found(alphabetical_unless_declared_otherwise, {"index.md": late}) == [
+        ("index.md", None)
     ]
 
 
@@ -416,6 +506,7 @@ def test_okf_version_declared() -> None:
     good = {"index.md": doc("okf_version: '0.1'\n", "# I\n")}
     assert found(okf_version_declared, good) == []
     assert found(okf_version_declared, {"index.md": "# I\n"}) == [("index.md", None)]
+    assert found(okf_version_declared, {"a.md": concept()}) == [("index.md", None)]
 
 
 # --- readme-content.md ---
@@ -479,10 +570,11 @@ def test_one_directory_under_working_docs() -> None:
         "working-docs/w/code/My_Module.py": "x = 1\n",
     }
     assert found(one_directory_under_working_docs, good) == []
-    bad = {"working-docs/v/Notes.md": "# N\n"}
+    bad = {"working-docs/v/Notes.md": "# N\n", "working-docs/v/good.Draft.md": "# D\n"}
     assert found(one_directory_under_working_docs, bad) == [
         ("working-docs/v/Notes.md", None),
         ("working-docs/v/ROOT.md", None),
+        ("working-docs/v/good.Draft.md", None),
         ("working-docs/v/index.md", None),
     ]
 
@@ -503,4 +595,38 @@ def test_one_list_of_items_state_by_section() -> None:
         ("working-docs/w/ROOT.md", None),
         ("working-docs/w/ROOT.md", 5),
         ("working-docs/w/note.md", 3),
+    ]
+
+
+def test_one_list_of_items_state_by_section_reads_bullets_directly_under() -> None:
+    leaf = (
+        "# R\n\n## Planned\n\n- **Item** body\n\n### Detail\n\n- plain detail\n\n"
+        "## Completed\n\n- **Done** body\n\n## Planned\n\n- plain again\n"
+    )
+    files = {"working-docs/w/ROOT.md": leaf}
+    assert found(one_list_of_items_state_by_section, files) == [
+        ("working-docs/w/ROOT.md", None),
+        ("working-docs/w/ROOT.md", 17),
+    ]
+
+
+def test_every_member_reached_from_rootmd() -> None:
+    good = {
+        "working-docs/w/index.md": "# I\n\n- [N](/working-docs/w/note.md) — N\n",
+        "working-docs/w/ROOT.md": "# R\n\n[Note](note.md) [S](/working-docs/w/s/ROOT.md)\n",
+        "working-docs/w/note.md": "# N\n\n[Deep](/working-docs/w/s/deep.md)\n",
+        "working-docs/w/s/ROOT.md": "# S\n\n[Deep](deep.md)\n",
+        "working-docs/w/s/deep.md": "# D\n",
+    }
+    assert found(every_member_reached_from_rootmd, good) == []
+    bad = {
+        "working-docs/w/index.md": "# I\n\n[Lost](/working-docs/w/lost.md)\n",
+        "working-docs/w/ROOT.md": "# R\n",
+        "working-docs/w/lost.md": "# L\n",
+        "working-docs/w/s/ROOT.md": "# S\n\n[Leaf](leaf.md)\n",
+        "working-docs/w/s/leaf.md": "# F\n",
+    }
+    assert found(every_member_reached_from_rootmd, bad) == [
+        ("working-docs/w/lost.md", None),
+        ("working-docs/w/s/ROOT.md", None),
     ]

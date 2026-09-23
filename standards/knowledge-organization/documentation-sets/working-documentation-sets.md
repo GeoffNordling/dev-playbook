@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Working Documentation Sets
-description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a directory per line of work under `working-docs/` and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
+description: What a working documentation set adds to Documentation Sets — a guess written as a guess, a link tree from ROOT.md, a directory per line of work under `working-docs/` and its strands, a worklist, buckets, terms held in ROOT.md, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
 population: "a working documentation set, the Markdown files one stream of in-process work accumulates"
 ---
 
@@ -39,6 +39,22 @@ exemption from
 [every sentence in the present tense](/standards/prose/conventions.md#every-sentence-in-the-present-tense).
 
 `knowledge-organization.a-guess-written-as-a-guess` · stochastic
+
+## Every member reached from `ROOT.md`
+
+Every `.md` file of a working documentation set other than an
+`index.md` is reached from its `ROOT.md` by a chain of links between
+files of the set. A link in an `index.md` is not part of a chain. The
+`ROOT.md` of a file is the one in its own directory or the nearest
+directory above; the `ROOT.md` of a strand is reached from the next
+`ROOT.md` above it.
+
+`knowledge-organization.every-member-reached-from-rootmd` · deterministic
+
+> **Why.** The chain is a second structure over
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)'s
+> tree of sets: an index lists a member, and only a link from the
+> work's own members says where it sits in the work.
 
 ## One directory under `working-docs/`
 

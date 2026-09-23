@@ -85,7 +85,8 @@ document's title where the heading does not fit the citing sentence.
 ## Workspace path for another repo
 
 A reference to a file or a directory in another repo is a link whose
-target starts `~/workspace/<repo>/`. A bare `~/workspace/<other repo>/`
+target starts `~/workspace/<repo>/`, or `~/.claude/` for a file the
+harness loads from there. A bare `~/workspace/<other repo>/`
 path outside a link, and a relative target that goes above the repo
 root, are findings.
 
@@ -132,7 +133,8 @@ inside the repository is `skills`, `rules`, or `agents`.
 
 In a file with no fixed repo root, a reference to a file of the same
 repo, outside the file's own skill bundle, is a link whose target
-starts `~/workspace/<repo>/`. A `/` target, and a relative target that
+starts `~/workspace/<repo>/`, or `~/.claude/` for a file the harness
+loads from there. A `/` target, and a relative target that
 goes out of the file's own `skills/<name>/` directory, are findings.
 
 `knowledge-organization.workspace-path-for-a-stable-location` · deterministic

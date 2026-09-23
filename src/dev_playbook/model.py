@@ -21,7 +21,7 @@ import bisect
 import re
 import subprocess
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 from importlib import resources
 from pathlib import Path, PurePosixPath
@@ -38,6 +38,8 @@ TRAILER_PATTERN = re.compile(
 )
 # An inline link whose text may wrap across one line break.
 LINK_PATTERN = re.compile(r"\[([^\]\n]*(?:\n[^\]\n]*)?)\]\(([^)\s]+)\)")
+# A list item's marker and the spaces after it, which set its content column.
+LIST_ITEM = re.compile(r"^( *)([-*+]|\d+[.)])( +|$)")
 PYTHON_SHEBANG_PREFIXES = (
     "#!/usr/bin/env python",
     "#!/usr/bin/python",
@@ -99,12 +101,26 @@ class Link:
 
 
 @dataclass(frozen=True)
+class BarePath:
+    """One ``~/workspace/`` path in prose, outside a link's target and outside code.
+
+    ``in_link`` is True where the path sits in a link's text.
+    """
+
+    target: str
+    line: int
+    in_link: bool
+
+
+@dataclass(frozen=True)
 class MarkdownFile:
     """One parsed markdown file.
 
     ``content`` is every body line outside a code fence, as ``(line, text)``
     with 1-based line numbers and no trailing newline; frontmatter lines are
-    not in it.
+    not in it. ``indented_code`` holds the line numbers of the indented code
+    blocks among them, and ``bare_paths`` every ``~/workspace/`` path outside
+    both kinds of code.
     """
 
     path: str
@@ -114,6 +130,8 @@ class MarkdownFile:
     trailers: tuple[Trailer, ...]
     links: tuple[Link, ...]
     content: tuple[tuple[int, str], ...]
+    indented_code: frozenset[int] = frozenset()
+    bare_paths: tuple[BarePath, ...] = ()
 
     def section(self, slug: str) -> tuple[tuple[int, str], ...]:
         """The content lines under the heading with ``slug``.
@@ -166,6 +184,10 @@ class Repo:
     markdown: Mapping[str, MarkdownFile]
     python: Mapping[str, PythonFile]
     canonical: Mapping[str, bytes]
+    # The heading slugs of files read from disk, held for this model's run only.
+    disk_slugs: dict[str, frozenset[str]] = field(
+        default_factory=dict, compare=False, repr=False
+    )
 
     @classmethod
     def from_files(
@@ -240,6 +262,23 @@ class Repo:
         """The UTF-8 text of one tracked file."""
         return decode(path, self.contents[path])
 
+    @property
+    def is_dev_playbook(self) -> bool:
+        """True for the repo that tracks the canonical directory, dev-playbook."""
+        prefix = sources.CANONICAL_DIR + "/"
+        return any(path.startswith(prefix) for path in self.files)
+
+    def slugs_on_disk(self, path: str) -> frozenset[str]:
+        """The heading slugs of a ``.md`` file outside the model, read once per model.
+
+        The one read from disk, for a check tagged ``WORKSPACE`` that opens
+        another repo's file; the answer lives as long as this model, so a
+        long-lived process that builds a new model never reads a stale one.
+        """
+        if path not in self.disk_slugs:
+            self.disk_slugs[path] = md.heading_slugs(Path(path))
+        return self.disk_slugs[path]
+
 
 @cache
 def shipped_canonical() -> Mapping[str, bytes]:
@@ -306,6 +345,7 @@ def parse_markdown(path: str, text: str) -> MarkdownFile:
         for n, line in content
         if (m := TRAILER_PATTERN.match(line))
     )
+    code = _indented_code(content)
     return MarkdownFile(
         path=path,
         text=text,
@@ -314,6 +354,8 @@ def parse_markdown(path: str, text: str) -> MarkdownFile:
         trailers=trailers,
         links=_links(content),
         content=content,
+        indented_code=code,
+        bare_paths=_bare_paths(tuple((n, t) for n, t in content if n not in code)),
     )
 
 
@@ -325,24 +367,97 @@ def _heading_above(headings: tuple[Heading, ...], line: int) -> Heading | None:
     return above[-1] if above else None
 
 
-def _links(content: tuple[tuple[int, str], ...]) -> tuple[Link, ...]:
-    """Every inline link in the content lines, wrapped text included.
+@dataclass(frozen=True)
+class _Joined:
+    """Content lines with inline code stripped, joined, and each offset's line."""
 
-    Inline code spans are stripped line by line first, so a bracketed
-    example inside backticks is prose, not a link. The lines are then joined
-    so a link whose text wraps across one line break is still found; it is
-    reported on the line its ``[`` opens.
+    text: str
+    starts: list[int]
+    numbers: list[int]
+
+    def line(self, offset: int) -> int:
+        """The line number the character at ``offset`` sits on."""
+        return self.numbers[bisect.bisect_right(self.starts, offset) - 1]
+
+
+def _join(content: tuple[tuple[int, str], ...]) -> _Joined:
+    """Strip inline code spans line by line, then join the lines.
+
+    A bracketed example inside backticks is then prose, not a link, and a
+    link whose text wraps a line break is one match of the joined text.
     """
     stripped = [md.INLINE_CODE_PATTERN.sub("", text) for _, text in content]
     starts = [0]
     for text in stripped[:-1]:
         starts.append(starts[-1] + len(text) + 1)
-    joined = "\n".join(stripped)
+    return _Joined("\n".join(stripped), starts, [n for n, _ in content])
+
+
+def _links(content: tuple[tuple[int, str], ...]) -> tuple[Link, ...]:
+    """Every inline link in the content lines, wrapped text included.
+
+    A link is reported on the line its ``[`` opens.
+    """
+    joined = _join(content)
     return tuple(
-        Link(
-            m.group(1),
-            m.group(2),
-            content[bisect.bisect_right(starts, m.start()) - 1][0],
-        )
-        for m in LINK_PATTERN.finditer(joined)
+        Link(m.group(1), m.group(2), joined.line(m.start()))
+        for m in LINK_PATTERN.finditer(joined.text)
     )
+
+
+def _bare_paths(content: tuple[tuple[int, str], ...]) -> tuple[BarePath, ...]:
+    """Every ``~/workspace/`` path in the content lines outside a link's target.
+
+    A link's brackets and target become spaces, so every offset keeps its
+    line and a path in the link's text is still read. A trailing ``.``,
+    ``,``, ``;``, or ``:`` ends the sentence, not the path.
+    """
+    joined = _join(content)
+    masked = list(joined.text)
+    text_spans: list[tuple[int, int]] = []
+    for m in LINK_PATTERN.finditer(joined.text):
+        text_spans.append(m.span(1))
+        for i in range(m.start(), m.end()):
+            if not m.start(1) <= i < m.end(1) and masked[i] != "\n":
+                masked[i] = " "
+    found: list[BarePath] = []
+    for m in md.WORKSPACE_REF_PATTERN.finditer("".join(masked)):
+        target = m.group(0).rstrip(md.BARE_PATH_TRAILER)
+        in_link = any(start <= m.start() < end for start, end in text_spans)
+        found.append(BarePath(target, joined.line(m.start()), in_link))
+    return tuple(found)
+
+
+def _indented_code(content: tuple[tuple[int, str], ...]) -> frozenset[int]:
+    """The line numbers of the indented code blocks among the content lines.
+
+    A line opens or continues one when it follows a blank line or another
+    such line, is indented four columns past its container's content
+    column, and is not a list item. The container is the document, column
+    0, or the list item last opened at or left of the line, whose content
+    column is past its marker and the spaces after it, so a list item's
+    continuation paragraph is not code.
+    """
+    found: set[int] = set()
+    base = 0
+    after_blank = False
+    in_block = False
+    for number, text in content:
+        if not text.strip():
+            after_blank = True
+            continue
+        indent = len(text) - len(text.lstrip(" "))
+        item = LIST_ITEM.match(text)
+        if (after_blank or in_block) and indent >= base + 4 and item is None:
+            found.add(number)
+            in_block = True
+        elif item is not None:
+            in_block = False
+            spaces = len(item.group(3))
+            base = indent + len(item.group(2)) + (spaces if 1 <= spaces <= 4 else 1)
+        else:
+            in_block = False
+            if after_blank and indent < base:
+                base = indent
+        after_blank = False
+    return frozenset(found)

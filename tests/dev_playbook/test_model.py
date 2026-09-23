@@ -103,6 +103,35 @@ class TestParseMarkdown:
         with pytest.raises(ModelError, match="x.md: frontmatter is not a mapping"):
             parse_markdown("x.md", "---\n- item\n---\nbody\n")
 
+    def test_bare_path_in_a_links_text_is_read(self) -> None:
+        doc = parse_markdown(
+            "d.md", "See [~/workspace/o/a.md](/x.md) and ~/workspace/o/b.md\n"
+        )
+        got = [(b.target, b.line, b.in_link) for b in doc.bare_paths]
+        assert got == [
+            ("~/workspace/o/a.md", 1, True),
+            ("~/workspace/o/b.md", 1, False),
+        ]
+
+    def test_bare_path_drops_a_trailing_sentence_mark(self) -> None:
+        doc = parse_markdown(
+            "d.md", "Read ~/workspace/demo/a.md. Then ~/workspace/d/b;\n"
+        )
+        assert [b.target for b in doc.bare_paths] == [
+            "~/workspace/demo/a.md",
+            "~/workspace/d/b",
+        ]
+
+    def test_bare_path_skips_code(self) -> None:
+        doc = parse_markdown(
+            "d.md", "Text.\n\n    ~/workspace/o/a.md\n\n`~/workspace/o/b.md`\n"
+        )
+        assert doc.bare_paths == ()
+
+    def test_list_continuation_is_not_indented_code(self) -> None:
+        text = "1. Item.\n\n    More [a](/a.md).\n\n       code\n\nText.\n\n    code\n"
+        assert parse_markdown("d.md", text).indented_code == frozenset({5, 9})
+
 
 class TestParsePython:
     def test_tree_for_valid_source(self) -> None:
@@ -143,6 +172,23 @@ class TestRepoFromFiles:
         assert repo.canonical == shipped_canonical()
         pinned = Repo.from_files(tmp_path, {}, canonical={"ci.yml": b"x\n"})
         assert pinned.canonical == {"ci.yml": b"x\n"}
+
+    def test_is_dev_playbook_where_the_canonical_directory_is_tracked(
+        self, tmp_path: Path
+    ) -> None:
+        canonical = f"{sources.CANONICAL_DIR}/.gitignore"
+        assert Repo.from_files(tmp_path, {canonical: b"x\n"}).is_dev_playbook
+        assert not Repo.from_files(tmp_path, {"a.md": b"# A\n"}).is_dev_playbook
+
+    def test_slugs_on_disk_are_held_for_one_model(self, tmp_path: Path) -> None:
+        target = tmp_path / "t.md"
+        target.write_text("# One\n")
+        first = Repo.from_files(tmp_path, {})
+        assert first.slugs_on_disk(str(target)) == frozenset({"one"})
+        target.write_text("# Two\n")
+        assert first.slugs_on_disk(str(target)) == frozenset({"one"})
+        second = Repo.from_files(tmp_path, {})
+        assert second.slugs_on_disk(str(target)) == frozenset({"two"})
 
     def test_non_utf8_markdown_names_the_file(self, tmp_path: Path) -> None:
         with pytest.raises(ModelError, match="b.md: not UTF-8"):

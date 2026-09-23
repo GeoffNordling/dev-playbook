@@ -61,7 +61,6 @@ AGENT_REQUIRED = ("name", "description", "model", "effort")
 AGENT_OPTIONAL = ("tools",)
 MODELS = ("haiku", "sonnet", "opus", "fable", "inherit")
 EFFORTS = ("low", "medium", "high", "xhigh")
-KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 TOOL_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
 DESCRIPTION_MAX = 1024
 TRIGGER_PREFIX = "Use when"
@@ -69,7 +68,6 @@ BODY_MAX_LINES = 500
 PLACEHOLDERS = ("$ARGUMENTS", "$0")
 BUNDLE_DIRECTORIES = ("references", "scripts")
 REFERENCE_DEFINITION = re.compile(r"^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)")
-EXTERNAL = ("http://", "https://", "mailto:")
 LOOP_ENTRY = re.compile(r"^[-*]\s+`[^`]+`\s+—\s")
 
 
@@ -244,7 +242,9 @@ def kebab_case_name(repo: Repo) -> Iterator[Finding]:
     """A runbook's ``name`` is kebab-case."""
     for runbook in _runbooks(repo):
         name = _field(runbook, "name")
-        if name is not None and not (isinstance(name, str) and KEBAB.match(name)):
+        if name is not None and not (
+            isinstance(name, str) and md.KEBAB_CASE.match(name)
+        ):
             yield Finding(runbook.path, None, f"name {name!r} is not kebab-case")
 
 
@@ -353,7 +353,7 @@ def arguments_bare_kebab_case_names(repo: Repo) -> Iterator[Finding]:
             yield Finding(runbook.path, None, "arguments is not a non-empty list")
             continue
         for item in value:
-            if not (isinstance(item, str) and KEBAB.match(item)):
+            if not (isinstance(item, str) and md.KEBAB_CASE.match(item)):
                 yield Finding(
                     runbook.path, None, f"argument {item!r} is not a kebab-case name"
                 )
@@ -690,22 +690,8 @@ def _resolve(source: str, target: str, repo_name: str, harness_root: str) -> str
     ``~/workspace/<repo_name>/``, or, where ``harness_root`` is given, under
     ``~/.claude/``, which is that root.
     """
-    target = target.split("#", 1)[0].strip()
-    workspace = f"~/workspace/{repo_name}/"
-    if not target or target.startswith(EXTERNAL):
-        return ""
-    if target.startswith(workspace):
-        joined = target[len(workspace) :]
-    elif harness_root and target.startswith("~/.claude/"):
-        joined = harness_root + "/" + target[len("~/.claude/") :]
-    elif target.startswith("~"):
-        return ""
-    elif target.startswith("/"):
-        joined = target.lstrip("/")
-    else:
-        joined = posixpath.join(posixpath.dirname(source), target)
-    resolved = posixpath.normpath(joined)
-    return "" if resolved.startswith("..") else resolved
+    resolved = md.resolve_target(source, target, repo_name, harness_root or None)
+    return resolved.path if resolved.kind == "repo" else ""
 
 
 def _link_targets(doc: MarkdownFile) -> list[str]:

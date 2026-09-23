@@ -94,6 +94,11 @@ as a source.
   `knowledge-organization.one-list-of-items-state-by-section`: one
   function each, new. Each body is its triage blockquote; the link each
   old body held to the general rule it qualifies moved into a Why.
+- `knowledge-organization.every-member-reached-from-rootmd`: function
+  `every_member_reached_from_rootmd`, new, restored in Step 12a per
+  escalation 6. The body is the triage blockquote; the link the old body
+  held to the general rule moved into a Why. The twelve reports under
+  `rewrite/` are reached from the step table of the rewrite plan.
 
 ### indexes.md
 
@@ -169,24 +174,7 @@ retired detector.
 
 ## Set aside
 
-- `knowledge-organization.every-member-reached-from-rootmd`, built in
-  full per escalation 6. It fails 10 files: the rewrite reports under
-  `working-docs/doc-type-system/detector-rewrite/rewrite/`, which only
-  that directory's `index.md` links, and `index.md` links are no part
-  of a chain. The rule left `working-documentation-sets.md`, and the
-  file's `description` and index row no longer name a link tree:
-
-  > Every `.md` file of a working documentation set other than an
-  > `index.md` is reached from its `ROOT.md` by a chain of links between
-  > files of the set. A link in an `index.md` is not part of a chain. The
-  > `ROOT.md` of a file is the one in its own directory or the nearest
-  > directory above; the `ROOT.md` of a strand is reached from the next
-  > `ROOT.md` above it.
-
-  The check built the link graph of the set, `index.md` files left out,
-  and walked it from each member's `ROOT.md`. The link to the rule in
-  `dotfiles/dot-claude/skills/doc-set-diagram/SKILL.md` now names the
-  file.
+None.
 
 ## Measured
 
