@@ -186,7 +186,7 @@ on. A reviewer reads every one of them at the next checkpoint and rules.
       exists; the Guardrails of
       `working-docs/doc-type-system/detector-rewrite/plan.md` hold.
 
-<!-- [ ] checkpoint -->
+<!-- [x] checkpoint -->
 
 - [ ] Step 12, family `shell`, retires nothing; the two tool-decided rules in
       `src/dev_playbook/checks/shell.py` stay as they are. Report:
