@@ -6,7 +6,8 @@ description: What the fence around a front must do — the windows it opens onto
 
 # The Sandbox
 
-A front runs inside a container, and a container starts able to see
+A front ([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
+runs inside a container, and a container starts able to see
 nothing of the machine that launched it. This member records what that
 container must nevertheless be able to reach, why, and whether
 [Sandcastle](/working-docs/parallel-fronts/sandcastle.md) can arrange it.
@@ -24,8 +25,8 @@ combination to be arranged once rather than reasoned about per front.
 
 ## Constraints
 
-Six bounds are settled — three limitations the user accepts, and three rules
-the work may not break. They are recorded here so the work does not reopen
+These bounds are settled — limitations the user accepts, and rules the
+work may not break. They are recorded here so the work does not reopen
 them.
 
 **Laps run on Fedora, and nowhere else.** The container, the image it starts
@@ -37,7 +38,8 @@ expected to work there, a result measured there does not count, and no effort
 is spent making it portable.
 
 **This device holds no metered credential, and something checks.** Every
-lap bills the subscription. A billing mistake is the quietest failure in
+lap ([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
+bills the subscription. A billing mistake is the quietest failure in
 the set, because the run succeeds and the cost arrives later, so the
 absence of a metered credential is asserted rather than assumed. No such
 credential exists on this device today; the check is there so that stays
@@ -45,9 +47,9 @@ true. Four surfaces could carry one: the live environment, the shell
 startup files, `~/.claude/settings.json`, and the repository's
 `.claude/settings.json`. `billing-lint` reads all four at the commit gate
 and refuses rather than reporting a finding; the same check is to run on
-this device immediately before a lap launches, once a driver exists to
-carry it. A check
-that runs where there is no device passes without asserting anything,
+this device immediately before a lap launches, once a driver
+([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
+exists to carry it. A check that runs where there is no device passes without asserting anything,
 which is the failure it exists to prevent.
 
 **No window may point at a real file.** Every window opens onto a copy made
@@ -110,7 +112,7 @@ line of the launch command:
 --volume=/host/path:/container/path:rw,Z
 ```
 
-The four fields, left to right: the real directory on the host, where it
+The fields, left to right: the real directory on the host, where it
 appears inside the container, whether the container may write through it,
 and an instruction to SELinux.
 
@@ -130,7 +132,7 @@ of the design below.
 
 ## The two windows that matter
 
-Two roles, and a front always has both.
+A front always has both.
 
 - **Config source** — dev-playbook at published state, read-only. What the
   eight symlinks point into and where `standards/` is found. Every front
@@ -139,12 +141,14 @@ Two roles, and a front always has both.
   front's branch, read-write. The only window a front may write through,
   and therefore the only thing that survives the container.
 
-The two cases the Goal names are then one difference and nothing else:
+The two cases the Goal names are then one difference and nothing else.
 
-| | config source | work checkout |
-|---|---|---|
-| **front assigned to another repository** | dev-playbook, read-only | that repository |
-| **front assigned to dev-playbook** | dev-playbook, read-only | dev-playbook, a second and separate copy |
+**A front assigned to another repository.** The config source is
+dev-playbook, read-only; the work checkout is that repository.
+
+**A front assigned to dev-playbook.** The config source is dev-playbook,
+read-only; the work checkout is dev-playbook too, a second and separate
+copy.
 
 In the second case the container holds two directories named dev-playbook,
 and they are separate copies: an edit in the work checkout does not appear
@@ -152,7 +156,7 @@ in the config source. That is the point rather than an accident — the
 config source answers "what does the published version say", so it must
 not show the front its own uncommitted work.
 
-Two smaller windows complete the set: the subscription credential, and a
+Smaller windows complete the set: the subscription credential, and a
 one-line file carrying a port so the agent's own hook events reach this
 machine's measurement store instead of dying with the container.
 
@@ -202,9 +206,8 @@ container exits.
 **Workspace collision.** Sandcastle puts the repository at
 `/home/agent/workspace`, and forces the agent's home to `/home/agent`, so
 the repository sits at `~/workspace` itself rather than in a directory of
-its own under it. Both values are fixed in Sandcastle's code
-(`SANDBOX_REPO_DIR` in the published package, and the podman plug-in's
-`HOME`), and no option changes them. That the word is `workspace` in both
+its own under it. No option changes either value
+([Sandcastle](/working-docs/parallel-fronts/sandcastle.md#what-it-fixes-and-where-it-bends)). That the word is `workspace` in both
 Sandcastle and this workspace is a coincidence. The consequence is drawn
 out in [The workspace collision](#the-workspace-collision) below.
 
@@ -217,6 +220,10 @@ restamp lands on a directory that is deleted at the end of the lap, and the
 clone carries its own private `.git`, so a front reaches its own branch and
 nothing else. This answers **Shared history** and **Relabel**, and
 experiment two proved both.
+
+The copy that fills the work checkout is the **work copy**, and the copy
+that fills the config source is the **config copy**; the rest of this
+member names the directories by those words.
 
 The clone is made without hard links. A clone taken on one machine shares
 file contents with its source by default, and the restamp would reach the
@@ -333,10 +340,9 @@ Sandcastle instead empties the repository into `~/workspace` itself:
     tests/
 ```
 
-Two things break. The repository is named `workspace`, because the name is
-read from the directory holding `.git` and same-repo resolution
-([Same-Repo Resolution](/docs/decisions/0009-same-repo-resolution.md))
-compares against it. And dev-playbook has no place: a directory
+The repository is named `workspace`, which breaks every
+same-repo citation inside it
+([What the work checkout is called](#what-the-work-checkout-is-called)). And dev-playbook has no place: a directory
 `~/workspace/dev-playbook` would sit inside the repository's own files, so
 the eight `~/.claude/` symlinks dangle and the front starts with no skills,
 rules, or hooks, silently.

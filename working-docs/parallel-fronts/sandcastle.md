@@ -28,11 +28,13 @@ workflow, task management, or context sources are imposed."
 
 ## What it gives the shape
 
-Four of its primitives map onto terms this set already has.
+Its primitives map onto terms this set already has.
 
 **A branch per front.** A run is configured with a branch strategy, and
 the named-branch strategy puts a front's commits on a branch the caller
-chooses. The fronts of one lap are then a list of names the driver holds.
+chooses. The fronts of one lap
+([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
+are then a list of names the driver holds.
 
 **A fan-out that the language already supplies.** Because a run is a
 function call that returns a value, running the fronts at once is the
@@ -81,9 +83,10 @@ experiment two
 ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#what-the-sandcastle-run-settled)).
 
 **Fixed, but only as a suggestion.** Sandcastle suggests
-`/home/agent/workspace` for the repository, and its podman plug-in always
-sets the agent's home to `/home/agent`. No run option changes either, which
-is the source of the workspace collision. But the suggestion reaches only
+`/home/agent/workspace` for the repository (`SANDBOX_REPO_DIR` in the
+published package), and its podman plug-in always sets the agent's home
+(`HOME`) to `/home/agent`. No run option changes either, which is the
+source of the workspace collision. But the suggestion reaches only
 the sandbox plug-in: after start, Sandcastle works wherever the plug-in
 reports the repository to be. Experiment three's 20-line plug-in moves it,
 with no fork

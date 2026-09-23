@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Parallel Fronts Working Root
-description: The root of the parallel-fronts set — the shape being prototyped, the words it uses, the open questions, and the worklist
+description: The root of the parallel-fronts set — the shape being prototyped, how the agent works with the user on it, the words it uses, the open questions, and the worklist
 ---
 
 # Parallel Fronts Working Root
@@ -36,12 +36,10 @@ inner loop, the user holds every seam between laps.
   dev-playbook branch at the same time. Both facts hold together, and
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md) is where the
   arrangement that serves them is worked out.
-- Sandcastle, if chosen, is used as published and never forked or
-  patched. A mismatch is closed by a plug-in Sandcastle accepts, or by
-  changing the workspace standards.
-- Every run needs a container, so every run happens on the Fedora machine.
-  The WSL machine this set was begun on has no container runtime and is
-  not a target.
+- Sandcastle, if chosen, is never forked or patched
+  ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)).
+- Every run happens on the Fedora machine
+  ([The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)).
 - Past decisions do not bind this set. A decision record that stands in the
   way is revised rather than worked around.
 
@@ -69,9 +67,12 @@ The words of the set, one meaning each.
 - **Driver** — the deterministic program that schedules a lap: which
   fronts run, from what base, with which prompt, and when the lap ends. It
   makes no judgment about the code the fronts produce.
-- **Integrator** — the agent that merges the fronts' branches at the end of
+- **Integrator** — the role that merges the fronts' branches at the end of
   a lap and reconciles what they conflict over. Unlike the driver, it
   judges.
+
+Checkpoint and integrator are working names. What each is, and who fills
+it, waits for the discussion of them in Planned.
 
 The word *orchestrator* covers the driver and the integrator both, which is
 why the set uses the two narrower names instead. The distinction is the one
@@ -85,7 +86,7 @@ and is answered there.
 
 ## Planned
 
-Three sessions with the user come first, each at a high level, the agent
+Sessions with the user come first, each at a high level, the agent
 guiding.
 
 - **Walk the user through the working prototype.** The user has not yet
@@ -97,7 +98,7 @@ guiding.
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-two-windows-that-matter):
   the config copy answers "what does published main say", so it must not
   show the front its own uncommitted edits.
-- **Discuss: what this gets us, and how we run it.** When this branch lands
+- **Discuss: what this gives the user, and how they run it.** When this branch lands
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
   part 4 ran on, or all of this branch's work (the hardened `front-clone`,
@@ -109,6 +110,11 @@ guiding.
   deliver and how the user wants to run them, before choosing any tool to
   run them with. [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
   records what one candidate offers.
+- **Discuss: the checkpoint and the integrator.** What happens at the end
+  of a lap: who merges the fronts' branches (the user, an agent, or both),
+  and who revises a front's plan when the fronts disagree. Also settle the
+  name "checkpoint", which the repo's shared glossary already uses for the
+  Ralph loop.
 - **Discuss: overlap with active branches.** Does the landing PR touch any
   file that another active, unmerged branch is also changing?
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
@@ -120,14 +126,10 @@ guiding.
   are solved in test; this is the last step to make them solved for real.
 - **One lap by hand.** Run the shape once with two fronts and no driver
   program at all, to find where it hurts before any of it is automated.
-  The lap answers three questions about the shape:
-  - Whether a front converges, or finishes its useful work and then invents
-    more. The guess: a front needs a way to declare itself done, and its
-    budget is a ceiling, not a target.
-  - Who integrates. The guess: the user, with an agent assisting, for the
-    first few laps, because that is where the real failure modes show.
-  - How a front's plan is revised when a lap ends with divergent views, and
-    whether that is the user's act or the integrator's.
+  The lap tests what the checkpoint discussion decided, and answers
+  whether a front converges or finishes its useful work and then invents
+  more. The guess: a front needs a way to declare itself done, and its
+  budget is a ceiling, not a target.
 
 ## Completed
 
@@ -136,11 +138,11 @@ guiding.
 - **State the sandbox requirement.** What a front's container must reach,
   and where Sandcastle collides with it, is recorded in
   [The Sandbox](/working-docs/parallel-fronts/sandbox.md).
-- **Assert this device holds no metered credential.** `billing-lint` reads
-  four surfaces and refuses rather than reports, and the
-  [Billing](/standards/billing/card.md) card stations it at the commit
-  gate. The same assertion immediately before a container launches waits on
-  the driver, since there is nothing yet to carry it.
+- **Assert this device holds no metered credential.** `billing-lint`
+  asserts it at the commit gate, stationed by the
+  [Billing](/standards/billing/card.md) card, and
+  [The Sandbox](/working-docs/parallel-fronts/sandbox.md#constraints)
+  records what it reads and the assertion still waiting on the driver.
 - **Experiment one: the clone round-trip.** A front's commits are made in a
   throwaway clone and reach the real repository at the same SHA, or the lap
   stops. [`front-clone`](/scripts/front-clone) is the plumbing, and
