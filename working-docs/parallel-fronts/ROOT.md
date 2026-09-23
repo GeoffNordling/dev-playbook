@@ -115,23 +115,23 @@ integrator is a judgment and is not.
 
 ## Planned
 
-Four discussions with the user come first, each at a high level, the agent
+Three sessions with the user come first, each at a high level, the agent
 guiding.
 
-- **Discuss: what merging gets us.** When this branch lands on main, what
-  does the user gain, and does it change any way work is done on main
-  today? This is where the landing PR's scope (Open, above) is ruled.
-- **Discuss: overlap with active branches.** Does the landing PR touch any
-  file that another active, unmerged branch is also changing?
 - **Walk the user through the working prototype.** The user has not yet
   looked at the sandbox solution. Guide them through it: the layout, the
   copies, the plug-in, the round trip, and the hook logging, with pictures
   rather than code.
-- **Discuss: what Sandcastle is for.** So far the work proved Sandcastle's
-  sandbox can be made safe, but sandboxing is not the library's point. It
-  coordinates agents across branches and worktrees. Step back and ideate
-  how that would help the user get work done, since its value is not yet
-  clear. This feeds **Decide the driver** below.
+- **Discuss: what merging gets us, and what Sandcastle is for.** When this
+  branch lands on main, what does the user gain, and does it change any way
+  work is done on main today? This is where the landing PR's scope (Open,
+  above) is ruled. Then step back further: so far the work proved
+  Sandcastle's sandbox can be made safe, but sandboxing is not the
+  library's point. It coordinates agents across branches and worktrees.
+  Ideate how that would help the user get work done, since its value is not
+  yet clear. This feeds **Decide the driver** below.
+- **Discuss: overlap with active branches.** Does the landing PR touch any
+  file that another active, unmerged branch is also changing?
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
   ([What part 4 settled](/working-docs/parallel-fronts/sandbox.md#what-part-4-settled)):
