@@ -72,7 +72,8 @@ front in a container, but not on the window layout Sandcastle chooses,
 which opens the real repository to the front and puts it at the wrong
 path. [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-five-problems)
 records the collisions and how each was closed: a throwaway copy, a
-hardened `front-clone`, and a plug-in of our own. The tool also offers
+hardened `front-clone`, and a plug-in of our own. Together they make
+[The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md). The tool also offers
 a no-sandbox provider that runs the agent directly on the host; this set
 does not use it.
 

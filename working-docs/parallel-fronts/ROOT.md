@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Parallel Fronts Working Root
-description: The root of the parallel-fronts set — the shape being prototyped, how the agent works with the user on it, the words it uses, the open questions, and the worklist
+description: The root of the parallel-fronts set — the shape being built, how the agent works with the user on it, the words it uses, the open questions, and the worklist
 ---
 
 # Parallel Fronts Working Root
@@ -9,8 +9,11 @@ description: The root of the parallel-fronts set — the shape being prototyped,
 This set is speculative: every member writes a guess as a guess, and every
 member inherits that voice. The work is to find out whether one project can
 be split into a few lines of work that agents advance in parallel, each on
-its own branch, merged back at a point where the user takes stock. Nothing
-here is settled.
+its own branch, merged back at a point where the user takes stock. One
+part is settled: the
+[Sandcastle pipeline](/working-docs/parallel-fronts/pipeline.md), which
+runs a single front safely, is built and proven. How fronts run together,
+and what that gives the user, is still speculation.
 
 ## Goal
 
@@ -73,6 +76,8 @@ The words of the set, one meaning each.
 - **Sandcastle pipeline** — the working arrangement that runs one front:
   throwaway copies go into a sealed container, one agent works there
   through Sandcastle and our plug-in, and only its commit comes back.
+  [The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md)
+  describes it.
 
 Checkpoint and integrator are working names. What each is, and who fills
 it, waits for the discussion of them in Planned.
@@ -96,14 +101,20 @@ guiding.
   on main, what does the user gain, and does it change any way work is done
   on main today? Rule what the landing PR carries: only the two changes
   part 4 ran on, or all of this branch's work (the hardened `front-clone`,
-  its trap test, and this working set) with them, and whether anything of
-  the `sandbox-probe` branch comes along. Then step back further: so far
+  its trap test, and this working set) with them, whether anything of
+  the `sandbox-probe` branch comes along, and where the pipeline's pieces
+  that now live only in the session scratchpad are kept
+  ([Where each piece lives](/working-docs/parallel-fronts/pipeline.md#where-each-piece-lives)). Then step back further: so far
   the work proved Sandcastle's sandbox can be made safe, but sandboxing is
   not the library's point. It coordinates agents across branches and
   worktrees. Define the question first, what value parallel fronts should
   deliver and how the user wants to run them, before choosing any tool to
   run them with. [Sandcastle](/working-docs/parallel-fronts/sandcastle.md)
-  records what one candidate offers.
+  records what one candidate offers. The answer also settles what the
+  pipeline does not yet do
+  ([The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md#what-it-does-not-yet-do)):
+  running fronts together, where real copies live, and what removes a
+  stranded container.
 - **Discuss: the checkpoint and the integrator.** What happens at the end
   of a lap: who merges the fronts' branches (the user, an agent, or both),
   and who revises a front's plan when the fronts disagree. Also settle the

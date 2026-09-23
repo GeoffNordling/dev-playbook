@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: The Sandbox
-description: What the fence around a front must do — the windows it opens onto the host, the two cases every front falls into, and whether Sandcastle can hold them
+description: How the Sandcastle pipeline was found — what a front's container must reach, the five problems Sandcastle raised, and the experiments that closed each one
 ---
 
 # The Sandbox
@@ -9,11 +9,12 @@ description: What the fence around a front must do — the windows it opens onto
 A front ([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
 runs inside a container, and a container starts able to see
 nothing of the machine that launched it. This member records what that
-container must nevertheless be able to reach, why, and whether
-[Sandcastle](/working-docs/parallel-fronts/sandcastle.md) can arrange it.
-The requirements come from the `sandbox-probe` branch, which built and
-measured a working container against podman. That branch is a prototype and
-prescribes nothing, but the constraints it found are real and hold here.
+container must nevertheless be able to reach, why, where
+[Sandcastle](/working-docs/parallel-fronts/sandcastle.md) collided with it,
+and the experiments that closed each collision. The result is
+[The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md).
+The requirements come from the `sandbox-probe` branch, an earlier prototype
+that built and measured a working container against podman.
 
 ## Goal
 
@@ -127,8 +128,8 @@ machine and refuses reads across security labels, so without it every read
 inside the container fails. `Z` tells podman to restamp the host directory
 with a label the container may read — and the restamp is permanent, lands
 on the real disk, and happens before the container starts, so a read-only
-window does not prevent it. The guess is that this single fact drives most
-of the design below.
+window does not prevent it. This single fact drives most of the design
+below.
 
 ## The two windows that matter
 
@@ -182,7 +183,7 @@ every member. The user tracks the work at the level of this table.
 | **Relabel** | The SELinux restamp permanently changes the label on the real files | The throwaway copy | Solved, proven by experiment two |
 | **Booby trap** | Something a front plants in its copy's git settings runs on the host when host-side git later works in the copy | Harden `front-clone` | Solved, proven by a permanent test |
 | **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option B, a 20-line plug-in | Solved, proven by experiment three with the stand-in and with real Claude |
-| **Hook logging** | The user's Claude Code hooks log every event to a database, and must keep doing so from inside the sandbox | The prototype's port file, plus the two end-of-session hooks set to wait | Solved and proven by part 4 in a throwaway config copy; not yet on main |
+| **Hook logging** | The user's Claude Code hooks log every event to a database, and must keep doing so from inside the sandbox | The `sandbox-probe` port file, plus the two end-of-session hooks set to wait | Solved and proven by part 4 in a throwaway config copy; not yet on main |
 
 ## Where Sandcastle collides
 
@@ -411,9 +412,8 @@ know what a front is.
             tests/
 ```
 
-A front on dev-playbook differs only in the name under `assignment/`. Why that
-front needs a second dev-playbook at all is a question the user parked for
-after experiment three's part 4 (see the root's Planned list).
+A front on dev-playbook differs only in the name under `assignment/`, and
+keeps both copies ([The two windows that matter](#the-two-windows-that-matter)).
 
 ## What experiment three settled
 
@@ -571,21 +571,6 @@ it survives under Sandcastle, once the two end-of-session hooks wait
 `sandbox-probe` branch: `sandbox_probe/SPEC.md`, `probe/sink.py` (the
 host-side receiver), `probe/podman.py` (the windows), `probe/billing.py`, and
 the changed `dotfiles/dot-claude/hooks/measure-event`.
-
-## Open
-
-- **Whether a shared SELinux label matters.** Sandcastle labels every
-  window as shared (`z`), where the prototype labeled them private (`Z`).
-  Experiment two showed the shared label lands only on the copies, so it
-  likely does not signify. It is recorded rather than resolved.
-- **What bounds a stranded container.** The prototype set a deadline podman
-  enforces from inside, so a container outlives neither its lap nor a
-  driver killed outright. Sandcastle cleans up only when the driver exits
-  in an orderly way.
-- **Where real copies live.** Not under `/tmp/claude-<uid>/`, which
-  collides with Claude's own temporary folder inside the sandbox (see
-  [What part 4 settled](#what-part-4-settled)). The place is chosen with
-  the driver.
 
 ## Acronyms
 
