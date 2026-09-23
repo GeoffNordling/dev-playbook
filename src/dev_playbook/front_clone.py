@@ -27,6 +27,17 @@ clone pushing into the real repository: git refuses a push to a branch that is
 checked out, and the direction has to be settled once rather than discovered
 per lap.
 
+The closing half never runs git *in* the clone. The front had write access to
+the clone's ``.git``, so its config, hooks and attributes are the front's to
+set, and git executes several of them on its own — ``core.fsmonitor`` on any
+index refresh, a hook, a filter driver named in the attributes. Any of those
+would run on the host, outside the container. So the clone is only ever read as
+data: its origin from its config file as text, its commits by the real
+repository fetching them (the serving side of a fetch is git's one path built to
+be safe against an untrusted repository), and its files by the real repository
+comparing them against the fetched tip under its own config.
+``test_front_clone_traps.py`` plants a trigger at every point and holds this.
+
 Every failure here stops the lap. A clone is removed only after its return has
 been verified, so a refused close leaves the directory on disk to be read.
 
@@ -45,6 +56,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from dev_playbook.gitrepo import no_git_env
@@ -140,15 +152,85 @@ def shared_object_files(clone: Path, source: Path) -> list[Path]:
     return shared
 
 
-def uncommitted(clone: Path) -> list[str]:
-    """The clone's uncommitted changes, as git's short status lines.
+def has_git_dir(clone: Path) -> bool:
+    """Whether ``clone`` holds a repository, judged from files alone.
+
+    Asking git would read the clone's config, which the front wrote.
+    """
+    return (clone / ".git" / "HEAD").is_file()
+
+
+def clone_origin(clone: Path) -> str:
+    """The clone's ``origin`` URL, read from its config file as text.
+
+    ``git config --file`` reads the one file and follows no ``include.path``,
+    so nothing the front wrote into the config is executed or pulled in.
+    """
+    return run_git(
+        [
+            "config",
+            "--file",
+            str(clone / ".git" / "config"),
+            "--get",
+            "remote.origin.url",
+        ]
+    )
+
+
+def quarantine_ref(branch: str) -> str:
+    """Where the front's branch lands in the real repository before it is checked."""
+    return f"refs/front-clone/{branch}"
+
+
+def uncommitted(clone: Path, source: Path, ref: str) -> list[str]:
+    """The clone's files that differ from ``ref``, as git's short status lines.
 
     Nothing in git protects work that was never committed, and the clone is
     deleted at the end of the lap, so this is the one thing whose loss the
-    round trip cannot undo.
+    round trip cannot undo. The comparison runs in the real repository, under
+    its own config, against a throwaway index built from ``ref``: the clone's
+    working files are read as data and its ``.git`` is not consulted at all. A
+    change staged in the clone and then deleted from its files is invisible to
+    this, which is the price of never reading the clone's index.
     """
-    status = git_in(clone, "status", "--porcelain")
-    return status.splitlines() if status else []
+    git_dir = git_in(source, "rev-parse", "--absolute-git-dir")
+    base = [
+        "git",
+        "--git-dir",
+        git_dir,
+        "--work-tree",
+        str(clone),
+        "-c",
+        "core.fsmonitor=false",
+        "-c",
+        "core.hooksPath=/dev/null",
+    ]
+    # ``status`` would also compare against the real repository's own HEAD, so
+    # the two halves are asked for directly: tracked files that differ from
+    # ``ref``, and files ``ref`` does not track and nothing ignores. The refresh
+    # exits nonzero exactly when something differs, which the diff then names.
+    steps = [
+        (["read-tree", ref], True),
+        (["update-index", "-q", "--refresh"], False),
+        (["diff-files", "--name-status"], True),
+        (["ls-files", "--others", "--exclude-standard"], True),
+    ]
+    found: list[str] = []
+    with tempfile.TemporaryDirectory() as scratch:
+        env = no_git_env() | {"GIT_INDEX_FILE": str(Path(scratch) / "index")}
+        for args, must_succeed in steps:
+            done = subprocess.run(
+                [*base, *args], capture_output=True, text=True, env=env
+            )
+            if must_succeed and done.returncode != 0:
+                raise LapFault(
+                    f"comparing {clone} with {ref} failed: {done.stderr.strip()}"
+                )
+            if args[0] == "diff-files":
+                found += done.stdout.splitlines()
+            elif args[0] == "ls-files":
+                found += [f"??\t{path}" for path in done.stdout.splitlines()]
+    return found
 
 
 def metadata_path(clone: Path) -> Path:
@@ -231,13 +313,14 @@ def open_clone(
 def close_clone(clone: Path) -> str:
     """Move the front's commits into the real repository and verify they landed.
 
-    Returns the commit the branch now names in both places. Every check before
-    the fetch refuses rather than repairs, and the check after it is the one
-    that matters: the branch tip in the real repository is the commit the clone
-    held, or the lap stops.
+    Returns the commit the branch now names in both places. The branch first
+    lands on a quarantine ref in the real repository, every check runs there,
+    and only then does it move onto the real branch — through git's own
+    fast-forward and checked-out refusals. Every check refuses rather than
+    repairs, and a refusal leaves the clone on disk.
     """
     clone = clone.resolve()
-    if not is_checkout(clone):
+    if not has_git_dir(clone):
         raise LapFault(f"{clone} is not a git checkout")
     recorded = read_metadata(clone)
     source = Path(recorded["source"])
@@ -246,25 +329,28 @@ def close_clone(clone: Path) -> str:
 
     if not is_checkout(source):
         raise LapFault(f"{source}, which {clone} was cloned from, is not a checkout")
-    origin = git_in(clone, "remote", "get-url", "origin")
+    origin = clone_origin(clone)
     if Path(origin).resolve() != source.resolve():
         raise LapFault(f"{clone} has origin {origin}, not the {source} it records")
 
-    dirty = uncommitted(clone)
-    if dirty:
-        raise LapFault(
-            f"{clone} holds {len(dirty)} uncommitted change(s) that would be lost "
-            f"with it: {'; '.join(dirty[:5])}"
-        )
-
-    tip = resolve_commit(clone, branch)
-    if not git_ok(clone, "merge-base", "--is-ancestor", base, branch):
-        raise LapFault(
-            f"{base[:12]} is not an ancestor of {branch}; "
-            "the front rewrote the commit the lap started from"
-        )
-
-    git_in(source, "fetch", "--no-tags", str(clone), f"{branch}:{branch}")
+    held = quarantine_ref(branch)
+    git_in(source, "fetch", "--no-tags", str(clone), f"+refs/heads/{branch}:{held}")
+    try:
+        tip = resolve_commit(source, held)
+        dirty = uncommitted(clone, source, held)
+        if dirty:
+            raise LapFault(
+                f"{clone} holds {len(dirty)} uncommitted change(s) that would be "
+                f"lost with it: {'; '.join(dirty[:5])}"
+            )
+        if not git_ok(source, "merge-base", "--is-ancestor", base, held):
+            raise LapFault(
+                f"{base[:12]} is not an ancestor of {branch}; "
+                "the front rewrote the commit the lap started from"
+            )
+        git_in(source, "fetch", "--no-tags", ".", f"{held}:refs/heads/{branch}")
+    finally:
+        git_in(source, "update-ref", "-d", held)
 
     landed = resolve_commit(source, branch)
     if landed != tip:

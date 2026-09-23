@@ -144,7 +144,7 @@ def test_the_clones_own_record_is_not_an_uncommitted_change(
 ) -> None:
     """It sits inside .git, which is why a fresh clone closes without refusing."""
     front_clone.open_clone(repo, clone, "front-a")
-    assert front_clone.uncommitted(clone) == []
+    assert front_clone.close_clone(clone)
     assert front_clone.metadata_path(clone).is_file()
 
 
@@ -186,7 +186,7 @@ def test_a_missing_branch_stops_the_lap(repo: Path, clone: Path) -> None:
     front_clone.open_clone(repo, clone, "front-a")
     git(clone, "checkout", "main")
     git(clone, "branch", "-D", "front-a")
-    with pytest.raises(front_clone.LapFault, match="rev-parse --verify"):
+    with pytest.raises(front_clone.LapFault, match="couldn't find remote ref"):
         front_clone.close_clone(clone)
 
 

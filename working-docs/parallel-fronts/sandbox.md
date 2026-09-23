@@ -175,8 +175,8 @@ every member. The user tracks the work at the level of this table.
 |---|---|---|---|
 | **Shared history** | Sandcastle opens the real `.git` to the front, so a front can delete other branches, other worktrees, and the user's unpushed commits | The throwaway copy | Solved, proven by experiment two |
 | **Relabel** | The SELinux restamp permanently changes the label on the real files | The throwaway copy | Solved, proven by experiment two |
-| **Booby trap** | Something a front plants in its copy's git settings runs on the host when host-side git later works in the copy | Harden `front-clone` | Fix approved, not built |
-| **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option A or option B | Neither tested |
+| **Booby trap** | Something a front plants in its copy's git settings runs on the host when host-side git later works in the copy | Harden `front-clone` | Solved, proven by a permanent test |
+| **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is misnamed and dev-playbook has no place | Option B; option A only if B fails | B under test |
 | **Hook logging** | The user's Claude Code hooks log every event to a database, and must keep doing so from inside the sandbox | The prototype's port file, carried over | Not tested under Sandcastle |
 
 ## Where Sandcastle collides
@@ -349,27 +349,51 @@ a fixed place of its own outside `~/workspace`, on the user's machine and in
 the container alike, and a repository's name is read from the note git keeps
 in the copy of where it was cloned from, which needs no network. The cost is
 a pass over every standard, skill, and setup step that assumes
-`~/workspace/dev-playbook`, and a revision of decision 0009.
+`~/workspace/dev-playbook`, and a revision of decision 0009. The user ruled
+it the fallback, tested only if option B fails: the user also runs code
+outside Sandcastle, so a standards change would cascade into workflows
+beyond this set.
 
 **Option B — our own container plug-in.** Sandcastle accepts user-written
 sandbox plug-ins (`createBindMountSandboxProvider` is exported), and its own
 podman plug-in is one of them, about 300 lines. A plug-in of ours would put
 the repository at `~/workspace/mission-control` and the config copy at
 `~/workspace/dev-playbook`, so the container matches the user's machine and
-no standard changes. The cost is owning that plug-in. Whether Sandcastle
-honors a location a plug-in changes is read from its code (the podman
-plug-in takes the location from the mounts it is handed) and not yet
-confirmed.
+no standard changes. The cost is owning that plug-in.
+
+The plug-in interface is public and documented: the README's "Custom
+Sandbox Providers" section, with the builders and their types exported from
+the package root. Read from the 0.12.0 code, `/home/agent/workspace` is only
+the location Sandcastle *suggests* in the mounts it hands a plug-in; after
+the container starts, every git call, the agent's working directory, and
+the commit collection use the location the plug-in reports back. The podman
+plug-in itself finds its location that way. So option B can be a thin
+wrapper around Sandcastle's own podman plug-in that moves the repository's
+mount to `~/workspace/mission-control`, rather than a rewrite. Confirmed by
+reading; not yet by a run.
 
 ## The booby-trap fix
 
-Approved by the user. `front-clone` runs every git command it runs inside a
-copy with all of git's known automatic-command points switched off,
-without reading what is in them: hooks, `core.fsmonitor`, and whatever
-else the specific commands it runs would consult. The step that pulls the
-commits back already runs in the real repository and uses the real
-repository's own hooks, so it is unaffected. A test plants a trap at every
-point, runs `close`, and asserts that no marker appears.
+Built and proven. The closing half of `front-clone` never runs git *in* the
+copy at all, which is the main-breaker form of "switch every trigger off":
+nothing in the copy's `.git` is ever treated as settings.
+
+- The copy's origin is read from its config file as plain text.
+- The commits come back by the real repository fetching them onto a holding
+  place of its own. The serving side of a fetch is git's one path built to
+  be safe against an untrusted repository.
+- The check for uncommitted work runs in the real repository, under its own
+  settings, comparing the copy's files against the fetched commit.
+- Only after every check passes does the branch move onto its real name.
+
+`tests/dev_playbook/test_front_clone_traps.py` plants a trigger at every
+point git offers (all 28 hook names, a second hooks directory, fsmonitor,
+filter, diff, pager, editor, credential, ssh, gpg, upload-pack, and an
+included config file), then closes. No trigger fires, on success or on a
+refused close. A control proves the traps are live: an ordinary git command
+in the same copy fires them. Run against the old code, the same test fails.
+One edge is accepted: a change staged in the copy and then deleted from its
+files goes unnoticed, since the copy's staging area is never read.
 
 ## Hook logging
 

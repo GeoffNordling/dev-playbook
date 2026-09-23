@@ -104,34 +104,27 @@ machine. The WSL machine this set was begun on has no container runtime and
 is not a target, which
 [The Sandbox](/working-docs/parallel-fronts/sandbox.md) records as settled.
 
-- **Experiment three.** Designed at the problem-table level, to be
-  confirmed with the user and then run. Parts 1 to 3 use the stand-in agent
-  and cost no tokens; part 4 uses real Claude briefly.
-  1. *Booby-trap fix.* Build the approved fix into `front-clone`, and add a
-     permanent test that plants a trap at every point and asserts none
-     fires on `close`.
-  2. *Option B.* Write our own container plug-in and run the stand-in
-     through it. It must report the repository at
-     `~/workspace/mission-control`, dev-playbook at
-     `~/workspace/dev-playbook`, the repository name `mission-control`, and
-     the skill and rule links resolving; experiment two's safety checks run
-     again.
-  3. *Option A.* Sandcastle's own podman plug-in, with dev-playbook at a
-     fixed place of its own and the name read from the copy's clone note,
-     the standards change made on this branch only. Same four reports, same
-     safety checks.
-  4. *Real Claude.* A tiny task on each option that passed: the agent has
-     its skills and rules, its hook events reach the measurement database,
-     and the billing check passes before launch.
-
-  The output is, per option, whether it worked and what it costs: for B the
-  plug-in's size, for A the standards that change. The user then chooses.
-- **Two windows, one container.** Open dev-playbook twice for one front —
-  read-only as the config source, read-write as the work checkout — and
-  confirm an edit in one does not appear in the other and the front still
-  loads its skills. This is the case where a front is assigned to change
-  dev-playbook itself, which the prototype specified and never ran. It may
-  fold into experiment three, part 2 or 3.
+- **Experiment three.** Approved by the user, in progress. Parts 1 and 2
+  use the stand-in agent and cost no tokens; part 4 uses real Claude
+  briefly.
+  1. *Booby-trap fix.* Done: see
+     [The Sandbox](/working-docs/parallel-fronts/sandbox.md#the-booby-trap-fix).
+  2. *Option B.* Our own container plug-in, a thin wrapper around
+     Sandcastle's podman plug-in, run with the stand-in. Six checks: the
+     name reads `mission-control`; dev-playbook sits at
+     `~/workspace/dev-playbook` and the eight links resolve; the real
+     repository and unpushed work are untouched; the commit comes back at
+     the same SHA; the planted traps do not fire; and **two windows, one
+     container** — a front assigned to change dev-playbook gets a
+     read-only copy to read from and a copy to edit, and an edit to one
+     does not appear in the other. The last is the check most likely to
+     break option B, since both copies want `~/workspace/dev-playbook`.
+  3. *Option A.* Only if option B fails. The user ruled it the fallback:
+     code also runs outside Sandcastle, so a standards change would cascade
+     into workflows beyond this set.
+  4. *Real Claude.* An end-to-end proof on the option that passed: a tiny
+     real task, with the billing check passing before launch, the skills
+     and rules loaded, and hook events reaching the measurement database.
 - **Sandcastle's other branch modes.** `branch` and `merge-to-head` run more
   git on the host than `head` mode, and may trip the booby trap themselves.
 - **One lap by hand.** Run the shape once with two fronts and no driver
