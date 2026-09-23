@@ -20,7 +20,7 @@ loads is [Claude Code Files](/standards/harness/files.md); the voice a
 [No first person](/standards/prose/conventions.md#no-first-person).
 
 > **Why.** `## Behaviors` leads because `### Read the standards` must
-> be the first heading in the file. That rule sends every agent to the
+> be the first `###` heading in the file. That rule sends every agent to the
 > standards catalog at session start; its sibling `### Navigate docs
 > by index` states how to walk OKF indexes without loading whole
 > trees.

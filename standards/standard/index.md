@@ -1,8 +1,7 @@
 # standards/standard/ — index
 
 Meta-Standard governs how the workspace's standards are laid out,
-found, and kept honest — the tree, the catalog, the detectors, and the
-boundaries.
+found, and kept honest — the tree, the catalog, and the detectors.
 
 Ordering: alphabetical by title.
 
