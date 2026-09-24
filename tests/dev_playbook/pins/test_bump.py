@@ -74,9 +74,8 @@ def scripted_gate(
 ) -> None:
     """Point the gate at a script giving ``runs[n]`` on its nth call.
 
-    The baseline and the verify are two calls to one command, and they have to
-    differ: the shape a lost network takes is a green baseline off the cached pin
-    and a verify that cannot clone the new rev.
+    ``check`` runs the gate once, at the new pin; a second call, or a call
+    where none is scripted, exits 3, which the gate reports as "could not run".
     """
     script = tmp_path / "scripted-gate"
     counter = tmp_path / "gate-calls"
@@ -362,7 +361,7 @@ def test_check_reports_green_and_leaves_the_checkout_untouched(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo = write_consumer(tmp_path / "consumer", CONFIG)
-    scripted_gate(monkeypatch, tmp_path, (0, PASSED), (0, PASSED))
+    scripted_gate(monkeypatch, tmp_path, (0, PASSED))
     assert bump.check(repo, URL, NEW, IDS) == 0
     assert config_of(repo) == CONFIG
     assert not worktree.git_out(repo, "status", "--porcelain")
@@ -373,7 +372,7 @@ def test_check_reports_red_and_leaves_the_checkout_untouched(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo = write_consumer(tmp_path / "consumer", CONFIG)
-    scripted_gate(monkeypatch, tmp_path, (0, PASSED), (1, FINDINGS))
+    scripted_gate(monkeypatch, tmp_path, (1, FINDINGS))
     assert bump.check(repo, URL, NEW, IDS) == 1
     assert config_of(repo) == CONFIG
     assert not worktree.git_out(repo, "status", "--porcelain")
@@ -383,7 +382,7 @@ def test_check_leaves_no_worktree_when_the_gate_cannot_run(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo = write_consumer(tmp_path / "consumer", CONFIG)
-    scripted_gate(monkeypatch, tmp_path, (0, PASSED), (3, CRASH))
+    scripted_gate(monkeypatch, tmp_path, (3, CRASH))
     with pytest.raises(ToolError, match="could not run"):
         bump.check(repo, URL, NEW, IDS)
     assert config_of(repo) == CONFIG
@@ -397,19 +396,30 @@ def test_check_judges_origin_main_not_the_checkout(
     repo = write_consumer(tmp_path / "consumer", CONFIG)
     worktree.git_out(repo, "checkout", "-q", "-b", "issue-12")
     (repo / "scratch.txt").write_text("work in progress", encoding="utf-8")
-    scripted_gate(monkeypatch, tmp_path, (0, PASSED), (0, PASSED))
+    scripted_gate(monkeypatch, tmp_path, (0, PASSED))
     assert bump.check(repo, URL, NEW, IDS) == 0
     assert (repo / "scratch.txt").is_file()
     assert worktree.git_out(repo, "branch", "--show-current") == "issue-12"
 
 
-def test_check_refuses_a_repo_already_red_at_its_current_pin(
+def test_check_runs_the_gate_once_at_the_new_pin_and_never_at_the_old(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """A repo red before the bump is red with more findings, never refused."""
     repo = write_consumer(tmp_path / "consumer", CONFIG)
-    scripted_gate(monkeypatch, tmp_path, (1, FINDINGS))
-    with pytest.raises(ToolError, match="already red at its current pin"):
-        bump.check(repo, URL, NEW, IDS)
+    seen = tmp_path / "pin-seen-by-gate"
+    script = tmp_path / "pin-reading-gate"
+    script.write_text(
+        "#!/bin/sh\n"
+        f"grep -c {NEW} .pre-commit-config.yaml >> {seen}\n"
+        f"echo '{FINDINGS}'\nexit 1\n",
+        encoding="utf-8",
+    )
+    script.chmod(0o755)
+    monkeypatch.setattr(gate, "GATE", (str(script),))
+
+    assert bump.check(repo, URL, NEW, IDS) == 1
+    assert seen.read_text().split() == ["1"]
     assert config_of(repo) == CONFIG
 
 

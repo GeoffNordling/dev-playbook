@@ -41,11 +41,13 @@ Done when the repo's name is in the roster.
 ## 2. Probe the bump
 
 {Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--check`}. It
-fetches `origin/main`, cuts a throwaway worktree of it, runs the gate at the
-current pin there, moves the pin and its hook ids to dev-playbook's release
-head, runs the gate again, and removes the worktree. This checkout is never
-read or written — it may sit on any branch, dirty or clean — and the probe
-commits the repo to nothing.
+fetches `origin/main`, cuts a throwaway worktree of it, moves the pin and its
+hook ids there to dev-playbook's release head, runs the gate once, and removes
+the worktree. This checkout is never read or written — it may sit on any
+branch, dirty or clean — and the probe commits the repo to nothing. There is
+no run at the current pin: a repo red before the bump is red with more
+findings, and every finding at the new pin is worked whichever release brought
+it.
 
 Its exit code picks the branch:
 
@@ -55,10 +57,9 @@ Its exit code picks the branch:
 | 1 | red — the findings are on stdout | §4 |
 | 2 | the probe reached no verdict | stop |
 
-Exit 2 is an environment fault or a repo already red at its **current** pin —
-breakage that predates this release either way. {If the probe exits 2, {Report
-the refusal it printed, as the fault it is}} rather than as findings this
-release caused.
+Exit 2 is an environment fault: the gate crashed, the network was gone, `gh`
+had no credential. {If the probe exits 2, {Report the refusal it printed, as
+the fault it is}} rather than as findings this release caused.
 
 Done when the exit code is read and the branch chosen.
 

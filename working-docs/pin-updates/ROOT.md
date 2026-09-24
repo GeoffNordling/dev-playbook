@@ -218,10 +218,6 @@ block), `gate`, `worktree`, `consumer` (one repo's state and landings),
 
 ## Planned
 
-- **Step 6 — first run.** After this PR merges — the ledger and the
-  manifest's `language_version` must be on `main` for any consumer to
-  move — over the seven on-machine repos with the user watching, `--dry-run`
-  first; then `lunch` and `date-tree` by local clone.
 - **Follow-ups.** Sandbox the fan-out once `sandcastle` merges; the
   consumers' `ci.yml` carries `SKIP: ref-lint,web-typecheck` against a
   canonical `SKIP: workspace`, so the first bump reddens every repo on
@@ -308,16 +304,26 @@ block), `gate`, `worktree`, `consumer` (one repo's state and landings),
 - **Sweep.** 2026-09-24. `consumer.bump_branches`, `worktree_of`,
   `remove_bump`; `agent.pr_state`; `update.sweep`, run in `main` over
   every consumer before the todo list is built.
+- **`bump-pin --check` drops the baseline run.** 2026-09-24. The
+  mission-control hand run stopped at §2 with exit 2 on four `ref-lint`
+  links its current pin already broke, while update-pins would have
+  gone red and handed them to the agent. `bump.check` now moves the pin
+  and runs the gate once; exit 2 is an environment fault alone; skill §2
+  says so. The Unfiled question about red baselines is closed the way
+  the design already answered it.
+- **All seven on-machine repos current at `e591c931a426`.** 2026-09-24.
+  story-forge, mission-control, sysadmin-playbook by hand runs; sounds
+  green (one automatic commit, `aa450d383f6f`); personal-trainer,
+  idea-tree, dwarf-flow by headless agents, dwarf-flow with the first
+  escalations (two fenced files, which the user edited on `main`). Timer
+  enabled 2026-09-24 11:42 EDT. lunch and date-tree cloned into
+  `~/workspace`; the next tick moves them.
 
 ## Unfiled
 
 - The consumers' `ci.yml` `SKIP` names (`ref-lint`) no longer exist as
   hook ids; pre-commit ignores unknown `SKIP` names, so this is only
   drift against the canonical block.
-- Whether the red-path agent should also fix a repo that is red before
-  the bump (a red baseline) — the design says yes, every finding is
-  worked; `bump_pins.check` still refuses a red baseline for its own
-  callers.
 - A `failed` row is never retried by update-pins; the user re-runs by
   hand or waits for the next release. A `--again REPO` flag that ignores
   the ledger for one repo may earn its place after the first runs.
