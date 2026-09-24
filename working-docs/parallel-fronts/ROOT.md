@@ -120,10 +120,8 @@ and is answered there.
 Sessions with the user come first, each at a high level, the agent
 guiding.
 
-- **Wait: overlap with active branches.** Paused: a large refactor is
-  in progress on `main`, and this set waits for it to finish. Then check
-  what it changed, and whether the landing PR touches any file that
-  another active, unmerged branch is also changing.
+- **Check overlap with active branches.** Find whether the landing PR
+  touches any file that another active, unmerged branch also changes.
 - **Design the invocation and the control code.** How the user starts a
   lap, the program around `run()` that decides what runs and when, and
   what happens at the lap's end: who merges the fronts' branches (the
@@ -139,8 +137,7 @@ guiding.
   the work lands, and what the landing PR carries: only the two changes
   part 4 ran on, or all of this branch's work (the hardened `front-clone`,
   its trap test, and this working set) with them, and whether anything of
-  the `sandbox-probe` branch comes along. Waits until the large refactor now running on `main`
-  finishes, since that refactor may move the places they would go.
+  the `sandbox-probe` branch comes along.
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
   ([Part 4](/working-docs/parallel-fronts/experiment-log.md#part-4-real-claude)):
