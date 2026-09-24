@@ -120,8 +120,6 @@ and is answered there.
 Sessions with the user come first, each at a high level, the agent
 guiding.
 
-- **Check overlap with active branches.** Find whether the landing PR
-  touches any file that another active, unmerged branch also changes.
 - **Design the invocation and the control code.** How the user starts a
   lap, the program around `run()` that decides what runs and when, and
   what happens at the lap's end: who merges the fronts' branches (the
@@ -130,8 +128,7 @@ guiding.
   ([The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md#what-it-does-not-yet-do)):
   what schedules a lap, and where real copies live. It also settles the
   names checkpoint and integrator; "checkpoint" is already used in the
-  repo's shared glossary for the Ralph loop. Waits on the overlap
-  discussion above.
+  repo's shared glossary for the Ralph loop.
 - **Discuss: where the pipeline lives on main.** Where its document and
   the code in [`rig/`](/working-docs/parallel-fronts/rig/index.md) go once
   the work lands, and what the landing PR carries: only the two changes
@@ -154,6 +151,9 @@ guiding.
 
 ## Completed
 
+- **Check overlap with active branches.** Done 2026-09-24: `main`'s
+  refactor is merged into this branch, and no active branch conflicts
+  with it.
 - **Survey Sandcastle.** What the tool offers this shape is recorded in
   [Sandcastle](/working-docs/parallel-fronts/sandcastle.md).
 - **State the sandbox requirement.** What a front's container must reach,
