@@ -45,8 +45,8 @@ a file in `doc-types/<name>/`.
 ## Verbs are the operations
 
 `definition.md` states the doc-type's verbs, a set of single words,
-empty for a doc-type that is only driven, and the `operations` of the
-class in `contract-shape.md` is the same set.
+possibly empty, and the `operations` of the class in
+`contract-shape.md` is the same set.
 
 `doc-type.verbs-are-the-operations` · stochastic
 
