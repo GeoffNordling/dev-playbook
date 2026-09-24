@@ -104,7 +104,7 @@ In order; each produces what the next needs.
   `9be0089`, are the models for the `chain` and `standard` extractors
   in the package, alongside the bedrock extractors, and a `loop` extractor
   reads a Loop document's Mermaid block
-  ([Planned](/working-docs/doc-type-system/loop/ROOT.md#planned));
+  ([Planned](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#planned));
   one refresh writes one fact base per checkout; the shims go. The `card` extractor and `cardgen` are
   struck: the doc-type system retired Standard-Card at step 6 of its
   plan.

@@ -7,7 +7,7 @@ description: How a loop is told what to do without the user present — the pred
 # Specifying a Loop
 
 How work reaches a loop when the user is not there. Speculative, per
-[ROOT.md](/working-docs/doc-type-system/loop/ROOT.md).
+[ROOT.md](/working-docs/doc-type-system/loop-and-workstream/ROOT.md).
 
 ## The predicate
 

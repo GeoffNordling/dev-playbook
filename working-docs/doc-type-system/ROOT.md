@@ -28,8 +28,9 @@ receipt, and every relation type belongs to a declared doc-type
 - **Doc-type system**, the language: doc-types, verbs, rules as
   predicates, encodings as grammar. Root:
   [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md).
-- **Loop**, the driver: the third doc-type, a full peer of Runbook and
-  Standard. Root: [Loop](/working-docs/doc-type-system/loop/ROOT.md).
+- **Loop and Workstream**, what drives and what is driven: Loop and the
+  new Workstream doc-type, designed together. Root:
+  [Loop and Workstream](/working-docs/doc-type-system/loop-and-workstream/ROOT.md).
 - **Fact base**, the compiled object: one deterministic object of nodes
   and edges per checkout, every view a selection from it. Root:
   [Fact Base](/working-docs/doc-type-system/fact-base/ROOT.md).
@@ -70,7 +71,7 @@ fact base. Loop and the simulation are leaves.
   of its four  │                                  │  defines an
   doc-types    ▼                                  ▼  extractor
   ┌────────────────────────────┐   ┌──────────────────────────────┐
-  │  LOOP · the driver         │   │  FACT BASE · the compiled    │
+  │  LOOP & WORKSTREAM         │   │  FACT BASE · the compiled    │
   │  predicates · specification│   │  object                      │
   │                 /loop.md   │   │  theory ····· fact-base.md   │
   │  how it is told            │   │  evidence ··· fact-base-     │

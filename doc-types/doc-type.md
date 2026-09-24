@@ -60,6 +60,6 @@ a drop to file-level detail is the **residual**; the primitives are
 refactored only when the reduction is worth the change cost. Residuals
 are recorded in the doc-type's residual ledger, one entry per instance
 that has one. The loop's current design is
-[Specifying a Loop](/working-docs/doc-type-system/loop/specifying-a-loop.md#the-loop-that-proposes),
+[Specifying a Loop](/working-docs/doc-type-system/loop-and-workstream/specifying-a-loop.md#the-loop-that-proposes),
 and the fact base strand plans to run it as a Loop
 ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).

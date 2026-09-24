@@ -10,7 +10,7 @@ The strand that holds the language: what a doc-type is, its verbs, its
 rules as predicates, its encodings as grammar. Speculative, per
 [Synthesis Working Root](/working-docs/doc-type-system/ROOT.md).
 It defines Loop, one of its four doc-types
-([Loop](/working-docs/doc-type-system/loop/ROOT.md)), and each
+([Loop](/working-docs/doc-type-system/loop-and-workstream/ROOT.md)), and each
 encoding it writes defines an extractor of the fact base
 ([Fact Base Strand](/working-docs/doc-type-system/fact-base/ROOT.md)).
 The user's own words on the work are kept verbatim in
@@ -82,7 +82,7 @@ specification.
   deterministic rule the deleted prototype chaingen applied to a
   runbook and its chain. The
   loop half is in the Loop strand
-  ([Principles](/working-docs/doc-type-system/loop/ROOT.md#principles)).
+  ([Principles](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#principles)).
 
 ## Terms
 

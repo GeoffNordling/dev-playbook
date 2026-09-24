@@ -218,9 +218,11 @@ Decided with the user on 2026-09-24.
 - **A coordinator agent advises only.** The user runs it; it reads the
   board, says which workstreams need the user, and drafts head files and
   verdicts. It launches nothing.
-- **The Loop working set folds in when the first Loop is written.**
-  [`doc-type-system/loop/`](/working-docs/doc-type-system/loop/ROOT.md)
-  is where the unattended stint's Loop gets written, not beside it.
+- **The doc-types have one home.** Workstream and Loop are designed
+  together in
+  [the Loop and Workstream strand](/working-docs/doc-type-system/loop-and-workstream/ROOT.md)
+  of the doc-type system set; this set holds only the workflow. Decided
+  2026-09-24.
 - **The unattended principal rules on the findings itself.** It judges
   the reviewer's sorted findings against the head file's Goal, Done when,
   and Constraints, and writes each ruling in the progress file, so the
@@ -256,10 +258,9 @@ Sessions with the user come first, each at a high level, the agent
 guiding. Running an unattended stint is the
 [sandcastle set's worklist](/working-docs/delegation/sandcastle/ROOT.md#planned).
 
-- **Write the Workstream doc-type.** Its definition and encoding under
-  `doc-types/workstream/`, its entry in
-  [Document Types](/standards/knowledge-organization/document-types.md),
-  and a conventions Standard with checks.
+- **Write the Workstream doc-type.** Designed and built with Loop in
+  [the Loop and Workstream strand](/working-docs/doc-type-system/loop-and-workstream/ROOT.md),
+  which holds its worklist; this item closes when that strand's does.
 - **Retire "working documentation set".** `working-docs/` renamed to
   `workstreams/`, each head file renamed,
   [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
@@ -269,8 +270,8 @@ guiding. Running an unattended stint is the
   tracking, each in its own section of
   [`standards/tracking/`](/standards/tracking/index.md).
 - **Write the unattended stint's Loop.** The first file in `loops/`,
-  written by folding in
-  [`doc-type-system/loop/`](/working-docs/doc-type-system/loop/ROOT.md).
+  once [the Loop and Workstream strand](/working-docs/doc-type-system/loop-and-workstream/ROOT.md)
+  has settled both doc-types.
 - **Build the board script.** It reads the head files and the live stints
   and prints the ✈️/💤 board.
 - **Build the coordinator agent.** Advisory only.

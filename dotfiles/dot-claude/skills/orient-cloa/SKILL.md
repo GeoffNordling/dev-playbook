@@ -20,7 +20,7 @@ Read each file end-to-end:
 - {Read [The doc-type system](~/workspace/dev-playbook/doc-types/doc-type-system.md); the published definition}.
 - {Read [Synthesis Working Root](~/workspace/dev-playbook/working-docs/doc-type-system/ROOT.md); the five strands, their shared terms, and the open cross-strand questions}.
 - {Read [the doc-type system strand root](~/workspace/dev-playbook/working-docs/doc-type-system/doc-type-system/ROOT.md); the language, the reference model, and ontology solvers}.
-- {Read [the Loop strand root](~/workspace/dev-playbook/working-docs/doc-type-system/loop/ROOT.md); the driver}.
+- {Read [the Loop strand root](~/workspace/dev-playbook/working-docs/doc-type-system/loop-and-workstream/ROOT.md); the driver}.
 - {Read [the fact base strand root](~/workspace/dev-playbook/working-docs/doc-type-system/fact-base/ROOT.md); the compiled object}.
 - {Read [the viewer strand root](~/workspace/dev-playbook/working-docs/doc-type-system/viewer/ROOT.md); the CLOA viewer}.
 - {Read [the story-forge simulation strand root](~/workspace/dev-playbook/working-docs/doc-type-system/story-forge-simulation/ROOT.md); the ideas tried by hand on one consumer repo}.
