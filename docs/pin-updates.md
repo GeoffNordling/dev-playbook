@@ -54,3 +54,10 @@ ledger's own bookkeeping never triggers the next run.
 |---|---|---|---|---|---|
 | 2026-09-24 02:38 | c67174ed88eb | sounds | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/sounds/.claude/worktrees/bump-pin-c67174ed88eb, log at /home/geoff/.local/state/dev-playbook/update-pins/20260924T023859Z/sounds.log |  |
 | 2026-09-24 02:51 | 38d8585f4785 | sounds | red | PR https://github.com/GeoffNordling/sounds/pull/6 | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | story-forge | current | main pins e591c931a426 | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | mission-control | current | main pins e591c931a426 | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | sysadmin-playbook | current | main pins e591c931a426 | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | sounds | green | main aa450d383f6f | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | personal-trainer | red | PR https://github.com/GeoffNordling/personal-trainer/pull/8 | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | idea-tree | red | PR https://github.com/GeoffNordling/idea-tree/pull/3 | no unmerged branches |
+| 2026-09-24 14:48 | e591c931a426 | dwarf-flow | red | PR https://github.com/GeoffNordling/dwarf-flow/pull/3 | no unmerged branches |
