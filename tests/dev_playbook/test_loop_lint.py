@@ -160,6 +160,23 @@ def test_a_link_that_does_not_resolve_fails(tmp_path: Path) -> None:
     )
 
 
+def test_a_yield_to_the_principal_passes(tmp_path: Path) -> None:
+    loop = LOOP.replace("to the user, yields", "to the principal, yields")
+
+    result = run(make_repo(tmp_path, loop))
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_a_yield_with_no_receiver_fails(tmp_path: Path) -> None:
+    loop = LOOP.replace("to the user, yields", "yields")
+
+    result = run(make_repo(tmp_path, loop))
+
+    assert result.returncode == 1
+    assert "`ask` names no receiver" in result.stdout
+
+
 def test_a_yield_with_no_condition_fails(tmp_path: Path) -> None:
     loop = LOOP.replace("yields when three rounds have run", "after three rounds")
 

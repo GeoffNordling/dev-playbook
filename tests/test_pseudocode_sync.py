@@ -1,6 +1,6 @@
-"""TEMPORARY: the five pseudocode blocks match the reference model's one.
+"""TEMPORARY: the six pseudocode blocks match the reference model's one.
 
-The doc-type system's pseudocode is split across five pages, the base in
+The doc-type system's pseudocode is split across six pages, the base in
 `doc-types/doc-type.md` and one class per `contract-shape.md`, and the
 reference model in the working set holds the same text whole. This test
 fails when they differ. It parses nothing as Python: the pseudocode is a
@@ -19,6 +19,7 @@ PAGES = [
     ROOT / "doc-types/standard/contract-shape.md",
     ROOT / "doc-types/guide/contract-shape.md",
     ROOT / "doc-types/loop/contract-shape.md",
+    ROOT / "doc-types/workstream/contract-shape.md",
 ]
 OPEN = "```python\n"
 CLOSE = "\n```"

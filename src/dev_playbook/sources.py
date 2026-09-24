@@ -42,6 +42,7 @@ REGISTERED_TYPES = frozenset(
         "Standard",
         "Survey",
         "Vocabulary",
+        "Workstream",
     }
 )
 

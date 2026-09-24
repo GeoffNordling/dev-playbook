@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Loop
-description: What a loop is — a document that drives a state toward a target state by iteratively taking prescribed actions and validating against prescribed standards — its three verbs, the family it serves, and where it lives
+description: What a loop is — a document that drives a state toward a target state by iteratively taking prescribed actions and validating against prescribed standards — its four verbs, the family it serves, and where it lives
 ---
 
 # Loop
@@ -13,12 +13,18 @@ measurement, a loop is moves and measurements iterated toward a target.
 
 ## The verbs
 
-Three, iterated:
+Four. Three are steps, iterated, and the fourth is what the steps do
+to a workstream:
 
 - **act** — a pointer at a runbook.
-- **verify** — a pointer at a standard, whose verifiers are run.
-- **yield** — a programmed exit to another loop or to the user, resumed
-  where it left.
+- **verify** — a pointer at one or more standards, whose verifiers are
+  run.
+- **yield** — a programmed exit to another loop, the user, or a stint's
+  principal, resumed where it left.
+- **drive** — what a loop does to a
+  [workstream](/doc-types/workstream/definition.md). The loop names no
+  workstream: a stint binds one loop to one workstream, and the
+  workstream records it.
 
 The target is not a field of the loop: it is written in the standards
 the verifications measure against. An act reads a standard to know
@@ -39,7 +45,8 @@ instance is the specification of a procedure that brings a system
 closer to its target state; the workflow script, skill, or person that
 runs it is the loop's driver, not the loop. A loop does one thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)):
-its acts, its verifications, and its yields, drawn as one graph.
+its acts, its verifications, and its yields, drawn as one graph. One
+loop drives many workstreams.
 
 ## Where a loop lives
 

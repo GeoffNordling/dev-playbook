@@ -69,8 +69,8 @@ Every entry of a file typed `Loop` contains `fires when` or
 `fires every iteration` if it is an act or a verification, and
 `yields when` if it is a yield. An act's entry has at least one
 link. A verification's entry has a link to a file typed `Standard`. A
-yield's entry has a link or the words `the user`, and each of its
-links goes to a file typed `Loop`. Every link in an entry is
+yield's entry has a link or the words `the user` or `the principal`,
+and each of its links goes to a file typed `Loop`. Every link in an entry is
 root-absolute or relative to the file, and goes to a file that
 exists in the repo.
 

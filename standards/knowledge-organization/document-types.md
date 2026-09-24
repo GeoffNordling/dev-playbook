@@ -47,6 +47,7 @@ frontmatter of the repo's own root `index.md`
 | `Standard` | One population and its rules, a normative target a reviewer or check could cite to reject work; lives under `standards/<name>/`, the one tree reserved for it, one directory per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
 | `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
 | `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
+| `Workstream` | The head file of one line of work, its ideas, target state, and context, driven by a loop; `WORKSTREAM.md`, the head of its directory (see [the Workstream doc-type](/doc-types/workstream/definition.md#where-a-workstream-lives)). |
 
 `knowledge-organization.type-names-a-registered-type` · deterministic
 

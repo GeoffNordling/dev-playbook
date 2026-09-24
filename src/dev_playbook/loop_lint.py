@@ -22,7 +22,7 @@ to. Five rules:
   - **loop-edges** — a step leads to a step; only a yield leads to a
     receiver; a receiver leads to a step.
   - **loop-entries** — an act links a file; a verification links a file typed
-    ``Standard``; a yield names the user or links a Loop; every entry
+    ``Standard``; a yield names the user or the principal, or links a Loop; every entry
     states its condition.
 
 The run stops at a file's first disagreement, since each rule reads
@@ -291,10 +291,10 @@ def check_entry(node: str, verb: str, rest: str, loop_path: Path, root: Path) ->
         )
     links = LINK_RE.findall(rest)
     if verb == "yield":
-        if not links and "the user" not in rest:
+        if not links and "the user" not in rest and "the principal" not in rest:
             raise Disagreement(
                 ENTRIES_POINT_AND_CONDITION,
-                f"`{node}` names no receiver: the user or a linked Loop",
+                f"`{node}` names no receiver: the user, the principal, or a linked Loop",
             )
         for link in links:
             if _type_of(_resolve(link, loop_path, root)) != LOOP_TYPE:
