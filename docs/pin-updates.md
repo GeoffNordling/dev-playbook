@@ -61,3 +61,12 @@ ledger's own bookkeeping never triggers the next run.
 | 2026-09-24 14:48 | e591c931a426 | personal-trainer | red | PR https://github.com/GeoffNordling/personal-trainer/pull/8 | no unmerged branches |
 | 2026-09-24 14:48 | e591c931a426 | idea-tree | red | PR https://github.com/GeoffNordling/idea-tree/pull/3 | no unmerged branches |
 | 2026-09-24 14:48 | e591c931a426 | dwarf-flow | red | PR https://github.com/GeoffNordling/dwarf-flow/pull/3 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | story-forge | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | mission-control | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | sysadmin-playbook | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | sounds | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | personal-trainer | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | idea-tree | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | dwarf-flow | current | main pins 07255322f419 | no unmerged branches |
+| 2026-09-24 16:15 | 07255322f419 | lunch | failed | worktree /home/geoff/workspace/lunch/.claude/worktrees/bump-pin-07255322f419 already exists, kept from an earlier run |  |
+| 2026-09-24 16:15 | 07255322f419 | date-tree | failed | worktree /home/geoff/workspace/date-tree/.claude/worktrees/bump-pin-07255322f419 already exists, kept from an earlier run |  |
