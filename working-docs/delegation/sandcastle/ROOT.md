@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Sandcastle Working Root
-description: The root of the sandcastle set inside delegation — the pipeline that runs an unattended stint in a sealed container, the hard bounds it runs under, its words, and its worklist
+description: The root of the sandcastle set inside delegation — the pipeline that runs an unattended stint in a sealed container, the hard bounds it runs under, how to report on it, its words, and its worklist
 ---
 
 # Sandcastle Working Root
@@ -20,22 +20,23 @@ built and proven.
 - Every sandboxed agent reads dev-playbook at published `main`, whichever
   repository it is assigned to change. One assigned to change dev-playbook
   reads the standards as published while it writes their replacement.
-  Refreshing the config mid-stint, or letting such an agent read its own
-  branch as config, was declined.
+  The config stays fixed for the whole stint, and never comes from the
+  agent's own branch.
 - Every run happens on the Fedora machine, and nowhere else. The container,
   its image, and the `claude` binary inside it are Fedora. The WSL Ubuntu
   machine has no container runtime and is not a target.
 - The subscription pays for every run, and this is asserted, not assumed.
-  The billing checks of `playbook check` read four places for a metered
-  credential: the live environment, the shell startup files,
-  `~/.claude/settings.json`, and the repository's `.claude/settings.json`.
-  They run at the commit gate and again before every run.
+  The billing checks of `playbook check`, under
+  [Billing Credentials](/standards/billing/credentials.md), run at the
+  commit gate and again before every run.
 - A container never mounts a real file, only copies made for the run and
   deleted after it. Podman's SELinux option permanently relabels whatever
   is mounted, even read-only, and a host program can then be refused its
   own file.
-- The container holds no GitHub credential, so only local git works
-  inside it, and whatever pushes its commits does so outside.
+- The container holds no GitHub credential, as
+  [the parent's constraints](/working-docs/delegation/ROOT.md#constraints)
+  require, so only local git works inside it, and whatever pushes its
+  commits does so outside.
 - The user's hooks keep logging every event to the measurement database
   from inside a container.
 - Sandcastle is never forked or patched. It is used as published, through
@@ -44,19 +45,17 @@ built and proven.
 
 ## Working with the user
 
-Report at the level of the problem table in
+A report to the user sits at the level of the problem table in
 [What it guarantees](/working-docs/delegation/sandcastle/pipeline.md#what-it-guarantees):
-plain language, each problem and solution by its name, a concrete picture
-where one helps, such as a directory tree with enough rows to show what the
-files are.
+plain language, each problem and solution by its name, and a concrete
+picture where one helps, such as a directory tree with enough rows to show
+what the files are.
 
 ## Terms
 
-- **Sandcastle pipeline** — the arrangement that runs an agent in a sealed
-  container: throwaway copies go in, one agent works there through
-  Sandcastle and our plug-in, and only its commit comes back.
-  [The Sandcastle Pipeline](/working-docs/delegation/sandcastle/pipeline.md)
-  describes it.
+The Sandcastle pipeline is defined with
+[the delegation workflow's terms](/working-docs/delegation/ROOT.md#terms),
+since the parent uses it too.
 
 ### Superseded terms
 
@@ -71,14 +70,18 @@ replace.
   run, from what base, with which prompt, and when they end.
 - **Integrator** — the role that merges the fronts' branches and judges
   their conflicts.
+- **Shape** — how the work is arranged: laps of fronts that a driver
+  schedules and an integrator merges. The delegation workflow's
+  [Shape](/working-docs/delegation/ROOT.md#shape) replaces it.
 
 Where the driver and the integrator go in the new words is open in
 [the parent](/working-docs/delegation/ROOT.md#open).
 
 ## Planned
 
-- **Connect a stint.** Launch an unattended stint from a workstream, count
-  its budget, wrap up at the hard limit, and yield. This settles what the
+- **Connect a stint.** An unattended stint launches from a
+  [workstream](/working-docs/delegation/ROOT.md#terms), counts its budget,
+  wraps up at the hard limit, and yields. This settles what the
   pipeline does not yet do
   ([What it does not yet do](/working-docs/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do)):
   what schedules a stint, and where real copies live. Waits on the
@@ -91,7 +94,7 @@ Where the driver and the integrator go in the new words is open in
 - **Discuss: where the pipeline lives on main.** Where its document and
   the code in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md)
   go once the work lands, and what the landing PR carries.
-- **One unattended stint by hand.** Run one with no driver program, to
+- **One unattended stint by hand.** A stint run with no driver program, to
   find where it hurts before any of it is automated. The guess: a stint
   needs a way to declare itself done, and its budget is a ceiling, not a
   target.
@@ -108,8 +111,7 @@ Where the driver and the integrator go in the new words is open in
   [The five problems](/working-docs/delegation/sandcastle/experiment-log.md#the-five-problems).
 - **Assert this device holds no metered credential.** The billing
   checks assert it at the commit gate, under
-  [Billing Credentials](/standards/billing/credentials.md); what they read is under
-  [Constraints](#constraints).
+  [Billing Credentials](/standards/billing/credentials.md).
 - **Experiment one: the clone round-trip.** Commits made in a throwaway
   clone reach the real repository at the same SHA, or the run stops.
   [`front-clone`](/scripts/front-clone) is the plumbing, and

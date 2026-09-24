@@ -11,7 +11,8 @@ member inherits that voice. The work is a standard workflow for delegation:
 the user and an agent brief a piece of work, agents advance it, with the
 user present or not, and the work comes back to the user for a verdict.
 This root holds the ideas, the tracking, and the words of that workflow.
-The machinery that runs an unattended stint is the nested
+The machinery that runs an unattended stint, the Sandcastle pipeline, is
+described in the nested
 [sandcastle set](/working-docs/delegation/sandcastle/ROOT.md). The set
 grew out of the parallel-fronts set, renamed on 2026-09-24 when its
 question widened.
@@ -56,16 +57,16 @@ Markdown format, so nothing is invented anew each time.
 
 The user holds the requirements and the approvals; the agent holds the
 technical detail. Decisions are made at the level of the structure: a
-Unicode diagram or a tree the user can see, never a wall of prose. Report
-in plain language, and leave out commands, flags, and mechanism unless the
-user asks. Put a question with a recommended answer, at most four at once.
-Describe a test plan and get approval before running it, and discuss
-results before acting on them.
+Unicode diagram or a tree the user can see, never a wall of prose. The
+agent reports in plain language and leaves out commands, flags, and
+mechanism unless the user asks. It puts each question with a recommended
+answer, at most four at once. It describes a test plan and gets the user's
+approval before running it, and discusses results before acting on them.
 
 ## Terms
 
-The words of the workflow, one meaning each; these five are the whole of
-it.
+The words of the workflow, one meaning each, and the name of the
+machinery an unattended stint runs on.
 
 - **Workstream** — one line of work: an intent and its history. It holds
   the goal, the reasons, the boundaries, what was decided and tried, and
@@ -80,13 +81,17 @@ it.
   loop. An **attended** stint has the user in it, as in a session like the
   one that wrote this set: the most effective and the most costly. An
   **unattended** stint runs in a sealed container with no user, on the
-  [Sandcastle pipeline](/working-docs/delegation/sandcastle/ROOT.md#terms),
-  and ends by yielding to the user.
+  Sandcastle pipeline, and ends by yielding to the user.
 - **Checkpoint** — a review point inside an unattended stint, after a
   block of iterations: the work is reviewed against the plan, and the plan
-  is revised.
+  is revised. It is the review the
+  [Ralph checkpoint skill](/dotfiles/dot-claude/skills/ralph-checkpoint/SKILL.md)
+  runs today.
 - **Iteration** — one fresh-context agent that does one task of the plan,
   commits, and exits.
+- **Sandcastle pipeline** — the machinery that runs an agent in a sealed
+  container, described in
+  [The Sandcastle Pipeline](/working-docs/delegation/sandcastle/pipeline.md).
 
 The parallel-fronts words these replace are listed in
 [the sandcastle set](/working-docs/delegation/sandcastle/ROOT.md#superseded-terms),
@@ -156,7 +161,7 @@ Decided with the user on 2026-09-24.
   progressive disclosure, to run in an attended stint as it does today and
   inside an unattended one.
 - **A coordinator agent advises only.** The user runs it; it reads the
-  board, says which workstreams need the user, and drafts briefs and
+  board, says which workstreams need the user, and drafts head files and
   verdicts. It launches nothing.
 - **The Loop working set folds in when the first Loop is written.**
   [`doc-type-system/loop/`](/working-docs/doc-type-system/loop/ROOT.md)
@@ -169,9 +174,10 @@ Each question with the agent's recommendation, to be decided from the
 
 - **Who rules at an unattended checkpoint.** The reviewer ranks findings
   and no user is there to confirm them. The checkpointer rules against the
-  brief, a separate judge rules, or every finding is accepted; in each, a
-  finding the brief cannot settle stops the stint as stuck. Recommended:
-  the checkpointer rules and records every ruling in the progress file.
+  head file, a separate judge rules, or every finding is accepted; in each,
+  a finding the head file cannot settle stops the stint as stuck.
+  Recommended: the checkpointer rules and records every ruling in the
+  progress file.
 - **The head file's name.** `ROOT.md` or `WORKSTREAM.md`. Recommended:
   `WORKSTREAM.md`, named for its type as `SKILL.md` is, so the board finds
   workstreams by name alone.
@@ -196,18 +202,17 @@ Sessions with the user come first, each at a high level, the agent
 guiding. Running an unattended stint is the
 [sandcastle set's worklist](/working-docs/delegation/sandcastle/ROOT.md#planned).
 
-- **Decide the Open questions from the diagram.** Draw the system as a
-  diagram in this set, and settle each item of [Open](#open) at that
-  level.
+- **Decide the Open questions from the diagram.** A diagram of the system
+  in this set, and each item of [Open](#open) settled at that level.
 - **Write the Workstream doc-type.** Its definition and encoding under
   `doc-types/workstream/`, its entry in
   [Document Types](/standards/knowledge-organization/document-types.md),
   and a conventions Standard with checks.
-- **Retire "working documentation set".** Rename `working-docs/` to
-  `workstreams/` and each head file, rewrite
+- **Retire "working documentation set".** `working-docs/` renamed to
+  `workstreams/`, each head file renamed,
   [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
-  as the Workstream's rules, reword the exemptions the other rules grant a
-  working set, and fix every link.
+  rewritten as the Workstream's rules, the exemptions the other rules
+  grant a working set reworded, and every link fixed.
 - **Split the tracking standard.** GitHub tracking and workstream
   tracking, each in its own section of
   [`standards/tracking/`](/standards/tracking/index.md).

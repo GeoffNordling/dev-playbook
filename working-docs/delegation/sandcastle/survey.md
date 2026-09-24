@@ -8,9 +8,10 @@ description: What Sandcastle offers the delegation set — the driver primitives
 
 Sandcastle is one candidate for the driver
 ([Sandcastle Working Root](/working-docs/delegation/sandcastle/ROOT.md#terms)).
-This member records what the tool supplies to the shape and what it leaves
-undone, so any decision about how the laps are run rests on something
-written rather than on first impressions. The findings come from the
+This member records what the tool supplies to
+[the shape](/working-docs/delegation/sandcastle/ROOT.md#superseded-terms)
+and what it leaves undone, so any decision about how the laps are run
+rests on something written rather than on first impressions. The findings come from the
 project's own documentation at <https://github.com/mattpocock/sandcastle>.
 
 ## What it is

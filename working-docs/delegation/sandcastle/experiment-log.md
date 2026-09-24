@@ -22,7 +22,7 @@ Pointed at the real repository, Sandcastle opens it into the container,
 | Problem | What went wrong | Closed by |
 |---|---|---|
 | **Shared history** | Worktrees share one `.git`, so a front could delete other branches and the user's unpushed commits, such as a worktree `issue-123` | Experiment two |
-| **Relabel** | Podman's SELinux option permanently relabels the mounted host files, even through a read-only mount | Experiment two |
+| **Relabel** | Podman's SELinux option relabels the mounted host files ([Constraints](/working-docs/delegation/sandcastle/ROOT.md#constraints)) | Experiment two |
 | **Booby trap** | A front plants a command in its copy's git settings that runs on the host when host-side git later works in the copy | The booby-trap fix |
 | **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is named `workspace` and dev-playbook has no place | Experiment three |
 | **Hook logging** | The user's hooks must keep logging to the measurement database from inside a container | Part 4 |
@@ -39,11 +39,11 @@ would point at git alone.
 **Settled.**
 
 - Git refuses a push into a checked-out branch, so the real repository
-  fetches from the clone instead, without force.
+  fetches from the clone instead.
 - A default local clone shared 318 object files with its source; with
   `--no-hardlinks` it shared none.
-- The front's branch exists only in the clone until the commits arrive.
-- A clone holding uncommitted work is refused and left on disk.
+- The round trip as it still runs is the Close step of
+  [the pipeline](/working-docs/delegation/sandcastle/pipeline.md#the-run-start-to-finish).
 
 ## Experiment two: Sandcastle against a copy
 

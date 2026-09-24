@@ -124,8 +124,8 @@ Sandcastle is used as published. By default it puts the repository at
 `~/workspace` itself, which breaks the workspace layout; a 20-line wrapper
 around its own podman plug-in moves the work copy to `~/assignment/<repo>`.
 The code is [`rig/relocated.mjs`](/working-docs/delegation/sandcastle/rig/index.md).
-Changing the workspace standards to fit Sandcastle instead was rejected:
-the user runs code outside Sandcastle too, and the change would reach it.
+Why the pipeline leaves the workspace standards unchanged is in
+[Experiment three](/working-docs/delegation/sandcastle/experiment-log.md#experiment-three-the-plug-in).
 
 ## The run() call
 
@@ -150,14 +150,14 @@ over. Two arguments control the loop:
 | Argument | Default | Meaning |
 |---|---|---|
 | `maxIterations` | 1 | The most sessions a run starts |
-| `completionSignal` | `<promise>COMPLETE</promise>` | Text that ends the loop early. Sandcastle never tells the agent about it, so the prompt must |
+| `completionSignal` | `<promise>COMPLETE</promise>` | Text that ends the loop early. Sandcastle never tells the agent this text, so the prompt names it |
 
 The rig uses the defaults: one session per front.
 
-**The branch strategy is `head`.** The agent works directly in the copy it
-is pointed at. `front-clone` has already checked the front's branch out
-there, so Sandcastle's other strategies, which add a worktree of their own
-on that branch, would fail.
+**The branch strategy is `head`**, of Sandcastle's
+[branch modes](/working-docs/delegation/sandcastle/survey.md#what-it-fixes-and-where-it-bends).
+`front-clone` has already checked the front's branch out in the copy, so a
+mode that adds a worktree of its own on that branch would fail.
 
 ## What it guarantees
 
