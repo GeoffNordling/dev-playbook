@@ -35,6 +35,11 @@ ledger's own bookkeeping never triggers the next run.
   - `failed` — the run could not finish for this repo; Landing says why.
     A red repo whose agent opened no PR keeps its worktree at
     `.claude/worktrees/bump-pin-<sha12>` for the user to read.
+
+  A `bump-pin-<sha12>` worktree and branch live until their PR is merged
+  or closed; the next run removes them, worktree, local branch and remote
+  branch, and says so on stdout. A branch with no PR, or an open one, is
+  kept.
 - **Landing** — `main <sha12>` for a landed commit, `PR <url>` for a
   pull request, or the reason for a failure.
 - **Notes** — the remote branches not merged to `main` when the run

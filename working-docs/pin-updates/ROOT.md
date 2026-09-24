@@ -82,6 +82,12 @@ Rulings the user made in the session, in the order made.
 - **Escalations always go into the PR body**, under `Escalations`, by
   hand or headless. Nothing waits on a user mid-run; the PR is where the
   user answers.
+- **The run cleans up after itself, one tick late.** A red repo's
+  worktree and branch become garbage when the user merges or closes the
+  PR, hours after the run that cut them, when no process of ours is in
+  that repo. So the next run removes them, and only them: nothing the
+  user made is ever touched. Ruled 2026-09-24 after the sounds merge left
+  `bump-pin-38d8585f4785` and its worktree behind.
 - **The pin tooling is its own subpackage**, `dev_playbook.pins`, one
   module per concern, beside the checks and not among them. The `gh`
   wrapper and `ToolError` moved to `dev_playbook.github` and
@@ -184,6 +190,12 @@ block), `gate`, `worktree`, `consumer` (one repo's state and landings),
   `failed` row, not a scrub. Agent output goes to
   `~/.local/state/dev-playbook/update-pins/<run>/<repo>.log`, the gate's
   findings beside it.
+- **Sweep.** Every run, before the pin work, for every governed repo on
+  the machine: each local `bump-pin-*` branch is looked up with
+  `gh pr list --head <branch> --state all`; `MERGED` or `CLOSED` removes
+  the worktree (`--force`), the local branch, and the remote branch when
+  GitHub kept it. `OPEN` or no PR is kept. Reported on stdout, never in
+  the ledger; a sweep failure is a stderr line and the run goes on.
 - **Ledger.** `docs/pin-updates.md`, `type: Log`, a table: time (UTC),
   release head (12 chars), repo, verdict (`current` / `green` / `red` /
   `pending` / `failed`), landing (`main <sha12>` / `PR <url>` / reason),
@@ -281,6 +293,21 @@ block), `gate`, `worktree`, `consumer` (one repo's state and landings),
   `test_update.py`; the release-head tests stay in
   `test_workspace_lint.py` because they use its fake `gh`. 165 tests in
   the four affected suites; ruff and mypy clean.
+- **First runs, and the fixes they taught.** 2026-09-24. PR #497 merged
+  as `38d8585`: `update-standards-pin` §5 hands the worktree to the user
+  (the story-forge hand run tried to invoke `/finish-pin-bump` itself,
+  which `disable-model-invocation` forbids); `finish-pin-bump`'s state
+  check accepts work already on the branch (the sounds agent stopped at
+  the PAT rejection with its fixes committed); the canonical `ci.yml`
+  installs Python 3.14 with `actions/setup-python@v7.0.0` (sounds #5 CI
+  died on `python_spec='python3.14'`; dev-playbook's own CI never saw it
+  because its hook is `language: system`). The user widened the PAT to
+  Workflows. Second sounds run at `38d8585f4785`: 14 turns, 53 s, PR #6
+  green in CI, merged by the user. The ledger's first three rows are
+  `failed` (c67174ed88eb), then `red` (38d8585f4785).
+- **Sweep.** 2026-09-24. `consumer.bump_branches`, `worktree_of`,
+  `remove_bump`; `agent.pr_state`; `update.sweep`, run in `main` over
+  every consumer before the todo list is built.
 
 ## Unfiled
 

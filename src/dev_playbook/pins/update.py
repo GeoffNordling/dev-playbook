@@ -40,6 +40,14 @@ one global lock — the run is:
 **Nothing here merges anything.** The skill the agent runs says so, and this
 command reads back a PR, never a merge.
 
+**Every run sweeps first.** A red repo's worktree and branch outlive the run
+that cut them: the PR is merged or closed hours later, by the user, when no
+process of ours is in that repo. So each run opens by asking GitHub, for every
+``bump-pin-*`` branch in every governed repo, whether its PR is finished, and
+removes the worktree, the local branch and the remote branch of each one that
+is. An open PR, or a branch with no PR yet, is kept. Nothing else in the repo
+is touched, and the sweep is reported on stdout, not in the ledger.
+
 ``--dry-run`` probes and reports, and lands nothing: no push, no worktree, no
 agent, no ledger row. It treats a missing ledger as empty, so the first run can
 be watched before the ledger is published.
@@ -96,6 +104,24 @@ GREEN = "green"
 RED = "red"
 PENDING = "pending"
 FAILED = "failed"
+
+FINISHED = ("MERGED", "CLOSED")
+
+
+def sweep(repo: Path, *, dry_run: bool) -> list[str]:
+    """Remove every bump whose PR is finished; ``branch (state)`` for each one.
+
+    Under ``dry_run`` the list is what would be removed, and nothing is.
+    """
+    swept = []
+    for branch in consumer.bump_branches(repo):
+        state = agent.pr_state(repo, branch)
+        if state not in FINISHED:
+            continue
+        if not dry_run:
+            consumer.remove_bump(repo, branch)
+        swept.append(f"{branch} ({state.lower()})")
+    return swept
 
 
 def update_repo(
@@ -211,6 +237,13 @@ def main(argv: list[str] | None = None) -> int:
 
     done = ledger.recorded(text, sha)
     consumers = [repo for repo in repos if not is_hook_repo(repo)]
+    verb = "would sweep" if args.dry_run else "swept"
+    for repo in consumers:
+        try:
+            for entry in sweep(repo, dry_run=args.dry_run):
+                print(f"{repo.name}: {verb} {entry}")
+        except ToolError as err:
+            print(f"update-pins: {repo.name}: sweep: {err}", file=sys.stderr)
     todo = [repo for repo in consumers if repo.name not in done]
     if absent:
         print(

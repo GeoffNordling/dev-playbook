@@ -101,7 +101,9 @@ runs working one branch is the one thing worse than an unworked bump.
 
 `cd` into the worktree, then {Run
 [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--write`} to move the
-pin, and commit it `--no-verify` as the branch's first commit.
+pin, and commit it `--no-verify` as the branch's first commit. The worktree
+and branch need no cleanup afterwards: once their PR is merged or closed, the
+next `update-pins` run removes both, and the remote branch with them.
 
 Done when the worktree holds the committed bump.
 
