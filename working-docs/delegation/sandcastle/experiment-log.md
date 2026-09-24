@@ -7,10 +7,10 @@ description: The historical record of the experiments that built the Sandcastle 
 # Experiment Log
 
 The record of how the
-[Sandcastle pipeline](/working-docs/parallel-fronts/pipeline.md) was
+[Sandcastle pipeline](/working-docs/delegation/sandcastle/pipeline.md) was
 found. Each entry is closed; what it settled that still holds lives in the
 pipeline and in the
-[root](/working-docs/parallel-fronts/ROOT.md#constraints). The starting
+[root](/working-docs/delegation/sandcastle/ROOT.md#constraints). The starting
 point was the `sandbox-probe` branch, an earlier prototype that built and
 measured a working podman container.
 
@@ -129,7 +129,7 @@ commit, and name three skills.
 - The run needed two dev-playbook changes, made only in the config copy:
   `measure-event` sending rows to the host, and the two end hooks waiting.
   They are kept as patches in
-  [`rig/`](/working-docs/parallel-fronts/rig/index.md).
+  [`rig/`](/working-docs/delegation/sandcastle/rig/index.md).
 - The rig kept its copies under `/tmp/claude-1000/`, Claude's own
   temporary folder, which Sandcastle's extra mount made root-owned inside
   the container. The rig pointed Claude elsewhere with
@@ -143,7 +143,7 @@ commit, and name three skills.
 started together and closed together.
 
 **Settled.** Every check passed. The results are in
-[Fronts in parallel](/working-docs/parallel-fronts/pipeline.md#fronts-in-parallel).
+[Fronts in parallel](/working-docs/delegation/sandcastle/pipeline.md#fronts-in-parallel).
 
 ## Acronyms
 

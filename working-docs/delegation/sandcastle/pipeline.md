@@ -7,14 +7,14 @@ description: The pipeline as built and proven — how a front runs from open to 
 # The Sandcastle Pipeline
 
 The Sandcastle pipeline runs fronts
-([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
+([Sandcastle Working Root](/working-docs/delegation/sandcastle/ROOT.md#terms))
 in parallel, each from start to finish in its own sealed container:
 throwaway copies go in, one agent works there through Sandcastle and a
 plug-in of ours, and only its commit comes back. It is built and proven
 with real Claude on the subscription, and bound by the set's
-[Constraints](/working-docs/parallel-fronts/ROOT.md#constraints). How
+[Constraints](/working-docs/delegation/sandcastle/ROOT.md#constraints). How
 each part was found and tested is in the
-[Experiment Log](/working-docs/parallel-fronts/experiment-log.md); this
+[Experiment Log](/working-docs/delegation/sandcastle/experiment-log.md); this
 member describes the result.
 
 ## The run, start to finish
@@ -74,7 +74,7 @@ limits how many run:
 
 Proven with two fronts on one repository, started at the same moment and
 closed at the same moment, by
-[`rig/parallel.mjs`](/working-docs/parallel-fronts/rig/index.md):
+[`rig/parallel.mjs`](/working-docs/delegation/sandcastle/rig/index.md):
 
 | Check | Result |
 |---|---|
@@ -123,7 +123,7 @@ edits never change the rules it runs under.
 Sandcastle is used as published. By default it puts the repository at
 `~/workspace` itself, which breaks the workspace layout; a 20-line wrapper
 around its own podman plug-in moves the work copy to `~/assignment/<repo>`.
-The code is [`rig/relocated.mjs`](/working-docs/parallel-fronts/rig/index.md).
+The code is [`rig/relocated.mjs`](/working-docs/delegation/sandcastle/rig/index.md).
 Changing the workspace standards to fit Sandcastle instead was rejected:
 the user runs code outside Sandcastle too, and the change would reach it.
 
@@ -132,7 +132,7 @@ the user runs code outside Sandcastle too, and the change would reach it.
 The pipeline calls one Sandcastle function, `run()`, which runs one agent
 from start to finish. Sandcastle's other functions wait until a need
 proves them
-([Principles](/working-docs/parallel-fronts/ROOT.md#principles)).
+([Principles](/working-docs/delegation/ROOT.md#principles)).
 
 **Instructions go in as `prompt`.** The driver reads the task from a file,
 such as `PROMPT.md`, and passes the text as `run()`'s `prompt` argument.
@@ -177,7 +177,7 @@ front reaches GitHub, since the container holds no GitHub credential.
 | Piece | Where it is now |
 |---|---|
 | `front-clone` and its trap test | This branch, under `scripts/` and `tests/` |
-| The plug-in, the parallel run, the receiver, the container image | This branch, in [`rig/`](/working-docs/parallel-fronts/rig/index.md) |
+| The plug-in, the parallel run, the receiver, the container image | This branch, in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md) |
 | `measure-event` sending hook events from a container, and the Stop and SessionEnd hooks set to wait | Patches in `rig/patches/`, not yet applied to dev-playbook |
 
 Everything in `rig/` stays in the set until the work lands on `main`.
@@ -185,7 +185,7 @@ Everything in `rig/` stays in the set until the work lands on `main`.
 ## What it does not yet do
 
 Each is settled by a Planned item in
-[the root](/working-docs/parallel-fronts/ROOT.md#planned).
+[the root](/working-docs/delegation/sandcastle/ROOT.md#planned).
 
 - **No schedule.** No program starts a lap's fronts and ends the lap; the
   rig starts a fixed pair.

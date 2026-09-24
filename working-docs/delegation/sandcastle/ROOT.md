@@ -1,0 +1,163 @@
+---
+type: General-Sheet
+title: Sandcastle Working Root
+description: The root of the sandcastle set inside delegation — the pipeline that runs an unattended stint in a sealed container, the hard bounds it runs under, its words, and its worklist
+---
+
+# Sandcastle Working Root
+
+This set is speculative, as its parent is: every member writes a guess as a
+guess. It holds the machinery for one part of
+[the delegation workflow](/working-docs/delegation/ROOT.md): running an
+unattended stint safely, an agent in a sealed container on a throwaway
+copy, with only its commit coming back. What a stint is, and how it is
+tracked, is the parent's; how it runs is this set's. The
+[Sandcastle pipeline](/working-docs/delegation/sandcastle/pipeline.md) is
+built and proven.
+
+## Constraints
+
+- Every sandboxed agent reads dev-playbook at published `main`, whichever
+  repository it is assigned to change. One assigned to change dev-playbook
+  reads the standards as published while it writes their replacement.
+  Refreshing the config mid-stint, or letting such an agent read its own
+  branch as config, was declined.
+- Every run happens on the Fedora machine, and nowhere else. The container,
+  its image, and the `claude` binary inside it are Fedora. The WSL Ubuntu
+  machine has no container runtime and is not a target.
+- The subscription pays for every run, and this is asserted, not assumed.
+  The billing checks of `playbook check` read four places for a metered
+  credential: the live environment, the shell startup files,
+  `~/.claude/settings.json`, and the repository's `.claude/settings.json`.
+  They run at the commit gate and again before every run.
+- A container never mounts a real file, only copies made for the run and
+  deleted after it. Podman's SELinux option permanently relabels whatever
+  is mounted, even read-only, and a host program can then be refused its
+  own file.
+- The container holds no GitHub credential, so only local git works
+  inside it, and whatever pushes its commits does so outside.
+- The user's hooks keep logging every event to the measurement database
+  from inside a container.
+- Sandcastle is never forked or patched. It is used as published, through
+  the plug-ins it accepts, since a fork would need maintaining for as long
+  as the set uses it.
+
+## Working with the user
+
+Report at the level of the problem table in
+[What it guarantees](/working-docs/delegation/sandcastle/pipeline.md#what-it-guarantees):
+plain language, each problem and solution by its name, a concrete picture
+where one helps, such as a directory tree with enough rows to show what the
+files are.
+
+## Terms
+
+- **Sandcastle pipeline** — the arrangement that runs an agent in a sealed
+  container: throwaway copies go in, one agent works there through
+  Sandcastle and our plug-in, and only its commit comes back.
+  [The Sandcastle Pipeline](/working-docs/delegation/sandcastle/pipeline.md)
+  describes it.
+
+### Superseded terms
+
+The members of this set were written in the parallel-fronts words, which
+[the delegation workflow's terms](/working-docs/delegation/ROOT.md#terms)
+replace.
+
+- **Front** — one line of work on its own branch. Now an unattended stint.
+- **Lap** — a synchronized fan-out of fronts from one commit, merged back
+  together. Retired: stints run and end on their own schedules.
+- **Driver** — the deterministic program that schedules the fronts: which
+  run, from what base, with which prompt, and when they end.
+- **Integrator** — the role that merges the fronts' branches and judges
+  their conflicts.
+
+Where the driver and the integrator go in the new words is open in
+[the parent](/working-docs/delegation/ROOT.md#open).
+
+## Planned
+
+- **Connect a stint.** Launch an unattended stint from a workstream, count
+  its budget, wrap up at the hard limit, and yield. This settles what the
+  pipeline does not yet do
+  ([What it does not yet do](/working-docs/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do)):
+  what schedules a stint, and where real copies live. Waits on the
+  parent's Open questions.
+- **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
+  changes that exist only in a throwaway config copy
+  ([Part 4](/working-docs/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
+  `measure-event` sending rows to the host from a sandbox, and the Stop and
+  SessionEnd hooks set to wait.
+- **Discuss: where the pipeline lives on main.** Where its document and
+  the code in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md)
+  go once the work lands, and what the landing PR carries.
+- **One unattended stint by hand.** Run one with no driver program, to
+  find where it hurts before any of it is automated. The guess: a stint
+  needs a way to declare itself done, and its budget is a ceiling, not a
+  target.
+- **Re-word the members.** `pipeline.md`, `survey.md`, and
+  `experiment-log.md` in the delegation workflow's terms, once the
+  parent's Open questions settle.
+
+## Completed
+
+- **Survey Sandcastle.** What the tool offers is recorded in
+  [Sandcastle](/working-docs/delegation/sandcastle/survey.md).
+- **State the sandbox requirement.** What a container must reach, and
+  where Sandcastle collides with it, is recorded in
+  [The five problems](/working-docs/delegation/sandcastle/experiment-log.md#the-five-problems).
+- **Assert this device holds no metered credential.** The billing
+  checks assert it at the commit gate, under
+  [Billing Credentials](/standards/billing/credentials.md); what they read is under
+  [Constraints](#constraints).
+- **Experiment one: the clone round-trip.** Commits made in a throwaway
+  clone reach the real repository at the same SHA, or the run stops.
+  [`front-clone`](/scripts/front-clone) is the plumbing, and
+  [the log](/working-docs/delegation/sandcastle/experiment-log.md#experiment-one-the-clone-round-trip)
+  records what the run settled.
+- **Experiment two: Sandcastle against a copy.** Sandcastle, pointed at a
+  `front-clone` copy with a misbehaving stand-in agent, left the real
+  repository and the user's unpushed work untouched, and the commit came
+  back. [The log](/working-docs/delegation/sandcastle/experiment-log.md#experiment-two-sandcastle-against-a-copy)
+  records the details.
+- **Experiment three, part 1: the booby-trap fix.** `front-clone close`
+  never runs git in a copy, and a permanent test plants a trigger at every
+  point git offers and asserts none fires.
+  [The log](/working-docs/delegation/sandcastle/experiment-log.md#the-booby-trap-fix)
+  records how.
+- **Experiment three, part 2: option B.** A 20-line wrapper around
+  Sandcastle's podman plug-in closes the **Workspace collision** with no
+  fork and no standards change, with the work copy at
+  `~/assignment/<repo>`.
+  [The log](/working-docs/delegation/sandcastle/experiment-log.md#experiment-three-the-plug-in)
+  records the run.
+- **Experiment three, part 4: real Claude end to end.** Real Claude, on the
+  subscription, did a tiny task through Sandcastle and the plug-in.
+  Billing, config, and the commit's return passed at once; hook logging
+  passed once the two end-of-session hooks were set to wait.
+  [The log](/working-docs/delegation/sandcastle/experiment-log.md#part-4-real-claude)
+  records the run.
+- **Walk the user through the Sandcastle pipeline.** The user saw the
+  copies, the plug-in, the round trip, and the hook logging, and named the
+  arrangement
+  ([Inside the container](/working-docs/delegation/sandcastle/pipeline.md#inside-the-container)).
+- **Save the pipeline's code.** The plug-in, the parallel run, the
+  receiver, the image, and the two dev-playbook changes as patches are
+  committed in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md).
+- **Run in parallel.** Two agents on one fake real repository ran at once
+  and closed at once, and every check passed
+  ([Fronts in parallel](/working-docs/delegation/sandcastle/pipeline.md#fronts-in-parallel)).
+- **Discuss: what this gives the user.** The ability to call Sandcastle's
+  `run()` and carry out any prompt inside a sealed container, holding the
+  assigned repository and a read-only copy of published dev-playbook
+  ([The run() call](/working-docs/delegation/sandcastle/pipeline.md#the-run-call)).
+- **Nest under delegation.** Done 2026-09-24: the Sandcastle members moved
+  from the delegation root into this set, and the `rig/` scripts find the
+  repository root one level further up.
+
+## Acronyms
+
+- **PR** — pull request.
+- **SELinux** — Security-Enhanced Linux, the kernel's access-control layer.
+- **SHA** — the hash that names a commit.
+- **WSL** — Windows Subsystem for Linux.

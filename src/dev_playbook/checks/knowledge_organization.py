@@ -958,7 +958,7 @@ def _roots(repo: Repo, directory: str) -> list[str]:
 
 @check("knowledge-organization.one-list-of-items-state-by-section")
 def one_list_of_items_state_by_section(repo: Repo) -> Iterator[Finding]:
-    """A leaf ``ROOT.md`` has one ``## Planned`` and one ``## Completed``; no other file has either."""
+    """A leaf ``ROOT.md`` has one of each worklist section, other roots at most one."""
     for directory in _sets(repo):
         roots = _roots(repo, directory)
         leaves = {
@@ -972,22 +972,26 @@ def one_list_of_items_state_by_section(repo: Repo) -> Iterator[Finding]:
         for path, doc in repo.markdown.items():
             if not path.startswith(directory + "/"):
                 continue
-            yield from _worklist_findings(doc, path in leaves)
+            yield from _worklist_findings(doc, path in leaves, path in roots)
 
 
-def _worklist_findings(doc: MarkdownFile, leaf: bool) -> Iterator[Finding]:
+def _worklist_findings(doc: MarkdownFile, leaf: bool, root: bool) -> Iterator[Finding]:
     for name in PLANNED_AND_COMPLETED:
         headings = [h for h in doc.headings if h.level == 2 and h.text == name]
         if leaf and len(headings) != 1:
             yield Finding(
                 doc.path, None, f"has {len(headings)} '## {name}' sections, not one"
             )
-        if not leaf:
+        if root and not leaf and len(headings) > 1:
+            yield Finding(
+                doc.path, None, f"has {len(headings)} '## {name}' sections, not one"
+            )
+        if not root:
             for heading in headings:
                 yield Finding(
-                    doc.path, heading.line, f"a '## {name}' outside a leaf ROOT.md"
+                    doc.path, heading.line, f"a '## {name}' outside a ROOT.md"
                 )
-        for heading in headings if leaf else ():
+        for heading in headings if root else ():
             for number, text in _directly_under(doc, heading):
                 if TOP_BULLET.match(text) and not BOLD_START.match(text):
                     yield Finding(

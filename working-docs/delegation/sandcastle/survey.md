@@ -1,13 +1,13 @@
 ---
 type: Survey
 title: Sandcastle
-description: What Sandcastle offers the parallel-fronts shape — the driver primitives it supplies, what it leaves to the user, and what it does not cover
+description: What Sandcastle offers the delegation set — the driver primitives it supplies, what it leaves to the user, and what it does not cover
 ---
 
 # Sandcastle
 
 Sandcastle is one candidate for the driver
-([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms)).
+([Sandcastle Working Root](/working-docs/delegation/sandcastle/ROOT.md#terms)).
 This member records what the tool supplies to the shape and what it leaves
 undone, so any decision about how the laps are run rests on something
 written rather than on first impressions. The findings come from the
@@ -33,7 +33,7 @@ Its primitives map onto terms this set already has.
 **A branch per front.** A run is configured with a branch strategy, and
 the named-branch strategy puts a front's commits on a branch the caller
 chooses. The fronts of one lap
-([Parallel Fronts Working Root](/working-docs/parallel-fronts/ROOT.md#terms))
+([Sandcastle Working Root](/working-docs/delegation/sandcastle/ROOT.md#terms))
 are then a list of names the driver holds.
 
 **A fan-out that the language already supplies.** Because a run is a
@@ -70,10 +70,10 @@ The library's headline concern is sandbox isolation: it runs each agent in
 a container and merges the commits back out. This set does want every
 front in a container, but not on the window layout Sandcastle chooses,
 which opens the real repository to the front and puts it at the wrong
-path. [The five problems](/working-docs/parallel-fronts/experiment-log.md#the-five-problems)
+path. [The five problems](/working-docs/delegation/sandcastle/experiment-log.md#the-five-problems)
 records the collisions and how each was closed: a throwaway copy, a
 hardened `front-clone`, and a plug-in of our own. Together they make
-[The Sandcastle Pipeline](/working-docs/parallel-fronts/pipeline.md). The tool also offers
+[The Sandcastle Pipeline](/working-docs/delegation/sandcastle/pipeline.md). The tool also offers
 a no-sandbox provider that runs the agent directly on the host; this set
 does not use it.
 
@@ -81,7 +81,7 @@ does not use it.
 
 Read from the published package, version 0.12.0, and partly confirmed by
 experiment two
-([Experiment two](/working-docs/parallel-fronts/experiment-log.md#experiment-two-sandcastle-against-a-copy)).
+([Experiment two](/working-docs/delegation/sandcastle/experiment-log.md#experiment-two-sandcastle-against-a-copy)).
 
 **Fixed, but only as a suggestion.** Sandcastle suggests
 `/home/agent/workspace` for the repository (`SANDBOX_REPO_DIR` in the
@@ -91,7 +91,7 @@ source of the workspace collision. But the suggestion reaches only
 the sandbox plug-in: after start, Sandcastle works wherever the plug-in
 reports the repository to be. Experiment three's 20-line plug-in moves it,
 with no fork
-([Experiment three](/working-docs/parallel-fronts/experiment-log.md#experiment-three-the-plug-in)).
+([Experiment three](/working-docs/delegation/sandcastle/experiment-log.md#experiment-three-the-plug-in)).
 
 **Bends.** The host repository is chosen per run (`cwd`), which is how a
 run is pointed at a throwaway copy. Extra read-only or read-write mounts

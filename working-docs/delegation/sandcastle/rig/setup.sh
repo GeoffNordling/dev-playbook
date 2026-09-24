@@ -6,7 +6,7 @@
 set -euo pipefail
 E="$1"
 RIG="$(cd "$(dirname "$0")" && pwd)"
-WT="$(cd "$RIG/../../.." && pwd)"
+WT="$(cd "$RIG/../../../.." && pwd)"
 rm -rf "$E/remote" "$E/real" "$E/config" "$E/lap" "$E/image"
 mkdir -p "$E/remote" "$E/real" "$E/config" "$E/lap" "$E/image"
 

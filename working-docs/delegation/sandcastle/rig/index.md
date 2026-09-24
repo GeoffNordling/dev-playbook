@@ -1,7 +1,7 @@
-# working-docs/parallel-fronts/rig/ — index
+# working-docs/delegation/sandcastle/rig/ — index
 
 The code that runs the
-[Sandcastle pipeline](/working-docs/parallel-fronts/pipeline.md), kept here
+[Sandcastle pipeline](/working-docs/delegation/sandcastle/pipeline.md), kept here
 while the set is open and moved to a permanent home when the work lands on
 `main`. Each run takes a lab directory, a scratch folder where the fake
 real repository, the config copy, and the throwaway copies are made.

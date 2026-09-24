@@ -646,8 +646,17 @@ def test_one_list_of_items_state_by_section() -> None:
         "working-docs/w/ROOT.md": "# R\n\nThe set.\n",
         "working-docs/w/s/ROOT.md": leaf,
         "working-docs/w/s/note.md": "# N\n",
+        "working-docs/v/ROOT.md": leaf,
+        "working-docs/v/s/ROOT.md": leaf,
     }
     assert found(one_list_of_items_state_by_section, good) == []
+    twice = {
+        "working-docs/w/ROOT.md": "# R\n\n## Planned\n\n## Planned\n",
+        "working-docs/w/s/ROOT.md": leaf,
+    }
+    assert found(one_list_of_items_state_by_section, twice) == [
+        ("working-docs/w/ROOT.md", None)
+    ]
     bad = {
         "working-docs/w/ROOT.md": "# R\n\n## Planned\n\n- plain item\n",
         "working-docs/w/note.md": "# N\n\n## Completed\n",

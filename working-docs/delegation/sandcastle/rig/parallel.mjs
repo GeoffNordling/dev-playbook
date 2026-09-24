@@ -12,7 +12,7 @@ import { relocated } from "./relocated.mjs";
 const E = process.argv[2];
 if (!E) throw new Error("usage: node parallel.mjs <lab directory>");
 const RIG = import.meta.dirname;
-const WT = join(RIG, "../../..");
+const WT = join(RIG, "../../../..");
 const REAL = `${E}/real/mission-control`;
 const CONFIG = `${E}/config/dev-playbook`;
 const HOME = "/home/agent";

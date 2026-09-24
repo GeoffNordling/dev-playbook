@@ -88,8 +88,9 @@ file.
 
 In a working documentation set, every `ROOT.md` with no `ROOT.md` in
 a directory below it has exactly one `## Planned` and one
-`## Completed` section, and no other file of the set has either. Each
-bullet directly under them starts with a bold name.
+`## Completed` section, every other `ROOT.md` has at most one of each,
+and no other file of the set has either. Each bullet directly under
+them starts with a bold name.
 
 `knowledge-organization.one-list-of-items-state-by-section` · deterministic
 
