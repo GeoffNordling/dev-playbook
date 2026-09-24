@@ -35,8 +35,9 @@ a rejected push, say — and the skill resumes from wherever the gate stands.
 
 ## 1. Work the findings
 
-Run `uvx pre-commit run --all-files` to put the worklist on screen when the
-arguments did not carry it. Commit freely with `--no-verify` while the work is
+The worklist is the gate's output. When the arguments name a file holding
+it, read that file; otherwise run `uvx pre-commit run --all-files` to put it on
+screen. Commit freely with `--no-verify` while the work is
 in flight; the gate is the worklist, not the judge, until §2 takes its verdict.
 Work to an empty gate.
 

@@ -175,7 +175,7 @@ def update_repo(
             return ledger.Row(now, sha, name, RED, "dry run: no branch cut", notes)
 
         worktree, old = consumer.red_worktree(repo, url, sha, ids)
-        task = agent.prompt(name, worktree, branch, old, sha, ids, branches, output)
+        task = agent.prompt(name, worktree, branch, old, sha, ids, branches, findings)
         log = run_dir / f"{name}.log"
         agent.run(worktree, task, log)
         pr = agent.open_pr(repo, branch)

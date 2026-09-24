@@ -402,11 +402,15 @@ def test_red_cuts_a_worktree_runs_the_agent_there_and_records_the_pr_gh_reports(
     prompt = argv[argv.index("-p") + 1]
     assert OLD in prompt and NEW in prompt and branch in prompt
     assert "feat-live (" in prompt
-    assert FINDINGS in prompt
     assert prompt.startswith("/finish-pin-bump\n")
-    # The transcript and the findings are on disk.
+    # The findings are on disk and the prompt names the file, carrying none of
+    # the text: a long gate output must not swell the command line.
+    findings = tmp_path / "state" / "consumer.findings.txt"
+    assert findings.read_text() == FINDINGS + "\n"
+    assert str(findings) in prompt
+    assert FINDINGS not in prompt
+    # The transcript is on disk.
     assert (tmp_path / "state" / "consumer.log").read_text().startswith('{"result"')
-    assert (tmp_path / "state" / "consumer.findings.txt").read_text() == FINDINGS + "\n"
     # main was not touched.
     assert origin_main(repo) == CONFIG
 
@@ -571,13 +575,32 @@ def test_the_prompt_invokes_the_skill_and_carries_the_state() -> None:
         NEW,
         IDS,
         [Branch("feat", "2026-09-01", 3)],
-        FINDINGS,
+        Path("/state/consumer.findings.txt"),
     )
     assert prompt.startswith("/finish-pin-bump\n")
     assert "bump-pin-abc" in prompt and OLD in prompt and NEW in prompt
     assert "- feat (2026-09-01, 3 ahead)" in prompt
     assert "playbook-check" in prompt
     assert "No user is present" in prompt
+    assert f"Gate output at {NEW[:12]}: /state/consumer.findings.txt" in prompt
+
+
+def test_an_agent_the_system_cannot_launch_is_a_failed_row_not_an_abort(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An OSError from the launch — an oversized prompt, an unrunnable binary —
+    fails this repo and keeps its worktree; it never ends the run."""
+    repo = consumer(tmp_path)
+    scripted_gate(monkeypatch, tmp_path, (1, FINDINGS))
+    scripted_gh(monkeypatch, tmp_path)
+    monkeypatch.setattr(agent, "CLAUDE", (str(tmp_path),))  # a directory
+
+    row = update_one(repo, tmp_path)
+
+    assert row.verdict == "failed"
+    assert row.landing.startswith("could not launch")
+    assert (repo / ".claude" / "worktrees" / f"bump-pin-{NEW[:12]}").is_dir()
+    assert origin_main(repo) == CONFIG
 
 
 # --- the run ---

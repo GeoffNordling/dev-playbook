@@ -3,8 +3,16 @@
 The agent is ``claude -p`` in the red worktree, invoking the
 ``finish-pin-bump`` skill the way a user would: the prompt is the slash
 command plus the state only this process knows — the repo, the worktree, the
-sha move, the unmerged branches, the gate's output. Every instruction about
-*how* to work the findings and land the PR lives in the skill, once.
+sha move, the unmerged branches, the path of the gate's output. Every
+instruction about *how* to work the findings and land the PR lives in the
+skill, once.
+
+The gate's output travels as a file, never inline. The prompt is one argument
+of the ``claude`` command line, and the kernel caps an argument at about 128 KB
+(``MAX_ARG_STRLEN``): date-tree's 1364 findings, 185 KB, were refused as
+``Argument list too long`` and took the whole run down with them
+(2026-09-24). ``update-pins`` writes the file before launching, so the agent
+reads it where the arguments say.
 
 Nothing the agent prints is trusted. The one fact the ledger records about a
 red repo is its PR, and that is read from GitHub with ``gh pr list``.
@@ -59,9 +67,13 @@ def prompt(
     sha: str,
     ids: tuple[str, ...],
     branches: list[Branch],
-    findings: str,
+    findings: Path,
 ) -> str:
-    """The skill invocation plus the state the skill's arguments carry."""
+    """The skill invocation plus the state the skill's arguments carry.
+
+    ``findings`` is the file holding the gate's output at ``sha``; the prompt
+    names it and carries none of its text.
+    """
     report = "\n".join(f"- {branch.render()}" for branch in branches) or "- none"
     return f"""{SKILL}
 
@@ -73,9 +85,9 @@ Launched by: update-pins, headless. No user is present; the pull request is the 
 Remote branches not merged to main, for the PR body:
 {report}
 
-Gate output at {sha[:12]}:
-
-{findings}
+Gate output at {sha[:12]}: {findings}
+Read that file for the worklist. It is not inlined here because it can run to
+thousands of lines.
 """
 
 
@@ -94,7 +106,9 @@ def run(worktree: Path, task: str, log: Path) -> None:
 
     The exit code is not the verdict — the PR's existence is — so a non-zero
     exit is recorded in the log and nothing more. A timeout is a refusal: an
-    agent still running after an hour is not working the findings.
+    agent still running after an hour is not working the findings. So is a
+    launch the operating system declines — ``claude`` missing from PATH, or
+    unrunnable — since the run must go on to the next repo and the ledger.
     """
     require_subscription_billing()
     log.parent.mkdir(parents=True, exist_ok=True)
@@ -122,6 +136,8 @@ def run(worktree: Path, task: str, log: Path) -> None:
             )
         except FileNotFoundError as err:
             raise ToolError(f"{CLAUDE[0]} not found on PATH") from err
+        except OSError as err:
+            raise ToolError(f"could not launch {CLAUDE[0]}: {err}") from err
         except subprocess.TimeoutExpired as err:
             raise ToolError(
                 f"the agent did not finish in {TIMEOUT}s; its log is {log}"
