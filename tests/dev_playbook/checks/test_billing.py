@@ -5,10 +5,12 @@ under ``tmp_path`` and clears the billing variables from the environment;
 the repo is a model rooted at another directory under ``tmp_path``.
 """
 
+from collections.abc import Iterable
 from pathlib import Path
 
 import pytest
 
+from dev_playbook.check_registry import Finding
 from dev_playbook.checks import billing
 from dev_playbook.checks.billing import (
     CannotRead,
@@ -44,7 +46,7 @@ def write(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def found(findings) -> list[tuple[str, int | None]]:
+def found(findings: Iterable[Finding]) -> list[tuple[str, int | None]]:
     """Each finding as (path, line)."""
     return [(f.path, f.line) for f in findings]
 
