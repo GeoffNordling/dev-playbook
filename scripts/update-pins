@@ -1,0 +1,29 @@
+#!/usr/bin/env -S uv run --script
+"""update-pins — move every governed repo's dev-playbook pin to the release head, and record it.
+
+Thin shim over ``dev_playbook.pins.update``: it puts the checkout's ``src`` on
+the path and calls the library's ``main``. For each governed repo on this
+machine without a ledger row at the release head it probes the bump in a
+throwaway worktree of ``origin/main``; green lands one commit on ``main``, red
+cuts a worktree and hands it to a headless agent that runs the
+``finish-pin-bump`` skill and opens a PR. Every outcome is one row appended to
+``docs/pin-updates.md`` on dev-playbook ``main``. Nothing is merged. Run with
+``--help`` for the flags.
+
+Usage:
+    update-pins [--workspace DIR] [--repos a,b] [--dry-run]
+"""
+# /// script
+# requires-python = ">=3.14"
+# dependencies = ["pyyaml>=6.0"]
+# ///
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from dev_playbook.pins.update import main  # noqa: E402
+
+if __name__ == "__main__":
+    raise SystemExit(main())

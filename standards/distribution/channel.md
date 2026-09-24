@@ -1,8 +1,8 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Distribution Channel
-description: How dev-playbook's checks reach the governed repos — the one published hook, the roster, a publisher's local block, and a consumer's pinned rev
-population: "a governed repo's share of the distribution channel: its hook manifest, its local block, its dev-playbook pin, and in dev-playbook the roster"
+description: How the hook repository's checks reach the governed repos — a valid manifest, a publisher's local block, a host's local hook and pinned dev dependency, and a consumer gating only through its checks
+population: "a governed repo's share of the distribution channel: its hook manifest, its local blocks, its local hook, and its dev dependency on the hook repository"
 ---
 
 # Distribution Channel
@@ -15,78 +15,82 @@ is independent of where the consumer or any of its worktrees sits on disk
 and identical on CI, and the clone carries the
 [canonical artifacts](/standards/build/canonical.md) with it. A change to
 the standard, hook code, a canonical artifact, or a version pin, reaches a
-consumer only when its pinned `rev` moves; the release is the bump
-([Distribution](/standards/distribution/card.md)).
+consumer only when its pinned `rev` moves; the release is the bump.
 
-## dev-playbook
+A consumer that writes its own Standards is a host: it runs its own
+checks in a second hook, `playbook-check-local`, in its own environment,
+because the environment pre-commit builds for the pinned hook holds
+dev-playbook and nothing of the consumer's
+([Consumer Checks Run in a Second, Local Hook](/docs/decisions/0031-consumer-checks-run-in-a-local-hook.md)).
 
-The hook repo itself, the one repo that carries
-`standards/build/canonical/`.
+## A publisher dogfoods its manifest
 
-### One published id
+A repo whose root holds `.pre-commit-hooks.yaml` lists every hook id that
+file publishes under a `repo: local` block of its `.pre-commit-config.yaml`.
 
-The manifest [.pre-commit-hooks.yaml](/.pre-commit-hooks.yaml) publishes
-exactly one hook, `playbook-lint`, backed by
-[scripts/playbook-lint](/scripts/playbook-lint), which dispatches to every
-detector in its roster
-([playbook_lint.py](/src/dev_playbook/playbook_lint.py)) and runs
-`uvx pre-commit validate-manifest` where the audited repo publishes a
-manifest of its own.
+`distribution.a-publisher-dogfoods-its-manifest` · deterministic
 
-A consumer never enumerates detectors, so enrollment rides the pin: a
-detector added upstream reaches every consumer at its next pin bump with
-no config edit anywhere.
+## A consumer pins the published head
 
-### Public
+A governed repo other than the hook repository pins the hook repository,
+in its `.pre-commit-config.yaml` on its default branch, at the sha of the
+hook repository's published `main` head, and lists under that block
+exactly the hook ids the hook repository's `.pre-commit-hooks.yaml`
+publishes at that sha. Behind the head, the repo runs a standard that is
+no longer the standard; at a stale id, pre-commit fails before any check
+runs.
 
-dev-playbook is a public repository; pre-commit clones it over
-unauthenticated HTTPS.
+`distribution.a-consumer-pins-the-published-head` · deterministic
 
-### The roster
+## A host runs its own checks
 
-workspace-lint's `GOVERNED` roster names every governed repo and nothing
-else; inclusion is declared there, never inferred from the directory
-listing.
+A repo other than the hook repository whose `standards/` holds a
+deterministic rule, or which tracks a `.py` file in
+`src/<package>/checks/`, lists the hook `playbook-check-local` under a
+`repo: local` block of its `.pre-commit-config.yaml`, with
+`entry: uv run --locked playbook check --local` and
+`language: system`.
 
-A repo the roster omits is not audited and draws no output. A roster entry
-with no such repo under the workspace root is a false claim, and the audit
-refuses to run rather than pass a quietly shorter sweep.
+`distribution.a-host-runs-its-own-checks` · deterministic
 
-### Dogfood in place of the pin
+> **Why.** The pinned `playbook-check` hook runs dev-playbook's checks
+> only. Without the local hook, a host's rules have no gate, and nothing
+> goes red to say so. `--locked` makes a stale `uv.lock` fail the hook
+> instead of the hook rewriting the lock mid-commit.
 
-dev-playbook's `.pre-commit-config.yaml` carries no pinned dev-playbook
-block; it runs the published hook from its working tree through its
-`repo: local` block, and it is the one governed repo exempt from the pin
-rule.
+## A host's dev-playbook rides the pin
 
-The hook metadata appears twice within dev-playbook, the manifest for
-consumers and the local block for the working tree, and a hook change
-updates both. The exemption follows which repo it is, not what it
-publishes: a consumer that publishes a manifest of its own still pins
-dev-playbook.
+A repo that lists `playbook-check-local` names `dev-playbook` in its
+`pyproject.toml` `[dependency-groups] dev`, and its
+`[tool.uv.sources]` sources it as `git` at the hook repository's URL
+with `rev` equal to the `rev` its `.pre-commit-config.yaml` pins for
+the hook repository.
 
-## A publisher
+`distribution.a-hosts-dev-playbook-rides-the-pin` · deterministic
 
-A repo whose tree holds a `.pre-commit-hooks.yaml`.
+> **Why.** The local hook runs the dev-playbook its environment holds, so
+> that copy must be the pinned one. A path source follows a live checkout
+> that a CI runner does not have, and any other rev drifts from the
+> Standards the pinned hook enforces. `bump-pin` and `update-pins` move
+> the two revs together.
 
-### The local block covers the manifest
+## A consumer gates only through its checks
 
-Every hook id the manifest publishes appears in the repo's `repo: local`
-block, so the repo runs what it ships from its own tree
-(`distribution.dogfood`); local-only hooks are free additions.
+A governed repo other than the hook repository holds no
+`.pre-commit-hooks.yaml`, and the only hooks its `repo: local` blocks
+list are `make-check` and `playbook-check-local`.
 
-## A consumer
+`distribution.a-consumer-gates-only-through-its-checks` · deterministic
 
-A governed repo other than dev-playbook.
+> **Why.** A consumer's own rule is decided by a check in
+> `src/<package>/checks/`, which the layer test ties to its rule and its
+> test, and which `playbook-check-local` runs. A script behind a hook of
+> its own is tied to no rule and shares no shape, so each repo would grow
+> its own way to gate. A tool such as mypy runs from `make check`.
 
-### A pinned rev
+## The manifest validates
 
-`.pre-commit-config.yaml` pins dev-playbook by `rev`, a sha already on
-GitHub (`distribution.pin`); a stale pin is advisory, since the consumer
-runs the standard as of its pin and catches up when the pin is bumped.
+A `.pre-commit-hooks.yaml` at a governed repo's root passes
+`pre-commit validate-manifest`.
 
-The pin block is a canonical block of the config
-([Canonical Artifacts](/standards/build/canonical.md#pre-commit-configyaml)).
-Staleness is reported by workspace-lint on demand, each pin compared
-against dev-playbook's current `main`, never by a commit hook. pre-commit
-installs a pin by fetching it, so a local-only sha is uninstallable.
+`distribution.the-manifest-validates` · deterministic

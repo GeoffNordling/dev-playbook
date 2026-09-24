@@ -1,0 +1,176 @@
+"""One consumer's state and landings, read and written on its ``origin/main``.
+
+Reading: the pin its published ``main`` carries, and the remote branches with
+commits ``main`` does not have. Landing: the green commit pushed to ``main``,
+and the red worktree on ``bump-pin-<sha12>`` holding the committed bump for an
+agent to work. Sweeping: the bump branches still in the repo, and the removal
+of one whose PR is finished — worktree, local branch, remote branch.
+"""
+
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+from dev_playbook import gitrepo
+from dev_playbook.errors import ToolError
+from dev_playbook.pins.config import move_pin, pinned_rev
+from dev_playbook.pins.worktree import git_out
+
+WORKTREES = Path(".claude") / "worktrees"
+BUMP_PREFIX = "bump-pin-"
+
+
+@dataclass(frozen=True)
+class Branch:
+    """One remote branch carrying commits ``origin/main`` does not have."""
+
+    name: str
+    date: str
+    ahead: int
+
+    def render(self) -> str:
+        """``name (date, n ahead)``."""
+        return f"{self.name} ({self.date}, {self.ahead} ahead)"
+
+
+def pinned_on_main(repo: Path, url: str) -> str:
+    """The dev-playbook rev ``origin/main`` pins, refusing a tree with no pin."""
+    result = subprocess.run(
+        ["git", "-C", str(repo), "show", "origin/main:.pre-commit-config.yaml"],
+        capture_output=True,
+        text=True,
+        env=gitrepo.no_git_env(),
+    )
+    if result.returncode != 0:
+        raise ToolError("no .pre-commit-config.yaml on origin/main")
+    rev = pinned_rev(result.stdout, url)
+    if rev is None:
+        raise ToolError(f"no {url} pin on origin/main; wiring one is adoption")
+    return rev
+
+
+def unmerged_branches(repo: Path) -> list[Branch]:
+    """Every ``origin/*`` branch with commits not on ``origin/main``, newest first.
+
+    ``origin/HEAD`` is a pointer and ``origin/main`` is the base, so neither is
+    a branch here. A branch fully merged reads as zero ahead and is left out:
+    it is history, and the question is what is still in flight.
+    """
+    listing = git_out(
+        repo,
+        "for-each-ref",
+        "--format=%(refname:short)%09%(committerdate:short)",
+        "refs/remotes/origin/",
+    )
+    branches = []
+    for line in listing.splitlines():
+        name, _, date = line.partition("\t")
+        if name in ("origin/HEAD", "origin/main"):
+            continue
+        ahead = int(git_out(repo, "rev-list", "--count", f"origin/main..{name}"))
+        if ahead:
+            branches.append(Branch(name.removeprefix("origin/"), date, ahead))
+    return sorted(branches, key=lambda branch: branch.date, reverse=True)
+
+
+def branch_notes(branches: list[Branch]) -> str:
+    """The unmerged-branch report as one ledger cell."""
+    if not branches:
+        return "no unmerged branches"
+    return "unmerged: " + "; ".join(branch.render() for branch in branches)
+
+
+def branch_name(sha: str) -> str:
+    """``bump-pin-<sha12>``: the branch and worktree name for one release."""
+    return f"{BUMP_PREFIX}{sha[:12]}"
+
+
+def bump_branches(repo: Path) -> list[str]:
+    """Every local ``bump-pin-*`` branch, whichever release cut it."""
+    listing = git_out(
+        repo, "for-each-ref", "--format=%(refname:short)", f"refs/heads/{BUMP_PREFIX}*"
+    )
+    return listing.splitlines()
+
+
+def worktree_of(repo: Path, branch: str) -> Path | None:
+    """The linked worktree that has ``branch`` checked out, or None."""
+    path: Path | None = None
+    for line in git_out(repo, "worktree", "list", "--porcelain").splitlines():
+        if line.startswith("worktree "):
+            path = Path(line.removeprefix("worktree "))
+        elif line == f"branch refs/heads/{branch}":
+            return path
+    return None
+
+
+def remove_bump(repo: Path, branch: str) -> None:
+    """Remove a finished bump: its worktree, its local branch, its remote branch.
+
+    Called only for a branch whose PR is merged or closed, so the worktree's
+    contents are either on ``main`` or discarded by the user's decision;
+    ``--force`` is that decision applied. GitHub may already have deleted the
+    remote branch at merge, so the remote is asked before it is told.
+    """
+    path = worktree_of(repo, branch)
+    if path is not None:
+        git_out(repo, "worktree", "remove", "--force", str(path))
+    git_out(repo, "branch", "-q", "-D", branch)
+    if git_out(repo, "ls-remote", "--heads", "origin", branch):
+        git_out(repo, "push", "-q", "origin", "--delete", branch)
+
+
+def land_green(tree: Path, changed: list[str], old: str, sha: str) -> str:
+    """Commit the moved pin in the probe worktree and push it to ``main``; the new sha.
+
+    ``changed`` is the files ``config.move_pin`` wrote. Hooks run: the
+    consumer's commit hook is the gate at the new pin, its pre-push hook is
+    ``make check``, and a rejection from either is the caller's ``failed``
+    row. The worktree is throwaway, so the commit's home is ``origin/main`` or
+    nowhere.
+    """
+    git_out(tree, "add", *changed)
+    git_out(
+        tree,
+        "commit",
+        "-q",
+        "-m",
+        f"Pin dev-playbook at {sha[:12]}\n\n"
+        f"update-pins moved the standards pin {old[:12]} -> {sha[:12]}; "
+        "the gate is green at the new pin.",
+    )
+    landed = git_out(tree, "rev-parse", "HEAD")
+    git_out(tree, "push", "-q", "origin", "HEAD:main")
+    return landed
+
+
+def red_worktree(
+    repo: Path, url: str, sha: str, ids: tuple[str, ...]
+) -> tuple[Path, str]:
+    """A persistent worktree on ``bump-pin-<sha12>`` holding the moved pin; path and old rev.
+
+    Cut from ``origin/main``, which is the tree the probe judged, so the
+    findings reproduce there exactly. The pin is committed with ``--no-verify``
+    because the gate is known red; the agent's last commit runs it. A worktree
+    already there is refused rather than reused: it belongs to an earlier run
+    that did not finish, and its state is the user's to read.
+    """
+    branch = branch_name(sha)
+    path = repo / WORKTREES / branch
+    if path.exists():
+        raise ToolError(f"worktree {path} already exists, kept from an earlier run")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    git_out(repo, "worktree", "add", "-q", "-b", branch, str(path), "origin/main")
+    changed, old = move_pin(path, url, sha, ids)
+    git_out(path, "add", *changed)
+    git_out(
+        path,
+        "commit",
+        "-q",
+        "--no-verify",
+        "-m",
+        f"Pin dev-playbook at {sha[:12]}\n\n"
+        f"update-pins moved the standards pin {old[:12]} -> {sha[:12]}; "
+        "the gate is red at the new pin and the findings follow.",
+    )
+    return path, old

@@ -1,23 +1,31 @@
 ---
 name: update-standards-pin
-description: Bump the dev-playbook standards pin of the consumer repo this session is standing in, landing it on main when the bump stays green and on a PR when it does not.
+description: Bump the dev-playbook standards pin of the consumer repo this session is standing in — probe the bump, land it on main when it stays green, cut a bump-pin worktree when it does not and hand the worktree to the user for /finish-pin-bump.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: xhigh
 ---
 
 # Update Standards Pin
 
 A consumer repo runs the standards as of the dev-playbook `rev` it pins, and
-nothing else: a detector added upstream, a rule tightened, a canonical artifact
+nothing else: a check added upstream, a rule tightened, a canonical artifact
 changed — none of it reaches that repo until the pin moves. {Read
 [Distribution Channel](~/workspace/dev-playbook/standards/distribution/channel.md);
 the bump *is* the release}.
 
 The target is the repo this session stands in, and the bump comes back **green**
-or **red**. Green lands one commit on `main`. Red moves to a worktree, works the
-findings there, and ends in a PR. `bump-pin` decides which; everything past the
-decision is judgment, and that is the half this skill owns.
+or **red**. Green lands one commit on `main`. Red moves to a worktree, and
+[finish-pin-bump](~/workspace/dev-playbook/dotfiles/dot-claude/skills/finish-pin-bump/SKILL.md) takes it from
+there. `bump-pin` decides which; this skill owns the decision and the landing,
+and nothing past the worktree.
+
+This is the hand form of what
+[update-pins](~/workspace/dev-playbook/scripts/update-pins) does for every
+governed repo on a timer. The two use the same branch name, `bump-pin-` plus
+the first twelve characters of the target sha, so a bump landed or a PR opened
+by hand is what the timer finds already done at its next tick, and it runs
+nothing for that repo.
 
 ## 1. Confirm the repo is governed
 
@@ -26,47 +34,48 @@ decision is judgment, and that is the half this skill owns.
 for the `GOVERNED` roster}: governance is declared there, never inferred from a
 repo sitting under the workspace root. {If the roster omits this repo, {Report
 that it is ungoverned, and that /enable-repo-governance is what adopts it} and
-stop} — bumping an unenrolled repo installs a standard nothing audits.
+stop} — bumping an unenrolled repo installs a standard nothing checks.
 
 Done when the repo's name is in the roster.
 
-## 2. Freshen main
+## 2. Probe the bump
 
-The probe judges this checkout, and a branch, if one is needed, is cut from
-`origin/main` — so the two have to be the same tree. Run `git fetch origin`, then
-confirm `main` is checked out and clean, and fast-forward it if it is behind.
-{If the working tree is dirty, {Report which files are uncommitted} and stop};
-the bump's diff carries the pin and its fallout and nothing else.
-
-Done when `main` is checked out, clean, and equal to `origin/main`.
-
-## 3. Probe the bump
-
-{Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--check`}. It runs
-the gate at the current pin, moves the pin to dev-playbook's published head,
-runs the gate again, and restores the config whichever way that went — so this
-checkout is left exactly as found and the probe commits the repo to nothing.
+{Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--check`}. It
+fetches `origin/main`, cuts a throwaway worktree of it, moves the pin and its
+hook ids there to dev-playbook's release head, runs the gate once, and removes
+the worktree. This checkout is never read or written — it may sit on any
+branch, dirty or clean — and the probe commits the repo to nothing. There is
+no run at the current pin: a repo red before the bump is red with more
+findings, and every finding at the new pin is worked whichever release brought
+it.
 
 Its exit code picks the branch:
 
 | Exit | Verdict | Continue at |
 |---|---|---|
-| 0 | green, or already current | §4 |
-| 1 | red — the findings are on stdout | §5 |
+| 0 | green, or already current | §3 |
+| 1 | red — the findings are on stdout | §4 |
 | 2 | the probe reached no verdict | stop |
 
-Exit 2 is an environment fault or a repo already red at its **current** pin —
-breakage that predates this release either way. {If the probe exits 2, {Report
-the refusal it printed, as the fault it is}} rather than as findings this
-release caused.
+Exit 2 is an environment fault: the gate crashed, the network was gone, `gh`
+had no credential. {If the probe exits 2, {Report the refusal it printed, as
+the fault it is}} rather than as findings this release caused.
 
 Done when the exit code is read and the branch chosen.
 
-## 4. Green: one commit on main
+## 3. Green: one commit on main
 
-{Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--write`} to move the
-pin for real, then commit that one changed line to `main` and push. The commit
-gate runs at the new pin, so a green commit is the second verification.
+The probe judged `origin/main`, and `--write` edits this checkout, so the two
+have to be the same tree before the edit is made. Run `git fetch origin`, then
+confirm `main` is checked out and clean, and fast-forward it if it is behind.
+{If a branch is checked out or the tree is dirty, {Report the branch and the
+uncommitted files} and stop}; the bump's commit carries the pin and nothing
+else.
+
+Then {Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--write`} to
+move the pin for real, commit the files it names to `main` — the config, and in
+a host `pyproject.toml` and `uv.lock` too — and push. The
+commit gate runs at the new pin, so a green commit is the second verification.
 
 Then `pre-commit gc`. A bump is what creates the garbage — pre-commit keeps one
 full clone of dev-playbook per rev ever pinned — and gc drops every cached clone
@@ -78,62 +87,34 @@ and anything removed is re-cloned on demand.
 
 Done when the commit is on `origin/main` and the cache is collected.
 
-## 5. Red: cut a worktree
+## 4. Red: cut the worktree
 
-Use the `EnterWorktree` tool, naming the worktree `bump-pin-` followed by the
-first twelve characters of the target sha, so the branch says which release it
-carries. The worktree is cut from `origin/main`, which §2 made identical to the
-tree the probe judged, so the findings reproduce there exactly.
+The findings belong on a branch cut from the tree the probe judged. Run
+`git fetch origin`, then
 
-Then {Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--write`} inside
-the worktree to move the pin, and re-run the gate with
-`uvx pre-commit run --all-files` to put the worklist on screen.
+    git worktree add -b bump-pin-<sha12> .claude/worktrees/bump-pin-<sha12> origin/main
 
-Done when the worktree holds the moved pin and the gate's findings are in hand.
+with `<sha12>` the first twelve characters of the target sha `bump-pin`
+printed. {If that path already exists, {Report it as an `update-pins`
+worktree, and that the
+[Pin Updates Ledger](~/workspace/dev-playbook/docs/pin-updates.md) says how
+that run ended} and stop}: it belongs to a run that did not finish, and two
+runs working one branch is the one thing worse than an unworked bump.
 
-## 6. Work the findings
+`cd` into the worktree, then {Run
+[bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--write`} to move the
+pin, and commit it `--no-verify` as the branch's first commit. The worktree
+and branch need no cleanup afterwards: once their PR is merged or closed, the
+next `update-pins` run removes both, and the remote branch with them.
 
-Commit freely with `--no-verify` while the work is in flight; the gate is the
-worklist, not the judge, until §7 takes its verdict. Work to an empty gate.
+Done when the worktree holds the committed bump.
 
-**Each finding names its own authority.** A finding's rule id reads
-`<card>.<rule>`, and the card half is a directory: `standards/<card>/card.md` in
-the dev-playbook checkout, whose Define cell names the document that governs the
-fix. {Read [the standards index](~/workspace/dev-playbook/standards/index.md);
-it lists every card directory} to reach it. Take the fix from that document
-rather than from the detector's message, which states the symptom.
+## 5. Hand off
 
-Three shapes account for most of what a bump reddens:
+`/finish-pin-bump` works the findings to an empty gate and lands the PR, and
+it is user-invoked: this skill never starts it. {Report the worktree path, the
+sha move, the finding count, and that the next step is the user typing
+`/finish-pin-bump` in a session whose working directory is the worktree} and
+stop.
 
-- **A canonical artifact drifted.** The pinned clone carries
-  `standards/build/canonical/`, so a canonical block changed upstream is a
-  finding the moment the pin moves. Re-seed the block from
-  `~/workspace/dev-playbook/standards/build/canonical/` — confirm that checkout
-  sits at the target sha first — and merge it into the repo's file. The
-  canonical copy wins; never edit the repo's copy to satisfy the detector by
-  hand.
-- **A detector reaching this repo for the first time.** Enrollment rides the
-  pin, so a detector added upstream runs here with no config edit anywhere. Adapt
-  the repo to the rule, authority as above.
-- **A requirement retired upstream.** This one shows up as silence, not as a
-  finding: the rule is gone from the new pin, so the adaptation the repo still
-  carries for it — a suppression, a shim, a note — is dead weight nothing asks
-  for any more. {Write the retired requirement's adaptation out of the repo}.
-
-**Escalate rather than decide** where a fix changes what the repo *does* instead
-of how it conforms — deleting a file whose content has no obvious new home,
-renaming something other tooling may reference. Finish everything decidable
-first, then {Report the remainder as one list of concrete choices} and wait.
-
-Done when `uvx pre-commit run --all-files` is green in the worktree.
-
-## 7. Land the PR
-
-Make the last commit without `--no-verify`, so the commit gate runs at the new
-pin and its green result is the verification. Push the branch and open a PR whose
-body names the sha the pin moved from and to, and what each adaptation was for.
-
-{Report the PR's URL, the sha move, and every escalation still open}. The merge
-is the user's.
-
-Done when the PR is open and its URL is on screen.
+Done when the report is on screen.

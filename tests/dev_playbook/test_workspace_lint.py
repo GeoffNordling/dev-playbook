@@ -1,22 +1,21 @@
 """Behavioral tests for scripts/workspace-lint.
 
 Fixtures build a throwaway workspace of git repos and point --workspace at
-it. Settings tests put a fake ``gh`` executable on PATH that serves canned
-JSON from a file, so no test touches the network. The pinned-repo URL and
-the hook repo's ``main`` sha come from the real checkout the script lives
-in, exactly as in production.
+it. Every run puts a fake ``gh`` executable on PATH that serves canned JSON
+from a file, so no test touches the network.
 """
 
 import json
 import os
-import re
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+import pytest
 from conftest import init_repo
 
-from dev_playbook import gitrepo, workspace_lint
+from dev_playbook import github, gitrepo, workspace_lint
+from dev_playbook.pins import config, release
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-lint"
 HOOK_REPO = Path(__file__).resolve().parents[2]
@@ -54,6 +53,10 @@ else:
     segs = args[0].split("?", 1)[0].split("/")
     slug = "/".join(segs[1:3])
     resource = segs[3] if len(segs) > 3 else "settings"
+    # A file read keeps its path, so a test can serve one file and not another;
+    # a commit read keeps its sha, so a test can script the release-head walk.
+    if resource in ("contents", "commits"):
+        resource = resource + "/" + "/".join(segs[4:])
 
 # What a resource answers when a test says nothing about it. Protection defaults
 # to fully protected under the canonical ruleset, so that a test about merge
@@ -63,9 +66,24 @@ CANONICAL = {
     "enforcement": "ACTIVE",
     "bypassActors": {"nodes": []},
 }
+# The pin defaults: the hook repo's head is HEAD and its manifest publishes one
+# id, and a consumer pins exactly that. So a test about anything else stays
+# clean on the pin rule, and a test about the pin serves its own config.
+HEAD = "HEAD_SHA"
+MANIFEST = "- id: playbook-check\\n  entry: playbook check\\n  language: python\\n"
+CONFIG = (
+    "repos:\\n"
+    "  - repo: HOOK_URL\\n"
+    "    rev: HEAD_SHA\\n"
+    "    hooks:\\n"
+    "      - id: playbook-check\\n"
+)
 DEFAULTS = {
     "labels": [],
     "issues": [],
+    "branches": {"commit": {"sha": HEAD}},
+    "contents/.pre-commit-hooks.yaml": MANIFEST,
+    "contents/.pre-commit-config.yaml": CONFIG,
     "protection": {
         "defaultBranchRef": {
             "name": "main",
@@ -78,22 +96,44 @@ DEFAULTS = {
         }
     },
 }
+# Any commit a test says nothing about is a release: it touches a source file
+# and is a root, so the release-head walk stops at it.
+COMMIT = {"files": [{"filename": "src/x.py"}], "parents": []}
+WRAPPER_KEYS = ("settings", "protection", "labels", "issues", "branches")
+WRAPPER_PREFIXES = ("contents/", "commits/")
 
 data = json.load(open(os.environ["FAKE_GH_DATA"]))
-if slug not in data:
+# The hook repo is read for its head, its commits, and its manifest in every
+# run, and a test that says nothing about it gets the defaults; any other
+# unlisted slug is unreachable.
+hook_repo_read = resource == "branches" or resource.startswith(WRAPPER_PREFIXES)
+if slug not in data and not hook_repo_read:
     sys.exit(1)
-entry = data[slug]
+entry = data.get(slug, {})
 
 # An entry is either a bare settings dict (legacy) or a wrapper carrying any of
-# settings / protection / labels / issues. A bare entry answers the base repo
-# path with its settings and every other resource with that resource's default.
+# settings / protection / labels / issues / branches / contents/<path>. A bare
+# entry answers the base repo path with its settings and every other resource
+# with that resource's default.
 wrapper = isinstance(entry, dict) and any(
-    k in entry for k in ("settings", "protection", "labels", "issues")
+    k in WRAPPER_KEYS or k.startswith(WRAPPER_PREFIXES) for k in entry
 )
-if wrapper:
+if resource.startswith("commits/"):
+    DEFAULTS[resource] = COMMIT
+if wrapper or slug not in data:
     payload = entry.get(resource, DEFAULTS.get(resource, {}))
 else:
     payload = entry if resource == "settings" else DEFAULTS.get(resource, {})
+# A file's text is served the way the contents endpoint serves it.
+if resource.startswith("contents/") and isinstance(payload, str) and payload not in (
+    "__unreachable__",
+    "__badjson__",
+):
+    import base64
+    payload = {
+        "encoding": "base64",
+        "content": base64.b64encode(payload.encode()).decode(),
+    }
 # A resource set to the sentinel "__unreachable__" simulates a non-zero `gh api`
 # exit (rate limit, permissions, transient 5xx) for that one resource.
 if payload == "__unreachable__":
@@ -171,22 +211,6 @@ def protection(
     }
 
 
-def hook_repo_url() -> str:
-    text = CANONICAL_CONFIG.read_text()
-    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
-    assert match, "canonical config lost its pinned block"
-    return match.group(1)
-
-
-def main_sha() -> str:
-    return subprocess.run(
-        ["git", "-C", str(HOOK_REPO), "rev-parse", "main"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
-
-
 def make_workspace_repo(
     workspace: Path, name: str, files: dict[str, str], origin: str | None = None
 ) -> Path:
@@ -204,10 +228,6 @@ def make_workspace_repo(
             capture_output=True,
         )
     return repo
-
-
-def pin_config(rev: str) -> str:
-    return f"repos:\n  - repo: {hook_repo_url()}\n    rev: {rev}\n    hooks:\n      - id: repo-lint\n"
 
 
 def run(
@@ -259,7 +279,9 @@ def make_fake_gh(tmp_path: Path, data: dict[str, object]) -> tuple[Path, Path]:
     gh_dir = tmp_path / "fakebin"
     gh_dir.mkdir()
     gh = gh_dir / "gh"
-    gh.write_text(FAKE_GH)
+    # The default consumer config pins the real hook URL, so the pin rule reads
+    # it as the block it audits.
+    gh.write_text(FAKE_GH.replace("HOOK_URL", release.hook_repo_url()))
     os.chmod(gh, 0o755)
     gh_data = tmp_path / "gh.json"
     gh_data.write_text(json.dumps(data))
@@ -278,112 +300,27 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = set(result.stdout.split())
-    assert "tracking.settings" in ids
-    assert "tracking.remote" in ids
-    assert "distribution.pin" in ids
+    assert "tracking.squash-only-merges" in ids
+    assert "tracking.origin-on-github" in ids
     # the tracking and software-factory rules this slice adds
-    assert "tracking.label-scheme" in ids
-    assert "tracking.no-blocked-label" in ids
-    assert "tracking.issue-brief-shape" in ids
-    assert "tracking.epic-shape" in ids
-    assert "tracking.tuple-valid" in ids
-    assert "tracking.session-shape" in ids
+    assert "tracking.exactly-the-labels-the-scheme-declares" in ids
+    assert "tracking.every-build-heading-in-bold" in ids
+    assert "tracking.category-only" in ids
+    assert "tracking.one-label-from-each-prefix" in ids
+    assert "tracking.one-category-label-no-phase-or-tests" in ids
     assert all(
         rule.split(".")[0] in {"tracking", "distribution", "software-factory"}
         for rule in ids
     ), ids
 
 
-# --- pins ---
+# --- the workspace root ---
 
 
 def test_missing_workspace_exits_two(tmp_path: Path) -> None:
-    result = run(tmp_path / "nowhere", "--pins-only")
+    result = run(tmp_path / "nowhere")
     assert result.returncode == 2
     assert "workspace root not found" in result.stderr
-
-
-def test_pin_current_stale_and_absent(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
-    )
-    make_workspace_repo(
-        ws, "beta", {".pre-commit-config.yaml": pin_config("0000000000000000")}
-    )
-    make_workspace_repo(ws, "gamma", {"README.md": "# G\n"})
-    result = run(ws, "--pins-only")
-    assert result.returncode == 1, result.stdout + result.stderr
-    assert "alpha: pin current" in result.stderr
-    assert re.search(
-        r"beta: distribution.pin 0{16} \(hook repo main is \w{12}\)", result.stdout
-    )
-    assert "gamma: distribution.pin no .pre-commit-config.yaml" in result.stdout
-    # The stale pin is advisory and the absent one is a finding; the summary
-    # counts them apart even though both carry distribution.pin.
-    assert "1 finding(s), 1 stale pin(s)" in result.stderr
-
-
-def test_stale_pin_is_not_a_failure(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "beta", {".pre-commit-config.yaml": pin_config("0000000000000000")}
-    )
-    assert run(ws, "--pins-only").returncode == 0
-
-
-def test_short_sha_pin_matches_main(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha()[:10])}
-    )
-    result = run(ws, "--pins-only")
-    assert "alpha: pin current" in result.stderr
-
-
-def test_config_without_hook_repo_pin(tmp_path: Path) -> None:
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws,
-        "delta",
-        {
-            ".pre-commit-config.yaml": (
-                "repos:\n  - repo: https://github.com/example/other\n"
-                "    rev: v1.0.0\n    hooks:\n      - id: x\n"
-            )
-        },
-    )
-    result = run(ws, "--pins-only")
-    assert result.returncode == 1
-    assert "delta: distribution.pin no dev-playbook pin" in result.stdout
-
-
-def test_hook_repo_itself_has_no_pin_line() -> None:
-    # The real checkout, since the exemption is identity: dev-playbook dogfoods
-    # from its working tree and has nothing to pin.
-    result = run(HOOK_REPO.parent, "--pins-only", repos=HOOK_REPO.name)
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert HOOK_REPO.name not in result.stdout
-
-
-def test_consumer_publishing_its_own_hooks_is_still_pin_checked(
-    tmp_path: Path,
-) -> None:
-    # A consumer may publish hooks of its own; that does not make it the hook
-    # repo, and its dev-playbook pin must still be audited. Reading the
-    # exemption off the manifest instead of off identity dropped exactly this
-    # repo's pin from the sweep.
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws,
-        "publisher",
-        {
-            ".pre-commit-hooks.yaml": "- id: x\n",
-            ".pre-commit-config.yaml": pin_config("0000000000000000"),
-        },
-    )
-    result = run(ws, "--pins-only")
-    assert "publisher: distribution.pin 0000000000000000" in result.stdout
 
 
 # --- the governed roster ---
@@ -394,46 +331,60 @@ def test_ungoverned_repo_draws_no_output(tmp_path: Path) -> None:
     # advisory, not a line. It is simply not this audit's business.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     make_workspace_repo(ws, "stranger", {"README.md": "# not ours\n"})
-    result = run(ws, "--pins-only", repos="alpha")
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(ws, "--settings-only", repos="alpha", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 0, result.stdout + result.stderr
     assert "stranger" not in result.stdout + result.stderr
     assert "1 repos" in result.stderr
 
 
-def test_governed_repo_that_is_absent_stops_the_run(tmp_path: Path) -> None:
-    # The other direction does close: the roster claiming a repo that is not
-    # there is a false claim, and a shorter audit must not pass for a clean one.
+def test_governed_repo_absent_from_this_machine_is_announced_and_passed_over(
+    tmp_path: Path,
+) -> None:
+    # The workspace spans machines: a roster name with no repo behind it here
+    # may live on another one, so the rest is audited and the absence is said.
     ws = tmp_path / "ws"
     make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
-    result = run(ws, "--pins-only", repos="alpha,ghost")
-    assert result.returncode == 2
-    assert "governed repo(s) not found" in result.stderr
-    assert "ghost" in result.stderr
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(
+        ws, "--settings-only", repos="alpha,ghost", gh_dir=gh_dir, gh_data=gh_data
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "not on this machine, not audited: ghost" in result.stderr
+    assert "1 repos" in result.stderr
 
 
 def test_governed_directory_without_git_is_not_a_repo(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     (ws / "plain").mkdir(parents=True)
-    result = run(ws, "--pins-only", repos="plain")
-    assert result.returncode == 2
-    assert "governed repo(s) not found" in result.stderr
+    gh_dir, gh_data = make_fake_gh(tmp_path, {})
+    result = run(ws, repos="plain", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0
+    assert "not on this machine, not audited: plain" in result.stderr
+    assert "0 repos" in result.stderr
 
 
 def test_roster_order_is_the_audit_order(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
+    drifted = dict(GOOD_SETTINGS, mergeCommitAllowed=True)
+    data: dict[str, object] = {}
     for name in ("alpha", "beta"):
         make_workspace_repo(
-            ws, name, {".pre-commit-config.yaml": pin_config(main_sha())}
+            ws, name, {"README.md": "# R\n"}, origin=f"git@github.com:me/{name}.git"
         )
-    result = run(ws, "--pins-only", repos="beta,alpha")
-    assert result.stderr.index("beta: pin current") < result.stderr.index(
-        "alpha: pin current"
+        data[f"me/{name}"] = drifted
+    gh_dir, gh_data = make_fake_gh(tmp_path, data)
+    result = run(
+        ws, "--settings-only", repos="beta,alpha", gh_dir=gh_dir, gh_data=gh_data
     )
+    assert result.stdout.index(
+        "beta: tracking.squash-only-merges"
+    ) < result.stdout.index("alpha: tracking.squash-only-merges")
 
 
 def test_default_roster_is_the_governed_constant() -> None:
@@ -472,19 +423,6 @@ def test_unauthenticated_gh_reports_ghs_own_reason(tmp_path: Path) -> None:
     assert "The token in default is invalid." in result.stderr
 
 
-def test_pins_only_needs_no_auth(tmp_path: Path) -> None:
-    # --pins-only reads nothing over the network, so requiring a credential
-    # would refuse a run that could answer correctly.
-    ws = tmp_path / "ws"
-    make_workspace_repo(
-        ws, "alpha", {".pre-commit-config.yaml": pin_config(main_sha())}
-    )
-    gh_dir, gh_data = make_fake_gh(tmp_path, {})
-    result = run(ws, "--pins-only", gh_dir=gh_dir, gh_data=gh_data, gh_auth="1")
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "alpha: pin current" in result.stderr
-
-
 def test_authenticated_gh_runs_normally(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     make_workspace_repo(
@@ -520,7 +458,7 @@ def test_drifted_setting_is_a_finding(tmp_path: Path) -> None:
     assert result.returncode == 1
     # Queried as mergeCommitAllowed, reported under the REST name.
     assert (
-        "alpha: tracking.settings allow_merge_commit is True (want False)"
+        "alpha: tracking.squash-only-merges allow_merge_commit is True (want False)"
         in result.stdout
     )
 
@@ -534,7 +472,8 @@ def test_unreachable_repo_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.settings unreachable via gh api (me/unknown)" in result.stdout
+        "alpha: tracking.squash-only-merges unreachable via gh api (me/unknown)"
+        in result.stdout
     )
 
 
@@ -553,7 +492,7 @@ def test_response_without_merge_fields_is_unreachable_not_six_drifts(
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert result.stdout.splitlines() == [
-        "alpha: tracking.settings unreachable via gh api (me/alpha)"
+        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
     ]
 
 
@@ -569,7 +508,7 @@ def test_partial_response_is_unreachable_not_partial_drift(tmp_path: Path) -> No
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert result.stdout.splitlines() == [
-        "alpha: tracking.settings unreachable via gh api (me/alpha)"
+        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
     ]
 
 
@@ -582,7 +521,10 @@ def test_null_repository_is_unreachable(tmp_path: Path) -> None:
     gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": {"settings": None}})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
-    assert "alpha: tracking.settings unreachable via gh api (me/alpha)" in result.stdout
+    assert (
+        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
+        in result.stdout
+    )
 
 
 def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
@@ -592,7 +534,8 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.remote no GitHub origin; settings unchecked" in result.stdout
+        "alpha: tracking.origin-on-github no GitHub origin; settings unchecked"
+        in result.stdout
     )
 
 
@@ -629,11 +572,11 @@ def test_unprotected_default_branch_is_two_findings(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.branch-protection main is not protected against force-push"
+        "alpha: tracking.default-branch-protected-from-destructive-operations main is not protected against force-push"
         in result.stdout
     )
     assert (
-        "alpha: tracking.branch-protection main is not protected against deletion"
+        "alpha: tracking.default-branch-protected-from-destructive-operations main is not protected against deletion"
         in result.stdout
     )
 
@@ -734,7 +677,7 @@ def test_unreadable_rules_are_surfaced_not_read_as_unprotected(tmp_path: Path) -
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.branch-protection rules unreachable via gh api (me/alpha)"
+        "alpha: tracking.default-branch-protected-from-destructive-operations rules unreachable via gh api (me/alpha)"
         in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -760,7 +703,7 @@ def test_bypass_actor_on_the_guarding_ruleset_is_a_finding(tmp_path: Path) -> No
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.branch-protection ruleset 'protect-main' grants bypass "
+        "alpha: tracking.default-branch-protected-from-destructive-operations ruleset 'protect-main' grants bypass "
         "to 2 actors (want none)" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -805,7 +748,7 @@ def test_protection_under_another_name_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.branch-protection main is protected by 'no-touchy', "
+        "alpha: tracking.default-branch-protected-from-destructive-operations main is protected by 'no-touchy', "
         "not by the canonical 'protect-main'" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -876,7 +819,7 @@ def test_unreadable_ruleset_is_surfaced_not_read_as_bypassless(
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.branch-protection a ruleset protecting main could not "
+        "alpha: tracking.default-branch-protected-from-destructive-operations a ruleset protecting main could not "
         "be read" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -929,14 +872,188 @@ def test_the_required_rules_may_be_split_across_rulesets(tmp_path: Path) -> None
 
 
 def test_repo_without_origin_draws_one_finding_not_two(tmp_path: Path) -> None:
-    # tracking.remote already says the origin is missing; protection stays quiet
+    # tracking.origin-on-github already says the origin is missing; protection stays quiet
     # rather than reporting the same absent repo a second time.
     ws = tmp_path / "ws"
     make_workspace_repo(ws, "alpha", {"README.md": "# A\n"})
     gh_dir, gh_data = make_fake_gh(tmp_path, {})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
-    assert "tracking.branch-protection" not in result.stdout
+    assert (
+        "tracking.default-branch-protected-from-destructive-operations"
+        not in result.stdout
+    )
     assert len(result.stdout.strip().splitlines()) == 1
+
+
+# --- the pin ---
+
+PIN_RULE = "distribution.a-consumer-pins-the-published-head"
+
+
+def pin_repo(
+    tmp_path: Path,
+    hook_repo: dict[str, object] | None = None,
+    config: str | None = None,
+) -> tuple[Path, Path, Path]:
+    """A one-repo workspace with good settings, whose fake gh serves ``config``
+    as alpha's published pre-commit config and, when given, the hook repo's
+    head and manifest; either left None takes the fake's clean default."""
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    alpha: dict[str, object] = {"settings": GOOD_SETTINGS}
+    if config is not None:
+        alpha["contents/.pre-commit-config.yaml"] = config
+    data: dict[str, object] = {"me/alpha": alpha}
+    if hook_repo is not None:
+        data[release.hook_repo_slug()] = hook_repo
+    gh_dir, gh_data = make_fake_gh(tmp_path, data)
+    return ws, gh_dir, gh_data
+
+
+def pin_config(rev: str, *ids: str) -> str:
+    """A consumer config pinning the hook repo at ``rev`` with ``ids`` under it."""
+    hooks = "".join(f"      - id: {i}\n" for i in ids)
+    url = release.hook_repo_url()
+    return f"repos:\n  - repo: {url}\n    rev: {rev}\n    hooks:\n{hooks}"
+
+
+def test_a_consumer_at_the_published_head_draws_no_pin_finding(
+    tmp_path: Path,
+) -> None:
+    ws, gh_dir, gh_data = pin_repo(tmp_path)
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_a_pin_behind_the_head_is_a_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        config=pin_config("OLD_SHA", "playbook-check"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        f"alpha: {PIN_RULE} pinned OLD_SHA, published head is HEAD_SHA" in result.stdout
+    )
+
+
+def test_a_stale_hook_id_is_a_finding_even_at_the_head(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        config=pin_config("HEAD_SHA", "playbook-lint"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        f"alpha: {PIN_RULE} hook ids playbook-lint; the manifest publishes playbook-check"
+        in result.stdout
+    )
+    assert "published head is" not in result.stdout
+
+
+def test_a_consumer_with_no_pin_is_a_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        config="repos: []\n",
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert f"alpha: {PIN_RULE} no {release.hook_repo_url()} pin" in result.stdout
+
+
+def test_a_consumer_with_no_config_on_main_is_a_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(tmp_path, config="__unreachable__")
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert f"alpha: {PIN_RULE} no .pre-commit-config.yaml on main" in result.stdout
+
+
+def test_the_head_and_manifest_follow_the_hook_repo_as_github_has_it(
+    tmp_path: Path,
+) -> None:
+    # The fake's default head is HEAD_SHA; the hook repo entry moves it, and
+    # the consumer left at HEAD_SHA is now behind.
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        hook_repo={
+            "branches": {"commit": {"sha": "NEWER_SHA"}},
+            "contents/.pre-commit-hooks.yaml": "- id: playbook-check\n  entry: x\n",
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "pinned HEAD_SHA, published head is NEWER_SHA" in result.stdout
+
+
+def test_an_unreadable_hook_repo_head_stops_the_run(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(tmp_path, hook_repo={"branches": "__unreachable__"})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 2
+    assert "cannot read main's head sha" in result.stderr
+
+
+def test_the_hook_repo_itself_is_passed_over(tmp_path: Path) -> None:
+    # dev-playbook is governed and pins nothing; the audit knows it by identity.
+    lines = workspace_lint.check_pin(
+        HOOK_REPO, "GeoffNordling/dev-playbook", "url", "HEAD", ("playbook-check",)
+    )
+    assert lines == []
+
+
+def test_a_worktree_of_the_hook_repo_is_the_hook_repo(tmp_path: Path) -> None:
+    # Identity is the shared .git directory, so the main checkout and a
+    # worktree of it — wherever either sits on disk — are one repo.
+    worktree = tmp_path / "wt"
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(HOOK_REPO),
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            str(worktree),
+        ],
+        check=True,
+        capture_output=True,
+        env=gitrepo.no_git_env(),
+    )
+    try:
+        assert release.is_hook_repo(worktree)
+        assert release.is_hook_repo(HOOK_REPO)
+    finally:
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(HOOK_REPO),
+                "worktree",
+                "remove",
+                "--force",
+                str(worktree),
+            ],
+            check=True,
+            capture_output=True,
+            env=gitrepo.no_git_env(),
+        )
+
+
+def test_another_repo_is_not_the_hook_repo(tmp_path: Path) -> None:
+    other = tmp_path / "other"
+    init_repo(other)
+    assert not release.is_hook_repo(other)
+    assert not release.is_hook_repo(tmp_path / "nowhere")
+
+
+def test_pinned_hook_ids_reads_the_block_for_the_url() -> None:
+    url = release.hook_repo_url()
+    assert config.pinned_hook_ids(pin_config("X", "a", "b"), url) == ("a", "b")
+    assert config.pinned_hook_ids(pin_config("X"), url) == ()
+    assert config.pinned_hook_ids("repos: []\n", url) is None
+    assert config.pinned_hook_ids("- not a mapping\n", url) is None
 
 
 # --- label scheme (full mode; settings clean so only label findings surface) ---
@@ -952,13 +1069,8 @@ def full_mode_repo(
     settings plus the given labels/issues, so a full-mode run surfaces only the
     label/issue findings under test."""
     ws = tmp_path / "ws"
-    # A current pin included deliberately: a governed repo carrying none is
-    # itself a finding, which would leak into every label/issue assertion here.
     make_workspace_repo(
-        ws,
-        "alpha",
-        {"README.md": "# A\n", ".pre-commit-config.yaml": pin_config(main_sha())},
-        origin="git@github.com:me/alpha.git",
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
     )
     gh_dir, gh_data = make_fake_gh(
         tmp_path,
@@ -976,15 +1088,17 @@ def full_mode_repo(
 def test_conformant_labels_raise_no_label_finding(tmp_path: Path) -> None:
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=canonical_label_objects())
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "tracking.label-scheme" not in result.stdout
-    assert "tracking.no-blocked-label" not in result.stdout
+    assert "tracking.exactly-the-labels-the-scheme-declares" not in result.stdout
 
 
 def test_missing_canonical_label_is_a_finding(tmp_path: Path) -> None:
     labels = [obj for obj in canonical_label_objects() if obj["name"] != "mode:spike"]
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.label-scheme missing label mode:spike" in result.stdout
+    assert (
+        "alpha: tracking.exactly-the-labels-the-scheme-declares missing label mode:spike"
+        in result.stdout
+    )
     assert result.returncode == 1
 
 
@@ -993,7 +1107,7 @@ def test_drifted_label_color_is_a_finding(tmp_path: Path) -> None:
     labels[0] = dict(labels[0], color="ff0000")
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.label-scheme" in result.stdout
+    assert "alpha: tracking.exactly-the-labels-the-scheme-declares" in result.stdout
     assert labels[0]["name"] in result.stdout
 
 
@@ -1002,7 +1116,7 @@ def test_drifted_label_description_is_a_finding(tmp_path: Path) -> None:
     labels[0] = dict(labels[0], description="wrong")
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.label-scheme" in result.stdout
+    assert "alpha: tracking.exactly-the-labels-the-scheme-declares" in result.stdout
     assert labels[0]["name"] in result.stdout
 
 
@@ -1013,41 +1127,28 @@ def test_unexpected_label_is_a_finding(tmp_path: Path) -> None:
     ]
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.label-scheme unexpected label wip" in result.stdout
+    assert (
+        "alpha: tracking.exactly-the-labels-the-scheme-declares unexpected label wip"
+        in result.stdout
+    )
 
 
 # --- blocked labels (own rule, overlapping the closed world by design) ---
 
 
-def test_blocked_label_is_its_own_finding(tmp_path: Path) -> None:
+def test_blocked_label_is_an_unexpected_label(tmp_path: Path) -> None:
+    # The scheme has no blocked state, so a label naming one is outside the
+    # closed world; valid-labels is the one rule that flags it.
     labels = [
         *canonical_label_objects(),
         {"name": "status:Blocked", "color": "cccccc", "description": ""},
     ]
     ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
     result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "alpha: tracking.no-blocked-label" in result.stdout
-    assert "status:Blocked" in result.stdout
-    # deliberately also flagged by the closed-world scheme rule
     assert (
-        "alpha: tracking.label-scheme unexpected label status:Blocked" in result.stdout
+        "alpha: tracking.exactly-the-labels-the-scheme-declares unexpected label status:Blocked"
+        in result.stdout
     )
-
-
-def test_label_containing_blocked_substring_is_not_a_blocked_finding(
-    tmp_path: Path,
-) -> None:
-    # The rule names a blocked *state* — the value token equal to "blocked".
-    # Names that merely contain the substring (a negation, a compound) are not
-    # blocked states and must not draw the no-blocked-label rule.
-    labels = [
-        *canonical_label_objects(),
-        {"name": "status:unblocked", "color": "cccccc", "description": ""},
-        {"name": "type:blocked-by-vendor", "color": "cccccc", "description": ""},
-    ]
-    ws, gh_dir, gh_data = full_mode_repo(tmp_path, labels=labels)
-    result = run(ws, gh_dir=gh_dir, gh_data=gh_data)
-    assert "tracking.no-blocked-label" not in result.stdout
 
 
 # --- fetch reachability (a failed labels/issues read must surface loudly) ---
@@ -1108,9 +1209,13 @@ def test_bad_json_response_reports_repo_unreachable_and_run_survives(
     )
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert "Traceback" not in result.stderr
-    assert "alpha: tracking.settings unreachable via gh api (me/alpha)" in result.stdout
-    assert "beta: tracking.settings allow_merge_commit is True (want False)" in (
-        result.stdout
+    assert (
+        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
+        in result.stdout
+    )
+    assert (
+        "beta: tracking.squash-only-merges allow_merge_commit is True (want False)"
+        in (result.stdout)
     )
     assert result.returncode == 1
 
@@ -1178,21 +1283,21 @@ def run_with_issue(tmp_path: Path, one: dict) -> subprocess.CompletedProcess:
 
 def test_valid_leaf_tuple_and_brief_pass(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(1, VALID_DIRECT, body=BUILD_BODY))
-    assert "tracking.tuple-valid" not in result.stdout
-    assert "tracking.issue-brief-shape" not in result.stdout
-    assert "tracking.epic-shape" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
+    assert "tracking.category-only" not in result.stdout
 
 
 def test_untriaged_issue_is_out_of_scope(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(2, ["phase:intake"], body=""))
-    assert "tracking.tuple-valid" not in result.stdout
-    assert "tracking.issue-brief-shape" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "tests:no", "phase:build"]
     result = run_with_issue(tmp_path, issue(7, labels, body=BUILD_BODY))
-    assert "alpha: tracking.tuple-valid" in result.stdout
+    assert "alpha: tracking.one-label-from-each-prefix" in result.stdout
     assert "#7" in result.stdout
     assert "mode" in result.stdout
 
@@ -1200,37 +1305,39 @@ def test_leaf_missing_mode_label_is_a_finding(tmp_path: Path) -> None:
 def test_leaf_invalid_phase_value_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:direct", "tests:no", "phase:frobnicate"]
     result = run_with_issue(tmp_path, issue(8, labels, body=BUILD_BODY))
-    assert "alpha: tracking.tuple-valid" in result.stdout
+    assert "alpha: tracking.one-label-from-each-prefix" in result.stdout
     assert "phase" in result.stdout
 
 
 def test_leaf_invalid_mode_value_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:frobnicate", "tests:yes", "phase:build"]
     result = run_with_issue(tmp_path, issue(9, labels, body=BUILD_BODY))
-    assert "alpha: tracking.tuple-valid" in result.stdout
+    assert "alpha: tracking.one-label-from-each-prefix" in result.stdout
     assert "mode:frobnicate is not a scheme value" in result.stdout
 
 
 def test_spike_leaf_requires_tests_no(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:yes", "phase:spike"]
     result = run_with_issue(tmp_path, issue(10, labels, body=SPIKE_BODY))
-    assert "alpha: tracking.tuple-valid" in result.stdout
+    assert (
+        "alpha: tracking.one-label-from-each-prefix-tests-fixed-at-no" in result.stdout
+    )
     assert "tests:no" in result.stdout
 
 
 def test_epic_with_phase_label_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "phase:build"]
     result = run_with_issue(tmp_path, issue(3, labels, sub_issues_total=4))
-    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
     assert "#3" in result.stdout
-    assert "tracking.tuple-valid" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_wellformed_epic_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(4, ["category:extension"], sub_issues_total=4)
     )
-    assert "tracking.epic-shape" not in result.stdout
+    assert "tracking.category-only" not in result.stdout
 
 
 def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
@@ -1238,23 +1345,23 @@ def test_epic_with_mode_label_but_no_phase_is_a_finding(tmp_path: Path) -> None:
     # the category-only invariant holds regardless of triage state.
     labels = ["category:extension", "mode:direct"]
     result = run_with_issue(tmp_path, issue(12, labels, sub_issues_total=3))
-    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
     assert "#12" in result.stdout
-    assert "tracking.tuple-valid" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_epic_without_category_label_is_a_finding(tmp_path: Path) -> None:
     # "An epic carries a category label only" is a positive invariant too: an
     # epic with no category label at all is malformed.
     result = run_with_issue(tmp_path, issue(13, [], sub_issues_total=2))
-    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
     assert "#13" in result.stdout
 
 
 def test_epic_with_two_category_labels_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "category:maintenance"]
     result = run_with_issue(tmp_path, issue(14, labels, sub_issues_total=2))
-    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
     assert "#14" in result.stdout
 
 
@@ -1262,7 +1369,7 @@ def test_epic_with_invalid_category_value_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(15, ["category:frobnicate"], sub_issues_total=2)
     )
-    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
     assert "#15" in result.stdout
 
 
@@ -1278,9 +1385,9 @@ VALID_SESSION = ["category:extension", "mode:session"]
 
 def test_wellformed_session_leaf_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(40, VALID_SESSION, body=SESSION_BODY))
-    assert "tracking.session-shape" not in result.stdout
-    assert "tracking.issue-brief-shape" not in result.stdout
-    assert "tracking.tuple-valid" not in result.stdout
+    assert "tracking.one-category-label-no-phase-or-tests" not in result.stdout
+    assert "tracking.every-session-heading-in-bold" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
     assert result.returncode == 0, result.stdout + result.stderr
 
 
@@ -1289,7 +1396,7 @@ def test_session_leaf_is_checked_without_a_phase_label(tmp_path: Path) -> None:
     # branch is what makes the brief visible to the audit at all.
     body = SESSION_BODY.replace("**Acceptance criteria:** a\n\n", "")
     result = run_with_issue(tmp_path, issue(41, VALID_SESSION, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.every-session-heading-in-bold" in result.stdout
     assert "Acceptance criteria" in result.stdout
 
 
@@ -1302,35 +1409,35 @@ def test_session_leaf_never_needs_the_factory_only_headings(tmp_path: Path) -> N
 def test_session_leaf_with_phase_label_is_a_finding(tmp_path: Path) -> None:
     labels = [*VALID_SESSION, "phase:build"]
     result = run_with_issue(tmp_path, issue(43, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-shape" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "phase:build" in result.stdout
-    assert "tracking.tuple-valid" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_session_leaf_with_tests_label_is_a_finding(tmp_path: Path) -> None:
     labels = [*VALID_SESSION, "tests:no"]
     result = run_with_issue(tmp_path, issue(44, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-shape" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "tests:no" in result.stdout
 
 
 def test_session_leaf_with_second_mode_is_a_finding(tmp_path: Path) -> None:
     labels = [*VALID_SESSION, "mode:direct"]
     result = run_with_issue(tmp_path, issue(45, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-shape" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "mode:direct" in result.stdout
 
 
 def test_session_leaf_without_category_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(46, ["mode:session"], body=SESSION_BODY))
-    assert "alpha: tracking.session-shape" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "missing category" in result.stdout
 
 
 def test_session_leaf_with_invalid_category_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:frobnicate", "mode:session"]
     result = run_with_issue(tmp_path, issue(47, labels, body=SESSION_BODY))
-    assert "alpha: tracking.session-shape" in result.stdout
+    assert "alpha: tracking.one-category-label-no-phase-or-tests" in result.stdout
     assert "category:frobnicate" in result.stdout
 
 
@@ -1339,8 +1446,8 @@ def test_epic_carrying_mode_session_is_an_epic_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(48, VALID_SESSION, body="", sub_issues_total=2)
     )
-    assert "alpha: tracking.epic-shape" in result.stdout
-    assert "tracking.session-shape" not in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
+    assert "tracking.one-category-label-no-phase-or-tests" not in result.stdout
 
 
 # --- wayfinder species: the map and the decision ticket ---
@@ -1356,8 +1463,8 @@ def test_wellformed_map_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(16, ["wayfinder:map"], body=MAP_BODY, sub_issues_total=3)
     )
-    assert "tracking.wayfinder-shape" not in result.stdout
-    assert "tracking.epic-shape" not in result.stdout
+    assert "tracking.one-wayfinder-label-and-nothing-else" not in result.stdout
+    assert "tracking.category-only" not in result.stdout
     assert result.returncode == 0, result.stdout + result.stderr
 
 
@@ -1366,8 +1473,8 @@ def test_map_is_told_by_its_label_not_by_having_children(tmp_path: Path) -> None
     result = run_with_issue(
         tmp_path, issue(17, ["wayfinder:map"], body=MAP_BODY, sub_issues_total=0)
     )
-    assert "tracking.wayfinder-shape" not in result.stdout
-    assert "tracking.tuple-valid" not in result.stdout
+    assert "tracking.one-wayfinder-label-and-nothing-else" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
 
 
 def test_map_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
@@ -1375,7 +1482,7 @@ def test_map_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(18, labels, body=MAP_BODY, sub_issues_total=2)
     )
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "#18" in result.stdout
     assert "category:extension" in result.stdout
     assert "phase:build" in result.stdout
@@ -1386,7 +1493,7 @@ def test_map_missing_a_body_section_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(19, ["wayfinder:map"], body=body, sub_issues_total=2)
     )
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.map-sections-ticket-question" in result.stdout
     assert "Not yet specified" in result.stdout
 
 
@@ -1395,7 +1502,7 @@ def test_map_also_carrying_a_ticket_type_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(21, labels, body=MAP_BODY, sub_issues_total=2)
     )
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "a map is not a ticket" in result.stdout
 
 
@@ -1403,8 +1510,8 @@ def test_wellformed_ticket_raises_no_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(22, ["wayfinder:research"], body=TICKET_BODY)
     )
-    assert "tracking.wayfinder-shape" not in result.stdout
-    assert "tracking.tuple-valid" not in result.stdout
+    assert "tracking.one-wayfinder-label-and-nothing-else" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
     assert result.returncode == 0, result.stdout + result.stderr
 
 
@@ -1413,21 +1520,21 @@ def test_ticket_carrying_a_factory_label_is_a_finding(tmp_path: Path) -> None:
     # gate entirely; it is now checked against its own contract.
     labels = ["wayfinder:grilling", "mode:direct", "tests:no"]
     result = run_with_issue(tmp_path, issue(23, labels, body=TICKET_BODY))
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "#23" in result.stdout
     assert "a decision ticket carries no factory label" in result.stdout
 
 
 def test_ticket_missing_its_question_section_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(tmp_path, issue(24, ["wayfinder:task"], body=""))
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.map-sections-ticket-question" in result.stdout
     assert "Question" in result.stdout
 
 
 def test_ticket_with_two_wayfinder_labels_is_a_finding(tmp_path: Path) -> None:
     labels = ["wayfinder:research", "wayfinder:grilling"]
     result = run_with_issue(tmp_path, issue(25, labels, body=TICKET_BODY))
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "multiple wayfinder labels" in result.stdout
 
 
@@ -1435,7 +1542,7 @@ def test_ticket_with_an_out_of_scheme_type_is_a_finding(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(26, ["wayfinder:frobnicate"], body=TICKET_BODY)
     )
-    assert "alpha: tracking.wayfinder-shape" in result.stdout
+    assert "alpha: tracking.one-wayfinder-label-and-nothing-else" in result.stdout
     assert "is not a scheme value" in result.stdout
 
 
@@ -1445,7 +1552,7 @@ def test_childed_issue_without_a_wayfinder_label_still_checks_as_an_epic(
     # The species dispatch keys on the wayfinder labels; an ordinary issue with
     # children is still a build epic and still carries the epic's shape.
     result = run_with_issue(tmp_path, issue(27, [], sub_issues_total=2))
-    assert "alpha: tracking.epic-shape" in result.stdout
+    assert "alpha: tracking.category-only" in result.stdout
     assert "#27" in result.stdout
 
 
@@ -1486,7 +1593,7 @@ def test_issue_missing_labels_key_is_surfaced_not_silently_skipped(
 def test_build_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     body = BUILD_BODY.replace("**Out of scope:** o\n", "")
     result = run_with_issue(tmp_path, issue(5, VALID_DIRECT, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Out of scope" in result.stdout
 
 
@@ -1496,7 +1603,7 @@ def test_build_leaf_missing_user_intent_is_a_finding(tmp_path: Path) -> None:
     # choose among permitted fixes.
     body = BUILD_BODY.replace("**User intent:** i\n\n", "")
     result = run_with_issue(tmp_path, issue(32, VALID_DIRECT, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "User intent" in result.stdout
 
 
@@ -1506,7 +1613,7 @@ def test_build_leaf_missing_prohibited_surfaces_is_a_finding(tmp_path: Path) -> 
     # second deviation limiter mechanical rather than a judgment call.
     body = BUILD_BODY.replace("**Prohibited surfaces:** none\n\n", "")
     result = run_with_issue(tmp_path, issue(37, VALID_DIRECT, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Prohibited surfaces" in result.stdout
 
 
@@ -1514,7 +1621,7 @@ def test_spike_leaf_missing_heading_is_a_finding(tmp_path: Path) -> None:
     labels = ["category:extension", "mode:spike", "tests:no", "phase:spike"]
     body = SPIKE_BODY.replace("**Deliverable:** d\n", "")
     result = run_with_issue(tmp_path, issue(6, labels, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.summary-question-and-deliverable" in result.stdout
     assert "Deliverable" in result.stdout
 
 
@@ -1528,7 +1635,7 @@ def test_heading_with_colon_outside_bold_is_accepted(tmp_path: Path) -> None:
         "**Prohibited surfaces**: none\n\n**Out of scope**: o\n"
     )
     result = run_with_issue(tmp_path, issue(31, VALID_DIRECT, body=body))
-    assert "tracking.issue-brief-shape" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def test_heading_only_inside_a_code_fence_is_a_finding(tmp_path: Path) -> None:
@@ -1539,7 +1646,7 @@ def test_heading_only_inside_a_code_fence_is_a_finding(tmp_path: Path) -> None:
         "```markdown\n**Out of scope:** the template's line\n```\n",
     )
     result = run_with_issue(tmp_path, issue(33, VALID_DIRECT, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Out of scope" in result.stdout
 
 
@@ -1553,7 +1660,7 @@ def test_headings_beside_a_quoted_template_pass(tmp_path: Path) -> None:
         "**User intent:**\nWhy this issue exists.\n```\nnested fence\n```\n````\n"
     )
     result = run_with_issue(tmp_path, issue(34, VALID_DIRECT, body=body))
-    assert "tracking.issue-brief-shape" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def test_heading_inside_a_nested_fence_does_not_forge(tmp_path: Path) -> None:
@@ -1566,7 +1673,7 @@ def test_heading_inside_a_nested_fence_does_not_forge(tmp_path: Path) -> None:
         "```\n**Out of scope:** forged\n```\n````\n"
     )
     result = run_with_issue(tmp_path, issue(35, VALID_DIRECT, body=body))
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.every-build-heading-in-bold" in result.stdout
     assert "Out of scope" in result.stdout
 
 
@@ -1580,7 +1687,7 @@ def test_body_with_an_unclosed_fence_is_a_finding(tmp_path: Path) -> None:
 
     result = run_with_issue(tmp_path, issue(36, VALID_DIRECT, body=body))
 
-    assert "alpha: tracking.issue-brief-shape" in result.stdout
+    assert "alpha: tracking.closed-fences" in result.stdout
     assert "unclosed" in result.stdout
     assert "missing" not in result.stdout
 
@@ -1589,8 +1696,8 @@ def test_pull_requests_are_ignored(tmp_path: Path) -> None:
     result = run_with_issue(
         tmp_path, issue(11, ["phase:build"], body="", pull_request=True)
     )
-    assert "tracking.tuple-valid" not in result.stdout
-    assert "tracking.issue-brief-shape" not in result.stdout
+    assert "tracking.one-label-from-each-prefix" not in result.stdout
+    assert "tracking.every-build-heading-in-bold" not in result.stdout
 
 
 def _add_origin(repo: Path, url: str) -> None:
@@ -1617,4 +1724,109 @@ def test_ambient_git_dir_does_not_redirect_origin_slug(
     decoy = ambient_git_dir("leaked.txt")
     _add_origin(decoy, "git@github.com:decoy/decoy.git")
 
-    assert workspace_lint.origin_slug(target) == "target/target"
+    assert github.origin_slug(target) == "target/target"
+
+
+# --- the release head ---
+
+LEDGER_ONLY = [{"filename": release.LEDGER}]
+
+
+def use_fake_gh(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, hook_repo: dict[str, object]
+) -> None:
+    """Put the fake gh on PATH, serving ``hook_repo`` as the hook repo's data."""
+    gh_dir, gh_data = make_fake_gh(tmp_path, {release.hook_repo_slug(): hook_repo})
+    monkeypatch.setenv("PATH", f"{gh_dir}:{os.environ['PATH']}")
+    monkeypatch.setenv("FAKE_GH_DATA", str(gh_data))
+
+
+def test_release_head_is_the_published_head_when_it_is_a_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(monkeypatch, tmp_path, {"branches": {"commit": {"sha": "REL"}}})
+    assert release.release_head() == "REL"
+
+
+def test_release_head_steps_back_over_ledger_only_commits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Two update-pins runs recorded in a row on top of the release: both are
+    # bookkeeping, and the sha consumers pin is the one underneath.
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "LEDGER2"}},
+            "commits/LEDGER2": {"files": LEDGER_ONLY, "parents": [{"sha": "LEDGER1"}]},
+            "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
+        },
+    )
+    assert release.release_head() == "REL"
+
+
+def test_release_head_counts_a_commit_touching_the_ledger_and_more_as_a_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "MIXED"}},
+            "commits/MIXED": {
+                "files": [*LEDGER_ONLY, {"filename": "docs/index.md"}],
+                "parents": [{"sha": "REL"}],
+            },
+        },
+    )
+    assert release.release_head() == "MIXED"
+
+
+def test_release_head_refuses_a_ledger_only_merge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "MERGE"}},
+            "commits/MERGE": {
+                "files": LEDGER_ONLY,
+                "parents": [{"sha": "A"}, {"sha": "B"}],
+            },
+        },
+    )
+    with pytest.raises(workspace_lint.ToolError, match="2 parents"):
+        release.release_head()
+
+
+def test_release_head_refuses_an_unreadable_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "REL"}},
+            "commits/REL": "__unreachable__",
+        },
+    )
+    with pytest.raises(workspace_lint.ToolError, match="cannot read commit REL"):
+        release.release_head()
+
+
+def test_the_pin_rule_judges_against_the_release_head_not_the_ledger_commit(
+    tmp_path: Path,
+) -> None:
+    # The consumer pins the release; the ledger commit on top of it is not drift.
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        hook_repo={
+            "branches": {"commit": {"sha": "LEDGER1"}},
+            "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
+        },
+        config=pin_config("REL", "playbook-check"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert workspace_lint.PINNED_HEAD not in result.stdout

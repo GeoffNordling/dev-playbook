@@ -3,9 +3,9 @@
 Renders every base-layer (and, with the python flag, python-layer) file for a
 new workspace repository from the canonical artifacts under
 ``standards/build/canonical/``, then runs the local setup steps: ``git init``,
-``uv lock``, staging, pre-commit hook installation, and a ``playbook-lint``
+``uv lock``, staging, pre-commit hook installation, and a ``playbook check``
 self-check. The GitHub-side tail of the procedure is prose, not code:
-``standards/build/bootstrap.md``.
+``guides/bootstrap.md``.
 """
 
 import argparse
@@ -14,7 +14,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import prose_lint, voice
+from dev_playbook import check_cli, voice
+from dev_playbook.checks.prose import WORKSPACE_WORD, word_pattern
 
 PLAYBOOK_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_DIR = PLAYBOOK_ROOT / "standards" / "build" / "canonical"
@@ -62,18 +63,18 @@ def pinned_rev() -> str:
 
 def render_tree(spec: RepoSpec, rev: str) -> dict[str, str]:
     """Map each file the new repo needs to its content, per the skeleton."""
-    # The name becomes the CLAUDE.md H1, which repo-lint reads as agent-facing
+    # The name becomes the CLAUDE.md H1, which the prose checks read as agent-facing
     # prose. Refuse it here, before anything is written, rather than let the
     # scaffold fail its own self-check with the tree already on disk.
     fault = voice.first_fault(spec.name)
     if fault is not None:
         raise RepoInitError(
-            f"'{spec.name}' would write a CLAUDE.md that repo-lint rejects — "
+            f"'{spec.name}' would write a CLAUDE.md that the prose checks reject — "
             f"{fault}; choose another name"
         )
-    if prose_lint.BANNED_PATTERN.search(spec.name):
+    if word_pattern(WORKSPACE_WORD).search(spec.name):
         raise RepoInitError(
-            f"'{spec.name}' would write a CLAUDE.md that prose-lint rejects — "
+            f"'{spec.name}' would write a CLAUDE.md that the prose checks reject — "
             f"the person is the 'user'; choose another name"
         )
     if spec.python and not spec.package.isidentifier():
@@ -126,8 +127,8 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
 
     Steps: render and write the tree, ``git init -b main``, ``uv lock``
     (python layer only), stage everything, install both pre-commit stages,
-    then run ``playbook-lint`` over the result. The self-check is the whole
-    published hook, not one detector: the scaffold installs that hook, so a
+    then run ``playbook check`` over the result. The self-check is the whole
+    published hook, not one check: the scaffold installs that hook, so a
     narrower check could ship a tree its own first commit rejects. Raises
     ``RepoInitError`` if the target already exists or the self-check reports
     findings; subprocess failures propagate as ``CalledProcessError``.
@@ -141,13 +142,8 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
         _run(["uv", "lock"], target)
     _run(["git", "add", "-A"], target)
     _run(["uvx", "pre-commit", "install"], target)
-    lint = subprocess.run(
-        [str(PLAYBOOK_ROOT / "scripts" / "playbook-lint"), str(target)],
-        cwd=target,
-        check=False,
-    )
-    if lint.returncode != 0:
-        raise RepoInitError("playbook-lint reported findings on the fresh scaffold")
+    if check_cli.run_check(target, False, frozenset()) != 0:
+        raise RepoInitError("playbook check reported findings on the fresh scaffold")
     return target
 
 
@@ -186,8 +182,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(f"initialized {target}")
     print(
-        "next: review and commit, then follow standards/build/bootstrap.md "
-        "for the GitHub tail"
+        "next: review and commit, then follow guides/bootstrap.md for the GitHub tail"
     )
     return 0
 

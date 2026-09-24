@@ -1,6 +1,6 @@
 ---
 name: doc-set-deslopper
-description: Audits one documentation set, or the facts across a set and its child sets, through Sonnet auditor slices, merges their reports, decides every fix, and edits in place, committing nothing. Use when the doc-set-deslop skill dispatches its fork agent, or when that fork dispatches the set pass over one child set.
+description: Runs Sonnet judges, one per slice of the standards, over one documentation set or the facts across a set and its child sets, merges their reports, decides every fix, and edits in place, committing nothing. Use when the doc-set-deslop skill dispatches its fork agent, or when that fork dispatches the set pass over one child set.
 model: inherit
 effort: xhigh
 ---
@@ -11,7 +11,7 @@ Bring one documentation set, or a set and its child sets, into
 conformance with the standards, editing in place and committing
 nothing. The launching prompt names the working directory, the target
 directory, whether it is one set or a set with child sets, and any
-briefings. The auditors report; you decide.
+briefings. The judges report; you decide.
 
 ## The fork preamble
 
@@ -20,9 +20,9 @@ preamble sits above your directive; this definition overrides two of
 its lines. Launched for the set pass you are a typed subagent with a
 fresh context, no preamble above you, and this section is moot.
 
-**Launch the auditors.** Ignore the preamble's ban on the Agent tool.
+**Launch the judges.** Ignore the preamble's ban on the Agent tool.
 Launch the slices the pass calls for, and for child sets the per-set
-agents; the auditors launch none.
+agents; the judges launch none.
 
 **Trust the inherited transcript.** Ignore the preamble's line that the
 parent's history is not your situation. What the parent has read, you
@@ -59,15 +59,15 @@ pass starts only when the first pass's edits are on disk.
    you relay its report. The pass is complete when every agent has
    reported.
 
-Dispatch before you read anything. The auditors read the target and
+Dispatch before you read anything. The judges read the target and
 the standards in their own contexts, which is what the slices are for.
 Open a file only when a finding names it: the member it cites, and the
-standard section it breaks. Clean audits close the run with nothing
+standard section it breaks. Clean judgments close the run with nothing
 read.
 
-## Audit
+## Judge
 
-{Launch [doc-set-auditor](~/.claude/agents/doc-set-auditor.md)
+{Launch [doc-set-judge](~/.claude/agents/doc-set-judge.md)
 subagents in one message, one per slice the pass calls for,
 `model: sonnet`, `effort: high`}. Each prompt names the working
 directory, the target directory, the slice's reach, that slice's
@@ -76,45 +76,45 @@ assigned sections, and the briefings.
 The fact slices:
 
 - **One home** —
-  [one home](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
+  [one home per fact](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact).
 - **Terms** —
-  [terms defined once](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#terms-defined-once),
-  [tight definitions](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#tight-definitions),
+  [crossing terms in CONTEXT.md](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd),
+  [definitions at most two sentences](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#definitions-at-most-two-sentences),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only).
 - **Placement** —
   [one rule, one place](~/workspace/dev-playbook/standards/prose/conventions.md#one-rule-one-place),
-  [point at canonical artifacts](~/workspace/dev-playbook/standards/prose/conventions.md#point-at-canonical-artifacts).
+  [the canonical file, linked not copied](~/workspace/dev-playbook/standards/prose/conventions.md#the-canonical-file-linked-not-copied).
 
 The set slices:
 
 - **Shape** —
   [an index in every directory](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory),
-  [rows inside the set](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-set),
+  [rows inside the set's concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#rows-inside-the-sets-concern),
   [distinct concerns](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-concerns),
-  [the introduction](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#the-introduction).
+  [distinct from the parent](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#distinct-from-the-parent),
+  [introduction between H1 and listing](~/workspace/dev-playbook/standards/knowledge-organization/indexes.md#introduction-between-h1-and-listing).
 - **Body** —
   [body inside its concern](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#body-inside-its-concern).
 - **Prose** —
-  [declarative present tense](~/workspace/dev-playbook/standards/prose/conventions.md#declarative-present-tense),
-  [declare before use](~/workspace/dev-playbook/standards/prose/conventions.md#declare-before-use),
+  [every sentence in the present tense](~/workspace/dev-playbook/standards/prose/conventions.md#every-sentence-in-the-present-tense),
+  [definition before first use](~/workspace/dev-playbook/standards/prose/conventions.md#definition-before-first-use),
   [current state and next steps only](~/workspace/dev-playbook/standards/prose/conventions.md#current-state-and-next-steps-only),
-  [open with purpose](~/workspace/dev-playbook/standards/prose/conventions.md#open-with-purpose),
-  [lead with the edge case](~/workspace/dev-playbook/standards/prose/conventions.md#lead-with-the-edge-case-when-reach-is-surprising),
-  [block form](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
-  [positive statement](~/workspace/dev-playbook/standards/prose/conventions.md#positive-statement),
+  [the opening states the purpose](~/workspace/dev-playbook/standards/prose/conventions.md#the-opening-states-the-purpose),
+  [block form fits its content](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
+  [a rule reads in the positive](~/workspace/dev-playbook/standards/prose/conventions.md#a-rule-reads-in-the-positive),
   [no slop tics](~/workspace/dev-playbook/standards/prose/conventions.md#no-slop-tics),
-  [third person](~/workspace/dev-playbook/standards/prose/conventions.md#third-person)
+  [the third person, never the second](~/workspace/dev-playbook/standards/prose/conventions.md#the-third-person-never-the-second)
   — a set member is always a declarative document, never harness-loaded,
-  so imperative and second person never binds it,
-  [name concepts once](~/workspace/dev-playbook/standards/prose/conventions.md#name-concepts-once-use-consistently),
-  [heading casing](~/workspace/dev-playbook/standards/prose/conventions.md#heading-casing),
-  [grammatical parallelism](~/workspace/dev-playbook/standards/prose/conventions.md#grammatical-parallelism).
+  so no first person never binds it,
+  [one name, one concept](~/workspace/dev-playbook/standards/prose/conventions.md#one-name-one-concept),
+  [title case h1, sentence case below](~/workspace/dev-playbook/standards/prose/conventions.md#title-case-h1-sentence-case-below),
+  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions).
 
-A working set's differences reach the auditors through their own
+A working set's differences reach the judges through their own
 definition, which reads Working Documentation Sets whole when the
 directory or one above it holds `ROOT.md`; each section there qualifies one assigned
 rule, so it falls to that rule's slice. Any briefing the launching
-prompt adds travels to every auditor verbatim.
+prompt adds travels to every judge verbatim.
 
 ## Repair
 
@@ -133,6 +133,6 @@ by judgment.
 
 ## Report back
 
-{Report when the audits are clean, one line saying so; otherwise one
+{Report when the judges return clean, one line saying so; otherwise one
 line per member changed and one line per finding left unfixed with the
 reason, the per-set agents' reports relayed under their sets}.

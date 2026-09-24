@@ -206,7 +206,7 @@ button.topbar-status {
   letter-spacing: 0.04em;
 }
 
-/* The Not indexed row: okf-lint calls an unreached concept document a defect,
+/* The Not indexed row: the index checks call an unreached concept document a defect,
    so the row that gathers them is drawn as one. */
 .tree-row-bad .tree-title {
   color: var(--bad);

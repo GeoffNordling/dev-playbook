@@ -56,7 +56,7 @@ The row is the whole record of a ruling.
 | wayfinder | **verbatim** | 2026-08-01 | — |
 | wizard | reject | 2026-08-28 | Nothing in the workspace references it, and its `template.sh` is past the shell standard's glue-only boundary |
 | writing-beats | reject | 2026-08-01 | Journey-based structure fights the workspace's current-state reference prose |
-| writing-for-agents | **adapt** | 2026-08-28 | Adopted as a harness standard (`standards/harness/writing-for-agents.md`) rather than a skill — the craft layer for any document an agent consumes is rules, and rules live in documents |
+| writing-for-agents | **adapt** | 2026-08-28 | Adopted as a harness standard (`guides/writing-for-agents.md`) rather than a skill — the craft layer for any document an agent consumes is rules, and rules live in documents |
 | writing-fragments | reject | 2026-08-01 | Idea capture lives in mission-control |
 | writing-shape | reject | 2026-08-08 | Sits in upstream's unpromoted `in-progress` tier |
 

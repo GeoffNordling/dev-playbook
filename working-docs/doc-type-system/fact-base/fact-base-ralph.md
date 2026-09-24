@@ -50,7 +50,7 @@ chain extractor set them.
 | frontmatter | Parse YAML frontmatter. `name`, `description`, `type`, `arguments`, `model`, `effort` become attributes; `resource` becomes a resource edge. | yes, md.py |
 | location | `skills/<name>/SKILL.md` is a Skill; `agents/<name>.md` is an Agent. | yes, the runbook shape's `location` predicate |
 | mdlink | Every markdown link `[text](target)` is a links-to edge to the resolved path. `~/.claude/` resolves to `dotfiles/dot-claude/`; `~/workspace/dev-playbook/` resolves to the checkout root. | yes, ref-lint |
-| chain | The runbook encoding's spans, `{Read …}`, `{Run …}`, `{Launch …}`, `{Write …}`, `{Never …}`, `{Report …}`, plus frontmatter `arguments`, yield chain edges with operation, target, and condition, in document order. | yes, chaingen |
+| chain | The runbook encoding's spans, `{Read …}`, `{Run …}`, `{Launch …}`, `{Write …}`, `{Never …}`, `{Report …}`, plus frontmatter `arguments`, yield chain edges with operation, target, and condition, in document order. | no; the deleted `chaingen` is the model |
 | js-meta | For a `.js` under `workflows/`, parse the `export const meta` literal and the `ARG_TYPES` literal. Name, description, and args become attributes. | no |
 | launch-literal | A fenced code block containing `Workflow({ name: "<x>"` yields a launches edge to `workflows/<x>.js`. | no, and it is fragile |
 

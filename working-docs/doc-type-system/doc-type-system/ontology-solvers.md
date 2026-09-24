@@ -16,14 +16,14 @@ repository shows. Speculative, per
 Nothing here is decided; the one question it raises is in the top
 root's [Open](/working-docs/doc-type-system/ROOT.md#open).
 
-## Source
+## The source is one recorded talk
 
 Frank Coyle, "Agents and Ontologies," recorded in mission-control at
 `ideas/ontology-guardrails.md` on 2026-07-27. No link or venue was
 recorded. The claim: a formal ontology outside the model as logical
 guardrails, probabilistic reasoning inside, logic outside. Pydantic at
 the door, ontology at the ledger; a failed check loops back to the
-model or escalates to the owner. That last sentence is act, check,
+model or escalates to the owner. That last sentence is act, verify,
 yield.
 
 ## The theory, in industry terms
@@ -32,7 +32,7 @@ yield.
   fact base is an ABox.
 - **TBox.** The schema: classes, properties with a domain and a range,
   a class hierarchy. RDFS. The doc-types are a TBox: `Runbook`,
-  `Standard`, `Loop` are classes; the ten verbs are properties with
+  `Standard`, `Explanation`, `Guide`, `Loop` are classes; the twelve verbs are properties with
   domains and ranges.
 - **Axioms.** OWL adds what the schema cannot say: functional
   properties (an order has at most one refund), disjoint classes
@@ -44,7 +44,7 @@ yield.
   behind a contradiction, is available and slower.
 - **SHACL.** Closed-world validation, a shape per node type, a report
   naming node, shape, property, and message per violation. A Standard's
-  rules are shapes; audit is the SHACL run; a violation is a finding
+  rules are shapes; verification is the SHACL run; a violation is a finding
   with a receipt.
 - **The open-world caveat.** An OWL reasoner treats an unstated fact
   as unknown, not false, and infers around a missing field. Checks

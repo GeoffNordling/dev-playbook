@@ -1,163 +1,259 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Doc Conventions
-description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics
-population: "an authored document, except type: Reference and the paths in .prose-lint-exempt"
+description: How Markdown docs are written — the rules an authored document obeys on contents, opening, voice, naming, and mechanics, and the form of the repo's vocabulary file
+population: "an authored document and, for the two word rules, every tracked text file, except type: Mirror, the paths in .prose-lint-exempt, and the two declaration files .prose-lint-exempt and .prose-lint-vocabulary"
 ---
 
 # Doc Conventions
 
 How Markdown documents in workspace repos are written. Every authored
-document is bound, except one carrying `type: Reference` frontmatter — a
+document is bound, except one carrying `type: Mirror` frontmatter — a
 verbatim mirror of an external text, which keeps its author's words wherever
 it lives. A repo exempts any further path by listing it in a tracked
-`.prose-lint-exempt` at its root, under a comment saying why.
+`.prose-lint-exempt` at its root, under a comment saying why, and bans
+words of its own, in all or part of its tree, by declaring each with its
+replacement in a tracked `.prose-lint-vocabulary` at its root. The two
+word rules read every tracked file except those two declaration files,
+which must spell the words they ban, and except a binary file, one
+holding a zero byte.
 
 ## One rule, one place
 
-Each rule lives in the lead sentence of its section. If the lead carries the
-rule, the section can stop there. Section size matches topic size.
+Each rule the document states lives in the lead sentence of one section, and no other section of the document states it again; the section's own heading, which names that same rule, sits inside that one place. Exempt: a statement of the document's own scope, which sits in the section under the H1.
 
-Across documents the same rule is Documentation Sets'
-[one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home).
+`prose.one-rule-one-place` · stochastic
+
+> **Why.** A section can stop at its lead when the lead carries the
+> whole rule, so section size matches topic size and a reader who skims
+> the leads reads every rule. A heading compressing that same rule is
+> the section's name for it, so a heading and a lead that say the same
+> thing are one place, not two; the second place this bars is another
+> section, or another document, where the copies drift apart.
 
 ## Current state and next steps only
 
-A document describes what exists and what's planned next, and doesn't
-reference removed things, past state, or rejected alternatives.
-[Changelog residue](/standards/prose/slop-tics.md#changelog-residue) names
-the forms this takes.
-History earns a sentence only when the present is unintelligible without
-it — a constraint that still binds, a decision that still governs.
+The document describes what exists and what is planned next, and does not
+reference removed things, past state, or rejected alternatives. History earns
+a sentence only where the present is unintelligible without it — a constraint
+that still binds, a decision that still governs. A numbered Decision Record
+is exempt.
 
-Decision Records are the exception. A Decision Record in `docs/decisions/` is a
-dated record of a past decision — the choice made, the alternatives rejected,
-the context that forced it — and is never rewritten to match later state.
+`prose.current-state-and-next-steps-only` · stochastic
 
-## Point at canonical artifacts
+> **Why.** A Decision Record is exempt because it is a dated record of
+> a past decision, frozen after merge.
 
-When a real file IS the standard, the doc references that file instead of
-restating its contents, in the form
-[Cross-References](/standards/knowledge-organization/cross-references.md)
-sets.
+## The canonical file, linked not copied
 
-## Open with purpose
+Where a file is itself the standard, the document links that file rather than reproducing its contents; naming one entry as a worked example is not reproduction.
 
-The opening states what the document is for and what a reader should be able
-to do after reading. It says why that matters before the reader thinks to ask,
-and addresses a reader with no prior conversation context.
+`prose.the-canonical-file-linked-not-copied` · stochastic
 
-## Declare before use
+> **Why.** A restated copy drifts from the file it restates.
+
+## The opening states the purpose
+
+The opening states what the document is for and what a reader should be able to do after reading; an `index.md` and a `README.md` answer instead to the opening-sentence and purpose-sentence rules of the knowledge-organization Standard.
+
+`prose.the-opening-states-the-purpose` · stochastic
+
+## Definition before first use
 
 A concept is defined before the prose leans on it — the definition sits above
-its first use. A concept another document defines is linked at first use.
+its first use.
 
-## Lead with the edge case when reach is surprising
-
-A rule with surprising scope names the edge case in the lede: "These
-conventions apply to every Python sub-project, including script-only ones
-with no `src/`."
+`prose.definition-before-first-use` · stochastic
 
 ## Block form fits its content
 
-A block's form fits what it holds: prose for an argument, a list for
-parallel items, a table for repeated structure, a callout for an aside,
-a quote for wording that is the point, and a code block for code that
-runs or spans lines. The pairs:
+A block's form fits what it holds: prose for an argument, a list for parallel
+items, a table for repeated structure, a callout for an aside, a quote for
+wording that is the point, and a code block for code that runs or spans lines.
+The pairs:
 
 - **Prose vs list.** Prose carries an argument; a list carries parallel items.
-  Items that aren't genuinely parallel read better as prose.
-- **Inline vs callout.** A callout earns the break in flow when the aside would
-  derail the argument inline.
-- **Table vs repeated structure.** The same shape with the same fields three or
-  more times is a table; anything fewer or uneven is prose with bold leads.
+  Items that are not parallel are prose.
+- **Inline vs callout.** A callout earns the break in flow where the aside
+  would derail the argument inline.
+- **Table vs repeated structure.** The same shape with the same fields two or more times is a table; anything fewer or uneven is prose with bold leads.
 - **Quote vs paraphrase.** The quote goes where the original wording is the
   point; the paraphrase where only the idea is.
-- **Code block vs inline code.** Multi-line, runnable, or illustrative goes in a
-  block; a single token or identifier stays inline.
+- **Code block vs inline code.** Multi-line, runnable, or illustrative code goes
+  in a block; a single token or identifier stays inline.
 
-## Declarative present tense
+`prose.block-form-fits-its-content` · stochastic
 
-"The symlink is relative." Not "We make the symlink relative."
+## Every sentence in the present tense
 
-A member of a
-[working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
-may write a guess as a guess.
+Every sentence is in the present tense, except a sentence reporting a measurement or an incident that happened, and except in a member of a working documentation set, which may write a guess as a guess.
 
-## Positive statement
+`prose.every-sentence-in-the-present-tense` · stochastic
 
-Rules read in the positive: what to do, where a thing lives. "Runnables
-live in `scripts/`", not "don't put runnables elsewhere". A prohibition
-appears only when the prohibition itself is the rule.
+## A rule reads in the positive
+
+A rule reads in the positive — what to do, where a thing lives — and a
+prohibition appears only where the prohibition itself is the rule.
+
+`prose.a-rule-reads-in-the-positive` · stochastic
 
 ## No slop tics
 
-A document commits none of the tics
-[Slop Tics](/standards/prose/slop-tics.md) names.
+The document commits none of the tics
+[Slop Tics](/guides/slop-tics.md) names.
 
-The catalog is the rule's content: each tic's definition, the action that
-removes it, and before-and-after examples. The document-remove-tics skill
-rewrites a document against it on demand
-([Prose](/standards/prose/card.md#enforce)).
+`prose.no-slop-tics` · stochastic
 
 ## Harness-loaded agent instructions
 
-The runbook and context members of the Claude Code file registry
-([files.md](/standards/harness/files.md)): documents addressed *to* the
-executing agent.
+The document is a harness-loaded agent instruction: it is a `CLAUDE.md`, or
+a segment of its path inside the repository is `skills`, `rules`, or
+`agents`.
 
-### Imperative and second person
+### No first person
 
-A harness-loaded agent instruction speaks in the imperative and `you`, and
-never in the first person: no `I`, `me`, or `my`. A first-person sentence
-puts the document in the agent's mouth, which inverts who is instructing
-whom.
+The document does not contain the word `I`, `me`, or `my`, in its
+frontmatter or its body. Exempt: `I` in `I/O`, and a word inside
+double quotes, an inline code span, or a fenced block.
 
-The ban governs the document's own voice: a double-quoted utterance is exempt.
-The phrasing a user types to trigger a skill, or the reaction a prototype
-exists to provoke, appears in their words — `"Show me a few options before
-I commit."` — while the surrounding prose stays imperative. A
-runbook's frontmatter is not exempt: its `description` is prose the agent
-reads to choose the runbook, so it answers to the same voice as the body.
+`prose.no-first-person` · deterministic
+
+> **Why.** A harness-loaded agent instruction is addressed to the
+> executing agent, so a first-person sentence puts the document in the
+> agent's mouth and inverts who is instructing whom. The ban governs
+> the document's own voice: a quoted utterance is another speaker's,
+> while a runbook's `description` is the document speaking.
 
 ## Declarative documents
 
-Every authored document outside the harness registry: a document that
-states facts to a reader.
+The document is a declarative document: it is not a `CLAUDE.md`, and no
+segment of its path inside the repository is `skills`, `rules`, or `agents`.
 
-### Third person
+### The third person, never the second
 
-A declarative document speaks in the third person, with no `you`.
+A declarative document speaks in the declarative mood and the third
+person, and does not address the reader as `you`. Exempt: a
+double-quoted utterance, and a name an encoding reads from a body as
+an action, such as a Guide step's bold run, which speaks in the
+imperative.
 
-The ban governs the document's own voice: a double-quoted utterance is
-exempt, the same as in a harness-loaded instruction.
+`prose.the-third-person-never-the-second` · stochastic
 
-## Name concepts once, use consistently
+> **Why.** A step names an action the reader performs, and the
+> imperative is the mood that names an action; the encoding reads that
+> name out of the body, so it is a name and not the prose around it.
 
-One name per concept holds across the document. The repo's root
-[`CONTEXT.md`](/CONTEXT.md) holds the established vocabulary; a doc uses its
-terms where they apply, with no obligation to extend it.
+## One name, one concept
 
-## Terminology: the person is the user
+One name per concept holds across the document.
 
-One actor — the dispatcher, reviewer, and approver — is the `user` in every
-authored file, never a synonym, in any case, plural, or compound.
+`prose.one-name-one-concept` · stochastic
 
-## Spelling
+## The person is the user
 
-House spelling is American English: `judgment`, not `judgement` — and
-`judgments`, not `judgements`.
+One actor, the dispatcher, reviewer, and approver, is the `user` throughout the document, its frontmatter, code spans, and fenced blocks included, never a synonym, in any case, plural, or compound. A numbered Decision Record is exempt.
 
-## Heading casing
+`prose.the-person-is-the-user` · stochastic
 
-H1 uses Title Case. H2 and below use sentence case.
-`# File Skeleton` at H1; `## Authored, not generated` at H2.
+## No banned word
 
-Proper nouns and code identifiers keep their native case at every level:
-`# CLAUDE.md Content`, `## pyproject.toml`, `### Ask in prose, never AskUserQuestion`.
+The file does not contain the workspace's banned word, singular
+or plural, in any case, frontmatter, code spans, and fenced blocks
+included. The match is a whole word: the word joined to another
+by a hyphen or a space fails, the word inside a longer word passes.
 
-## Grammatical parallelism
+`prose.no-banned-word` · deterministic
 
-Items that sit together take the same grammatical shape: the headings of a
-document, the bullets of a list, the clauses of a sentence. One form holds
-throughout, so a break in the pattern marks a break in meaning.
+> **Why.** The banned word is `human`, the synonym for the `user` that
+> recurs; a ban over every tracked file holds the line in code and
+> config, where the stochastic rule on the person's name is not run.
+
+## No word the repo bans
+
+For each word in the repo's `.prose-lint-vocabulary`, no tracked
+file under a directory listed for that word contains the word, bare
+or plural, in any case, frontmatter, code spans, and fenced blocks
+included. A word with no directory listed is banned in every
+tracked file.
+
+`prose.no-word-the-repo-bans` · deterministic
+
+> **Why.** The directories an entry names hold a term to the part of
+> the tree that defines it, and leave the word alone where it means
+> something else.
+
+## The vocabulary file is well formed
+
+`.prose-lint-vocabulary`, where the repo has one, is a YAML
+mapping. Each key is a word the workspace does not already ban. Each
+value has a `say` string and, optionally, a `where` list of
+directories that exist in the repo, and no other key.
+
+`prose.the-vocabulary-file-is-well-formed` · deterministic
+
+> **Why.** An entry the check cannot read bans nothing, so a malformed
+> file would pass every file it meant to hold; the fault is reported
+> where the entry sits instead.
+
+## Judgment, not judgement
+
+The document's prose spells `judgment`, never the British `judgement` or
+`judgements`, in any case. Exempt: the frontmatter, an inline code span, and a
+fenced block.
+
+`prose.judgment-not-judgement` · deterministic
+
+## Title Case H1, sentence case below
+
+The H1 is in Title Case and every heading below it is in sentence case, except
+that a proper noun or a code identifier keeps its native case at any level, and
+the `Considered Options` heading of a Decision Record is exempt.
+
+`prose.title-case-h1-sentence-case-below` · stochastic
+
+## Headings are propositions
+
+Each heading below the H1 is a proposition the section establishes, in
+the third person. Two headings inside any document name something else,
+and a proposition would displace what they name:
+
+- **The imperative** names an action: a name an encoding reads from a
+  body, such as a Guide step's bold run.
+- **The case** names what a scope binds: a heading that states no point
+  of its own and only scopes the sections under it.
+
+A third form is the document's, not a heading's. Where every section
+below the H1 opens with the same definition run, each heading in that
+document names the term its own section defines. Where one section does
+not open that way, no heading in it takes this form — a heading is
+never exempt for resisting a proposition.
+
+Every form is written in block language — the register of headlines,
+articles and copulas dropped — in the fewest words that carry the
+point, a noun phrase wherever one carries it.
+
+The verdicts, over one rule:
+
+| Heading | Verdict |
+|---|---|
+| `Judgment, not judgement` | passes: the proposition, its verb dropped |
+| `The prose spells judgment` | passes: the proposition, third person |
+| `Spelling` | fails: the topic named |
+| `Write judgment, not judgement` | fails: the imperative, which addresses the reader |
+| `The prose spells judgment and never the British judgement` | fails: the predicate restated |
+
+[Slop Tics](/guides/slop-tics.md) is such a document: its fifteen
+sections open with `**Definition.**`, so `Flourish` names the term, and
+`The ordinary word, not the flourish` would put the fix where the name
+belongs.
+
+`prose.headings-are-propositions` · stochastic
+
+> **Why.** A parse shows the headings and nothing beneath them, so read
+> alone and in order the propositions are the document's argument; a
+> topic name is only its table of contents, and a restated predicate is
+> a second body. Where the sections define terms, the headings are the
+> vocabulary the rest of the repo speaks, and a reader looks one up
+> rather than reading them in order, so a proposition in that place
+> costs the name and buys no argument.
+

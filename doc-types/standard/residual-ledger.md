@@ -1,30 +1,25 @@
 ---
 type: General-Sheet
 title: Standard Residual Ledger
-description: Standard's residual record — what four cells and a ruleset cannot express, one entry per card or ruleset that has one
+description: Standard's residual record — what the Standard shape cannot express, one entry per Standard that has one
 ---
 
 # Standard Residual Ledger
 
 Standard's residual record: what
-[four cells and a ruleset](/doc-types/standard/contract-shape.md)
+[the Standard shape](/doc-types/standard/contract-shape.md)
 cannot express. That is all an entry is — a record.
 
-## Cards
+## Standards
 
-Empty: every card in the catalog fits the four cells whole, and that is
-a record, not an omission.
-
-## Rulesets
-
-Per ruleset ported to the encoding: what the rewrite could not express,
+Per Standard ported to the encoding: what the rewrite could not express,
 recognized and written down at the moment of porting. Entries name
 populations, rules, and conditions in the vocabulary
 [encoding.md](/doc-types/standard/encoding.md) declares.
 
 An entry is a couple of sentences, hard limit: name each specific thing
 the file could not express and why the shape cannot say it, nothing
-else. A ruleset with nothing to record has no entry.
+else. A Standard with nothing to record has no entry.
 
 ### build/skeleton
 
@@ -56,13 +51,6 @@ Could not express the tics by name: No slop tics points at the catalog,
 so the fifteen names sit below the view, the way the canonical files'
 contents sit below Canonical Artifacts.
 
-### standard/gates
-
-Could not express a population of three fixed members: the phrase names
-the class, and the three are named only in the Three rungs predicate.
-Could not express the red-CI rule over a gate's state: its object is a
-pull request, so it binds a member outside the population.
-
 ### distribution/channel
 
 Could not express one class of object: the population spans four kinds
@@ -74,7 +62,7 @@ object in a tree: its member is one line of workspace-lint's source.
 
 Could not express The only future-work file over the member: its objects
 are the rogue `ROADMAP.md` and its kin elsewhere in the tree, so it binds
-a member outside the population, the way Gates' red-CI rule does.
+a member outside the population.
 
 ### tracking/issue-shapes
 
@@ -130,7 +118,7 @@ carries none of them.
 
 Could not express the contiguity half of Sequential numbering over one
 member: a gap is a property of the whole directory, which is why
-decisions-lint reports it against `docs/decisions/` and not a file.
+the numbering check reports it against `docs/decisions/` and not a file.
 Could not express The directory over the member: its object is the
 directory that holds the population, the way Repository Settings'
 GitHub origin binds the clone. Could not express the obligation that a
@@ -150,19 +138,4 @@ it out.
 Could not express the invocation mode as a condition without three
 restated conditions, so the fork sits inside Description's predicate.
 Could not give the no-`SKILL.md` directory and the 500-line advisory a
-lint partner: both emit no rule id. Could not give Carries its chain an
-Audit pointer: `chaingen --check` answers no `--list-rules`.
-
-### standard/cards
-
-Could not express one class of object: the population is the cards and
-the index listing them, joined only by the tree. Could not express the
-dev-playbook meta-card lead slot as a condition; it is a clause of The
-catalog.
-
-### standard/detectors
-
-Could not express Verbatim content over a consumer's script: it names
-`src/dev_playbook/external.py`, which only dev-playbook imports. Could
-not express the optional-surface fork of Wired throughout its scope as
-a condition: it is a fact about the population, not the detector.
+check: both emit no rule id.

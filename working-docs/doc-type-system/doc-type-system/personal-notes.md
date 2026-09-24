@@ -38,3 +38,7 @@ Six more, shorter, from the same conversations:
   distribution, the predicates describe the distribution."
 - **Spec-driven development led me astray**, and Matt Pocock's specs as
   "targets in his state space."
+
+## Acronyms
+
+- **LLM** — Large Language Model.

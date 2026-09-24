@@ -1,130 +1,27 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: File Skeleton
-description: The tree a governed repo carries — the entries every repo requires, keeps at the root, and forbids, and the entries each layer adds, with worked trees
+description: The tree a governed repo carries — the entries every repo requires, keeps at the root, and forbids, and the entries each layer adds
 population: "a governed repo's tree, except standards/build/canonical/ in dev-playbook"
 ---
 
 # File Skeleton
 
 The entries a governed repo's tree requires, permits, and forbids. Every
-repo on the [roster](/standards/distribution/channel.md#the-roster) is
-bound. A rule under no condition binds every repo, the base layer; each
+governed repo is bound. A rule under no condition binds every repo, the
+base layer; each
 condition is a further layer, and a repo is in every layer whose test its
-tree meets, inferred from facts on disk, never declared.
-`standards/build/canonical/` in dev-playbook is quoted material, the source
-of the [canonical artifacts](/standards/build/canonical.md), and no tree
-rule reads it. `repo-lint` is the authority on conformance
-([Build](/standards/build/card.md)).
+tree meets, inferred from facts on disk, never declared. An entry no rule
+names is free. `standards/build/canonical/` in dev-playbook is quoted
+material, the source of the
+[canonical artifacts](/standards/build/canonical.md), and no tree rule
+reads it.
 
-## Required files
+## Files every repo carries
 
 `README.md`, `CLAUDE.md`, `index.md`, `.gitignore`,
 `.pre-commit-config.yaml`, and `Makefile` exist at the root, and
 `.github/workflows/ci.yml` exists.
-
-What each holds is another Standard's rule:
-
-- `README.md` —
-  [README Content](/standards/knowledge-organization/readme-content.md).
-- `CLAUDE.md` —
-  [CLAUDE.md Content](/standards/harness/claude-content.md).
-- `index.md` — [Indexes](/standards/knowledge-organization/indexes.md),
-  which also places the further indexes wherever concept documents live.
-- `.gitignore`, `.pre-commit-config.yaml`, `Makefile`, and `ci.yml` —
-  [Canonical Artifacts](/standards/build/canonical.md), one rule per file.
-
-## Root-only files
-
-`pyproject.toml`, `CONTEXT.md`, and `CANDIDATES.md` appear at the root or
-not at all, one of each.
-
-`CONTEXT.md` is the vocabulary center
-([CONTEXT.md Content](/standards/knowledge-organization/context-content.md));
-`CANDIDATES.md` is the register of uncommitted future work
-([Candidates](/standards/tracking/candidates.md)); `pyproject.toml` is the
-one Python project ([The Python Project](/standards/build/python.md)).
-
-## Runnables live in scripts/
-
-Checked-in runnables, in any language, live in `scripts/`; no `bin/` or
-`tools/` directory exists at the root.
-
-Shell in `scripts/` is gated by shellcheck and shfmt
-([Shell](/standards/shell/card.md)); Python in `scripts/` is bound by
-[The Python Project](/standards/build/python.md#scripts).
-
-## Dependencies live in pyproject.toml
-
-Dependencies are declared in `pyproject.toml` and locked in `uv.lock`; no
-`requirements.txt` exists anywhere in the tree.
-
-## Python
-
-A repo in which `pyproject.toml` exists at the root.
-
-### uv.lock and .python-version
-
-`uv.lock` is tracked and `.python-version` exists, both at the root.
-
-`.python-version` is a
-[canonical artifact](/standards/build/canonical.md#python-version).
-
-## Python package
-
-A Python repo in which `src/` exists.
-
-`src/` is the default source root of most JavaScript build tools as
-well, so the condition is a conjunction: a repo without `pyproject.toml`
-is not Python, whatever it keeps in `src/`.
-
-### One package under src/
-
-`src/` holds exactly one directory, the import package the
-[name mapping](/standards/build/python.md#name-mapping) names.
-
-## Python source
-
-A repo in which `src/` exists beside a root `pyproject.toml`, or `scripts/`
-holds a `.py` file.
-
-### tests/ present
-
-`tests/` exists and is not empty.
-
-Its content is [Testing Conventions](/standards/testing/conventions.md).
-
-## JavaScript
-
-A repo in which `package.json` exists at the root.
-
-### Lockfile committed
-
-A lockfile, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock`,
-or `bun.lockb`, is tracked beside `package.json`.
-
-## Additions are free
-
-An entry no rule names is free: a tree is rejected only for a required
-entry absent, a root-only entry elsewhere, a forbidden entry present, or a
-canonical copy drifted.
-
-Entries a repo carries when it has the content, each governed by the
-Standard that owns the content:
-
-- `artifacts.mk` — the build products the gate needs that git does not
-  carry ([Canonical Artifacts](/standards/build/canonical.md#artifactsmk)).
-- `docs/` — guides and surveys that outgrow the README, each an OKF concept
-  document.
-- `docs/decisions/` — Decision Records
-  ([Decision Record Conventions](/standards/decisions/records.md)).
-- `working-docs/` — the working documentation sets, one directory per
-  line of work, each kept as long as its work runs
-  ([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#where-a-set-lives)).
-- `.claude/` — Claude Code files ([Harness Files](/standards/harness/index.md));
-  `worktrees/` under it is gitignored.
-
-A base tree:
 
 ```
 <repo>/
@@ -139,7 +36,61 @@ A base tree:
 └── scripts/            # optional — shell here, gated by shellcheck and shfmt
 ```
 
-A full stack, Python with a package and scripts:
+`build.files-every-repo-carries` · deterministic
+
+## One at the root, or none
+
+`pyproject.toml`, `CONTEXT.md`, and `CANDIDATES.md` appear at the root or
+not at all, one of each.
+
+`build.one-at-the-root-or-none` · deterministic
+
+## No other future-work file
+
+No file named `ROADMAP.md`, `TODO.md`, `BACKLOG.md`, or `IDEAS.md` exists
+at any depth in the tree.
+
+`build.no-other-future-work-file` · deterministic
+
+## Runnables live in scripts/
+
+No `bin/` directory and no `tools/` directory exists at the root.
+
+`build.runnables-live-in-scripts` · deterministic
+
+## scripts/ holds only scripts
+
+Every file under `scripts/` has a name ending in `.py`, `.sh`, or `.md`,
+or a name with no dot and `#!/usr/bin/env -S uv run --script` as its
+first line.
+
+`build.scripts-holds-only-scripts` · deterministic
+
+> **Why.** The canonical
+> [pyproject.toml](/standards/build/canonical/pyproject.toml) has ruff
+> read every file under `scripts/` as Python except a `.sh` file and a
+> `.md` file, so a name with no dot says the file is a uv Python script,
+> and a file of any other kind lives elsewhere.
+
+## Dependencies live in pyproject.toml
+
+No file named `requirements.txt` exists anywhere in the tree.
+
+`build.dependencies-live-in-pyprojecttoml` · deterministic
+
+## Python
+
+A repo in which `pyproject.toml` exists at the root.
+
+### Lock file tracked, Python version pinned
+
+`uv.lock` is tracked and `.python-version` exists, both at the root.
+
+`build.lock-file-tracked-python-version-pinned` · deterministic
+
+## Python package
+
+A Python repo in which `src/` exists.
 
 ```
 <repo>/
@@ -161,3 +112,21 @@ A full stack, Python with a package and scripts:
 │   └── __init__.py     # empty
 └── tests/
 ```
+
+### One package under src/
+
+`src/` holds exactly one entry: a directory whose name is the import
+package [The Python Project](/standards/build/python.md#the-repo-directory-names-the-project-and-package) names.
+
+`build.one-package-under-src` · deterministic
+
+## Python source
+
+A repo in which `src/` exists beside a root `pyproject.toml`, or
+`scripts/` holds a [Python file](/standards/build/python.md#scripts).
+
+### tests/ present
+
+`tests/` exists and is not empty.
+
+`build.tests-present` · deterministic

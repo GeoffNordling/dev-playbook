@@ -21,13 +21,13 @@ Wayfinder is **planning** by default: each ticket resolves a decision, and the m
 
 Every map and ticket is an issue, so it has a **name** — its title. In everything the user reads — narration, the map's Decisions-so-far — refer to it by that name, never by a bare id, number, or slug. A wall of `#42, #43, #44` is illegible; names read at a glance. The id and URL don't vanish — a name wraps its link — but they ride _inside_ the name, never stand in for it.
 
-## The Map
+## The map
 
 The map is a single issue on this repo's issue tracker, labelled `wayfinder:map` — the canonical artifact. Its tickets are child issues of the map.
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** {Read [linking issues](~/workspace/dev-playbook/standards/tracking/linking-issues.md) for the sub-issue, blocked-by, and open sub-issues calls _this_ repo's tracker uses}.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** {Read [linking issues](~/workspace/dev-playbook/guides/linking-issues.md) for the sub-issue, blocked-by, and open sub-issues calls _this_ repo's tracker uses}.
 
 ### The map body
 
@@ -67,7 +67,7 @@ Each ticket is a **child issue** of the map; the tracker's issue id is its ident
 <the decision or investigation this ticket resolves>
 ```
 
-Each ticket carries a `wayfinder:<type>` label — one of `research`, `prototype`, `grilling`, `task` (see [Ticket Types](#ticket-types)).
+Each ticket carries a `wayfinder:<type>` label — one of `research`, `prototype`, `grilling`, `task` (see [Ticket types](#ticket-types)).
 
 A session **claims** a ticket by assigning it to the dev driving the map, **first**, before any work, so concurrent sessions skip it. That assignee _is_ the claim: an open, unassigned ticket is unclaimed.
 
@@ -75,7 +75,7 @@ Blocking uses the tracker's **native** dependency relationship — essential bec
 
 The answer isn't part of the body — it's recorded on resolution (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
 
-## Ticket Types
+## Ticket types
 
 Every ticket is either **HITL** — the user in the loop, worked _with_ the user, who speaks for themselves — or **AFK**, driven by the agent alone. A HITL ticket only resolves through that live exchange; the agent never stands in for the user's side of it (a grilling agent that answers its own questions has broken this).
 

@@ -57,8 +57,8 @@ and writing a TypeScript file per run to do it. Declined on that alone.
   program beside the agent, with all its traffic passing through — every
   destination checked against a list we maintain. Worth having eventually, so a
   hijacked agent can't phone home. Deferred because a missing entry doesn't
-  announce itself: the agent stalls or reports something unrelated, and you
-  debug the wrong thing.
+  announce itself: the agent stalls or reports something unrelated, and the
+  wrong thing is debugged.
 
 ## Open
 

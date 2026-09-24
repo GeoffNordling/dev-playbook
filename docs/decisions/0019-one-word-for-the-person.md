@@ -30,7 +30,7 @@ The split cost more than it bought, in both directions:
 - **Review friction ran both ways.** A doc using the agent-facing word and a
   skill using the declarative one were each a finding, so the convention
   generated corrections in two directions instead of one.
-- **The rule could only be enforced on half the repo.** `repo-lint` banned the
+- **The rule could only be enforced on half the repo.** The structure detector banned the
   second noun inside agent-facing files, because that is the only side where
   the correct word was unambiguous. Everywhere else the convention was prose
   the reviewer upheld by eye.
@@ -80,11 +80,11 @@ quotation of an external source.
 
 ### The enforcing lint landed with the swap
 
-The half-repo check was replaced rather than left standing. `prose-lint` gained
+The half-repo check was replaced rather than left standing. The prose checks gained
 `prose.banned-word`, a deterministic ban over **every tracked file** of any
 type — no code-span and no fence escape, since a banned word inside backticks
 is still the word — with the vendored and verbatim-mirror exemptions above.
-`repo-lint`'s `agent-facing-voice` check narrowed to the first person it still
+The structure detector's `agent-facing-voice` check narrowed to the first person it still
 owns, and `dev_playbook.voice` narrowed with it; `repo-init` consults the ban
 before scaffolding, so a repo name carrying the noun is refused up front.
 
@@ -102,7 +102,7 @@ kind of thing:
   the word today; the ban has no opinion about them, because the swap never
   claimed them either.
 - **Exempted inside scope.** Exactly two authored files are excused by name:
-  the detector `src/dev_playbook/prose_lint.py` and its test, which must spell
+  the check module `src/dev_playbook/checks/prose.py` and the Standard, which must spell
   the word to ban it. That roster is a constant in the detector rather than a
   convention, so a third exemption is a code change and a visible one.
 
@@ -143,7 +143,7 @@ Any individual file's pre-swap text is `git show 207a1bf:<path>`.
   exception for quotations. Cite the upstream source, not this record, when the
   exact wording matters.
 - **Every consumer repo inherits the ban at its next pin bump.** The published
-  `playbook-lint` hook dispatches `prose-lint`, so a consumer that bumps its
+  `playbook-lint` hook runs the prose checks, so a consumer that bumps its
   dev-playbook `rev` starts failing its own commit gate on every occurrence it
   carries. Each repo needs its own swap before it bumps
   ([distribution.md](/standards/build/distribution.md)).

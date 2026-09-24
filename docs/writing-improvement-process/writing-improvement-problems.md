@@ -14,7 +14,7 @@ when it recurs; a countermeasure, once built, is linked from its entry.
 
 **Definition.** Sentence-level style patterns: changelog residue,
 contrast pairs, closing cadence, and the rest. The named tics live in
-[slop-tics.md](/standards/prose/slop-tics.md).
+[slop-tics.md](/guides/slop-tics.md).
 
 **Action.** `/document-remove-tics` dispatches the tics-remover agent to
 remove them from a document.
@@ -36,17 +36,17 @@ to be reminded.
   injection, hooks, etc.), see the official skill and subagent
   documentation." → **After** deleted.
 
-## Enforcement meta-commentary
+## Verifier meta-commentary
 
-**Definition.** Declaring the document binding, or naming the lint that
-enforces it.
+**Definition.** Declaring the document binding, or naming the check that
+decides it.
 
 **Action.** Delete the sentence. The purpose of a document does not include
-documenting its own external validators.
+documenting its own verifiers.
 
 **Examples.**
 
-- **Before** "This standard is binding, and harness-files-lint enforces
+- **Before** "This standard is binding, and its check runs
   it at the commit gate." → **After** deleted.
 
 ## Relationship meta-commentary
@@ -76,7 +76,7 @@ Never duplicate facts across multiple documents.
 
 - **Before** "A runbook is harness-owned — Claude Code loads it as
   configuration, not as prose to learn from — so it is not an OKF
-  concept document." (the file-roles standard owns this) → **After**
+  concept document." (Document Types owns this) → **After**
   deleted.
 
 ## Section-scale duplication

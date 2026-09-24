@@ -1,11 +1,10 @@
-"""GNU-format finding rendering shared by the workspace detectors.
+"""GNU-format finding rendering, shared by playbook check, loop-lint, and workspace-lint.
 
-Every detector emits findings in the one format the meta-standard's detector
-contract fixes (standards/standard/detectors.md): ``location:line: card.rule
-message`` — a colon
-after the location, single spaces, a repo-relative path; ``:line`` omitted for a
-file-level finding. Rendering lives here so the format is defined once and
-cannot drift between the detectors that consume it.
+Every check prints findings in the one format guides/writing-a-check.md gives:
+``location:line: name.rule message`` — a colon after the location, single
+spaces, a repo-relative path; ``:line`` omitted for a file-level finding.
+Rendering lives here so the format is defined once and cannot drift between the
+commands that print it.
 """
 
 from collections.abc import Iterable
@@ -14,7 +13,7 @@ from collections.abc import Iterable
 def render(location: str, rule: str, message: str, line: int | None = None) -> str:
     """One finding line in GNU format.
 
-    ``location`` is a repo-relative path (or, for workspace-lint, the audited
+    ``location`` is a repo-relative path (or, for workspace-lint, the checked
     repo's name). ``line`` is the 1-based line number; omit it (``None``) for a
     file-level finding, which drops the ``:line`` segment entirely.
     """
@@ -23,11 +22,10 @@ def render(location: str, rule: str, message: str, line: int | None = None) -> s
 
 
 def print_rules(rules: Iterable[str]) -> int:
-    """Print a detector's rule ids, one per line, sorted and deduplicated.
+    """Print a command's rule ids, one per line, sorted and deduplicated.
 
-    The shared body of every detector's ``--list-rules`` flag: it needs no
-    repository and runs from any cwd, so the card↔rule matrix detector can
-    enumerate the fleet's rules. Returns 0, the flag's exit code.
+    The shared body of the ``--list-rules`` flag of loop-lint and
+    workspace-lint: it needs no repository and runs from any cwd. Returns 0, the flag's exit code.
     """
     for rule in sorted(set(rules)):
         print(rule)

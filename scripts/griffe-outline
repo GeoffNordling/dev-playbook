@@ -3,14 +3,17 @@
 # requires-python = ">=3.14"
 # dependencies = ["griffe"]
 # ///
-"""Print a readable structure report of a Python package: classes, functions,
-type-hinted signatures, and first-line docstrings. Static analysis via griffe.
+"""griffe-outline — print the structure of a Python package.
+
+Lists its classes, functions, type-hinted signatures, and first-line
+docstrings, by static analysis via griffe.
 
 Usage:
     griffe-outline src/mypackage
     griffe-outline src/mypackage > structure.txt
     griffe-outline src/mypackage --search src   # extra search paths for griffe
 """
+
 import argparse
 import sys
 from pathlib import Path
@@ -29,12 +32,12 @@ def members_of_kind(parent, kind):
     Protocol``) raises ``AliasResolutionError``.
     """
     return [
-        m for m in parent.members.values()
-        if not m.is_alias and m.kind.value == kind
+        m for m in parent.members.values() if not m.is_alias and m.kind.value == kind
     ]
 
 
 def format_param(p):
+    """One parameter as ``name: annotation = default``."""
     s = p.name
     if p.annotation is not None:
         s += f": {p.annotation}"
@@ -44,6 +47,7 @@ def format_param(p):
 
 
 def format_function(func, indent=0):
+    """Print a function's decorators, signature, and first docstring line."""
     prefix = "  " * indent
 
     for dec in func.decorators:
@@ -61,6 +65,7 @@ def format_function(func, indent=0):
 
 
 def format_class(cls, indent=0):
+    """Print a class's header and docstring line, then its attributes and methods."""
     prefix = "  " * indent
 
     for dec in cls.decorators:
@@ -94,6 +99,7 @@ def format_class(cls, indent=0):
 
 
 def format_module(mod, path=""):
+    """Print a module's classes and functions, then each submodule's."""
     full_path = f"{path}.{mod.name}" if path else mod.name
 
     submodules = members_of_kind(mod, "module")
@@ -120,13 +126,19 @@ def format_module(mod, path=""):
 
 
 def main():
+    """Load the package named on the command line and print its outline."""
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("package", help="Path to the Python package (e.g. src/mypackage)")
     parser.add_argument(
-        "--search", "-s", action="append", default=[],
+        "package", help="Path to the Python package (e.g. src/mypackage)"
+    )
+    parser.add_argument(
+        "--search",
+        "-s",
+        action="append",
+        default=[],
         help="Extra search paths for griffe (repeatable)",
     )
     args = parser.parse_args()

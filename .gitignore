@@ -28,7 +28,12 @@ dotfiles/dot-claude/todos/
 dotfiles/dot-claude/sessions/
 dotfiles/dot-claude/plugins/
 dotfiles/dot-claude/projects/
+# skills pulled down from the claude.ai account by Claude Code's cloud sync
+dotfiles/dot-claude/skills/synced/
 
 # cloa-viewer web project — installed and built, never committed
 src/dev_playbook/cloa_viewer/web/node_modules/
 src/dev_playbook/cloa_viewer/web/dist/
+
+# parallel-fronts rig — a link to an installed @ai-hero/sandcastle, never committed
+working-docs/parallel-fronts/rig/node_modules

@@ -20,8 +20,6 @@
       "Bash(git pull *)",
       "Bash(git fetch)",
       "Bash(git fetch *)",
-      "Bash(*/scripts/ref-lint)",
-      "Bash(*/scripts/ref-lint *)",
       "Bash(gh label list)",
       "Bash(gh label list *)",
       "Bash(gh label create *)",
@@ -50,7 +48,7 @@
       "AskUserQuestion"
     ]
   },
-  "model": "sonnet",
+  "model": "opus[1m]",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [

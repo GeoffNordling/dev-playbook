@@ -1,13 +1,13 @@
 ---
 type: General-Sheet
 title: Runbook Residual Ledger
-description: Runbook's residual record — what the Reference chain cannot express, one entry per ported runbook
+description: Runbook's residual record — what the chain cannot express, one entry per ported runbook
 ---
 
 # Runbook Residual Ledger
 
 Runbook's residual record: what the
-[Reference chain](/doc-types/runbook/contract-shape.md)
+[chain](/doc-types/runbook/contract-shape.md)
 cannot express. That is all an entry is — a record.
 
 ## Runbooks
@@ -45,7 +45,7 @@ deliberately outside the ontology until a ruling is reversed.
   context means; ruled not accounted.
 - **Behavior-mode setting** — a runbook whose body installs standing
   behavior in the session's ephemeral context and fires no edge at
-  invocation. Ruled residual; admitting it later requires a lintable,
+  invocation. Ruled residual; admitting it later requires a checkable,
   deterministic form.
 - **Presentation gestures** — opening an already-written artifact for
   the user (improve-codebase-architecture's `xdg-open` on its report);
@@ -79,8 +79,8 @@ no frontmatter or spans, so the does edge ends at the file.
 
 ### deslopper
 
-Could not express being a Standard's enforce arm (flattened to a plain
-read) or an agent's inputs — agents have no `arguments` frontmatter.
+Could not express being the runbook that fixes a Standard's findings
+(flattened to a plain read) or an agent's inputs — agents have no `arguments` frontmatter.
 
 ### handoff
 
@@ -91,11 +91,13 @@ Could not express telling the two reports apart — both render
 
 Could not express the report's name (`launch_command` rides only in
 annotation) or the mid-run `READ:` acknowledgment, which targets the
-conversation, not the invoker. Could not express the gate runs of §5 and §6 —
+conversation, not the invoker. Could not express the reads of §5's chain —
+the files vary with the plan, so no link names them — or its tripwire, a
+threshold with no primitive. Could not express the gate runs of §6 and §7 —
 a bare command in the target repo, with no on-disk link for a does edge — the
 read-back of the checkpoint markers it just wrote, which inspects the file's
 own text rather than firing an edge — or the `/ralph-checkpoint` mention in
-§7, which names a skill the user invokes and this one never runs.
+§8, which names a skill the user invokes and this one never runs.
 
 ### commit
 
@@ -137,17 +139,10 @@ itself (no primitive for an iterative Q&A frontier) or the closing
 conditional on the user's confirmation, and the Never vocabulary has no
 verb for acting.
 
-### intake
-
-Could not express the mode→phase routing table (a table has no
-sentence for the grammar to span). `software-factory.md` renders as
-bare link text: `classify()` has no type for docs outside
-`standards/`.
-
 ### runbook-creator
 
 Could not express the interview loop of steps 2 and 6 (no primitive
-for a question-and-answer round), the `scripts/harness-files-lint` run (bare
+for a question-and-answer round), the `uv run playbook check` run (bare
 command, no link for a does edge), or the step-completion gates (no
 control-flow primitive).
 
@@ -160,79 +155,17 @@ the tree, with no link for `{If}` to read), or the closing user
 verdict — accept-and-commit versus reject-and-restore-to-`HEAD` —
 which no primitive covers.
 
-### doc-pr-review
-
-Could not express the audit act itself — no primitive for it — or the
-diff-conditional standards table in § Read what the diff calls for — a
-table has no sentence for the grammar to span. The escalation bullets in
-§ 6 restate the condition rather than firing their own edges,
-since the map has no primitive for enumerating alternative triggers
-under one condition.
-
-### adjudicator
-
-Could not express the routing test and its dispositions
-(§3–§4), the ordered-first-hit routing, or the callout distinction — no
-control-flow or enumeration primitive for any of them. Could not express the
-prompt's issue-number and verdict-word input — agents have no `arguments`
-frontmatter — or the `READ:` acknowledgment, which targets the conversation,
-not the invoker.
-
-### build
-
-Could not express the issue-number input (agents have no `arguments`
-frontmatter), the open-ended "read the standard that governs the artifact"
-instruction (an example-led rule, not an enumerable branch), telling the
-escalation and completion reports apart (both render `outcome: str`), or
-the gate runs (`make check`, §4 and §6) — a bare command in the ambient
-repo, with no on-disk link for a does edge.
-
-### design
-
-Could not express the
-`EnterWorktree`/`ExitWorktree` tool calls and worktree/branch git
-commands (does covers only file-linked runbooks, and none carries a fenced
-`-C` block for `{Commit}`), the approval gate spanning §6 into §7
-(condition containment can't cross sections), the area-discovery and
-probe-picking interviews (no primitive for a question-and-answer round
-with the user), or the `READ:` acknowledgment (targets the
-conversation, not the invoker).
-
-### code-pr-review
-
-Could not express the audit act itself — no primitive for it — or the
-diff-conditional standards table
-in § Read what the diff calls for, or the presence-check and
-audit-dimension tables — a table has no sentence for the grammar to
-span. The green-gate and PR/diff-missing
-escalation bullets restate the condition rather than firing their
-own edges, since the map has no primitive for enumerating alternative
-triggers under one condition.
-
 ### compact-prep
 
 Could not express step 2's "only if something stands out" condition —
 the condition primitive gates a whole span, not a report's own contents.
 
-### set-auditor
+### set-judge
 
 Could not express the set-member reads — the root and its linked working
 files are runtime-bound (named in the launching prompt), so `{Read}`'s one
 fixed on-disk link cannot cover them; they stay plain prose. Could not
 express "ask no questions" — the Never vocabulary has no verb for it.
-
-### agent-view-overwatch
-
-Could not express the launch command handed to the user (no primitive for
-an instruction the agent itself never runs), the teardown's
-`git worktree remove`/`git branch -D` (writes—git bucket is scoped to
-commits, not arbitrary git subcommands), or the board table (no
-primitive for a rendered report's shape).
-
-### bug-pr-review
-
-The eight finder angles and their dedup/tag steps
-are procedure, not edges, so the map has nothing to encode there.
 
 ### set-deslopper
 
@@ -245,30 +178,6 @@ Could not express the size-conditional
 landing choice in § 5 (a decision, not a fixed condition) or the
 GitHub-token permission preflight, which has no primitive.
 
-### user-intent-mini-interview
-
-Could not express the
-ask/scrutinize/marry interview loop of steps 1–3 (no primitive for a
-question-and-answer round).
-
-### issue-overwatch
-
-Could not express the
-`EnterWorktree` calls and worktree-only git commands (does covers only
-file-linked runbooks). The AFK/Inline/Review-stop engagement switch, including
-the fixed `/open-pr` launch inside the Review-stop branch, has no primitive
-for a multi-way enumeration — encoding just that one branch would misstate it
-as unconditional. The runtime-chosen `Run /<skill> <N>` delegation has no
-fixed link for `{Launch}` — tabled: the factory's node-delegation process is
-in flux and likely to be overhauled, so no encoding is attempted for it now.
-
-### open-pr
-
-Could not express the local branch-diff read
-(`git diff origin/main...issue-<issue>` — no on-disk link) or the
-issue-number input (agents have no `arguments` frontmatter). The
-alternate reports all collapse to `outcome: str`.
-
 ### update-standards-pin
 
 Could not express the exit-code routing table in § Probe the bump (a table
@@ -279,11 +188,6 @@ bucket needs a fenced command with a fixed `-C`, and the runtime-chosen
 consumer repo carries no honest one. Could not express `pre-commit gc` or
 the PR the run ends on: a bare command and a `gh` call, neither with an
 on-disk link for a does edge.
-
-### issue-review-simulation
-
-Could not express the read of whatever files the brief names —
-`{Read}` needs one fixed on-disk link and they are runtime-bound.
 
 ### improve-codebase-architecture
 
@@ -300,12 +204,6 @@ throwaway-harness and captured-trace writes — menu options among Phase 1's
 ten ways, so an unconditional scratch edge would misstate them. Could
 not express the commit that carries the confirmed hypothesis — writes—git
 bucket needs a fixed `-C <repo>` a same-repo commit can't honestly carry.
-
-### wayfinder-to-build
-
-Could not express the mid-run `READ:` acknowledgment
-(targets the conversation, not the invoker) or the per-step "Done when"
-completion gates (no control-flow primitive).
 
 ### research
 
@@ -332,17 +230,22 @@ and the branch name is chosen per ticket.
 
 ### ralph-checkpoint
 
-Could not express the ban on launching the next segment itself — the Never
-vocabulary carries no verb for running one. Could not express the
-blocker-versus-checkpoint branch on the workflow's return value, which is
-runtime data with no link for `{If}` to read.
+Could not express the blocker-versus-checkpoint branch on the workflow's
+return value, or the zero-findings branch on the reviewer's, both runtime
+data with no link for `{If}` to read. Could not express the `git log` runs
+that name the segment — bare commands with no on-disk link — or the wait for
+the user's ruling, which targets the conversation, not the invoker.
 
 ### ralph-checkpointer
 
-Could not express running each task's Verify clause — the clause names a
-command or artifact chosen per task, so there is no fixed target. Could not
-express the accepted/reverted/deferred ruling itself, which is a decision with
-no primitive.
+Could not express applying the user's ruling to each finding, which is a
+decision with no primitive.
+
+### ralph-reviewer
+
+Could not express running each task's Verify clause or reading each task's
+sources — both are chosen per task, so there is no fixed target — or the
+ranking itself, which is a decision with no primitive.
 
 ### prototype
 

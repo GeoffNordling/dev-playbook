@@ -2,7 +2,7 @@
 name: enable-repo-governance
 description: Bring the repository the session is standing in into governance — wire the standards pin, work it to green, finish the GitHub tail, and enroll it.
 disable-model-invocation: true
-model: opus
+model: inherit
 effort: xhigh
 ---
 
@@ -10,7 +10,7 @@ effort: xhigh
 
 An existing repo joins the workspace by being brought to green against the
 pinned standard, then enrolled. {Read
-[bootstrap.md](~/workspace/dev-playbook/standards/build/bootstrap.md); that
+[bootstrap.md](~/workspace/dev-playbook/guides/bootstrap.md); that
 document is the authority on the adoption steps and their order — this skill
 owns only the choreography around them: preflight, the findings loop, the
 hand-offs, and the commits}.
@@ -51,9 +51,9 @@ the hook stages. The canonical artifacts live in
 merges into a file the repo already has and the merge is more than mechanical
 insertion, show the user the merged result before moving on.
 
-## 3. Lint to green
+## 3. Check to green
 
-{Run [repo-lint](~/workspace/dev-playbook/scripts/repo-lint)}. The findings
+{Run `uv run playbook check`}. The findings
 are the worklist; work it to empty, taking each fix's authority from the
 rule's define doc, reached through {Read
 [standards/index.md](~/workspace/dev-playbook/standards/index.md)}.
@@ -71,7 +71,7 @@ concrete choices.
 The merge settings and the protection ruleset sit behind GitHub's
 Administration permission — hand those to the user per bootstrap.md's tail,
 pointing at {Read
-[repo-settings.md](~/workspace/dev-playbook/standards/tracking/repo-settings.md)},
+[repo-settings.md](~/workspace/dev-playbook/guides/repo-settings.md)},
 and wait for their confirmation before calling the tail done.
 
 ## 5. Land the target
@@ -80,7 +80,7 @@ The size of the diff decides how the work lands — judge it as soon as the
 worklist makes the size clear:
 
 - **Five or fewer changed files**: one commit carrying the pin wiring and
-  every fix together, straight to `main` — /commit runs the gate at the new
+  every fix together, straight to `main` — /commit-inherit runs the gate at the new
   pin, which is the verification.
 - **More**: a branch, commits as the work proceeds, and a PR handed to the
   user at the end — approval and merge are the user's.
@@ -97,6 +97,7 @@ edit separately, one line}:
     git -C ~/workspace/dev-playbook add src/dev_playbook/workspace_lint.py && git -C ~/workspace/dev-playbook commit -m "<subject>" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 
 On the PR path this waits for the user's merge — a repo enrolled while its
-pin sits on an unmerged branch reports a `distribution.pin` finding against `main`.
+pin sits on an unmerged branch reports a
+`distribution.a-consumer-pins-the-published-head` finding against `main`.
 
 {Report per-repo results; a failure in one never blocks the other's report}.

@@ -8,6 +8,7 @@ dependencies = [
 
 [project.scripts]
 cloa-viewer = "dev_playbook.cloa_viewer.cli:main"
+playbook = "dev_playbook.check_cli:main"
 
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network
@@ -18,9 +19,9 @@ build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# The suite is mostly waiting -- on fixture `git` subprocesses and the factory
-# tests' real sleeps -- so it shards well across cores. It sits here rather than
-# in the Makefile because repo-lint holds `test:` verbatim; `uv run pytest -n0`
+# The suite is mostly waiting on fixture `git` subprocesses, so it shards
+# well across cores. It sits here rather than
+# in the Makefile because the build checks hold `test:` verbatim; `uv run pytest -n0`
 # turns it off for a pdb run.
 addopts = ["-n", "auto"]
 # src/ exposes the dev_playbook package; tests/ carries a bare-imported
@@ -51,6 +52,10 @@ default-groups = ["dev", "viewer"]
 [tool.ruff]
 target-version = "py314"
 line-length = 88
+# A file under scripts/ with no extension is a uv Python script
+# (build.scripts-holds-only-scripts).
+extend-include = ["scripts/*"]
+extend-exclude = ["scripts/*.sh", "scripts/*.md"]
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "UP", "B", "SIM", "SLF", "D"]
 # D401 (imperative-mood summaries) is excluded to keep the workspace's

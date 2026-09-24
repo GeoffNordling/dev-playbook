@@ -8,15 +8,15 @@ the bundle boundary, and the rootless roster are defined once here rather than
 drifting between scripts.
 
 ``yaml`` is imported lazily inside :func:`parse_frontmatter` so importers that
-only need the pure-text helpers (``ref-lint`` runs under plain ``python3``) do
-not require pyyaml on the interpreter; only frontmatter-parsing callers do, and
-those run under ``uv run --script`` with pyyaml declared.
+only need the pure-text helpers do not require pyyaml on the interpreter; only
+frontmatter-parsing callers do.
 """
 
-import functools
+import posixpath
 import re
 import subprocess
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 from dev_playbook import gitrepo
@@ -41,8 +41,16 @@ HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
 # A markdown inline link: [text](target). target stops at whitespace or ')';
 # a trailing "#anchor" stays part of the captured target.
 MD_LINK_PATTERN = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
-# Bare ~/workspace/<repo>/... citations, matched outside code spans/fences.
-WORKSPACE_REF_PATTERN = re.compile(r"~/workspace/[^ )`\n]+")
+# Bare ~/workspace/<repo>/... citations, matched outside code spans/fences. A
+# trailing sentence mark is not part of the path; see BARE_PATH_TRAILER.
+WORKSPACE_REF_PATTERN = re.compile(r"~/workspace/[^\s)`]+")
+BARE_PATH_TRAILER = ".,;:"
+# A lowercase kebab-case name: runbook names, arguments, working-set files.
+KEBAB_CASE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+# A URI: a scheme, then a colon.
+URI_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
+WORKSPACE_PREFIX = "~/workspace/"
+CLAUDE_PREFIX = "~/.claude/"
 
 # Inline-markdown stripping for heading slugs; see github_slug.
 SLUG_BACKTICK = re.compile(r"`([^`]*)`")
@@ -166,12 +174,11 @@ def content_lines(filepath: Path) -> Iterator[tuple[int, str]]:
         raise UnclosedFence(unclosed.marker, unclosed.line, str(filepath)) from None
 
 
-@functools.cache
 def heading_slugs(filepath: Path) -> frozenset[str]:
     """Return the set of GitHub slugs for every ATX heading in ``filepath``.
 
-    Headings inside fenced code blocks are skipped. Cached by path so a
-    target referenced from many sources is only parsed once per run.
+    Headings inside fenced code blocks are skipped. Read fresh on every call;
+    a caller that asks often holds its own cache for the length of one run.
     """
     return frozenset(
         github_slug(m.group(1))
@@ -188,6 +195,61 @@ def markdown_links(line: str) -> list[tuple[str, str]]:
     """
     stripped = INLINE_CODE_PATTERN.sub("", line)
     return [(m.group(1), m.group(2)) for m in MD_LINK_PATTERN.finditer(stripped)]
+
+
+@dataclass(frozen=True)
+class Target:
+    """Where a link target points: this repo's path, another repo's, or nowhere read.
+
+    ``kind`` is ``repo`` (``path`` is repo-relative, ``""`` the root), ``other``
+    (``path`` is the full path on this machine), ``outside`` (a relative target
+    above the repo root), or ``skip`` (a URI, a ``~/.claude/`` path with no
+    harness root, or any form the grammar does not resolve).
+    """
+
+    kind: str
+    path: str
+
+
+def resolve_target(
+    source: str, target: str, repo_name: str, claude_root: str | None
+) -> Target:
+    """Where one link target in the file ``source`` points, its ``#anchor`` dropped.
+
+    A target is root-absolute, relative to ``source``, under
+    ``~/workspace/<repo>/``, or under ``~/.claude/``, which resolves into
+    ``claude_root`` where one is given and is skipped where not. A bare
+    ``#anchor`` points at ``source`` itself.
+    """
+    path, _, anchor = target.strip().partition("#")
+    if not path:
+        return Target("repo", source) if anchor else Target("skip", "")
+    if URI_PATTERN.match(path):
+        return Target("skip", "")
+    if path.startswith(CLAUDE_PREFIX):
+        if claude_root is None:
+            return Target("skip", "")
+        rest = path.removeprefix(CLAUDE_PREFIX)
+        return Target("repo", _normal(posixpath.join(claude_root, rest)))
+    if path.startswith(WORKSPACE_PREFIX):
+        name, _, rest = path.removeprefix(WORKSPACE_PREFIX).partition("/")
+        if name == repo_name:
+            return Target("repo", _normal(rest))
+        return Target("other", str(Path.home() / "workspace" / name / rest))
+    if path.startswith("~"):
+        return Target("skip", "")
+    if path.startswith("/"):
+        return Target("repo", _normal(path.lstrip("/")))
+    joined = posixpath.normpath(posixpath.join(posixpath.dirname(source), path))
+    if joined == ".." or joined.startswith("../"):
+        return Target("outside", joined)
+    return Target("repo", _normal(joined))
+
+
+def _normal(path: str) -> str:
+    """``path`` normalized, with the repo root as ``""``."""
+    normal = posixpath.normpath(path) if path else ""
+    return "" if normal == "." else normal
 
 
 def parse_frontmatter(text: str) -> tuple[dict | None, str]:
@@ -216,8 +278,8 @@ def parse_frontmatter(text: str) -> tuple[dict | None, str]:
 def has_fixed_repo_root(relpath: str) -> bool:
     """True when a source file is always read from one repo, so ``/`` resolves.
 
-    The one home for the rootless test: ``ref-lint`` decides the ``wrong-form``
-    finding with it and the file graph stamps the matching edge status, so a new
+    The one home for the rootless test: the cross-reference checks decide the
+    form findings with it and the file graph stamps the matching edge status, so a new
     rootless segment reaches both at once rather than drifting between them.
 
     A segment matches at any depth, which is what lets
@@ -233,7 +295,7 @@ def is_agent_instruction(relpath: str) -> bool:
     The set the agent-facing voice rule governs (prose/conventions.md — Voice,
     person of address): every ``CLAUDE.md`` at any depth, plus every file under a
     skills, rules, or agents root. Scope is stated once here rather than in each
-    detector that needs it.
+    check that needs it.
 
     Membership is decided by :data:`ROOTLESS_SEGMENTS` at any depth, the same
     roster and the same at-any-depth test :func:`has_fixed_repo_root` uses — so a
@@ -258,7 +320,7 @@ def classify(relpath: str) -> str:
     - ``"index"`` — a directory listing (``index.md``): typeless, validated as
       an index rather than as a concept document.
     - ``"concept"`` — a prose concept document that carries OKF frontmatter and
-      is subject to the type-lint.
+      is subject to the type checks.
     - ``"harness"`` — an in-bundle file a tool consumes as configuration or
       runs as code, not prose: ``CLAUDE.md``, ``SKILL.md`` and skill
       ``references/``/``scripts/``, ``agents/``, ``rules/``, every top-level
@@ -301,7 +363,7 @@ def is_decision_record(relpath: str) -> bool:
     """True for a numbered Decision Record — ``docs/decisions/NNNN-slug.md``.
 
     A numbered record is immutable, so its outbound references are accepted
-    staleness: ``ref-lint`` skips one as a source, and the viewer's
+    staleness: the cross-reference checks skip one as a source, and the viewer's
     ``markdown-file`` kind badges a link out of one ``decision-record`` rather
     than ``broken``. The two callers decide it here so the check and the screen
     can never disagree.

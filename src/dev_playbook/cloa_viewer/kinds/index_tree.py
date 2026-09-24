@@ -1,7 +1,7 @@
 """The ``index-tree`` kind: the checkout's markdown, arranged by its indexes.
 
-One view file per checkout, in the two groups the
-[File Roles](/standards/knowledge-organization/file-roles.md) guide names.
+One view file per checkout, in the two groups the vocabulary's
+[File roles](/CONTEXT.md#file-roles) names.
 The concept documents come from the walk: it starts at the root ``index.md``
 and follows every listing entry, so the tree on screen is the hierarchy the
 [Indexes](/standards/knowledge-organization/indexes.md) standard describes and
@@ -11,7 +11,7 @@ file the user needs to see.
 The harness-owned files the walk never reaches land in ``harness``, a flat list.
 
 Which group a file belongs to is ``md.classify``, the one encoding of the
-boundary, never a test of this module's own: the tree and okf-lint cannot
+boundary, never a test of this module's own: the tree and the index checks cannot
 disagree about a file's role when they ask the same function. A file that
 function calls ``excluded`` gets no row at all.
 

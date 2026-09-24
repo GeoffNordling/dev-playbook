@@ -31,7 +31,7 @@ identity), so a batch can mix identities across its jobs.
 
 The script validates args, then fans out once with `parallel()`:
 
-1. parse and validate `args` (a JSON string — see [Running it](#running-it)):
+1. parse and validate `args` (see [Running it](#running-it)):
    require a `jobs` array whose every entry carries its own `model` and `effort`,
    and guard the batch size, all before any agent spawns,
 2. run every job concurrently as its own isolated `agent()`, with that job's own
@@ -61,10 +61,7 @@ Build the batch and call the workflow by name, passing the batch as `args`:
 `jobs` is required — no defaults — and each job must carry its own `model` and
 `effort`; `schema` is optional. A missing or malformed arg throws.
 
-Note the asymmetry between that call and the script: the caller passes an **object**,
-but the script parses a **JSON string** and rejects an object outright. Both are
-correct: the Workflow runtime serializes every `args` value on the way in, so a
-passed object reaches the script as JSON text and an omitted one as `undefined` —
-contrary to the runtime's own documentation. Every workflow here is written to that
-contract. Source:
+The script accepts the batch as an object or as JSON text, and validates both the
+same way, because how `args` reaches a script has varied across runtime versions
+and invocation paths. Source:
 [`scatter-gather.js`](/dotfiles/dot-claude/workflows/scatter-gather.js).

@@ -1,11 +1,11 @@
 import re
-import subprocess
 from pathlib import Path
 
 import pytest
 
+from dev_playbook import check_cli
+from dev_playbook.checks.prose import WORKSPACE_WORD
 from dev_playbook.repo_init import (
-    PLAYBOOK_ROOT,
     RepoInitError,
     RepoSpec,
     init_repo,
@@ -21,34 +21,25 @@ PY_SPEC = RepoSpec(name="sample-lib", description="A demo repo", python=True)
 PLACEHOLDER = re.compile(r"<[a-zA-Z][a-zA-Z0-9_-]*>")
 
 
-def run_playbook_lint(target: Path) -> subprocess.CompletedProcess[str]:
-    """Audit a scaffolded repo with the very hook the scaffold installs."""
-    return subprocess.run(
-        [str(PLAYBOOK_ROOT / "scripts" / "playbook-lint"), str(target)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-
-def test_scaffolded_base_repo_passes_playbook_lint(tmp_path: Path) -> None:
+def test_scaffolded_base_repo_passes_playbook_check(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # The very hook the scaffold installs, run over the scaffold.
     target = init_repo(BASE_SPEC, tmp_path)
 
-    lint = run_playbook_lint(target)
-
-    assert lint.returncode == 0, lint.stdout
+    assert check_cli.main(["check", str(target)]) == 0, capsys.readouterr().out
 
 
-def test_scaffolded_python_repo_passes_playbook_lint(tmp_path: Path) -> None:
+def test_scaffolded_python_repo_passes_playbook_check(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     target = init_repo(PY_SPEC, tmp_path)
 
-    lint = run_playbook_lint(target)
-
-    assert lint.returncode == 0, lint.stdout
+    assert check_cli.main(["check", str(target)]) == 0, capsys.readouterr().out
 
 
 def test_root_index_carries_an_introduction() -> None:
-    # okf-lint's knowledge-organization.index-intro rule: prose stands between
+    # The knowledge-organization.introduction-between-h1-and-listing rule: prose stands between
     # the H1 and the first entry.
     tree = render_tree(BASE_SPEC, REV)
 
@@ -130,6 +121,16 @@ def test_name_carrying_an_agent_facing_voice_word_is_refused(
     spec = RepoSpec(name=name, description="A demo repo", python=False)
 
     with pytest.raises(RepoInitError, match=re.escape(f"'{word}'")):
+        render_tree(spec, REV)
+
+
+@pytest.mark.parametrize(
+    "name", [f"the-{WORKSPACE_WORD}", f"{WORKSPACE_WORD}-readable"]
+)
+def test_name_carrying_the_banned_word_is_refused(name: str) -> None:
+    spec = RepoSpec(name=name, description="A demo repo", python=False)
+
+    with pytest.raises(RepoInitError, match="the prose checks reject"):
         render_tree(spec, REV)
 
 

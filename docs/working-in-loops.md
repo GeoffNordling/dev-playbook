@@ -20,7 +20,7 @@ to live in asynchronous loops.
 
 The user should spend most of their time helping
 build and improve loops. Loops run without the user.
-Detectors catch slop before it bubbles up.
+Checks catch slop before it bubbles up.
 
 ## Linear work
 
@@ -42,7 +42,7 @@ once, and the next dispatch makes the same slop.
 
 A **loop** is a worker pursuing a goal under constraints, with something
 checking the work. The worker is a model or the user. The constraints
-are a contract, the standards, and the detectors. The check is a
+are a contract, the standards, and their checks. The verifier is a
 predicate, a reviewer, or the user.
 
 ```
@@ -68,7 +68,7 @@ user leaves a loop at the moment the predicate that replaces the user is
 written; a loop without that predicate still has the user in it.
 
 A loop improves by error analysis: the user reads what the review caught
-and the detectors missed, and the most common kind gets a detector.
+and the checks missed, and the most common kind gets a check.
 
 Every loop has Claude Code as its innermost loop: the model plans, acts
 through a tool, observes the result, and repeats until it has an answer
@@ -97,7 +97,7 @@ be written only for work defined well enough to state a predicate over.
 Scope is the lever, since a unit small enough to define is a unit a
 predicate can check.
 
-Constructing a constraint — a standard, a doc-type, a detector — sits
+Constructing a constraint — a standard, a doc-type, a check — sits
 at the far right, because it invents the thing future predicates will
 check. Every constraint built there moves other work left. The user's
 time is spent at the right end, making things that move work to the
@@ -122,7 +122,7 @@ can yield to.
 The agent cooks; the user checks back later. The user reads a run's
 outputs and samples below them, as a scientist samples and a manager
 checks in, and at the end of a run reads the diff. When the user does
-not like the result, the user changes the loop — a contract, a detector,
+not like the result, the user changes the loop — a contract, a check,
 a standard — and runs it again. The user does not fix the output by
 hand, because that is linear work; their time is better spent improving
 the loop.

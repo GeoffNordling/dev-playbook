@@ -1,5 +1,5 @@
 ---
-type: Guide
+type: General-Sheet
 title: The Sandcastle Pipeline
 description: The pipeline as built and proven — how a front runs from open to close, how fronts run in parallel, the layout inside a container, how a run is told what to do, what it guarantees, where each piece lives, and what it does not yet do
 ---
@@ -22,7 +22,7 @@ member describes the result.
 ```
  HOST                                         CONTAINER (podman)
  ────                                         ─────────
- 1 guard      billing-lint: no metered credential
+ 1 guard      billing checks: no metered credential
  2 open       front-clone open ─► work copy
               config copy of published main
               credential copy, hook receiver + port file
@@ -33,7 +33,7 @@ member describes the result.
  5 clean up   copies deleted, receiver stopped, no container left
 ```
 
-1. **Guard.** `billing-lint` asserts no metered credential on this device,
+1. **Guard.** The billing checks of `playbook check` assert no metered credential on this device,
    and the run itself refuses to start if anything it hands the container
    carries one.
 2. **Open.** [`front-clone`](/scripts/front-clone) `open` clones the real

@@ -51,7 +51,7 @@ inner loop, the user holds every seam between laps.
   machine has no container runtime and is not a target: a result measured
   there does not count, and no effort goes to making the set portable.
 - The subscription pays for every run, and this is asserted, not assumed.
-  `billing-lint` checks four places for a metered credential: the live
+  The billing checks of `playbook check` read four places for a metered credential: the live
   environment, the shell startup files, `~/.claude/settings.json`, and the
   repository's `.claude/settings.json`. It runs at the commit gate and again
   before every run.
@@ -162,9 +162,9 @@ guiding.
 - **State the sandbox requirement.** What a front's container must reach,
   and where Sandcastle collides with it, is recorded in
   [The five problems](/working-docs/parallel-fronts/experiment-log.md#the-five-problems).
-- **Assert this device holds no metered credential.** `billing-lint`
-  asserts it at the commit gate, stationed by the
-  [Billing](/standards/billing/card.md) card; what it reads is under
+- **Assert this device holds no metered credential.** The billing
+  checks assert it at the commit gate, under
+  [Billing Credentials](/standards/billing/credentials.md); what they read is under
   [Constraints](#constraints).
 - **Experiment one: the clone round-trip.** A front's commits are made in a
   throwaway clone and reach the real repository at the same SHA, or the lap

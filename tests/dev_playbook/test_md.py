@@ -183,7 +183,7 @@ class TestClassify:
             ("dotfiles/dot-claude/agents/build.md", "harness"),
             ("dotfiles/dot-claude/skills/prototype/references/logic.md", "harness"),
             (".pre-commit-config.yaml", "harness"),
-            ("tools/bin/ref-lint", "harness"),
+            ("tools/bin/some-lint", "harness"),
             ("tests/x.md", "harness"),
             ("tests/fixtures/specs/feat-01.md", "harness"),
             ("tests/spec_files/broken.md", "harness"),
@@ -295,6 +295,26 @@ class TestHeadingSlugs:
         f = tmp_path / "t.md"
         f.write_text("# Top\n## Mid\n```\n## Fake\n```\n### Deep\n")
         assert md.heading_slugs(f) == frozenset({"top", "mid", "deep"})
+
+
+class TestResolveTarget:
+    def test_forms(self) -> None:
+        def got(target: str, claude: str | None = None) -> tuple[str, str]:
+            resolved = md.resolve_target("d/a.md", target, "demo", claude)
+            return resolved.kind, resolved.path
+
+        assert got("/b.md#x") == ("repo", "b.md")
+        assert got("c.md") == ("repo", "d/c.md")
+        assert got("#x") == ("repo", "d/a.md")
+        assert got("../../up.md") == ("outside", "../up.md")
+        assert got("~/workspace/demo/b.md") == ("repo", "b.md")
+        assert got("~/workspace/other/b.md")[0] == "other"
+        assert got("https://example.com") == ("skip", "")
+        assert got("~/.claude/rules/r.md") == ("skip", "")
+        assert got("~/.claude/rules/r.md", "dotfiles/dot-claude") == (
+            "repo",
+            "dotfiles/dot-claude/rules/r.md",
+        )
 
 
 class TestFindMdFiles:

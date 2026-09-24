@@ -44,10 +44,13 @@ the repository, would report the environment as a defect in the code when
 run on a secondary. It is skipped there, and announces the skip on every
 run.
 
-- **`ref-lint`.** Cross-repo Citations resolve only where the cited repo is
-  cloned, and a secondary deliberately carries only some of the workspace's
-  repos. `SKIP=ref-lint` stands the detector down.
+- **The checks tagged `workspace`.** Cross-repo Citations resolve only
+  where the cited repo is cloned, and a secondary deliberately carries only
+  some of the workspace's repos. `SKIP=workspace` stands those checks down;
+  `playbook checks` lists them by their tag.
 
 The primary carries every repo and runs every check, so nothing goes
-permanently unchecked. Which gates this affects is recorded in
-[Gates](/standards/standard/gates.md#skips).
+permanently unchecked. Which gates each check reaches is the committed
+wiring, `.pre-commit-config.yaml`, `make check`, and the workflows; a
+machine's skip is not in it, and is recorded here instead
+([A skip is machine state](/standards/standard/checks.md#a-skip-is-machine-state)).

@@ -1,4 +1,4 @@
-"""Audit the workspace: GitHub repo settings, label/issue conformance, and pins.
+"""Audit the workspace: GitHub repo settings and label/issue conformance.
 
 The library behind the ``workspace-lint`` shim — the on-demand audit venue of
 the enforcement standard, the checks that live outside any single commit. It
@@ -24,82 +24,113 @@ in, so governance is declared rather than inferred. For each governed repo:
     rules rather than from the ruleset list, so a ruleset that reaches the
     branch carrying nothing required is never looked at.
   - **labels** — compare the repo's labels against the canonical scheme at full
-    parity (a finding exactly when bootstrap-labels would repair), and flag any
-    label naming a blocked state.
+    parity (a finding exactly when bootstrap-labels would repair).
   - **issues** — from one open-issues read, check each open issue against the
     shape rules of its species: a build leaf's four-tuple validity and brief
     shape, a build epic's category-only shape, and a wayfinder map's or decision
     ticket's shape. Species comes from the label set and ``sub_issues_summary``.
-  - **pin** — read the dev-playbook `rev` pinned in the repo's
-    `.pre-commit-config.yaml` and compare it against the hook repo's local
-    `main`. Stale pins are reported but are not failures: a consumer catches up
-    when its pin is deliberately bumped. No pin at all is a failure — being
-    governed is what makes the absence wrong.
+  - **pin** — read the consumer's ``.pre-commit-config.yaml`` on its default
+    branch and require that its dev-playbook block pins the hook repo's
+    release head — the newest ``main`` commit that is not the pin ledger's
+    bookkeeping, see ``pins.release.release_head`` — and lists the hook ids the
+    manifest publishes there. The head and the manifest are read once per
+    run, from GitHub, so a stale pin is a finding on the machine that never
+    cloned the consumer at all. The hook repo itself is passed over: it
+    dogfoods from its tree.
 
-Every check but the pin reads GitHub, so an authenticated `gh` is a precondition
-of the run rather than a per-repo condition: the audit checks it once up front
-and refuses to start without it, because an unauthenticated `gh` degrades to
-anonymous requests instead of failing (see ``check_auth``). ``--pins-only``
-reads nothing over the network and so is exempt.
+Every check reads GitHub, so an authenticated `gh` is a precondition of the run
+rather than a per-repo condition: the audit checks it once up front and refuses
+to start without it, because an unauthenticated `gh` degrades to anonymous
+requests instead of failing (see ``check_auth``).
+
+A roster name with no repo behind it on this machine is announced on stderr
+and passed over rather than refused: the workspace spans machines, and a repo
+may deliberately live on another one.
+
+The pin is read through ``dev_playbook.pins`` — ``release`` for the hook
+repo's release head and manifest, ``config`` for a consumer's pinned block —
+the same modules ``bump-pin`` and ``update-pins`` write through, so the
+reader and the writers cannot disagree.
 
 Output:
-    stdout — one finding per line, ``repo: card.rule message`` (the repo name
+    stdout — one finding per line, ``repo: name.rule message`` (the repo name
              stands in the location slot; this audit inspects repos, not files).
-    stderr — informational per-repo lines (current/absent pins) and one summary.
+    stderr — one summary line.
     exit   — 0 clean, 1 findings, 2 cannot run.
 """
 
 import argparse
-import json
 import re
-import subprocess
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import gitrepo, md
+from dev_playbook import md
+from dev_playbook.errors import ToolError
 from dev_playbook.findings import print_rules, render
+from dev_playbook.github import check_auth, gh_api, gh_graphql, origin_slug
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
+from dev_playbook.pins.config import pinned_hook_ids, pinned_rev
+from dev_playbook.pins.release import (
+    hook_repo_url,
+    is_hook_repo,
+    published_file,
+    published_hook_ids,
+    release_head,
+)
 
-# Every rule id this detector can emit. Repo-settings drift, reachability, and
-# the live-repo tracking checks (label scheme, blocked labels, four-tuple
-# validity, brief shape, epic shape, wayfinder shape) answer the tracking card;
-# a stale dev-playbook pin answers the build card (non-blocking).
-# Informational pin lines carry no rule id. Each id is a module-level constant so
-# every emission site references the constant, never a raw literal, and RULES
-# (what --list-rules prints) cannot drift from what the detector actually emits.
-SETTINGS = "tracking.settings"
-PROTECTION = "tracking.branch-protection"
-REMOTE = "tracking.remote"
-LABEL_SCHEME = "tracking.label-scheme"
-NO_BLOCKED_LABEL = "tracking.no-blocked-label"
-ISSUE_BRIEF_SHAPE = "tracking.issue-brief-shape"
-EPIC_SHAPE = "tracking.epic-shape"
-WAYFINDER_SHAPE = "tracking.wayfinder-shape"
-TUPLE_VALID = "tracking.tuple-valid"
-SESSION_SHAPE = "tracking.session-shape"
-PIN = "distribution.pin"
+# Every rule id this command can emit. Repo-settings drift, reachability, and
+# the live-repo tracking checks (label scheme, leaf labels and headings, epic
+# labels, wayfinder labels and body) answer the tracking Standards. Each id is a
+# module-level constant so every emission site references the constant, never a
+# raw literal, and RULES (what --list-rules prints) cannot drift from what the
+# command actually emits.
+SQUASH_ONLY_MERGES = "tracking.squash-only-merges"
+DEFAULT_BRANCH_PROTECTION = (
+    "tracking.default-branch-protected-from-destructive-operations"
+)
+GITHUB_ORIGIN = "tracking.origin-on-github"
+VALID_LABELS = "tracking.exactly-the-labels-the-scheme-declares"
+CLOSED_FENCES = "tracking.closed-fences"
+BUILD_LABELS = "tracking.one-label-from-each-prefix"
+BUILD_HEADINGS = "tracking.every-build-heading-in-bold"
+SPIKE_LABELS = "tracking.one-label-from-each-prefix-tests-fixed-at-no"
+SPIKE_HEADINGS = "tracking.summary-question-and-deliverable"
+SESSION_LABELS = "tracking.one-category-label-no-phase-or-tests"
+SESSION_HEADINGS = "tracking.every-session-heading-in-bold"
+CATEGORY_ONLY = "tracking.category-only"
+WAYFINDER_LABELS = "tracking.one-wayfinder-label-and-nothing-else"
+WAYFINDER_BODY = "tracking.map-sections-ticket-question"
+# The one distribution rule this command decides: a consumer's published
+# config pins the hook repo's published head and lists the ids its manifest
+# publishes there. Read over `gh api` like the rest, because the audited fact
+# is the repo's default branch as GitHub has it, not a checkout on this machine.
+PINNED_HEAD = "distribution.a-consumer-pins-the-published-head"
 
 RULES = (
-    SETTINGS,
-    PROTECTION,
-    REMOTE,
-    LABEL_SCHEME,
-    NO_BLOCKED_LABEL,
-    ISSUE_BRIEF_SHAPE,
-    EPIC_SHAPE,
-    WAYFINDER_SHAPE,
-    TUPLE_VALID,
-    SESSION_SHAPE,
-    PIN,
+    PINNED_HEAD,
+    SQUASH_ONLY_MERGES,
+    DEFAULT_BRANCH_PROTECTION,
+    GITHUB_ORIGIN,
+    VALID_LABELS,
+    CLOSED_FENCES,
+    BUILD_LABELS,
+    BUILD_HEADINGS,
+    SPIKE_LABELS,
+    SPIKE_HEADINGS,
+    SESSION_LABELS,
+    SESSION_HEADINGS,
+    CATEGORY_ONLY,
+    WAYFINDER_LABELS,
+    WAYFINDER_BODY,
 )
 
 # The required headings of each brief format, stated here exactly as
 # standards/tracking/issue-shapes.md states them (§ Build headings, § Spike
 # headings, and § Session headings) — the doc and this rule read one contract
 # and cannot disagree.
-BUILD_HEADINGS = (
+BUILD_HEADING_LIST = (
     "Summary",
     "User intent",
     "Current behavior",
@@ -109,8 +140,8 @@ BUILD_HEADINGS = (
     "Prohibited surfaces",
     "Out of scope",
 )
-SPIKE_HEADINGS = ("Summary", "Question", "Deliverable")
-SESSION_HEADINGS = (
+SPIKE_HEADING_LIST = ("Summary", "Question", "Deliverable")
+SESSION_HEADING_LIST = (
     "Summary",
     "User intent",
     "Current behavior",
@@ -124,7 +155,7 @@ SESSION_HEADINGS = (
 # ``§ Tickets`` of dotfiles/.agents/skills/wayfinder/SKILL.md). The skill — not
 # this workspace — is the definition of a map's shape, per
 # standards/tracking/issue-shapes.md § Wayfinder map or ticket, so this rule
-# mirrors the skill directly, the way BUILD_HEADINGS mirrors the brief standard.
+# mirrors the skill directly, the way BUILD_HEADING_LIST mirrors the brief standard.
 # The bundle is installed verbatim at a pin, which is what makes the mirror
 # stable: a pin bump delta-checks these tuples against the upstream text.
 # Wayfinder writes ``##`` sections, not the bold headings a brief uses.
@@ -139,11 +170,6 @@ TICKET_SECTIONS = ("Question",)
 
 # The four dimensions of the state-machine tuple (status is not part of it).
 TUPLE_DIMENSIONS = ("category", "mode", "tests", "phase")
-
-HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
-CANONICAL_CONFIG = (
-    HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
-)
 
 # The governed repos — the workspace population the standards apply to, named
 # here because governance is an act rather than a property of sitting under the
@@ -160,6 +186,7 @@ GOVERNED = (
     "idea-tree",
     "dwarf-flow",
     "lunch",
+    "date-tree",
 )
 
 # Expected GitHub settings, under the REST field names. The audit only reads;
@@ -245,32 +272,18 @@ PROTECTION_QUERY = """query($owner: String!, $name: String!) {
   }
 }"""
 
-REMOTE_SLUG_PATTERN = re.compile(
-    r"^(?:git@github\.com:|https://github\.com/)([^/\s]+/[^/\s]+?)(?:\.git)?$"
-)
-
-
-class ToolError(Exception):
-    """The audit could not run at all."""
-
 
 @dataclass(frozen=True)
 class Line:
     """One line of the audit's output — a finding or an informational advisory."""
 
     repo: str
-    rule: str | None  # None = informational (no rule id): a stderr advisory
+    rule: str
     message: str
-    blocking: bool = False  # a real finding: sets exit 1
-
-    @property
-    def stale(self) -> bool:
-        """Whether this line reports a stale (non-blocking) dev-playbook pin."""
-        return self.rule == PIN and not self.blocking
+    blocking: bool = True  # every line is a finding: sets exit 1
 
     def render(self) -> str:
-        """The finding rendered as ``repo: card.rule message``."""
-        assert self.rule is not None
+        """The finding rendered as ``repo: name.rule message``."""
         return render(self.repo, self.rule, self.message)
 
 
@@ -297,188 +310,62 @@ class Rule:
     ruleset: Ruleset | None
 
 
-def hook_repo_url() -> str:
-    """The published hook-repo URL, read from the canonical config's pinned block."""
-    text = CANONICAL_CONFIG.read_text(encoding="utf-8")
-    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
-    if not match:
-        raise ToolError(f"no pinned block in {CANONICAL_CONFIG}")
-    return match.group(1)
+def check_pin(
+    repo: Path, slug: str | None, url: str, head: str, ids: tuple[str, ...]
+) -> list[Line]:
+    """The pin rule over one consumer's published config.
 
-
-def hook_repo_main() -> str:
-    """The hook repo's local ``main`` commit sha."""
-    result = subprocess.run(
-        ["git", "-C", str(HOOK_REPO_ROOT), "rev-parse", "main"],
-        capture_output=True,
-        text=True,
-        env=gitrepo.no_git_env(),
-    )
-    if result.returncode != 0:
-        raise ToolError(
-            f"cannot resolve main in {HOOK_REPO_ROOT}: {result.stderr.strip()}"
+    The hook repo itself dogfoods from its working tree and pins nothing, so it
+    is passed over; a repo with no origin was already reported by
+    check_settings.
+    """
+    if slug is None or is_hook_repo(repo):
+        return []
+    config = published_file(slug, ".pre-commit-config.yaml")
+    if config is None:
+        return [Line(repo.name, PINNED_HEAD, "no .pre-commit-config.yaml on main")]
+    rev = pinned_rev(config, url)
+    if rev is None:
+        return [Line(repo.name, PINNED_HEAD, f"no {url} pin")]
+    lines = []
+    if rev != head:
+        lines.append(
+            Line(
+                repo.name,
+                PINNED_HEAD,
+                f"pinned {rev[:12]}, published head is {head[:12]}",
+            )
         )
-    return result.stdout.strip()
+    pinned_ids = pinned_hook_ids(config, url) or ()
+    if pinned_ids != ids:
+        lines.append(
+            Line(
+                repo.name,
+                PINNED_HEAD,
+                f"hook ids {', '.join(pinned_ids) or '(none)'}; "
+                f"the manifest publishes {', '.join(ids)}",
+            )
+        )
+    return lines
 
 
-def workspace_repos(workspace: Path, roster: tuple[str, ...]) -> list[Path]:
-    """The roster's repos under ``workspace``, in roster order.
+def workspace_repos(
+    workspace: Path, roster: tuple[str, ...]
+) -> tuple[list[Path], list[str]]:
+    """The roster's repos under ``workspace`` in roster order, and the names not there.
 
     Only the listed repos are audited — an unlisted repo under the root is not
-    governed and draws no output. The reverse does not hold: a listed repo that
-    is not a git repo under the root is a false claim by the roster, and the
-    audit refuses to run rather than quietly auditing a shorter list.
+    governed and draws no output. A listed name with no git repo behind it on
+    this machine is returned separately, for the caller to announce: the
+    workspace spans machines and a repo may deliberately live on another one,
+    so its absence here is neither a finding nor a reason to refuse the rest.
     """
     if not workspace.is_dir():
         raise ToolError(f"workspace root not found: {workspace}")
     repos = [workspace / name for name in roster]
-    missing = [repo.name for repo in repos if not (repo / ".git").exists()]
-    if missing:
-        raise ToolError(
-            f"governed repo(s) not found under {workspace}: {', '.join(missing)}"
-        )
-    return repos
-
-
-def origin_slug(repo: Path) -> str | None:
-    """``owner/name`` from the repo's GitHub origin, or None if there is none."""
-    result = subprocess.run(
-        ["git", "-C", str(repo), "remote", "get-url", "origin"],
-        capture_output=True,
-        text=True,
-        env=gitrepo.no_git_env(),
-    )
-    if result.returncode != 0:
-        return None
-    match = REMOTE_SLUG_PATTERN.match(result.stdout.strip())
-    return match.group(1) if match else None
-
-
-def rev_line(lines: list[str], url: str) -> int | None:
-    """Index of the ``rev:`` line pinning ``url``, or None when there is none.
-
-    The one place a pinned block's rev line is located. The audit reads through
-    it and bump_pins rewrites through it, so the reader and the writer cannot
-    disagree about which line carries the pin.
-    """
-    for i, line in enumerate(lines):
-        if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
-            for follower in range(i + 1, min(i + 3, len(lines))):
-                if re.match(r"^\s*rev:\s*\S+", lines[follower]):
-                    return follower
-    return None
-
-
-def pinned_rev(config_text: str, url: str) -> str | None:
-    """The ``rev`` pinned for ``url`` in a ``.pre-commit-config.yaml`` body, or None."""
-    lines = config_text.splitlines()
-    index = rev_line(lines, url)
-    return lines[index].split(":", 1)[1].strip() if index is not None else None
-
-
-def check_pin(repo: Path, url: str, main_sha: str) -> Line | None:
-    """One pin line per consumer repo; None for the hook repo itself.
-
-    A governed repo carrying no pin at all is a finding, not an advisory: being
-    on the roster is what makes the absence wrong. A stale pin stays advisory —
-    the consumer catches up when its pin is deliberately bumped.
-    """
-    # Only dev-playbook itself is exempt, and identity is the test: it dogfoods
-    # from its working tree, so it has nothing to pin. Publishing a manifest is
-    # not the test — a consumer may publish hooks of its own and still pin
-    # dev-playbook, and reading the exemption off the manifest would drop that
-    # repo's pin from the audit entirely.
-    if repo.resolve() == HOOK_REPO_ROOT:
-        return None
-    name = repo.name
-    config = repo / ".pre-commit-config.yaml"
-    if not config.is_file():
-        return Line(name, PIN, "no .pre-commit-config.yaml", blocking=True)
-    rev = pinned_rev(config.read_text(encoding="utf-8"), url)
-    if rev is None:
-        return Line(name, PIN, "no dev-playbook pin", blocking=True)
-    current = main_sha == rev or (len(rev) >= 7 and main_sha.startswith(rev))
-    if current:
-        return Line(name, None, "pin current")
-    return Line(
-        name,
-        PIN,
-        f"{rev} (hook repo main is {main_sha[:12]})",
-    )
-
-
-def gh_api(path: str, *, paginate: bool = False) -> object | None:
-    """Parsed JSON from ``gh api <path>``, or None when the call fails.
-
-    A non-zero exit or a body that is not JSON (an empty 204, a degraded/HTML
-    error page) yields None for that one path, so a single bad response degrades
-    to an unreachable finding rather than a traceback that blinds the audit to
-    every remaining repo. With ``paginate=True``, ``gh api --paginate`` follows
-    the Link headers and merges every page's JSON array into one array, so a list
-    endpoint with more than a page of results is read in full.
-    """
-    argv = ["gh", "api"]
-    if paginate:
-        argv.append("--paginate")
-    argv.append(path)
-    return _gh_json(argv)
-
-
-def _gh_json(argv: list[str]) -> object | None:
-    """Parsed JSON from one ``gh`` invocation, or None when the call is unusable."""
-    try:
-        result = subprocess.run(argv, capture_output=True, text=True)
-    except FileNotFoundError as err:
-        raise ToolError("gh not found on PATH") from err
-    if result.returncode != 0:
-        return None
-    try:
-        parsed: object = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        return None
-    return parsed
-
-
-def check_auth() -> None:
-    """Stop the run when `gh` holds no usable credential.
-
-    Authentication is a precondition of the whole audit, not a per-repo
-    condition, because an unauthenticated `gh` does not fail — it degrades to
-    anonymous requests, and anonymity is answered three different ways. A public
-    repo serves its REST resources, so labels and issues return real findings. A
-    private repo answers 404, indistinguishable from one that was deleted.
-    GraphQL has no anonymous mode at all, so the settings check fails on every
-    repo whatever its visibility. The audit would then print a mix of genuine
-    findings and per-repo unreachable lines under one exit 1, with nothing in the
-    output telling a reader which was which. Refusing to start is the only honest
-    answer.
-    """
-    try:
-        result = subprocess.run(
-            ["gh", "auth", "status"], capture_output=True, text=True
-        )
-    except FileNotFoundError as err:
-        raise ToolError("gh not found on PATH") from err
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout).strip()
-        raise ToolError(
-            "gh holds no usable credential, so every GitHub read would "
-            "silently degrade to an anonymous request. Run `gh auth login`, or "
-            f"re-run where the credential store is readable.\n{detail}"
-        )
-
-
-def gh_graphql(query: str, **variables: str) -> object | None:
-    """Parsed JSON from ``gh api graphql``, or None when the call fails.
-
-    The same degradation contract as ``gh_api``: a non-zero exit (which is how
-    `gh` reports GraphQL errors) or an unparseable body yields None for that one
-    call, so a single bad response degrades to an unreachable finding.
-    """
-    argv = ["gh", "api", "graphql", "-f", f"query={query}"]
-    for key, value in variables.items():
-        argv += ["-f", f"{key}={value}"]
-    return _gh_json(argv)
+    present = [repo for repo in repos if (repo / ".git").exists()]
+    absent = [repo.name for repo in repos if not (repo / ".git").exists()]
+    return present, absent
 
 
 def fetch_settings(slug: str) -> dict | None:
@@ -592,15 +479,27 @@ def check_settings(repo: Path, slug: str | None) -> list[Line]:
     name = repo.name
     if slug is None:
         return [
-            Line(name, REMOTE, "no GitHub origin; settings unchecked", blocking=True)
+            Line(
+                name,
+                GITHUB_ORIGIN,
+                "no GitHub origin; settings unchecked",
+                blocking=True,
+            )
         ]
     settings = fetch_settings(slug)
     if settings is None:
-        return [Line(name, SETTINGS, f"unreachable via gh api ({slug})", blocking=True)]
+        return [
+            Line(
+                name,
+                SQUASH_ONLY_MERGES,
+                f"unreachable via gh api ({slug})",
+                blocking=True,
+            )
+        ]
     return [
         Line(
             name,
-            SETTINGS,
+            SQUASH_ONLY_MERGES,
             f"{field} is {settings.get(field)!r} (want {want!r})",
             blocking=True,
         )
@@ -631,7 +530,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
         return [
             Line(
                 name,
-                PROTECTION,
+                DEFAULT_BRANCH_PROTECTION,
                 f"rules unreachable via gh api ({slug})",
                 blocking=True,
             )
@@ -641,7 +540,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
     lines = [
         Line(
             name,
-            PROTECTION,
+            DEFAULT_BRANCH_PROTECTION,
             f"{branch} is not protected against {operation}",
             blocking=True,
         )
@@ -653,7 +552,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
         lines.append(
             Line(
                 name,
-                PROTECTION,
+                DEFAULT_BRANCH_PROTECTION,
                 f"a ruleset protecting {branch} could not be read",
                 blocking=True,
             )
@@ -666,7 +565,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
             lines.append(
                 Line(
                     name,
-                    PROTECTION,
+                    DEFAULT_BRANCH_PROTECTION,
                     f"ruleset {ruleset.name!r} enforcement is "
                     f"{ruleset.enforcement!r} (want 'ACTIVE')",
                     blocking=True,
@@ -677,7 +576,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
             lines.append(
                 Line(
                     name,
-                    PROTECTION,
+                    DEFAULT_BRANCH_PROTECTION,
                     f"ruleset {ruleset.name!r} grants bypass to {count} "
                     f"actor{'' if count == 1 else 's'} (want none)",
                     blocking=True,
@@ -688,7 +587,7 @@ def check_protection(repo: Path, slug: str | None) -> list[Line]:
         lines.append(
             Line(
                 name,
-                PROTECTION,
+                DEFAULT_BRANCH_PROTECTION,
                 f"{branch} is protected by {filed}, not by the canonical "
                 f"{CANONICAL_RULESET!r}",
                 blocking=True,
@@ -702,8 +601,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
 
     Mirrors what bootstrap-labels would repair — a finding for every missing
     label, every drifted color/description, and every label outside the closed
-    world — plus its own named rule for any label naming a blocked state (which
-    the closed-world check already flags, deliberately overlapping).
+    world.
     """
     have = {label["name"]: label for label in labels}
     canonical = canonical_labels()
@@ -712,7 +610,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
     for label_name, color, desc in canonical:
         if label_name not in have:
             lines.append(
-                Line(name, LABEL_SCHEME, f"missing label {label_name}", blocking=True)
+                Line(name, VALID_LABELS, f"missing label {label_name}", blocking=True)
             )
         elif (
             have[label_name].get("color", "").lower() != color.lower()
@@ -721,7 +619,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
             lines.append(
                 Line(
                     name,
-                    LABEL_SCHEME,
+                    VALID_LABELS,
                     f"label {label_name} drifted (color/description)",
                     blocking=True,
                 )
@@ -730,16 +628,7 @@ def check_labels(name: str, labels: list) -> list[Line]:
         if label_name not in canonical_names:
             lines.append(
                 Line(
-                    name, LABEL_SCHEME, f"unexpected label {label_name}", blocking=True
-                )
-            )
-        if label_name.split(":")[-1].lower() == "blocked":
-            lines.append(
-                Line(
-                    name,
-                    NO_BLOCKED_LABEL,
-                    f"label {label_name} names a blocked state",
-                    blocking=True,
+                    name, VALID_LABELS, f"unexpected label {label_name}", blocking=True
                 )
             )
     return lines
@@ -818,7 +707,7 @@ def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[L
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} map carries {offending}; a map carries no factory label",
                 blocking=True,
             )
@@ -828,7 +717,7 @@ def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[L
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} map also carries ticket types {types}; a map is not a ticket",
                 blocking=True,
             )
@@ -836,7 +725,7 @@ def _map_findings(name: str, number: int, labels: set[str], body: str) -> list[L
     lines.extend(
         Line(
             name,
-            WAYFINDER_SHAPE,
+            WAYFINDER_BODY,
             f"#{number} map missing {section} section",
             blocking=True,
         )
@@ -862,7 +751,7 @@ def _ticket_findings(
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} ticket carries {offending}; a decision ticket carries no factory label",
                 blocking=True,
             )
@@ -872,7 +761,7 @@ def _ticket_findings(
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} ticket has multiple wayfinder labels: {types}",
                 blocking=True,
             )
@@ -881,7 +770,7 @@ def _ticket_findings(
         lines.append(
             Line(
                 name,
-                WAYFINDER_SHAPE,
+                WAYFINDER_LABELS,
                 f"#{number} ticket wayfinder:{types[0]} is not a scheme value",
                 blocking=True,
             )
@@ -889,7 +778,7 @@ def _ticket_findings(
     lines.extend(
         Line(
             name,
-            WAYFINDER_SHAPE,
+            WAYFINDER_BODY,
             f"#{number} ticket missing {section} section",
             blocking=True,
         )
@@ -915,7 +804,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic carries {offending}; an epic carries a category label only",
                 blocking=True,
             )
@@ -925,7 +814,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic missing category label",
                 blocking=True,
             )
@@ -934,7 +823,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic has multiple category labels: {categories}",
                 blocking=True,
             )
@@ -943,7 +832,7 @@ def _epic_findings(
         lines.append(
             Line(
                 name,
-                EPIC_SHAPE,
+                CATEGORY_ONLY,
                 f"#{number} epic category:{categories[0]} is not a scheme value",
                 blocking=True,
             )
@@ -971,7 +860,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf carries {offending}; a session leaf "
                 "carries a category label and mode:session only",
                 blocking=True,
@@ -982,7 +871,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf missing category label",
                 blocking=True,
             )
@@ -991,7 +880,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf has multiple category labels: {categories}",
                 blocking=True,
             )
@@ -1000,7 +889,7 @@ def _session_findings(
         lines.append(
             Line(
                 name,
-                SESSION_SHAPE,
+                SESSION_LABELS,
                 f"#{number} session leaf category:{categories[0]} is not a scheme value",
                 blocking=True,
             )
@@ -1017,18 +906,21 @@ def _tuple_findings(
     scheme, and the mode↔tests pairings holding.
     """
     present = {dim: _dimension_values(labels, dim) for dim in TUPLE_DIMENSIONS}
+    # The spike's rule is the build leaf's plus the tests:no pairing; a leaf
+    # whose mode is missing or ambiguous is held to the build leaf's.
+    rule = SPIKE_LABELS if present["mode"] == ["spike"] else BUILD_LABELS
     lines: list[Line] = []
     for dim in TUPLE_DIMENSIONS:
         vals = present[dim]
         if not vals:
             lines.append(
-                Line(name, TUPLE_VALID, f"#{number} missing {dim} label", blocking=True)
+                Line(name, rule, f"#{number} missing {dim} label", blocking=True)
             )
         elif len(vals) > 1:
             lines.append(
                 Line(
                     name,
-                    TUPLE_VALID,
+                    rule,
                     f"#{number} multiple {dim} labels: {vals}",
                     blocking=True,
                 )
@@ -1037,7 +929,7 @@ def _tuple_findings(
             lines.append(
                 Line(
                     name,
-                    TUPLE_VALID,
+                    rule,
                     f"#{number} {dim}:{vals[0]} is not a scheme value",
                     blocking=True,
                 )
@@ -1048,7 +940,7 @@ def _tuple_findings(
         lines.append(
             Line(
                 name,
-                TUPLE_VALID,
+                SPIKE_LABELS,
                 f"#{number} mode:spike requires tests:no",
                 blocking=True,
             )
@@ -1060,17 +952,23 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
     """A leaf's body carries its mode's required brief headings."""
     modes = _dimension_values(labels, "mode")
     if len(modes) != 1:
-        return []  # a missing or ambiguous mode is tuple-valid's finding
+        return []  # a missing or ambiguous mode is the labels rule's finding
     mode = modes[0]
-    required: tuple[str, ...]
     if mode == "spike":
-        required = SPIKE_HEADINGS
-    elif mode == "direct":
-        required = BUILD_HEADINGS
-    elif mode == "session":
-        required = SESSION_HEADINGS
-    else:
-        return []  # an unknown mode value is tuple-valid's finding
+        return _heading_findings(name, number, body, SPIKE_HEADING_LIST, SPIKE_HEADINGS)
+    if mode == "direct":
+        return _heading_findings(name, number, body, BUILD_HEADING_LIST, BUILD_HEADINGS)
+    if mode == "session":
+        return _heading_findings(
+            name, number, body, SESSION_HEADING_LIST, SESSION_HEADINGS
+        )
+    return []  # an unknown mode value is the labels rule's finding
+
+
+def _heading_findings(
+    name: str, number: int, body: str, required: tuple[str, ...], rule: str
+) -> list[Line]:
+    """The body's missing headings under ``rule``, or its unclosed fence."""
     try:
         prose = [line for _, line in md.lines_outside_fences(body)]
     except md.UnclosedFence as unclosed:
@@ -1083,7 +981,7 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
         return [
             Line(
                 name,
-                ISSUE_BRIEF_SHAPE,
+                CLOSED_FENCES,
                 f"#{number} body has an {unclosed}",
                 blocking=True,
             )
@@ -1091,7 +989,7 @@ def _brief_findings(name: str, number: int, labels: set[str], body: str) -> list
     return [
         Line(
             name,
-            ISSUE_BRIEF_SHAPE,
+            rule,
             f"#{number} missing {heading} heading",
             blocking=True,
         )
@@ -1188,10 +1086,10 @@ def check_tracking(repo: Path, slug: str | None) -> list[Line]:
         return []
     return [
         *_fetch_or_report(
-            repo.name, slug, LABEL_SCHEME, "labels", fetch_labels, check_labels
+            repo.name, slug, VALID_LABELS, "labels", fetch_labels, check_labels
         ),
         *_fetch_or_report(
-            repo.name, slug, ISSUE_BRIEF_SHAPE, "issues", fetch_issues, check_issues
+            repo.name, slug, BUILD_LABELS, "issues", fetch_issues, check_issues
         ),
     ]
 
@@ -1204,8 +1102,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="workspace-lint",
         description=(
-            "Report GitHub settings drift, label/issue/epic/tuple conformance, "
-            "and stale dev-playbook pins across the workspace."
+            "Report GitHub settings drift and label/issue/epic/tuple conformance "
+            "across the workspace."
         ),
     )
     parser.add_argument(
@@ -1223,16 +1121,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--list-rules",
         action="store_true",
-        help="print the rule ids this detector can emit, one per line, and exit",
+        help="print the rule ids this command can emit, one per line, and exit",
     )
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--pins-only", action="store_true", help="skip the gh api checks")
-    mode.add_argument(
+    parser.add_argument(
         "--settings-only",
         action="store_true",
         help=(
             "run only the repo-settings checks — merge settings and default-branch "
-            "protection (skip pins and the tracking gh-api checks)"
+            "protection (skip the tracking gh-api checks)"
         ),
     )
     args = parser.parse_args(argv)
@@ -1240,37 +1136,31 @@ def main(argv: list[str] | None = None) -> int:
         return print_rules(RULES)
 
     try:
-        repos = workspace_repos(args.workspace.resolve(), args.repos)
-        if not args.pins_only:
-            check_auth()
+        repos, absent = workspace_repos(args.workspace.resolve(), args.repos)
+        check_auth()
         url = hook_repo_url()
-        main_sha = hook_repo_main() if not args.settings_only else ""
+        head = release_head()
+        ids = published_hook_ids(head)
         lines: list[Line] = []
         for repo in repos:
+            slug = origin_slug(repo)
+            lines.extend(check_settings(repo, slug))
+            lines.extend(check_protection(repo, slug))
+            lines.extend(check_pin(repo, slug, url, head, ids))
             if not args.settings_only:
-                pin = check_pin(repo, url, main_sha)
-                if pin is not None:
-                    lines.append(pin)
-            if not args.pins_only:
-                slug = origin_slug(repo)
-                lines.extend(check_settings(repo, slug))
-                lines.extend(check_protection(repo, slug))
-                if not args.settings_only:
-                    lines.extend(check_tracking(repo, slug))
+                lines.extend(check_tracking(repo, slug))
     except ToolError as err:
         print(f"workspace-lint: {err}", file=sys.stderr)
         return 2
 
     for line in lines:
-        if line.rule is not None:
-            print(line.render())
-        else:
-            print(f"workspace-lint: {line.repo}: {line.message}", file=sys.stderr)
+        print(line.render())
 
+    if absent:
+        print(
+            f"workspace-lint: not on this machine, not audited: {', '.join(absent)}",
+            file=sys.stderr,
+        )
     findings = sum(1 for line in lines if line.blocking)
-    stale = sum(1 for line in lines if line.stale)
-    print(
-        f"workspace-lint: {len(repos)} repos, {findings} finding(s), {stale} stale pin(s)",
-        file=sys.stderr,
-    )
+    print(f"workspace-lint: {len(repos)} repos, {findings} finding(s)", file=sys.stderr)
     return 1 if findings else 0

@@ -1,5 +1,5 @@
 ---
-type: Standard-Ruleset
+type: Standard
 title: Issue Shapes
 description: The five species of GitHub issue and the shape of each — its labels and its body headings — the build leaf, the spike, the session leaf, the epic, and the wayfinder map or ticket, plus the rules every body obeys
 population: "a GitHub issue in a governed repo"
@@ -9,71 +9,83 @@ population: "a GitHub issue in a governed repo"
 
 A GitHub issue in a governed repo is committed work, at any size. Work
 not yet decided on is a Candidate in `CANDIDATES.md`
-([Candidates](/standards/tracking/candidates.md)), and a unit of work
-sits in one home, never both. An issue is one of five species, told from
+([Candidates](/standards/tracking/candidates.md)). An issue is one of
+five species, told from
 its labels and its sub-issues, and each species fixes the labels the
 issue carries and the headings its body carries. The labels are
 [Label Scheme](/standards/tracking/label-scheme.md)'s; the calls that
-link issues are [Linking Issues](/standards/tracking/linking-issues.md).
-
-## Roles
-
-Every issue is a **leaf**, an issue with no sub-issues, or an **epic**,
-an issue with sub-issues; the role is read from the tracker and is never
-a label. An epic is never built directly: its children carry the work.
-
-## Relationships
-
-Hierarchy and dependency are native GitHub relationships, never body
-fields and never labels: a **sub-issue** is part of its parent, and an
-issue **blocked-by** another waits for it to close. The two are
-independent, so a parent says nothing about order and a blocker nothing
-about parentage, and *blocked* is derived from open blockers, never a
-label.
+link issues are [Linking Issues](/guides/linking-issues.md).
 
 ## Written for the user
 
-A brief is readable unaided by the user, who sees only the issue and
-never the author's context: a reference to existing file content quotes
-the text it amends verbatim.
+An issue's body is readable unaided by a user who sees only the issue and
+never the author's context, and a reference to existing file content
+quotes verbatim the text it amends.
+
+`tracking.written-for-the-user` · stochastic
 
 ## Behavioural, not procedural
 
-A brief describes what the system does after the work, as interfaces and
+The body of an issue that carries `mode:direct` or `mode:session`
+describes what the system does after the work, as interfaces and
 behavioural contracts, never the steps that get there.
+
+`tracking.behavioural-not-procedural` · stochastic
 
 ## One goal
 
-A brief serves one outcome: any part that could slip indefinitely with
-the outcome still standing, and could ship later as its own issue
-without reopening this one, is deferred to a stub minted at
-`phase:intake` and named under `Out of scope`.
+An issue that carries `mode:direct` or `mode:session` serves one
+outcome, and every part that could slip indefinitely
+with the outcome still standing, and could ship later as its own issue
+without reopening this one, is named under the issue's `Out of scope`
+heading and carried by a separate issue that carries `phase:intake`.
+
+`tracking.one-goal` · stochastic
+
+## User intent in the user's voice
+
+An issue's `User intent` section is written in the user's voice, not an
+agent's paraphrase.
+
+`tracking.user-intent-in-the-users-voice` · stochastic
+
+> **Why.** Only the user can vouch for what they meant. A paraphrase
+> is an agent's reading of the intent, and the reading is what drifts,
+> so the section keeps the user's words and the agent's reading goes
+> elsewhere in the issue.
+
+## Closed fences
+
+The body of a leaf that has `mode:session`, or that has a `phase:*`
+label other than `phase:intake`, closes every code fence it opens.
+
+`tracking.closed-fences` · deterministic
 
 ## Build leaf
 
-A leaf carrying `mode:direct`: the software factory's path, an issue
-that ends in merged code.
+The issue has no sub-issues and has `mode:direct`.
 
-### Build labels
+### One label from each prefix
 
-A build leaf carries one label from each of `category`, `mode`, `tests`,
-and `phase`, each a scheme value, `phase:*` naming its current node; an
-untriaged leaf carries `phase:intake` or no labels at all. workspace-lint
-reports a leaf past intake whose set is incomplete, doubled, or
-off-scheme (`tracking.tuple-valid`).
+A build leaf with a `phase:*` label other than `phase:intake` has
+exactly one `category:*`, one `mode:*`, one `tests:*`, and one
+`phase:*` label, and each of the four is a label in
+`src/dev_playbook/label_scheme.json`.
 
-### Build headings
+`tracking.one-label-from-each-prefix` · deterministic
 
-The body carries every heading below, `Key interfaces` and `Prohibited
-surfaces` stating "none" rather than being omitted; workspace-lint
-reports a missing heading (`tracking.issue-brief-shape`).
+### Every build heading, in bold
+
+The body of a build leaf with a `phase:*` label other than
+`phase:intake` has each of the eight headings below as bold text
+followed by a colon, `**Summary:**` or `**Summary**:`, outside any
+code fence.
 
 ```markdown
 **Summary:** one line
 
 **User intent:**
-Why the issue exists and which way to lean when goods collide, in the
-user's own words, written fresh for this issue.
+Why the issue exists and which way to lean when goods collide.
 
 **Current behavior:**
 What happens now.
@@ -94,28 +106,35 @@ What happens after the work, including edge cases and error conditions.
 - What this issue will not change
 ```
 
-`User intent` is the user's words and never an agent's paraphrase; one
-epic-level block copied into every child is the defect. `Prohibited
-surfaces` names only the paths whose touching is a real hazard. A brief
-whose deliverables include prose may carry it verbatim in a
-`## Artifacts` section, each block in a code fence, four backticks when
-the content has fences of its own; the section binds when present and
-is never required.
+`tracking.every-build-heading-in-bold` · deterministic
+
+### Every artifact block in a fence
+
+Where a build leaf's body carries an `Artifacts` section, each block
+under it sits in a code fence, four backticks when the block has fences
+of its own.
+
+`tracking.every-artifact-block-in-a-fence` · stochastic
 
 ## Spike
 
-A leaf carrying `mode:spike`: a question whose deliverable is an answer
-in the issue's closing comment; no PR opens.
+The issue has no sub-issues and has `mode:spike`.
 
-### Spike labels
+### One label from each prefix, tests fixed at no
 
-A spike carries the build leaf's four labels, with `mode:spike` paired
-with `tests:no` (`tracking.tuple-valid`).
+A spike with a `phase:*` label other than `phase:intake` has
+exactly one `category:*`, one `mode:*`, one `tests:*`, and one
+`phase:*` label, each a label in
+`src/dev_playbook/label_scheme.json`, and its `tests:*` label is
+`tests:no`.
 
-### Spike headings
+`tracking.one-label-from-each-prefix-tests-fixed-at-no` · deterministic
 
-The body carries `Summary`, `Question`, and `Deliverable`
-(`tracking.issue-brief-shape`):
+### Summary, Question, and Deliverable
+
+The body of a spike with a `phase:*` label other than
+`phase:intake` has `Summary`, `Question`, and `Deliverable` as bold
+text followed by a colon, outside any code fence.
 
 ```markdown
 **Summary:** one-line framing of the question
@@ -127,68 +146,83 @@ The specific question, narrow enough to resolve in one investigation.
 What a good answer looks like.
 ```
 
+`tracking.summary-question-and-deliverable` · deterministic
+
 ## Session leaf
 
-A leaf carrying `mode:session`: work the user leads in a session, in a
-worktree, with a pull request opened by hand; nothing dispatches it.
+The issue has no sub-issues and has `mode:session`.
 
-### Session labels
+### One category label, no phase or tests
 
-A session leaf carries exactly one `category:*` label and
-`mode:session`, and no `tests:*` or `phase:*` label; workspace-lint
-reports the rest (`tracking.session-shape`).
+A session leaf has exactly one `category:*` label, a label in
+`src/dev_playbook/label_scheme.json`, no `mode:*` label other than
+`mode:session`, and no `tests:*` or `phase:*` label.
 
-### Session headings
+`tracking.one-category-label-no-phase-or-tests` · deterministic
 
-The body carries `Summary`, `User intent`, `Current behavior`, `Desired
-behavior`, `Acceptance criteria`, and `Out of scope`, as the build leaf
-states them (`tracking.issue-brief-shape`); `Out of scope` may read
-"Unknown; dealt with when found."
+### Every session heading, in bold
+
+The body of a session leaf has `Summary`, `User intent`,
+`Current behavior`, `Desired behavior`, `Acceptance criteria`, and
+`Out of scope` as bold text followed by a colon, outside any code
+fence. `Out of scope` may read `Unknown; dealt with when found.`
+
+`tracking.every-session-heading-in-bold` · deterministic
 
 ### A stable body
 
-The body is written once and stays the brief: the plan, the open
-questions, and the decisions of the work live in a working documentation
-set on the branch
-([Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)),
-and a worklist, an open question, or a running decision in the body is
-the defect.
+A session leaf's body holds no worklist, no open question, and no running
+decision.
+
+`tracking.a-stable-body` · stochastic
+
+> **Why.** The plan, the open questions, and the decisions of the work
+> live in a
+> [working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+> on the branch, so the body has nothing to accrue.
 
 ## Epic
 
-An issue with sub-issues and no `wayfinder:*` label.
+The issue has sub-issues and has no `wayfinder:*` label.
 
 ### Category only
 
-An epic carries exactly one `category:*` label, a scheme value, and no
-`phase:*`, `mode:*`, or `tests:*` label; workspace-lint reports the rest
-(`tracking.epic-shape`).
+An epic has exactly one `category:*` label, a label in
+`src/dev_playbook/label_scheme.json`, and no `phase:*`, `mode:*`, or
+`tests:*` label.
 
-### Epic headings
+`tracking.category-only` · deterministic
 
-The body carries `Outcome` and `Decomposition rationale` and never
-duplicates the native sub-issue list; `Out of scope` and `Standing
-rulings` are added only when the epic accrues one, and `Standing
-rulings` is numbered and appended to, never renumbered.
+### No child list
 
-```markdown
-**Outcome:**
-The end state once every child has merged.
+An epic's body does not list its sub-issues.
 
-**Decomposition rationale:**
-Why the work was sliced this way.
-```
+`tracking.no-child-list` · stochastic
 
 ## Wayfinder map or ticket
 
-An issue carrying a `wayfinder:*` label: a **map**, the planning epic the
-`/wayfinder` skill drives, or a **decision ticket**, one of its children.
-The skill owns the body shapes and workspace-lint mirrors them; this
-Standard restates none of it.
+The issue has a `wayfinder:*` label: `wayfinder:map` makes it a
+**map**, and any other `wayfinder:*` value makes it a **decision
+ticket**.
 
-### Wayfinder labels
+### One wayfinder label and nothing else
 
-A map carries `wayfinder:map` and no ticket type; a ticket carries
-exactly one `wayfinder:<type>`, a scheme value, and is a sub-issue of its
-map; neither carries a `category:*`, `mode:*`, `tests:*`, or `phase:*`
-label (`tracking.wayfinder-shape`).
+A map has `wayfinder:map` and no other `wayfinder:*` label. A
+decision ticket has exactly one `wayfinder:*` label, a label in
+`src/dev_playbook/label_scheme.json`. Neither has a `category:*`,
+`mode:*`, `tests:*`, or `phase:*` label.
+
+`tracking.one-wayfinder-label-and-nothing-else` · deterministic
+
+### Map sections, ticket Question
+
+A map's body has a markdown heading, at any level, for each of
+`Destination`, `Notes`, `Decisions so far`, `Not yet specified`,
+and `Out of scope`. A decision ticket's body has a markdown heading
+`Question`, at any level.
+
+`tracking.map-sections-ticket-question` · deterministic
+
+> **Why.** The `/wayfinder` skill owns these body shapes; the rule
+> mirrors them, so a change to the shapes the skill drives is what
+> changes the rule.

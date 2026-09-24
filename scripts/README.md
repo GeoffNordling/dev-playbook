@@ -1,14 +1,14 @@
 ---
 type: README
 title: Scripts
-description: The executable surface of published hook entry points and local dev scripts, with shared library code in src/dev_playbook/
+description: The local dev scripts, thin shims over the library code in src/dev_playbook/, and how the published playbook hook relates to them
 ---
 
 # Scripts
 
-The repo's executable surface: the published pre-commit hook entry points and
-the local dev CLIs. Each file here is a thin shim over the library code in
-`src/dev_playbook/`.
+The repo's local dev CLIs. The one published hook is the `playbook`
+console script, not a file here. Each file here is a thin shim over the
+library code in `src/dev_playbook/`.
 
 > *"The perfect race car crosses the finish line in first place and then falls to pieces."*  
 > — Ferdinand Porsche
@@ -21,7 +21,6 @@ the local dev CLIs. Each file here is a thin shim over the library code in
 
 ## What belongs here
 
-- Published hook entry points — the scripts consumer repos run via pre-commit.
 - Local dev CLIs that automate workspace tasks across repos, run ad hoc.
 
 Every file is an executable shim: it puts `src/` on `sys.path` and calls into
@@ -44,69 +43,37 @@ Run from the repo root. `uv sync` builds the editable install of
 `dev_playbook`; each script is directly executable and also self-bootstraps
 its dependencies via its `uv run --script` shebang.
 
-## Validation scripts
+## The commit gate
 
-The commit-gate detectors. They run automatically on every commit through
-`playbook-lint` — the one published hook, whose roster
-(`src/dev_playbook/playbook_lint.py`) dispatches every detector below
-concurrently and aggregates their exits — and consumer repos run that hook
-from a pinned clone (see
-[Distribution Channel](/standards/distribution/channel.md)). Each script exits 0
-on success / 1 on findings / 2 on tool error, writes machine-readable findings
-to stdout (one per line) and a one-line summary to stderr. Each takes the
-repository root as its argument (default: cwd) and discovers its targets
-through `git ls-files`, so discovery is gitignore-aware and worktree-scoped.
-
-| Script | Standard | Purpose |
-|--------|----------|---------|
-| `billing-lint` | [billing/credentials.md](/standards/billing/credentials.md) | Metered-billing credentials over four surfaces — the live environment, the shell startup files, and the Claude settings files of both the machine and the repo; the one detector that reads the machine |
-| `repo-lint` | [the build standard](/standards/build/index.md) | Repo structure — inferred layers, required/forbidden files, canonical-artifact compares, name mapping, doc shape, the dogfood mirror |
-| `python-lint` | [python/style.md](/standards/python/style.md) | Python-source rules in one walk: no `from __future__ import annotations`, empty `__init__.py` |
-| `testing-lint` | [testing/conventions.md](/standards/testing/conventions.md) | Python test rules: no private-name access from tests, test-file mirror placement, no `if`/`try` logic in a test body |
-| `ref-lint` | [cross-references.md](/standards/knowledge-organization/cross-references.md) | Cross-reference integrity — root-absolute Links and `~/workspace` Citations |
-| `okf-lint` | [document-types.md](/standards/knowledge-organization/document-types.md), [indexes.md](/standards/knowledge-organization/indexes.md) | OKF-bundle integrity — concept-doc frontmatter types and `index.md` freshness |
-| `decisions-lint` | [decisions/records.md](/standards/decisions/records.md) | Decision Record integrity — sequential numbering and status vocabulary over `docs/decisions/` |
-| `harness-files-lint` | [runbook-conventions.md](/standards/harness/runbook-conventions.md), [claude-content.md](/standards/harness/claude-content.md) | Harness-file conformance — skills and agents, plus the global CLAUDE.md source's section shape and required rules where that file is authored |
-| `prose-lint` | [prose/conventions.md](/standards/prose/conventions.md) | Prose spelling — the American `judgment` — over authored Markdown, the banned actor noun over every tracked file of any type, and the first person in a harness-loaded agent instruction file; less verbatim `type: Reference` mirrors and the repo's `.prose-lint-exempt` paths |
-| `standards-lint` | [standard.md](/standards/standard/card.md) | The meta-standard's rules over `standards/` — card layout, catalog order, the card↔rule matrix, hook-surface agreement, and no shadowing of an upstream card (consumer mode); clean by construction where no `standards/` tree is present |
-| `loop-lint` | [loop-conventions.md](/standards/knowledge-organization/loop-conventions.md) | Loop conformance — every document typed `Loop` under `loops/` has a Mermaid graph that agrees with its Acts, Checks, and Yields sections; clean by construction where no `loops/` tree is present |
-
-`repo-lint`, `python-lint`, `testing-lint`, `ref-lint`, `okf-lint`,
-`decisions-lint`, and `prose-lint` assert unconditionally and fail loud; they do
-not skip themselves when a target kind is absent. `harness-files-lint`,
-`standards-lint`, and `loop-lint` are optional-surface: each exits 0 silently when
-its audited surface is absent — no runbooks, no `standards/` tree, no `loops/`
-tree — and asserts only over a surface that is present. Run
-any script with `--help`; each script's docstring documents its behavior in
-full.
+The commit gate is `playbook check` — the one published hook, the console
+script `pyproject.toml` declares. It builds one model of the repository
+from `git ls-files`, runs every check the package registers
+(`src/dev_playbook/checks/`, one module per `standards/` directory), then
+two steps that are not functions over the model: the
+[Loop Conventions](/standards/doc-type/loop-conventions.md) checks in
+`dev_playbook.loop_lint`, until the loop workstream moves them into the
+package, and `pre-commit validate-manifest` where the repo publishes a
+manifest. It exits 0 on success / 1 on findings / 2 when the model cannot
+be built or a step cannot run, writes findings to stdout one per line, and
+a summary to stderr. `playbook checks` lists the registry. Consumer repos
+run the hook from a venv pre-commit installs at the pinned rev (see
+[Distribution Channel](/standards/distribution/channel.md)).
 
 ## Shared libraries (`src/dev_playbook/`)
 
 The scripts share their markdown and Python primitives through the library —
 the installed `dev_playbook` package:
 
-- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, the OKF concept-doc/harness-owned path classification, and the agent-instruction test behind the voice rule. Consumed by `ref-lint`, `okf-lint`, and `prose-lint`.
-- `dev_playbook.pyast` — gitignore-aware Python-file discovery and AST parsing. Consumed by `python-lint`, `testing-lint`, and `repo-lint`.
-- `dev_playbook.testing_lint` — the Python-testing detector logic: the three test-file rules (privacy, mirror layout, no-logic) over one walk. Consumed by `testing-lint`.
-- `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by `ref-lint` and `repo-lint`.
+- `dev_playbook.md` — fenced-code skipping, GitHub heading slugs, YAML frontmatter, link extraction, the OKF concept-doc/harness-owned path classification, and the agent-instruction test behind the voice rule. Consumed by the repo model and the checks.
+- `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by the repo model.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
-- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by `prose-lint`, which enforces it over prose, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.prose_lint`).
+- `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by the prose checks, which check prose against it, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.checks.prose`).
 - `dev_playbook.front_clone` — the round trip a lap's commits make: the clone opened without shared object files, the record it keeps of its own source and base, and the verified fetch back into the real repository. Consumed by `front-clone`.
-- `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook-lint` self-check). Consumed by `repo-init`.
+- `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook check` self-check). Consumed by `repo-init`.
 
-The larger surfaces are subpackages: `dev_playbook.transcript_export` (the
-Claude Code session model, classifier, and renderer behind
-`transcript-export`) and `dev_playbook.factory`, whose pieces are the
-software factory's append-only run ledger — the `ledger` table beside the
-hook-capture `events` table, its per-kind writers and its two read queries; the
-job launcher that sweeps a launch's credentials, spawns a factory node, watches
-its stream live, and writes its two job rows; and the build-region traverse that
-carries one issue from its phase label to an open pull request, behind
-`traverse-issue`. The launcher and the traverse are **Linux only**, and say so
-at import: every node the launcher spawns is set to die with it through
-`PR_SET_PDEATHSIG`, a `prctl` operation with no portable equivalent, and a
-child that could outlive its launcher is an hour of claude billed with nobody
-watching it.
+The one larger surface is a subpackage: `dev_playbook.transcript_export`,
+the Claude Code session model, classifier, and renderer behind
+`transcript-export`.
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so
@@ -116,20 +83,15 @@ directory.
 
 ### Two run environments
 
-Each *published* hook entry runs in two environments and MUST work in both:
+The published hook runs in two environments and MUST work in both:
 
-1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs the script from the working tree, cwd at the repo root.
-2. **Consumer repos and CI** — pre-commit clones dev-playbook at the pinned `rev` into its own cache and runs the script from that clone, cwd at the consumer repo. See [Distribution Channel](/standards/distribution/channel.md).
+1. **dev-playbook itself** — the `repo: local` block in [`.pre-commit-config.yaml`](/.pre-commit-config.yaml) runs `uv run playbook check` from the working tree, cwd at the repo root.
+2. **Consumer repos and CI** — pre-commit installs dev-playbook at the pinned `rev` into a venv it caches and runs the console script from there, cwd at the consumer repo. See [Distribution Channel](/standards/distribution/channel.md).
 
-In both, pre-commit resolves the script by the relative `entry:` path declared
-in [`.pre-commit-hooks.yaml`](/.pre-commit-hooks.yaml) (mirrored in the local
-block) against the dev-playbook checkout that holds it — no `$HOME` paths, no
-`realpath` indirection.
-
-When adding a validator, enroll it in the `playbook-lint` roster
-(`DETECTORS` in `src/dev_playbook/playbook_lint.py`) — the manifest and the
-local block carry only the aggregate hook and never change — and test it in
-dev-playbook and a consumer repo before pushing.
+When adding a check, write it as one function under `src/dev_playbook/checks/`
+with the `@check` decorator — the manifest and the local block carry only the
+one hook and never change — and test it in dev-playbook and a consumer repo
+before pushing.
 
 ## Utility scripts
 
@@ -138,15 +100,15 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-lint` | On-demand workspace audit via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/standards/tracking/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
-| `bootstrap-labels` | Enforce the GitHub label scheme in the current repo — run by hand, after a scheme change or when adopting a repo |
+| `workspace-lint` | On-demand workspace check via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and whether each consumer's published config pins dev-playbook's published head with the hook ids its manifest publishes there ([Distribution Channel](/standards/distribution/channel.md)); a roster name with no repo on this machine is announced and passed over |
+| `bootstrap-labels` | Apply the GitHub label scheme to the current repo — run by hand, after a scheme change or when adopting a repo |
 | `labelgen` | Render the label scheme as the table in [label-scheme.md](/standards/tracking/label-scheme.md); `--check` fails on drift |
-| `bump-pin` | Check whether one consumer repo's dev-playbook `rev` pin can move to the published head (`--check`, a probe that restores the config) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |
-| `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook-lint` self-check; the GitHub tail is [bootstrap.md](/standards/build/bootstrap.md) |
+| `bump-pin` | Check whether one consumer repo's dev-playbook pin — its `rev` and the hook ids the manifest publishes at that rev, and in a host the dev-playbook source's `rev` in `pyproject.toml` with `uv.lock` re-locked — can move to the release head (`--check`, a probe run in a throwaway worktree of `origin/main`) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |
+| `update-pins` | Move every governed repo's dev-playbook pin to the release head — for each repo on this machine with no ledger row at that head, probe the bump in a throwaway worktree of `origin/main`; green lands one commit on `main`, red cuts a `bump-pin-<sha12>` worktree and hands it to a headless agent that runs `/finish-pin-bump` and opens a PR — and append one row per repo to the [Pin Updates Ledger](/docs/pin-updates.md); run by a systemd user timer every fifteen minutes, exits at once when every repo is recorded; first removes every `bump-pin-*` worktree and branch whose PR is merged or closed; merges nothing; `--dry-run` probes and lands nothing |
+| `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook check` self-check; the GitHub tail is [bootstrap.md](/guides/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages and wire up the `~/.bashrc.d` loader |
 | `front-clone` | Open and close a front's throwaway clone for one lap: `open` clones with `--no-hardlinks`, verifies the clone shares no object file with its source, and starts the front's branch at the lap's base commit; `close` returns the commits by fetching from the clone, verifies the branch tip matches, and deletes it. Every check refuses rather than repairs, and a refused close leaves the clone on disk |
-| `traverse-issue` | Carry one factory issue from its phase label to an open PR: `traverse-issue <owner/name> <issue> <auto\|user-rework>` — per-issue lock, worktree create-or-reuse, the `build` and `open-pr` nodes launched headless, one JSON line on stdout naming the terminal status |
 
 Run any script with `--help`; each script's docstring documents its behavior in
 full.
