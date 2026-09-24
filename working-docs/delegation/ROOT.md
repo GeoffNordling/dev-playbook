@@ -93,6 +93,10 @@ machinery an unattended stint runs on.
   runs today.
 - **Iteration** — one fresh-context agent that does one task of the plan,
   commits, and exits.
+- **Principal** — the top-level entity of a stint, which owns the plan
+  and rules on the reports of the iterations and the reviewer. In an
+  attended stint it is the user and the top-level agent together; in an
+  unattended stint it is the top-level agent alone.
 - **Sandcastle pipeline** — the machinery that runs an agent in a sealed
   container, described in
   [The Sandcastle Pipeline](/working-docs/delegation/sandcastle/pipeline.md).
@@ -166,6 +170,23 @@ Decided with the user on 2026-09-24.
   Settled, Open, and Stints are new.
 - **Open holds questions only.** An answer, recommended or not, is a
   separate thing and does not sit with the question.
+- **The Ralph pattern has four parts**, and every driver keeps them:
+  1. The plan is written in the standard format. An attended principal
+     makes it; an unattended principal is given it.
+  2. Independent fresh-context iterations each do one chunk.
+  3. A fresh-context reviewer compares what was done with the plan, sorts
+     its findings, and returns them to the principal, which supplies taste
+     and judgment. The sorting is how the pattern scales: the user rules
+     on the top findings only, since no user can read everything agents
+     report, and ruling on a sorted list calibrates the user's taste.
+  4. The principal changes the plan on the iterations' and the reviewer's
+     reports, so the entity that manages the plan is the one that changes
+     it.
+- **An unattended principal keeps the whole stint in its own context,
+  and never forks.** It knows the history of what it is doing because it
+  lived it. The attended Ralph, which changes the plan through a fork of
+  the top session, stays as it is, and the unattended driver is built
+  separately.
 - **The drivers form a menu.** Today: the Ralph workflow, which runs in a
   Claude Code session through the `Workflow` runtime
   ([`ralph-loop.js`](/dotfiles/dot-claude/workflows/ralph-loop.js)), and
@@ -190,38 +211,44 @@ Decided with the user on 2026-09-24.
   unmerged branch.
 - **No queue and no push.** A script reads the workstreams and the live
   stints and prints a board, ✈️ for running and 💤 for waiting on the
-  user, and any agent can run it from the command line. What the board
-  tracks is open.
+  user, and any agent can run it from the command line.
 - **The tracking standard splits in two.** GitHub issues become one way
   to track work among several, in their own section; this workflow is
   another, and the two do not tangle.
-- **The Ralph checkpoint skill serves both modes.** It is refactored, by
-  progressive disclosure, to run in an attended stint as it does today and
-  inside an unattended one.
 - **A coordinator agent advises only.** The user runs it; it reads the
   board, says which workstreams need the user, and drafts head files and
   verdicts. It launches nothing.
 - **The Loop working set folds in when the first Loop is written.**
   [`doc-type-system/loop/`](/working-docs/doc-type-system/loop/ROOT.md)
   is where the unattended stint's Loop gets written, not beside it.
+- **The unattended principal rules on the findings itself.** It judges
+  the reviewer's sorted findings against the head file's Goal, Done when,
+  and Constraints, and writes each ruling in the progress file, so the
+  user sees every ruling at the yield. A finding the head file cannot
+  settle ends the stint as stuck.
+- **The unattended principal is one headless Claude session.** The
+  driver resumes the same session at each checkpoint, so its context
+  holds the whole stint, and it runs sealed like every other call.
+- **The context-window risk is accepted.** The principal takes in every
+  report of the stint, which may break the constraint that no agent runs
+  until its context fills. The stint's hard limit bounds it; a better
+  answer waits for a real stint to show the need.
+- **The head file is `WORKSTREAM.md`**, named for its type as `SKILL.md`
+  is.
+- **The board shows one row per stint running (✈️) or waiting (💤)**:
+  its workstream, its branch, the checkpoint reached, such as "2 of 3",
+  and why it stopped. Nothing more for now.
+- **The user brings a stint's work in.** No term names the role, and
+  "integrator" retires.
+- **A stint's plan is `PLAN.md` and `PROGRESS.md`** beside the head file
+  on the stint's branch, as a Ralph run keeps them today. At the verdict,
+  the stint's entry under Stints records the outcome.
+- **A workstream's target is not a Standard, for now.** Done when stays a
+  heading; the idea returns after the first real stint.
 
 ## Open
 
-To be decided from the [Shape](#shape) diagram.
-
-- **Who rules at an unattended checkpoint.** The reviewer ranks findings
-  and no user is there to confirm them.
-- **The head file's name.** `ROOT.md`, `WORKSTREAM.md`, or another.
-- **What the board tracks.** Which stints get a row, and which facts of
-  each it shows.
-- **Where the integrator goes.** Whether the role that brings a stint's
-  work in needs a name of its own, or is the user.
-- **Where a stint's plan lives.** The checkpoints × iterations plan and
-  its progress belong to the stint, not the head file; where they are
-  written is not decided.
-- **A workstream's target as a Standard.** A loop's target lives in the
-  Standards its verify steps point at, and a workstream could hold its
-  done-when as a draft Standard. Parked by the user.
+None.
 
 ## Planned
 
@@ -229,12 +256,6 @@ Sessions with the user come first, each at a high level, the agent
 guiding. Running an unattended stint is the
 [sandcastle set's worklist](/working-docs/delegation/sandcastle/ROOT.md#planned).
 
-- **Decide the Open questions from the diagram.** A diagram of the system
-  in this set, and each item of [Open](#open) settled at that level.
-- **Pass context between headless nodes.** A fork subagent inherits its
-  parent's conversation for free; a headless driver has no fork, so the
-  context a node needs reaches it some other way. The specifics are
-  decided later.
 - **Write the Workstream doc-type.** Its definition and encoding under
   `doc-types/workstream/`, its entry in
   [Document Types](/standards/knowledge-organization/document-types.md),
@@ -250,8 +271,6 @@ guiding. Running an unattended stint is the
 - **Write the unattended stint's Loop.** The first file in `loops/`,
   written by folding in
   [`doc-type-system/loop/`](/working-docs/doc-type-system/loop/ROOT.md).
-- **Refactor the Ralph checkpoint skill** for attended and unattended
-  stints, by progressive disclosure.
 - **Build the board script.** It reads the head files and the live stints
   and prints the ✈️/💤 board.
 - **Build the coordinator agent.** Advisory only.
@@ -261,6 +280,9 @@ guiding. Running an unattended stint is the
 - **Design the delegation workflow.** Done 2026-09-24: a grilling session
   with the user set the five terms, the [Shape](#shape), and everything
   under [Settled](#settled), and renamed this set from `parallel-fronts`.
+- **Decide the Open questions from the diagram.** Done 2026-09-24: the
+  diagrams of a driven Sandcastle stint and of today's attended Ralph
+  settled every question, recorded under [Settled](#settled).
 - **Separate the machinery.** Done 2026-09-24: the Sandcastle members
   moved into the nested
   [sandcastle set](/working-docs/delegation/sandcastle/ROOT.md), so this

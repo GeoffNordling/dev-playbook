@@ -75,8 +75,8 @@ replace.
   schedules and an integrator merges. The delegation workflow's
   [Shape](/working-docs/delegation/ROOT.md#shape) replaces it.
 
-Where the integrator goes in the new words is open in
-[the parent](/working-docs/delegation/ROOT.md#open).
+The integrator retires: the user brings a stint's work in
+([the parent's Settled](/working-docs/delegation/ROOT.md#settled)).
 
 ## Planned
 
@@ -85,8 +85,7 @@ Where the integrator goes in the new words is open in
   wraps up at the hard limit, and yields. This settles what the
   pipeline does not yet do
   ([What it does not yet do](/working-docs/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do)):
-  what schedules a stint, and where real copies live. Waits on the
-  parent's Open questions.
+  what schedules a stint, and where real copies live.
 - **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
   changes that exist only in a throwaway config copy
   ([Part 4](/working-docs/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
@@ -99,7 +98,16 @@ Where the integrator goes in the new words is open in
   step that runs one iteration swappable between a local `claude -p` and
   the Sandcastle pipeline. Sandcastle is a Node library, so the Sandcastle
   step calls a small `.mjs` shim that runs Sandcastle's `run()` for one
-  iteration; Sandcastle's own loop goes unused.
+  iteration; Sandcastle's own loop goes unused. The iteration prompt moves
+  out of `ralph-loop.js` into one file that both drivers read. The
+  reviewer runs sealed too, so nothing in a stint
+  touches the host but the driver.
+- **Test the container's lifetime.** The guess: the work copy opens once
+  per stint and closes once at the yield, and each agent call (an
+  iteration or the reviewer) gets a new container on that
+  copy, so only commits carry from one call to the next. The guess holds
+  only if it proves simple and reliable in Sandcastle; one container for
+  the whole stint is the fallback.
 - **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
   and the pipeline's document beside it, through one PR or several; which
   PRs, in what order, carrying what.
@@ -108,8 +116,7 @@ Where the integrator goes in the new words is open in
   needs a way to declare itself done, and its budget is a ceiling, not a
   target.
 - **Re-word the members.** `pipeline.md`, `survey.md`, and
-  `experiment-log.md` in the delegation workflow's terms, once the
-  parent's Open questions settle.
+  `experiment-log.md` in the delegation workflow's terms.
 
 ## Completed
 
