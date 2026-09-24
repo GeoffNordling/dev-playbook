@@ -12,6 +12,7 @@ committed.
 - `parallel.mjs` — runs two fronts at once and closes both at once, then checks commits, billing, hook logging, and clean up
 - `lifetime.mjs` — two calls in turn on one work copy with a stand-in agent; checks that each gets a new container and only the work copy carries
 - `traps.mjs` — plants every booby-trap trigger in a work copy through a stand-in agent; checks that `run()` fires none on the host
+- `resume.mjs` — a Sonnet session told a magic word, then resumed in a new container and asked it, beside a fresh control; checks the conversation carries and its session file stays in the stint's folder
 - `relocated.mjs` — the plug-in: Sandcastle's podman plug-in with the work copy moved to `~/assignment/<repo>`
 - `receiver.py` — the host-side receiver that writes the container's hook events into the measurement database
 - `package.json` — requires `@ai-hero/sandcastle` `^0.12.0`, any 0.12 release

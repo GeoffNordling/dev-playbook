@@ -175,6 +175,29 @@ booby-trap test, each touching a marker in a folder only the host has; call
   copy as plain files, never with host git, and must itself catch an
   iteration that left work uncommitted.
 
+## The principal's conversation
+
+**Asked.** Can the principal's conversation carry from one sealed call to
+the next, each call in a new container, with its first call fresh?
+
+**Ran.** `rig/resume.mjs`, Sonnet on a new copy of the fake
+mission-control. Call 1, fresh, was told a magic word in its prompt only,
+and told to write nothing. Call 2, in a new container, resumed call 1's
+session and was asked the word. A control, a fresh session on the same
+copy, was asked too. Sandcastle's own session capture kept the session
+file in the stint's folder, through `claudeCode`'s `hostProjectsDir`.
+
+**Settled.**
+
+- Call 2 named the word, in call 1's session. The control answered that
+  it had none, and no file in the copy held the word, so the word came
+  through the conversation only.
+- The session file sat in the stint's folder only. The user's
+  `~/.claude/projects` gained nothing.
+- So the principal can be one conversation across a stint, sealed at
+  every call: Sandcastle's `resumeSession` on a session file the driver
+  keeps with the stint.
+
 ## Acronyms
 
 - **SHA** — Secure Hash Algorithm; here, the ID of a git commit.
