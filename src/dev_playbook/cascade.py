@@ -421,7 +421,7 @@ State: the working directory is the worktree {worktree} on branch {branch}, cut 
 
 Do, in order:
 
-1. Read the skill at {SKILL} and follow its sections 6 and 7 here, in this worktree: work every finding to an empty gate, taking each fix from the rule the finding names rather than from the check's message, and commit as you go with --no-verify.
+1. Read the skill at {SKILL} and follow its sections "Work the findings" and "Land the PR" here, in this worktree, as the cascade-launched caller it describes: work every finding to an empty gate, taking each fix from the rule the finding names rather than from the check's message, and commit as you go with --no-verify.
 2. Make the last commit without --no-verify, so the commit gate runs at the new pin and its green result is the verification.
 3. Push the branch: `git push -u origin {branch}`. If the push is rejected because the token cannot write .github/workflows, stop and print the rejection verbatim: the user widens the token by hand.
 4. Open the PR: `gh pr create --base main --head {branch}` with the title "Pin dev-playbook at {sha[:12]}" and a body that names the sha move {old[:12]} -> {sha[:12]}, each adaptation and the rule it serves, whether .github/workflows/ci.yml changed, and this list of remote branches not merged to main as of this run:

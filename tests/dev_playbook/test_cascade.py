@@ -466,7 +466,7 @@ def test_the_prompt_names_the_skill_and_forbids_the_merge() -> None:
         FINDINGS,
     )
     assert "update-standards-pin/SKILL.md" in prompt
-    assert "sections 6 and 7" in prompt
+    assert "Work the findings" in prompt and "Land the PR" in prompt
     assert "- feat (2026-09-01, 3 ahead)" in prompt
     assert "gh pr create --base main --head bump-pin-abc" in prompt
     assert "No user is present" in prompt

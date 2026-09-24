@@ -151,7 +151,7 @@ the shim `scripts/cascade`, as planned before it was written.
   `bump-pin-<sha12>`, the pin committed `--no-verify`, then
   `claude -p --model opus --permission-mode bypassPermissions` with a
   prompt that names the state, orders the findings worked per
-  `/update-standards-pin` §6, a push, `gh pr create` with the sha move
+  `/update-standards-pin` "Work the findings" and "Land the PR", a push, `gh pr create` with the sha move
   and each adaptation in the body, no merge, and says no user is
   present. The row is `red → PR <url>`, read back from
   `gh pr list --head`, never from the agent's text. No PR → `failed`,
@@ -184,12 +184,6 @@ the shim `scripts/cascade`, as planned before it was written.
 
 ## Planned
 
-- **Step 4 — the headless per-repo runbook.** Rewrite
-  `dotfiles/dot-claude/skills/update-standards-pin/SKILL.md`: §2 and
-  §3 still say the checkout must be on a clean `main` and that the
-  probe "restores the config", both false since step 1; add the mode
-  the cascade launches, a worktree that already holds the bump, work
-  the findings, open the PR.
 - **Step 5 — the timer.** In sysadmin-playbook: `systemd/pin-cascade.
   service` and `.timer` (15 min, `Persistent=true`, the DNS wait
   `agentsview-update.service` uses), a `docs/periodic-jobs/pin-cascade.
@@ -235,6 +229,15 @@ the shim `scripts/cascade`, as planned before it was written.
   with a real bare origin and scripted gate, `claude`, and `gh`; 6
   release-head tests; 164 in the three suites. First dry run over
   story-forge found the interpreter fault above.
+- **Step 4 — the runbook for both callers.** 2026-09-23.
+  `dotfiles/dot-claude/skills/update-standards-pin/SKILL.md` rewritten:
+  a "Two callers" section (by hand §1–§6; cascade-launched starts at
+  "Work the findings" in the worktree the cascade cut), the clean-`main`
+  requirement moved to the green path only, the red path cuts
+  `bump-pin-<sha12>` at `.claude/worktrees/` to match the cascade, the
+  PR body enumerated, escalations go under an `Escalations` heading
+  when no user is present. The cascade prompt and its test name the
+  sections by title.
 
 ## Unfiled
 
