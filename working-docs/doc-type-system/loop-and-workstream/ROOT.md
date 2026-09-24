@@ -80,9 +80,6 @@ Decided with the user on 2026-09-24.
 
 ## Planned
 
-- **Enter Workstream and Loop in the reference model.** Both classes,
-  the drive edge, the principal receiver, and "How they fit" rewritten,
-  for the user's approval.
 - **Write the Workstream bundle.** `doc-types/workstream/` in the
   four-file form, its registry row in
   [Doc-Type System](/doc-types/doc-type-system.md), and a conventions
@@ -119,6 +116,11 @@ Decided with the user on 2026-09-24.
 
 ## Completed
 
+- **Enter Workstream and Loop in the reference model.** Done
+  2026-09-24: both classes, the drive edge, `Loop.acts`/`verifications`/`yields`
+  in place of `steps`, a verification's `standards` list, `Workstream`
+  with its `Heading` and `Stint` parts and derived `parent`/`children`
+  properties, and "How they fit" rewritten. Approved by the user.
 - **Build the Loop doc-type.** Its definition, shape, encoding, and
   ledger in `doc-types/loop/`, its registry row, the `typed-loop`
   location check, `loops/` with an empty index, and

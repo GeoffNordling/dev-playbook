@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Reference Model
-description: The doc-type system's target state as a reference model — four DocTypes, eleven verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
+description: The doc-type system's target state as a reference model — five DocTypes, twelve verbs, the parts each composes, and how they fit, in pseudocode, then where each thing the picture has no place for goes
 ---
 
 # Reference Model
@@ -43,7 +43,8 @@ Target = DocType | File | Issue | PullRequest | External   # what an edge lands 
 # Issue       a GitHub issue; Issue Shapes holds a population of them
 # PullRequest a GitHub pull request; the factory's contract is issue in, PR out
 # External    the catch-all for whatever the doc-type system does not define:
-#             git history, scratch, the launch prompt, the rest of GitHub
+#             git history, scratch, the launch prompt, the rest of GitHub,
+#             the user, a stint's principal, a loop's driver
 
 
 from doc_type import DocType, Target, Verb
@@ -122,22 +123,63 @@ from standard import Finding, Standard
 
 
 class Loop(DocType):
-    """Acts, verifications, and yields, iterated. Drives."""
-    operations  = {act, verify, yield}
+    """Acts, verifications, and yields, iterated. Drives a workstream.
+    Its instance draws the steps as a graph, and the graph carries their order."""
+    operations  = {act, verify, yield, drive}
     frontmatter = DocType.frontmatter | {type, title}
 
-    class Act:
+    class Act:                    # a part: one step that runs a runbook
         runbook:   Runbook
         condition: str | None     # None fires every iteration
-    class Verification:
-        standard:  Standard
+    class Verification:           # a part: one step that runs the verifiers of its standards
+        standards: list[Standard] # one or more
         condition: str | None
-        findings:  list[Finding]  # what its verifiers return; the next act and a yield read them
-    class Yield:
-        receiver:  "Loop | User"
+        findings:  list[Finding]  # every standard's, together; the next act and a yield read them
+    class Yield:                  # a part: one programmed exit
+        receiver:  "Loop | External"   # External: the user, or a stint's principal, named in the instance
         condition: str | None     # "yields when …"
 
-    steps: list[Act | Verification | Yield]   # in iteration order; a step whose condition holds fires
+    acts:          list[Act]      # peers; the graph, not the list, orders them
+    verifications: list[Verification]
+    yields:        list[Yield]
+    # no workstream: one loop drives many, and each workstream's Stints records which loop drove it
+
+
+from doc_type import DocType
+from loop import Loop
+
+
+class Workstream(DocType):
+    """One line of work: the ideas, the target state, and the context of one job. Driven.
+    Its instance is the head file WORKSTREAM.md; the rest of its directory is its material,
+    and a subdirectory with a head file of its own is a child workstream."""
+    operations  = set()           # driven, as a Standard is held to; it adds no verb
+    frontmatter = DocType.frontmatter | {type, title}
+
+    class Heading:                # a part: one H2, picked from the menu; every heading optional, all peers
+        name: Goal | DoneWhen | Principles | Constraints | Terms | Settled | Open \
+              | Planned | Completed | Stints | Unfiled | Acronyms
+        body: str                 # opaque, but for Stints
+
+    class Stint:                  # a part: one entry under Stints, a unit of accounting
+        loop:    Loop             # the loop that drives, or will drive, the workstream
+        budget:  str              # checkpoints × iterations, plus slack, to a hard limit
+        spent:   str | None       # None for the planned stint
+        branch:  str | None
+        verdict: advance | accept | delete | None   # None until the user rules
+
+    headings: list[Heading]       # in file order, each name at most once
+    stints:   list[Stint]         # the planned stint first, if any, then the recorded ones, newest first
+
+    # parent and children are derived from the directory, never written;
+    # its Standard requires each child's head file be reached by links from its parent's
+    @property
+    def parent(self) -> "Workstream | None":
+        """The head file in the nearest directory above; None at the top."""
+
+    @property
+    def children(self) -> list["Workstream"]:
+        """The head files in the directories below, with no head file between."""
 ```
 
 ### The toolchain
@@ -149,18 +191,19 @@ def verify(standard, state) -> list[Finding] # parse the file, route each id to 
 gate: pre-commit | pre-push | CI             # each runs the checks, never a judge
 ```
 
-Runbook is invoked, Standard is held to, Guide instructs, Loop drives.
-Eleven verbs across four DocTypes. A verb belongs to a DocType only; a
+Runbook is invoked, Standard is held to, Guide instructs, Loop drives,
+Workstream is driven. Twelve verbs across five DocTypes. A verb belongs to a DocType only; a
 part has none.
 
 ## How they fit
 
 ```
-Loop ─act───▶ Runbook ─do────▶ Runbook | Script
-  │                   ─read──▶ Standard
-  │                   ─write─▶ state
-  ├─verify─▶ verify(Standard) ─▶ Findings ─▶ the next act, or a yield
-  └─yield─▶ User | Loop
+Loop ─drive──▶ Workstream   each drive logged as a Stint under the workstream's Stints
+  ├─act────▶ Runbook ─do────▶ Runbook | Script
+  │                  ─read──▶ Standard
+  │                  ─write─▶ state
+  ├─verify─▶ verify(Standards) ─▶ Findings ─▶ the next act, or a yield
+  └─yield──▶ Loop | External
 
 Guide ─instruct─▶ User | Runbook   links a Standard's rules and states none
 
@@ -171,8 +214,11 @@ Verifier, check, judge, and gate are the words of
 [CONTEXT.md](/CONTEXT.md#governance); a loop's verification runs
 verifiers and never gates.
 
-A loop points at the other two and contains neither. Nothing points
-at a loop except another loop's yield. A stochastic rule certifies at
+A loop points at Runbooks and Standards and contains neither. It
+names no workstream, since one loop drives many; a workstream's Stints
+names the loop of each stint, planned or recorded, and that link has
+no verb. Another loop's yield is the other thing that points at a
+loop. A stochastic rule certifies at
 a loop's verification the same way a deterministic one does: zero
 findings. Which checks run at a gate is that gate's wiring, not the
 standard's.
@@ -195,6 +241,9 @@ What the picture has no place for, and where each thing goes:
 - **`args` and `never` as verbs.** `accept` is the verb for args; a
   ban is a polarity on a write edge.
 - **`Object`.** Renamed `DocType`, which is what it was.
+- **Working documentation set.** A workstream: a documentation set in
+  a workstream's directory is its material.
+- **`PLAN.md` and `PROGRESS.md`.** A stint's material, on its branch.
 - **Spec, Deviation, Predicate as objects.** A standard written for
   one run, a finding an act left standing, and the first paragraph of
   a rule.
