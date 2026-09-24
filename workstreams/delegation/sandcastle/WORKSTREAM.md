@@ -61,17 +61,19 @@ since the parent uses it too.
 
 In order:
 
-1. **Plan the landing on main.** Which PRs, in what order, carrying what:
-   the code in `rig/` into `scripts/` with the pipeline's document beside
-   it, the code freed from the scratch lab folder where `setup.sh` builds
-   the fake real repository, the config copy, and the image, and the two
-   dev-playbook changes Part 4 ran on, which exist only in a throwaway
-   config copy
+1. **Plan closing the workstream.** What moves where, on this branch
+   only: the code in `rig/` to the place `main` will use it from, such as
+   `scripts/`, with the pipeline's document beside it; the code freed
+   from the scratch lab folder where `setup.sh` builds the fake real
+   repository, the config copy, and the image; the documentation and any
+   standards the tool needs; and the dev-playbook changes that ride as
+   patches in a throwaway config copy
    ([Part 4](/workstreams/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
-   `measure-event` sending rows to the host from a sandbox, and the Stop
-   and SessionEnd hooks set to wait. The `commit-sandbox` skill rides
-   the same way until then.
-2. **Land on main.** Open the PRs the plan names, in its order.
+   `measure-event` sending rows to the host from a sandbox, the Stop and
+   SessionEnd hooks set to wait, and the `commit-sandbox` skill. No PR
+   and no merge: the agents that own this branch's other workstreams
+   take it to `main` later.
+2. **Close the workstream.** Carry out the plan on this branch.
 
 ## Completed
 
