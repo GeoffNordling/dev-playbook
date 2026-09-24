@@ -102,12 +102,6 @@ The integrator retires: the user brings a stint's work in
   out of `ralph-loop.js` into one file that both drivers read. The
   reviewer runs sealed too, so nothing in a stint
   touches the host but the driver.
-- **Test the container's lifetime.** The guess: the work copy opens once
-  per stint and closes once at the yield, and each agent call (an
-  iteration or the reviewer) gets a new container on that
-  copy, so only commits carry from one call to the next. The guess holds
-  only if it proves simple and reliable in Sandcastle; one container for
-  the whole stint is the fallback.
 - **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
   and the pipeline's document beside it, through one PR or several; which
   PRs, in what order, carrying what.
@@ -172,6 +166,11 @@ The integrator retires: the user brings a stint's work in
 - **Nest under delegation.** Done 2026-09-24: the Sandcastle members moved
   from the delegation root into this set, and the `rig/` scripts find the
   repository root one level further up.
+- **Test the container's lifetime.** Done 2026-09-24: the work copy opens
+  once per stint, and each agent call gets a new container on it. Only the
+  work copy carries from one call to the next, uncommitted files included,
+  and Sandcastle runs nothing on the host that the agent can plant
+  ([The container's lifetime](/working-docs/delegation/sandcastle/experiment-log.md#the-containers-lifetime)).
 
 ## Acronyms
 
