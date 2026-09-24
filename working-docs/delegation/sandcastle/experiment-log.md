@@ -144,6 +144,36 @@ started together and closed together.
 
 **Settled.** Every check passed. The results are in
 [Fronts in parallel](/working-docs/delegation/sandcastle/pipeline.md#fronts-in-parallel).
+Re-run on 2026-09-24, after the set moved under delegation: every check
+passed again.
+
+## The container's lifetime
+
+**Asked.** When one work copy takes two `run()` calls in turn, as the
+iterations of a stint do, does anything but the work copy carry from the
+first to the second? And does Sandcastle run git on the host in the copy
+between calls, where the agent's planted triggers would fire?
+
+**Ran.** Two stand-in scripts, no tokens, each test on a new `front-clone`
+copy of the fake mission-control. `rig/lifetime.mjs`: call 1 commits, then
+leaves a file in `~`, a file in `/tmp`, a global git setting, a background
+process, and an uncommitted file in the repository; call 2 reports which it
+sees. `rig/traps.mjs`: call 1 commits and plants every trigger of the
+booby-trap test, each touching a marker in a folder only the host has; call
+2 is an ordinary second call; then a control runs `git status` on the host.
+
+**Settled.**
+
+- Each call gets a new container, and only the work copy carries: the
+  commit, and the uncommitted file too. Everything outside the work copy
+  is gone. Sandcastle did not report the uncommitted file.
+- In `head` mode, `run()` fires no trap on the host, in either call.
+  Sandcastle counts the commits inside the container. The control fired
+  two traps, so the traps were live.
+- So the guess in the root holds: the copy opens once per stint, and each
+  call gets a new container on it. A driver between calls must read the
+  copy as plain files, never with host git, and must itself catch an
+  iteration that left work uncommitted.
 
 ## Acronyms
 
