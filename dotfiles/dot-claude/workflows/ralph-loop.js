@@ -101,7 +101,7 @@ ${segmentScope}
 3. Find the next incomplete task in your segment and implement it — one task only, small enough to finish cleanly in this iteration.
 4. ${step4}
 5. Mark that task complete in ${PLAN}. Optionally record in Working notes an important, durable fact that future iterations would need. Append a one-line entry to ${PROGRESS}: what you did, and what is next. Where the plan and its sources did not settle something you had to decide, add one indented line under that entry in the shape ${PROGRESS} gives — never stop for such a point, and never decide one silently.
-6. Commit this iteration's work by invoking the /commit skill.
+6. Commit this iteration's work by invoking the /commit-sonnet skill.
 7. Report: summary = one line on what you did; tasksLeft = how many unchecked \`- [ ]\` task lines are left in your segment now that yours is checked off — count them in the file, and do not count a checkpoint marker line; blocker = null unless step 1 stopped you.`
 
 // The loop stops on tasksLeft === 0: the checkpoint this segment ran up to. Whether it is the last

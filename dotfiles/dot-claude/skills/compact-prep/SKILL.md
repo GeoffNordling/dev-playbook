@@ -14,7 +14,7 @@ check.
 
 ## Procedure
 
-1. {Run [/commit](~/.claude/skills/commit/SKILL.md); split unrelated
+1. {Run [/commit-inherit](~/.claude/skills/commit-inherit/SKILL.md); split unrelated
    changes into separate commits}.
 
 2. Mention anything important at risk — only if something stands out.

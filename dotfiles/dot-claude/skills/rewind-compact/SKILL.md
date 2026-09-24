@@ -31,7 +31,7 @@ arguments: [target]
    git status --short
    ```
 
-   {If the tree is dirty, {Run [/commit](~/.claude/skills/commit/SKILL.md)}
+   {If the tree is dirty, {Run [/commit-inherit](~/.claude/skills/commit-inherit/SKILL.md)}
    and label the commit as a /rewind-compact point}. Done when the tree
    is clean.
 

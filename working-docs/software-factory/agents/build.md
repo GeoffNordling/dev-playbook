@@ -50,7 +50,7 @@ Carry out the brief in coherent pieces, keeping the tree green as you go:
 
 1. Make the changes for a coherent piece of the scope. Under `tests:yes` that piece is a chunk, driven by the loops in [tdd.md](~/workspace/dev-playbook/working-docs/software-factory/docs/tdd.md).
 2. Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root — and resolve failures.
-3. {Run [/commit](~/.claude/skills/commit/SKILL.md)} on the piece.
+3. {Run [/commit-sonnet](~/.claude/skills/commit-sonnet/SKILL.md)} on the piece.
 4. Move to the next piece, or to §6 once the issue's scope is fully carried out.
 
 ## 5. Escalations
@@ -68,6 +68,6 @@ The user reads the report, decides, and relaunches; you don't push past the obst
 With every acceptance criterion satisfied:
 
 1. **Leave the tree green.** Run the gate — `make -C <subproject> check`, or `make check` when the `Makefile` is at the repo root; don't commit a red tree.
-2. **Commit** the remaining changes with {Run [/commit](~/.claude/skills/commit/SKILL.md)}.
+2. **Commit** the remaining changes with {Run [/commit-sonnet](~/.claude/skills/commit-sonnet/SKILL.md)}.
 3. **Record the deviation ledger.** {If any deviation was logged, {Write to GitHub the ledger entries in the contract's shape; before a PR exists, as one issue comment headed `## Deviation ledger`, which the node that authors the PR description lifts — on a rework lap, appended to the PR description's `## Deviation ledger` section (`gh pr edit`)}}. No deviations — record nothing here; the PR section states `No deviations.`
 4. {Report the completion envelope; `outcome` is `"done"`, and `gist` gives the outcome in prose — the commit, that the gate is green, and that the branch is pushed}.

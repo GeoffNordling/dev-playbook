@@ -1,6 +1,6 @@
 ---
-name: commit
-description: Commit staged work with a clean message, then push it. Use when the user asks to commit changes, or when a software factory skill needs to commit its work.
+name: commit-sonnet
+description: Commit staged work with a clean message and push it, on Sonnet. Use when committing frequently on a long run, such as once per iteration of a loop.
 disable-model-invocation: false
 model: sonnet
 effort: low

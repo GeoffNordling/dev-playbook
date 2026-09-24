@@ -80,7 +80,7 @@ The size of the diff decides how the work lands — judge it as soon as the
 worklist makes the size clear:
 
 - **Five or fewer changed files**: one commit carrying the pin wiring and
-  every fix together, straight to `main` — /commit runs the gate at the new
+  every fix together, straight to `main` — /commit-inherit runs the gate at the new
   pin, which is the verification.
 - **More**: a branch, commits as the work proceeds, and a PR handed to the
   user at the end — approval and merge are the user's.

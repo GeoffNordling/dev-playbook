@@ -1,7 +1,7 @@
 ---
 name: commit-inherit
-description: Manually invoked commit for a Fable session, keeping the session's own model so the conversation is not write-cached onto Sonnet.
-disable-model-invocation: true
+description: Commit staged work with a clean message and push it, on the session's own model. Use when committing infrequently, such as when the user asks for a commit or a unit of work ends.
+disable-model-invocation: false
 model: inherit
 effort: low
 arguments: [target]

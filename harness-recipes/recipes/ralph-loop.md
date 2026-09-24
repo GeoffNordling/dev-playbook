@@ -35,7 +35,7 @@ Each iteration is one fresh `agent()` that:
 3. implements the single next incomplete task in its segment,
 4. brings the gate back to green when one is configured — never commits red,
 5. checks the task off in the plan, optionally records a durable fact for later iterations in the plan's Working notes, and appends a line to the progress log,
-6. commits via the `/commit` skill,
+6. commits via the `/commit-sonnet` skill,
 7. reports how many unchecked tasks are left in its segment.
 
 The runtime repeats this until that count reaches zero. The agent supplies the
@@ -105,7 +105,7 @@ Four agents and a runtime, in five different positions:
    OUTER│   INNER│  │   gate ▸ read PLAN + PROGRESS ▸ do 1 task ▸ gate │
     LOOP│    LOOP│  │   ▸ check the task off in PLAN                   │
         │        │  │   ▸ append 1 log line + any judgment calls       │
-  1 per │   1 per│  │   ▸ /commit ▸ report tasksLeft                   │
+  1 per │   1 per│  │   ▸ /commit-sonnet ▸ report tasksLeft            │
 segment │    task│  └───────────────┬──────────────────────────────────┘
         │        │                  │ tasksLeft
         │        └───────── > 0 ────┤
