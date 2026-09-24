@@ -61,15 +61,16 @@ since the parent uses it too.
 
 In order:
 
-1. **Connect a stint.** One command starts an unattended stint on a real
-   repository's [workstream](/workstreams/delegation/WORKSTREAM.md#terms):
-   it opens the work copy, runs the driver, and closes the copy at the
-   yield, and it gives real copies a set place outside Claude's
+1. **Connect a stint.** One command takes any repository, a branch to
+   start from, the workstream directory in it, and a budget: it opens the
+   work copy, runs the driver, and closes the copy at the yield. Where
+   copies live is an argument with a set default outside Claude's
    temporary folder. It settles both of
-   [What it does not yet do](/workstreams/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do).
-   The driver already launches from a workstream, counts the budget, and
-   yields ([The headless driver](/workstreams/delegation/sandcastle/experiment-log.md#the-headless-driver));
-   today each stint is started by hand in a scratch lab folder.
+   [What it does not yet do](/workstreams/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do),
+   and is tested on the fake repository. The driver already runs a stint
+   from a workstream to its yield
+   ([The headless driver](/workstreams/delegation/sandcastle/experiment-log.md#the-headless-driver));
+   today each stint is opened and closed by hand.
 2. **Write a sandboxed commit skill.** It commits with plain git and never
    pushes, since a sealed agent has no GitHub. The stint's prompts do this
    in their own words today; the general iteration prompt commits through
