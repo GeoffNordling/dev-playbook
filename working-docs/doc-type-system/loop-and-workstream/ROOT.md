@@ -80,11 +80,13 @@ Decided with the user on 2026-09-24.
 
 ## Planned
 
-- **Write Workstream Conventions.** The Standard over the head files,
-  per
-  [Doc-Type](/standards/doc-type/doc-type.md#held-to-a-standard), each
-  deterministic rule with its check: the headings from the menu, the
-  Stints entries, and every child reached by links from its parent.
+- **Move the working-set rules to Workstream Conventions.** At the
+  rename of `working-docs/` to `workstreams/`: the rules of
+  [Working Documentation Sets](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+  that bind a head file, the bold Planned and Completed items, the
+  Acronyms appendix, a guess written as a guess, and a shared term
+  defined once, moved into
+  [Workstream Conventions](/standards/doc-type/workstream-conventions.md).
 - **Re-read the old Loop items.** Four items carried from the old Loop
   strand, each kept, rewritten, or dropped against the new model:
   - Retire `loop_lint` and move its five checks into the check
@@ -112,6 +114,11 @@ Decided with the user on 2026-09-24.
 
 ## Completed
 
+- **Write Workstream Conventions.** Done 2026-09-24:
+  [Workstream Conventions](/standards/doc-type/workstream-conventions.md),
+  four rules, the three deterministic ones checked in
+  `checks/doc_type.py`, and the menu's names shipped in `sources.py`
+  and pinned to its table by a test.
 - **Write the Workstream bundle.** Done 2026-09-24:
   `doc-types/workstream/` in the four-file form, its row in
   [Doc-Type System](/doc-types/doc-type-system.md), and the `Workstream`

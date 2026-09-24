@@ -105,6 +105,6 @@ by `playbook check`; Standard's rides
 [Standard Conventions](/standards/doc-type/standard-conventions.md),
 checked by `playbook check`; Guide's rides
 [Guide Conventions](/standards/doc-type/guide-conventions.md);
-Workstream's Standard is planned
-([Planned](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#planned)).
-The shape is never itself a Standard, so the five remain peers.
+Workstream's rides
+[Workstream Conventions](/standards/doc-type/workstream-conventions.md),
+checked by `playbook check`. The shape is never itself a Standard, so the five remain peers.

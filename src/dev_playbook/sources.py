@@ -46,6 +46,31 @@ REGISTERED_TYPES = frozenset(
     }
 )
 
+# The menu a Workstream's head file picks its headings from.
+WORKSTREAM_MENU = Section(
+    "standards/doc-type/workstream-conventions.md",
+    "headings-from-the-menu",
+)
+
+# Every heading in the WORKSTREAM_MENU table, shipped as REGISTERED_TYPES is;
+# the test beside this module pins the set to the table.
+WORKSTREAM_HEADINGS = frozenset(
+    {
+        "Goal",
+        "Done when",
+        "Principles",
+        "Constraints",
+        "Terms",
+        "Settled",
+        "Open",
+        "Planned",
+        "Completed",
+        "Stints",
+        "Unfiled",
+        "Acronyms",
+    }
+)
+
 # The table whose Ruling cells link each doc-type's directory.
 REGISTRY_RULINGS = Section("doc-types/doc-type-system.md", "registry-rulings")
 

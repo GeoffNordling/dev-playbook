@@ -8,13 +8,16 @@ from dev_playbook.checks.doc_type import (
     a_rule_heading_predicate_trailer,
     a_sequence_is_one_list,
     a_step_opens_with_its_name,
+    a_stint_entry_in_form,
     an_act_links_a_runbook,
     arguments_bare_kebab_case_names,
     body_opens_with_an_h1,
     boolean_disable_model_invocation,
     description_two_sentences_or_one,
     every_bundle_file_reached_from_skillmd,
+    every_child_reached_from_its_parent,
     front_matter_holds_its_kinds_vocabulary,
+    headings_from_the_menu,
     kebab_case_name,
     model_and_effort_from_closed_sets,
     name_matches_its_home,
@@ -470,3 +473,72 @@ def test_the_files_why_ends_the_opening_prose() -> None:
             "standards/fam/twice.md": typed("Standard", twice),
         },
     ) == [("standards/fam/late.md", 8), ("standards/fam/twice.md", 10)]
+
+
+def test_headings_from_the_menu() -> None:
+    body = """\
+# Work
+
+## Goal
+
+## Stints
+
+## Ideas
+
+## Goal
+"""
+    assert found(
+        headings_from_the_menu,
+        {"workstreams/w/WORKSTREAM.md": typed("Workstream", body)},
+    ) == [("workstreams/w/WORKSTREAM.md", 12), ("workstreams/w/WORKSTREAM.md", 14)]
+
+
+STINTS = """\
+# Work
+
+## Stints
+
+- **Planned.** Loop: [Design](/loops/design.md). Budget: one session.
+- **2026-09-24.** Loop: [Design](/loops/design.md). Budget: two sessions.
+  Spent: two sessions. Verdict: advance.
+- **2026-09-20.** Loop: [Design](/loops/design.md). Verdict: accept.
+"""
+
+
+def test_a_stint_entry_in_form() -> None:
+    loop = typed("Loop", "# Design\n")
+    head = "workstreams/w/WORKSTREAM.md"
+    assert (
+        found(
+            a_stint_entry_in_form,
+            {head: typed("Workstream", STINTS), "loops/design.md": loop},
+        )
+        == []
+    )
+    bad = (
+        STINTS.replace("2026-09-20", "2026-09-30")
+        .replace("Verdict: accept", "Verdict: merged")
+        .replace(
+            "Budget: one session.", "Budget: one session. Also [x](/loops/design.md)."
+        )
+        + "- **Planned.** Loop: [Notes](/notes.md).\n- Next, maybe.\n"
+    )
+    assert found(
+        a_stint_entry_in_form,
+        {head: typed("Workstream", bad), "loops/design.md": loop, "notes.md": b"# N\n"},
+    ) == [(head, 10), (head, 13), (head, 13), (head, 14), (head, 14), (head, 15)]
+
+
+def test_every_child_reached_from_its_parent() -> None:
+    parent = typed("Workstream", "# Top\n\nSee [notes](notes.md).\n")
+    notes = b"# Notes\n\nThe [child](/w/a/WORKSTREAM.md).\n"
+    assert found(
+        every_child_reached_from_its_parent,
+        {
+            "w/WORKSTREAM.md": parent,
+            "w/notes.md": notes,
+            "w/a/WORKSTREAM.md": typed("Workstream", "# A\n"),
+            "w/a/deep/WORKSTREAM.md": typed("Workstream", "# Deep\n"),
+            "w/b/WORKSTREAM.md": typed("Workstream", "# B\n"),
+        },
+    ) == [("w/a/deep/WORKSTREAM.md", None), ("w/b/WORKSTREAM.md", None)]

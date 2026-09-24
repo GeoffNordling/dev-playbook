@@ -143,7 +143,8 @@ Decided with the user on 2026-09-24.
 - **The brief is the workstream's head file.** One object serves attended
   and unattended work alike.
 - **A workstream picks its headings from one menu.** The user and the
-  agent pick the ones the work needs:
+  agent pick the ones the work needs. The menu's home is now
+  [Headings from the menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu); the table below is the decision:
 
   | Heading | Holds |
   |---|---|

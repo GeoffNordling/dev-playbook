@@ -8,7 +8,9 @@ description: The layer below the shape — how a Workstream's head file writes i
 
 The layer below [the shape](/doc-types/workstream/contract-shape.md):
 the form a Workstream's head file takes so deterministic code reads
-every heading and every stint, and where the file sits.
+every heading and every stint, and where the file sits. The Standard
+that binds a head file to this encoding is
+[Workstream Conventions](/standards/doc-type/workstream-conventions.md).
 
 ## The frontmatter
 
@@ -23,10 +25,9 @@ skips it.
 
 ## Headings
 
-A heading is an H2 whose text is one menu name: `Goal`, `Done when`,
-`Principles`, `Constraints`, `Terms`, `Settled`, `Open`, `Planned`,
-`Completed`, `Stints`, `Unfiled`, or `Acronyms`. Each name is used at
-most once. An H3 or deeper under a heading is part of its body, and
+A heading is an H2 whose text is one name from the menu in
+[Headings from the menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu).
+Each name is used at most once. An H3 or deeper under a heading is part of its body, and
 the body is opaque, except under Stints.
 
 ## Stints

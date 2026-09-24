@@ -1,9 +1,11 @@
 """The doc-type family: the rules of ``standards/doc-type/``.
 
-Twenty-one rules are decided by functions over the model. One holds each
+Twenty-four rules are decided by functions over the model. One holds each
 ``doc-types/<name>/`` directory to a row of the registry rulings table. Three
 hold a file typed ``Guide`` to its steps and its lack of trailers. One holds
-the acts of a file typed ``Loop`` to a runbook link. Thirteen hold a runbook, a
+the acts of a file typed ``Loop`` to a runbook link. Three hold a file typed
+``Workstream`` to its menu of headings, its stint entries, and the links that
+reach it from its parent. Thirteen hold a runbook, a
 skill bundle or an agent definition under ``.claude/`` or
 ``dotfiles/dot-claude/``, to its front matter, its body, and its bundle files.
 Three hold a file typed ``Standard`` to its population and its rule shape.
@@ -34,6 +36,7 @@ STANDARDS = "standards"
 WORKING_DOCS = "working-docs/"
 GUIDE_TYPE = "Guide"
 LOOP_TYPE = "Loop"
+WORKSTREAM_TYPE = "Workstream"
 STANDARD_TYPE = "Standard"
 WHY = "> **Why.**"
 # The blocks a rule may hold after its first paragraph.
@@ -70,6 +73,10 @@ PLACEHOLDERS = ("$ARGUMENTS", "$0")
 BUNDLE_DIRECTORIES = ("references", "scripts")
 REFERENCE_DEFINITION = re.compile(r"^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)")
 LOOP_ENTRY = re.compile(r"^[-*]\s+`[^`]+`\s+—\s")
+BULLET = re.compile(r"^[-*]\s")
+STINT_OPENING = re.compile(r"^[-*]\s+\*\*(Planned|\d{4}-\d{2}-\d{2})\.\*\*")
+VERDICT = re.compile(r"Verdict:\s*(\w*)")
+VERDICTS = frozenset({"advance", "accept", "delete"})
 
 
 @dataclass(frozen=True)
@@ -517,7 +524,129 @@ def the_files_why_ends_the_opening_prose(repo: Repo) -> Iterator[Finding]:
             )
 
 
+# --- workstream-conventions.md ------------------------------------------------
+
+
+@check("doc-type.headings-from-the-menu")
+def headings_from_the_menu(repo: Repo) -> Iterator[Finding]:
+    """Each H2 of a Workstream is a heading of the menu, and none is used twice."""
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        seen: set[str] = set()
+        for heading in doc.headings:
+            if heading.level != 2:
+                continue
+            if heading.text not in sources.WORKSTREAM_HEADINGS:
+                yield Finding(
+                    path, heading.line, f"`{heading.text}` is not a menu heading"
+                )
+            elif heading.text in seen:
+                yield Finding(path, heading.line, f"`{heading.text}` is used twice")
+            seen.add(heading.text)
+
+
+@check("doc-type.a-stint-entry-in-form")
+def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
+    """Each Stints item opens planned or dated, links one Loop, and sits in order.
+
+    The planned item is first; the dated ones follow, newest first. A
+    ``Verdict:`` is one of the three the user rules.
+    """
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        if not any(h.level == 2 and h.slug == "stints" for h in doc.headings):
+            continue
+        section = doc.section("stints")
+        starts = [n for n, text in section if BULLET.match(text)]
+        ends = starts[1:] + [section[-1][0] + 1 if section else 0]
+        dates: list[str] = []
+        for index, (start, end) in enumerate(zip(starts, ends, strict=True)):
+            text = " ".join(t for n, t in section if start <= n < end)
+            opening = STINT_OPENING.match(text)
+            if opening is None:
+                yield Finding(
+                    path,
+                    start,
+                    "a stint opens with `**Planned.**` or `**YYYY-MM-DD.**`",
+                )
+                continue
+            label = opening.group(1)
+            if label == "Planned" and index != 0:
+                yield Finding(path, start, "the planned stint is the first item")
+            if label != "Planned":
+                if dates and label > dates[-1]:
+                    yield Finding(path, start, "the dated stints run newest first")
+                dates.append(label)
+            loops = [
+                target
+                for link in doc.links
+                if start <= link.line < end
+                and _type_of(repo, target := _resolve(path, link.target, repo.name, ""))
+                == LOOP_TYPE
+            ]
+            if len(loops) != 1:
+                yield Finding(
+                    path, start, f"a stint links one file typed Loop, not {len(loops)}"
+                )
+            verdict = VERDICT.search(text)
+            if verdict is not None and verdict.group(1) not in VERDICTS:
+                yield Finding(
+                    path, start, "a verdict is `advance`, `accept`, or `delete`"
+                )
+
+
+@check("doc-type.every-child-reached-from-its-parent")
+def every_child_reached_from_its_parent(repo: Repo) -> Iterator[Finding]:
+    """Each child Workstream is reached by links from its parent's head file."""
+    heads = {posixpath.dirname(path): path for path, _ in _typed(repo, WORKSTREAM_TYPE)}
+    for path in sorted(heads.values()):
+        parent = _parent_head(heads, path)
+        if parent is None:
+            continue
+        top = posixpath.dirname(parent)
+        prefix = f"{top}/" if top else ""
+        members = {p for p in repo.markdown if p.startswith(prefix)}
+        graph = {
+            member: {
+                target
+                for link in repo.markdown[member].links
+                if (target := _resolve(member, link.target, repo.name, "")) in members
+            }
+            for member in members
+        }
+        if path not in _reached(graph, parent):
+            yield Finding(path, None, f"not reached by links from {parent}")
+
+
 # --- helpers ------------------------------------------------------------------
+
+
+def _type_of(repo: Repo, path: str) -> str | None:
+    """The frontmatter ``type`` of a tracked markdown file; None for any other."""
+    doc = repo.markdown.get(path)
+    if doc is None or doc.frontmatter is None:
+        return None
+    return doc.frontmatter.get("type")
+
+
+def _parent_head(heads: dict[str, str], path: str) -> str | None:
+    """The head file in the nearest directory above ``path``'s own; None at the top."""
+    here = posixpath.dirname(path)
+    while here:
+        here = posixpath.dirname(here)
+        if here in heads:
+            return heads[here]
+    return None
+
+
+def _reached(graph: dict[str, set[str]], root: str) -> set[str]:
+    """Every file a chain of links leads to from ``root``, ``root`` included."""
+    seen = {root}
+    frontier = [root]
+    while frontier:
+        for target in graph.get(frontier.pop(), set()):
+            if target not in seen:
+                seen.add(target)
+                frontier.append(target)
+    return seen
 
 
 def _typed(repo: Repo, doctype: str) -> Iterator[tuple[str, MarkdownFile]]:
