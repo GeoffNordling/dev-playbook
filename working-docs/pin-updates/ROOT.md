@@ -63,7 +63,7 @@ Rulings the user made in the session, in the order made.
 - **One ledger file in dev-playbook**, one row per repo per run,
   committed by update-pins itself, so the history reads in `git log`
   and the IDE.
-- **The ledger commit is not a release.** Pending the user's veto: the
+- **The ledger commit is not a release.** Ruled by the user 2026-09-23: the
   release head is the newest commit on dev-playbook `main` that touches
   anything other than the ledger file. Without this, each ledger commit
   moves `main` and triggers the next run, forever.
