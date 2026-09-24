@@ -184,14 +184,12 @@ Everything in `rig/` stays in the workstream until the work lands on `main`.
 
 ## What it does not yet do
 
-Each is settled by a Planned item in
-[the head file](/workstreams/delegation/sandcastle/WORKSTREAM.md#planned).
-
-- **No schedule.** No program starts a stint and ends it; the rig starts
-  a fixed pair.
-- **No home for real copies.** The rig keeps its copies in a scratch
-  folder. Real copies need a set place, outside `/tmp/claude-<uid>/`,
-  which is Claude's own temporary folder.
+Both gaps this section listed are closed by `rig/stint.py`
+([The start command](/workstreams/delegation/sandcastle/experiment-log.md#the-start-command)):
+one command starts a stint on any repository and ends it, and it keeps
+each stint's copies in `~/stints/<repo>/<stint>/`, outside Claude's own
+temporary folder. What remains is on the
+[head file's worklist](/workstreams/delegation/sandcastle/WORKSTREAM.md#planned).
 
 ## Acronyms
 

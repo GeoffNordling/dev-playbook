@@ -9,19 +9,27 @@ and refuses a symlink on any path it reads, so a planted link cannot pull a
 host file into a prompt.
 
 Usage:
-    stint.py --lab LAB --copy COPY --stint STINT --workstream DIR
-             --check CMD --budget N [--model M] [--close]
+    stint.py REPO --base REF --workstream DIR --check CMD --budget N
+             [--name NAME] [--home HOME] [--playbook PATH] [--model M]
 
-COPY is a work copy front-clone opened, already holding the workstream DIR
-(its WORKSTREAM.md, PLAN.md, and PROGRESS.md). STINT is the stint's folder on
-the host. Refuses to launch a plan with more open tasks than the budget.
-Writes STINT/stint.json, the stint's record, and exits 0 on done, 1 on any
-other yield.
+REPO is any git repository; the stint's branch NAME starts at REF, which
+already holds the workstream DIR (its WORKSTREAM.md, PLAN.md, and
+PROGRESS.md). The stint's folder is HOME/<repo>/NAME. At launch the driver
+makes two copies in it: the work copy, REPO opened by front-clone, and the
+config copy, dev-playbook's `main` with the pipeline's two patches. At the
+yield it closes the work copy, which brings the branch into REPO and deletes
+the copy, and deletes the config copy. A work copy holding uncommitted work
+is kept, and the close says so. The stint's record stays in its folder.
+
+Refuses to launch a plan with more open tasks than the budget. Writes
+stint.json, the stint's record, and exits 0 on done, 1 on any other yield.
+The image `localhost/sandcastle-pipeline:rig` must already be built.
 """
 
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -104,7 +112,7 @@ def context_tokens(record: dict) -> int:
 def sandcastle_step(args, name: str, prompt: str, resume: str | None) -> dict:
     """Run one call sealed through call.mjs and return its record."""
     opts = {
-        "lab": str(args.lab),
+        "config": str(args.config),
         "copy": str(args.copy),
         "stint": str(args.stint),
         "name": name,
@@ -140,10 +148,10 @@ def fill(template: str, values: dict) -> str:
 class Stint:
     """One stint's state: its calls, iterations spent, the principal's session, and HEAD."""
 
-    def __init__(self, args):
+    def __init__(self, args, step=sandcastle_step):
         """Read the copy's HEAD and set the values every prompt shares."""
         self.args = args
-        self.step = sandcastle_step
+        self.step = step
         ws = args.workstream
         self.base = {
             "REPO": f"/home/agent/assignment/{args.copy.name}",
@@ -273,32 +281,100 @@ class Stint:
                 )
 
 
-def main() -> int:
-    """Parse the arguments, run the stint, write stint.json, and close the copy."""
+def make_config(playbook: Path, config: Path) -> None:
+    """Clone dev-playbook's main into the config copy and commit the pipeline's two patches."""
+    subprocess.run(
+        [
+            "git",
+            "clone",
+            "-q",
+            "--no-hardlinks",
+            "--branch",
+            "main",
+            str(playbook),
+            str(config),
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(config),
+            "apply",
+            *sorted(str(p) for p in (RIG / "patches").glob("*.patch")),
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(config),
+            "-c",
+            "user.name=stint",
+            "-c",
+            "user.email=stint@example.invalid",
+            "commit",
+            "-q",
+            "-am",
+            "stint: the pipeline's two dev-playbook changes",
+        ],
+        check=True,
+    )
+
+
+def main(argv=None, step=sandcastle_step) -> int:
+    """Open both copies, run the stint, write stint.json, and close both copies."""
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--lab", type=Path, required=True)
-    p.add_argument("--copy", type=Path, required=True)
-    p.add_argument("--stint", type=Path, required=True)
+    p.add_argument("repo", type=Path)
+    p.add_argument("--base", required=True)
     p.add_argument("--workstream", required=True)
     p.add_argument("--check", required=True)
     p.add_argument("--budget", type=int, required=True)
-    p.add_argument("--model", default="claude-sonnet-5")
+    p.add_argument("--name", default=time.strftime("stint-%Y%m%d-%H%M%S"))
+    p.add_argument("--home", type=Path, default=Path.home() / "stints")
     p.add_argument(
-        "--close", action="store_true", help="front-clone close the copy at the yield"
+        "--playbook", type=Path, default=Path.home() / "workspace" / "dev-playbook"
     )
-    args = p.parse_args()
-    args.lab, args.copy, args.stint = (
-        args.lab.resolve(),
-        args.copy.resolve(),
-        args.stint.resolve(),
-    )
-    (args.stint / "calls").mkdir(parents=True, exist_ok=True)
-    stint = Stint(args)
+    p.add_argument("--model", default="claude-sonnet-5")
+    args = p.parse_args(argv)
+    args.repo = args.repo.resolve()
+    args.stint = (args.home / args.repo.name / args.name).resolve()
+    args.copy = args.stint / args.repo.name
+    args.config = args.stint / "config"
+    if args.stint.exists():
+        raise SystemExit(f"{args.stint} already exists; a stint's folder is made fresh")
+    (args.stint / "calls").mkdir(parents=True)
+    front_clone = str(RIG.parents[3] / "scripts" / "front-clone")
     started = time.time()
     try:
-        reason = stint.run()
-    except Yield as y:
-        reason = str(y)
+        make_config(args.playbook, args.config)
+        subprocess.run(
+            [
+                front_clone,
+                "open",
+                str(args.repo),
+                str(args.copy),
+                args.name,
+                "--base",
+                args.base,
+            ],
+            check=True,
+        )
+        print(f"stint {args.name}: {args.stint}", flush=True)
+        stint = Stint(args, step)
+        try:
+            reason = stint.run()
+        except Yield as y:
+            reason = str(y)
+    finally:
+        # Take down whatever the launch made, even when the launch failed part way.
+        closed = (
+            not args.copy.exists()
+            or subprocess.run([front_clone, "close", str(args.copy)]).returncode == 0
+        )
+        shutil.rmtree(args.config, ignore_errors=True)
     record = {
         "reason": reason,
         "spent": stint.spent,
@@ -306,6 +382,7 @@ def main() -> int:
         "principal": stint.principal,
         "head": stint.head,
         "minutes": round((time.time() - started) / 60, 1),
+        "closed": closed,
         "notes": stint.notes,
         "principalContext": stint.context,
         "calls": [
@@ -319,12 +396,9 @@ def main() -> int:
         f"yield: {reason} ({stint.spent}/{args.budget} iterations, {len(stint.calls)} calls,"
         f" {len(stint.notes)} notes, principal context {final} tokens, {record['minutes']} min)"
     )
-    if args.close:
-        subprocess.run(
-            [str(RIG.parents[3] / "scripts" / "front-clone"), "close", str(args.copy)],
-            check=True,
-        )
-    return 0 if reason == "done" else 1
+    if not closed:
+        print(f"the work copy is kept: {args.copy}")
+    return 0 if reason == "done" and closed else 1
 
 
 if __name__ == "__main__":

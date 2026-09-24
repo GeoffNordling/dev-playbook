@@ -295,6 +295,37 @@ the driver ran live on new copies of the `wordcount` workstream, budget
   budget, for example "not launched: 4 tasks, budget 3", so a stint never
   starts that cannot finish.
 
+## The start command
+
+**Question.** Can one command start a stint on any repository and end it,
+with no copy left behind?
+
+**Method.** `rig/stint.py` now takes a repository, a base branch, the
+workstream directory, a check command, and a budget. It makes the
+stint's folder at `~/stints/<repo>/<stint>/`, and in it two copies: the
+work copy, opened by `front-clone`, and the config copy, dev-playbook's
+`main` with the two patches. At the yield it closes the work copy and
+deletes the config copy, and it keeps the record. `rules.py` runs the
+whole command with the fake step; then it ran live on the fake
+repository, from a branch `wordcount-seed` that holds the `wordcount`
+workstream.
+
+**Settled.**
+
+- The fake-step run passes: exit 0, the branch landed in the source
+  repository, and the folder held only `calls`, `review-1.md`,
+  `review-2.md`, and `stint.json`.
+- Stint 5 ran live to done in 9 calls, 4 of 6 iterations, and 9.1
+  minutes, with the principal's context at 50,681 tokens. The command
+  opened `/home/geoff/stints/mission-control/stint-5/mission-control`,
+  and at the yield branch `stint-5` landed in the fake repository at
+  `04acdf5` with 6 commits. Both copies were gone, no container was
+  left, and the kept record is 2.0 MB, most of it the session files.
+- A work copy holding uncommitted work is kept, since `front-clone close`
+  refuses it; the command says so and exits 1.
+- The image `localhost/sandcastle-pipeline:rig` must already be built;
+  `setup.sh` still builds it.
+
 ## Acronyms
 
 - **SHA** — Secure Hash Algorithm; here, the ID of a git commit.

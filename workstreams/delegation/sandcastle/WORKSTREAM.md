@@ -61,22 +61,12 @@ since the parent uses it too.
 
 In order:
 
-1. **Connect a stint.** One command takes any repository, a branch to
-   start from, the workstream directory in it, and a budget: it opens the
-   work copy, runs the driver, and closes the copy at the yield. Where
-   copies live is an argument with a set default outside Claude's
-   temporary folder. It settles both of
-   [What it does not yet do](/workstreams/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do),
-   and is tested on the fake repository. The driver already runs a stint
-   from a workstream to its yield
-   ([The headless driver](/workstreams/delegation/sandcastle/experiment-log.md#the-headless-driver));
-   today each stint is opened and closed by hand.
-2. **Write a sandboxed commit skill.** It commits with plain git and never
+1. **Write a sandboxed commit skill.** It commits with plain git and never
    pushes, since a sealed agent has no GitHub. The stint's prompts do this
    in their own words today; the general iteration prompt commits through
    `commit-sonnet`, which pushes
    ([One unattended stint by hand](/workstreams/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand)).
-3. **Plan the landing on main.** Which PRs, in what order, carrying what:
+2. **Plan the landing on main.** Which PRs, in what order, carrying what:
    the code in `rig/` into `scripts/` with the pipeline's document beside
    it, the code freed from the scratch lab folder where `setup.sh` builds
    the fake real repository, the config copy, and the image, and the two
@@ -85,7 +75,7 @@ In order:
    ([Part 4](/workstreams/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
    `measure-event` sending rows to the host from a sandbox, and the Stop
    and SessionEnd hooks set to wait.
-4. **Land on main.** Open the PRs the plan names, in its order.
+3. **Land on main.** Open the PRs the plan names, in its order.
 
 ## Completed
 
@@ -164,6 +154,12 @@ In order:
   billing. The pipeline's remaining work is the Planned list above and
   the board in the
   [parent's worklist](/workstreams/delegation/WORKSTREAM.md#planned).
+- **Connect a stint.** Done 2026-09-24: `rig/stint.py` takes any
+  repository, a base branch, the workstream directory, and a budget. It
+  makes the work copy and the config copy in `~/stints/<repo>/<stint>/`,
+  runs the stint, lands its branch, deletes both copies, and keeps the
+  record. Stint 5 ran through it live to done
+  ([The start command](/workstreams/delegation/sandcastle/experiment-log.md#the-start-command)).
 
 - **Re-word the members.** Done 2026-09-24: `pipeline.md`,
   `survey.md`, `experiment-log.md`, and `rig/index.md` in the

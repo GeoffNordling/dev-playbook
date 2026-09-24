@@ -112,7 +112,7 @@ def run(behave, budget=6):
     """Run the driver with the fake step; return the yield reason and the stint."""
     copy = fresh()
     args = SimpleNamespace(
-        lab=LAB,
+        config=LAB,
         copy=copy,
         stint=LAB,
         workstream="ws",
@@ -268,6 +268,46 @@ ok = got == "done" and s.notes == ["iter-1 checked off 2 tasks, not 1"]
 fails += not ok
 print(
     f"{'PASS' if ok else 'FAIL'} two tasks in one is noted, not stopped: {got}, {s.notes}"
+)
+
+# The whole command: both copies made at launch, the stint run, the branch
+# brought into the source repository, and both copies deleted at the yield.
+source = fresh()
+git(source, "branch", "-q", "seed")
+home = LAB / "home"
+code = stint.main(
+    [
+        str(source),
+        "--base",
+        "seed",
+        "--workstream",
+        "ws",
+        "--check",
+        "true",
+        "--budget",
+        "6",
+        "--name",
+        "s1",
+        "--home",
+        str(home),
+    ],
+    step=fake(lambda n, c, r: None),
+)
+folder = home / "mc" / "s1"
+record = json.loads((folder / "stint.json").read_text())
+landed = git(source, "log", "--format=%s", "seed..s1").split()
+ok = (
+    code == 0
+    and record["reason"] == "done"
+    and record["closed"]
+    and landed[0] == "principal-2"
+    and not (folder / "mc").exists()
+    and not (folder / "config").exists()
+)
+fails += not ok
+print(
+    f"{'PASS' if ok else 'FAIL'} the command opens both copies, lands the branch, and deletes both:"
+    f" exit {code}, {len(landed)} commits on s1, left in the folder: {sorted(p.name for p in folder.iterdir())}"
 )
 shutil.rmtree(LAB)
 sys.exit(fails)

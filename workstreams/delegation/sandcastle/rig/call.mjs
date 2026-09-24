@@ -4,7 +4,7 @@
 // review, and every turn of the principal.
 //
 // Usage: node call.mjs <options JSON file>
-//   lab        the lab directory setup.sh filled (config copy, image)
+//   config     the stint's config copy: dev-playbook, mounted read-only
 //   copy       the stint's work copy, opened by front-clone
 //   stint      the stint's folder on the host: session files, logs, call records
 //   name       this call's name, such as iter-1; names its log and record
@@ -22,13 +22,13 @@ import { basename, join } from "node:path";
 import { relocated } from "./relocated.mjs";
 
 const opts = JSON.parse(readFileSync(process.argv[2], "utf8"));
-for (const k of ["lab", "copy", "stint", "name", "model", "prompt"]) {
+for (const k of ["config", "copy", "stint", "name", "model", "prompt"]) {
   if (!opts[k]) throw new Error(`call.mjs: missing option ${k}`);
 }
 const RIG = import.meta.dirname;
 const HOME = "/home/agent";
 const REPO = `${HOME}/assignment/${basename(opts.copy)}`;
-const CONFIG = `${opts.lab}/config/dev-playbook`;
+const CONFIG = opts.config;
 const CALLS = `${opts.stint}/calls`;
 mkdirSync(CALLS, { recursive: true });
 
