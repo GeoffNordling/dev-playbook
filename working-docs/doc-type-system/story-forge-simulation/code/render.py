@@ -7,7 +7,10 @@ from pathlib import Path
 
 from fact_base import ENV, SHORT, TESTS, cell, citers, d, in_e, nodes, sec, stories
 
-OUT = Path(__file__).resolve().parent.parent / "stories-views.html"
+# Pages are never committed: they render into ~/views/, the one fixed path
+# the browser bookmarks, from whichever worktree ran this script.
+VIEWS = Path.home() / "views"
+OUT = VIEWS / "stories-views.html"
 E = html.escape
 ORDER = ["Resume", "Projection", "Prep-Unit", "General-Sheet", "File"]
 COL = {
@@ -509,5 +512,6 @@ document.querySelectorAll('svg').forEach(svg=>svg.querySelectorAll('.n').forEach
 n.onmouseenter=()=>es.forEach(e=>e.classList.add(e.dataset.a===id||e.dataset.b===id?'hi':'lo'));
 n.onmouseleave=()=>es.forEach(e=>e.classList.remove('hi','lo'));}}));
 </script></body></html>"""
+VIEWS.mkdir(exist_ok=True)
 OUT.write_text(page)
 print(OUT)

@@ -65,16 +65,22 @@ the specimen is surveyed in
   base by `[redacted, N words]` so the row keeps its shape and the
   receipt its line; story `title` attrs and the resume filenames were
   seen and allowed.
-- **Views render locally.** Every view is a `.html` file in this set,
-  which the user opens in their own browser or in VS Code, never the
-  terminal and never a Claude artifact or any other hosted page, so no
-  story-forge row leaves the machine to be drawn.
-- **Code and pages are committed.** Every script and page the strand
-  writes lives in this set, in git, the scripts under `code/`: the
-  extractor `extract.py`, the queries `fact_base.py`, and `render.py`,
-  which writes `stories-views.html` from `stories-fact-base.json` alone.
-  The one exception is the extractor's output, which carries
-  unredacted descriptions and is written outside the repo.
+- **Views render to `~/views/`.** Every view is a `.html` page that
+  `render.py` writes into `~/views/`, one fixed directory outside
+  every repo, which the user bookmarks as `file:///home/geoff/views/`
+  and opens in their own browser or in VS Code, never the terminal and
+  never a Claude artifact or any other hosted page. The path is fixed
+  so the bookmark survives restarts and worktree moves and always
+  shows the latest render, committed or not. Pages are never
+  committed: they are derived, and keeping them out of git keeps
+  them off public GitHub.
+- **Code is committed, output is not.** Every script the strand writes
+  lives in this set, in git, under `code/`: the extractor
+  `extract.py`, the queries `fact_base.py`, and `render.py`, which
+  writes `stories-views.html` from `stories-fact-base.json` alone.
+  What the scripts write stays outside the repo: the pages in
+  `~/views/`, and the extractor's output, which carries unredacted
+  descriptions, in the scratchpad.
 - **Slow and iterative.** One subsystem at a time, each step shown to
   the user before the next.
 - **A hand-wave stands in for code, never for magic.** A simulation
