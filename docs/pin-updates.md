@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-24 16:15 | 07255322f419 | story-forge | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | mission-control | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | sysadmin-playbook | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | sounds | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | personal-trainer | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | idea-tree | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | dwarf-flow | current | main pins 07255322f419 | no unmerged branches |
-| 2026-09-24 16:15 | 07255322f419 | lunch | failed | worktree /home/geoff/workspace/lunch/.claude/worktrees/bump-pin-07255322f419 already exists, kept from an earlier run |  |
-| 2026-09-24 16:15 | 07255322f419 | date-tree | failed | worktree /home/geoff/workspace/date-tree/.claude/worktrees/bump-pin-07255322f419 already exists, kept from an earlier run |  |
 | 2026-09-24 16:30 | c9cd7e817208 | story-forge | green | main 6cec1a5844f7 | no unmerged branches |
 | 2026-09-24 16:30 | c9cd7e817208 | mission-control | green | main ac15c6905c7b | no unmerged branches |
 | 2026-09-24 16:30 | c9cd7e817208 | sysadmin-playbook | green | main 5f28c11c6330 | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-24 16:45 | b0611fc83d52 | dwarf-flow | green | main 4bfbd2c4db0d | no unmerged branches |
 | 2026-09-24 16:45 | b0611fc83d52 | lunch | green | main eb9cec73b54b | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
 | 2026-09-24 16:45 | b0611fc83d52 | date-tree | green | main 44de42e667f7 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | story-forge | green | main e6840c60a366 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | mission-control | green | main 6711ad2ef522 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | sysadmin-playbook | green | main 46db7508b002 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | sounds | green | main 53f5e14d88be | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | personal-trainer | green | main cf25136a6ec7 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | idea-tree | green | main e3058c9725a8 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | dwarf-flow | green | main 9d4bda2a41b4 | no unmerged branches |
+| 2026-09-24 17:00 | 9a9242e4d479 | lunch | green | main 853108207c1d | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
+| 2026-09-24 17:00 | 9a9242e4d479 | date-tree | green | main e1c1b17078a0 | no unmerged branches |
