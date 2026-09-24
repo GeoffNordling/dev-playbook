@@ -1,6 +1,6 @@
 ---
 name: update-standards-pin
-description: Bump the dev-playbook standards pin of the consumer repo this session is standing in — probe the bump, land it on main when it stays green, cut a bump-pin worktree when it does not and hand off to /finish-pin-bump.
+description: Bump the dev-playbook standards pin of the consumer repo this session is standing in — probe the bump, land it on main when it stays green, cut a bump-pin worktree when it does not and hand the worktree to the user for /finish-pin-bump.
 disable-model-invocation: true
 model: inherit
 effort: xhigh
@@ -105,9 +105,12 @@ pin, and commit it `--no-verify` as the branch's first commit.
 
 Done when the worktree holds the committed bump.
 
-## 5. Finish
+## 5. Hand off
 
-{Run `/finish-pin-bump`} in the worktree. It works the findings to an empty
-gate and lands the PR; the merge is the user's.
+`/finish-pin-bump` works the findings to an empty gate and lands the PR, and
+it is user-invoked: this skill never starts it. {Report the worktree path, the
+sha move, the finding count, and that the next step is the user typing
+`/finish-pin-bump` in a session whose working directory is the worktree} and
+stop.
 
-Done when finish-pin-bump reports the PR's URL.
+Done when the report is on screen.
