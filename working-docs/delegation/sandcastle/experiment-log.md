@@ -243,6 +243,42 @@ resumed, three iterations, a reviewer, the principal resumed, then
   commits through the `commit-sonnet` skill, which pushes. The stint's
   prompts commit with plain git and never push.
 
+## The headless driver
+
+**Question.** Can a script run the stint that ran by hand above, from
+the principal's opening call to the yield, with no person in the loop?
+
+**Method.** `rig/stint.py` runs the calls in order through `rig/call.mjs`
+and applies the stop rules after each call. It reads the work copy as
+plain files only, never with host git, and refuses a symlink on any path
+it reads. `rig/rules.py` checks the stop rules with no tokens: a scripted
+fake step plays every agent, and in each case one call misbehaves. Then
+the driver ran live on new copies of the `wordcount` workstream, budget
+6, with `--close`.
+
+**Settled.**
+
+- `rules.py` passes all 11 cases. Examples: an iteration that checks off
+  two tasks yields "iter-1 checked off 2 tasks, not 1"; a plan replaced
+  by a link to a host file yields "symlink in the copy: ws/PLAN.md"; a
+  call billed `ANTHROPIC_API_KEY` yields at once.
+- Two live runs yielded at the principal's opening call, both for a
+  correct reason:
+  - Stint 2: the check gate left
+    `tests/__pycache__/test_smoke.cpython-314.pyc` uncommitted. The seed
+    now carries `rig/seed/gitignore`, copied in as `.gitignore`.
+  - Stint 3: the principal put its JSON line inside a ```` ```json ````
+    fence. The driver now skips fence lines when it finds the last line.
+- Stint 4 ran to done in 9 calls, 4 of 6 iterations, and 9.3 minutes.
+  The principal was one session (`b75a2913…`) across its three calls,
+  every call billed `none`, and no call left work uncommitted. Both
+  reviewers found 0 findings. `front-clone close` brought branch
+  `stint-4` into the fake real repository at `cf70a75`, and no container
+  was left.
+- The `local` step, `claude -p` on the host, is written but not run. It
+  reads the new commits and the uncommitted files with host git in the
+  copy after the agent has touched it.
+
 ## Acronyms
 
 - **SHA** — Secure Hash Algorithm; here, the ID of a git commit.
