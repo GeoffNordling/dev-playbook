@@ -68,12 +68,11 @@ def no_git_env() -> dict[str, str]:
     return {k: v for k, v in os.environ.items() if k not in local}
 
 
-def canonical_repo_name(repo_root: Path) -> str:
-    """Repo name from git, identical for main checkout and any worktree of it.
+def common_dir(repo_root: Path) -> Path:
+    """The shared ``.git`` directory behind ``repo_root``, absolute and resolved.
 
-    Uses `git rev-parse --git-common-dir`, which points at the shared .git
-    directory regardless of which worktree you're standing in. The parent of
-    that directory is the repo's canonical on-disk name.
+    `git rev-parse --git-common-dir` answers the same path from the main
+    checkout and from every worktree of it, so it is the repo's identity.
     """
     result = subprocess.run(
         ["git", "-C", str(repo_root), "rev-parse", "--git-common-dir"],
@@ -85,8 +84,17 @@ def canonical_repo_name(repo_root: Path) -> str:
         raise NotAGitRepository(str(repo_root))
     common = Path(result.stdout.strip())
     if not common.is_absolute():
-        common = (repo_root / common).resolve()
-    return common.parent.name
+        common = repo_root / common
+    return common.resolve()
+
+
+def canonical_repo_name(repo_root: Path) -> str:
+    """Repo name from git, identical for main checkout and any worktree of it.
+
+    The parent of the shared ``.git`` directory is the repo's canonical on-disk
+    name.
+    """
+    return common_dir(repo_root).parent.name
 
 
 def git_files(root: Path, *, tracked_only: bool = False) -> list[str]:

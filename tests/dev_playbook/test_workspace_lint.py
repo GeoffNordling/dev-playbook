@@ -11,9 +11,11 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+import pytest
 from conftest import init_repo
 
-from dev_playbook import gitrepo, workspace_lint
+from dev_playbook import github, gitrepo, workspace_lint
+from dev_playbook.pins import config, release
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-lint"
 HOOK_REPO = Path(__file__).resolve().parents[2]
@@ -51,6 +53,10 @@ else:
     segs = args[0].split("?", 1)[0].split("/")
     slug = "/".join(segs[1:3])
     resource = segs[3] if len(segs) > 3 else "settings"
+    # A file read keeps its path, so a test can serve one file and not another;
+    # a commit read keeps its sha, so a test can script the release-head walk.
+    if resource in ("contents", "commits"):
+        resource = resource + "/" + "/".join(segs[4:])
 
 # What a resource answers when a test says nothing about it. Protection defaults
 # to fully protected under the canonical ruleset, so that a test about merge
@@ -60,9 +66,24 @@ CANONICAL = {
     "enforcement": "ACTIVE",
     "bypassActors": {"nodes": []},
 }
+# The pin defaults: the hook repo's head is HEAD and its manifest publishes one
+# id, and a consumer pins exactly that. So a test about anything else stays
+# clean on the pin rule, and a test about the pin serves its own config.
+HEAD = "HEAD_SHA"
+MANIFEST = "- id: playbook-check\\n  entry: playbook check\\n  language: python\\n"
+CONFIG = (
+    "repos:\\n"
+    "  - repo: HOOK_URL\\n"
+    "    rev: HEAD_SHA\\n"
+    "    hooks:\\n"
+    "      - id: playbook-check\\n"
+)
 DEFAULTS = {
     "labels": [],
     "issues": [],
+    "branches": {"commit": {"sha": HEAD}},
+    "contents/.pre-commit-hooks.yaml": MANIFEST,
+    "contents/.pre-commit-config.yaml": CONFIG,
     "protection": {
         "defaultBranchRef": {
             "name": "main",
@@ -75,22 +96,44 @@ DEFAULTS = {
         }
     },
 }
+# Any commit a test says nothing about is a release: it touches a source file
+# and is a root, so the release-head walk stops at it.
+COMMIT = {"files": [{"filename": "src/x.py"}], "parents": []}
+WRAPPER_KEYS = ("settings", "protection", "labels", "issues", "branches")
+WRAPPER_PREFIXES = ("contents/", "commits/")
 
 data = json.load(open(os.environ["FAKE_GH_DATA"]))
-if slug not in data:
+# The hook repo is read for its head, its commits, and its manifest in every
+# run, and a test that says nothing about it gets the defaults; any other
+# unlisted slug is unreachable.
+hook_repo_read = resource == "branches" or resource.startswith(WRAPPER_PREFIXES)
+if slug not in data and not hook_repo_read:
     sys.exit(1)
-entry = data[slug]
+entry = data.get(slug, {})
 
 # An entry is either a bare settings dict (legacy) or a wrapper carrying any of
-# settings / protection / labels / issues. A bare entry answers the base repo
-# path with its settings and every other resource with that resource's default.
+# settings / protection / labels / issues / branches / contents/<path>. A bare
+# entry answers the base repo path with its settings and every other resource
+# with that resource's default.
 wrapper = isinstance(entry, dict) and any(
-    k in entry for k in ("settings", "protection", "labels", "issues")
+    k in WRAPPER_KEYS or k.startswith(WRAPPER_PREFIXES) for k in entry
 )
-if wrapper:
+if resource.startswith("commits/"):
+    DEFAULTS[resource] = COMMIT
+if wrapper or slug not in data:
     payload = entry.get(resource, DEFAULTS.get(resource, {}))
 else:
     payload = entry if resource == "settings" else DEFAULTS.get(resource, {})
+# A file's text is served the way the contents endpoint serves it.
+if resource.startswith("contents/") and isinstance(payload, str) and payload not in (
+    "__unreachable__",
+    "__badjson__",
+):
+    import base64
+    payload = {
+        "encoding": "base64",
+        "content": base64.b64encode(payload.encode()).decode(),
+    }
 # A resource set to the sentinel "__unreachable__" simulates a non-zero `gh api`
 # exit (rate limit, permissions, transient 5xx) for that one resource.
 if payload == "__unreachable__":
@@ -236,7 +279,9 @@ def make_fake_gh(tmp_path: Path, data: dict[str, object]) -> tuple[Path, Path]:
     gh_dir = tmp_path / "fakebin"
     gh_dir.mkdir()
     gh = gh_dir / "gh"
-    gh.write_text(FAKE_GH)
+    # The default consumer config pins the real hook URL, so the pin rule reads
+    # it as the block it audits.
+    gh.write_text(FAKE_GH.replace("HOOK_URL", release.hook_repo_url()))
     os.chmod(gh, 0o755)
     gh_data = tmp_path / "gh.json"
     gh_data.write_text(json.dumps(data))
@@ -296,23 +341,32 @@ def test_ungoverned_repo_draws_no_output(tmp_path: Path) -> None:
     assert "1 repos" in result.stderr
 
 
-def test_governed_repo_that_is_absent_stops_the_run(tmp_path: Path) -> None:
-    # The other direction does close: the roster claiming a repo that is not
-    # there is a false claim, and a shorter audit must not pass for a clean one.
+def test_governed_repo_absent_from_this_machine_is_announced_and_passed_over(
+    tmp_path: Path,
+) -> None:
+    # The workspace spans machines: a roster name with no repo behind it here
+    # may live on another one, so the rest is audited and the absence is said.
     ws = tmp_path / "ws"
-    make_workspace_repo(ws, "alpha", {"README.md": "# A\n"})
-    result = run(ws, repos="alpha,ghost")
-    assert result.returncode == 2
-    assert "governed repo(s) not found" in result.stderr
-    assert "ghost" in result.stderr
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {"me/alpha": GOOD_SETTINGS})
+    result = run(
+        ws, "--settings-only", repos="alpha,ghost", gh_dir=gh_dir, gh_data=gh_data
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "not on this machine, not audited: ghost" in result.stderr
+    assert "1 repos" in result.stderr
 
 
 def test_governed_directory_without_git_is_not_a_repo(tmp_path: Path) -> None:
     ws = tmp_path / "ws"
     (ws / "plain").mkdir(parents=True)
-    result = run(ws, repos="plain")
-    assert result.returncode == 2
-    assert "governed repo(s) not found" in result.stderr
+    gh_dir, gh_data = make_fake_gh(tmp_path, {})
+    result = run(ws, repos="plain", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0
+    assert "not on this machine, not audited: plain" in result.stderr
+    assert "0 repos" in result.stderr
 
 
 def test_roster_order_is_the_audit_order(tmp_path: Path) -> None:
@@ -829,6 +883,177 @@ def test_repo_without_origin_draws_one_finding_not_two(tmp_path: Path) -> None:
         not in result.stdout
     )
     assert len(result.stdout.strip().splitlines()) == 1
+
+
+# --- the pin ---
+
+PIN_RULE = "distribution.a-consumer-pins-the-published-head"
+
+
+def pin_repo(
+    tmp_path: Path,
+    hook_repo: dict[str, object] | None = None,
+    config: str | None = None,
+) -> tuple[Path, Path, Path]:
+    """A one-repo workspace with good settings, whose fake gh serves ``config``
+    as alpha's published pre-commit config and, when given, the hook repo's
+    head and manifest; either left None takes the fake's clean default."""
+    ws = tmp_path / "ws"
+    make_workspace_repo(
+        ws, "alpha", {"README.md": "# A\n"}, origin="git@github.com:me/alpha.git"
+    )
+    alpha: dict[str, object] = {"settings": GOOD_SETTINGS}
+    if config is not None:
+        alpha["contents/.pre-commit-config.yaml"] = config
+    data: dict[str, object] = {"me/alpha": alpha}
+    if hook_repo is not None:
+        data[release.hook_repo_slug()] = hook_repo
+    gh_dir, gh_data = make_fake_gh(tmp_path, data)
+    return ws, gh_dir, gh_data
+
+
+def pin_config(rev: str, *ids: str) -> str:
+    """A consumer config pinning the hook repo at ``rev`` with ``ids`` under it."""
+    hooks = "".join(f"      - id: {i}\n" for i in ids)
+    url = release.hook_repo_url()
+    return f"repos:\n  - repo: {url}\n    rev: {rev}\n    hooks:\n{hooks}"
+
+
+def test_a_consumer_at_the_published_head_draws_no_pin_finding(
+    tmp_path: Path,
+) -> None:
+    ws, gh_dir, gh_data = pin_repo(tmp_path)
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_a_pin_behind_the_head_is_a_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        config=pin_config("OLD_SHA", "playbook-check"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        f"alpha: {PIN_RULE} pinned OLD_SHA, published head is HEAD_SHA" in result.stdout
+    )
+
+
+def test_a_stale_hook_id_is_a_finding_even_at_the_head(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        config=pin_config("HEAD_SHA", "playbook-lint"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert (
+        f"alpha: {PIN_RULE} hook ids playbook-lint; the manifest publishes playbook-check"
+        in result.stdout
+    )
+    assert "published head is" not in result.stdout
+
+
+def test_a_consumer_with_no_pin_is_a_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        config="repos: []\n",
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert f"alpha: {PIN_RULE} no {release.hook_repo_url()} pin" in result.stdout
+
+
+def test_a_consumer_with_no_config_on_main_is_a_finding(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(tmp_path, config="__unreachable__")
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert f"alpha: {PIN_RULE} no .pre-commit-config.yaml on main" in result.stdout
+
+
+def test_the_head_and_manifest_follow_the_hook_repo_as_github_has_it(
+    tmp_path: Path,
+) -> None:
+    # The fake's default head is HEAD_SHA; the hook repo entry moves it, and
+    # the consumer left at HEAD_SHA is now behind.
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        hook_repo={
+            "branches": {"commit": {"sha": "NEWER_SHA"}},
+            "contents/.pre-commit-hooks.yaml": "- id: playbook-check\n  entry: x\n",
+        },
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 1
+    assert "pinned HEAD_SHA, published head is NEWER_SHA" in result.stdout
+
+
+def test_an_unreadable_hook_repo_head_stops_the_run(tmp_path: Path) -> None:
+    ws, gh_dir, gh_data = pin_repo(tmp_path, hook_repo={"branches": "__unreachable__"})
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 2
+    assert "cannot read main's head sha" in result.stderr
+
+
+def test_the_hook_repo_itself_is_passed_over(tmp_path: Path) -> None:
+    # dev-playbook is governed and pins nothing; the audit knows it by identity.
+    lines = workspace_lint.check_pin(
+        HOOK_REPO, "GeoffNordling/dev-playbook", "url", "HEAD", ("playbook-check",)
+    )
+    assert lines == []
+
+
+def test_a_worktree_of_the_hook_repo_is_the_hook_repo(tmp_path: Path) -> None:
+    # Identity is the shared .git directory, so the main checkout and a
+    # worktree of it — wherever either sits on disk — are one repo.
+    worktree = tmp_path / "wt"
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(HOOK_REPO),
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            str(worktree),
+        ],
+        check=True,
+        capture_output=True,
+        env=gitrepo.no_git_env(),
+    )
+    try:
+        assert release.is_hook_repo(worktree)
+        assert release.is_hook_repo(HOOK_REPO)
+    finally:
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(HOOK_REPO),
+                "worktree",
+                "remove",
+                "--force",
+                str(worktree),
+            ],
+            check=True,
+            capture_output=True,
+            env=gitrepo.no_git_env(),
+        )
+
+
+def test_another_repo_is_not_the_hook_repo(tmp_path: Path) -> None:
+    other = tmp_path / "other"
+    init_repo(other)
+    assert not release.is_hook_repo(other)
+    assert not release.is_hook_repo(tmp_path / "nowhere")
+
+
+def test_pinned_hook_ids_reads_the_block_for_the_url() -> None:
+    url = release.hook_repo_url()
+    assert config.pinned_hook_ids(pin_config("X", "a", "b"), url) == ("a", "b")
+    assert config.pinned_hook_ids(pin_config("X"), url) == ()
+    assert config.pinned_hook_ids("repos: []\n", url) is None
+    assert config.pinned_hook_ids("- not a mapping\n", url) is None
 
 
 # --- label scheme (full mode; settings clean so only label findings surface) ---
@@ -1499,4 +1724,109 @@ def test_ambient_git_dir_does_not_redirect_origin_slug(
     decoy = ambient_git_dir("leaked.txt")
     _add_origin(decoy, "git@github.com:decoy/decoy.git")
 
-    assert workspace_lint.origin_slug(target) == "target/target"
+    assert github.origin_slug(target) == "target/target"
+
+
+# --- the release head ---
+
+LEDGER_ONLY = [{"filename": release.LEDGER}]
+
+
+def use_fake_gh(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, hook_repo: dict[str, object]
+) -> None:
+    """Put the fake gh on PATH, serving ``hook_repo`` as the hook repo's data."""
+    gh_dir, gh_data = make_fake_gh(tmp_path, {release.hook_repo_slug(): hook_repo})
+    monkeypatch.setenv("PATH", f"{gh_dir}:{os.environ['PATH']}")
+    monkeypatch.setenv("FAKE_GH_DATA", str(gh_data))
+
+
+def test_release_head_is_the_published_head_when_it_is_a_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(monkeypatch, tmp_path, {"branches": {"commit": {"sha": "REL"}}})
+    assert release.release_head() == "REL"
+
+
+def test_release_head_steps_back_over_ledger_only_commits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Two update-pins runs recorded in a row on top of the release: both are
+    # bookkeeping, and the sha consumers pin is the one underneath.
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "LEDGER2"}},
+            "commits/LEDGER2": {"files": LEDGER_ONLY, "parents": [{"sha": "LEDGER1"}]},
+            "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
+        },
+    )
+    assert release.release_head() == "REL"
+
+
+def test_release_head_counts_a_commit_touching_the_ledger_and_more_as_a_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "MIXED"}},
+            "commits/MIXED": {
+                "files": [*LEDGER_ONLY, {"filename": "docs/index.md"}],
+                "parents": [{"sha": "REL"}],
+            },
+        },
+    )
+    assert release.release_head() == "MIXED"
+
+
+def test_release_head_refuses_a_ledger_only_merge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "MERGE"}},
+            "commits/MERGE": {
+                "files": LEDGER_ONLY,
+                "parents": [{"sha": "A"}, {"sha": "B"}],
+            },
+        },
+    )
+    with pytest.raises(workspace_lint.ToolError, match="2 parents"):
+        release.release_head()
+
+
+def test_release_head_refuses_an_unreadable_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "REL"}},
+            "commits/REL": "__unreachable__",
+        },
+    )
+    with pytest.raises(workspace_lint.ToolError, match="cannot read commit REL"):
+        release.release_head()
+
+
+def test_the_pin_rule_judges_against_the_release_head_not_the_ledger_commit(
+    tmp_path: Path,
+) -> None:
+    # The consumer pins the release; the ledger commit on top of it is not drift.
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        hook_repo={
+            "branches": {"commit": {"sha": "LEDGER1"}},
+            "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
+        },
+        config=pin_config("REL", "playbook-check"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert workspace_lint.PINNED_HEAD not in result.stdout

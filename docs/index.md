@@ -7,6 +7,7 @@ intentions, and explorations — and the Decision Records.
 - [Headless Operation](/docs/headless.md) — What `claude -p` guarantees on subscription — billing and the credentials that outrank the login, how stable the policy is, what a run declares about itself, what the harness loads, what the flags buy, and the path-scoped permissions that do not work
 - [Machines](/docs/machines.md) — The machines the workspace runs on — one Fedora primary and two Windows/WSL secondaries — and what differs between them
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
+- [Pin Updates Ledger](/docs/pin-updates.md) — Every run of update-pins, one row per governed repo — when it ran, which release head it moved the pin to, the verdict at that head, where the bump landed, and the remote branches the run saw still unmerged
 - [Sandboxing Claude agents](/docs/sandboxing.md) — The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached has a working prototype, not yet integrated
 - [System Legibility](/docs/system-legibility.md) — The doctrine — the user understands the systems they own without reading all of them — and the principles and ambitions that serve it
 - [Working in Loops](/docs/working-in-loops.md) — The doctrine — agents work in loops, and the user works on the loops

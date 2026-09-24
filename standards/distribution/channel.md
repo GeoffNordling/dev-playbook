@@ -24,6 +24,18 @@ file publishes under a `repo: local` block of its `.pre-commit-config.yaml`.
 
 `distribution.a-publisher-dogfoods-its-manifest` · deterministic
 
+## A consumer pins the published head
+
+A governed repo other than the hook repository pins the hook repository,
+in its `.pre-commit-config.yaml` on its default branch, at the sha of the
+hook repository's published `main` head, and lists under that block
+exactly the hook ids the hook repository's `.pre-commit-hooks.yaml`
+publishes at that sha. Behind the head, the repo runs a standard that is
+no longer the standard; at a stale id, pre-commit fails before any check
+runs.
+
+`distribution.a-consumer-pins-the-published-head` · deterministic
+
 ## The manifest validates
 
 A `.pre-commit-hooks.yaml` at a governed repo's root passes

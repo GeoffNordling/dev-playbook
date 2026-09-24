@@ -29,14 +29,28 @@ in, so governance is declared rather than inferred. For each governed repo:
     shape rules of its species: a build leaf's four-tuple validity and brief
     shape, a build epic's category-only shape, and a wayfinder map's or decision
     ticket's shape. Species comes from the label set and ``sub_issues_summary``.
+  - **pin** — read the consumer's ``.pre-commit-config.yaml`` on its default
+    branch and require that its dev-playbook block pins the hook repo's
+    release head — the newest ``main`` commit that is not the pin ledger's
+    bookkeeping, see ``pins.release.release_head`` — and lists the hook ids the
+    manifest publishes there. The head and the manifest are read once per
+    run, from GitHub, so a stale pin is a finding on the machine that never
+    cloned the consumer at all. The hook repo itself is passed over: it
+    dogfoods from its tree.
 
 Every check reads GitHub, so an authenticated `gh` is a precondition of the run
 rather than a per-repo condition: the audit checks it once up front and refuses
 to start without it, because an unauthenticated `gh` degrades to anonymous
 requests instead of failing (see ``check_auth``).
 
-The pin helpers ``hook_repo_url``, ``rev_line``, and ``pinned_rev`` stay here
-for ``bump_pins``, which rewrites a consumer's pin through them.
+A roster name with no repo behind it on this machine is announced on stderr
+and passed over rather than refused: the workspace spans machines, and a repo
+may deliberately live on another one.
+
+The pin is read through ``dev_playbook.pins`` — ``release`` for the hook
+repo's release head and manifest, ``config`` for a consumer's pinned block —
+the same modules ``bump-pin`` and ``update-pins`` write through, so the
+reader and the writers cannot disagree.
 
 Output:
     stdout — one finding per line, ``repo: name.rule message`` (the repo name
@@ -46,17 +60,25 @@ Output:
 """
 
 import argparse
-import json
 import re
-import subprocess
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from dev_playbook import gitrepo, md
+from dev_playbook import md
+from dev_playbook.errors import ToolError
 from dev_playbook.findings import print_rules, render
+from dev_playbook.github import check_auth, gh_api, gh_graphql, origin_slug
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
+from dev_playbook.pins.config import pinned_hook_ids, pinned_rev
+from dev_playbook.pins.release import (
+    hook_repo_url,
+    is_hook_repo,
+    published_file,
+    published_hook_ids,
+    release_head,
+)
 
 # Every rule id this command can emit. Repo-settings drift, reachability, and
 # the live-repo tracking checks (label scheme, leaf labels and headings, epic
@@ -80,8 +102,14 @@ SESSION_HEADINGS = "tracking.every-session-heading-in-bold"
 CATEGORY_ONLY = "tracking.category-only"
 WAYFINDER_LABELS = "tracking.one-wayfinder-label-and-nothing-else"
 WAYFINDER_BODY = "tracking.map-sections-ticket-question"
+# The one distribution rule this command decides: a consumer's published
+# config pins the hook repo's published head and lists the ids its manifest
+# publishes there. Read over `gh api` like the rest, because the audited fact
+# is the repo's default branch as GitHub has it, not a checkout on this machine.
+PINNED_HEAD = "distribution.a-consumer-pins-the-published-head"
 
 RULES = (
+    PINNED_HEAD,
     SQUASH_ONLY_MERGES,
     DEFAULT_BRANCH_PROTECTION,
     GITHUB_ORIGIN,
@@ -142,11 +170,6 @@ TICKET_SECTIONS = ("Question",)
 
 # The four dimensions of the state-machine tuple (status is not part of it).
 TUPLE_DIMENSIONS = ("category", "mode", "tests", "phase")
-
-HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
-CANONICAL_CONFIG = (
-    HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
-)
 
 # The governed repos — the workspace population the standards apply to, named
 # here because governance is an act rather than a property of sitting under the
@@ -249,14 +272,6 @@ PROTECTION_QUERY = """query($owner: String!, $name: String!) {
   }
 }"""
 
-REMOTE_SLUG_PATTERN = re.compile(
-    r"^(?:git@github\.com:|https://github\.com/)([^/\s]+/[^/\s]+?)(?:\.git)?$"
-)
-
-
-class ToolError(Exception):
-    """The audit could not run at all."""
-
 
 @dataclass(frozen=True)
 class Line:
@@ -295,142 +310,62 @@ class Rule:
     ruleset: Ruleset | None
 
 
-def hook_repo_url() -> str:
-    """The published hook-repo URL, read from the canonical config's pinned block."""
-    text = CANONICAL_CONFIG.read_text(encoding="utf-8")
-    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
-    if not match:
-        raise ToolError(f"no pinned block in {CANONICAL_CONFIG}")
-    return match.group(1)
+def check_pin(
+    repo: Path, slug: str | None, url: str, head: str, ids: tuple[str, ...]
+) -> list[Line]:
+    """The pin rule over one consumer's published config.
+
+    The hook repo itself dogfoods from its working tree and pins nothing, so it
+    is passed over; a repo with no origin was already reported by
+    check_settings.
+    """
+    if slug is None or is_hook_repo(repo):
+        return []
+    config = published_file(slug, ".pre-commit-config.yaml")
+    if config is None:
+        return [Line(repo.name, PINNED_HEAD, "no .pre-commit-config.yaml on main")]
+    rev = pinned_rev(config, url)
+    if rev is None:
+        return [Line(repo.name, PINNED_HEAD, f"no {url} pin")]
+    lines = []
+    if rev != head:
+        lines.append(
+            Line(
+                repo.name,
+                PINNED_HEAD,
+                f"pinned {rev[:12]}, published head is {head[:12]}",
+            )
+        )
+    pinned_ids = pinned_hook_ids(config, url) or ()
+    if pinned_ids != ids:
+        lines.append(
+            Line(
+                repo.name,
+                PINNED_HEAD,
+                f"hook ids {', '.join(pinned_ids) or '(none)'}; "
+                f"the manifest publishes {', '.join(ids)}",
+            )
+        )
+    return lines
 
 
-def workspace_repos(workspace: Path, roster: tuple[str, ...]) -> list[Path]:
-    """The roster's repos under ``workspace``, in roster order.
+def workspace_repos(
+    workspace: Path, roster: tuple[str, ...]
+) -> tuple[list[Path], list[str]]:
+    """The roster's repos under ``workspace`` in roster order, and the names not there.
 
     Only the listed repos are audited — an unlisted repo under the root is not
-    governed and draws no output. The reverse does not hold: a listed repo that
-    is not a git repo under the root is a false claim by the roster, and the
-    audit refuses to run rather than quietly auditing a shorter list.
+    governed and draws no output. A listed name with no git repo behind it on
+    this machine is returned separately, for the caller to announce: the
+    workspace spans machines and a repo may deliberately live on another one,
+    so its absence here is neither a finding nor a reason to refuse the rest.
     """
     if not workspace.is_dir():
         raise ToolError(f"workspace root not found: {workspace}")
     repos = [workspace / name for name in roster]
-    missing = [repo.name for repo in repos if not (repo / ".git").exists()]
-    if missing:
-        raise ToolError(
-            f"governed repo(s) not found under {workspace}: {', '.join(missing)}"
-        )
-    return repos
-
-
-def origin_slug(repo: Path) -> str | None:
-    """``owner/name`` from the repo's GitHub origin, or None if there is none."""
-    result = subprocess.run(
-        ["git", "-C", str(repo), "remote", "get-url", "origin"],
-        capture_output=True,
-        text=True,
-        env=gitrepo.no_git_env(),
-    )
-    if result.returncode != 0:
-        return None
-    match = REMOTE_SLUG_PATTERN.match(result.stdout.strip())
-    return match.group(1) if match else None
-
-
-def rev_line(lines: list[str], url: str) -> int | None:
-    """Index of the ``rev:`` line pinning ``url``, or None when there is none.
-
-    The one place a pinned block's rev line is located. The audit reads through
-    it and bump_pins rewrites through it, so the reader and the writer cannot
-    disagree about which line carries the pin.
-    """
-    for i, line in enumerate(lines):
-        if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
-            for follower in range(i + 1, min(i + 3, len(lines))):
-                if re.match(r"^\s*rev:\s*\S+", lines[follower]):
-                    return follower
-    return None
-
-
-def pinned_rev(config_text: str, url: str) -> str | None:
-    """The ``rev`` pinned for ``url`` in a ``.pre-commit-config.yaml`` body, or None."""
-    lines = config_text.splitlines()
-    index = rev_line(lines, url)
-    return lines[index].split(":", 1)[1].strip() if index is not None else None
-
-
-def gh_api(path: str, *, paginate: bool = False) -> object | None:
-    """Parsed JSON from ``gh api <path>``, or None when the call fails.
-
-    A non-zero exit or a body that is not JSON (an empty 204, a degraded/HTML
-    error page) yields None for that one path, so a single bad response degrades
-    to an unreachable finding rather than a traceback that blinds the audit to
-    every remaining repo. With ``paginate=True``, ``gh api --paginate`` follows
-    the Link headers and merges every page's JSON array into one array, so a list
-    endpoint with more than a page of results is read in full.
-    """
-    argv = ["gh", "api"]
-    if paginate:
-        argv.append("--paginate")
-    argv.append(path)
-    return _gh_json(argv)
-
-
-def _gh_json(argv: list[str]) -> object | None:
-    """Parsed JSON from one ``gh`` invocation, or None when the call is unusable."""
-    try:
-        result = subprocess.run(argv, capture_output=True, text=True)
-    except FileNotFoundError as err:
-        raise ToolError("gh not found on PATH") from err
-    if result.returncode != 0:
-        return None
-    try:
-        parsed: object = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        return None
-    return parsed
-
-
-def check_auth() -> None:
-    """Stop the run when `gh` holds no usable credential.
-
-    Authentication is a precondition of the whole audit, not a per-repo
-    condition, because an unauthenticated `gh` does not fail — it degrades to
-    anonymous requests, and anonymity is answered three different ways. A public
-    repo serves its REST resources, so labels and issues return real findings. A
-    private repo answers 404, indistinguishable from one that was deleted.
-    GraphQL has no anonymous mode at all, so the settings check fails on every
-    repo whatever its visibility. The audit would then print a mix of genuine
-    findings and per-repo unreachable lines under one exit 1, with nothing in the
-    output telling a reader which was which. Refusing to start is the only honest
-    answer.
-    """
-    try:
-        result = subprocess.run(
-            ["gh", "auth", "status"], capture_output=True, text=True
-        )
-    except FileNotFoundError as err:
-        raise ToolError("gh not found on PATH") from err
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout).strip()
-        raise ToolError(
-            "gh holds no usable credential, so every GitHub read would "
-            "silently degrade to an anonymous request. Run `gh auth login`, or "
-            f"re-run where the credential store is readable.\n{detail}"
-        )
-
-
-def gh_graphql(query: str, **variables: str) -> object | None:
-    """Parsed JSON from ``gh api graphql``, or None when the call fails.
-
-    The same degradation contract as ``gh_api``: a non-zero exit (which is how
-    `gh` reports GraphQL errors) or an unparseable body yields None for that one
-    call, so a single bad response degrades to an unreachable finding.
-    """
-    argv = ["gh", "api", "graphql", "-f", f"query={query}"]
-    for key, value in variables.items():
-        argv += ["-f", f"{key}={value}"]
-    return _gh_json(argv)
+    present = [repo for repo in repos if (repo / ".git").exists()]
+    absent = [repo.name for repo in repos if not (repo / ".git").exists()]
+    return present, absent
 
 
 def fetch_settings(slug: str) -> dict | None:
@@ -1201,13 +1136,17 @@ def main(argv: list[str] | None = None) -> int:
         return print_rules(RULES)
 
     try:
-        repos = workspace_repos(args.workspace.resolve(), args.repos)
+        repos, absent = workspace_repos(args.workspace.resolve(), args.repos)
         check_auth()
+        url = hook_repo_url()
+        head = release_head()
+        ids = published_hook_ids(head)
         lines: list[Line] = []
         for repo in repos:
             slug = origin_slug(repo)
             lines.extend(check_settings(repo, slug))
             lines.extend(check_protection(repo, slug))
+            lines.extend(check_pin(repo, slug, url, head, ids))
             if not args.settings_only:
                 lines.extend(check_tracking(repo, slug))
     except ToolError as err:
@@ -1217,6 +1156,11 @@ def main(argv: list[str] | None = None) -> int:
     for line in lines:
         print(line.render())
 
+    if absent:
+        print(
+            f"workspace-lint: not on this machine, not audited: {', '.join(absent)}",
+            file=sys.stderr,
+        )
     findings = sum(1 for line in lines if line.blocking)
     print(f"workspace-lint: {len(repos)} repos, {findings} finding(s)", file=sys.stderr)
     return 1 if findings else 0

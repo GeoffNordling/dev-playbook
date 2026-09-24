@@ -97,6 +97,7 @@ edit separately, one line}:
     git -C ~/workspace/dev-playbook add src/dev_playbook/workspace_lint.py && git -C ~/workspace/dev-playbook commit -m "<subject>" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 
 On the PR path this waits for the user's merge — a repo enrolled while its
-pin sits on an unmerged branch reports a `distribution.a-pinned-rev` finding against `main`.
+pin sits on an unmerged branch reports a
+`distribution.a-consumer-pins-the-published-head` finding against `main`.
 
 {Report per-repo results; a failure in one never blocks the other's report}.

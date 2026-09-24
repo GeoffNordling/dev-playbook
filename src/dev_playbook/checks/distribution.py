@@ -5,7 +5,9 @@ One rule is decided by a function over the model: a repo that publishes a
 block of its ``.pre-commit-config.yaml``. The manifest's validity is decided
 by ``pre-commit validate-manifest``, which ``playbook check`` runs as its
 ``validate-manifest`` step only where the manifest exists, and is registered
-by that name.
+by that name. Whether a consumer pins the published head is decided by
+``scripts/workspace-lint``, which reads the consumer's config and the hook
+repo's head over ``gh api``, and is registered by that hook name.
 """
 
 from collections.abc import Iterator
@@ -20,6 +22,11 @@ CONFIG = ".pre-commit-config.yaml"
 
 tool_check(
     "distribution.the-manifest-validates", hook="validate-manifest", module=__name__
+)
+tool_check(
+    "distribution.a-consumer-pins-the-published-head",
+    hook="workspace-lint",
+    module=__name__,
 )
 
 
