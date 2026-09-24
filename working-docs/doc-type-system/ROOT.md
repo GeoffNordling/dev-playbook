@@ -16,6 +16,15 @@ This root holds only what crosses strands.
 
 ## Goal
 
+The set builds a typed property graph compiled from declared
+documents, in the lineage of Kythe and Glean: the fact base. Around it
+are the language that declares the documents, the driver that moves
+them toward a target, and the viewer that draws the graph. It is not a
+knowledge graph in the usual sense, where a model extracts the facts
+and the schema grows freely. Here a parser yields every row with a
+receipt, and every relation type belongs to a declared doc-type
+([Precedent](/working-docs/doc-type-system/fact-base/precedent.md)).
+
 - **Doc-type system**, the language: doc-types, verbs, rules as
   predicates, encodings as grammar. Root:
   [Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md).
