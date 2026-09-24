@@ -16,6 +16,12 @@
 # construction. Resolution is independent of where the consumer repo — or any
 # of its worktrees — sits on disk. See standards/distribution/channel.md.
 #
+# The venv holds dev-playbook and nothing of the consumer's, so this hook runs
+# dev-playbook's checks only. A consumer that writes its own checks runs them
+# in a second hook of its own, `playbook-check-local`, which runs
+# `playbook check --local` in the consumer's environment. That hook is not
+# published here. See docs/decisions/0031-consumer-checks-run-in-a-local-hook.md.
+#
 # language_version names the interpreter pre-commit builds that venv with.
 # Without it pre-commit uses whichever Python runs pre-commit itself, and a
 # consumer's gate runs `uvx pre-commit`, whose tool environment is whatever

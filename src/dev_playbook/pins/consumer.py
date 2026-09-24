@@ -13,7 +13,7 @@ from pathlib import Path
 
 from dev_playbook import gitrepo
 from dev_playbook.errors import ToolError
-from dev_playbook.pins.config import pinned_rev, rewritten
+from dev_playbook.pins.config import move_pin, pinned_rev
 from dev_playbook.pins.worktree import git_out
 
 WORKTREES = Path(".claude") / "worktrees"
@@ -120,15 +120,16 @@ def remove_bump(repo: Path, branch: str) -> None:
         git_out(repo, "push", "-q", "origin", "--delete", branch)
 
 
-def land_green(tree: Path, old: str, sha: str) -> str:
+def land_green(tree: Path, changed: list[str], old: str, sha: str) -> str:
     """Commit the moved pin in the probe worktree and push it to ``main``; the new sha.
 
-    Hooks run: the consumer's commit hook is the gate at the new pin, its
-    pre-push hook is ``make check``, and a rejection from either is the caller's
-    ``failed`` row. The worktree is throwaway, so the commit's home is
-    ``origin/main`` or nowhere.
+    ``changed`` is the files ``config.move_pin`` wrote. Hooks run: the
+    consumer's commit hook is the gate at the new pin, its pre-push hook is
+    ``make check``, and a rejection from either is the caller's ``failed``
+    row. The worktree is throwaway, so the commit's home is ``origin/main`` or
+    nowhere.
     """
-    git_out(tree, "add", ".pre-commit-config.yaml")
+    git_out(tree, "add", *changed)
     git_out(
         tree,
         "commit",
@@ -160,10 +161,8 @@ def red_worktree(
         raise ToolError(f"worktree {path} already exists, kept from an earlier run")
     path.parent.mkdir(parents=True, exist_ok=True)
     git_out(repo, "worktree", "add", "-q", "-b", branch, str(path), "origin/main")
-    config = path / ".pre-commit-config.yaml"
-    updated, old = rewritten(config.read_text(encoding="utf-8"), url, sha, ids)
-    config.write_text(updated, encoding="utf-8")
-    git_out(path, "add", ".pre-commit-config.yaml")
+    changed, old = move_pin(path, url, sha, ids)
+    git_out(path, "add", *changed)
     git_out(
         path,
         "commit",

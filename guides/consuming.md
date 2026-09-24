@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Adopting a Repo-Scoped Standard
-description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write its checks where dev-playbook keeps its own, and bump the pin that runs them
+description: The consumer-repo recipe for a first repo-scoped standard — grow the standards/ tree, write its checks where dev-playbook keeps its own, wire the local hook that runs them, and bump the pin
 ---
 
 # Adopting a Repo-Scoped Standard
@@ -37,13 +37,48 @@ in the Standard the step links.
    `tests/<package>/checks/test_<name>.py`, the same places dev-playbook
    keeps its own
    ([Writing a Check](/guides/writing-a-check.md)).
-3. **Bump the pin.** The `playbook-check` hook the repo already pins
-   runs dev-playbook's checks, the meta-standard's among them, and the
-   repo's own beside them. Bump the pin to a dev-playbook `rev` that
-   loads a consumer's checks: from that rev they run over the repo, and
-   `playbook checks --family <name>` lists them. Until the pin moves,
-   the new Standard is unchecked.
-4. **Register a local document type (only if the standard needs one).**
+3. **Wire the local hook.** The `playbook-check` hook the repo already
+   pins runs dev-playbook's checks only. The repo's own checks run in a
+   second hook in its own environment, so they can import the repo's
+   package and its dependencies. Add this block to
+   `.pre-commit-config.yaml`
+   ([A host runs its own checks](/standards/distribution/channel.md#a-host-runs-its-own-checks)):
+
+   ```yaml
+   - repo: local
+     hooks:
+       - id: playbook-check-local
+         name: playbook check --local
+         entry: uv run --locked playbook check --local
+         language: system
+         pass_filenames: false
+         always_run: true
+   ```
+
+   The hook runs the dev-playbook in the repo's environment, so list
+   it as a dev dependency, sourced from git at the `rev` the
+   dev-playbook block of `.pre-commit-config.yaml` pins, then run
+   `uv lock`
+   ([A host's dev-playbook rides the pin](/standards/distribution/channel.md#a-hosts-dev-playbook-rides-the-pin)):
+
+   ```toml
+   [dependency-groups]
+   dev = [
+       # ...
+       "dev-playbook",
+   ]
+
+   [tool.uv.sources]
+   dev-playbook = { git = "https://github.com/GeoffNordling/dev-playbook", rev = "<the pinned sha>" }
+   ```
+
+   `uv run playbook checks --local --family <name>` lists the new
+   checks. `bump-pin` and `update-pins` move this `rev` with the
+   pre-commit `rev` from then on.
+4. **Bump the pin.** Bump the pin to a dev-playbook `rev` that has
+   `playbook check --local`. Until the pin moves, the new Standard is
+   unchecked.
+5. **Register a local document type (only if the standard needs one).**
    Skip this step unless the new standard governs a **document type**
    the global OKF registry does not carry. If it does, declare the type
    in the frontmatter of the repo's root `index.md`, an `okf_types`

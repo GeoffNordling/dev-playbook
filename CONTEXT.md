@@ -33,6 +33,12 @@ What decides one rule over a member and returns findings: a check or a judge. It
 A verifier for a deterministic rule: a function registered under the rule's id, which `playbook check` runs, or a tool such as ruff registered by its hook.
 _Avoid_: detector, lint.
 
+**Layer**
+The checks one repo keeps in `src/<package>/checks/`. dev-playbook's layer runs in every governed repo through the pinned `playbook-check` hook; a host's own layer runs through its `playbook-check-local` hook.
+
+**Host**
+A consumer repo with its own deterministic rules or its own layer. It runs `playbook-check-local` in its own environment and sources dev-playbook as a dev dependency at the pinned rev.
+
 **Judge**
 A verifier for a stochastic rule: a model prompted with the rule's predicate.
 

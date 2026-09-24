@@ -24,11 +24,12 @@ one global lock — the run is:
     is bumped regardless of in-flight work — a branch meets the new pin when
     it merges, on its own PR — and the report is how the user spots a live
     branch and vetoes.
-  - Probe in a throwaway worktree of ``origin/main``: rewrite the pin and the
-    hook ids, run the gate once. No baseline run: the question is "green at
-    the new pin", and every finding at that pin is worked, whichever release
-    brought it.
-  - **Green**: commit the one-file change and push it to ``main``. The
+  - Probe in a throwaway worktree of ``origin/main``: move the pin
+    (``config.move_pin``: the rev and the hook ids, and in a host the
+    dev-playbook source's rev and ``uv.lock``), run the gate once. No
+    baseline run: the question is "green at the new pin", and every finding
+    at that pin is worked, whichever release brought it.
+  - **Green**: commit the moved pin and push it to ``main``. The
     consumer's commit hook runs the gate at the new pin and its pre-push hook
     runs ``make check``, so a landed commit is verified twice. A rejected push
     is the row ``failed`` with git's reason, never a retry.
@@ -59,7 +60,8 @@ pin, and nothing that checks a repo. The modules underneath, one concern each:
   - ``release`` — the hook repo as GitHub publishes it: its URL, its release
     head, the manifest at a sha, a file on ``main``.
   - ``config`` — a consumer's pinned block: locate the ``rev`` line, read the
-    rev and hook ids, rewrite both.
+    rev and hook ids, rewrite both; and move the whole pin, a host's
+    dev-playbook source and lock with it.
   - ``gate`` — the consumer's commit gate, run to a verdict or a refusal.
   - ``worktree`` — git in a consumer: one command, a fetch, a throwaway
     detached worktree of ``origin/main``.
@@ -85,7 +87,7 @@ from pathlib import Path
 from dev_playbook.errors import ToolError
 from dev_playbook.github import check_auth
 from dev_playbook.pins import agent, consumer, ledger
-from dev_playbook.pins.config import rewritten
+from dev_playbook.pins.config import move_pin
 from dev_playbook.pins.gate import run_gate
 from dev_playbook.pins.release import (
     LEDGER,
@@ -157,12 +159,10 @@ def update_repo(
             f"update-pins: {name}: {old[:12]} -> {sha[:12]}, probing", file=sys.stderr
         )
         with probe_worktree(repo) as tree:
-            config = tree / ".pre-commit-config.yaml"
-            updated, _ = rewritten(config.read_text(encoding="utf-8"), url, sha, ids)
-            config.write_text(updated, encoding="utf-8")
+            changed, _ = move_pin(tree, url, sha, ids)
             passed, output = run_gate(tree)
             if passed and not dry_run:
-                landed = consumer.land_green(tree, old, sha)
+                landed = consumer.land_green(tree, changed, old, sha)
                 return ledger.Row(now, sha, name, GREEN, f"main {landed[:12]}", notes)
         if passed:
             return ledger.Row(now, sha, name, GREEN, "dry run: not landed", notes)
