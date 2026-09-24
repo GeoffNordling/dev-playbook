@@ -97,20 +97,31 @@ main-child.md ············ role:    side-child.md
 leaf-file.md ······················· role: section · section
    │
    ▼
-child-set/
+notes/draft.md ····················· role: section
+   │
+   ▼
+child-workstream/
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ index.md
-┃ ├── child-member.md ·············· role: section · section
-┃ └── last-child.md ················ role: section
+┃    │
+┃    ▼
+┃ WORKSTREAM.md ···················· role: section · section
+┃    │
+┃    ▼
+┃ child-member.md ·················· role: section
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-A child set of a workstream that holds its own `WORKSTREAM.md` is a child workstream
-([one directory under `workstreams/`](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#one-directory-under-workstreams)),
-and takes the link tree form inside its border, its `index.md` at the
-top with one edge to its `WORKSTREAM.md`. A child set with no `WORKSTREAM.md` is a
-set like any other, so it takes the bordered index-row form even
-though its parent takes the link tree.
+A child directory with no `WORKSTREAM.md` shares its parent's head
+file, so it gets no border: each of its files joins the link tree where
+a link reaches it, its name drawn with the directory, such as
+`notes/draft.md`. A child directory that holds its own `WORKSTREAM.md`
+is a child workstream
+([every child reached from its parent](~/workspace/dev-playbook/standards/doc-type/workstream-conventions.md#every-child-reached-from-its-parent)).
+It hangs, bordered, under the file whose link reaches its
+`WORKSTREAM.md`, and takes the link tree form inside its border, its
+`index.md` at the top with one edge to its `WORKSTREAM.md`. Each file
+is drawn once, under the first edge that reaches it.
 
 ASCII box characters only, 78 columns wide, one annotation column every
 label aligns to, fragments rather than sentences. Where two nodes stand

@@ -251,12 +251,18 @@ Sessions with the user come first, each at a high level, the agent
 guiding. Running an unattended stint is the
 [sandcastle workstream's worklist](/workstreams/delegation/sandcastle/WORKSTREAM.md#planned).
 
-- **Write the Workstream doc-type.** Designed and built with Loop in
-  [Loop and Workstream](/workstreams/doc-type-system/loop-and-workstream/WORKSTREAM.md),
-  which holds its worklist; this item closes when that child workstream's does.
 - **Split the tracking standard.** GitHub tracking and workstream
   tracking, each in its own section of
   [`standards/tracking/`](/standards/tracking/index.md).
+- **Design what a stint returns.** A session with the user, before the
+  unattended stint's Loop is written. Inside the container, iterations
+  and checkpoints write files on the stint's branch: `PLAN.md`,
+  `PROGRESS.md`, commits, and the head file's worklist moves. The
+  design settles which of these come back when the container stops,
+  which stay on the branch, and which reach `main` only on an accept.
+  It also settles who writes the stint's entry under `## Stints`, and
+  when: the container at the yield, or the driver after the user's
+  verdict, since a verdict exists only after the yield.
 - **Write the unattended stint's Loop.** The first file in `loops/`,
   once [Loop and Workstream](/workstreams/doc-type-system/loop-and-workstream/WORKSTREAM.md)
   has settled both doc-types.
@@ -279,6 +285,13 @@ guiding. Running an unattended stint is the
 - **Check overlap with active branches.** Done 2026-09-24: `main`'s
   refactor is merged into this branch, and no active branch conflicts
   with it.
+- **Write the Workstream doc-type.** Done 2026-09-24, with Loop in
+  [Loop and Workstream](/workstreams/doc-type-system/loop-and-workstream/WORKSTREAM.md):
+  its class in the reference model, the bundle in
+  [`doc-types/workstream/`](/doc-types/workstream/index.md),
+  [Workstream Conventions](/standards/doc-type/workstream-conventions.md)
+  and its checks, and every head file typed `Workstream`. The Loop
+  items left there are that child workstream's.
 - **Move the work to `workstreams/`.** Done 2026-09-24: each head
   file renamed `WORKSTREAM.md` and typed Workstream,
   [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md)
