@@ -70,3 +70,12 @@ ledger's own bookkeeping never triggers the next run.
 | 2026-09-24 16:15 | 07255322f419 | dwarf-flow | current | main pins 07255322f419 | no unmerged branches |
 | 2026-09-24 16:15 | 07255322f419 | lunch | failed | worktree /home/geoff/workspace/lunch/.claude/worktrees/bump-pin-07255322f419 already exists, kept from an earlier run |  |
 | 2026-09-24 16:15 | 07255322f419 | date-tree | failed | worktree /home/geoff/workspace/date-tree/.claude/worktrees/bump-pin-07255322f419 already exists, kept from an earlier run |  |
+| 2026-09-24 16:30 | c9cd7e817208 | story-forge | green | main 6cec1a5844f7 | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | mission-control | green | main ac15c6905c7b | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | sysadmin-playbook | green | main 5f28c11c6330 | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | sounds | green | main 0a0002a6b010 | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | personal-trainer | green | main bdde9e3afb60 | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | idea-tree | green | main d480358301a1 | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | dwarf-flow | green | main c24d93e65629 | no unmerged branches |
+| 2026-09-24 16:30 | c9cd7e817208 | lunch | red | PR https://github.com/GeoffNordling/lunch/pull/5 | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
+| 2026-09-24 16:30 | c9cd7e817208 | date-tree | red | PR https://github.com/GeoffNordling/date-tree/pull/4 | no unmerged branches |
