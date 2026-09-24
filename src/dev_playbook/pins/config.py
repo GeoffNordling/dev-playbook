@@ -4,13 +4,37 @@ The block is the ``- repo: <hook repo url>`` item with its ``rev:`` line and
 its ``hooks:`` list. One function locates the rev line (``rev_line``); the
 audit reads through it and the writers rewrite through it, so the reader and
 the writer cannot disagree about which line carries the pin.
+
+A host, a consumer that runs its own checks, pins dev-playbook a second time:
+its ``pyproject.toml`` sources the dev dependency from git at the same rev.
+``move_pin`` moves both and re-locks ``uv.lock``, so every writer moves the
+pin as one act.
 """
 
 import re
+import subprocess
+import tomllib
+from pathlib import Path
 
 import yaml
 
 from dev_playbook.errors import ToolError
+
+CONFIG = ".pre-commit-config.yaml"
+PYPROJECT = "pyproject.toml"
+LOCK = "uv.lock"
+
+# The one line of ``[tool.uv.sources]`` that sources dev-playbook, split
+# around its rev: `dev-playbook = { git = "<url>", rev = "<sha>" }`.
+SOURCE_REV = re.compile(r'^(dev-playbook\s*=\s*\{.*\brev\s*=\s*")([^"]*)(".*)$', re.M)
+
+
+def hook_url(canonical_config: str) -> str:
+    """The hook-repo URL, read from the canonical config's pinned block."""
+    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", canonical_config)
+    if not match:
+        raise ToolError("no pinned block in the canonical .pre-commit-config.yaml")
+    return match.group(1)
 
 
 def rev_line(lines: list[str], url: str) -> int | None:
@@ -97,3 +121,40 @@ def rewritten(text: str, url: str, sha: str, ids: tuple[str, ...]) -> tuple[str,
 
     tail = "\n" if text.endswith("\n") else ""
     return "\n".join(lines) + tail, old
+
+
+def move_pin(
+    tree: Path, url: str, sha: str, ids: tuple[str, ...]
+) -> tuple[list[str], str]:
+    """Move the pin in the checkout ``tree`` to ``sha``; the files changed and the old rev.
+
+    The config's pinned block always moves (:func:`rewritten`). Where
+    ``pyproject.toml`` sources dev-playbook from git, its rev moves too and
+    ``uv lock`` re-locks, so the host's local hook runs the pinned
+    dev-playbook. A git source whose rev is not on one line is refused rather
+    than left behind.
+    """
+    config = tree / CONFIG
+    updated, old = rewritten(config.read_text(encoding="utf-8"), url, sha, ids)
+    config.write_text(updated, encoding="utf-8")
+    pyproject = tree / PYPROJECT
+    if not pyproject.is_file():
+        return [CONFIG], old
+    text = pyproject.read_text(encoding="utf-8")
+    sources = tomllib.loads(text).get("tool", {}).get("uv", {}).get("sources", {})
+    source = sources.get("dev-playbook")
+    if not isinstance(source, dict) or "git" not in source:
+        return [CONFIG], old
+    moved, count = SOURCE_REV.subn(rf"\g<1>{sha}\g<3>", text)
+    if count != 1:
+        raise ToolError(
+            f"{PYPROJECT} sources dev-playbook from git, but not on one "
+            '`dev-playbook = { git = "...", rev = "..." }` line to move'
+        )
+    pyproject.write_text(moved, encoding="utf-8")
+    result = subprocess.run(
+        ["uv", "lock"], cwd=tree, capture_output=True, text=True, check=False
+    )
+    if result.returncode != 0:
+        raise ToolError(f"uv lock failed in {tree}:\n{result.stderr}")
+    return [CONFIG, PYPROJECT, LOCK], old

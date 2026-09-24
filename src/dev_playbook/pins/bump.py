@@ -24,10 +24,12 @@ steps, with the refusal each one carries:
     this release has not earned.
   - **verify** — rewrite the pin and run the gate again. pre-commit clones the
     new rev during this run, so this is the moment the new standard takes
-    effect in that repo and the only step that touches the network.
+    effect in that repo and, with a host's ``uv lock``, the only step that
+    touches the network.
 
 ``--write`` makes the durable edit — the pinned block's ``rev:`` line and its
-hook ids, nothing else — and runs no gate. It asks only for a clean working
+hook ids, and in a host the dev-playbook source's rev in ``pyproject.toml``
+and ``uv.lock`` (``config.move_pin``), nothing else — and runs no gate. It asks only for a clean working
 tree, so it serves the worktree a caller cuts after a red probe as readily as
 ``main`` after a green one.
 
@@ -45,7 +47,7 @@ import sys
 from pathlib import Path
 
 from dev_playbook.errors import ToolError
-from dev_playbook.pins.config import pinned_rev, rewritten
+from dev_playbook.pins.config import move_pin, pinned_rev
 from dev_playbook.pins.gate import run_gate
 from dev_playbook.pins.release import (
     hook_repo_url,
@@ -98,8 +100,6 @@ def check(repo: Path, url: str, sha: str, ids: tuple[str, ...]) -> int:
         return 0
 
     with probe_worktree(repo) as tree:
-        config = tree / ".pre-commit-config.yaml"
-        text = config.read_text(encoding="utf-8")
         print(
             f"bump-pin: {repo.name}: checking baseline at {old[:12]}", file=sys.stderr
         )
@@ -110,8 +110,7 @@ def check(repo: Path, url: str, sha: str, ids: tuple[str, ...]) -> int:
                 f"these findings are not this release's:\n{baseline_output}"
             )
 
-        updated, _ = rewritten(text, url, sha, ids)
-        config.write_text(updated, encoding="utf-8")
+        move_pin(tree, url, sha, ids)
         print(
             f"bump-pin: {repo.name}: {old[:12]} -> {sha[:12]}, verifying",
             file=sys.stderr,
@@ -132,10 +131,8 @@ def write(repo: Path, url: str, sha: str, ids: tuple[str, ...]) -> int:
     if old == sha:
         print(f"{repo.name}: {CURRENT} ({sha[:12]})")
         return 0
-    config = repo / ".pre-commit-config.yaml"
-    updated, _ = rewritten(config.read_text(encoding="utf-8"), url, sha, ids)
-    config.write_text(updated, encoding="utf-8")
-    print(f"{repo.name}: pinned {old[:12]} -> {sha[:12]}")
+    changed, _ = move_pin(repo, url, sha, ids)
+    print(f"{repo.name}: pinned {old[:12]} -> {sha[:12]} ({', '.join(changed)})")
     return 0
 
 

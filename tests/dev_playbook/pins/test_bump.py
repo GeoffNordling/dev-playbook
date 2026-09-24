@@ -191,6 +191,82 @@ def test_rewritten_refuses_a_config_with_no_such_pin() -> None:
         config.rewritten(without, URL, NEW, IDS)
 
 
+HOST_PYPROJECT = f"""\
+[project]
+name = "a-host"
+
+[dependency-groups]
+dev = ["dev-playbook"]
+
+[tool.uv.sources]
+dev-playbook = {{ git = "{URL}", rev = "{OLD}" }}
+"""
+
+
+def fake_uv_lock(monkeypatch: pytest.MonkeyPatch, returncode: int = 0) -> list[Path]:
+    """Stand in for ``uv lock``; the list collects each directory it ran in."""
+    ran: list[Path] = []
+
+    def run(argv: list[str], *, cwd: Path, **_: object) -> object:
+        assert argv == ["uv", "lock"]
+        ran.append(cwd)
+        return type("Done", (), {"returncode": returncode, "stderr": "no resolve"})
+
+    monkeypatch.setattr(config.subprocess, "run", run)
+    return ran
+
+
+def test_move_pin_moves_the_config_alone_outside_a_host(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ran = fake_uv_lock(monkeypatch)
+    (tmp_path / ".pre-commit-config.yaml").write_text(CONFIG)
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "plain"\n')
+    assert config.move_pin(tmp_path, URL, NEW, IDS) == (
+        [".pre-commit-config.yaml"],
+        OLD,
+    )
+    assert NEW in (tmp_path / ".pre-commit-config.yaml").read_text()
+    assert ran == []
+
+
+def test_move_pin_moves_a_hosts_source_and_relocks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ran = fake_uv_lock(monkeypatch)
+    (tmp_path / ".pre-commit-config.yaml").write_text(CONFIG)
+    (tmp_path / "pyproject.toml").write_text(HOST_PYPROJECT)
+    changed, old = config.move_pin(tmp_path, URL, NEW, IDS)
+    assert changed == [".pre-commit-config.yaml", "pyproject.toml", "uv.lock"]
+    assert old == OLD
+    assert (tmp_path / "pyproject.toml").read_text() == HOST_PYPROJECT.replace(OLD, NEW)
+    assert ran == [tmp_path]
+
+
+def test_move_pin_refuses_a_git_source_it_cannot_move(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_uv_lock(monkeypatch)
+    split = HOST_PYPROJECT.replace(
+        f'dev-playbook = {{ git = "{URL}", rev = "{OLD}" }}',
+        f'[tool.uv.sources.dev-playbook]\ngit = "{URL}"\nrev = "{OLD}"',
+    ).replace("[tool.uv.sources]\n", "")
+    (tmp_path / ".pre-commit-config.yaml").write_text(CONFIG)
+    (tmp_path / "pyproject.toml").write_text(split)
+    with pytest.raises(ToolError, match="not on one"):
+        config.move_pin(tmp_path, URL, NEW, IDS)
+
+
+def test_move_pin_fails_loud_when_uv_lock_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_uv_lock(monkeypatch, returncode=1)
+    (tmp_path / ".pre-commit-config.yaml").write_text(CONFIG)
+    (tmp_path / "pyproject.toml").write_text(HOST_PYPROJECT)
+    with pytest.raises(ToolError, match="uv lock failed"):
+        config.move_pin(tmp_path, URL, NEW, IDS)
+
+
 def test_pinned_reads_the_current_rev(tmp_path: Path) -> None:
     repo = write_consumer(tmp_path / "consumer", CONFIG)
     assert bump.pinned(repo, URL) == OLD

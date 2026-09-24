@@ -25,12 +25,9 @@ template.
 
 `build.ciyml-byte-identical-to-canonical` · deterministic
 
-> **Why.** The canonical workflow runs the hook suite and no tests,
-> because a test suite depends on dev-playbook as a local path
-> dependency a cloud runner does not have. It sets `SKIP: workspace` for
-> the same reason: the checks tagged `workspace` resolve a cross-repo
-> citation at its absolute path under `~/workspace/`, a tree the runner
-> does not have.
+> **Why.** The workflow sets `SKIP: workspace` because the checks
+> tagged `workspace` resolve a cross-repo citation at its absolute path
+> under `~/workspace/`, a tree the runner does not have.
 
 ## .python-version byte-identical to canonical
 

@@ -1,22 +1,33 @@
 """The ``playbook`` console script: ``check`` runs the checks, ``checks`` lists them.
 
-``playbook check [DIR]`` builds the model once, loads dev-playbook's checks and
-those the repo hosts in ``src/<package>/checks/``, runs every check function, prints
-each finding in GNU format with its rule id, then runs the
-two steps that are not functions over the model: the loop family's
-``loop_lint`` module, kept whole for the loop workstream, and ``pre-commit
-validate-manifest`` where the repo publishes a ``.pre-commit-hooks.yaml``.
-It exits 1 on any finding, 2 when the model or the repo's checks cannot be
-loaded, the repo's checks and its Standards do not match, or a step cannot
-run. ``--without TAG`` leaves out the checks tagged as needing that
-environment, and says so on stderr on every run, so a skip never goes
-silent. ``SKIP``, the variable pre-commit reads for hook ids, is read
-here for tag names too: ``SKIP=workspace`` is ``--without workspace``, so a
-CI file leaves the tagged checks out with the one variable it already sets,
-and pre-commit ignores a name that is no hook id of its own.
+``playbook check [DIR]`` builds the model once, loads dev-playbook's checks,
+runs every check function, prints each finding in GNU format with its rule
+id, then runs the two steps that are not functions over the model: the loop
+family's ``loop_lint`` module, kept whole for the loop workstream, and
+``pre-commit validate-manifest`` where the repo publishes a
+``.pre-commit-hooks.yaml``. Over dev-playbook, whose checks are its own, the
+layer test runs first.
 
-``playbook checks [DIR]`` prints the registry, both layers: id, module, and
-the hook or tag, computed live. ``--family`` and ``--without`` filter it.
+``playbook check --local [DIR]`` runs a consumer repo's own layer instead:
+the checks it hosts in ``src/<package>/checks/``, after the layer test holds
+them and the repo's Standards together, and no steps. The two runs are the
+consumer's two hooks. The pinned ``playbook-check`` runs in the environment
+pre-commit builds for dev-playbook, which holds nothing of the consumer's;
+the consumer's ``playbook-check-local`` runs ``--local`` in the consumer's
+own environment, so its checks can import its package and its dependencies.
+
+Either run exits 1 on any finding, 2 when the model or the checks cannot be
+loaded, the layer test fails, or a step cannot run. ``--without TAG`` leaves
+out the checks tagged as needing that environment, and says so on stderr on
+every run, so a skip never goes silent. ``SKIP``, the variable pre-commit
+reads for hook ids, is read here for tag names too: ``SKIP=workspace`` is
+``--without workspace``, so a CI file leaves the tagged checks out with the
+one variable it already sets, and pre-commit ignores a name that is no hook
+id of its own.
+
+``playbook checks [DIR]`` prints the registry: id, module, and the hook or
+tag, computed live, of dev-playbook's layer, or with ``--local`` of the
+repo's. ``--family`` and ``--without`` filter it.
 """
 
 import argparse
@@ -31,6 +42,8 @@ from dev_playbook.model import ModelError, Repo
 
 MANIFEST = ".pre-commit-hooks.yaml"
 
+LOCAL_HELP = "run the repo's own checks, in src/<package>/checks/, instead"
+
 
 def main(argv: list[str] | None = None) -> int:
     """Run one subcommand; return its exit code."""
@@ -44,6 +57,7 @@ def main(argv: list[str] | None = None) -> int:
         default=".",
         help="repository root to check (default: current directory)",
     )
+    run.add_argument("--local", action="store_true", help=LOCAL_HELP)
     run.add_argument(
         "--without",
         action="append",
@@ -57,8 +71,9 @@ def main(argv: list[str] | None = None) -> int:
         "directory",
         nargs="?",
         default=".",
-        help="repository whose own checks join the list (default: current directory)",
+        help="repository whose checks to list (default: current directory)",
     )
+    listing.add_argument("--local", action="store_true", help=LOCAL_HELP)
     listing.add_argument("--family", help="only this family")
     listing.add_argument(
         "--without",
@@ -69,12 +84,11 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     args = parser.parse_args(argv)
+    root = Path(args.directory).resolve()
     if args.command == "check":
         without = frozenset(args.without) | skipped_tags()
-        return run_check(Path(args.directory).resolve(), without)
-    return list_checks(
-        Path(args.directory).resolve(), args.family, frozenset(args.without)
-    )
+        return run_check(root, args.local, without)
+    return list_checks(root, args.local, args.family, frozenset(args.without))
 
 
 def skipped_tags() -> frozenset[str]:
@@ -100,19 +114,33 @@ class CannotLoad(Exception):
     """The model or the checks cannot be loaded; each arg is one line to print."""
 
 
-def load(root: Path) -> tuple[Repo, dict[str, check_registry.Check]]:
-    """The model of ``root`` and both layers of checks.
+def load(root: Path, local: bool) -> tuple[Repo, dict[str, check_registry.Check]]:
+    """The model of ``root`` and the layer of checks one run runs.
 
-    Raises :class:`CannotLoad` when the model cannot be built, a module of
-    the repo's own checks cannot run or register, or the repo's checks and
-    its Standards do not match (:func:`check_registry.layer_problems`).
+    Without ``local``, dev-playbook's layer, and over dev-playbook the layer
+    test with it. With ``local``, the layer ``root`` hosts, after the layer
+    test. Raises :class:`CannotLoad` when the model cannot be built, ``local``
+    names dev-playbook itself, a module of the
+    repo's checks cannot run or register, or the layer test fails
+    (:func:`check_registry.layer_problems`).
     """
     try:
         repo = Repo.from_git(root)
     except (ModelError, subprocess.CalledProcessError) as err:
         raise CannotLoad(f"cannot build the model: {err}") from err
     try:
-        registry = check_registry.load(repo)
+        package = check_registry.import_package(repo)
+        if not local:
+            registry = dict(check_registry.load())
+            if package == "dev_playbook":
+                check_layer(registry, repo)
+            return repo, registry
+        if package == "dev_playbook":
+            raise CannotLoad(
+                "--local runs a consumer repo's own checks; dev-playbook's "
+                "checks are its own, so they run without --local"
+            )
+        both = check_registry.load(repo)
     except (
         check_registry.RegistryError,
         tomllib.TOMLDecodeError,
@@ -120,9 +148,19 @@ def load(root: Path) -> tuple[Repo, dict[str, check_registry.Check]]:
         ImportError,
     ) as err:
         raise CannotLoad(f"cannot load {repo.name}'s checks: {err}") from err
+    check_layer(both, repo)
+    layer = {
+        id: c
+        for id, c in both.items()
+        if package is not None and c.module.startswith(f"{package}.checks.")
+    }
+    return repo, layer
+
+
+def check_layer(registry: dict[str, check_registry.Check], repo: Repo) -> None:
+    """Raise :class:`CannotLoad` naming each place the layer test fails."""
     if problems := check_registry.layer_problems(registry, repo):
         raise CannotLoad(*problems)
-    return repo, registry
 
 
 def cannot_load(command: str, err: CannotLoad) -> int:
@@ -132,10 +170,14 @@ def cannot_load(command: str, err: CannotLoad) -> int:
     return 2
 
 
-def run_check(root: Path, without: frozenset[str]) -> int:
-    """Build the model, run the checks and the two steps; exit 0, 1, or 2."""
+def run_check(root: Path, local: bool, without: frozenset[str]) -> int:
+    """Build the model and run one layer, then the two steps; exit 0, 1, or 2.
+
+    The steps run with dev-playbook's layer only, so a consumer runs each
+    once, in its pinned hook.
+    """
     try:
-        repo, registry = load(root)
+        repo, registry = load(root, local)
     except CannotLoad as err:
         return cannot_load("playbook check", err)
     if without:
@@ -153,10 +195,12 @@ def run_check(root: Path, without: frozenset[str]) -> int:
             count += 1
     sys.stdout.flush()
     print(
-        f"playbook check: {len(enabled)} check(s) over {len(repo.files)} files, "
-        f"{count} finding(s)",
+        f"playbook check: {len(enabled)} {'local ' if local else ''}check(s) over "
+        f"{len(repo.files)} files, {count} finding(s)",
         file=sys.stderr,
     )
+    if local:
+        return 1 if count else 0
     steps = [loop_lint.main([str(root)])]
     if (root / MANIFEST).is_file():
         steps.append(validate_manifest(root / MANIFEST))
@@ -175,10 +219,12 @@ def validate_manifest(manifest: Path) -> int:
         return 2
 
 
-def list_checks(root: Path, family: str | None, without: frozenset[str]) -> int:
-    """Print one line per check of both layers: id, module, and its hook or tags."""
+def list_checks(
+    root: Path, local: bool, family: str | None, without: frozenset[str]
+) -> int:
+    """Print one line per check of one layer: id, module, and its hook or tags."""
     try:
-        _, registry = load(root)
+        _, registry = load(root, local)
     except CannotLoad as err:
         return cannot_load("playbook checks", err)
     for c in selected(registry, without, family):

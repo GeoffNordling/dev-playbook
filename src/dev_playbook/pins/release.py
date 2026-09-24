@@ -11,7 +11,6 @@ dev-playbook, which is a fact about the disk.
 """
 
 import base64
-import re
 from pathlib import Path
 
 import yaml
@@ -19,6 +18,7 @@ import yaml
 from dev_playbook import gitrepo
 from dev_playbook.errors import ToolError
 from dev_playbook.github import gh_api, origin_slug
+from dev_playbook.pins.config import hook_url
 
 HOOK_REPO_ROOT = Path(__file__).resolve().parents[3]
 CANONICAL_CONFIG = (
@@ -39,11 +39,7 @@ RELEASE_WALK_LIMIT = 50
 
 def hook_repo_url() -> str:
     """The published hook-repo URL, read from the canonical config's pinned block."""
-    text = CANONICAL_CONFIG.read_text(encoding="utf-8")
-    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
-    if not match:
-        raise ToolError(f"no pinned block in {CANONICAL_CONFIG}")
-    return match.group(1)
+    return hook_url(CANONICAL_CONFIG.read_text(encoding="utf-8"))
 
 
 def is_hook_repo(repo: Path) -> bool:

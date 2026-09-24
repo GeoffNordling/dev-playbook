@@ -164,7 +164,7 @@ PYPROJECT = '[project]\nname = "local-repo"\n'
 
 
 class TestRepoChecks:
-    def test_the_repo_checks_run_beside_dev_playbooks(
+    def test_local_runs_the_repo_checks_and_not_dev_playbooks(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
         root = a_repo(
@@ -177,16 +177,67 @@ class TestRepoChecks:
                 "notes/a.txt": "TODO\n",
             },
         )
-        assert check_cli.main(["check", str(root)]) == 1
-        assert "notes/a.txt: local.no-todo holds TODO\n" in capsys.readouterr().out
-        assert check_cli.main(["checks", str(root), "--family", "local"]) == 0
+        assert check_cli.main(["check", "--local", str(root)]) == 1
+        captured = capsys.readouterr()
+        assert captured.out == "notes/a.txt: local.no-todo holds TODO\n"
+        assert "1 local check(s)" in captured.err
+        assert check_cli.main(["checks", "--local", str(root)]) == 0
         assert capsys.readouterr().out == "local.no-todo\tlocal_repo.checks.local\t-\n"
+
+    def test_without_local_the_repo_checks_are_not_loaded(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        root = a_repo(
+            tmp_path,
+            {
+                "pyproject.toml": PYPROJECT,
+                "standards/local/rules.md": RULES,
+                "src/local_repo/checks/local.py": "import not_installed_here\n",
+            },
+        )
+        assert check_cli.main(["checks", str(root), "--family", "local"]) == 0
+        assert capsys.readouterr().out == ""
+
+    def test_a_repo_check_imports_the_repo_package(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        imports = LOCAL_CHECKS.replace(
+            "from dev_playbook", "from local_repo.words import WORD\nfrom dev_playbook"
+        ).replace('b"TODO"', "WORD")
+        root = a_repo(
+            tmp_path,
+            {
+                "pyproject.toml": PYPROJECT,
+                "standards/local/rules.md": RULES,
+                "src/local_repo/__init__.py": "",
+                "src/local_repo/words.py": 'WORD = b"TODO"\n',
+                "src/local_repo/checks/__init__.py": "",
+                "src/local_repo/checks/local.py": imports,
+                "tests/local_repo/checks/test_local.py": LOCAL_TESTS,
+                "notes/a.txt": "TODO\n",
+            },
+        )
+        monkeypatch.syspath_prepend(str(root / "src"))
+        assert check_cli.main(["check", "--local", str(root)]) == 1
+        assert capsys.readouterr().out == "notes/a.txt: local.no-todo holds TODO\n"
+
+    def test_local_over_dev_playbook_exits_2(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        root = a_repo(
+            tmp_path, {"pyproject.toml": '[project]\nname = "dev-playbook"\n'}
+        )
+        assert check_cli.main(["check", "--local", str(root)]) == 2
+        assert "run without --local" in capsys.readouterr().err
 
     def test_a_rule_with_no_check_exits_2(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
         root = a_repo(tmp_path, {"standards/local/rules.md": RULES})
-        assert check_cli.main(["check", str(root)]) == 2
+        assert check_cli.main(["check", "--local", str(root)]) == 2
         assert (
             "playbook check: local.no-todo: the rule in standards/local/rules.md "
             "has no check" in capsys.readouterr().err
@@ -203,7 +254,7 @@ class TestRepoChecks:
                 "src/local_repo/checks/local.py": LOCAL_CHECKS,
             },
         )
-        assert check_cli.main(["check", str(root)]) == 2
+        assert check_cli.main(["check", "--local", str(root)]) == 2
         assert (
             "local.no-todo: no test_no_todo in tests/local_repo/checks/test_local.py"
             in capsys.readouterr().err
@@ -219,7 +270,7 @@ class TestRepoChecks:
                 "src/local_repo/checks/other.py": LOCAL_CHECKS,
             },
         )
-        assert check_cli.main(["check", str(root)]) == 2
+        assert check_cli.main(["check", "--local", str(root)]) == 2
         assert (
             "cannot load repo's checks: local.no-todo: registered from module "
             "other, not local" in capsys.readouterr().err

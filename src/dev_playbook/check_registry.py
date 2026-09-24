@@ -13,9 +13,15 @@ modules are ``src/dev_playbook/checks/``, its tests
 ``story_forge`` keeps its own in ``src/story_forge/checks/`` and
 ``tests/story_forge/checks/``. In both, one module per ``standards/``
 directory is named for it, so a rule's family and its module coincide.
-:func:`load` imports both layers and returns the one dict;
-:func:`layer_problems` holds the layer a repo hosts and its Standards
-together.
+:func:`load` imports dev-playbook's layer, and with a repo the repo's layer
+too, and returns the one dict; :func:`layer_problems` holds the layer a repo
+hosts and its Standards together.
+
+The two layers run in two hooks. dev-playbook's runs in the pinned
+``playbook-check`` hook, in the environment pre-commit builds for it, which
+holds dev-playbook and nothing of the consumer's. A consumer's runs in its
+``playbook-check-local`` hook, ``playbook check --local`` in the consumer's
+own environment, so its checks can import its package and its dependencies.
 """
 
 import ast
@@ -177,7 +183,8 @@ def load_repo_layer(repo: Repo, package: str) -> dict[str, Check]:
 
     Each module runs from the model's bytes as ``<package>.checks.<module>``,
     so a file git does not track is never run, and a second load runs it
-    again into a new dict.
+    again into a new dict. A module may import ``<package>`` and its
+    dependencies, absolutely or relatively, wherever they are installed.
     """
     global _layer
     layer: dict[str, Check] = {}
@@ -190,6 +197,7 @@ def load_repo_layer(repo: Repo, package: str) -> dict[str, Check]:
             name = f"{package}.checks.{filename.removesuffix('.py')}"
             module = types.ModuleType(name)
             module.__file__ = str(repo.root / path)
+            module.__package__ = f"{package}.checks"
             sys.modules[name] = module
             exec(compile(repo.contents[path], module.__file__, "exec"), vars(module))
     finally:

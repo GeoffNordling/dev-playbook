@@ -72,7 +72,8 @@ uncommitted files} and stop}; the bump's commit carries the pin and nothing
 else.
 
 Then {Run [bump-pin](~/workspace/dev-playbook/scripts/bump-pin) `--write`} to
-move the pin for real, commit that one changed file to `main`, and push. The
+move the pin for real, commit the files it names to `main` — the config, and in
+a host `pyproject.toml` and `uv.lock` too — and push. The
 commit gate runs at the new pin, so a green commit is the second verification.
 
 Then `pre-commit gc`. A bump is what creates the garbage — pre-commit keeps one

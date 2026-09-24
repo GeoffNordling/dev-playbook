@@ -142,7 +142,7 @@ def init_repo(spec: RepoSpec, parent: Path) -> Path:
         _run(["uv", "lock"], target)
     _run(["git", "add", "-A"], target)
     _run(["uvx", "pre-commit", "install"], target)
-    if check_cli.run_check(target, frozenset()) != 0:
+    if check_cli.run_check(target, False, frozenset()) != 0:
         raise RepoInitError("playbook check reported findings on the fresh scaffold")
     return target
 

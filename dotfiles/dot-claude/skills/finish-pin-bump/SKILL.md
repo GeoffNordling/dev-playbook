@@ -11,7 +11,8 @@ effort: xhigh
 The situation this skill starts in, and nothing else: the working directory is
 a worktree of a governed consumer repo on the branch `bump-pin-<sha12>`, cut
 from `origin/main`, whose last commit moves the dev-playbook pin in
-`.pre-commit-config.yaml` and its hook ids to release head `<sha12>`. At that
+`.pre-commit-config.yaml` and its hook ids, and in a host the dev-playbook
+source in `pyproject.toml` with `uv.lock`, to release head `<sha12>`. At that
 pin the gate, `uvx pre-commit run --all-files`, is red. The job is to make it
 green and land the PR.
 
