@@ -45,11 +45,7 @@ and approved by the user there before any first instance is written.
 - **Predicates, not fixes.** An idea about the doc-type system is
   written as a goal, a predicate, or an objective, never carried out as
   an instruction.
-- **A Loop document for every loop.** Shape is orthogonal to
-  stochasticity
-  ([Principles](/working-docs/doc-type-system/doc-type-system/ROOT.md#principles)),
-  so a loop a script runs still gets a Loop document, and a drift check
-  binds the document to its driver's code.
+- **A Loop document for every loop**, one a script runs included.
 
 ## Settled
 
@@ -91,6 +87,8 @@ Decided with the user on 2026-09-24.
   deterministic one already runs in the repo's pre-commit hooks, so a
   loop's verification running it too is a second path to the same
   check. Noted 2026-09-24; not to be solved yet.
+- **A driver can drift from its Loop document.** No check binds them
+  yet. Noted 2026-09-24.
 
 ## Planned
 
