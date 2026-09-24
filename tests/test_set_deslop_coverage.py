@@ -1,10 +1,7 @@
 """The deslop judge assignments stay in lockstep with the standards they slice.
 
-The doc-set-deslopper agent divides three standards among six judges
-by citing section anchors; the fourth, Workstream Files, the
-judge reads whole when the set's directory is under workstreams/, filing
-each section under the slice of the general rule it cites. Two drifts can
-silently break the division:
+The doc-set-deslopper agent divides four standards among six judges
+by citing section anchors. Two drifts can silently break the division:
 
   - a section added to a standard that no judge is assigned — the new
     rule is never judged;
@@ -27,8 +24,7 @@ from dev_playbook.md import content_lines, github_slug
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-deslopper.md"
-JUDGE = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-judge.md"
-WORKING_SETS = (
+WORKSTREAM_FILES = (
     REPO_ROOT
     / "standards/knowledge-organization/documentation-sets/workstream-files.md"
 )
@@ -49,6 +45,15 @@ EXEMPT: dict[Path, frozenset[str]] = {
             "no-word-the-repo-bans",
             "the-vocabulary-file-is-well-formed",
             "the-person-is-the-user",
+        }
+    ),
+    WORKSTREAM_FILES: frozenset(
+        {
+            # The knowledge-organization checks decide these deterministically.
+            "every-file-reached-from-its-head-file",
+            "one-directory-under-workstreams",
+            "workstreams-holds-only-workstreams",
+            "the-worklist-in-the-head-file-only",
         }
     ),
     REPO_ROOT / "standards/doc-type/workstream-conventions.md": frozenset(
@@ -118,16 +123,6 @@ def test_exemptions_name_real_headings() -> None:
         )
 
 
-def test_working_set_rules_are_read_whole() -> None:
-    """The judge reads Workstream Files whole, so nothing is sliced
-    there; the one thing that can drift is the link itself."""
-    link = "~/workspace/dev-playbook/" + str(WORKING_SETS.relative_to(REPO_ROOT))
-    assert any(link in line for _, line in content_lines(JUDGE)), (
-        f"{JUDGE.name} no longer reads {WORKING_SETS.name}; a workstream's "
-        "further rules reach no judge"
-    )
-
-
 def leaf_sections(standard: Path) -> dict[str, list[str]]:
     """Each leaf heading's slug mapped to the lines of its section."""
     leaves = leaf_slugs(standard)
@@ -144,16 +139,16 @@ def leaf_sections(standard: Path) -> dict[str, list[str]]:
     return sections
 
 
-def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
-    """The judge routes a Workstream Files section to the slice that owns the
-    general rule it qualifies, so every section must cite one such rule by
-    anchor, and that anchor must be one the deslopper assigns."""
+def test_every_workstream_files_section_qualifies_an_assigned_rule() -> None:
+    """A Workstream Files section sits in the slice of the general rule it
+    qualifies, so every section must cite one such rule by anchor, and that
+    anchor must be one the deslopper assigns."""
     assigned = {
         "/" + str(standard.relative_to(REPO_ROOT)): assigned_slugs(standard)
         for standard in EXEMPT
     }
     citation = re.compile(r"\((/standards/[^)#]+\.md)#([a-z0-9-]+)\)")
-    for slug, lines in leaf_sections(WORKING_SETS).items():
+    for slug, lines in leaf_sections(WORKSTREAM_FILES).items():
         cited = {
             (path, anchor)
             for line in lines
@@ -161,6 +156,6 @@ def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
             if anchor in assigned.get(path, frozenset())
         }
         assert cited, (
-            f"{WORKING_SETS.name}#{slug} cites no rule the deslopper assigns; "
+            f"{WORKSTREAM_FILES.name}#{slug} cites no rule the deslopper assigns; "
             "a judge has no slice to file it under"
         )

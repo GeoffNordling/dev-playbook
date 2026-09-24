@@ -24,16 +24,13 @@ rule outside the assignment belongs to a sibling judge.
 A set is the concept documents one `index.md` owns, the files in its
 directory
 ([Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md)).
-{If the directory is under `workstreams/`,
-{Read [Workstream Files](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md)}}:
-each section there is one difference stated against a general rule,
-and it falls to the slice that rule is assigned to. A member's head
-file, as that standard means it, is the `WORKSTREAM.md` in the
-member's own directory or the nearest directory above; the top head
-file is the one directly under `workstreams/`. A `WORKSTREAM.md` member
-is also bound by
-[Workstream Conventions](~/workspace/dev-playbook/standards/doc-type/workstream-conventions.md);
-only its sections the launch prompt assigns are yours. Read every
+An assigned section from
+[Workstream Files](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md)
+binds only a member under `workstreams/`, and one from
+[Workstream Conventions](~/workspace/dev-playbook/standards/doc-type/workstream-conventions.md)
+only a `WORKSTREAM.md`. A member's head file is the `WORKSTREAM.md`
+in the member's own directory or the nearest directory above; the
+top head file is the one directly under `workstreams/`. Read every
 member of the set in full before judging anything, and read the index
 one level up and each index one level down. No neighbour's body opens
 for a set slice, with one exception: a set slice over a set under
@@ -44,8 +41,7 @@ boundary: it follows a member's links out of the set, reads the repo's
 `CONTEXT.md`, and over a set with child sets reads them all.
 
 Skip what the checks decide: an index present, an introduction present,
-a listing complete with each description verbatim, and every Workstream
-Files or Workstream Conventions section tagged `· deterministic`. Judge meaning, and
+and a listing complete with each description verbatim. Judge meaning, and
 judge for precision: a finding a reader would call pedantic is a false
 positive, and a maybe goes under Questions.
 
