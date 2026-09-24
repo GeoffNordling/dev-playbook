@@ -1,9 +1,8 @@
 """The headless driver: run one unattended stint from launch to yield.
 
-The loop, the stop rules, and the checkpoints live here. One step runs one
-agent call and is swappable: `sandcastle` runs it sealed through `call.mjs`,
-`local` runs `claude -p` on the host in the copy. Each call is fresh except
-the principal's, which is one conversation resumed at every checkpoint.
+The loop, the stop rules, and the checkpoints live here. Every agent call
+runs sealed through `call.mjs`. Each call is fresh except the principal's,
+which is one conversation resumed at every checkpoint.
 
 Between calls the driver reads the copy as plain files, never with host git,
 and refuses a symlink on any path it reads, so a planted link cannot pull a
@@ -11,13 +10,13 @@ host file into a prompt.
 
 Usage:
     stint.py --lab LAB --copy COPY --stint STINT --workstream DIR
-             --check CMD --budget N [--model M] [--step sandcastle|local]
-             [--close]
+             --check CMD --budget N [--model M] [--close]
 
 COPY is a work copy front-clone opened, already holding the workstream DIR
 (its WORKSTREAM.md, PLAN.md, and PROGRESS.md). STINT is the stint's folder on
-the host. Writes STINT/stint.json, the stint's record, and exits 0 on done,
-1 on any other yield.
+the host. Refuses to launch a plan with more open tasks than the budget.
+Writes STINT/stint.json, the stint's record, and exits 0 on done, 1 on any
+other yield.
 """
 
 import argparse
@@ -113,66 +112,6 @@ def sandcastle_step(args, name: str, prompt: str, resume: str | None) -> dict:
     return json.loads(record_file.read_text())
 
 
-def local_step(args, name: str, prompt: str, resume: str | None) -> dict:
-    """Run one call as `claude -p` on the host in the copy and return its record."""
-    command = [
-        "claude",
-        "-p",
-        "--model",
-        args.model,
-        "--output-format",
-        "stream-json",
-        "--verbose",
-        "--dangerously-skip-permissions",
-    ]
-    if resume:
-        command += ["--resume", resume]
-    before = head_sha(args.copy)
-    started = time.time()
-    done = subprocess.run(
-        command, input=prompt, cwd=args.copy, capture_output=True, text=True
-    )
-    (args.stint / "calls" / f"{name}.log").write_text(done.stdout + done.stderr)
-    messages = [json.loads(line) for line in done.stdout.splitlines() if line.strip()]
-    init = next(
-        (
-            m
-            for m in messages
-            if m.get("type") == "system" and m.get("subtype") == "init"
-        ),
-        {},
-    )
-    final = next((m for m in messages if m.get("type") == "result"), {})
-    after = head_sha(args.copy)
-    listed = subprocess.run(
-        ["git", "-C", str(args.copy), "rev-list", "--reverse", f"{before}..{after}"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.split()
-    dirty = subprocess.run(
-        ["git", "-C", str(args.copy), "status", "--porcelain", "--untracked-files=all"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.splitlines()
-    record = {
-        "name": name,
-        "session": final.get("session_id"),
-        "resumed": resume,
-        "apiKeySource": init.get("apiKeySource"),
-        "seconds": round(time.time() - started),
-        "isError": final.get("is_error"),
-        "commits": listed,
-        "uncommitted": dirty,
-        "answer": final.get("result", ""),
-    }
-    (args.stint / "calls" / f"{name}.json").write_text(json.dumps(record, indent=2))
-    if done.returncode:
-        raise Yield(f"call {name} failed: exit {done.returncode}")
-    return record
-
-
 def fill(template: str, values: dict) -> str:
     """Fill a prompt template's {{KEY}} placeholders, refusing any left unfilled."""
     text = (RIG / "prompts" / f"{template}.md.in").read_text()
@@ -191,15 +130,10 @@ class Stint:
     def __init__(self, args):
         """Read the copy's HEAD and set the values every prompt shares."""
         self.args = args
-        self.step = {"sandcastle": sandcastle_step, "local": local_step}[args.step]
-        repo = (
-            f"/home/agent/assignment/{args.copy.name}"
-            if args.step == "sandcastle"
-            else str(args.copy)
-        )
+        self.step = sandcastle_step
         ws = args.workstream
         self.base = {
-            "REPO": repo,
+            "REPO": f"/home/agent/assignment/{args.copy.name}",
             "HEAD": f"{ws}/WORKSTREAM.md",
             "PLAN": f"{ws}/PLAN.md",
             "PROGRESS": f"{ws}/PROGRESS.md",
@@ -245,6 +179,10 @@ class Stint:
 
     def run(self) -> str:
         """Run the stint to its yield; return "done" or raise Yield."""
+        if self.plan()["left"] > self.args.budget:
+            raise Yield(
+                f"not launched: {self.plan()['left']} tasks, budget {self.args.budget}"
+            )
         record, end = self.call("principal-0", "principal-open")
         self.principal = record["session"]
         if record["commits"]:
@@ -325,7 +263,6 @@ def main() -> int:
     p.add_argument("--check", required=True)
     p.add_argument("--budget", type=int, required=True)
     p.add_argument("--model", default="claude-sonnet-5")
-    p.add_argument("--step", choices=["sandcastle", "local"], default="sandcastle")
     p.add_argument(
         "--close", action="store_true", help="front-clone close the copy at the yield"
     )

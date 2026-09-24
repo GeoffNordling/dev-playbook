@@ -258,7 +258,7 @@ the driver ran live on new copies of the `wordcount` workstream, budget
 
 **Settled.**
 
-- `rules.py` passes all 11 cases. Examples: an iteration that checks off
+- `rules.py` passes all 12 cases. Examples: an iteration that checks off
   two tasks yields "iter-1 checked off 2 tasks, not 1"; a plan replaced
   by a link to a host file yields "symlink in the copy: ws/PLAN.md"; a
   call billed `ANTHROPIC_API_KEY` yields at once.
@@ -275,9 +275,12 @@ the driver ran live on new copies of the `wordcount` workstream, budget
   reviewers found 0 findings. `front-clone close` brought branch
   `stint-4` into the fake real repository at `cf70a75`, and no container
   was left.
-- The `local` step, `claude -p` on the host, is written but not run. It
-  reads the new commits and the uncommitted files with host git in the
-  copy after the agent has touched it.
+- The driver had a second step, `claude -p` on the host. It was never
+  run, and it read the copy with host git after an agent had touched it,
+  so it is removed: every call runs sealed.
+- The driver now refuses to launch a plan with more open tasks than the
+  budget, for example "not launched: 4 tasks, budget 3", so a stint never
+  starts that cannot finish.
 
 ## Acronyms
 

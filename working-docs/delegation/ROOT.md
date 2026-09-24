@@ -184,14 +184,14 @@ Decided with the user on 2026-09-24.
 - **The drivers form a menu.** Today: the Ralph workflow, which runs in a
   Claude Code session through the `Workflow` runtime
   ([`ralph-loop.js`](/dotfiles/dot-claude/workflows/ralph-loop.js)), and
-  the Sandcastle pipeline, proven for one iteration. Planned: a headless
-  loop script.
+  the headless loop script, which runs an unattended stint to its yield
+  on the Sandcastle pipeline.
 - **A headless agent never runs a Claude Code workflow.** An unattended
   stint's driver is headless code the user writes and maintains, as a
   professional practice, even where a headless agent could run a
   workflow. The Ralph pattern (fresh agent, status, stop rule,
-  checkpoints) is written as a Python script, with the step that runs one
-  iteration swappable: locally or in the Sandcastle pipeline.
+  checkpoints) is written as a Python script, and every call it makes
+  runs in the Sandcastle pipeline, never on the host. Decided 2026-09-24.
 - **An unattended stint is planned before launch** as checkpoints ×
   iterations, plus slack. At the hard limit the agent wraps up and yields.
   Wall-clock time and commit counts are not budgets; tokens would be

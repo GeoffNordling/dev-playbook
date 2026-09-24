@@ -111,7 +111,6 @@ def run(behave, budget=6):
         check="true",
         budget=budget,
         model="m",
-        step="sandcastle",
     )
     s = stint.Stint(args)
     s.step = fake(behave)
@@ -193,6 +192,16 @@ def reviewer_writes(name, copy, rec):
         return rec
 
 
+def budget_eaten(name, copy, rec):
+    """principal-1 adds a fix task, so four iterations cannot finish the plan."""
+    if name == "principal-1":
+        check_first(copy, stint.OPEN_MARK, stint.DONE_MARK)
+        check_first(copy, stint.OPEN_MARK, "- [ ] Fix it\n" + stint.OPEN_MARK)
+        rec["commits"] = [commit(copy, name)]
+        rec["answer"] = '{"verdict": "continue", "reason": "r"}'
+        return rec
+
+
 def billed(name, copy, rec):
     """iter-3 is billed to an API key."""
     if name == "iter-3":
@@ -202,7 +211,13 @@ def billed(name, copy, rec):
 
 CASES = [
     ("happy path", lambda n, c, r: None, 6, "done"),
-    ("budget runs out", lambda n, c, r: None, 3, "budget: 3 of 3 iterations spent"),
+    (
+        "plan bigger than budget",
+        lambda n, c, r: None,
+        3,
+        "not launched: 4 tasks, budget 3",
+    ),
+    ("budget runs out", budget_eaten, 4, "budget: 4 of 4 iterations spent"),
     ("uncommitted work", dirty, 6, "iter-2 left work uncommitted"),
     ("two tasks in one", two_tasks, 6, "iter-1 checked off 2 tasks, not 1"),
     ("marker moved", marker, 6, "iter-1 moved a checkpoint marker"),

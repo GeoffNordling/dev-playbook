@@ -70,17 +70,6 @@ since the parent uses it too.
   ([Part 4](/working-docs/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
   `measure-event` sending rows to the host from a sandbox, and the Stop and
   SessionEnd hooks set to wait.
-- **Write the headless loop script.** The
-  [headless driver](/working-docs/delegation/ROOT.md#settled) in Python,
-  developed in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md):
-  the loop, the stop rules, and the checkpoints in the script, and the
-  step that runs one iteration swappable between a local `claude -p` and
-  the Sandcastle pipeline. Sandcastle is a Node library, so the Sandcastle
-  step calls a small `.mjs` shim that runs Sandcastle's `run()` for one
-  iteration; Sandcastle's own loop goes unused. The iteration prompt moves
-  out of `ralph-loop.js` into one file that both drivers read. The
-  reviewer runs sealed too, so nothing in a stint
-  touches the host but the driver.
 - **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
   and the pipeline's document beside it, through one PR or several; which
   PRs, in what order, carrying what.
@@ -154,6 +143,12 @@ since the parent uses it too.
   in the stint's folder
   ([One unattended stint by hand](/working-docs/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand),
   [The principal's conversation](/working-docs/delegation/sandcastle/experiment-log.md#the-principals-conversation)).
+- **Write the headless loop script.** Done 2026-09-24:
+  [`rig/stint.py`](/working-docs/delegation/sandcastle/rig/index.md) ran a
+  stint to done with no person in the loop, every call sealed, and
+  `rig/rules.py` checks its stop rules with no tokens. The user ruled that
+  every call runs in a container, so the local step is removed
+  ([The headless driver](/working-docs/delegation/sandcastle/experiment-log.md#the-headless-driver)).
 
 - **Re-word the members.** Done 2026-09-24: `pipeline.md`,
   `survey.md`, `experiment-log.md`, and `rig/index.md` in the
