@@ -42,10 +42,9 @@ dev-playbook, `story_forge` in story-forge.
    module.
 3. **Read the model and yield findings.** The function takes a `Repo`
    and yields `Finding(path, line, message)`, with `line` as `None` for
-   a finding on the whole file. It reads the model only:
-   `repo.markdown[path]` for a parsed markdown file, with its
-   frontmatter, headings, trailers, and links; `repo.python[path]` for
-   an `ast` tree; `repo.contents` and `repo.text(path)` for the rest.
+   a finding on the whole file. It reads the model only; what the model
+   holds, parsed markdown, `ast` trees, and raw bytes, is in
+   [model.py](/src/dev_playbook/model.py).
    In dev-playbook, the module imports only `dev_playbook`, the
    standard library, and `yaml`, since the pinned hook's environment
    holds nothing else. A consumer's module may also import the
@@ -74,6 +73,28 @@ dev-playbook, `story_forge` in story-forge.
    in dev-playbook, the new check and the layer test run with them. In
    a consumer, `uv run playbook check --local .` runs the new check and
    the layer test.
+
+## dev-playbook's layer is the example to copy
+
+Before writing a check, read one family of dev-playbook's layer end to
+end: the rules in
+[channel.md](/standards/distribution/channel.md), their checks in
+[distribution.py](/src/dev_playbook/checks/distribution.py), and their
+tests in
+[test_distribution.py](/tests/dev_playbook/checks/test_distribution.py).
+Write a consumer's checks in the same shape:
+
+- One module per family, holding its imports, its constants, its
+  `@check` functions, and private `_` helpers, and nothing that runs on
+  import.
+- A check reads the model and yields findings; it writes no file, runs
+  no process, and prints nothing.
+- A test builds each repo it needs in memory with `Repo.from_files`,
+  and asserts the findings of a clean repo and of each failing one.
+
+A check that runs the consumer's own code keeps this shape: it passes
+the model's bytes to the package's function and yields a finding for
+each output the rule refuses.
 
 ## A rule a tool decides is registered by the hook's name
 
@@ -146,7 +167,10 @@ environment
 ([A host runs its own checks](/standards/distribution/channel.md#a-host-runs-its-own-checks)).
 A check the repo adds runs there at its next commit, from the tracked
 file. The repo adds checks and never removes one of dev-playbook's, as
-it adds Standards and never shadows one.
+it adds Standards and never shadows one. A check is the only way a
+consumer gates its own rules: it publishes no hooks, and its
+`repo: local` blocks list only `make-check` and `playbook-check-local`
+([A consumer gates only through its checks](/standards/distribution/channel.md#a-consumer-gates-only-through-its-checks)).
 
 ## A check writes nothing
 

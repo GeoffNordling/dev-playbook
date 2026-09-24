@@ -1,11 +1,12 @@
 """The distribution family: the rules of ``standards/distribution/``.
 
-Three rules are decided by functions over the model: a repo that publishes a
+Four rules are decided by functions over the model: a repo that publishes a
 ``.pre-commit-hooks.yaml`` runs every id it publishes from a ``repo: local``
 block of its ``.pre-commit-config.yaml``; a host, a consumer with its own
-deterministic rules or checks, lists the ``playbook-check-local`` hook; and a
+deterministic rules or checks, lists the ``playbook-check-local`` hook; a
 repo with that hook sources dev-playbook as a dev dependency at the rev its
-config pins. The manifest's validity is decided
+config pins; and a consumer publishes no hooks and lists no local hook but
+``make-check`` and ``playbook-check-local``. The manifest's validity is decided
 by ``pre-commit validate-manifest``, which ``playbook check`` runs as its
 ``validate-manifest`` step only where the manifest exists, and is registered
 by that name. Whether a consumer pins the published head is decided by
@@ -29,6 +30,7 @@ PYPROJECT = "pyproject.toml"
 
 LOCAL_HOOK = "playbook-check-local"
 LOCAL_ENTRY = "uv run --locked playbook check --local"
+CONSUMER_LOCAL_HOOKS = frozenset({"make-check", LOCAL_HOOK})
 
 tool_check(
     "distribution.the-manifest-validates", hook="validate-manifest", module=__name__
@@ -124,6 +126,34 @@ def a_hosts_dev_playbook_rides_the_pin(repo: Repo) -> Iterator[Finding]:
             PYPROJECT,
             None,
             f"`[tool.uv.sources]` must hold {want}, the rev {CONFIG} pins",
+        )
+
+
+@check("distribution.a-consumer-gates-only-through-its-checks")
+def a_consumer_gates_only_through_its_checks(repo: Repo) -> Iterator[Finding]:
+    """A consumer publishes no hooks and lists no local hook but the two it is given."""
+    if repo.is_dev_playbook:
+        return
+    if MANIFEST in repo.contents:
+        yield Finding(
+            MANIFEST,
+            None,
+            "a consumer publishes no hooks; its rules are checks in "
+            f"src/<package>/checks/, run by `{LOCAL_HOOK}`",
+        )
+    if CONFIG not in repo.contents:
+        return
+    config, fault = _load(repo, CONFIG)
+    if fault is not None:
+        yield Finding(CONFIG, None, fault)
+        return
+    other = sorted(_local_ids(config) - CONSUMER_LOCAL_HOOKS)
+    if other:
+        yield Finding(
+            CONFIG,
+            None,
+            "a consumer's `repo: local` blocks list only "
+            f"{', '.join(sorted(CONSUMER_LOCAL_HOOKS))} (also: {', '.join(other)})",
         )
 
 

@@ -6,6 +6,7 @@ from pathlib import Path
 from dev_playbook.check_registry import Finding
 from dev_playbook.checks.distribution import (
     LOCAL_ENTRY,
+    a_consumer_gates_only_through_its_checks,
     a_host_runs_its_own_checks,
     a_hosts_dev_playbook_rides_the_pin,
     dogfoods_its_manifest,
@@ -88,6 +89,26 @@ def test_a_hosts_dev_playbook_rides_the_pin() -> None:
     assert host_findings(
         check, {CONFIG: host_config(), "pyproject.toml": unlisted}
     ) == [("pyproject.toml", "`[dependency-groups] dev` must list dev-playbook")]
+
+
+def test_a_consumer_gates_only_through_its_checks() -> None:
+    check = a_consumer_gates_only_through_its_checks
+    assert host_findings(check, {CONFIG: host_config()}) == []
+    assert host_findings(check, {CONFIG: host_config(None)}) == []
+    lint = host_config() + b"      - id: stories-lint\n        entry: scripts/x\n"
+    [(path, message)] = host_findings(check, {CONFIG: lint})
+    assert path == CONFIG
+    assert "(also: stories-lint)" in message
+    [(path, _)] = host_findings(
+        check, {CONFIG: host_config(), ".pre-commit-hooks.yaml": MANIFEST}
+    )
+    assert path == ".pre-commit-hooks.yaml"
+    dev_playbook = {
+        "standards/build/canonical/Makefile": b"",
+        CONFIG: lint,
+        ".pre-commit-hooks.yaml": MANIFEST,
+    }
+    assert host_findings(check, dev_playbook) == []
 
 
 MANIFEST = b"""\

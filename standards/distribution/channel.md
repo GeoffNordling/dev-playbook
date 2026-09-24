@@ -1,8 +1,8 @@
 ---
 type: Standard
 title: Distribution Channel
-description: How the hook repository's checks reach the governed repos — a valid manifest, a publisher's local block, and a host's local hook and pinned dev dependency
-population: "a governed repo's share of the distribution channel: its hook manifest, its local block, its local hook, and its dev dependency on the hook repository"
+description: How the hook repository's checks reach the governed repos — a valid manifest, a publisher's local block, a host's local hook and pinned dev dependency, and a consumer gating only through its checks
+population: "a governed repo's share of the distribution channel: its hook manifest, its local blocks, its local hook, and its dev dependency on the hook repository"
 ---
 
 # Distribution Channel
@@ -73,6 +73,20 @@ the hook repository.
 > that a CI runner does not have, and any other rev drifts from the
 > Standards the pinned hook enforces. `bump-pin` and `update-pins` move
 > the two revs together.
+
+## A consumer gates only through its checks
+
+A governed repo other than the hook repository holds no
+`.pre-commit-hooks.yaml`, and the only hooks its `repo: local` blocks
+list are `make-check` and `playbook-check-local`.
+
+`distribution.a-consumer-gates-only-through-its-checks` · deterministic
+
+> **Why.** A consumer's own rule is decided by a check in
+> `src/<package>/checks/`, which the layer test ties to its rule and its
+> test, and which `playbook-check-local` runs. A script behind a hook of
+> its own is tied to no rule and shares no shape, so each repo would grow
+> its own way to gate. A tool such as mypy runs from `make check`.
 
 ## The manifest validates
 
