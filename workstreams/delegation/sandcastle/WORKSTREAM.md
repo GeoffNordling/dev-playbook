@@ -59,27 +59,32 @@ since the parent uses it too.
 
 ## Planned
 
-- **Connect a stint.** An unattended stint launches from a
-  [workstream](/workstreams/delegation/WORKSTREAM.md#terms), counts its budget,
-  wraps up at the hard limit, and yields. This settles what the
-  pipeline does not yet do
-  ([What it does not yet do](/workstreams/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do)):
-  what schedules a stint, and where real copies live.
-- **Land the sandbox changes on main.** Part 4 ran on two dev-playbook
-  changes that exist only in a throwaway config copy
-  ([Part 4](/workstreams/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
-  `measure-event` sending rows to the host from a sandbox, and the Stop and
-  SessionEnd hooks set to wait.
-- **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
-  and the pipeline's document beside it, through one PR or several; which
-  PRs, in what order, carrying what. The code stops depending on a
-  scratch lab folder: today `setup.sh` builds the fake real repository,
-  the config copy, and the image there. This comes first, since nothing
-  else runs on real work until the code has its home.
-- **Write a sandboxed commit skill.** It commits with plain git and never
-  pushes, since a sealed agent has no GitHub. Today's iteration prompt
-  commits through `commit-sonnet`, which pushes
-  ([One unattended stint by hand](/workstreams/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand)).
+In order:
+
+1. **Connect a stint.** One command starts an unattended stint on a real
+   repository's [workstream](/workstreams/delegation/WORKSTREAM.md#terms):
+   it opens the work copy, runs the driver, and closes the copy at the
+   yield, and it gives real copies a set place outside Claude's
+   temporary folder. It settles both of
+   [What it does not yet do](/workstreams/delegation/sandcastle/pipeline.md#what-it-does-not-yet-do).
+   The driver already launches from a workstream, counts the budget, and
+   yields ([The headless driver](/workstreams/delegation/sandcastle/experiment-log.md#the-headless-driver));
+   today each stint is started by hand in a scratch lab folder.
+2. **Write a sandboxed commit skill.** It commits with plain git and never
+   pushes, since a sealed agent has no GitHub. The stint's prompts do this
+   in their own words today; the general iteration prompt commits through
+   `commit-sonnet`, which pushes
+   ([One unattended stint by hand](/workstreams/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand)).
+3. **Plan the landing on main.** Which PRs, in what order, carrying what:
+   the code in `rig/` into `scripts/` with the pipeline's document beside
+   it, the code freed from the scratch lab folder where `setup.sh` builds
+   the fake real repository, the config copy, and the image, and the two
+   dev-playbook changes Part 4 ran on, which exist only in a throwaway
+   config copy
+   ([Part 4](/workstreams/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
+   `measure-event` sending rows to the host from a sandbox, and the Stop
+   and SessionEnd hooks set to wait.
+4. **Land on main.** Open the PRs the plan names, in its order.
 
 ## Completed
 
