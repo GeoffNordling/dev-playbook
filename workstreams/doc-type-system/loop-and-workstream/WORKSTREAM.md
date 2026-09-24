@@ -71,42 +71,35 @@ Decided with the user on 2026-09-24.
 
 ## Open
 
-- **Is Done when a Spec written for one run?** That is, the target of a
-  stint, verified to zero findings like a Standard, or only the
-  condition of the finish yield.
-- **Does a stint's review verify against a Standard?** Accepted
-  tentatively: the reviewer is a verification against a stochastic
-  Standard, "a segment does what its plan said".
+None. Its two questions moved to
+[Think the system through](/workstreams/delegation/WORKSTREAM.md#planned).
 
 ## Planned
 
-- **Re-read the old Loop items.** Four items carried from the old Loop
-  child workstream, each kept, rewritten, or dropped against the new model:
-  - Retire `loop_lint` and move its five checks into the check
-    package: `src/dev_playbook/loop_lint.py`, its tests, and the
-    legacy step `playbook check` calls, replaced by one function per
-    rule in `checks/doc_type.py`.
-  - Three rules drafted for Loop Conventions: every step points at a
-    file that exists; no Runbook edge or Standard rule lands under
-    `loops/`; a verification passes on zero findings only.
-  - The objective part: a scalar a proposing loop descends.
-  - The Mermaid block as encoding, read by the fact base's `loop`
-    extractor
-    ([Planned](/workstreams/doc-type-system/fact-base/WORKSTREAM.md#planned)).
-- **Decide the deferred risks.** Two, not to be solved before the first
-  instances:
-  - A verification that runs deterministic rules collides with the
-    gates. A stochastic rule is easy for an agent to run; a
-    deterministic one already runs in the repo's pre-commit hooks, so a
-    loop's verification running it too is a second path to the same
-    check.
-  - A driver can drift from its Loop document, and no check binds them.
-- **Re-read Specifying a Loop.**
-  [Specifying a Loop](/workstreams/doc-type-system/loop-and-workstream/specifying-a-loop.md)
-  kept, rewritten, or dropped against the new model.
+None.
 
 ## Completed
 
+- **Re-read the old Loop items.** Done 2026-09-24, each ruled with the
+  user. `loop_lint` is retired: its five rules are checks in
+  `checks/doc_type.py`, and `playbook check` runs no Loop step. The
+  three drafted rules are dropped: the rule that a step points at a file
+  that exists is in
+  [every entry states its condition](/standards/doc-type/loop-conventions.md#every-entry-states-its-condition),
+  a Standard or a runbook cannot live under `loops/` by
+  [Document Types](/standards/knowledge-organization/document-types.md),
+  and the rule that a verification passes on zero findings is in the
+  [Loop definition](/doc-types/loop/definition.md). The objective part
+  is dropped from Loop; an objective stays one of the three written
+  forms. The Mermaid block is the encoding already, and the `loop`
+  extractor is the fact base's
+  ([Planned](/workstreams/doc-type-system/fact-base/WORKSTREAM.md#planned)).
+- **Move the deferred risks and the re-read.** Done 2026-09-24: the two
+  deferred risks, the re-read of Specifying a Loop, and both Open
+  questions moved to
+  [Think the system through](/workstreams/delegation/WORKSTREAM.md#planned),
+  since each asks how the whole system works, not how one doc-type is
+  written.
 - **Write Workstream Conventions.** Done 2026-09-24:
   [Workstream Conventions](/standards/doc-type/workstream-conventions.md),
   four rules, the three deterministic ones checked in

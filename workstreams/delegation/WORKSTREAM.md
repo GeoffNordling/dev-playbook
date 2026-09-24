@@ -254,6 +254,31 @@ guiding. Running an unattended stint is the
 - **Split the tracking standard.** GitHub tracking and workstream
   tracking, each in its own section of
   [`standards/tracking/`](/standards/tracking/index.md).
+- **Think the system through.** A session with the user, before any
+  more of the stint is designed or built. The parts were designed and
+  approved one at a time: Loop, Workstream, the stint, and a Standard
+  as what a verification runs. Nobody has yet thought through how they
+  work together. The session reads the old Loop writing against the
+  model approved on 2026-09-24 and settles or reopens each of these:
+  - **How a Standard plugs into a loop.** A verification runs a
+    Standard, and a Standard has deterministic rules that the
+    pre-commit hooks already run on every commit. How the two meet,
+    overlap, or load the run twice is unthought.
+  - **Driver drift.** A Loop document describes a loop, and a driver,
+    such as the sandcastle `rig/` scripts, runs it. If the script
+    changes, for example the checkpoint moves from every 5 iterations
+    to every 10, the Loop document still says 5, and no check compares
+    the two.
+  - **Is `## Done when` a spec written for one run?** That is, the
+    target of a stint, verified to zero findings like a Standard, or
+    only the condition of the finish yield.
+  - **Does a stint's review verify against a Standard?** Accepted
+    tentatively: the reviewer is a verification against a stochastic
+    Standard, "a segment does what its plan said".
+  - **[Specifying a Loop](/workstreams/doc-type-system/loop-and-workstream/specifying-a-loop.md),**
+    written before the model: what still fits, what is rewritten,
+    what is dropped. Its goal form names a GitHub issue as its home,
+    and work is now tracked in head files.
 - **Design what a stint returns.** A session with the user, before the
   unattended stint's Loop is written. Inside the container, iterations
   and checkpoints write files on the stint's branch: `PLAN.md`,
@@ -264,8 +289,8 @@ guiding. Running an unattended stint is the
   when: the container at the yield, or the driver after the user's
   verdict, since a verdict exists only after the yield.
 - **Write the unattended stint's Loop.** The first file in `loops/`,
-  once [Loop and Workstream](/workstreams/doc-type-system/loop-and-workstream/WORKSTREAM.md)
-  has settled both doc-types.
+  once the system is thought through and what a stint returns is
+  designed.
 - **Build the board script.** It reads the head files and the live stints
   and prints the ✈️/💤 board.
 - **Build the coordinator agent.** Advisory only.

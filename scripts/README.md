@@ -49,11 +49,8 @@ The commit gate is `playbook check` — the one published hook, the console
 script `pyproject.toml` declares. It builds one model of the repository
 from `git ls-files`, runs every check the package registers
 (`src/dev_playbook/checks/`, one module per `standards/` directory), then
-two steps that are not functions over the model: the
-[Loop Conventions](/standards/doc-type/loop-conventions.md) checks in
-`dev_playbook.loop_lint`, until the loop workstream moves them into the
-package, and `pre-commit validate-manifest` where the repo publishes a
-manifest. It exits 0 on success / 1 on findings / 2 when the model cannot
+one step that is not a function over the model:
+`pre-commit validate-manifest` where the repo publishes a manifest. It exits 0 on success / 1 on findings / 2 when the model cannot
 be built or a step cannot run, writes findings to stdout one per line, and
 a summary to stderr. `playbook checks` lists the registry. Consumer repos
 run the hook from a venv pre-commit installs at the pinned rev (see

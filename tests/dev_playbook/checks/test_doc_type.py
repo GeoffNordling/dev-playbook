@@ -10,13 +10,16 @@ from dev_playbook.checks.doc_type import (
     a_step_opens_with_its_name,
     a_stint_entry_in_form,
     a_worklist_item_opens_with_its_bold_name,
+    acts_verifications_and_yields_in_that_order,
     an_act_links_a_runbook,
     arguments_bare_kebab_case_names,
     body_opens_with_an_h1,
     boolean_disable_model_invocation,
     description_two_sentences_or_one,
+    edges_lead_to_steps,
     every_bundle_file_reached_from_skillmd,
     every_child_reached_from_its_parent,
+    every_entry_states_its_condition,
     front_matter_holds_its_kinds_vocabulary,
     headings_from_the_menu,
     kebab_case_name,
@@ -24,6 +27,8 @@ from dev_playbook.checks.doc_type import (
     name_matches_its_home,
     no_argument_placeholder,
     no_trailer,
+    nodes_and_entries_agree,
+    one_paragraph_then_one_graph,
     references_one_level_deep,
     registered,
     skillmd_at_most_500_lines,
@@ -571,3 +576,182 @@ def test_every_child_reached_from_its_parent() -> None:
             "w/b/WORKSTREAM.md": typed("Workstream", "# B\n"),
         },
     ) == [("w/a/deep/WORKSTREAM.md", None), ("w/b/WORKSTREAM.md", None)]
+
+
+# --- the five Loop rules that read its cut in order -------------------------
+
+LOOP_RUNBOOK = "---\nname: tidy\ndescription: Tidies\n---\n\nTidy the tree.\n"
+LOOP_STANDARD = (
+    "---\ntype: Standard\ntitle: Tidy Tree\ndescription: A tidy tree\n"
+    'population: "a tree"\n---\n\n# Tidy Tree\n\n## Flat\n\nNo nesting.\n'
+)
+TIDY_LOOP = """---
+type: Loop
+title: Tidy
+description: Drives the tree tidy
+---
+
+# Tidy
+
+Drives the repo's tree toward Tidy Tree.
+
+```mermaid
+flowchart LR
+    tidy[tidy] -->|every iteration| flat[flat?]
+    flat -->|findings| ask{ask?}
+    ask -->|none met| tidy
+    ask -->|3 rounds| user([the user])
+    user -->|resumes| tidy
+```
+
+## Acts
+
+- `tidy` — [tidy](/skills/tidy.md), fires every iteration.
+
+## Verifications
+
+- `flat` — [Tidy Tree](/standards/tidy/tree.md), fires every
+  iteration.
+
+## Yields
+
+- `ask` — to the user, yields when three rounds have run.
+"""
+
+
+def loop_found(
+    check: Callable[[Repo], Iterator[Finding]], loop: str = TIDY_LOOP
+) -> list[tuple[str, str]]:
+    """The findings of one Loop check over a repo of a runbook, a Standard, a Loop."""
+    repo = Repo.from_files(
+        Path("/r"),
+        {
+            "skills/tidy.md": LOOP_RUNBOOK.encode(),
+            "standards/tidy/tree.md": LOOP_STANDARD.encode(),
+            "loops/tidy.md": loop.encode(),
+        },
+    )
+    return [(f.path, f.message) for f in check(repo)]
+
+
+LOOP_CHECKS = (
+    one_paragraph_then_one_graph,
+    acts_verifications_and_yields_in_that_order,
+    nodes_and_entries_agree,
+    edges_lead_to_steps,
+    every_entry_states_its_condition,
+)
+
+
+def only(loop: str) -> tuple[str, str]:
+    """The one finding the five Loop checks give together over ``loop``, by check name."""
+    hits = [(c.__name__, m) for c in LOOP_CHECKS for _, m in loop_found(c, loop)]
+    assert len(hits) == 1, hits
+    return hits[0]
+
+
+def test_graph_and_prose_that_agree_pass() -> None:
+    assert [loop_found(c) for c in LOOP_CHECKS] == [[]] * 5
+
+
+def test_nodes_and_entries_agree() -> None:
+    loop = TIDY_LOOP.replace(
+        "    ask -->|none met| tidy\n",
+        "    ask -->|none met| tidy\n    extra[extra] --> tidy\n",
+    )
+    assert only(loop) == (
+        "nodes_and_entries_agree",
+        "`extra` has no entry and no yield leads to it",
+    )
+
+
+def test_an_entry_with_no_node_fails() -> None:
+    loop = TIDY_LOOP.replace(
+        "## Verifications\n",
+        "## Verifications\n\n- `ghost` — [Tidy Tree](/standards/tidy/tree.md), "
+        "fires every iteration.\n",
+    )
+    assert only(loop) == (
+        "nodes_and_entries_agree",
+        "`ghost` has an entry but is not a node of the graph",
+    )
+
+
+def test_edges_lead_to_steps() -> None:
+    loop = TIDY_LOOP.replace(
+        "    flat -->|findings| ask{ask?}\n",
+        "    flat -->|findings| ask{ask?}\n    flat --> user\n",
+    )
+    name, message = only(loop)
+    assert name == "edges_lead_to_steps"
+    assert message.startswith("edge `flat` → `user` is verification → receiver")
+
+
+def test_a_verification_that_links_a_file_not_typed_standard_fails() -> None:
+    loop = TIDY_LOOP.replace(
+        "[Tidy Tree](/standards/tidy/tree.md)", "[tidy](/skills/tidy.md)"
+    )
+    name, message = only(loop)
+    assert name == "every_entry_states_its_condition"
+    assert "a verification links a file typed Standard" in message
+
+
+def test_a_link_that_does_not_resolve_fails() -> None:
+    loop = TIDY_LOOP.replace("/skills/tidy.md", "/skills/gone.md")
+    assert only(loop) == (
+        "every_entry_states_its_condition",
+        "link '/skills/gone.md' does not resolve",
+    )
+
+
+def test_a_second_link_that_does_not_resolve_fails() -> None:
+    loop = TIDY_LOOP.replace(
+        "[tidy](/skills/tidy.md),", "[tidy](/skills/tidy.md) [gone](gone.md),"
+    )
+    assert only(loop) == (
+        "every_entry_states_its_condition",
+        "link 'gone.md' does not resolve",
+    )
+
+
+def test_a_yield_to_the_principal_passes() -> None:
+    loop = TIDY_LOOP.replace("to the user, yields", "to the principal, yields")
+    assert [loop_found(c, loop) for c in LOOP_CHECKS] == [[]] * 5
+
+
+def test_a_yield_with_no_receiver_fails() -> None:
+    loop = TIDY_LOOP.replace("to the user, yields", "yields")
+    name, message = only(loop)
+    assert name == "every_entry_states_its_condition"
+    assert message.startswith("`ask` names no receiver")
+
+
+def test_every_entry_states_its_condition() -> None:
+    loop = TIDY_LOOP.replace("yields when three rounds have run", "after three rounds")
+    name, message = only(loop)
+    assert name == "every_entry_states_its_condition"
+    assert message.startswith("`ask` states no condition")
+
+
+def test_acts_verifications_and_yields_in_that_order() -> None:
+    loop = TIDY_LOOP.replace("## Verifications", "## Measures")
+    name, message = only(loop)
+    assert name == "acts_verifications_and_yields_in_that_order"
+    assert message.startswith("verb sections are")
+
+
+def test_one_paragraph_then_one_graph() -> None:
+    loop = TIDY_LOOP.replace(
+        "Drives the repo's tree toward Tidy Tree.\n",
+        "Drives the tree.\n\nToward Tidy Tree.\n",
+    )
+    assert only(loop) == (
+        "one_paragraph_then_one_graph",
+        "2 paragraphs before the graph; the encoding is one",
+    )
+
+
+def test_a_loop_in_a_workstream_is_not_read() -> None:
+    bad = TIDY_LOOP.replace("## Verifications", "## Measures")
+    repo = Repo.from_files(Path("/r"), {"workstreams/w/tidy.md": bad.encode()})
+    assert [list(c(repo)) for c in LOOP_CHECKS] == [[]] * 5
