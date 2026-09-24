@@ -84,10 +84,10 @@ since the parent uses it too.
 - **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
   and the pipeline's document beside it, through one PR or several; which
   PRs, in what order, carrying what.
-- **One unattended stint by hand.** A stint run with no driver program, to
-  find where it hurts before any of it is automated. The guess: a stint
-  needs a way to declare itself done, and its budget is a ceiling, not a
-  target.
+- **Write a sandboxed commit skill.** It commits with plain git and never
+  pushes, since a sealed agent has no GitHub. Today's iteration prompt
+  commits through `commit-sonnet`, which pushes
+  ([One unattended stint by hand](/working-docs/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand)).
 
 ## Completed
 
@@ -148,6 +148,12 @@ since the parent uses it too.
   work copy carries from one call to the next, uncommitted files included,
   and Sandcastle runs nothing on the host that the agent can plant
   ([The container's lifetime](/working-docs/delegation/sandcastle/experiment-log.md#the-containers-lifetime)).
+- **One unattended stint by hand.** Done 2026-09-24: a four-task stint
+  ran to done with every call sealed, and the principal was one
+  conversation across its three calls, resumed from a session file kept
+  in the stint's folder
+  ([One unattended stint by hand](/working-docs/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand),
+  [The principal's conversation](/working-docs/delegation/sandcastle/experiment-log.md#the-principals-conversation)).
 
 - **Re-word the members.** Done 2026-09-24: `pipeline.md`,
   `survey.md`, `experiment-log.md`, and `rig/index.md` in the
