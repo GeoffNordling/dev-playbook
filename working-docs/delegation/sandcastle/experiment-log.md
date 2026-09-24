@@ -198,6 +198,51 @@ file in the stint's folder, through `claudeCode`'s `hostProjectsDir`.
   every call: Sandcastle's `resumeSession` on a session file the driver
   keeps with the stint.
 
+## One unattended stint by hand
+
+**Asked.** Does a whole stint work with every call sealed, the principal
+one conversation across it, and a person in place of the driver? And
+where does it hurt?
+
+**Ran.** A `wordcount` workstream seeded into the fake mission-control
+(`rig/seed/`): a head file, a plan of four tasks in two segments, and a
+budget of five iterations. Every call was Sonnet, run through
+`rig/call.mjs` with a prompt from `rig/prompts/`, and filled in by hand:
+the principal's opening call, two iterations, a reviewer, the principal
+resumed, three iterations, a reviewer, the principal resumed, then
+`front-clone close`.
+
+**Settled.**
+
+- The stint ran to done in ten calls and about eleven minutes. The
+  principal was one session across its three calls, each call billed to
+  the subscription, no call left work uncommitted, and the branch came
+  back at the same SHA with no container left.
+- The review loop did its job. Running the check gate leaves Python's
+  cache files, the fake repository had no `.gitignore`, and both
+  iterations of segment 1 committed them. The reviewer ranked it the one
+  finding; the principal accepted it and added a fix task, which the next
+  iteration did.
+- It hurt in four places:
+  - **The judgment calls went unruled.** The iterations recorded two, and
+    the principal ruled only on the reviewer's findings, so neither was
+    ruled. The principal's prompt must rule on the judgment calls too.
+  - **The budget had no slack.** Four tasks and five iterations; the fix
+    task took the fifth, and a second finding would have ended the stint
+    on budget.
+  - **The seed lacked a `.gitignore`**, and the iteration prompt says
+    `git add -A`. A real repository has one; the prompt should still
+    commit only the files the task meant.
+  - **The ending line is loose.** Agents wrapped the closing JSON line in
+    backticks about half the time; the driver strips them.
+- Sandcastle's token figures are the context size at the end of a call,
+  not the tokens spent, so they cannot be a budget. They do show the
+  principal's context growing: about 32,000 tokens at open, 42,000 at
+  checkpoint 1, and 50,000 at checkpoint 2.
+- The current Ralph iteration prompt cannot run sealed as it is: it
+  commits through the `commit-sonnet` skill, which pushes. The stint's
+  prompts commit with plain git and never push.
+
 ## Acronyms
 
 - **SHA** — Secure Hash Algorithm; here, the ID of a git commit.

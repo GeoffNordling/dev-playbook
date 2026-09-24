@@ -10,6 +10,9 @@ committed.
 
 - `setup.sh` — fills the lab directory: the fake real repository, the config copy with both patches applied, two fronts' throwaway copies, and the container image
 - `parallel.mjs` — runs two fronts at once and closes both at once, then checks commits, billing, hook logging, and clean up
+- `call.mjs` — one sealed call of a stint: one Claude session in a new container on the stint's work copy, fresh or resumed, then a probe for uncommitted work; writes the call's record to the stint's folder
+- `prompts/` — the stint's four prompts: `iteration.md.in`, `reviewer.md.in`, `principal-open.md.in`, and `principal-checkpoint.md.in`, templates whose `{{KEY}}` placeholders the driver fills
+- `seed/` — the `wordcount` workstream the by-hand stint ran on: its head file, plan, and progress log as `.md.in` templates, copied in without the `.in`, and a smoke test for the check gate
 - `lifetime.mjs` — two calls in turn on one work copy with a stand-in agent; checks that each gets a new container and only the work copy carries
 - `traps.mjs` — plants every booby-trap trigger in a work copy through a stand-in agent; checks that `run()` fires none on the host
 - `resume.mjs` — a Sonnet session told a magic word, then resumed in a new container and asked it, beside a fresh control; checks the conversation carries and its session file stays in the stint's folder

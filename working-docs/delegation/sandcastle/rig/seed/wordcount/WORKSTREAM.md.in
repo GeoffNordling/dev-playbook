@@ -1,0 +1,24 @@
+# Workstream: wordcount
+
+## Goal
+
+A small `wordcount` command in this repository, so a note's length can be
+checked without leaving the terminal.
+
+## Done when
+
+- `python3 wordcount.py FILE` prints the number of words in FILE.
+- `python3 wordcount.py` with no FILE reads standard input.
+- `--lines` prints the number of lines instead.
+- A missing FILE prints `wordcount: no such file: FILE` to standard error
+  and exits 1.
+- Every behavior above has a test, and `python3 -m unittest discover -s tests`
+  passes.
+- `README.md` has a `## wordcount` section with one example.
+
+## Constraints
+
+- Python standard library only; no new dependency.
+- One file for the command, `wordcount.py`, at the repository root.
+- A word is a run of characters between whitespace, as `str.split()` finds
+  them.
