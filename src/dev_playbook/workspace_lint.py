@@ -29,14 +29,26 @@ in, so governance is declared rather than inferred. For each governed repo:
     shape rules of its species: a build leaf's four-tuple validity and brief
     shape, a build epic's category-only shape, and a wayfinder map's or decision
     ticket's shape. Species comes from the label set and ``sub_issues_summary``.
+  - **pin** — read the consumer's ``.pre-commit-config.yaml`` on its default
+    branch and require that its dev-playbook block pins the hook repo's
+    published ``main`` head and lists the hook ids the manifest publishes
+    there. The head and the manifest are read once per run, from GitHub, so a
+    stale pin is a finding on the machine that never cloned the consumer at
+    all. The hook repo itself is passed over: it dogfoods from its tree.
 
 Every check reads GitHub, so an authenticated `gh` is a precondition of the run
 rather than a per-repo condition: the audit checks it once up front and refuses
 to start without it, because an unauthenticated `gh` degrades to anonymous
 requests instead of failing (see ``check_auth``).
 
-The pin helpers ``hook_repo_url``, ``rev_line``, and ``pinned_rev`` stay here
-for ``bump_pins``, which rewrites a consumer's pin through them.
+A roster name with no repo behind it on this machine is announced on stderr
+and passed over rather than refused: the workspace spans machines, and a repo
+may deliberately live on another one.
+
+The pin helpers ``hook_repo_url``, ``rev_line``, ``pinned_rev``,
+``published_head``, and ``published_hook_ids`` are shared with ``bump_pins``,
+which rewrites a consumer's pin through them, so the reader and the writer
+cannot disagree.
 
 Output:
     stdout — one finding per line, ``repo: name.rule message`` (the repo name
@@ -46,6 +58,7 @@ Output:
 """
 
 import argparse
+import base64
 import json
 import re
 import subprocess
@@ -53,6 +66,8 @@ import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+
+import yaml
 
 from dev_playbook import gitrepo, md
 from dev_playbook.findings import print_rules, render
@@ -80,8 +95,14 @@ SESSION_HEADINGS = "tracking.every-session-heading-in-bold"
 CATEGORY_ONLY = "tracking.category-only"
 WAYFINDER_LABELS = "tracking.one-wayfinder-label-and-nothing-else"
 WAYFINDER_BODY = "tracking.map-sections-ticket-question"
+# The one distribution rule this command decides: a consumer's published
+# config pins the hook repo's published head and lists the ids its manifest
+# publishes there. Read over `gh api` like the rest, because the audited fact
+# is the repo's default branch as GitHub has it, not a checkout on this machine.
+PINNED_HEAD = "distribution.a-consumer-pins-the-published-head"
 
 RULES = (
+    PINNED_HEAD,
     SQUASH_ONLY_MERGES,
     DEFAULT_BRANCH_PROTECTION,
     GITHUB_ORIGIN,
@@ -304,23 +325,140 @@ def hook_repo_url() -> str:
     return match.group(1)
 
 
-def workspace_repos(workspace: Path, roster: tuple[str, ...]) -> list[Path]:
-    """The roster's repos under ``workspace``, in roster order.
+def is_hook_repo(repo: Path) -> bool:
+    """Whether ``repo`` is a checkout of the hook repo — its main checkout or any worktree.
+
+    Identity is the shared ``.git`` directory, not the path: this module may be
+    running from a worktree of dev-playbook while the workspace lists the main
+    checkout, and both are the one repo that dogfoods and pins nothing.
+    """
+    try:
+        return gitrepo.common_dir(repo) == gitrepo.common_dir(HOOK_REPO_ROOT)
+    except gitrepo.NotAGitRepository:
+        return False
+
+
+def hook_repo_slug() -> str:
+    """``owner/name`` of the hook repo's GitHub origin."""
+    slug = origin_slug(HOOK_REPO_ROOT)
+    if slug is None:
+        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}")
+    return slug
+
+
+def published_head() -> str:
+    """The hook repo's ``main`` head sha, as GitHub has it.
+
+    Read from the remote rather than from the publisher's disk. pre-commit
+    installs a pin by fetching that object, so a sha the remote has never seen is
+    not stale, it is uninstallable; and a consumer's release should not depend on
+    what happens to be checked out elsewhere on the machine.
+    """
+    slug = hook_repo_slug()
+    match gh_api(f"repos/{slug}/branches/main"):
+        case {"commit": {"sha": str(sha)}}:
+            return sha
+    raise ToolError(f"cannot read main's head sha from {slug}")
+
+
+def published_file(slug: str, path: str, ref: str | None = None) -> str | None:
+    """The text of ``path`` in ``slug`` at ``ref`` (default branch when None), or None."""
+    query = f"?ref={ref}" if ref else ""
+    match gh_api(f"repos/{slug}/contents/{path}{query}"):
+        case {"encoding": "base64", "content": str(content)}:
+            return base64.b64decode(content).decode("utf-8")
+    return None
+
+
+def published_hook_ids(sha: str) -> tuple[str, ...]:
+    """The hook ids ``.pre-commit-hooks.yaml`` publishes at ``sha``, as GitHub has it.
+
+    Read at the target sha rather than from the publisher's disk, for the reason
+    ``published_head`` is: the consumer runs the manifest pre-commit clones at
+    that sha, and a local checkout may sit anywhere.
+    """
+    slug = hook_repo_slug()
+    text = published_file(slug, ".pre-commit-hooks.yaml", sha)
+    if text is None:
+        raise ToolError(f"cannot read .pre-commit-hooks.yaml at {sha[:12]} from {slug}")
+    return manifest_ids(text)
+
+
+def manifest_ids(text: str) -> tuple[str, ...]:
+    """The hook ids a ``.pre-commit-hooks.yaml`` body publishes, in file order."""
+    manifest = yaml.safe_load(text)
+    if not isinstance(manifest, list) or not manifest:
+        raise ToolError("the published manifest is not a list of hooks")
+    return tuple(str(hook["id"]) for hook in manifest)
+
+
+def pinned_hook_ids(config_text: str, url: str) -> tuple[str, ...] | None:
+    """The hook ids listed under ``url``'s block of a config body, or None without one."""
+    config = yaml.safe_load(config_text)
+    if not isinstance(config, dict):
+        return None
+    for block in config.get("repos") or ():
+        if isinstance(block, dict) and block.get("repo") == url:
+            return tuple(str(hook["id"]) for hook in block.get("hooks") or ())
+    return None
+
+
+def check_pin(
+    repo: Path, slug: str | None, url: str, head: str, ids: tuple[str, ...]
+) -> list[Line]:
+    """The pin rule over one consumer's published config.
+
+    The hook repo itself dogfoods from its working tree and pins nothing, so it
+    is passed over; a repo with no origin was already reported by
+    check_settings.
+    """
+    if slug is None or is_hook_repo(repo):
+        return []
+    config = published_file(slug, ".pre-commit-config.yaml")
+    if config is None:
+        return [Line(repo.name, PINNED_HEAD, "no .pre-commit-config.yaml on main")]
+    rev = pinned_rev(config, url)
+    if rev is None:
+        return [Line(repo.name, PINNED_HEAD, f"no {url} pin")]
+    lines = []
+    if rev != head:
+        lines.append(
+            Line(
+                repo.name,
+                PINNED_HEAD,
+                f"pinned {rev[:12]}, published head is {head[:12]}",
+            )
+        )
+    pinned_ids = pinned_hook_ids(config, url) or ()
+    if pinned_ids != ids:
+        lines.append(
+            Line(
+                repo.name,
+                PINNED_HEAD,
+                f"hook ids {', '.join(pinned_ids) or '(none)'}; "
+                f"the manifest publishes {', '.join(ids)}",
+            )
+        )
+    return lines
+
+
+def workspace_repos(
+    workspace: Path, roster: tuple[str, ...]
+) -> tuple[list[Path], list[str]]:
+    """The roster's repos under ``workspace`` in roster order, and the names not there.
 
     Only the listed repos are audited — an unlisted repo under the root is not
-    governed and draws no output. The reverse does not hold: a listed repo that
-    is not a git repo under the root is a false claim by the roster, and the
-    audit refuses to run rather than quietly auditing a shorter list.
+    governed and draws no output. A listed name with no git repo behind it on
+    this machine is returned separately, for the caller to announce: the
+    workspace spans machines and a repo may deliberately live on another one,
+    so its absence here is neither a finding nor a reason to refuse the rest.
     """
     if not workspace.is_dir():
         raise ToolError(f"workspace root not found: {workspace}")
     repos = [workspace / name for name in roster]
-    missing = [repo.name for repo in repos if not (repo / ".git").exists()]
-    if missing:
-        raise ToolError(
-            f"governed repo(s) not found under {workspace}: {', '.join(missing)}"
-        )
-    return repos
+    present = [repo for repo in repos if (repo / ".git").exists()]
+    absent = [repo.name for repo in repos if not (repo / ".git").exists()]
+    return present, absent
 
 
 def origin_slug(repo: Path) -> str | None:
@@ -1201,13 +1339,17 @@ def main(argv: list[str] | None = None) -> int:
         return print_rules(RULES)
 
     try:
-        repos = workspace_repos(args.workspace.resolve(), args.repos)
+        repos, absent = workspace_repos(args.workspace.resolve(), args.repos)
         check_auth()
+        url = hook_repo_url()
+        head = published_head()
+        ids = published_hook_ids(head)
         lines: list[Line] = []
         for repo in repos:
             slug = origin_slug(repo)
             lines.extend(check_settings(repo, slug))
             lines.extend(check_protection(repo, slug))
+            lines.extend(check_pin(repo, slug, url, head, ids))
             if not args.settings_only:
                 lines.extend(check_tracking(repo, slug))
     except ToolError as err:
@@ -1217,6 +1359,11 @@ def main(argv: list[str] | None = None) -> int:
     for line in lines:
         print(line.render())
 
+    if absent:
+        print(
+            f"workspace-lint: not on this machine, not audited: {', '.join(absent)}",
+            file=sys.stderr,
+        )
     findings = sum(1 for line in lines if line.blocking)
     print(f"workspace-lint: {len(repos)} repos, {findings} finding(s)", file=sys.stderr)
     return 1 if findings else 0

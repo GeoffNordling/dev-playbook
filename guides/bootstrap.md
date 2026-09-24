@@ -89,5 +89,7 @@ Both paths finish on GitHub, in order:
    `GOVERNED` roster — a dev-playbook edit, made only once the repo is
    green. Inclusion is declared, never inferred from the directory listing
    ([Distribution Channel](/standards/distribution/channel.md));
-   until enrolled, the repo is not checked and its pin drift never
-   reported.
+   until enrolled, the repo is not audited, and a pin that falls behind
+   the published head
+   ([A consumer pins the published head](/standards/distribution/channel.md#a-consumer-pins-the-published-head))
+   is never reported.

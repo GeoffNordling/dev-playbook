@@ -172,8 +172,8 @@ def test_rewritten_refuses_a_block_with_no_hooks_key() -> None:
 
 
 def test_manifest_ids_reads_the_published_ids_in_order() -> None:
-    assert bump_pins.manifest_ids(MANIFEST) == ("playbook-check",)
-    assert bump_pins.manifest_ids(MANIFEST + "- id: second\n  entry: x\n") == (
+    assert workspace_lint.manifest_ids(MANIFEST) == ("playbook-check",)
+    assert workspace_lint.manifest_ids(MANIFEST + "- id: second\n  entry: x\n") == (
         "playbook-check",
         "second",
     )
@@ -181,7 +181,7 @@ def test_manifest_ids_reads_the_published_ids_in_order() -> None:
 
 def test_manifest_ids_refuses_a_body_that_is_not_a_hook_list() -> None:
     with pytest.raises(bump_pins.ToolError, match="not a list of hooks"):
-        bump_pins.manifest_ids("hooks: {}\n")
+        workspace_lint.manifest_ids("hooks: {}\n")
 
 
 def test_rewritten_refuses_a_config_with_no_such_pin() -> None:

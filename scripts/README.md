@@ -99,7 +99,7 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | Script | Purpose |
 |--------|---------|
 | `griffe-outline` | Print class/function structure of a Python package |
-| `workspace-lint` | On-demand workspace check via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and stale dev-playbook pins |
+| `workspace-lint` | On-demand workspace check via `gh api`: GitHub settings drift and default-branch protection ([repo-settings.md](/guides/repo-settings.md)), label-scheme parity and blocked-label bans, open-leaf four-tuple validity and brief shape, session-leaf shape, epic shape, wayfinder map and ticket shape, and whether each consumer's published config pins dev-playbook's published head with the hook ids its manifest publishes there ([Distribution Channel](/standards/distribution/channel.md)); a roster name with no repo on this machine is announced and passed over |
 | `bootstrap-labels` | Apply the GitHub label scheme to the current repo — run by hand, after a scheme change or when adopting a repo |
 | `labelgen` | Render the label scheme as the table in [label-scheme.md](/standards/tracking/label-scheme.md); `--check` fails on drift |
 | `bump-pin` | Check whether one consumer repo's dev-playbook pin — its `rev` and the hook ids the manifest publishes at that rev — can move to the published head (`--check`, a probe run in a throwaway worktree of `origin/main`) or move it (`--write`) — the release step of [Distribution Channel](/standards/distribution/channel.md); commits nothing |

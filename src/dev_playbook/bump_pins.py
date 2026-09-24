@@ -60,7 +60,6 @@ Output:
 """
 
 import argparse
-import base64
 import subprocess
 import sys
 import tempfile
@@ -68,10 +67,8 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-import yaml
-
 from dev_playbook import gitrepo, workspace_lint
-from dev_playbook.workspace_lint import HOOK_REPO_ROOT, ToolError
+from dev_playbook.workspace_lint import ToolError, published_head, published_hook_ids
 
 # The consumer's commit gate, verbatim as the canonical Makefile's `check`
 # target spells it. This is the surface the pin controls: every dev-playbook
@@ -210,53 +207,6 @@ def run_gate(repo: Path) -> tuple[bool, str]:
     return result.returncode == 0, output
 
 
-def published_head() -> str:
-    """The hook repo's ``main`` head sha, as GitHub has it.
-
-    Read from the remote rather than from the publisher's disk. pre-commit
-    installs a pin by fetching that object, so a sha the remote has never seen is
-    not stale, it is uninstallable; and a consumer's release should not depend on
-    what happens to be checked out elsewhere on the machine.
-    """
-    slug = hook_repo_slug()
-    match workspace_lint.gh_api(f"repos/{slug}/branches/main"):
-        case {"commit": {"sha": str(sha)}}:
-            return sha
-    raise ToolError(f"cannot read main's head sha from {slug}")
-
-
-def hook_repo_slug() -> str:
-    """``owner/name`` of the hook repo's GitHub origin."""
-    slug = workspace_lint.origin_slug(HOOK_REPO_ROOT)
-    if slug is None:
-        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}")
-    return slug
-
-
-def published_hook_ids(sha: str) -> tuple[str, ...]:
-    """The hook ids ``.pre-commit-hooks.yaml`` publishes at ``sha``, as GitHub has it.
-
-    Read at the target sha rather than from the publisher's disk, for the reason
-    ``published_head`` is: the consumer runs the manifest pre-commit clones at
-    that sha, and a local checkout may sit anywhere.
-    """
-    slug = hook_repo_slug()
-    match workspace_lint.gh_api(
-        f"repos/{slug}/contents/.pre-commit-hooks.yaml?ref={sha}"
-    ):
-        case {"encoding": "base64", "content": str(content)}:
-            return manifest_ids(base64.b64decode(content).decode("utf-8"))
-    raise ToolError(f"cannot read .pre-commit-hooks.yaml at {sha[:12]} from {slug}")
-
-
-def manifest_ids(text: str) -> tuple[str, ...]:
-    """The hook ids a ``.pre-commit-hooks.yaml`` body publishes, in file order."""
-    manifest = yaml.safe_load(text)
-    if not isinstance(manifest, list) or not manifest:
-        raise ToolError("the published manifest is not a list of hooks")
-    return tuple(str(hook["id"]) for hook in manifest)
-
-
 def consumer_root(start: Path) -> Path:
     """The git root holding ``start``, refusing the hook repo itself.
 
@@ -265,7 +215,7 @@ def consumer_root(start: Path) -> Path:
     move. Identity is the test, exactly as it is in workspace-lint.
     """
     root = Path(git_out(start, "rev-parse", "--show-toplevel"))
-    if root.resolve() == HOOK_REPO_ROOT:
+    if workspace_lint.is_hook_repo(root):
         raise ToolError("dev-playbook dogfoods from its working tree and pins nothing")
     return root
 
