@@ -21,7 +21,9 @@
 # consumer's gate runs `uvx pre-commit`, whose tool environment is whatever
 # Python uv prefers — 3.13 on the publishing machine — so the install of a
 # package requiring 3.14 dies before any check runs. The version here is the
-# floor pyproject.toml's requires-python states; move the two together.
+# floor pyproject.toml's requires-python states; move the two together, and
+# with them the interpreter the canonical ci.yml installs on the runner, where
+# nothing else puts a python3.14 on PATH for pre-commit to find.
 
 - id: playbook-check
   name: playbook check
