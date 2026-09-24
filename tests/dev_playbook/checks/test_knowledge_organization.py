@@ -394,6 +394,8 @@ def test_guide_lives_under_guides() -> None:
     assert found(guide_lives_under_guides, {"a.md": concept("Guide")}) == [
         ("a.md", None)
     ]
+    in_set = {"working-docs/w/a.md": concept("Guide")}
+    assert found(guide_lives_under_guides, in_set) == []
 
 
 def test_readmemd_is_typed_readme() -> None:
@@ -475,6 +477,20 @@ def test_one_entry_per_concept_document_and_child_directory() -> None:
         ("index.md", 7),
         ("index.md", 8),
         ("index.md", 9),
+    ]
+
+
+def test_one_entry_per_concept_document_and_child_directory_in_a_working_set() -> None:
+    listing = "# I\n\nHolds.\n\n- [A](/working-docs/w/a.md) — One doc\n- `setup.sh` — makes the lab\n- [run](/working-docs/w/run.mjs) — runs it\n"
+    files = {"working-docs/w/index.md": listing, "working-docs/w/a.md": concept()}
+    assert found(one_entry_per_concept_document_and_child_directory, files) == []
+    files = {
+        "working-docs/w/index.md": listing,
+        "working-docs/w/a.md": concept(),
+        "working-docs/w/b.md": concept(),
+    }
+    assert found(one_entry_per_concept_document_and_child_directory, files) == [
+        ("working-docs/w/index.md", None)
     ]
 
 
@@ -611,6 +627,8 @@ def test_one_directory_under_working_docs() -> None:
         "working-docs/w/ROOT.md": "# R\n",
         "working-docs/w/sub/check-fixes.md": "# D\n",
         "working-docs/w/code/My_Module.py": "x = 1\n",
+        "working-docs/w/image/Containerfile": "FROM fedora\n",
+        "working-docs/w/.gitignore": "node_modules\n",
     }
     assert found(one_directory_under_working_docs, good) == []
     bad = {"working-docs/v/Notes.md": "# N\n", "working-docs/v/good.Draft.md": "# D\n"}

@@ -139,6 +139,7 @@ def test_a_sequence_is_one_list() -> None:
         {
             "guides/bad.md": typed("Guide", BAD_GUIDE),
             "notes/bad.md": typed("General-Sheet", BAD_GUIDE),
+            "working-docs/w/draft.md": typed("Guide", BAD_GUIDE),
         },
     ) == [
         ("guides/bad.md", 12),

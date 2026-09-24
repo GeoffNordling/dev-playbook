@@ -2,12 +2,13 @@
 type: Standard
 title: Loop Conventions
 description: The form a document typed Loop takes — one paragraph, one Mermaid graph, and the Acts, Verifications, and Yields sections that agree with it
-population: "a document typed Loop"
+population: "a document typed Loop, outside a working documentation set"
 ---
 
 # Loop Conventions
 
-A document typed `Loop`, under `loops/`
+A document typed `Loop`, under `loops/` and outside a working
+documentation set
 ([Document Types](/standards/knowledge-organization/document-types.md#loop-lives-under-loops)).
 The [Loop doc-type](/doc-types/loop/index.md) declares what a loop is and
 the encoding its file takes,

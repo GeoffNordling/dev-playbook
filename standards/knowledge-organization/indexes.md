@@ -51,6 +51,8 @@ directory holds, the sentence says what the directory is for instead.
 An `index.md` has exactly one bullet for each concept document in its
 directory and one for each child directory's `index.md`, and no other
 `-`, `*`, or `+` bullet outside a fenced code block or a blockquote. Each bullet is a link whose target starts `/`.
+In a working documentation set, an `index.md` may also have bullets
+that are not links to a Markdown file, such as one for each code file.
 A concept document's bullet ends with ` — ` and that document's
 frontmatter `description`, character for character.
 

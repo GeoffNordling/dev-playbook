@@ -1,5 +1,5 @@
 ---
-type: General-Sheet
+type: Guide
 title: The Sandcastle Pipeline
 description: The pipeline as built and proven — how a front runs from open to close, how fronts run in parallel, the layout inside a container, how a run is told what to do, what it guarantees, where each piece lives, and what it does not yet do
 ---

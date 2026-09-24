@@ -99,19 +99,22 @@ a non-empty value.
 
 ## Standard lives under `standards/`
 
-A concept document typed `Standard` lives under `standards/`.
+A concept document typed `Standard` lives under `standards/` or in a working
+documentation set under `working-docs/`.
 
 `knowledge-organization.standard-lives-under-standards` · deterministic
 
 ## Loop lives under `loops/`
 
-A concept document typed `Loop` lives under `loops/`.
+A concept document typed `Loop` lives under `loops/` or in a working
+documentation set under `working-docs/`.
 
 `knowledge-organization.loop-lives-under-loops` · deterministic
 
 ## Guide lives under `guides/`
 
-A concept document typed `Guide` lives under `guides/`.
+A concept document typed `Guide` lives under `guides/` or in a working
+documentation set under `working-docs/`.
 
 `knowledge-organization.guide-lives-under-guides` · deterministic
 

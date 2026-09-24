@@ -43,6 +43,6 @@ its acts, its verifications, and its yields, drawn as one graph.
 
 ## Where a loop lives
 
-A document typed `Loop` lives under `loops/`; nothing outside that tree
-claims the label. A consumer repo keeps its own `loops/` for its own
+A document typed `Loop` lives under `loops/`, or as a draft in a working
+documentation set under `working-docs/`; nothing else claims the label. A consumer repo keeps its own `loops/` for its own
 loops, the way it keeps its own `standards/`.

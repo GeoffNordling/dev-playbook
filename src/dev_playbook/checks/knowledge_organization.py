@@ -481,6 +481,11 @@ def _bundle_target(repo: Repo, ref: Reference, bundle: str) -> bool:
 # --- document-types.md ---------------------------------------------------
 
 
+def _in_working_set(path: str) -> bool:
+    """Whether ``path`` is in a working documentation set, where some rules loosen."""
+    return path.startswith(WORKING_DOCS + "/")
+
+
 def _concept_documents(repo: Repo) -> Iterator[MarkdownFile]:
     for path, doc in repo.markdown.items():
         if md.classify(path) == "concept":
@@ -585,6 +590,8 @@ def recipe_description_carries_a_resource(repo: Repo) -> Iterator[Finding]:
 def _lives_under(repo: Repo, doctype: str) -> Iterator[Finding]:
     home = LIVES_UNDER[doctype]
     for doc in _concept_documents(repo):
+        if _in_working_set(doc.path):
+            continue
         front = doc.frontmatter
         if front and front.get("type") == doctype and not doc.path.startswith(home):
             yield Finding(doc.path, None, f"'{doctype}' lives under {home}")
@@ -592,19 +599,19 @@ def _lives_under(repo: Repo, doctype: str) -> Iterator[Finding]:
 
 @check("knowledge-organization.standard-lives-under-standards")
 def standard_lives_under_standards(repo: Repo) -> Iterator[Finding]:
-    """A concept document typed ``Standard`` lives under ``standards/``."""
+    """A concept document typed ``Standard`` lives under ``standards/`` or in a working set."""
     yield from _lives_under(repo, "Standard")
 
 
 @check("knowledge-organization.loop-lives-under-loops")
 def loop_lives_under_loops(repo: Repo) -> Iterator[Finding]:
-    """A concept document typed ``Loop`` lives under ``loops/``."""
+    """A concept document typed ``Loop`` lives under ``loops/`` or in a working set."""
     yield from _lives_under(repo, "Loop")
 
 
 @check("knowledge-organization.guide-lives-under-guides")
 def guide_lives_under_guides(repo: Repo) -> Iterator[Finding]:
-    """A concept document typed ``Guide`` lives under ``guides/``."""
+    """A concept document typed ``Guide`` lives under ``guides/`` or in a working set."""
     yield from _lives_under(repo, "Guide")
 
 
@@ -729,7 +736,10 @@ def one_entry_per_concept_document_and_child_directory(
             path for path in concepts if posixpath.dirname(path) == directory
         } | _child_indexes(repo, directory)
         seen: set[str] = set()
+        loose = _in_working_set(doc.path)
         for entry in _entries(doc):
+            if loose and not entry.target.endswith(".md"):
+                continue
             if not entry.target:
                 yield Finding(doc.path, entry.line, "a bullet with no '/' link")
                 continue
@@ -919,7 +929,7 @@ def working_docs_holds_only_sets(repo: Repo) -> Iterator[Finding]:
 
 @check("knowledge-organization.one-directory-under-working-docs")
 def one_directory_under_working_docs(repo: Repo) -> Iterator[Finding]:
-    """Each set has an ``index.md`` and a ``ROOT.md``, and its files kebab-case names."""
+    """Each set has an ``index.md`` and a ``ROOT.md``, and its Markdown files kebab-case names."""
     for directory in _sets(repo):
         for name in (INDEX, ROOT_NOTE):
             path = f"{directory}/{name}"
@@ -929,7 +939,7 @@ def one_directory_under_working_docs(repo: Repo) -> Iterator[Finding]:
             if not path.startswith(directory + "/"):
                 continue
             name = PurePosixPath(path).name
-            if name in FIXED_NAMES or name.endswith(".py"):
+            if name in FIXED_NAMES or not name.endswith(".md"):
                 continue
             stem, dot, extension = name.rpartition(".")
             if not dot:

@@ -17,6 +17,10 @@ below is the one difference the set adds, stated against the general rule
 it qualifies, and a member is otherwise judged as any member is. A member
 whose type is not yet settled carries `type: General-Sheet`
 ([Document Types](/standards/knowledge-organization/document-types.md#type-names-a-registered-type)).
+A member may also carry a type whose home is elsewhere, such as
+`Guide`, before it moves there
+([Guide lives under `guides/`](/standards/knowledge-organization/document-types.md#guide-lives-under-guides));
+the form rules of that type do not bind it while it is in the set.
 
 The work may split into **strands**, each one line of it with its own
 worklist, held in one member or in one subdirectory with its own
@@ -59,9 +63,9 @@ directory above; the `ROOT.md` of a strand is reached from the next
 ## One directory under `working-docs/`
 
 Every directory directly under `working-docs/` has an `index.md` and a
-`ROOT.md`. Every file under it has a lowercase kebab-case name, such
-as `check-fixes.md`, except `index.md`, `ROOT.md`, `README.md`,
-`PROMPT.md`, `SKILL.md`, `CLAUDE.md`, and a Python module.
+`ROOT.md`. Every Markdown file under it has a lowercase kebab-case
+name, such as `check-fixes.md`, except `index.md`, `ROOT.md`,
+`README.md`, `PROMPT.md`, `SKILL.md`, and `CLAUDE.md`.
 
 `knowledge-organization.one-directory-under-working-docs` · deterministic
 

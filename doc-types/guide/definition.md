@@ -24,7 +24,8 @@ the one kind of work its title names.
 
 ## Where a guide lives
 
-Under `guides/`; the registry's rule is
+Under `guides/`, or as a draft in a working documentation set under
+`working-docs/`; the registry's rule is
 [Guide lives under `guides/`](/standards/knowledge-organization/document-types.md#guide-lives-under-guides).
 A consumer repo keeps its own `guides/` for its own work, the way it
 keeps its own `standards/`.

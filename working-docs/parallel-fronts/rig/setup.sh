@@ -40,5 +40,5 @@ git -C "$C" -c user.name=rig -c user.email=rig@example.invalid commit -q -am "ri
 mkdir -p "$E/image/ctx"
 git -C "$C" archive HEAD src scripts dotfiles pyproject.toml | tar -x -C "$E/image/ctx"
 cp -L "$HOME/.local/bin/claude" "$E/image/ctx/claude"
-podman build -q -t localhost/sandcastle-pipeline:rig -f "$RIG/image/containerfile" "$E/image/ctx"
+podman build -q -t localhost/sandcastle-pipeline:rig -f "$RIG/image/Containerfile" "$E/image/ctx"
 echo "setup done"

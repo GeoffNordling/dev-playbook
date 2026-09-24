@@ -31,6 +31,7 @@ for _loop_rule in (
 
 DOC_TYPES = "doc-types"
 STANDARDS = "standards"
+WORKING_DOCS = "working-docs/"
 GUIDE_TYPE = "Guide"
 LOOP_TYPE = "Loop"
 STANDARD_TYPE = "Standard"
@@ -520,8 +521,14 @@ def the_files_why_ends_the_opening_prose(repo: Repo) -> Iterator[Finding]:
 
 
 def _typed(repo: Repo, doctype: str) -> Iterator[tuple[str, MarkdownFile]]:
-    """Every markdown file whose frontmatter ``type`` is ``doctype``."""
+    """Every markdown file whose frontmatter ``type`` is ``doctype``, outside ``working-docs/``.
+
+    A member of a working documentation set may carry a type before it moves
+    to that type's home, and that type's form rules do not bind it there.
+    """
     for path, doc in sorted(repo.markdown.items()):
+        if path.startswith(WORKING_DOCS):
+            continue
         if doc.frontmatter is not None and doc.frontmatter.get("type") == doctype:
             yield path, doc
 
