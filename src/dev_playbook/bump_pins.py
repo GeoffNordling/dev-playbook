@@ -14,17 +14,17 @@ one question and makes one edit, and stops there:
   ``--check``   Can this repo's pin move to the published head without going red?
   ``--write``   Move it.
 
-``--check`` is a probe: it runs the gate at the current pin, rewrites the pin,
-runs the gate again, and puts the config back however that second run went.
-Restoring is what lets the caller choose where the durable edit lands — a green
-probe can be committed straight to ``main``, while a red one belongs on a branch
-where the findings can be worked, and neither choice is made here. The steps,
-with the refusal each one carries:
+``--check`` is a probe run in a throwaway detached worktree of the consumer's
+``origin/main``: the gate at the current pin, the pin rewritten, the gate again,
+the worktree removed. The caller's own checkout is never read or written, so it
+may sit on any branch, dirty or clean, with sessions working in it — the probe
+judges the tree the release will land on, not the tree someone is editing. A
+green probe can then be committed straight to ``main``, while a red one belongs
+on a branch where the findings can be worked, and neither choice is made here.
+The steps, with the refusal each one carries:
 
-  - **preflight** — the repo is a consumer carrying a dev-playbook pin, sits on
-    ``main`` with a clean working tree, and its ``main`` matches ``origin/main``.
-    A dirty tree makes the baseline meaningless, and a ``main`` behind the remote
-    probes a tree the caller is not about to branch from.
+  - **preflight** — the repo is a consumer carrying a dev-playbook pin, and its
+    ``origin/main`` was just fetched.
   - **baseline** — the gate is already green at the *current* pin. Bumping a red
     repo makes the new findings indistinguishable from the ones that were
     already there, so a red baseline refuses rather than reporting a verdict
@@ -35,14 +35,21 @@ with the refusal each one carries:
     dies rather than judging refuses too: "could not check" reported as "needs
     work" would name a repo for a problem it does not have.
 
-``--write`` makes the durable edit — the one ``rev:`` line, nothing else — and
-runs no gate. It asks only for a clean working tree, so it serves the worktree
-a caller cuts after a red probe as readily as ``main`` after a green one.
+``--write`` makes the durable edit — the pinned block's ``rev:`` line and its
+hook ids, nothing else — and runs no gate. It asks only for a clean working
+tree, so it serves the worktree a caller cuts after a red probe as readily as
+``main`` after a green one.
 
-The target is always the hook repo's ``main`` as GitHub has it. pre-commit
-installs a pin by fetching that object from the hook repo's URL, so the
-published head is the only sha a consumer can pin at all; reading it from the
-remote is what makes the pin installable rather than merely recent.
+The rewrite moves two things together. The ``rev`` is the release; the hook
+ids under it are whatever ``.pre-commit-hooks.yaml`` publishes *at that rev*,
+so a hook renamed upstream reaches the consumer in the same edit as the sha
+that renamed it, and pre-commit never meets an id the manifest no longer has.
+
+The target is always the hook repo's ``main`` as GitHub has it, and the
+manifest is read there too. pre-commit installs a pin by fetching that object
+from the hook repo's URL, so the published head is the only sha a consumer can
+pin at all; reading it from the remote is what makes the pin installable rather
+than merely recent.
 
 Nothing is committed and nothing is pushed.
 
@@ -53,9 +60,15 @@ Output:
 """
 
 import argparse
+import base64
 import subprocess
 import sys
+import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
+
+import yaml
 
 from dev_playbook import gitrepo, workspace_lint
 from dev_playbook.workspace_lint import HOOK_REPO_ROOT, ToolError
@@ -102,22 +115,60 @@ def git_out(repo: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
-def rewritten(text: str, url: str, sha: str) -> tuple[str, str]:
-    """``text`` with ``url``'s pin moved to ``sha``, and the rev it replaced.
+def pinned_block(lines: list[str], url: str) -> range:
+    """The lines of the block pinning ``url``: its ``- repo:`` line through its last child.
 
-    Only the one ``rev:`` line changes — its indentation is preserved and every
-    other byte of the config, including the trailing newline, is carried through
-    untouched. A config with no such pin raises rather than growing one: adding a
-    dev-playbook block to a repo is adoption, a different act from a bump.
+    The block ends at the first non-blank line indented no deeper than the
+    ``- repo:`` line — the next repo item, or a top-level key. A config with no
+    such block raises rather than growing one: adding a dev-playbook block to a
+    repo is adoption, a different act from a bump.
     """
-    lines = text.splitlines()
     index = workspace_lint.rev_line(lines, url)
     if index is None:
         raise ToolError(f"no {url} pin to move")
-    line = lines[index]
+    start = index - 1
+    depth = len(lines[start]) - len(lines[start].lstrip())
+    end = index + 1
+    while end < len(lines):
+        line = lines[end]
+        if line.strip() and len(line) - len(line.lstrip()) <= depth:
+            break
+        end += 1
+    return range(start, end)
+
+
+def rewritten(text: str, url: str, sha: str, ids: tuple[str, ...]) -> tuple[str, str]:
+    """``text`` with ``url``'s pin at ``sha`` and its hooks set to ``ids``, and the old rev.
+
+    Two edits, both inside the one pinned block: the ``rev:`` line takes ``sha``,
+    and the entries under ``hooks:`` become one ``- id:`` line per published id,
+    so a hook renamed upstream — ``playbook-lint`` becoming ``playbook-check`` —
+    moves with the pin instead of failing loud at the next gate. Indentation is
+    taken from the block as found; every byte outside the block, including the
+    trailing newline, is carried through untouched. A block whose hook entries
+    already match ``ids`` changes only its rev line.
+    """
+    lines = text.splitlines()
+    block = pinned_block(lines, url)
+    rev_index = block.start + 1
+    line = lines[rev_index]
     old = line.split(":", 1)[1].strip()
     indent = line[: len(line) - len(line.lstrip())]
-    lines[index] = f"{indent}rev: {sha}"
+    lines[rev_index] = f"{indent}rev: {sha}"
+
+    hooks_index = next((i for i in block if lines[i].strip() == "hooks:"), None)
+    if hooks_index is None:
+        raise ToolError(f"the {url} block has no hooks: key")
+    entries = [lines[i] for i in range(hooks_index + 1, block.stop)]
+    id_lines = [entry for entry in entries if entry.lstrip().startswith("- id:")]
+    if id_lines:
+        id_indent = id_lines[0][: len(id_lines[0]) - len(id_lines[0].lstrip())]
+    else:
+        id_indent = indent + "  "
+    lines[hooks_index + 1 : block.stop] = [
+        f"{id_indent}- id: {hook_id}" for hook_id in ids
+    ]
+
     tail = "\n" if text.endswith("\n") else ""
     return "\n".join(lines) + tail, old
 
@@ -167,13 +218,43 @@ def published_head() -> str:
     not stale, it is uninstallable; and a consumer's release should not depend on
     what happens to be checked out elsewhere on the machine.
     """
-    slug = workspace_lint.origin_slug(HOOK_REPO_ROOT)
-    if slug is None:
-        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}")
+    slug = hook_repo_slug()
     match workspace_lint.gh_api(f"repos/{slug}/branches/main"):
         case {"commit": {"sha": str(sha)}}:
             return sha
     raise ToolError(f"cannot read main's head sha from {slug}")
+
+
+def hook_repo_slug() -> str:
+    """``owner/name`` of the hook repo's GitHub origin."""
+    slug = workspace_lint.origin_slug(HOOK_REPO_ROOT)
+    if slug is None:
+        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}")
+    return slug
+
+
+def published_hook_ids(sha: str) -> tuple[str, ...]:
+    """The hook ids ``.pre-commit-hooks.yaml`` publishes at ``sha``, as GitHub has it.
+
+    Read at the target sha rather than from the publisher's disk, for the reason
+    ``published_head`` is: the consumer runs the manifest pre-commit clones at
+    that sha, and a local checkout may sit anywhere.
+    """
+    slug = hook_repo_slug()
+    match workspace_lint.gh_api(
+        f"repos/{slug}/contents/.pre-commit-hooks.yaml?ref={sha}"
+    ):
+        case {"encoding": "base64", "content": str(content)}:
+            return manifest_ids(base64.b64decode(content).decode("utf-8"))
+    raise ToolError(f"cannot read .pre-commit-hooks.yaml at {sha[:12]} from {slug}")
+
+
+def manifest_ids(text: str) -> tuple[str, ...]:
+    """The hook ids a ``.pre-commit-hooks.yaml`` body publishes, in file order."""
+    manifest = yaml.safe_load(text)
+    if not isinstance(manifest, list) or not manifest:
+        raise ToolError("the published manifest is not a list of hooks")
+    return tuple(str(hook["id"]) for hook in manifest)
 
 
 def consumer_root(start: Path) -> Path:
@@ -206,52 +287,56 @@ def require_clean(repo: Path) -> None:
         raise ToolError(f"uncommitted changes in {repo}")
 
 
-def require_fresh_main(repo: Path) -> None:
-    """Refuse a repo not sitting on a ``main`` that matches the remote.
+def fetch_origin(repo: Path) -> None:
+    """Bring ``origin/main`` up to date; the probe judges that ref and nothing else."""
+    git_out(repo, "fetch", "-q", "origin", "main")
 
-    Both halves serve the probe. Off ``main``, or behind it, the gate judges a
-    tree that is not the one the caller will commit to or branch from, so a
-    verdict about this release would be a verdict about something else.
+
+@contextmanager
+def probe_worktree(repo: Path, base: str = "origin/main") -> Iterator[Path]:
+    """A throwaway detached worktree of ``repo`` at ``base``, removed on exit.
+
+    The probe judges the tree the release will land on, ``origin/main``, and a
+    worktree is how it reads that tree without caring what the caller's checkout
+    has checked out, whether it is dirty, or which branch a session there is
+    working: none of that is touched, and nothing is left behind.
     """
-    branch = git_out(repo, "branch", "--show-current")
-    if branch != "main":
-        raise ToolError(f"{repo} is on {branch}; the baseline is only honest on main")
-    if git_out(repo, "rev-parse", "main") != git_out(repo, "rev-parse", "origin/main"):
-        raise ToolError(f"main in {repo} is not at origin/main; fast-forward it first")
+    with tempfile.TemporaryDirectory(prefix="bump-pin-") as tmp:
+        path = Path(tmp) / repo.name
+        git_out(repo, "worktree", "add", "-q", "--detach", str(path), base)
+        try:
+            yield path
+        finally:
+            git_out(repo, "worktree", "remove", "--force", str(path))
 
 
-def check(repo: Path, url: str, sha: str) -> int:
-    """Probe the bump and restore the config; the exit code is the verdict."""
-    require_fresh_main(repo)
-    require_clean(repo)
+def check(repo: Path, url: str, sha: str, ids: tuple[str, ...]) -> int:
+    """Probe the bump in a throwaway worktree of ``origin/main``; the exit code is the verdict."""
     old = pinned(repo, url)
     if old == sha:
         print(f"{repo.name}: {CURRENT} ({sha[:12]})")
         return 0
 
-    config = repo / ".pre-commit-config.yaml"
-    text = config.read_text(encoding="utf-8")
-    print(f"bump-pin: {repo.name}: checking baseline at {old[:12]}", file=sys.stderr)
-    baseline_ok, baseline_output = run_gate(repo)
-    if not baseline_ok:
-        raise ToolError(
-            f"{repo.name} is already red at its current pin ({old[:12]}), so these "
-            f"findings are not this release's:\n{baseline_output}"
+    with probe_worktree(repo) as tree:
+        config = tree / ".pre-commit-config.yaml"
+        text = config.read_text(encoding="utf-8")
+        print(
+            f"bump-pin: {repo.name}: checking baseline at {old[:12]}", file=sys.stderr
         )
+        baseline_ok, baseline_output = run_gate(tree)
+        if not baseline_ok:
+            raise ToolError(
+                f"{repo.name} is already red at its current pin ({old[:12]}), so "
+                f"these findings are not this release's:\n{baseline_output}"
+            )
 
-    updated, _ = rewritten(text, url, sha)
-    config.write_text(updated, encoding="utf-8")
-    print(
-        f"bump-pin: {repo.name}: {old[:12]} -> {sha[:12]}, verifying", file=sys.stderr
-    )
-    try:
-        passed, output = run_gate(repo)
-    finally:
-        # However the verify run went — verdict, crash, interrupt — the tree goes
-        # back exactly as found. The caller has yet to decide where the durable
-        # edit lands, and an uncommitted pin sitting in main is not a tree anyone
-        # can branch cleanly from.
-        config.write_text(text, encoding="utf-8")
+        updated, _ = rewritten(text, url, sha, ids)
+        config.write_text(updated, encoding="utf-8")
+        print(
+            f"bump-pin: {repo.name}: {old[:12]} -> {sha[:12]}, verifying",
+            file=sys.stderr,
+        )
+        passed, output = run_gate(tree)
 
     if passed:
         print(f"{repo.name}: {CLEAN} at {sha[:12]}")
@@ -260,15 +345,15 @@ def check(repo: Path, url: str, sha: str) -> int:
     return 1
 
 
-def write(repo: Path, url: str, sha: str) -> int:
-    """Move the pin for real, running no gate."""
+def write(repo: Path, url: str, sha: str, ids: tuple[str, ...]) -> int:
+    """Move the pin for real, hook ids with it, running no gate."""
     require_clean(repo)
     old = pinned(repo, url)
     if old == sha:
         print(f"{repo.name}: {CURRENT} ({sha[:12]})")
         return 0
     config = repo / ".pre-commit-config.yaml"
-    updated, _ = rewritten(config.read_text(encoding="utf-8"), url, sha)
+    updated, _ = rewritten(config.read_text(encoding="utf-8"), url, sha, ids)
     config.write_text(updated, encoding="utf-8")
     print(f"{repo.name}: pinned {old[:12]} -> {sha[:12]}")
     return 0
@@ -311,8 +396,12 @@ def main(argv: list[str] | None = None) -> int:
         repo = consumer_root(args.repo)
         url = workspace_lint.hook_repo_url()
         sha = published_head()
-        print(f"bump-pin: target {sha}", file=sys.stderr)
-        return check(repo, url, sha) if args.check else write(repo, url, sha)
+        ids = published_hook_ids(sha)
+        print(f"bump-pin: target {sha} ({', '.join(ids)})", file=sys.stderr)
+        if args.check:
+            fetch_origin(repo)
+            return check(repo, url, sha, ids)
+        return write(repo, url, sha, ids)
     except ToolError as err:
         print(f"bump-pin: {err}", file=sys.stderr)
         return 2
