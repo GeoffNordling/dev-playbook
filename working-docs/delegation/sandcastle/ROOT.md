@@ -67,14 +67,15 @@ replace.
 - **Lap** — a synchronized fan-out of fronts from one commit, merged back
   together. Retired: stints run and end on their own schedules.
 - **Driver** — the deterministic program that schedules the fronts: which
-  run, from what base, with which prompt, and when they end.
+  run, from what base, with which prompt, and when they end. Now a driver
+  in the delegation terms, which runs one stint's loop.
 - **Integrator** — the role that merges the fronts' branches and judges
   their conflicts.
 - **Shape** — how the work is arranged: laps of fronts that a driver
   schedules and an integrator merges. The delegation workflow's
   [Shape](/working-docs/delegation/ROOT.md#shape) replaces it.
 
-Where the driver and the integrator go in the new words is open in
+Where the integrator goes in the new words is open in
 [the parent](/working-docs/delegation/ROOT.md#open).
 
 ## Planned
@@ -91,9 +92,17 @@ Where the driver and the integrator go in the new words is open in
   ([Part 4](/working-docs/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
   `measure-event` sending rows to the host from a sandbox, and the Stop and
   SessionEnd hooks set to wait.
-- **Discuss: where the pipeline lives on main.** Where its document and
-  the code in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md)
-  go once the work lands, and what the landing PR carries.
+- **Write the headless loop script.** The
+  [headless driver](/working-docs/delegation/ROOT.md#settled) in Python,
+  developed in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md):
+  the loop, the stop rules, and the checkpoints in the script, and the
+  step that runs one iteration swappable between a local `claude -p` and
+  the Sandcastle pipeline. Sandcastle is a Node library, so the Sandcastle
+  step calls a small `.mjs` shim that runs Sandcastle's `run()` for one
+  iteration; Sandcastle's own loop goes unused.
+- **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
+  and the pipeline's document beside it, through one PR or several; which
+  PRs, in what order, carrying what.
 - **One unattended stint by hand.** A stint run with no driver program, to
   find where it hurts before any of it is automated. The guess: a stint
   needs a way to declare itself done, and its budget is a ceiling, not a

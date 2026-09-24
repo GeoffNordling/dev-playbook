@@ -75,13 +75,17 @@ machinery an unattended stint runs on.
   directory that may hold documentation sets; this set is one.
 - **Loop** — machinery: a shape of act, verify, and yield steps, defined
   once in a file typed [Loop](/doc-types/loop/definition.md) under
-  `loops/`. It holds no goal and no history. A workstream is driven by a
+  `loops/`. It holds no goal and no history. Each stint is driven by a
   loop chosen for it, and one loop drives many workstreams.
-- **Stint** — a bounded spend of effort advancing one workstream with its
-  loop. An **attended** stint has the user in it, as in a session like the
-  one that wrote this set: the most effective and the most costly. An
-  **unattended** stint runs in a sealed container with no user, on the
-  Sandcastle pipeline, and ends by yielding to the user.
+- **Driver** — the program that runs a stint's loop: it starts each
+  iteration, reads what the iteration reports, and stops the stint. The
+  drivers form a menu, and each stint names the one it used.
+- **Stint** — a bounded spend of effort advancing one workstream, with a
+  loop and a driver chosen for it. An **attended** stint has the user in
+  it, as in a session like the one that wrote this set: the most effective
+  and the most costly. An **unattended** stint runs in a sealed container
+  with no user, on the Sandcastle pipeline, and ends by yielding to the
+  user.
 - **Checkpoint** — a review point inside an unattended stint, after a
   block of iterations: the work is reviewed against the plan, and the plan
   is revised. It is the review the
@@ -103,12 +107,13 @@ The guess as it stands:
 
 ```
 Loop                        loops/<name>.md — the shape: act · verify · yield
+Driver                      a program from the driver menu that runs a loop
 Workstream                  one line of work, its head file typed Workstream
-├─ head file                Goal · Done when · Boundaries · Planned · Completed
-│                           · the loop that drives it · the log of its stints
+├─ head file                the headings picked from the menu
 ├─ documentation sets       whatever the work accumulates
 ├─ child workstreams        a subdirectory with its own head file
-└─ stints                   bounded spends of effort, one after another
+└─ stints                   bounded spends of effort, one after another,
+   │                        each with its own loop and driver
    ├─ attended              the user and Claude in a session
    └─ unattended            a sealed container, its own branch, no user
       ├─ plan               checkpoints × iterations, plus slack; a hard limit
@@ -134,11 +139,44 @@ Decided with the user on 2026-09-24.
   this set's first.
 - **A loop is distinct from a workstream.** The loop is how, general and
   without memory; the workstream is what and why, particular and with
-  history. The user chooses the loop that drives a workstream.
-- **The brief is the workstream's head file.** The buckets a working
-  documentation set has today (Goal, Planned, Completed, …) grow the
-  fields an unattended stint needs, and every workstream carries them, so
-  one object serves attended and unattended work alike.
+  history. The loop and the driver belong to a stint, not to the
+  workstream: the user chooses them for each stint, and the workstream's
+  Stints heading records which ran.
+- **The brief is the workstream's head file.** One object serves attended
+  and unattended work alike.
+- **A workstream picks its headings from one menu.** The user and the
+  agent pick the ones the work needs:
+
+  | Heading | Holds |
+  |---|---|
+  | Goal | what the work is for |
+  | Done when | the state at which a stint yields as finished |
+  | Principles | the judgment calls that guide choices |
+  | Constraints | the hard bounds, the boundaries of a stint included |
+  | Terms | the terms the work coins |
+  | Settled | the decisions made, with their dates |
+  | Open | the questions not yet decided |
+  | Planned, Completed | the worklist |
+  | Stints | the log of stints: date, loop, driver, branch, verdict |
+  | Unfiled | material awaiting triage |
+  | Acronyms | the appendix |
+
+  Goal, Principles, Constraints, Terms, Planned, Completed, Unfiled, and
+  Acronyms are a working documentation set's buckets today; Done when,
+  Settled, Open, and Stints are new.
+- **Open holds questions only.** An answer, recommended or not, is a
+  separate thing and does not sit with the question.
+- **The drivers form a menu.** Today: the Ralph workflow, which runs in a
+  Claude Code session through the `Workflow` runtime
+  ([`ralph-loop.js`](/dotfiles/dot-claude/workflows/ralph-loop.js)), and
+  the Sandcastle pipeline, proven for one iteration. Planned: a headless
+  loop script.
+- **A headless agent never runs a Claude Code workflow.** An unattended
+  stint's driver is headless code the user writes and maintains, as a
+  professional practice, even where a headless agent could run a
+  workflow. The Ralph pattern (fresh agent, status, stop rule,
+  checkpoints) is written as a Python script, with the step that runs one
+  iteration swappable: locally or in the Sandcastle pipeline.
 - **An unattended stint is planned before launch** as checkpoints ×
   iterations, plus slack. At the hard limit the agent wraps up and yields.
   Wall-clock time and commit counts are not budgets; tokens would be
@@ -169,29 +207,18 @@ Decided with the user on 2026-09-24.
 
 ## Open
 
-Each question with the agent's recommendation, to be decided from the
-[Shape](#shape) diagram.
+To be decided from the [Shape](#shape) diagram.
 
 - **Who rules at an unattended checkpoint.** The reviewer ranks findings
-  and no user is there to confirm them. The checkpointer rules against the
-  head file, a separate judge rules, or every finding is accepted; in each,
-  a finding the head file cannot settle stops the stint as stuck.
-  Recommended: the checkpointer rules and records every ruling in the
-  progress file.
-- **The head file's name.** `ROOT.md` or `WORKSTREAM.md`. Recommended:
-  `WORKSTREAM.md`, named for its type as `SKILL.md` is, so the board finds
-  workstreams by name alone.
-- **The head file's fields.** What Goal, Planned, and Completed gain:
-  done when, boundaries, the loop, the plan shape, the base branch, what
-  to read first, the stint log.
-- **What the board tracks.** For each stint: its workstream, branch,
-  state, checkpoints and iterations done against planned, why it stopped,
-  where it runs, its log. Recommended: one row per stint running or
-  waiting, grouped by workstream.
-- **How a workstream names its loop.**
-- **Where the driver and the integrator go.** Whether the program that
-  runs an unattended stint and the role that brings its work in need
-  names of their own, or are the Sandcastle pipeline and the user.
+  and no user is there to confirm them.
+- **The head file's name.** `ROOT.md`, `WORKSTREAM.md`, or another.
+- **What the board tracks.** Which stints get a row, and which facts of
+  each it shows.
+- **Where the integrator goes.** Whether the role that brings a stint's
+  work in needs a name of its own, or is the user.
+- **Where a stint's plan lives.** The checkpoints × iterations plan and
+  its progress belong to the stint, not the head file; where they are
+  written is not decided.
 - **A workstream's target as a Standard.** A loop's target lives in the
   Standards its verify steps point at, and a workstream could hold its
   done-when as a draft Standard. Parked by the user.
@@ -204,6 +231,10 @@ guiding. Running an unattended stint is the
 
 - **Decide the Open questions from the diagram.** A diagram of the system
   in this set, and each item of [Open](#open) settled at that level.
+- **Pass context between headless nodes.** A fork subagent inherits its
+  parent's conversation for free; a headless driver has no fork, so the
+  context a node needs reaches it some other way. The specifics are
+  decided later.
 - **Write the Workstream doc-type.** Its definition and encoding under
   `doc-types/workstream/`, its entry in
   [Document Types](/standards/knowledge-organization/document-types.md),
