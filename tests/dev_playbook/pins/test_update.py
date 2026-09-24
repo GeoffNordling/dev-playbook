@@ -149,11 +149,25 @@ def scripted_gate(
 
 
 def scripted_gh(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
-    """A ``gh`` whose ``pr list`` answers the contents of one file; that file."""
+    """A ``gh`` whose ``pr list`` answers the contents of one file; that file.
+
+    ``--state open`` (the PR read) answers ``open-pr-url``; ``--state all``
+    (the sweep's state read) answers ``pr-state``, keyed by the branch the
+    ``--head`` names, so one script can hold several branches' fates.
+    """
     pr_file = tmp_path / "open-pr-url"
     script = tmp_path / "scripted-gh"
     script.write_text(
-        f"#!/bin/sh\ncat {pr_file} 2>/dev/null\nexit 0\n", encoding="utf-8"
+        "#!/bin/sh\n"
+        'head=""; state=""; prev=""\n'
+        'for a in "$@"; do\n'
+        '  [ "$prev" = --head ] && head=$a\n'
+        '  [ "$prev" = --state ] && state=$a\n'
+        "  prev=$a\n"
+        "done\n"
+        f'[ "$state" = all ] && {{ cat {tmp_path}/pr-state/$head 2>/dev/null; exit 0; }}\n'
+        f"cat {pr_file} 2>/dev/null\nexit 0\n",
+        encoding="utf-8",
     )
     script.chmod(0o755)
     monkeypatch.setattr(agent, "GH", (str(script),))
@@ -186,6 +200,21 @@ def update_one(repo: Path, tmp_path: Path, dry_run: bool = False) -> ledger.Row:
     return update.update_repo(
         repo, URL, NEW, IDS, now=NOW, run_dir=tmp_path / "state", dry_run=dry_run
     )
+
+
+def bump_left_behind(repo: Path, sha: str, tmp_path: Path, state: str | None) -> Path:
+    """A ``bump-pin-<sha12>`` worktree and branch, pushed, whose PR GitHub reports as ``state``."""
+    branch = f"bump-pin-{sha[:12]}"
+    path = repo / ".claude" / "worktrees" / branch
+    path.parent.mkdir(parents=True, exist_ok=True)
+    git_out(repo, "worktree", "add", "-q", "-b", branch, str(path), "origin/main")
+    (path / "work.txt").write_text("agent work\n", encoding="utf-8")
+    commit_all(path)
+    git_out(path, "push", "-q", "origin", branch)
+    if state is not None:
+        (tmp_path / "pr-state").mkdir(exist_ok=True)
+        (tmp_path / "pr-state" / branch).write_text(state + "\n", encoding="utf-8")
+    return path
 
 
 # --- the ledger ---
@@ -457,6 +486,80 @@ def test_red_under_dry_run_prints_the_findings_and_cuts_nothing(
     assert FINDINGS in capsys.readouterr().out
     assert not (repo / ".claude").exists()
     assert not call.exists()
+
+
+# --- the sweep ---
+
+
+def test_sweep_removes_a_bump_whose_pr_is_merged_and_keeps_the_rest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = consumer(tmp_path)
+    scripted_gh(monkeypatch, tmp_path)
+    merged = bump_left_behind(repo, NEW, tmp_path, "MERGED")
+    closed = bump_left_behind(repo, "f" * 40, tmp_path, "CLOSED")
+    still_open = bump_left_behind(repo, "e" * 40, tmp_path, "OPEN")
+    no_pr = bump_left_behind(repo, "d" * 40, tmp_path, None)
+    push_branch(repo, "feat-mine")  # not a bump: never the sweep's business
+
+    swept = update.sweep(repo, dry_run=False)
+
+    assert swept == [f"bump-pin-{NEW[:12]} (merged)", f"bump-pin-{'f' * 12} (closed)"]
+    assert not merged.exists() and not closed.exists()
+    assert still_open.is_dir() and no_pr.is_dir()
+    local = git_out(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads/")
+    assert set(local.splitlines()) == {
+        "main",
+        "feat-mine",
+        f"bump-pin-{'e' * 12}",
+        f"bump-pin-{'d' * 12}",
+    }
+    remote = git_out(repo, "ls-remote", "--heads", "origin")
+    assert f"bump-pin-{NEW[:12]}" not in remote and f"bump-pin-{'f' * 12}" not in remote
+    assert f"bump-pin-{'e' * 12}" in remote and "feat-mine" in remote
+
+
+def test_sweep_survives_a_remote_branch_github_already_deleted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = consumer(tmp_path)
+    scripted_gh(monkeypatch, tmp_path)
+    path = bump_left_behind(repo, NEW, tmp_path, "MERGED")
+    git_out(repo, "push", "-q", "origin", "--delete", f"bump-pin-{NEW[:12]}")
+
+    assert update.sweep(repo, dry_run=False) == [f"bump-pin-{NEW[:12]} (merged)"]
+    assert not path.exists()
+
+
+def test_sweep_under_dry_run_names_the_bumps_and_removes_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = consumer(tmp_path)
+    scripted_gh(monkeypatch, tmp_path)
+    path = bump_left_behind(repo, NEW, tmp_path, "MERGED")
+
+    assert update.sweep(repo, dry_run=True) == [f"bump-pin-{NEW[:12]} (merged)"]
+    assert path.is_dir()
+
+
+def test_main_sweeps_a_repo_already_recorded_at_the_head(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
+) -> None:
+    """The merge comes after the row, so the sweep cannot wait for the next release."""
+    ws = tmp_path / "ws"
+    repo = consumer(ws)
+    fake_github(monkeypatch, LEDGER, head=OLD)  # recorded: nothing to move
+    scripted_gate(monkeypatch, tmp_path)  # any call exits 3
+    scripted_gh(monkeypatch, tmp_path)
+    path = bump_left_behind(repo, OLD, tmp_path, "MERGED")
+
+    code = update.main(["--workspace", str(ws), "--repos", "consumer"])
+
+    out = capsys.readouterr().out
+    assert code == 0
+    assert f"consumer: swept bump-pin-{OLD[:12]} (merged)" in out
+    assert "nothing to do" in out
+    assert not path.exists()
 
 
 def test_the_prompt_invokes_the_skill_and_carries_the_state() -> None:

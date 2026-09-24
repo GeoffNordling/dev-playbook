@@ -3,7 +3,8 @@
 Reading: the pin its published ``main`` carries, and the remote branches with
 commits ``main`` does not have. Landing: the green commit pushed to ``main``,
 and the red worktree on ``bump-pin-<sha12>`` holding the committed bump for an
-agent to work.
+agent to work. Sweeping: the bump branches still in the repo, and the removal
+of one whose PR is finished — worktree, local branch, remote branch.
 """
 
 import subprocess
@@ -16,6 +17,7 @@ from dev_playbook.pins.config import pinned_rev, rewritten
 from dev_playbook.pins.worktree import git_out
 
 WORKTREES = Path(".claude") / "worktrees"
+BUMP_PREFIX = "bump-pin-"
 
 
 @dataclass(frozen=True)
@@ -80,7 +82,42 @@ def branch_notes(branches: list[Branch]) -> str:
 
 def branch_name(sha: str) -> str:
     """``bump-pin-<sha12>``: the branch and worktree name for one release."""
-    return f"bump-pin-{sha[:12]}"
+    return f"{BUMP_PREFIX}{sha[:12]}"
+
+
+def bump_branches(repo: Path) -> list[str]:
+    """Every local ``bump-pin-*`` branch, whichever release cut it."""
+    listing = git_out(
+        repo, "for-each-ref", "--format=%(refname:short)", f"refs/heads/{BUMP_PREFIX}*"
+    )
+    return listing.splitlines()
+
+
+def worktree_of(repo: Path, branch: str) -> Path | None:
+    """The linked worktree that has ``branch`` checked out, or None."""
+    path: Path | None = None
+    for line in git_out(repo, "worktree", "list", "--porcelain").splitlines():
+        if line.startswith("worktree "):
+            path = Path(line.removeprefix("worktree "))
+        elif line == f"branch refs/heads/{branch}":
+            return path
+    return None
+
+
+def remove_bump(repo: Path, branch: str) -> None:
+    """Remove a finished bump: its worktree, its local branch, its remote branch.
+
+    Called only for a branch whose PR is merged or closed, so the worktree's
+    contents are either on ``main`` or discarded by the user's decision;
+    ``--force`` is that decision applied. GitHub may already have deleted the
+    remote branch at merge, so the remote is asked before it is told.
+    """
+    path = worktree_of(repo, branch)
+    if path is not None:
+        git_out(repo, "worktree", "remove", "--force", str(path))
+    git_out(repo, "branch", "-q", "-D", branch)
+    if git_out(repo, "ls-remote", "--heads", "origin", branch):
+        git_out(repo, "push", "-q", "origin", "--delete", branch)
 
 
 def land_green(tree: Path, old: str, sha: str) -> str:

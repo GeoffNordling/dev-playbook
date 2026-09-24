@@ -135,6 +135,15 @@ def open_pr(repo: Path, branch: str) -> str | None:
     Read from GitHub, never from what an agent printed: the PR is the one fact
     about a red repo the ledger records, so it comes from the system of record.
     """
+    return _pr_field(repo, branch, state="open", field="url")
+
+
+def pr_state(repo: Path, branch: str) -> str | None:
+    """``OPEN``, ``MERGED`` or ``CLOSED`` for the newest PR whose head is ``branch``; None for no PR."""
+    return _pr_field(repo, branch, state="all", field="state")
+
+
+def _pr_field(repo: Path, branch: str, *, state: str, field: str) -> str | None:
     try:
         result = subprocess.run(
             [
@@ -144,11 +153,11 @@ def open_pr(repo: Path, branch: str) -> str | None:
                 "--head",
                 branch,
                 "--state",
-                "open",
+                state,
                 "--json",
-                "url",
+                field,
                 "--jq",
-                ".[0].url // empty",
+                f".[0].{field} // empty",
             ],
             cwd=repo,
             capture_output=True,
@@ -158,5 +167,5 @@ def open_pr(repo: Path, branch: str) -> str | None:
         raise ToolError(f"{GH[0]} not found on PATH") from err
     if result.returncode != 0:
         raise ToolError(f"gh pr list --head {branch} failed: {result.stderr.strip()}")
-    url = result.stdout.strip()
-    return url or None
+    value = result.stdout.strip()
+    return value or None
