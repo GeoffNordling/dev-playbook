@@ -290,6 +290,10 @@ code = stint.main(
         "s1",
         "--home",
         str(home),
+        "--playbook",
+        str(Path.home() / "workspace" / "dev-playbook"),
+        "--model",
+        "claude-sonnet-5",
     ],
     step=fake(lambda n, c, r: None),
 )

@@ -10,7 +10,10 @@ host file into a prompt.
 
 Usage:
     stint.py REPO --base REF --workstream DIR --check CMD --budget N
-             [--name NAME] [--home HOME] [--playbook PATH] [--model M]
+             --name NAME --home HOME --playbook PATH --model M
+
+Every argument is required; none has a default. PLAYBOOK is the dev-playbook
+checkout whose `main` the config copy is cloned from.
 
 REPO is any git repository; the stint's branch NAME starts at REF, which
 already holds the workstream DIR (its WORKSTREAM.md, PLAN.md, and
@@ -333,12 +336,10 @@ def main(argv=None, step=sandcastle_step) -> int:
     p.add_argument("--workstream", required=True)
     p.add_argument("--check", required=True)
     p.add_argument("--budget", type=int, required=True)
-    p.add_argument("--name", default=time.strftime("stint-%Y%m%d-%H%M%S"))
-    p.add_argument("--home", type=Path, default=Path.home() / "stints")
-    p.add_argument(
-        "--playbook", type=Path, default=Path.home() / "workspace" / "dev-playbook"
-    )
-    p.add_argument("--model", default="claude-sonnet-5")
+    p.add_argument("--name", required=True)
+    p.add_argument("--home", type=Path, required=True)
+    p.add_argument("--playbook", type=Path, required=True)
+    p.add_argument("--model", required=True)
     args = p.parse_args(argv)
     args.repo = args.repo.resolve()
     args.stint = (args.home / args.repo.name / args.name).resolve()
