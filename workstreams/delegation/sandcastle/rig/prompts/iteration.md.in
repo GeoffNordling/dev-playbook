@@ -20,8 +20,7 @@ inside it. Never add, remove, move, or edit a marker.
    what you did, and what is next. Where the plan and its sources did not
    settle something you had to decide, add one indented line under it:
    `- judgment: <what was unsettled> → <what you did>, because <why>`.
-6. Commit everything with plain `git add -A` and `git commit`. Never push,
-   and use no skill to commit. Leave nothing uncommitted.
+6. Run `/commit-sandbox`. Leave nothing uncommitted.
 7. End your reply with one line of JSON and nothing after it:
    `{"summary": "<one line>", "tasksLeft": <unchecked tasks left in your segment>, "blocker": null}`
    with `blocker` a one-line reason instead of null if step 1 stopped you.

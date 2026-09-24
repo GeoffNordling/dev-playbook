@@ -21,8 +21,7 @@ Iterations spent: {{SPENT}} of {{BUDGET}}.
    `<!-- [ ] checkpoint -->` after them, and only if the budget has room.
    Revise the tasks ahead if what you learned calls for it, and record
    each change in `## Decisions` too.
-4. Commit with plain `git add -A` and `git commit`. Never push, and use no
-   skill to commit.
+4. Run `/commit-sandbox`.
 
 End your reply with one line of JSON and nothing after it:
 `{"verdict": "continue" | "done" | "budget" | "stuck", "reason": "<one line>"}`
