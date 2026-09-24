@@ -37,7 +37,7 @@ the standards it verifies against are run by the loop, never at a gate
 The documents typed `Loop` under `loops/`, one file per loop. A Loop
 instance is the specification of a procedure that brings a system
 closer to its target state; the workflow script, skill, or person that
-runs it is the substrate, not the loop. A loop does one thing
+runs it is the loop's driver, not the loop. A loop does one thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)):
 its acts, its verifications, and its yields, drawn as one graph.
 

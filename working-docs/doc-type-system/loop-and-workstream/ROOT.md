@@ -64,8 +64,6 @@ Decided with the user on 2026-09-24.
 - **The principal is a yield receiver**, beside another loop and the
   user. A checkpoint yields to the principal, which changes the plan;
   the end of a stint yields to the user.
-- **Driver replaces substrate.** The program that runs a loop is its
-  driver, in the delegation sense.
 - **The reference model comes first.** Workstream and Loop enter
   [Reference Model](/working-docs/doc-type-system/doc-type-system/reference-model.md)
   together, and the user approves both there before any instance is
@@ -102,8 +100,8 @@ Decided with the user on 2026-09-24.
   [Doc-Type](/standards/doc-type/doc-type.md#held-to-a-standard).
 - **Revise the Loop bundle.** `doc-types/loop/` and
   [Loop Conventions](/standards/doc-type/loop-conventions.md) brought
-  to the approved model: driver for substrate, the principal receiver,
-  and whatever else the model changes.
+  to the approved model: the principal receiver, and whatever else the
+  model changes.
 - **Re-read the old Loop items.** Four items carried from the old Loop
   strand, each kept, rewritten, or dropped against the new model:
   - Retire `loop_lint` and move its five checks into the check

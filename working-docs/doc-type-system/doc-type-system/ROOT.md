@@ -77,12 +77,11 @@ specification.
   threshold on content, not a line between file kinds.
 - **Shape is orthogonal to stochasticity.** A fully deterministic
   runbook or loop still gets its doc-type document, because the
-  document is the legible form. The one requirement that follows is
-  a drift check between the document and its substrate, the same
-  deterministic rule the deleted prototype chaingen applied to a
-  runbook and its chain. The
-  loop half is in the Loop strand
-  ([Principles](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#principles)).
+  document is the legible form. For a runbook, a drift check binds
+  the document to the code it describes, the deterministic rule the
+  deleted prototype chaingen applied to a runbook and its chain. A
+  loop has none yet
+  ([Unfiled](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#unfiled)).
 
 ## Terms
 

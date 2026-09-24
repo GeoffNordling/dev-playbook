@@ -66,7 +66,7 @@ class Loop(DocType):
 
 A loop carries no target field and no runtime: the standards the
 verifications point at describe the target, and whatever runs the loop
-is the substrate, not the loop
+is its driver, not the loop
 ([System Legibility](/docs/system-legibility.md#standing-principles)).
 
 ## The graph
