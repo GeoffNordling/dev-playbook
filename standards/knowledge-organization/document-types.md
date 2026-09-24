@@ -90,13 +90,6 @@ document describes, never a companion file that only supports it.
 
 `knowledge-organization.resource-names-the-asset` · stochastic
 
-## No tags or timestamp
-
-A concept document's frontmatter has no `tags` key and no `timestamp`
-key.
-
-`knowledge-organization.no-tags-or-timestamp` · deterministic
-
 ## Recipe-Description carries a `resource`
 
 A concept document typed `Recipe-Description` has a `resource` key with

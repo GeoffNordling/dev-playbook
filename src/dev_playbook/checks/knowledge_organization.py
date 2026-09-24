@@ -567,15 +567,6 @@ def resource_a_repo_root_path_or_a_uri(repo: Repo) -> Iterator[Finding]:
             )
 
 
-@check("knowledge-organization.no-tags-or-timestamp")
-def no_tags_or_timestamp(repo: Repo) -> Iterator[Finding]:
-    """A concept document's frontmatter has no ``tags`` and no ``timestamp`` key."""
-    for doc in _concept_documents(repo):
-        for key in ("tags", "timestamp"):
-            if doc.frontmatter is not None and key in doc.frontmatter:
-                yield Finding(doc.path, None, f"frontmatter has a '{key}' key")
-
-
 @check("knowledge-organization.recipe-description-carries-a-resource")
 def recipe_description_carries_a_resource(repo: Repo) -> Iterator[Finding]:
     """A concept document typed ``Recipe-Description`` has a non-empty ``resource``."""

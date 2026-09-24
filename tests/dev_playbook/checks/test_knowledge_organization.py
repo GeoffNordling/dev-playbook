@@ -22,7 +22,6 @@ from dev_playbook.checks.knowledge_organization import (
     language_section_present,
     loop_lives_under_loops,
     no_okf_type,
-    no_tags_or_timestamp,
     non_empty_description_no_closing_period,
     non_empty_title,
     okf_version_declared,
@@ -366,15 +365,6 @@ def test_resource_a_repo_root_path_or_a_uri() -> None:
         resource_a_repo_root_path_or_a_uri,
         {"a.md": concept(extra="resource: src/x.py\n")},
     ) == [("a.md", None)]
-
-
-def test_no_tags_or_timestamp() -> None:
-    assert found(no_tags_or_timestamp, {"a.md": concept()}) == []
-    bad = concept(extra="tags: [x]\ntimestamp: now\n")
-    assert found(no_tags_or_timestamp, {"a.md": bad}) == [
-        ("a.md", None),
-        ("a.md", None),
-    ]
 
 
 def test_recipe_description_carries_a_resource() -> None:
