@@ -1,19 +1,9 @@
 # Commit Procedure
 
 The procedure every commit skill follows. The skill that sent you here
-says what to stage and what to do after the commit.
+says where to commit, what to stage, and what to do after the commit.
 
 Commit without narration; speak up only when something is unexpected.
-
-## Args
-
-`target` is free text on where to commit — `main`, `new branch`, `current worktree`, anything. Any phrasing counts as an instruction for the rest of the session.
-
-Off `main`: commit to the branch checked out.
-
-On `main`, no target: stop and ask, per the global rule.
-
-Target given that doesn't match the branch checked out: fail loud, don't commit.
 
 ## Worklist
 

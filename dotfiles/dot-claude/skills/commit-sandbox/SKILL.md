@@ -4,12 +4,11 @@ description: Commit work with a clean message and never push, for an agent seale
 disable-model-invocation: false
 model: inherit
 effort: low
-arguments: [target]
 allowed-tools: Bash(git *), Read, Edit
 ---
 
 # Commit
 
 {Read [commit.md](~/.claude/skills/commit-inherit/references/commit.md)}
-and follow it. Never push: the sandbox has no GitHub access, and the
-host brings your commits out.
+and follow it. Commit to the branch checked out. Never push: the sandbox
+has no GitHub access, and the host brings your commits out.
