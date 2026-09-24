@@ -1,12 +1,12 @@
-"""Behavioral tests for scripts/cascade.
+"""Behavioral tests for scripts/update-pins (``dev_playbook.pins.update``).
 
-The cascade pushes to other repos' ``main``, cuts worktrees in them, launches a
+update-pins pushes to other repos' ``main``, cuts worktrees in them, launches a
 headless agent, and commits to dev-playbook — so every path is driven over
 throwaway repos with a real bare ``origin``, and the three outside programs are
-scripts: the gate (``bump_pins.GATE``), the agent (``cascade.CLAUDE``), and the
-GitHub CLI (``cascade.GH``). The one fact about a red repo the ledger records,
+scripts: the gate (``gate.GATE``), the agent (``agent.CLAUDE``), and the
+GitHub CLI (``agent.GH``). The one fact about a red repo the ledger records,
 the PR, is read through the scripted ``gh`` and never from the agent's output,
-and the tests hold the cascade to that.
+and the tests hold update-pins to that.
 """
 
 import subprocess
@@ -15,8 +15,15 @@ from pathlib import Path
 import pytest
 from conftest import commit_all, init_repo
 
-from dev_playbook import bump_pins, cascade, workspace_lint
-from dev_playbook.bump_pins import git_out
+from dev_playbook.errors import ToolError
+from dev_playbook.pins import agent, bump, gate, ledger, release, update
+from dev_playbook.pins.consumer import (
+    Branch,
+    branch_notes,
+    pinned_on_main,
+    unmerged_branches,
+)
+from dev_playbook.pins.worktree import fetch_all, git_out
 
 URL = "https://github.com/GeoffNordling/dev-playbook"
 OLD = "6cf8a2b554db3b22edcbca40186bdc12b71a1e41"
@@ -47,16 +54,16 @@ PR_URL = "https://github.com/me/consumer/pull/7"
 LEDGER = f"""\
 ---
 type: Log
-title: Pin Cascade Ledger
+title: Pin Updates Ledger
 description: test ledger
 ---
 
-# Pin Cascade Ledger
+# Pin Updates Ledger
 
 ## Runs
 
-{cascade.LEDGER_HEADER}
-{cascade.LEDGER_RULE}
+{ledger.HEADER}
+{ledger.RULE}
 | 2026-09-22 09:00 | {OLD[:12]} | consumer | green | main abcdef123456 | no unmerged branches |
 | 2026-09-22 09:00 | {OLD[:12]} | other | red | PR {PR_URL} | unmerged: feat (2026-09-01, 3 ahead) |
 """
@@ -121,7 +128,7 @@ def scripted_gate(
 ) -> None:
     """Point the gate at a script answering ``run`` once; no ``run`` means any call is a crash.
 
-    The cascade runs the gate once per repo, at the new pin, so one scripted
+    update-pins runs the gate once per repo, at the new pin, so one scripted
     answer is the whole contract; a second call, or a call where none is
     expected, exits 3, which the gate reports as "could not run".
     """
@@ -138,7 +145,7 @@ def scripted_gate(
         encoding="utf-8",
     )
     script.chmod(0o755)
-    monkeypatch.setattr(bump_pins, "GATE", (str(script),))
+    monkeypatch.setattr(gate, "GATE", (str(script),))
 
 
 def scripted_gh(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
@@ -149,7 +156,7 @@ def scripted_gh(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
         f"#!/bin/sh\ncat {pr_file} 2>/dev/null\nexit 0\n", encoding="utf-8"
     )
     script.chmod(0o755)
-    monkeypatch.setattr(cascade, "GH", (str(script),))
+    monkeypatch.setattr(agent, "GH", (str(script),))
     return pr_file
 
 
@@ -171,12 +178,12 @@ def scripted_agent(
         encoding="utf-8",
     )
     script.chmod(0o755)
-    monkeypatch.setattr(cascade, "CLAUDE", (str(script),))
+    monkeypatch.setattr(agent, "CLAUDE", (str(script),))
     return record
 
 
-def cascade_one(repo: Path, tmp_path: Path, dry_run: bool = False) -> cascade.Row:
-    return cascade.cascade_repo(
+def update_one(repo: Path, tmp_path: Path, dry_run: bool = False) -> ledger.Row:
+    return update.update_repo(
         repo, URL, NEW, IDS, now=NOW, run_dir=tmp_path / "state", dry_run=dry_run
     )
 
@@ -185,22 +192,22 @@ def cascade_one(repo: Path, tmp_path: Path, dry_run: bool = False) -> cascade.Ro
 
 
 def test_ledger_rows_skips_the_header_and_the_rule() -> None:
-    rows = cascade.ledger_rows(LEDGER)
+    rows = ledger.rows(LEDGER)
     assert [row[2] for row in rows] == ["consumer", "other"]
     assert rows[1][4] == f"PR {PR_URL}"
 
 
 def test_recorded_matches_the_head_by_its_twelve_character_prefix() -> None:
-    assert cascade.recorded(LEDGER, OLD) == {"consumer", "other"}
-    assert cascade.recorded(LEDGER, NEW) == set()
+    assert ledger.recorded(LEDGER, OLD) == {"consumer", "other"}
+    assert ledger.recorded(LEDGER, NEW) == set()
 
 
 def test_recorded_is_empty_for_an_empty_ledger() -> None:
-    assert cascade.recorded("", NEW) == set()
+    assert ledger.recorded("", NEW) == set()
 
 
 def test_row_render_keeps_a_pipe_out_of_the_table() -> None:
-    row = cascade.Row(NOW, NEW, "consumer", "failed", "git said a | b", "")
+    row = ledger.Row(NOW, NEW, "consumer", "failed", "git said a | b", "")
     assert row.render() == (
         f"| {NOW} | {NEW[:12]} | consumer | failed | git said a / b |  |"
     )
@@ -211,35 +218,33 @@ def test_record_appends_the_rows_on_origin_main_and_touches_the_ledger_alone(
 ) -> None:
     hook_repo = consumer(tmp_path, name="dev-playbook")
     (hook_repo / "docs").mkdir()
-    (hook_repo / workspace_lint.LEDGER).write_text(LEDGER, encoding="utf-8")
+    (hook_repo / release.LEDGER).write_text(LEDGER, encoding="utf-8")
     commit_all(hook_repo)
     git_out(hook_repo, "push", "-q", "origin", "main")
     rows = [
-        cascade.Row(NOW, NEW, "consumer", "green", "main 123456789abc", "n"),
-        cascade.Row(NOW, NEW, "other", "current", f"main pins {NEW[:12]}", "n"),
+        ledger.Row(NOW, NEW, "consumer", "green", "main 123456789abc", "n"),
+        ledger.Row(NOW, NEW, "other", "current", f"main pins {NEW[:12]}", "n"),
     ]
 
-    sha = cascade.record(rows, hook_repo=hook_repo)
+    sha = ledger.record(rows, hook_repo=hook_repo)
 
-    text = origin_main(hook_repo, workspace_lint.LEDGER)
+    text = origin_main(hook_repo, release.LEDGER)
     assert text.endswith(rows[0].render() + "\n" + rows[1].render() + "\n")
-    assert cascade.recorded(text, NEW) == {"consumer", "other"}
+    assert ledger.recorded(text, NEW) == {"consumer", "other"}
     assert git_out(hook_repo, "rev-parse", "origin/main") == sha
     touched = git_out(hook_repo, "show", "--name-only", "--format=", sha)
-    assert touched == workspace_lint.LEDGER
+    assert touched == release.LEDGER
     # The command's own checkout was never written.
     assert git_out(hook_repo, "status", "--porcelain") == ""
     assert (
-        not (hook_repo / workspace_lint.LEDGER)
-        .read_text()
-        .endswith(rows[1].render() + "\n")
+        not (hook_repo / release.LEDGER).read_text().endswith(rows[1].render() + "\n")
     )
 
 
 def test_record_refuses_a_hook_repo_with_no_ledger(tmp_path: Path) -> None:
     hook_repo = consumer(tmp_path, name="dev-playbook")
-    with pytest.raises(workspace_lint.ToolError, match="no docs/pin-cascade.md"):
-        cascade.record([], hook_repo=hook_repo)
+    with pytest.raises(ToolError, match="no docs/pin-updates.md"):
+        ledger.record([], hook_repo=hook_repo)
 
 
 # --- reading one consumer ---
@@ -249,13 +254,13 @@ def test_pinned_on_main_reads_origin_main_not_the_checkout(tmp_path: Path) -> No
     repo = consumer(tmp_path)
     (repo / ".pre-commit-config.yaml").write_text(BUMPED, encoding="utf-8")
     commit_all(repo)  # ahead of origin, unpushed
-    assert cascade.pinned_on_main(repo, URL) == OLD
+    assert pinned_on_main(repo, URL) == OLD
 
 
 def test_pinned_on_main_refuses_a_tree_with_no_pin(tmp_path: Path) -> None:
     repo = consumer(tmp_path, config="repos: []\n")
-    with pytest.raises(workspace_lint.ToolError, match="no .* pin on origin/main"):
-        cascade.pinned_on_main(repo, URL)
+    with pytest.raises(ToolError, match="no .* pin on origin/main"):
+        pinned_on_main(repo, URL)
 
 
 def test_unmerged_branches_reports_only_branches_ahead_of_main(
@@ -264,14 +269,14 @@ def test_unmerged_branches_reports_only_branches_ahead_of_main(
     repo = consumer(tmp_path)
     push_branch(repo, "feat-live")
     push_branch(repo, "old-merged", merged=True)
-    cascade.fetch_all(repo)
+    fetch_all(repo)
 
-    branches = cascade.unmerged_branches(repo)
+    branches = unmerged_branches(repo)
 
     assert [(b.name, b.ahead) for b in branches] == [("feat-live", 1)]
     assert len(branches[0].date) == len("2026-09-23")
-    assert cascade.branch_notes(branches).startswith("unmerged: feat-live (")
-    assert cascade.branch_notes([]) == "no unmerged branches"
+    assert branch_notes(branches).startswith("unmerged: feat-live (")
+    assert branch_notes([]) == "no unmerged branches"
 
 
 # --- one repo: current and green ---
@@ -282,7 +287,7 @@ def test_a_repo_already_at_the_head_is_current_and_runs_no_gate(
 ) -> None:
     repo = consumer(tmp_path, config=BUMPED)
     scripted_gate(monkeypatch, tmp_path)  # any call exits 3
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
     assert (row.verdict, row.landing) == ("current", f"main pins {NEW[:12]}")
     assert row.notes == "no unmerged branches"
 
@@ -295,7 +300,7 @@ def test_green_lands_one_commit_on_main_and_leaves_the_checkout_alone(
     scripted_gate(monkeypatch, tmp_path, (0, PASSED))
     scripted_gh(monkeypatch, tmp_path)
 
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
 
     assert row.verdict == "green"
     landed = git_out(repo, "rev-parse", "origin/main")
@@ -319,7 +324,7 @@ def test_green_under_dry_run_pushes_nothing(
     repo = consumer(tmp_path)
     scripted_gate(monkeypatch, tmp_path, (0, PASSED))
     scripted_gh(monkeypatch, tmp_path)
-    row = cascade_one(repo, tmp_path, dry_run=True)
+    row = update_one(repo, tmp_path, dry_run=True)
     assert (row.verdict, row.landing) == ("green", "dry run: not landed")
     assert origin_main(repo) == CONFIG
 
@@ -330,7 +335,7 @@ def test_a_gate_that_cannot_run_is_a_failed_row_not_a_verdict(
     repo = consumer(tmp_path)
     scripted_gate(monkeypatch, tmp_path, (3, "An unexpected error has occurred"))
     scripted_gh(monkeypatch, tmp_path)
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
     assert row.verdict == "failed"
     assert "the gate could not run" in row.landing
     assert origin_main(repo) == CONFIG
@@ -348,7 +353,7 @@ def test_red_cuts_a_worktree_runs_the_agent_there_and_records_the_pr_gh_reports(
     pr_file = scripted_gh(monkeypatch, tmp_path)
     call = scripted_agent(monkeypatch, tmp_path, pr_file, opens_pr=True)
 
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
 
     branch = f"bump-pin-{NEW[:12]}"
     worktree = repo / ".claude" / "worktrees" / branch
@@ -369,7 +374,7 @@ def test_red_cuts_a_worktree_runs_the_agent_there_and_records_the_pr_gh_reports(
     assert OLD in prompt and NEW in prompt and branch in prompt
     assert "feat-live (" in prompt
     assert FINDINGS in prompt
-    assert "Never merge the PR" in prompt
+    assert prompt.startswith("/finish-pin-bump\n")
     # The transcript and the findings are on disk.
     assert (tmp_path / "state" / "consumer.log").read_text().startswith('{"result"')
     assert (tmp_path / "state" / "consumer.findings.txt").read_text() == FINDINGS + "\n"
@@ -385,7 +390,7 @@ def test_red_with_no_pr_afterwards_is_failed_and_keeps_the_worktree(
     pr_file = scripted_gh(monkeypatch, tmp_path)
     scripted_agent(monkeypatch, tmp_path, pr_file, opens_pr=False)
 
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
 
     worktree = repo / ".claude" / "worktrees" / f"bump-pin-{NEW[:12]}"
     assert row.verdict == "failed"
@@ -403,7 +408,7 @@ def test_red_refuses_to_launch_the_agent_on_a_metered_credential(
     call = scripted_agent(monkeypatch, tmp_path, pr_file, opens_pr=True)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-metered")
 
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
 
     assert row.verdict == "failed"
     assert "ANTHROPIC_API_KEY" in row.landing
@@ -417,7 +422,7 @@ def test_an_open_pr_for_this_head_is_pending_and_runs_nothing(
     scripted_gate(monkeypatch, tmp_path)  # any call exits 3
     pr_file = scripted_gh(monkeypatch, tmp_path)
     pr_file.write_text(PR_URL + "\n", encoding="utf-8")
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
     assert (row.verdict, row.landing) == ("pending", f"PR {PR_URL}")
 
 
@@ -431,7 +436,7 @@ def test_red_refuses_a_worktree_left_by_an_earlier_run(
     stale = repo / ".claude" / "worktrees" / f"bump-pin-{NEW[:12]}"
     stale.mkdir(parents=True)
 
-    row = cascade_one(repo, tmp_path)
+    row = update_one(repo, tmp_path)
 
     assert row.verdict == "failed"
     assert "already exists" in row.landing
@@ -446,7 +451,7 @@ def test_red_under_dry_run_prints_the_findings_and_cuts_nothing(
     pr_file = scripted_gh(monkeypatch, tmp_path)
     call = scripted_agent(monkeypatch, tmp_path, pr_file, opens_pr=True)
 
-    row = cascade_one(repo, tmp_path, dry_run=True)
+    row = update_one(repo, tmp_path, dry_run=True)
 
     assert (row.verdict, row.landing) == ("red", "dry run: no branch cut")
     assert FINDINGS in capsys.readouterr().out
@@ -454,21 +459,21 @@ def test_red_under_dry_run_prints_the_findings_and_cuts_nothing(
     assert not call.exists()
 
 
-def test_the_prompt_names_the_skill_and_forbids_the_merge() -> None:
-    prompt = cascade.agent_prompt(
+def test_the_prompt_invokes_the_skill_and_carries_the_state() -> None:
+    prompt = agent.prompt(
         "consumer",
         Path("/w"),
         "bump-pin-abc",
         OLD,
         NEW,
         IDS,
-        [cascade.Branch("feat", "2026-09-01", 3)],
+        [Branch("feat", "2026-09-01", 3)],
         FINDINGS,
     )
-    assert "update-standards-pin/SKILL.md" in prompt
-    assert "Work the findings" in prompt and "Land the PR" in prompt
+    assert prompt.startswith("/finish-pin-bump\n")
+    assert "bump-pin-abc" in prompt and OLD in prompt and NEW in prompt
     assert "- feat (2026-09-01, 3 ahead)" in prompt
-    assert "gh pr create --base main --head bump-pin-abc" in prompt
+    assert "playbook-check" in prompt
     assert "No user is present" in prompt
 
 
@@ -476,16 +481,16 @@ def test_the_prompt_names_the_skill_and_forbids_the_merge() -> None:
 
 
 def fake_github(
-    monkeypatch: pytest.MonkeyPatch, ledger: str | None, head: str = NEW
+    monkeypatch: pytest.MonkeyPatch, text: str | None, head: str = NEW
 ) -> None:
     """Stand in for every GitHub read ``main`` makes."""
-    monkeypatch.setattr(cascade, "release_head", lambda: head)
-    monkeypatch.setattr(cascade, "published_hook_ids", lambda sha: IDS)
-    monkeypatch.setattr(cascade, "hook_repo_url", lambda: URL)
-    monkeypatch.setattr(cascade, "hook_repo_slug", lambda: "me/dev-playbook")
-    monkeypatch.setattr(cascade, "published_file", lambda slug, path: ledger)
-    monkeypatch.setattr(workspace_lint, "check_auth", lambda: None)
-    monkeypatch.setattr(cascade, "is_hook_repo", lambda repo: False)
+    monkeypatch.setattr(update, "release_head", lambda: head)
+    monkeypatch.setattr(update, "published_hook_ids", lambda sha: IDS)
+    monkeypatch.setattr(update, "hook_repo_url", lambda: URL)
+    monkeypatch.setattr(ledger, "hook_repo_slug", lambda: "me/dev-playbook")
+    monkeypatch.setattr(ledger, "published_file", lambda slug, path: text)
+    monkeypatch.setattr(update, "check_auth", lambda: None)
+    monkeypatch.setattr(update, "is_hook_repo", lambda repo: False)
 
 
 def test_main_exits_at_once_when_every_repo_is_recorded_at_the_head(
@@ -496,7 +501,7 @@ def test_main_exits_at_once_when_every_repo_is_recorded_at_the_head(
     fake_github(monkeypatch, LEDGER, head=OLD)
     scripted_gate(monkeypatch, tmp_path)  # any call exits 3
 
-    code = cascade.main(["--workspace", str(ws), "--repos", "consumer"])
+    code = update.main(["--workspace", str(ws), "--repos", "consumer"])
 
     assert code == 0
     assert "nothing to do" in capsys.readouterr().out
@@ -510,9 +515,9 @@ def test_main_dry_run_probes_the_unrecorded_repos_and_records_nothing(
     fake_github(monkeypatch, LEDGER)  # rows at OLD, none at NEW
     scripted_gate(monkeypatch, tmp_path, (0, PASSED))
     scripted_gh(monkeypatch, tmp_path)
-    monkeypatch.setattr(cascade, "STATE_DIR", tmp_path / "state")
+    monkeypatch.setattr(update, "STATE_DIR", tmp_path / "state")
 
-    code = cascade.main(
+    code = update.main(
         ["--workspace", str(ws), "--repos", "consumer,ghost", "--dry-run"]
     )
 
@@ -530,7 +535,7 @@ def test_main_refuses_a_live_run_with_no_published_ledger(
     ws = tmp_path / "ws"
     consumer(ws)
     fake_github(monkeypatch, None)
-    code = cascade.main(["--workspace", str(ws), "--repos", "consumer"])
+    code = update.main(["--workspace", str(ws), "--repos", "consumer"])
     assert code == 2
     assert "cannot run without it" in capsys.readouterr().err
 
@@ -543,8 +548,8 @@ def test_main_dry_run_treats_a_missing_ledger_as_empty(
     fake_github(monkeypatch, None)
     scripted_gate(monkeypatch, tmp_path, (0, PASSED))
     scripted_gh(monkeypatch, tmp_path)
-    monkeypatch.setattr(cascade, "STATE_DIR", tmp_path / "state")
-    code = cascade.main(["--workspace", str(ws), "--repos", "consumer", "--dry-run"])
+    monkeypatch.setattr(update, "STATE_DIR", tmp_path / "state")
+    code = update.main(["--workspace", str(ws), "--repos", "consumer", "--dry-run"])
     assert code == 0
     assert "consumer: green" in capsys.readouterr().out
 
@@ -556,14 +561,12 @@ def test_main_passes_the_hook_repo_over_by_identity(
     consumer(ws, name="dev-playbook")
     fake_github(monkeypatch, LEDGER)
     monkeypatch.setattr(
-        cascade, "is_hook_repo", lambda repo: repo.name == "dev-playbook"
+        update, "is_hook_repo", lambda repo: repo.name == "dev-playbook"
     )
-    code = cascade.main(["--workspace", str(ws), "--repos", "dev-playbook"])
+    code = update.main(["--workspace", str(ws), "--repos", "dev-playbook"])
     assert code == 0
     assert "nothing to do" in capsys.readouterr().out
 
 
-def test_bump_pins_gate_is_the_cascade_gate() -> None:
-    # One gate for both writers: a test that scripts bump_pins.GATE scripts the
-    # cascade's probe too, and the two cannot judge a repo differently.
-    assert cascade.run_gate is bump_pins.run_gate
+def test_one_gate_judges_the_probe_and_the_update() -> None:
+    assert bump.run_gate is gate.run_gate and update.run_gate is gate.run_gate

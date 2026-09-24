@@ -1,16 +1,16 @@
 ---
 type: General-Sheet
-title: Pin Cascade
-description: The working root for the pin cascade — the goal, the decisions the user has ruled on, the design of the cascade command and its ledger, the timer, the headless per-repo run, and the worklist; speculative until the cascade has run once over the governed repos
+title: Pin Updates
+description: The working root for the pin updates — the goal, the decisions the user has ruled on, the design of the update-pins command and its ledger, the timer, the headless per-repo run, and the worklist; speculative until update-pins has run once over the governed repos
 ---
 
-# Pin Cascade
+# Pin Updates
 
-The working documentation set for the pin cascade: the system that
+The working documentation set for pin updates: the system that
 moves every governed consumer repo's dev-playbook pin to the published
 head whenever dev-playbook `main` moves, works each repo back to green,
 and records what it did. This set is speculative: it is the plan and
-the decisions of one session, written before the cascade has run once.
+the decisions of one session, written before update-pins has run once.
 The branch is `worktree-pin-cascade`, cut from `main` at `a94aebd`
 (PR #495) in the worktree `.claude/worktrees/pin-cascade`.
 
@@ -32,11 +32,11 @@ git and the IDE.
   about.
 - **The headless fan-out is unsandboxed for now.** The `sandcastle`
   branch, unmerged, is the future fence; a follow-up sandboxes the
-  cascade once it merges.
+  update-pins once it merges.
 - **A `ci.yml` change costs the user a PAT widening.** A fine-grained
   PAT needs Workflows read/write, granted by hand at
   github.com/settings/personal-access-tokens, before any push that
-  changes `.github/workflows/ci.yml`. The cascade must say when a repo's
+  changes `.github/workflows/ci.yml`. update-pins must say when a repo's
   adaptation touches that file.
 - **Off-machine repos exist.** `lunch` and `date-tree` are governed and
   live only on the WSL machine (GPU, personal data). They are handled
@@ -52,24 +52,41 @@ Rulings the user made in the session, in the order made.
 - **Landing rule.** Green at the new pin → one commit on the consumer's
   `main`. Red → a branch, the agent works the findings to green, opens a
   PR, and the user merges or vetoes.
-- **Unmerged branches take the pin when they merge.** The cascade bumps
+- **Unmerged branches take the pin when they merge.** update-pins bumps
   `main` regardless of in-flight branches and worktrees. A branch is
   untouched; it meets the new pin when it rebases or merges, and its
-  findings surface then, on its own PR. The cascade *reports* every
+  findings surface then, on its own PR. update-pins *reports* every
   remote branch not merged to `main` with its last-commit date, so the
   user can spot a live one and veto. Merged-but-undeleted remote
   branches are noise and are not reported.
 - **Poll interval: 15 minutes.** A systemd user timer on this machine.
 - **One ledger file in dev-playbook**, one row per repo per run,
-  committed by the cascade itself, so the history reads in `git log`
+  committed by update-pins itself, so the history reads in `git log`
   and the IDE.
 - **The ledger commit is not a release.** Pending the user's veto: the
   release head is the newest commit on dev-playbook `main` that touches
   anything other than the ledger file. Without this, each ledger commit
-  moves `main` and triggers the next cascade, forever.
+  moves `main` and triggers the next run, forever.
 - **Headless `claude -p`, Opus**, one run per red repo, the user's
   first use of headless. Billing and flags are in
   [Headless Operation](/docs/headless.md).
+- **The name is `update-pins`**, not `cascade` or `release`: the
+  command is `update-standards-pin` run over every governed repo, and
+  the names should say so. The ledger is `docs/pin-updates.md`, the
+  timer `update-pins.timer`.
+- **Two skills, not one with modes.** `update-standards-pin` is the hand
+  runbook through cutting the worktree; `finish-pin-bump` is the
+  worktree runbook, working the findings and landing the PR, and is
+  what the headless agent runs. The prompt is the slash command plus the
+  run's state; no instruction lives in Python.
+- **Escalations always go into the PR body**, under `Escalations`, by
+  hand or headless. Nothing waits on a user mid-run; the PR is where the
+  user answers.
+- **The pin tooling is its own subpackage**, `dev_playbook.pins`, one
+  module per concern, beside the checks and not among them. The `gh`
+  wrapper and `ToolError` moved to `dev_playbook.github` and
+  `dev_playbook.errors` so the audit and the pins share them without a
+  cycle.
 
 ## Findings
 
@@ -117,14 +134,18 @@ What the survey established, kept because the design rests on it.
 
 ## Design
 
-The shape of the cascade command, `src/dev_playbook/cascade.py` with
-the shim `scripts/cascade`, as planned before it was written.
+The shape of the update-pins command, `src/dev_playbook/pins/update.py`
+with the shim `scripts/update-pins`, as planned before it was written
+and as refactored after. The package `dev_playbook/pins/` holds
+`release` (the hook repo as published), `config` (a consumer's pinned
+block), `gate`, `worktree`, `consumer` (one repo's state and landings),
+`ledger`, `agent`, `bump` (the `bump-pin` command), and `update`.
 
-- **Entry.** `cascade [--workspace DIR] [--repos a,b] [--dry-run]`. It
+- **Entry.** `update-pins [--workspace DIR] [--repos a,b] [--dry-run]`. It
   reads the release head from GitHub and the ledger from dev-playbook
   `main`; a repo with a row at that head, whatever the verdict, is done
   for this release. No repo to move → exit 0 with one line, nothing else
-  runs. So the timer runs `cascade` and nothing more; there is no
+  runs. So the timer runs `update-pins` and nothing more; there is no
   separate poller, a `failed` repo is not retried until the next release
   or a hand `bump-pin`, and a `--repos` subset leaves the rest to the
   next tick. Without a published ledger a live run refuses; a dry run
@@ -140,7 +161,7 @@ the shim `scripts/cascade`, as planned before it was written.
   notes, and the PR body.
 - **Probe.** `bump_pins.probe_worktree` at `origin/main`; rewrite the
   pin with `bump_pins.rewritten`; run the gate once. No baseline run:
-  the cascade's question is "green at the new pin", and every finding
+  update-pins's question is "green at the new pin", and every finding
   is the agent's to work whatever release caused it.
 - **Green.** Commit the one-file change in the worktree, push
   `HEAD:main`. The commit hook runs the gate at the new pin; the
@@ -149,26 +170,27 @@ the shim `scripts/cascade`, as planned before it was written.
 - **Red.** A persistent worktree at
   `<repo>/.claude/worktrees/bump-pin-<sha12>` on branch
   `bump-pin-<sha12>`, the pin committed `--no-verify`, then
-  `claude -p --model opus --permission-mode bypassPermissions` with a
-  prompt that names the state, orders the findings worked per
-  `/update-standards-pin` "Work the findings" and "Land the PR", a push, `gh pr create` with the sha move
-  and each adaptation in the body, no merge, and says no user is
-  present. The row is `red → PR <url>`, read back from
+  `claude -p --model opus --permission-mode bypassPermissions` whose
+  prompt is `/finish-pin-bump` followed by the state: repo, worktree,
+  branch, sha move, hook ids, the unmerged-branch list, the gate output,
+  and that no user is present. Everything about how to work the
+  findings and land the PR is in that skill. The row is `red → PR
+  <url>`, read back from
   `gh pr list --head`, never from the agent's text. No PR → `failed`,
   worktree kept and named; a worktree already at that path → `failed`
   too, it belongs to a run that did not finish. The agent is not
   launched while any credential variable from
   [Headless Operation](/docs/headless.md) § Billing is set: that is a
   `failed` row, not a scrub. Agent output goes to
-  `~/.local/state/dev-playbook/cascade/<run>/<repo>.log`, the gate's
+  `~/.local/state/dev-playbook/update-pins/<run>/<repo>.log`, the gate's
   findings beside it.
-- **Ledger.** `docs/pin-cascade.md`, `type: Log`, a table: time (UTC),
+- **Ledger.** `docs/pin-updates.md`, `type: Log`, a table: time (UTC),
   release head (12 chars), repo, verdict (`current` / `green` / `red` /
   `pending` / `failed`), landing (`main <sha12>` / `PR <url>` / reason),
   notes (unmerged branches). Appended and committed in a detached
   worktree of dev-playbook `origin/main`, pushed to `main`. Rows landed
   but not recorded are printed to stderr and the run exits 1.
-- **Release head.** Both `cascade` and `workspace-lint`'s pin check use
+- **Release head.** Both `update-pins` and `workspace-lint's pin check use
   it: walk back from `main`'s head over commits whose only changed
   file is the ledger. `gh api repos/{slug}/commits/{sha}` gives `files`
   and `parents`.
@@ -177,17 +199,13 @@ the shim `scripts/cascade`, as planned before it was written.
 
 - **Release head** — the newest commit on dev-playbook `main` that
   touches any file other than the ledger; the sha consumers pin.
-- **Ledger** — `docs/pin-cascade.md`, the append-only record of every
-  cascade run, one row per repo.
-- **Cascade** — one run of `scripts/cascade` over the governed repos at
+- **Ledger** — `docs/pin-updates.md`, the append-only record of every
+  update-pins run, one row per repo.
+- **Update-pins run** — one run of `scripts/update-pins` over the governed repos at
   one release head.
 
 ## Planned
 
-- **Step 5 — the timer.** In sysadmin-playbook: `systemd/pin-cascade.
-  service` and `.timer` (15 min, `Persistent=true`, the DNS wait
-  `agentsview-update.service` uses), a `docs/periodic-jobs/pin-cascade.
-  md` per that repo's conventions, a separate PR.
 - **Step 6 — first run.** After this PR merges — the ledger and the
   manifest's `language_version` must be on `main` for any consumer to
   move — over the seven on-machine repos with the user watching, `--dry-run`
@@ -218,26 +236,51 @@ the shim `scripts/cascade`, as planned before it was written.
   declare `pyyaml`. 130 tests in the two suites; the full suite's five
   errors are `run make web first`, a build artifact the fresh worktree
   lacks.
-- **Step 3 — the cascade command.** 2026-09-23. `src/dev_playbook/
-  cascade.py` and `scripts/cascade` as the Design section states;
-  `workspace_lint.release_head` walks `gh api repos/{slug}/commits/{sha}`
+- **Step 3 — the update-pins command.** 2026-09-23. Written as
+  `src/dev_playbook/cascade.py` and `scripts/cascade`, since renamed and
+  moved into `pins/` (below). `workspace_lint.release_head` walks `gh api repos/{slug}/commits/{sha}`
   back over ledger-only commits and is the target of `bump-pin`,
-  `workspace-lint`'s pin rule, and the cascade alike; the ledger
-  `docs/pin-cascade.md` (type Log) with its `docs/index.md` row; the
+  `workspace-lint`'s pin rule, and update-pins alike; the ledger
+  `docs/pin-updates.md` (type Log) with its `docs/index.md` row; the
   `scripts/README.md` row; `.pre-commit-hooks.yaml` gains
-  `language_version: python3.14`. 26 cascade tests over throwaway repos
+  `language_version: python3.14`. 26 update-pins tests over throwaway repos
   with a real bare origin and scripted gate, `claude`, and `gh`; 6
   release-head tests; 164 in the three suites. First dry run over
   story-forge found the interpreter fault above.
-- **Step 4 — the runbook for both callers.** 2026-09-23.
-  `dotfiles/dot-claude/skills/update-standards-pin/SKILL.md` rewritten:
-  a "Two callers" section (by hand §1–§6; cascade-launched starts at
-  "Work the findings" in the worktree the cascade cut), the clean-`main`
-  requirement moved to the green path only, the red path cuts
-  `bump-pin-<sha12>` at `.claude/worktrees/` to match the cascade, the
-  PR body enumerated, escalations go under an `Escalations` heading
-  when no user is present. The cascade prompt and its test name the
-  sections by title.
+- **Step 4 — the runbook.** 2026-09-23. First as one skill with a
+  "Two callers" section and mode switches; the user's review split it
+  (below). What stayed: the clean-`main` requirement applies to the
+  green path only, the red path cuts `bump-pin-<sha12>` at
+  `.claude/worktrees/` to match update-pins, the PR body is enumerated.
+- **Step 5 — the timer.** 2026-09-23. Written into the sysadmin-playbook
+  main checkout, uncommitted there because this worktree session may not
+  run git in another repo: `systemd/update-pins.service` (oneshot,
+  `PATH` with `%h/.local/bin`, a 2-minute `github.com` DNS wait,
+  `WorkingDirectory` the dev-playbook checkout, `ExecStart`
+  `scripts/update-pins`), `systemd/update-pins.timer` (`OnCalendar=*:0/15`,
+  `Persistent=true`), `docs/periodic-jobs/update-pins.md` per that
+  repo's README conventions, and its `index.md` row. Both units pass
+  `systemd-analyze --user verify` except for the `scripts/update-pins` path,
+  which exists only on this branch until it merges; that repo's gate
+  passes. Committed to that repo's `main` by the user as `pin-cascade`;
+  renamed to `update-pins` on disk in the refactor below, that rename
+  again the user's commit.
+- **Refactor — names, skills, package.** 2026-09-23, after the user's
+  review of steps 3 and 4. `cascade` → `update-pins` everywhere: module,
+  shim, ledger (`docs/pin-updates.md`), state dir, timer units, this
+  set's directory (the branch and worktree keep `pin-cascade`). The
+  skill split into `update-standards-pin` (§1 governed, §2 probe, §3
+  green, §4 cut the worktree, §5 run `/finish-pin-bump`) and
+  `finish-pin-bump` (§1 work the findings, §2 land the PR), escalations
+  always into the PR body. The headless prompt is now
+  `/finish-pin-bump` plus state. `bump_pins.py`, `cascade.py`, and the
+  pin half of `workspace_lint.py` became `dev_playbook/pins/` (nine
+  modules, the largest `update.py` at ~230 lines); the `gh` wrapper
+  became `dev_playbook/github.py` and `ToolError` `dev_playbook/errors.py`.
+  Tests moved to `tests/dev_playbook/pins/test_bump.py` and
+  `test_update.py`; the release-head tests stay in
+  `test_workspace_lint.py` because they use its fake `gh`. 165 tests in
+  the four affected suites; ruff and mypy clean.
 
 ## Unfiled
 
@@ -248,10 +291,10 @@ the shim `scripts/cascade`, as planned before it was written.
   the bump (a red baseline) — the design says yes, every finding is
   worked; `bump_pins.check` still refuses a red baseline for its own
   callers.
-- A `failed` row is never retried by the cascade; the user re-runs by
+- A `failed` row is never retried by update-pins; the user re-runs by
   hand or waits for the next release. A `--again REPO` flag that ignores
   the ledger for one repo may earn its place after the first runs.
-- The cascade does not run `pre-commit gc` after a green landing, so
+- update-pins does not run `pre-commit gc` after a green landing, so
   superseded dev-playbook clones accumulate in `~/.cache/pre-commit`
   until someone does.
 - The consumers' existing pre-commit environments were built under four

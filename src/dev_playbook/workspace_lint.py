@@ -31,8 +31,8 @@ in, so governance is declared rather than inferred. For each governed repo:
     ticket's shape. Species comes from the label set and ``sub_issues_summary``.
   - **pin** — read the consumer's ``.pre-commit-config.yaml`` on its default
     branch and require that its dev-playbook block pins the hook repo's
-    release head — the newest ``main`` commit that is not the pin cascade's
-    ledger bookkeeping, see ``release_head`` — and lists the hook ids the
+    release head — the newest ``main`` commit that is not the pin ledger's
+    bookkeeping, see ``pins.release.release_head`` — and lists the hook ids the
     manifest publishes there. The head and the manifest are read once per
     run, from GitHub, so a stale pin is a finding on the machine that never
     cloned the consumer at all. The hook repo itself is passed over: it
@@ -47,10 +47,10 @@ A roster name with no repo behind it on this machine is announced on stderr
 and passed over rather than refused: the workspace spans machines, and a repo
 may deliberately live on another one.
 
-The pin helpers ``hook_repo_url``, ``rev_line``, ``pinned_rev``,
-``release_head``, and ``published_hook_ids`` are shared with ``bump_pins`` and
-``cascade``, which rewrite a consumer's pin through them, so the reader and the
-writers cannot disagree.
+The pin is read through ``dev_playbook.pins`` — ``release`` for the hook
+repo's release head and manifest, ``config`` for a consumer's pinned block —
+the same modules ``bump-pin`` and ``update-pins`` write through, so the
+reader and the writers cannot disagree.
 
 Output:
     stdout — one finding per line, ``repo: name.rule message`` (the repo name
@@ -60,20 +60,25 @@ Output:
 """
 
 import argparse
-import base64
-import json
 import re
-import subprocess
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-import yaml
-
-from dev_playbook import gitrepo, md
+from dev_playbook import md
+from dev_playbook.errors import ToolError
 from dev_playbook.findings import print_rules, render
+from dev_playbook.github import check_auth, gh_api, gh_graphql, origin_slug
 from dev_playbook.label_scheme import canonical_labels, values_by_dimension
+from dev_playbook.pins.config import pinned_hook_ids, pinned_rev
+from dev_playbook.pins.release import (
+    hook_repo_url,
+    is_hook_repo,
+    published_file,
+    published_hook_ids,
+    release_head,
+)
 
 # Every rule id this command can emit. Repo-settings drift, reachability, and
 # the live-repo tracking checks (label scheme, leaf labels and headings, epic
@@ -102,16 +107,6 @@ WAYFINDER_BODY = "tracking.map-sections-ticket-question"
 # publishes there. Read over `gh api` like the rest, because the audited fact
 # is the repo's default branch as GitHub has it, not a checkout on this machine.
 PINNED_HEAD = "distribution.a-consumer-pins-the-published-head"
-
-# The pin cascade's ledger, the one file on the hook repo's ``main`` whose
-# commits are not releases: the cascade appends a row there after every run,
-# and if that commit moved the head consumers pin, every run would trigger the
-# next. ``release_head`` walks back over commits touching this file alone.
-LEDGER = "docs/pin-cascade.md"
-# How many ledger-only commits the walk will step over before refusing. The
-# cascade commits once per run and a run happens once per release, so two in a
-# row is already unusual; fifty means the head is not what this reader thinks.
-RELEASE_WALK_LIMIT = 50
 
 RULES = (
     PINNED_HEAD,
@@ -175,11 +170,6 @@ TICKET_SECTIONS = ("Question",)
 
 # The four dimensions of the state-machine tuple (status is not part of it).
 TUPLE_DIMENSIONS = ("category", "mode", "tests", "phase")
-
-HOOK_REPO_ROOT = Path(__file__).resolve().parents[2]
-CANONICAL_CONFIG = (
-    HOOK_REPO_ROOT / "standards" / "build" / "canonical" / ".pre-commit-config.yaml"
-)
 
 # The governed repos — the workspace population the standards apply to, named
 # here because governance is an act rather than a property of sitting under the
@@ -282,14 +272,6 @@ PROTECTION_QUERY = """query($owner: String!, $name: String!) {
   }
 }"""
 
-REMOTE_SLUG_PATTERN = re.compile(
-    r"^(?:git@github\.com:|https://github\.com/)([^/\s]+/[^/\s]+?)(?:\.git)?$"
-)
-
-
-class ToolError(Exception):
-    """The audit could not run at all."""
-
 
 @dataclass(frozen=True)
 class Line:
@@ -326,130 +308,6 @@ class Rule:
 
     type: str
     ruleset: Ruleset | None
-
-
-def hook_repo_url() -> str:
-    """The published hook-repo URL, read from the canonical config's pinned block."""
-    text = CANONICAL_CONFIG.read_text(encoding="utf-8")
-    match = re.search(r"-\s*repo:\s*(\S+)\n\s*rev:\s*<pinned-sha>", text)
-    if not match:
-        raise ToolError(f"no pinned block in {CANONICAL_CONFIG}")
-    return match.group(1)
-
-
-def is_hook_repo(repo: Path) -> bool:
-    """Whether ``repo`` is a checkout of the hook repo — its main checkout or any worktree.
-
-    Identity is the shared ``.git`` directory, not the path: this module may be
-    running from a worktree of dev-playbook while the workspace lists the main
-    checkout, and both are the one repo that dogfoods and pins nothing.
-    """
-    try:
-        return gitrepo.common_dir(repo) == gitrepo.common_dir(HOOK_REPO_ROOT)
-    except gitrepo.NotAGitRepository:
-        return False
-
-
-def hook_repo_slug() -> str:
-    """``owner/name`` of the hook repo's GitHub origin."""
-    slug = origin_slug(HOOK_REPO_ROOT)
-    if slug is None:
-        raise ToolError(f"no GitHub origin in {HOOK_REPO_ROOT}")
-    return slug
-
-
-def published_head() -> str:
-    """The hook repo's ``main`` head sha, as GitHub has it.
-
-    Read from the remote rather than from the publisher's disk. pre-commit
-    installs a pin by fetching that object, so a sha the remote has never seen is
-    not stale, it is uninstallable; and a consumer's release should not depend on
-    what happens to be checked out elsewhere on the machine.
-    """
-    slug = hook_repo_slug()
-    match gh_api(f"repos/{slug}/branches/main"):
-        case {"commit": {"sha": str(sha)}}:
-            return sha
-    raise ToolError(f"cannot read main's head sha from {slug}")
-
-
-def release_head() -> str:
-    """The newest commit on the hook repo's ``main`` that touches anything but the ledger.
-
-    This is the sha a consumer pins. ``published_head`` is the raw head, and the
-    two differ only right after the cascade has recorded a run: that commit
-    changes ``LEDGER`` and nothing else, and it is bookkeeping about a release,
-    not one. Pinning it would be harmless to the consumer and would trigger
-    another cascade, whose ledger commit would trigger the next, so the walk
-    steps back over every such commit to the release underneath. A ledger-only
-    commit with no single parent — a root, a merge — is not something this
-    reader can walk past, and it refuses rather than guess.
-    """
-    slug = hook_repo_slug()
-    sha = published_head()
-    for _ in range(RELEASE_WALK_LIMIT):
-        match gh_api(f"repos/{slug}/commits/{sha}"):
-            case {"files": list(files), "parents": list(parents)}:
-                pass
-            case _:
-                raise ToolError(f"cannot read commit {sha[:12]} from {slug}")
-        touched = {str(entry["filename"]) for entry in files if isinstance(entry, dict)}
-        if touched != {LEDGER}:
-            return sha
-        match parents:
-            case [{"sha": str(parent)}]:
-                sha = parent
-            case _:
-                raise ToolError(
-                    f"{sha[:12]} touches only {LEDGER} and has "
-                    f"{len(parents)} parents; the release head cannot be walked to"
-                )
-    raise ToolError(
-        f"{RELEASE_WALK_LIMIT} consecutive commits on {slug} main touch only "
-        f"{LEDGER}; the release head cannot be walked to"
-    )
-
-
-def published_file(slug: str, path: str, ref: str | None = None) -> str | None:
-    """The text of ``path`` in ``slug`` at ``ref`` (default branch when None), or None."""
-    query = f"?ref={ref}" if ref else ""
-    match gh_api(f"repos/{slug}/contents/{path}{query}"):
-        case {"encoding": "base64", "content": str(content)}:
-            return base64.b64decode(content).decode("utf-8")
-    return None
-
-
-def published_hook_ids(sha: str) -> tuple[str, ...]:
-    """The hook ids ``.pre-commit-hooks.yaml`` publishes at ``sha``, as GitHub has it.
-
-    Read at the target sha rather than from the publisher's disk, for the reason
-    ``published_head`` is: the consumer runs the manifest pre-commit clones at
-    that sha, and a local checkout may sit anywhere.
-    """
-    slug = hook_repo_slug()
-    text = published_file(slug, ".pre-commit-hooks.yaml", sha)
-    if text is None:
-        raise ToolError(f"cannot read .pre-commit-hooks.yaml at {sha[:12]} from {slug}")
-    return manifest_ids(text)
-
-
-def manifest_ids(text: str) -> tuple[str, ...]:
-    """The hook ids a ``.pre-commit-hooks.yaml`` body publishes, in file order."""
-    manifest = yaml.safe_load(text)
-    if not isinstance(manifest, list) or not manifest:
-        raise ToolError("the published manifest is not a list of hooks")
-    return tuple(str(hook["id"]) for hook in manifest)
-
-
-def pinned_hook_ids(config_text: str, url: str) -> tuple[str, ...] | None:
-    """The hook ids listed under ``url``'s block of a config body, or None without one."""
-    config = yaml.safe_load(config_text)
-    if not isinstance(config, dict):
-        return None
-    for block in config.get("repos") or ():
-        if isinstance(block, dict) and block.get("repo") == url:
-            return tuple(str(hook["id"]) for hook in block.get("hooks") or ())
-    return None
 
 
 def check_pin(
@@ -508,116 +366,6 @@ def workspace_repos(
     present = [repo for repo in repos if (repo / ".git").exists()]
     absent = [repo.name for repo in repos if not (repo / ".git").exists()]
     return present, absent
-
-
-def origin_slug(repo: Path) -> str | None:
-    """``owner/name`` from the repo's GitHub origin, or None if there is none."""
-    result = subprocess.run(
-        ["git", "-C", str(repo), "remote", "get-url", "origin"],
-        capture_output=True,
-        text=True,
-        env=gitrepo.no_git_env(),
-    )
-    if result.returncode != 0:
-        return None
-    match = REMOTE_SLUG_PATTERN.match(result.stdout.strip())
-    return match.group(1) if match else None
-
-
-def rev_line(lines: list[str], url: str) -> int | None:
-    """Index of the ``rev:`` line pinning ``url``, or None when there is none.
-
-    The one place a pinned block's rev line is located. The audit reads through
-    it and bump_pins rewrites through it, so the reader and the writer cannot
-    disagree about which line carries the pin.
-    """
-    for i, line in enumerate(lines):
-        if re.match(rf"^\s*-\s*repo:\s*{re.escape(url)}\s*$", line):
-            for follower in range(i + 1, min(i + 3, len(lines))):
-                if re.match(r"^\s*rev:\s*\S+", lines[follower]):
-                    return follower
-    return None
-
-
-def pinned_rev(config_text: str, url: str) -> str | None:
-    """The ``rev`` pinned for ``url`` in a ``.pre-commit-config.yaml`` body, or None."""
-    lines = config_text.splitlines()
-    index = rev_line(lines, url)
-    return lines[index].split(":", 1)[1].strip() if index is not None else None
-
-
-def gh_api(path: str, *, paginate: bool = False) -> object | None:
-    """Parsed JSON from ``gh api <path>``, or None when the call fails.
-
-    A non-zero exit or a body that is not JSON (an empty 204, a degraded/HTML
-    error page) yields None for that one path, so a single bad response degrades
-    to an unreachable finding rather than a traceback that blinds the audit to
-    every remaining repo. With ``paginate=True``, ``gh api --paginate`` follows
-    the Link headers and merges every page's JSON array into one array, so a list
-    endpoint with more than a page of results is read in full.
-    """
-    argv = ["gh", "api"]
-    if paginate:
-        argv.append("--paginate")
-    argv.append(path)
-    return _gh_json(argv)
-
-
-def _gh_json(argv: list[str]) -> object | None:
-    """Parsed JSON from one ``gh`` invocation, or None when the call is unusable."""
-    try:
-        result = subprocess.run(argv, capture_output=True, text=True)
-    except FileNotFoundError as err:
-        raise ToolError("gh not found on PATH") from err
-    if result.returncode != 0:
-        return None
-    try:
-        parsed: object = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        return None
-    return parsed
-
-
-def check_auth() -> None:
-    """Stop the run when `gh` holds no usable credential.
-
-    Authentication is a precondition of the whole audit, not a per-repo
-    condition, because an unauthenticated `gh` does not fail — it degrades to
-    anonymous requests, and anonymity is answered three different ways. A public
-    repo serves its REST resources, so labels and issues return real findings. A
-    private repo answers 404, indistinguishable from one that was deleted.
-    GraphQL has no anonymous mode at all, so the settings check fails on every
-    repo whatever its visibility. The audit would then print a mix of genuine
-    findings and per-repo unreachable lines under one exit 1, with nothing in the
-    output telling a reader which was which. Refusing to start is the only honest
-    answer.
-    """
-    try:
-        result = subprocess.run(
-            ["gh", "auth", "status"], capture_output=True, text=True
-        )
-    except FileNotFoundError as err:
-        raise ToolError("gh not found on PATH") from err
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout).strip()
-        raise ToolError(
-            "gh holds no usable credential, so every GitHub read would "
-            "silently degrade to an anonymous request. Run `gh auth login`, or "
-            f"re-run where the credential store is readable.\n{detail}"
-        )
-
-
-def gh_graphql(query: str, **variables: str) -> object | None:
-    """Parsed JSON from ``gh api graphql``, or None when the call fails.
-
-    The same degradation contract as ``gh_api``: a non-zero exit (which is how
-    `gh` reports GraphQL errors) or an unparseable body yields None for that one
-    call, so a single bad response degrades to an unreachable finding.
-    """
-    argv = ["gh", "api", "graphql", "-f", f"query={query}"]
-    for key, value in variables.items():
-        argv += ["-f", f"{key}={value}"]
-    return _gh_json(argv)
 
 
 def fetch_settings(slug: str) -> dict | None:

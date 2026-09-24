@@ -14,7 +14,8 @@ from pathlib import Path
 import pytest
 from conftest import init_repo
 
-from dev_playbook import gitrepo, workspace_lint
+from dev_playbook import github, gitrepo, workspace_lint
+from dev_playbook.pins import config, release
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "workspace-lint"
 HOOK_REPO = Path(__file__).resolve().parents[2]
@@ -280,7 +281,7 @@ def make_fake_gh(tmp_path: Path, data: dict[str, object]) -> tuple[Path, Path]:
     gh = gh_dir / "gh"
     # The default consumer config pins the real hook URL, so the pin rule reads
     # it as the block it audits.
-    gh.write_text(FAKE_GH.replace("HOOK_URL", workspace_lint.hook_repo_url()))
+    gh.write_text(FAKE_GH.replace("HOOK_URL", release.hook_repo_url()))
     os.chmod(gh, 0o755)
     gh_data = tmp_path / "gh.json"
     gh_data.write_text(json.dumps(data))
@@ -906,7 +907,7 @@ def pin_repo(
         alpha["contents/.pre-commit-config.yaml"] = config
     data: dict[str, object] = {"me/alpha": alpha}
     if hook_repo is not None:
-        data[workspace_lint.hook_repo_slug()] = hook_repo
+        data[release.hook_repo_slug()] = hook_repo
     gh_dir, gh_data = make_fake_gh(tmp_path, data)
     return ws, gh_dir, gh_data
 
@@ -914,7 +915,7 @@ def pin_repo(
 def pin_config(rev: str, *ids: str) -> str:
     """A consumer config pinning the hook repo at ``rev`` with ``ids`` under it."""
     hooks = "".join(f"      - id: {i}\n" for i in ids)
-    url = workspace_lint.hook_repo_url()
+    url = release.hook_repo_url()
     return f"repos:\n  - repo: {url}\n    rev: {rev}\n    hooks:\n{hooks}"
 
 
@@ -959,7 +960,7 @@ def test_a_consumer_with_no_pin_is_a_finding(tmp_path: Path) -> None:
     )
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
-    assert f"alpha: {PIN_RULE} no {workspace_lint.hook_repo_url()} pin" in result.stdout
+    assert f"alpha: {PIN_RULE} no {release.hook_repo_url()} pin" in result.stdout
 
 
 def test_a_consumer_with_no_config_on_main_is_a_finding(tmp_path: Path) -> None:
@@ -1021,8 +1022,8 @@ def test_a_worktree_of_the_hook_repo_is_the_hook_repo(tmp_path: Path) -> None:
         env=gitrepo.no_git_env(),
     )
     try:
-        assert workspace_lint.is_hook_repo(worktree)
-        assert workspace_lint.is_hook_repo(HOOK_REPO)
+        assert release.is_hook_repo(worktree)
+        assert release.is_hook_repo(HOOK_REPO)
     finally:
         subprocess.run(
             [
@@ -1043,16 +1044,16 @@ def test_a_worktree_of_the_hook_repo_is_the_hook_repo(tmp_path: Path) -> None:
 def test_another_repo_is_not_the_hook_repo(tmp_path: Path) -> None:
     other = tmp_path / "other"
     init_repo(other)
-    assert not workspace_lint.is_hook_repo(other)
-    assert not workspace_lint.is_hook_repo(tmp_path / "nowhere")
+    assert not release.is_hook_repo(other)
+    assert not release.is_hook_repo(tmp_path / "nowhere")
 
 
 def test_pinned_hook_ids_reads_the_block_for_the_url() -> None:
-    url = workspace_lint.hook_repo_url()
-    assert workspace_lint.pinned_hook_ids(pin_config("X", "a", "b"), url) == ("a", "b")
-    assert workspace_lint.pinned_hook_ids(pin_config("X"), url) == ()
-    assert workspace_lint.pinned_hook_ids("repos: []\n", url) is None
-    assert workspace_lint.pinned_hook_ids("- not a mapping\n", url) is None
+    url = release.hook_repo_url()
+    assert config.pinned_hook_ids(pin_config("X", "a", "b"), url) == ("a", "b")
+    assert config.pinned_hook_ids(pin_config("X"), url) == ()
+    assert config.pinned_hook_ids("repos: []\n", url) is None
+    assert config.pinned_hook_ids("- not a mapping\n", url) is None
 
 
 # --- label scheme (full mode; settings clean so only label findings surface) ---
@@ -1723,21 +1724,19 @@ def test_ambient_git_dir_does_not_redirect_origin_slug(
     decoy = ambient_git_dir("leaked.txt")
     _add_origin(decoy, "git@github.com:decoy/decoy.git")
 
-    assert workspace_lint.origin_slug(target) == "target/target"
+    assert github.origin_slug(target) == "target/target"
 
 
 # --- the release head ---
 
-LEDGER_ONLY = [{"filename": workspace_lint.LEDGER}]
+LEDGER_ONLY = [{"filename": release.LEDGER}]
 
 
 def use_fake_gh(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, hook_repo: dict[str, object]
 ) -> None:
     """Put the fake gh on PATH, serving ``hook_repo`` as the hook repo's data."""
-    gh_dir, gh_data = make_fake_gh(
-        tmp_path, {workspace_lint.hook_repo_slug(): hook_repo}
-    )
+    gh_dir, gh_data = make_fake_gh(tmp_path, {release.hook_repo_slug(): hook_repo})
     monkeypatch.setenv("PATH", f"{gh_dir}:{os.environ['PATH']}")
     monkeypatch.setenv("FAKE_GH_DATA", str(gh_data))
 
@@ -1746,13 +1745,13 @@ def test_release_head_is_the_published_head_when_it_is_a_release(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     use_fake_gh(monkeypatch, tmp_path, {"branches": {"commit": {"sha": "REL"}}})
-    assert workspace_lint.release_head() == "REL"
+    assert release.release_head() == "REL"
 
 
 def test_release_head_steps_back_over_ledger_only_commits(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # Two cascade runs recorded in a row on top of the release: both are
+    # Two update-pins runs recorded in a row on top of the release: both are
     # bookkeeping, and the sha consumers pin is the one underneath.
     use_fake_gh(
         monkeypatch,
@@ -1763,7 +1762,7 @@ def test_release_head_steps_back_over_ledger_only_commits(
             "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
         },
     )
-    assert workspace_lint.release_head() == "REL"
+    assert release.release_head() == "REL"
 
 
 def test_release_head_counts_a_commit_touching_the_ledger_and_more_as_a_release(
@@ -1780,7 +1779,7 @@ def test_release_head_counts_a_commit_touching_the_ledger_and_more_as_a_release(
             },
         },
     )
-    assert workspace_lint.release_head() == "MIXED"
+    assert release.release_head() == "MIXED"
 
 
 def test_release_head_refuses_a_ledger_only_merge(
@@ -1798,7 +1797,7 @@ def test_release_head_refuses_a_ledger_only_merge(
         },
     )
     with pytest.raises(workspace_lint.ToolError, match="2 parents"):
-        workspace_lint.release_head()
+        release.release_head()
 
 
 def test_release_head_refuses_an_unreadable_commit(
@@ -1813,7 +1812,7 @@ def test_release_head_refuses_an_unreadable_commit(
         },
     )
     with pytest.raises(workspace_lint.ToolError, match="cannot read commit REL"):
-        workspace_lint.release_head()
+        release.release_head()
 
 
 def test_the_pin_rule_judges_against_the_release_head_not_the_ledger_commit(
