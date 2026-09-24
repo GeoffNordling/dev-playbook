@@ -61,12 +61,7 @@ since the parent uses it too.
 
 In order:
 
-1. **Write a sandboxed commit skill.** It commits with plain git and never
-   pushes, since a sealed agent has no GitHub. The stint's prompts do this
-   in their own words today; the general iteration prompt commits through
-   `commit-sonnet`, which pushes
-   ([One unattended stint by hand](/workstreams/delegation/sandcastle/experiment-log.md#one-unattended-stint-by-hand)).
-2. **Plan the landing on main.** Which PRs, in what order, carrying what:
+1. **Plan the landing on main.** Which PRs, in what order, carrying what:
    the code in `rig/` into `scripts/` with the pipeline's document beside
    it, the code freed from the scratch lab folder where `setup.sh` builds
    the fake real repository, the config copy, and the image, and the two
@@ -74,8 +69,9 @@ In order:
    config copy
    ([Part 4](/workstreams/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
    `measure-event` sending rows to the host from a sandbox, and the Stop
-   and SessionEnd hooks set to wait.
-3. **Land on main.** Open the PRs the plan names, in its order.
+   and SessionEnd hooks set to wait. The `commit-sandbox` skill rides
+   the same way until then.
+2. **Land on main.** Open the PRs the plan names, in its order.
 
 ## Completed
 
@@ -160,6 +156,14 @@ In order:
   runs the stint, lands its branch, deletes both copies, and keeps the
   record. Stint 5 ran through it live to done
   ([The start command](/workstreams/delegation/sandcastle/experiment-log.md#the-start-command)).
+- **Write a sandboxed commit skill.** Done 2026-09-24: `commit-sandbox`
+  commits everything to the branch checked out and never pushes. It
+  shares one procedure, `commit-inherit/references/commit.md`, with
+  `commit-inherit` and `commit-sonnet`; those two also read
+  `references/host.md`, which holds the target, the staging rule, and
+  the push. The stint's prompts run it, and
+  `rig/patches/commit-sandbox.patch` puts it in the config copy until it
+  is on `main`.
 
 - **Re-word the members.** Done 2026-09-24: `pipeline.md`,
   `survey.md`, `experiment-log.md`, and `rig/index.md` in the

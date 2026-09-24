@@ -282,7 +282,7 @@ class Stint:
 
 
 def make_config(playbook: Path, config: Path) -> None:
-    """Clone dev-playbook's main into the config copy and commit the pipeline's two patches."""
+    """Clone dev-playbook's main into the config copy and commit the pipeline's patches."""
     subprocess.run(
         [
             "git",
@@ -302,6 +302,7 @@ def make_config(playbook: Path, config: Path) -> None:
             "-C",
             str(config),
             "apply",
+            "--index",
             *sorted(str(p) for p in (RIG / "patches").glob("*.patch")),
         ],
         check=True,
@@ -317,8 +318,8 @@ def make_config(playbook: Path, config: Path) -> None:
             "user.email=stint@example.invalid",
             "commit",
             "-q",
-            "-am",
-            "stint: the pipeline's two dev-playbook changes",
+            "-m",
+            "stint: the pipeline's dev-playbook changes",
         ],
         check=True,
     )

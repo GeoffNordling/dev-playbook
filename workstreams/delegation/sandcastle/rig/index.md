@@ -24,3 +24,4 @@ committed.
 - `image/Containerfile` — the container image: Fedora, the `claude` binary, and the dotfile links
 - `patches/measure-event-sink.patch` — from the `sandbox-probe` branch: `measure-event` sends each row to the receiver when a sink file, naming the receiver's address and port, is present
 - `patches/end-hooks-wait.patch` — the Stop and SessionEnd `measure-event` hooks wait instead of running in the background
+- `patches/commit-sandbox.patch` — the `commit-sandbox` skill and the commit procedure it reads, which the stint's prompts run
