@@ -10,6 +10,12 @@ it.
 The ledger is also the trigger. A repo with a row at the release head,
 whatever its verdict, is done for that release; ``recorded`` is how a run
 learns what is left.
+
+**The table holds the last three release heads.** Each ``record`` drops the
+rows of older heads in the same commit that appends the new ones, so the page
+stays short and reads as recent history. Nothing is lost: every dropped row is
+in ``git log -p docs/pin-updates.md``. The trigger reads only the current
+head's rows, which are always kept.
 """
 
 from dataclasses import dataclass
@@ -26,6 +32,8 @@ from dev_playbook.pins.worktree import fetch_origin, git_out, probe_worktree
 
 HEADER = "| Time (UTC) | Release head | Repo | Verdict | Landing | Notes |"
 RULE = "|---|---|---|---|---|---|"
+# How many release heads the table keeps; older heads' rows live in git history.
+KEEP_HEADS = 3
 
 
 @dataclass(frozen=True)
@@ -54,16 +62,37 @@ class Row:
 
 def rows(text: str) -> list[tuple[str, ...]]:
     """The cells of every data row in the ledger's table, in file order."""
-    found = []
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("|"):
-            continue
-        cells = tuple(cell.strip() for cell in stripped.strip("|").split("|"))
-        if cells[:2] == ("Time (UTC)", "Release head") or set(cells[0]) <= {"-"}:
-            continue
-        found.append(cells)
-    return found
+    return [cells for line in text.splitlines() if (cells := _cells(line))]
+
+
+def _cells(line: str) -> tuple[str, ...] | None:
+    """The cells of ``line`` when it is a data row of the table, else None."""
+    stripped = line.strip()
+    if not stripped.startswith("|"):
+        return None
+    cells = tuple(cell.strip() for cell in stripped.strip("|").split("|"))
+    if cells[:2] == ("Time (UTC)", "Release head") or set(cells[0]) <= {"-"}:
+        return None
+    return cells
+
+
+def trim(text: str, keep: int = KEEP_HEADS) -> str:
+    """``text`` with only the rows of the newest ``keep`` release heads.
+
+    Heads are ordered by their first row in the file, which the append-only
+    table makes the order they were released. Every line that is not a data
+    row — the frontmatter, the prose, the header — is kept as it stands.
+    """
+    heads: list[str] = []
+    for cells in rows(text):
+        if cells[1] not in heads:
+            heads.append(cells[1])
+    kept = set(heads[-keep:])
+    return "".join(
+        line
+        for line in text.splitlines(keepends=True)
+        if (row := _cells(line)) is None or row[1] in kept
+    )
 
 
 def recorded(text: str, head: str) -> set[str]:
@@ -85,7 +114,7 @@ def published(*, required: bool) -> str:
 
 
 def record(new_rows: list[Row], hook_repo: Path | None = None) -> str:
-    """Append ``new_rows`` to the ledger on dev-playbook ``origin/main`` and push; the commit sha.
+    """Append ``new_rows`` to the ledger on dev-playbook ``origin/main``, trim, push; the commit sha.
 
     In a throwaway worktree, so the checkout this command runs from — the
     timer's main checkout, or a session's worktree — is never written.
@@ -99,9 +128,8 @@ def record(new_rows: list[Row], hook_repo: Path | None = None) -> str:
         text = ledger.read_text(encoding="utf-8")
         if not text.endswith("\n"):
             text += "\n"
-        ledger.write_text(
-            text + "".join(row.render() + "\n" for row in new_rows), encoding="utf-8"
-        )
+        text += "".join(row.render() + "\n" for row in new_rows)
+        ledger.write_text(trim(text), encoding="utf-8")
         git_out(tree, "add", LEDGER)
         heads = sorted({row.head[:12] for row in new_rows})
         git_out(

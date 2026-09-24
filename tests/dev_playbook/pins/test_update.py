@@ -270,6 +270,42 @@ def test_record_appends_the_rows_on_origin_main_and_touches_the_ledger_alone(
     )
 
 
+def test_trim_keeps_the_rows_of_the_newest_heads_and_every_other_line() -> None:
+    heads = ["a" * 12, "b" * 12, "c" * 12, "d" * 12]
+    table = "".join(
+        ledger.Row(NOW, head, repo, "current", "x", "").render() + "\n"
+        for head in heads
+        for repo in ("consumer", "other")
+    )
+    top = f"# Ledger\n\nProse.\n\n{ledger.HEADER}\n{ledger.RULE}\n"
+
+    trimmed = ledger.trim(top + table, keep=3)
+
+    kept = [cells[1] for cells in ledger.rows(trimmed)]
+    assert kept == [h for h in heads[1:] for _ in range(2)]
+    assert trimmed.startswith(top)
+    assert ledger.trim(trimmed, keep=3) == trimmed
+
+
+def test_record_drops_rows_older_than_the_last_three_heads(tmp_path: Path) -> None:
+    hook_repo = consumer(tmp_path, name="dev-playbook")
+    (hook_repo / "docs").mkdir()
+    newer = "".join(
+        ledger.Row(NOW, head, "consumer", "current", "x", "").render() + "\n"
+        for head in ("1" * 12, "2" * 12)
+    )
+    (hook_repo / release.LEDGER).write_text(LEDGER + newer, encoding="utf-8")
+    commit_all(hook_repo)
+    git_out(hook_repo, "push", "-q", "origin", "main")
+
+    ledger.record([ledger.Row(NOW, NEW, "consumer", "green", "main 1", "")], hook_repo)
+
+    text = origin_main(hook_repo, release.LEDGER)
+    heads = {cells[1] for cells in ledger.rows(text)}
+    assert heads == {"1" * 12, "2" * 12, NEW[:12]}
+    assert ledger.recorded(text, OLD) == set()
+
+
 def test_record_refuses_a_hook_repo_with_no_ledger(tmp_path: Path) -> None:
     hook_repo = consumer(tmp_path, name="dev-playbook")
     with pytest.raises(ToolError, match="no docs/pin-updates.md"):
