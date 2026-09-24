@@ -31,10 +31,12 @@ in, so governance is declared rather than inferred. For each governed repo:
     ticket's shape. Species comes from the label set and ``sub_issues_summary``.
   - **pin** — read the consumer's ``.pre-commit-config.yaml`` on its default
     branch and require that its dev-playbook block pins the hook repo's
-    published ``main`` head and lists the hook ids the manifest publishes
-    there. The head and the manifest are read once per run, from GitHub, so a
-    stale pin is a finding on the machine that never cloned the consumer at
-    all. The hook repo itself is passed over: it dogfoods from its tree.
+    release head — the newest ``main`` commit that is not the pin cascade's
+    ledger bookkeeping, see ``release_head`` — and lists the hook ids the
+    manifest publishes there. The head and the manifest are read once per
+    run, from GitHub, so a stale pin is a finding on the machine that never
+    cloned the consumer at all. The hook repo itself is passed over: it
+    dogfoods from its tree.
 
 Every check reads GitHub, so an authenticated `gh` is a precondition of the run
 rather than a per-repo condition: the audit checks it once up front and refuses
@@ -46,9 +48,9 @@ and passed over rather than refused: the workspace spans machines, and a repo
 may deliberately live on another one.
 
 The pin helpers ``hook_repo_url``, ``rev_line``, ``pinned_rev``,
-``published_head``, and ``published_hook_ids`` are shared with ``bump_pins``,
-which rewrites a consumer's pin through them, so the reader and the writer
-cannot disagree.
+``release_head``, and ``published_hook_ids`` are shared with ``bump_pins`` and
+``cascade``, which rewrite a consumer's pin through them, so the reader and the
+writers cannot disagree.
 
 Output:
     stdout — one finding per line, ``repo: name.rule message`` (the repo name
@@ -100,6 +102,16 @@ WAYFINDER_BODY = "tracking.map-sections-ticket-question"
 # publishes there. Read over `gh api` like the rest, because the audited fact
 # is the repo's default branch as GitHub has it, not a checkout on this machine.
 PINNED_HEAD = "distribution.a-consumer-pins-the-published-head"
+
+# The pin cascade's ledger, the one file on the hook repo's ``main`` whose
+# commits are not releases: the cascade appends a row there after every run,
+# and if that commit moved the head consumers pin, every run would trigger the
+# next. ``release_head`` walks back over commits touching this file alone.
+LEDGER = "docs/pin-cascade.md"
+# How many ledger-only commits the walk will step over before refusing. The
+# cascade commits once per run and a run happens once per release, so two in a
+# row is already unusual; fifty means the head is not what this reader thinks.
+RELEASE_WALK_LIMIT = 50
 
 RULES = (
     PINNED_HEAD,
@@ -359,6 +371,43 @@ def published_head() -> str:
         case {"commit": {"sha": str(sha)}}:
             return sha
     raise ToolError(f"cannot read main's head sha from {slug}")
+
+
+def release_head() -> str:
+    """The newest commit on the hook repo's ``main`` that touches anything but the ledger.
+
+    This is the sha a consumer pins. ``published_head`` is the raw head, and the
+    two differ only right after the cascade has recorded a run: that commit
+    changes ``LEDGER`` and nothing else, and it is bookkeeping about a release,
+    not one. Pinning it would be harmless to the consumer and would trigger
+    another cascade, whose ledger commit would trigger the next, so the walk
+    steps back over every such commit to the release underneath. A ledger-only
+    commit with no single parent — a root, a merge — is not something this
+    reader can walk past, and it refuses rather than guess.
+    """
+    slug = hook_repo_slug()
+    sha = published_head()
+    for _ in range(RELEASE_WALK_LIMIT):
+        match gh_api(f"repos/{slug}/commits/{sha}"):
+            case {"files": list(files), "parents": list(parents)}:
+                pass
+            case _:
+                raise ToolError(f"cannot read commit {sha[:12]} from {slug}")
+        touched = {str(entry["filename"]) for entry in files if isinstance(entry, dict)}
+        if touched != {LEDGER}:
+            return sha
+        match parents:
+            case [{"sha": str(parent)}]:
+                sha = parent
+            case _:
+                raise ToolError(
+                    f"{sha[:12]} touches only {LEDGER} and has "
+                    f"{len(parents)} parents; the release head cannot be walked to"
+                )
+    raise ToolError(
+        f"{RELEASE_WALK_LIMIT} consecutive commits on {slug} main touch only "
+        f"{LEDGER}; the release head cannot be walked to"
+    )
 
 
 def published_file(slug: str, path: str, ref: str | None = None) -> str | None:
@@ -1342,7 +1391,7 @@ def main(argv: list[str] | None = None) -> int:
         repos, absent = workspace_repos(args.workspace.resolve(), args.repos)
         check_auth()
         url = hook_repo_url()
-        head = published_head()
+        head = release_head()
         ids = published_hook_ids(head)
         lines: list[Line] = []
         for repo in repos:

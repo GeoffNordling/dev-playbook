@@ -2,11 +2,13 @@
 """bump-pin — check whether one consumer repo's dev-playbook pin can move, or move it.
 
 Thin shim over ``dev_playbook.bump_pins``: it puts the checkout's ``src`` on the
-path and calls the library's ``main``. ``--check`` probes the bump — the gate at
-the current pin, the pin moved, the gate again, the config restored — and reports
-the verdict; ``--write`` makes the durable edit and runs no gate. The target is
-always dev-playbook's published ``main`` head. It commits nothing and pushes
-nothing. Run with ``--help`` for the full behavior.
+path and calls the library's ``main``. ``--check`` probes the bump in a throwaway
+worktree of the consumer's ``origin/main`` — the gate at the current pin, the pin
+and its hook ids moved, the gate again — and reports the verdict, leaving the
+caller's checkout untouched; ``--write`` makes the durable edit and runs no gate.
+The target is always dev-playbook's release head, its published ``main`` less the
+pin cascade's ledger commits. It commits nothing and pushes nothing. Run with
+``--help`` for the full behavior.
 
 Usage:
     bump-pin (--check | --write) [REPO]

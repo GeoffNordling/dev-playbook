@@ -11,6 +11,7 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+import pytest
 from conftest import init_repo
 
 from dev_playbook import gitrepo, workspace_lint
@@ -51,9 +52,10 @@ else:
     segs = args[0].split("?", 1)[0].split("/")
     slug = "/".join(segs[1:3])
     resource = segs[3] if len(segs) > 3 else "settings"
-    # A file read keeps its path, so a test can serve one file and not another.
-    if resource == "contents":
-        resource = "contents/" + "/".join(segs[4:])
+    # A file read keeps its path, so a test can serve one file and not another;
+    # a commit read keeps its sha, so a test can script the release-head walk.
+    if resource in ("contents", "commits"):
+        resource = resource + "/" + "/".join(segs[4:])
 
 # What a resource answers when a test says nothing about it. Protection defaults
 # to fully protected under the canonical ruleset, so that a test about merge
@@ -93,12 +95,17 @@ DEFAULTS = {
         }
     },
 }
+# Any commit a test says nothing about is a release: it touches a source file
+# and is a root, so the release-head walk stops at it.
+COMMIT = {"files": [{"filename": "src/x.py"}], "parents": []}
 WRAPPER_KEYS = ("settings", "protection", "labels", "issues", "branches")
+WRAPPER_PREFIXES = ("contents/", "commits/")
 
 data = json.load(open(os.environ["FAKE_GH_DATA"]))
-# The hook repo is read for its head and manifest in every run, and a test that
-# says nothing about it gets the defaults; any other unlisted slug is unreachable.
-hook_repo_read = resource == "branches" or resource.startswith("contents/")
+# The hook repo is read for its head, its commits, and its manifest in every
+# run, and a test that says nothing about it gets the defaults; any other
+# unlisted slug is unreachable.
+hook_repo_read = resource == "branches" or resource.startswith(WRAPPER_PREFIXES)
 if slug not in data and not hook_repo_read:
     sys.exit(1)
 entry = data.get(slug, {})
@@ -108,8 +115,10 @@ entry = data.get(slug, {})
 # entry answers the base repo path with its settings and every other resource
 # with that resource's default.
 wrapper = isinstance(entry, dict) and any(
-    k in WRAPPER_KEYS or k.startswith("contents/") for k in entry
+    k in WRAPPER_KEYS or k.startswith(WRAPPER_PREFIXES) for k in entry
 )
+if resource.startswith("commits/"):
+    DEFAULTS[resource] = COMMIT
 if wrapper or slug not in data:
     payload = entry.get(resource, DEFAULTS.get(resource, {}))
 else:
@@ -1715,3 +1724,110 @@ def test_ambient_git_dir_does_not_redirect_origin_slug(
     _add_origin(decoy, "git@github.com:decoy/decoy.git")
 
     assert workspace_lint.origin_slug(target) == "target/target"
+
+
+# --- the release head ---
+
+LEDGER_ONLY = [{"filename": workspace_lint.LEDGER}]
+
+
+def use_fake_gh(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, hook_repo: dict[str, object]
+) -> None:
+    """Put the fake gh on PATH, serving ``hook_repo`` as the hook repo's data."""
+    gh_dir, gh_data = make_fake_gh(
+        tmp_path, {workspace_lint.hook_repo_slug(): hook_repo}
+    )
+    monkeypatch.setenv("PATH", f"{gh_dir}:{os.environ['PATH']}")
+    monkeypatch.setenv("FAKE_GH_DATA", str(gh_data))
+
+
+def test_release_head_is_the_published_head_when_it_is_a_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(monkeypatch, tmp_path, {"branches": {"commit": {"sha": "REL"}}})
+    assert workspace_lint.release_head() == "REL"
+
+
+def test_release_head_steps_back_over_ledger_only_commits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Two cascade runs recorded in a row on top of the release: both are
+    # bookkeeping, and the sha consumers pin is the one underneath.
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "LEDGER2"}},
+            "commits/LEDGER2": {"files": LEDGER_ONLY, "parents": [{"sha": "LEDGER1"}]},
+            "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
+        },
+    )
+    assert workspace_lint.release_head() == "REL"
+
+
+def test_release_head_counts_a_commit_touching_the_ledger_and_more_as_a_release(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "MIXED"}},
+            "commits/MIXED": {
+                "files": [*LEDGER_ONLY, {"filename": "docs/index.md"}],
+                "parents": [{"sha": "REL"}],
+            },
+        },
+    )
+    assert workspace_lint.release_head() == "MIXED"
+
+
+def test_release_head_refuses_a_ledger_only_merge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "MERGE"}},
+            "commits/MERGE": {
+                "files": LEDGER_ONLY,
+                "parents": [{"sha": "A"}, {"sha": "B"}],
+            },
+        },
+    )
+    with pytest.raises(workspace_lint.ToolError, match="2 parents"):
+        workspace_lint.release_head()
+
+
+def test_release_head_refuses_an_unreadable_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_fake_gh(
+        monkeypatch,
+        tmp_path,
+        {
+            "branches": {"commit": {"sha": "REL"}},
+            "commits/REL": "__unreachable__",
+        },
+    )
+    with pytest.raises(workspace_lint.ToolError, match="cannot read commit REL"):
+        workspace_lint.release_head()
+
+
+def test_the_pin_rule_judges_against_the_release_head_not_the_ledger_commit(
+    tmp_path: Path,
+) -> None:
+    # The consumer pins the release; the ledger commit on top of it is not drift.
+    ws, gh_dir, gh_data = pin_repo(
+        tmp_path,
+        hook_repo={
+            "branches": {"commit": {"sha": "LEDGER1"}},
+            "commits/LEDGER1": {"files": LEDGER_ONLY, "parents": [{"sha": "REL"}]},
+        },
+        config=pin_config("REL", "playbook-check"),
+    )
+    result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert workspace_lint.PINNED_HEAD not in result.stdout

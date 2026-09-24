@@ -15,10 +15,18 @@
 # — the consumer config enumerates nothing, and enrollment rides the pin by
 # construction. Resolution is independent of where the consumer repo — or any
 # of its worktrees — sits on disk. See standards/distribution/channel.md.
+#
+# language_version names the interpreter pre-commit builds that venv with.
+# Without it pre-commit uses whichever Python runs pre-commit itself, and a
+# consumer's gate runs `uvx pre-commit`, whose tool environment is whatever
+# Python uv prefers — 3.13 on the publishing machine — so the install of a
+# package requiring 3.14 dies before any check runs. The version here is the
+# floor pyproject.toml's requires-python states; move the two together.
 
 - id: playbook-check
   name: playbook check
   entry: playbook check
   language: python
+  language_version: python3.14
   pass_filenames: false
   always_run: true

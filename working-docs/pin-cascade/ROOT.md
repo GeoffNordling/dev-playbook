@@ -101,6 +101,19 @@ What the survey established, kept because the design rests on it.
 - `claude -p` takes `--model`, `--effort`, `--permission-mode
   bypassPermissions`, `--output-format json`, `--session-id`,
   `--json-schema`.
+- **The published manifest could not install at all.** The first dry run
+  (step 3, over story-forge) died before any check: pre-commit builds a
+  `language: python` hook with the interpreter running pre-commit, the
+  consumers' gate is `uvx pre-commit`, and that tool environment runs on
+  uv's managed Python 3.13 while dev-playbook requires 3.14. The manifest
+  had no `language_version`. Fixed on this branch:
+  `language_version: python3.14` in `.pre-commit-hooks.yaml`, verified
+  with `pre-commit try-repo` against story-forge. The fix reaches
+  consumers only through a release head that carries it, so this PR must
+  merge before any consumer can be moved.
+- **story-forge is red at `a94aebd`**: 404 findings, most of them
+  `tracking.one-list-item-per-entry` in `CANDIDATES.md`. The first real
+  measure of what the red-path agent will be handed.
 
 ## Design
 
@@ -108,13 +121,19 @@ The shape of the cascade command, `src/dev_playbook/cascade.py` with
 the shim `scripts/cascade`, as planned before it was written.
 
 - **Entry.** `cascade [--workspace DIR] [--repos a,b] [--dry-run]`. It
-  reads the release head from GitHub and the last released head from
-  the ledger; equal → exit 0 with one line, nothing else runs. So the
-  timer runs `cascade` and nothing more; there is no separate poller.
+  reads the release head from GitHub and the ledger from dev-playbook
+  `main`; a repo with a row at that head, whatever the verdict, is done
+  for this release. No repo to move → exit 0 with one line, nothing else
+  runs. So the timer runs `cascade` and nothing more; there is no
+  separate poller, a `failed` repo is not retried until the next release
+  or a hand `bump-pin`, and a `--repos` subset leaves the rest to the
+  next tick. Without a published ledger a live run refuses; a dry run
+  treats it as empty.
 - **Per repo, in roster order, sequentially** (pre-commit's cache lock
   is global). Skip the hook repo by identity (`is_hook_repo`); announce
   off-machine repos. `git fetch origin --prune`. Read the pin on
-  `origin/main`; already current → row `current`.
+  `origin/main`; already current → row `current`. A PR already open on
+  `bump-pin-<sha12>` → row `pending`, nothing runs.
 - **Branch report.** Every `refs/remotes/origin/*` with commits not in
   `origin/main`: name, last-commit date, commits ahead. Under 14 days
   reads as live, older as stale. Goes to stdout, the ledger row's
@@ -136,12 +155,19 @@ the shim `scripts/cascade`, as planned before it was written.
   and each adaptation in the body, no merge, and says no user is
   present. The row is `red → PR <url>`, read back from
   `gh pr list --head`, never from the agent's text. No PR → `failed`,
-  worktree kept and named. Agent output goes to
-  `~/.local/state/dev-playbook/cascade/<run>/<repo>.log`.
-- **Ledger.** `docs/pin-cascade.md`, `type: Log`, a table: time,
-  release head, repo, verdict, landing (`main <sha>` / `PR <url>` /
-  reason), notes (unmerged branches). Appended and committed in a
-  detached worktree of dev-playbook `origin/main`, pushed to `main`.
+  worktree kept and named; a worktree already at that path → `failed`
+  too, it belongs to a run that did not finish. The agent is not
+  launched while any credential variable from
+  [Headless Operation](/docs/headless.md) § Billing is set: that is a
+  `failed` row, not a scrub. Agent output goes to
+  `~/.local/state/dev-playbook/cascade/<run>/<repo>.log`, the gate's
+  findings beside it.
+- **Ledger.** `docs/pin-cascade.md`, `type: Log`, a table: time (UTC),
+  release head (12 chars), repo, verdict (`current` / `green` / `red` /
+  `pending` / `failed`), landing (`main <sha12>` / `PR <url>` / reason),
+  notes (unmerged branches). Appended and committed in a detached
+  worktree of dev-playbook `origin/main`, pushed to `main`. Rows landed
+  but not recorded are printed to stderr and the run exits 1.
 - **Release head.** Both `cascade` and `workspace-lint`'s pin check use
   it: walk back from `main`'s head over commits whose only changed
   file is the ledger. `gh api repos/{slug}/commits/{sha}` gives `files`
@@ -158,11 +184,6 @@ the shim `scripts/cascade`, as planned before it was written.
 
 ## Planned
 
-- **Step 3 — the cascade command.** `src/dev_playbook/cascade.py`,
-  `scripts/cascade`, tests over throwaway repos with a scripted gate and
-  a scripted `claude`; the ledger file and its `docs/index.md` row;
-  `release_head` shared with `workspace-lint`; rows in
-  `scripts/README.md`.
 - **Step 4 — the headless per-repo runbook.** Rewrite
   `dotfiles/dot-claude/skills/update-standards-pin/SKILL.md`: §2 and
   §3 still say the checkout must be on a clean `main` and that the
@@ -173,8 +194,10 @@ the shim `scripts/cascade`, as planned before it was written.
   service` and `.timer` (15 min, `Persistent=true`, the DNS wait
   `agentsview-update.service` uses), a `docs/periodic-jobs/pin-cascade.
   md` per that repo's conventions, a separate PR.
-- **Step 6 — first run.** Over the seven on-machine repos with the user
-  watching; then `lunch` and `date-tree` by local clone.
+- **Step 6 — first run.** After this PR merges — the ledger and the
+  manifest's `language_version` must be on `main` for any consumer to
+  move — over the seven on-machine repos with the user watching, `--dry-run`
+  first; then `lunch` and `date-tree` by local clone.
 - **Follow-ups.** Sandbox the fan-out once `sandcastle` merges; the
   consumers' `ci.yml` carries `SKIP: ref-lint,web-typecheck` against a
   canonical `SKIP: workspace`, so the first bump reddens every repo on
@@ -201,6 +224,17 @@ the shim `scripts/cascade`, as planned before it was written.
   declare `pyyaml`. 130 tests in the two suites; the full suite's five
   errors are `run make web first`, a build artifact the fresh worktree
   lacks.
+- **Step 3 — the cascade command.** 2026-09-23. `src/dev_playbook/
+  cascade.py` and `scripts/cascade` as the Design section states;
+  `workspace_lint.release_head` walks `gh api repos/{slug}/commits/{sha}`
+  back over ledger-only commits and is the target of `bump-pin`,
+  `workspace-lint`'s pin rule, and the cascade alike; the ledger
+  `docs/pin-cascade.md` (type Log) with its `docs/index.md` row; the
+  `scripts/README.md` row; `.pre-commit-hooks.yaml` gains
+  `language_version: python3.14`. 26 cascade tests over throwaway repos
+  with a real bare origin and scripted gate, `claude`, and `gh`; 6
+  release-head tests; 164 in the three suites. First dry run over
+  story-forge found the interpreter fault above.
 
 ## Unfiled
 
@@ -211,6 +245,16 @@ the shim `scripts/cascade`, as planned before it was written.
   the bump (a red baseline) — the design says yes, every finding is
   worked; `bump_pins.check` still refuses a red baseline for its own
   callers.
+- A `failed` row is never retried by the cascade; the user re-runs by
+  hand or waits for the next release. A `--again REPO` flag that ignores
+  the ledger for one repo may earn its place after the first runs.
+- The cascade does not run `pre-commit gc` after a green landing, so
+  superseded dev-playbook clones accumulate in `~/.cache/pre-commit`
+  until someone does.
+- The consumers' existing pre-commit environments were built under four
+  different interpreters (`py_env-python3`, `3.12`, `3.13`, `3.14` in the
+  cache); with `language_version` pinned, every consumer rebuilds once
+  under 3.14 at its bump.
 
 ## Acronyms
 

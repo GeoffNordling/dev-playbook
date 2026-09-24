@@ -45,9 +45,10 @@ ids under it are whatever ``.pre-commit-hooks.yaml`` publishes *at that rev*,
 so a hook renamed upstream reaches the consumer in the same edit as the sha
 that renamed it, and pre-commit never meets an id the manifest no longer has.
 
-The target is always the hook repo's ``main`` as GitHub has it, and the
+The target is always the hook repo's release head — its ``main`` as GitHub has
+it, less any commit that only appends to the pin cascade's ledger — and the
 manifest is read there too. pre-commit installs a pin by fetching that object
-from the hook repo's URL, so the published head is the only sha a consumer can
+from the hook repo's URL, so a published sha is the only kind a consumer can
 pin at all; reading it from the remote is what makes the pin installable rather
 than merely recent.
 
@@ -68,7 +69,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from dev_playbook import gitrepo, workspace_lint
-from dev_playbook.workspace_lint import ToolError, published_head, published_hook_ids
+from dev_playbook.workspace_lint import ToolError, published_hook_ids, release_head
 
 # The consumer's commit gate, verbatim as the canonical Makefile's `check`
 # target spells it. This is the surface the pin controls: every dev-playbook
@@ -326,7 +327,7 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument(
         "--check",
         action="store_true",
-        help="probe the bump, restore the config, and report the verdict",
+        help="probe the bump in a throwaway worktree of origin/main and report the verdict",
     )
     mode.add_argument(
         "--write",
@@ -345,7 +346,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         repo = consumer_root(args.repo)
         url = workspace_lint.hook_repo_url()
-        sha = published_head()
+        sha = release_head()
         ids = published_hook_ids(sha)
         print(f"bump-pin: target {sha} ({', '.join(ids)})", file=sys.stderr)
         if args.check:
