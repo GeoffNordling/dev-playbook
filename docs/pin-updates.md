@@ -48,3 +48,4 @@ ledger's own bookkeeping never triggers the next run.
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
 | 2026-09-24 02:38 | c67174ed88eb | sounds | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/sounds/.claude/worktrees/bump-pin-c67174ed88eb, log at /home/geoff/.local/state/dev-playbook/update-pins/20260924T023859Z/sounds.log |  |
+| 2026-09-24 02:51 | 38d8585f4785 | sounds | red | PR https://github.com/GeoffNordling/sounds/pull/6 | no unmerged branches |
