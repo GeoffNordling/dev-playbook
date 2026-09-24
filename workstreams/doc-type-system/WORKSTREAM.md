@@ -46,7 +46,7 @@ receipt, and every relation type belongs to a declared doc-type
 
 A dependency is what one child workstream's plan needs from another's, never a
 runtime data flow. There are five: the doc-type system defines Loop,
-one of its four doc-types; each encoding the doc-type system writes
+one of its five doc-types; each encoding the doc-type system writes
 defines an extractor of the fact base; every view the viewer draws is
 a selection of the fact base; the story-forge simulation
 takes its language from the doc-type system and its method from the
@@ -64,11 +64,10 @@ fact base. Loop and the simulation are leaves.
   │  theory ········ ontology-solvers.md                           │
   │  user's words ·· personal-notes.md                             │
   │  drained ······· doc-types/{doc-type, runbook, standard}       │
-  │  plan: refactor steps 1–10 · banned words                      │
-  │        · first instance, a loop that proposes predicates       │
+  │  plan: none, goal met                                          │
   └────────────┬──────────────────────────────────┬────────────────┘
   Loop is one  │                                  │  each encoding
-  of its four  │                                  │  defines an
+  of its five  │                                  │  defines an
   doc-types    ▼                                  ▼  extractor
   ┌────────────────────────────┐   ┌──────────────────────────────┐
   │  LOOP & WORKSTREAM         │   │  FACT BASE · the compiled    │
@@ -78,11 +77,11 @@ fact base. Loop and the simulation are leaves.
   │     · specifying-a-loop.md │   │      ralph.md · ralph.json   │
   │                            │   │  planned view                │
   │  drained · doc-types/loop/ │   │     · deterministic-         │
-  │     · loop_lint · loops/   │   │       separation.md          │
-  │  plan: the objective part, │   │  plan: simulations by hand · │
-  │        if any · its use by │   │   extractors chain, standard,│
-  │        the two loops above │   │   loop · verifier table and  │
-  │        and right           │   │   gate config as declared    │
+  │     · doc-types/workstream/│   │       separation.md          │
+  │     · loops/               │   │  plan: simulations by hand · │
+  │  plan: none, goal met      │   │   extractors chain, standard,│
+  │                            │   │   loop · verifier table and  │
+  │                            │   │   gate config as declared    │
   └────────────────────────────┘   │   data · findings as a       │
                                    │   stamped artifact · the     │
                                    │   simulation as a loop       │
@@ -106,11 +105,11 @@ fact base. Loop and the simulation are leaves.
 
 ### Order
 
-The dependencies give the order. The doc-type system's refactor runs
-first, because Loop's predicates and the fact base's extractors bind
-to what it produces. Loop and the fact base then run beside each
-other. The viewer's next kinds wait on the fact base, since each is a
-selection from it.
+The dependencies give the order. The doc-type system and Loop and
+Workstream are done, so the fact base runs next. The viewer and the
+story-forge simulation wait on it: each of the viewer's next kinds is
+a selection from the fact base, and the simulation takes its method
+from it.
 
 ## Terms
 
@@ -240,17 +239,7 @@ rules decide it with an error rate.
 
 ## Open
 
-- **Whether every condition is a Rule.** A runbook edge's and a loop
-  step's condition are strings; a Standard rule's condition is a
-  reference to another rule. Option: every condition is a Rule with a
-  kind, so all three unify and the fact base gets one condition edge.
-  Cost: runbook prose conditions would need ids. Crosses the doc-type
-  system and the fact base.
-- **Whether one solver or two.** Mypy over the pseudocode, an engine
-  over the fact base and a domain layer, or one of them. The case is in
-  [Ontology Solvers](/workstreams/doc-type-system/doc-type-system/ontology-solvers.md).
-  The user is not convinced two are needed. Crosses the doc-type
-  system and the fact base.
+None.
 
 ## Acronyms
 

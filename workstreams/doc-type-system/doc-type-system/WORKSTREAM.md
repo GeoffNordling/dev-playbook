@@ -9,7 +9,7 @@ description: The head file of the doc-type system child workstream — the langu
 The child workstream that holds the language: what a doc-type is, its verbs, its
 rules as predicates, its encodings as grammar. Speculative, per
 [Synthesis Workstream](/workstreams/doc-type-system/WORKSTREAM.md).
-It defines Loop, one of its four doc-types
+It defines Loop, one of its five doc-types
 ([Loop](/workstreams/doc-type-system/loop-and-workstream/WORKSTREAM.md)), and each
 encoding it writes defines an extractor of the fact base
 ([Fact Base Workstream](/workstreams/doc-type-system/fact-base/WORKSTREAM.md)).
@@ -19,13 +19,12 @@ for use outside the workstream.
 
 ## Goal
 
-Four DocTypes, eleven verbs, in
+Five DocTypes, Runbook, Standard, Guide, Loop, and Workstream, and
+their verbs, in
 [Reference Model](/workstreams/doc-type-system/doc-type-system/reference-model.md),
 the picture of the target state; the Standard
 [Doc-Type](/standards/doc-type/doc-type.md) is the same state as
-predicates over any doc-type.
-The refactor that reaches them, then one loop that grows the
-specification.
+predicates over any doc-type. The refactor that reaches them.
 
 ## Principles
 
@@ -102,10 +101,6 @@ specification.
   file order in the reference model. One must give.
 - **The `External` target.** The reference model's `External`
   catch-all target sits against the fact base's total accounting.
-- **Whether the fenced pseudocode becomes real Python.**
-  [Ontology Solvers](/workstreams/doc-type-system/doc-type-system/ontology-solvers.md)
-  proposes the route: a module of dataclasses with no bodies, checked
-  by mypy, introspected into an ontology.
 
 ## Planned
 

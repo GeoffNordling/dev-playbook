@@ -268,7 +268,10 @@ guiding. Running an unattended stint is the
     such as the sandcastle `rig/` scripts, runs it. If the script
     changes, for example the checkpoint moves from every 5 iterations
     to every 10, the Loop document still says 5, and no check compares
-    the two.
+    the two. A check between them is needed. The graph is data, so
+    the driver can read the Loop document as its instructions, and
+    then the steps cannot drift at all; what the document cannot
+    carry, such as a count, still needs a check.
   - **Is `## Done when` a spec written for one run?** That is, the
     target of a stint, verified to zero findings like a Standard, or
     only the condition of the finish yield.

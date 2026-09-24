@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Ontology Solvers
-description: Ontology solvers against the doc-type system — the fact base as an ABox, the doc-types as a TBox, a Standard's rules as shapes, a type checker as the same solver over program text, the route from the fenced pseudocode to real Python, and the document and domain ontologies another repository splits into, none of it decided
+description: Ontology solvers against the doc-type system — the fact base as an ABox, the doc-types as a TBox, a Standard's rules as shapes, and the document and domain ontologies another repository splits into, none of it decided
 ---
 
 # Ontology Solvers
@@ -52,28 +52,6 @@ yield.
 - **Cost.** Sub-second at this scale. Rules plus fixpoint, not
   search; nothing like a MIP.
 
-## Pseudocode and type checkers
-
-A type checker is an ontology solver over program text. Mypy reads
-class declarations as a TBox and every expression as an assertion,
-and a type error is a consistency violation with a line number. The
-difference from an ontology engine is what the assertions range over:
-mypy checks the source, the engine checks the data.
-
-Route proposed for the pseudocode: the fenced block in
-[Reference Model](/workstreams/doc-type-system/doc-type-system/reference-model.md)
-becomes real Python that never runs. The bare names,
-`operations = {read, write, do}` and
-`kind: deterministic | stochastic`, become an `Enum` or `Literal`, and
-the block is a module of dataclasses with no bodies. Mypy checks the
-declarations against themselves. A script introspects the classes with
-`typing.get_type_hints` and emits the OWL classes, properties, and
-cardinality shapes. The `# rules:` lines become predicates, as Python
-functions over loaded instances or as shapes. A bedrock extractor
-pulls the fence out of the markdown the way doctest pulls examples out
-of a docstring. The words around the block are the stochastic
-remainder; the block sits at zero.
-
 ## The loop the solver enables
 
 Check: extract the fact base, run the solver, findings are
@@ -97,14 +75,12 @@ A Standard's population ranges over domain classes; a loop's checks
 read domain facts. dev-playbook has no domain layer because its domain
 is itself.
 
-The agent's proposal: Python and mypy author the document ontology,
-emitting OWL and SHACL by introspection the way Pydantic emits JSON
-Schema; domain ontologies are declared files in the emitted form from
-the start, since an agent writes them from a conversation and the
-generic toolchain must read them without importing code; one engine
-checks both over one fact base per checkout. The case for the engine
-at the domain layer: schema as data, existing vocabularies such as
-schema.org's `JobPosting` and `Organization`, and open-world fit for
+One engine checks both ontologies over one fact base per checkout. The
+document ontology is declared once in dev-playbook; a domain ontology is
+a declared file in the same form from the start, since an agent writes
+it from a conversation and the generic toolchain must read it without
+importing code. The case for the engine at the domain layer: schema as
+data, existing vocabularies such as schema.org's `JobPosting` and `Organization`, and open-world fit for
 partial domain knowledge.
 
 ## Acronyms

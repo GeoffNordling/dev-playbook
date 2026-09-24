@@ -275,15 +275,6 @@ Parked, in the order raised.
   schema. The likely answer is that the consumer adds locally and
   dev-playbook absorbs a primitive only when a second consumer raises
   the same one, but that is not decided.
-- **The ontology solver.** System Legibility reserves the word
-  ontology
-  ([Ambitions](/docs/system-legibility.md#ambitions)). The dedicated
-  session ran on 2026-09-14 and is recorded in
-  [Ontology Solvers](/workstreams/doc-type-system/doc-type-system/ontology-solvers.md):
-  the fact base is the ABox the solver runs over, the doc-types are its
-  TBox, and a Standard's rules are its shapes. What stays open is
-  whether one solver or two, in the top head file's
-  [Open](/workstreams/doc-type-system/WORKSTREAM.md#open).
 
 ## Acronyms
 
