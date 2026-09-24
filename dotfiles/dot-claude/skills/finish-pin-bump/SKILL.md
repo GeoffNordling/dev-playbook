@@ -26,9 +26,11 @@ both, because every decision a user would be asked for goes into the PR body
 instead, where the user reads it before merging either way.
 
 Confirm the state first: `git branch --show-current` is `bump-pin-<sha12>`, and
-`git log -1 --format=%s` is the pin commit. {If either is not so, {Report the
-branch and last commit} and stop}: this skill does not cut worktrees or move
-pins, and running it elsewhere works the wrong tree.
+`git log --oneline origin/main..HEAD` opens with the pin commit. {If either is
+not so, {Report the branch and the commits} and stop}: this skill does not cut
+worktrees or move pins, and running it elsewhere works the wrong tree. Commits
+above the pin commit are earlier work on this same bump — a run that stopped at
+a rejected push, say — and the skill resumes from wherever the gate stands.
 
 ## 1. Work the findings
 
