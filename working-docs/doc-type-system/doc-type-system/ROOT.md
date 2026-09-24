@@ -81,7 +81,7 @@ specification.
   the document to the code it describes, the deterministic rule the
   deleted prototype chaingen applied to a runbook and its chain. A
   loop has none yet
-  ([Unfiled](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#unfiled)).
+  ([Planned](/working-docs/doc-type-system/loop-and-workstream/ROOT.md#planned)).
 
 ## Terms
 

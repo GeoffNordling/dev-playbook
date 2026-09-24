@@ -78,16 +78,6 @@ Decided with the user on 2026-09-24.
   tentatively: the reviewer is a verification against a stochastic
   Standard, "a segment does what its plan said".
 
-## Unfiled
-
-- **A verification that runs deterministic rules collides with the
-  gates.** A stochastic rule is easy for an agent to run. A
-  deterministic one already runs in the repo's pre-commit hooks, so a
-  loop's verification running it too is a second path to the same
-  check. Noted 2026-09-24; not to be solved yet.
-- **A driver can drift from its Loop document.** No check binds them
-  yet. Noted 2026-09-24.
-
 ## Planned
 
 - **Enter Workstream and Loop in the reference model.** Both classes,
@@ -115,6 +105,14 @@ Decided with the user on 2026-09-24.
   - The Mermaid block as encoding, read by the fact base's `loop`
     extractor
     ([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
+- **Decide the deferred risks.** Two, not to be solved before the first
+  instances:
+  - A verification that runs deterministic rules collides with the
+    gates. A stochastic rule is easy for an agent to run; a
+    deterministic one already runs in the repo's pre-commit hooks, so a
+    loop's verification running it too is a second path to the same
+    check.
+  - A driver can drift from its Loop document, and no check binds them.
 - **Re-read Specifying a Loop.**
   [Specifying a Loop](/working-docs/doc-type-system/loop-and-workstream/specifying-a-loop.md)
   kept, rewritten, or dropped against the new model.

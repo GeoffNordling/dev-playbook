@@ -57,27 +57,6 @@ The Sandcastle pipeline is defined with
 [the delegation workflow's terms](/working-docs/delegation/ROOT.md#terms),
 since the parent uses it too.
 
-### Superseded terms
-
-The members of this set were written in the parallel-fronts words, which
-[the delegation workflow's terms](/working-docs/delegation/ROOT.md#terms)
-replace.
-
-- **Front** — one line of work on its own branch. Now an unattended stint.
-- **Lap** — a synchronized fan-out of fronts from one commit, merged back
-  together. Retired: stints run and end on their own schedules.
-- **Driver** — the deterministic program that schedules the fronts: which
-  run, from what base, with which prompt, and when they end. Now a driver
-  in the delegation terms, which runs one stint's loop.
-- **Integrator** — the role that merges the fronts' branches and judges
-  their conflicts.
-- **Shape** — how the work is arranged: laps of fronts that a driver
-  schedules and an integrator merges. The delegation workflow's
-  [Shape](/working-docs/delegation/ROOT.md#shape) replaces it.
-
-The integrator retires: the user brings a stint's work in
-([the parent's Settled](/working-docs/delegation/ROOT.md#settled)).
-
 ## Planned
 
 - **Connect a stint.** An unattended stint launches from a
@@ -109,8 +88,6 @@ The integrator retires: the user brings a stint's work in
   find where it hurts before any of it is automated. The guess: a stint
   needs a way to declare itself done, and its budget is a ceiling, not a
   target.
-- **Re-word the members.** `pipeline.md`, `survey.md`, and
-  `experiment-log.md` in the delegation workflow's terms.
 
 ## Completed
 
@@ -158,7 +135,7 @@ The integrator retires: the user brings a stint's work in
   committed in [`rig/`](/working-docs/delegation/sandcastle/rig/index.md).
 - **Run in parallel.** Two agents on one fake real repository ran at once
   and closed at once, and every check passed
-  ([Fronts in parallel](/working-docs/delegation/sandcastle/pipeline.md#fronts-in-parallel)).
+  ([Stints in parallel](/working-docs/delegation/sandcastle/pipeline.md#stints-in-parallel)).
 - **Discuss: what this gives the user.** The ability to call Sandcastle's
   `run()` and carry out any prompt inside a sealed container, holding the
   assigned repository and a read-only copy of published dev-playbook
@@ -171,6 +148,10 @@ The integrator retires: the user brings a stint's work in
   work copy carries from one call to the next, uncommitted files included,
   and Sandcastle runs nothing on the host that the agent can plant
   ([The container's lifetime](/working-docs/delegation/sandcastle/experiment-log.md#the-containers-lifetime)).
+
+- **Re-word the members.** Done 2026-09-24: `pipeline.md`,
+  `survey.md`, `experiment-log.md`, and `rig/index.md` in the
+  delegation workflow's terms.
 
 ## Acronyms
 

@@ -13,9 +13,7 @@ user present or not, and the work comes back to the user for a verdict.
 This root holds the ideas, the tracking, and the words of that workflow.
 The machinery that runs an unattended stint, the Sandcastle pipeline, is
 described in the nested
-[sandcastle set](/working-docs/delegation/sandcastle/ROOT.md). The set
-grew out of the parallel-fronts set, renamed on 2026-09-24 when its
-question widened.
+[sandcastle set](/working-docs/delegation/sandcastle/ROOT.md).
 
 ## Goal
 
@@ -100,10 +98,6 @@ machinery an unattended stint runs on.
 - **Sandcastle pipeline** — the machinery that runs an agent in a sealed
   container, described in
   [The Sandcastle Pipeline](/working-docs/delegation/sandcastle/pipeline.md).
-
-The parallel-fronts words these replace are listed in
-[the sandcastle set](/working-docs/delegation/sandcastle/ROOT.md#superseded-terms),
-whose members still use them.
 
 ## Shape
 
@@ -240,8 +234,7 @@ Decided with the user on 2026-09-24.
 - **The board shows one row per stint running (✈️) or waiting (💤)**:
   its workstream, its branch, the checkpoint reached, such as "2 of 3",
   and why it stopped. Nothing more for now.
-- **The user brings a stint's work in.** No term names the role, and
-  "integrator" retires.
+- **The user brings a stint's work in.** No term names the role.
 - **A stint's plan is `PLAN.md` and `PROGRESS.md`** beside the head file
   on the stint's branch, as a Ralph run keeps them today. At the verdict,
   the stint's entry under Stints records the outcome.

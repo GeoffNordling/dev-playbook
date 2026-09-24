@@ -8,8 +8,8 @@ real repository, the config copy, and the throwaway copies are made.
 `node_modules` links to an installed `@ai-hero/sandcastle` and is not
 committed.
 
-- `setup.sh` — fills the lab directory: the fake real repository, the config copy with both patches applied, two fronts' throwaway copies, and the container image
-- `parallel.mjs` — runs two fronts at once and closes both at once, then checks commits, billing, hook logging, and clean up
+- `setup.sh` — fills the lab directory: the fake real repository, the config copy with both patches applied, two stints' throwaway copies, and the container image
+- `parallel.mjs` — runs two stints at once and closes both at once, then checks commits, billing, hook logging, and clean up
 - `call.mjs` — one sealed call of a stint: one Claude session in a new container on the stint's work copy, fresh or resumed, then a probe for uncommitted work; writes the call's record to the stint's folder
 - `prompts/` — the stint's four prompts: `iteration.md.in`, `reviewer.md.in`, `principal-open.md.in`, and `principal-checkpoint.md.in`, templates whose `{{KEY}}` placeholders the driver fills
 - `seed/` — the `wordcount` workstream the by-hand stint ran on: its head file, plan, and progress log as `.md.in` templates, copied in without the `.in`, and a smoke test for the check gate

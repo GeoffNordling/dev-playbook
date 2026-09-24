@@ -21,15 +21,15 @@ Pointed at the real repository, Sandcastle opens it into the container,
 
 | Problem | What went wrong | Closed by |
 |---|---|---|
-| **Shared history** | Worktrees share one `.git`, so a front could delete other branches and the user's unpushed commits, such as a worktree `issue-123` | Experiment two |
+| **Shared history** | Worktrees share one `.git`, so an agent could delete other branches and the user's unpushed commits, such as a worktree `issue-123` | Experiment two |
 | **Relabel** | Podman's SELinux option relabels the mounted host files ([Constraints](/working-docs/delegation/sandcastle/ROOT.md#constraints)) | Experiment two |
-| **Booby trap** | A front plants a command in its copy's git settings that runs on the host when host-side git later works in the copy | The booby-trap fix |
+| **Booby trap** | An agent plants a command in its copy's git settings that runs on the host when host-side git later works in the copy | The booby-trap fix |
 | **Workspace collision** | Sandcastle puts the repository at `~/workspace` itself, so the repository is named `workspace` and dev-playbook has no place | Experiment three |
 | **Hook logging** | The user's hooks must keep logging to the measurement database from inside a container | Part 4 |
 
 ## Experiment one: the clone round trip
 
-**Asked.** Can a front's commits be made in a throwaway clone and reach the
+**Asked.** Can an agent's commits be made in a throwaway clone and reach the
 real repository at the same SHA? No container and no driver, so a failure
 would point at git alone.
 
@@ -100,14 +100,14 @@ with the stand-in, in three cases.
 
 **Settled.**
 
-- A front on mission-control: every check passed. The name came out
+- A run on mission-control: every check passed. The name came out
   `mission-control`, all eight `~/.claude/` links resolved, the config copy
   refused a write, the commit came back, and no trap fired.
-- A front on dev-playbook with its work copy at `~/workspace/dev-playbook`:
+- A run on dev-playbook with its work copy at `~/workspace/dev-playbook`:
   podman refused to start ("duplicate mount destination").
-- The same front with its work copy under a separate folder: every check
+- The same run with its work copy under a separate folder: every check
   passed, with the two copies separate.
-- The user then chose one layout for every front, work copy at
+- The user then chose one layout for every run, work copy at
   `~/assignment/<repo>`.
 
 ## Part 4: real Claude
@@ -115,7 +115,7 @@ with the stand-in, in three cases.
 **Asked.** Does real Claude, on the subscription, work end to end through
 Sandcastle and the plug-in?
 
-**Ran.** Sonnet on a mission-control front: add one line to `README.md`,
+**Ran.** Sonnet on a mission-control copy: add one line to `README.md`,
 commit, and name three skills.
 
 **Settled.**
@@ -135,15 +135,15 @@ commit, and name three skills.
   the container. The rig pointed Claude elsewhere with
   `CLAUDE_CODE_TMPDIR`.
 
-## Fronts in parallel
+## Stints in parallel
 
-**Asked.** Do two fronts run and close at once without interfering?
+**Asked.** Do two stints run and close at once without interfering?
 
-**Ran.** `rig/parallel.mjs`, two Haiku fronts on one fake repository,
+**Ran.** `rig/parallel.mjs`, two Haiku stints on one fake repository,
 started together and closed together.
 
 **Settled.** Every check passed. The results are in
-[Fronts in parallel](/working-docs/delegation/sandcastle/pipeline.md#fronts-in-parallel).
+[Stints in parallel](/working-docs/delegation/sandcastle/pipeline.md#stints-in-parallel).
 Re-run on 2026-09-24, after the set moved under delegation: every check
 passed again.
 
