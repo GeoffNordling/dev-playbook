@@ -8,7 +8,7 @@ form fits where the target lives and whether the file has a fixed repo root.
 Eleven hold a concept document to its frontmatter, one a directory of concept
 documents to its ``index.md``, five an ``index.md`` to its listing, one a
 ``README.md`` to its H1, three a consumer's ``okf_types`` mapping to its shape,
-and four ``working-docs/`` to its sets.
+and four ``workstreams/`` to the files of its workstreams.
 
 Two checks, the ones that read a ``~/workspace/<other repo>/`` target, read
 that repo's main checkout on this machine and are tagged ``WORKSPACE``.
@@ -29,8 +29,8 @@ CONTEXT = "CONTEXT.md"
 ROOT_INDEX = "index.md"
 INDEX = "index.md"
 README = "README.md"
-ROOT_NOTE = "ROOT.md"
-WORKING_DOCS = "working-docs"
+HEAD_FILE = "WORKSTREAM.md"
+WORKSTREAMS = "workstreams"
 VOCABULARY = "Vocabulary"
 README_TYPE = "README"
 LANGUAGE = "Language"
@@ -57,7 +57,7 @@ TYPE_NAME = re.compile(r"[A-Z][A-Za-z0-9]*(?:-[A-Z][A-Za-z0-9]*)*")
 # A file name's extension: lowercase letters and digits after the last dot.
 EXTENSION = re.compile(r"^[a-z0-9]*$")
 FIXED_NAMES = frozenset(
-    {INDEX, ROOT_NOTE, README, "PROMPT.md", "SKILL.md", "CLAUDE.md"}
+    {INDEX, HEAD_FILE, README, "PROMPT.md", "SKILL.md", "CLAUDE.md"}
 )
 BULLET = re.compile(r"^\s*[-*+]\s")
 TOP_BULLET = re.compile(r"^[-*+]\s")
@@ -481,9 +481,9 @@ def _bundle_target(repo: Repo, ref: Reference, bundle: str) -> bool:
 # --- document-types.md ---------------------------------------------------
 
 
-def _in_working_set(path: str) -> bool:
-    """Whether ``path`` is in a working documentation set, where some rules loosen."""
-    return path.startswith(WORKING_DOCS + "/")
+def _in_workstream(path: str) -> bool:
+    """Whether ``path`` is under ``workstreams/``, where some rules loosen."""
+    return path.startswith(WORKSTREAMS + "/")
 
 
 def _concept_documents(repo: Repo) -> Iterator[MarkdownFile]:
@@ -590,7 +590,7 @@ def recipe_description_carries_a_resource(repo: Repo) -> Iterator[Finding]:
 def _lives_under(repo: Repo, doctype: str) -> Iterator[Finding]:
     home = LIVES_UNDER[doctype]
     for doc in _concept_documents(repo):
-        if _in_working_set(doc.path):
+        if _in_workstream(doc.path):
             continue
         front = doc.frontmatter
         if front and front.get("type") == doctype and not doc.path.startswith(home):
@@ -599,19 +599,19 @@ def _lives_under(repo: Repo, doctype: str) -> Iterator[Finding]:
 
 @check("knowledge-organization.standard-lives-under-standards")
 def standard_lives_under_standards(repo: Repo) -> Iterator[Finding]:
-    """A concept document typed ``Standard`` lives under ``standards/`` or in a working set."""
+    """A concept document typed ``Standard`` lives under ``standards/`` or under ``workstreams/``."""
     yield from _lives_under(repo, "Standard")
 
 
 @check("knowledge-organization.loop-lives-under-loops")
 def loop_lives_under_loops(repo: Repo) -> Iterator[Finding]:
-    """A concept document typed ``Loop`` lives under ``loops/`` or in a working set."""
+    """A concept document typed ``Loop`` lives under ``loops/`` or under ``workstreams/``."""
     yield from _lives_under(repo, "Loop")
 
 
 @check("knowledge-organization.guide-lives-under-guides")
 def guide_lives_under_guides(repo: Repo) -> Iterator[Finding]:
-    """A concept document typed ``Guide`` lives under ``guides/`` or in a working set."""
+    """A concept document typed ``Guide`` lives under ``guides/`` or under ``workstreams/``."""
     yield from _lives_under(repo, "Guide")
 
 
@@ -736,7 +736,7 @@ def one_entry_per_concept_document_and_child_directory(
             path for path in concepts if posixpath.dirname(path) == directory
         } | _child_indexes(repo, directory)
         seen: set[str] = set()
-        loose = _in_working_set(doc.path)
+        loose = _in_workstream(doc.path)
         for entry in _entries(doc):
             if loose and not entry.target.endswith(".md"):
                 continue
@@ -900,12 +900,12 @@ def add_never_shadow(repo: Repo) -> Iterator[Finding]:
         seen.add(lowered)
 
 
-# --- working-documentation-sets.md ---------------------------------------
+# --- workstream-files.md ---------------------------------------
 
 
-def _sets(repo: Repo) -> list[str]:
-    """Each directory directly under ``working-docs/``."""
-    prefix = WORKING_DOCS + "/"
+def _workstreams(repo: Repo) -> list[str]:
+    """Each directory directly under ``workstreams/``."""
+    prefix = WORKSTREAMS + "/"
     return sorted(
         {
             prefix + path.removeprefix(prefix).split("/", 1)[0]
@@ -915,26 +915,26 @@ def _sets(repo: Repo) -> list[str]:
     )
 
 
-@check("knowledge-organization.working-docs-holds-only-sets")
-def working_docs_holds_only_sets(repo: Repo) -> Iterator[Finding]:
-    """``working-docs/`` directly has ``index.md``, directories, and no other file."""
-    prefix = WORKING_DOCS + "/"
+@check("knowledge-organization.workstreams-holds-only-workstreams")
+def workstreams_holds_only_workstreams(repo: Repo) -> Iterator[Finding]:
+    """``workstreams/`` directly has ``index.md``, directories, and no other file."""
+    prefix = WORKSTREAMS + "/"
     for path in repo.files:
         name = path.removeprefix(prefix)
         if path.startswith(prefix) and "/" not in name and name != INDEX:
             yield Finding(
-                path, None, "a file directly under working-docs/ other than index.md"
+                path, None, "a file directly under workstreams/ other than index.md"
             )
 
 
-@check("knowledge-organization.one-directory-under-working-docs")
-def one_directory_under_working_docs(repo: Repo) -> Iterator[Finding]:
-    """Each set has an ``index.md`` and a ``ROOT.md``, and its Markdown files kebab-case names."""
-    for directory in _sets(repo):
-        for name in (INDEX, ROOT_NOTE):
+@check("knowledge-organization.one-directory-under-workstreams")
+def one_directory_under_workstreams(repo: Repo) -> Iterator[Finding]:
+    """Each workstream has an ``index.md`` and a ``WORKSTREAM.md``, and kebab-case names."""
+    for directory in _workstreams(repo):
+        for name in (INDEX, HEAD_FILE):
             path = f"{directory}/{name}"
             if path not in repo.contents:
-                yield Finding(path, None, f"the set has no {name}")
+                yield Finding(path, None, f"the workstream has no {name}")
         for path in repo.files:
             if not path.startswith(directory + "/"):
                 continue
@@ -948,71 +948,23 @@ def one_directory_under_working_docs(repo: Repo) -> Iterator[Finding]:
                 yield Finding(path, None, "the file name is not lowercase kebab-case")
 
 
-def _roots(repo: Repo, directory: str) -> list[str]:
-    return sorted(
-        path
-        for path in repo.markdown
-        if path.startswith(directory + "/") and PurePosixPath(path).name == ROOT_NOTE
-    )
-
-
-@check("knowledge-organization.one-list-of-items-state-by-section")
-def one_list_of_items_state_by_section(repo: Repo) -> Iterator[Finding]:
-    """A leaf ``ROOT.md`` has one of each worklist section, other roots at most one."""
-    for directory in _sets(repo):
-        roots = _roots(repo, directory)
-        leaves = {
-            root
-            for root in roots
-            if not any(
-                other != root and other.startswith(posixpath.dirname(root) + "/")
-                for other in roots
-            )
-        }
-        for path, doc in repo.markdown.items():
-            if not path.startswith(directory + "/"):
-                continue
-            yield from _worklist_findings(doc, path in leaves, path in roots)
-
-
-def _worklist_findings(doc: MarkdownFile, leaf: bool, root: bool) -> Iterator[Finding]:
-    for name in PLANNED_AND_COMPLETED:
-        headings = [h for h in doc.headings if h.level == 2 and h.text == name]
-        if leaf and len(headings) != 1:
-            yield Finding(
-                doc.path, None, f"has {len(headings)} '## {name}' sections, not one"
-            )
-        if root and not leaf and len(headings) > 1:
-            yield Finding(
-                doc.path, None, f"has {len(headings)} '## {name}' sections, not one"
-            )
-        if not root:
-            for heading in headings:
+@check("knowledge-organization.the-worklist-in-the-head-file-only")
+def the_worklist_in_the_head_file_only(repo: Repo) -> Iterator[Finding]:
+    """No file under ``workstreams/`` but a ``WORKSTREAM.md`` has a worklist section."""
+    for path, doc in sorted(repo.markdown.items()):
+        if not _in_workstream(path) or PurePosixPath(path).name == HEAD_FILE:
+            continue
+        for heading in doc.headings:
+            if heading.level == 2 and heading.text in PLANNED_AND_COMPLETED:
                 yield Finding(
-                    doc.path, heading.line, f"a '## {name}' outside a ROOT.md"
+                    path, heading.line, f"a '## {heading.text}' outside a WORKSTREAM.md"
                 )
-        for heading in headings if root else ():
-            for number, text in _directly_under(doc, heading):
-                if TOP_BULLET.match(text) and not BOLD_START.match(text):
-                    yield Finding(
-                        doc.path,
-                        number,
-                        "a worklist item does not start with a bold name",
-                    )
 
 
-def _directly_under(doc: MarkdownFile, heading: Heading) -> tuple[tuple[int, str], ...]:
-    """The content lines under ``heading``, to the next heading of any level."""
-    end = next((h.line for h in doc.headings if h.line > heading.line), None)
-    return tuple(
-        (n, t) for n, t in doc.content if n > heading.line and (end is None or n < end)
-    )
-
-
-@check("knowledge-organization.every-member-reached-from-rootmd")
-def every_member_reached_from_rootmd(repo: Repo) -> Iterator[Finding]:
-    """Every ``.md`` file of a set but an ``index.md`` is reached from its ``ROOT.md`` by links."""
-    for directory in _sets(repo):
+@check("knowledge-organization.every-file-reached-from-its-head-file")
+def every_file_reached_from_its_head_file(repo: Repo) -> Iterator[Finding]:
+    """Every ``.md`` file of a workstream but an index or a head file is reached from its head."""
+    for directory in _workstreams(repo):
         members = {
             path
             for path in repo.markdown
@@ -1020,9 +972,11 @@ def every_member_reached_from_rootmd(repo: Repo) -> Iterator[Finding]:
         }
         graph = {path: _set_links(repo, path, members) for path in members}
         for path in sorted(members):
-            root = _root_of(repo, directory, path)
-            if root is not None and path not in _reached(graph, root):
-                yield Finding(path, None, f"not reached by links from {root}")
+            if PurePosixPath(path).name == HEAD_FILE:
+                continue
+            head = _head_of(repo, directory, path)
+            if head is not None and path not in _reached(graph, head):
+                yield Finding(path, None, f"not reached by links from {head}")
 
 
 def _set_links(repo: Repo, path: str, members: set[str]) -> set[str]:
@@ -1038,17 +992,11 @@ def _set_links(repo: Repo, path: str, members: set[str]) -> set[str]:
     return targets
 
 
-def _root_of(repo: Repo, directory: str, path: str) -> str | None:
-    """The ``ROOT.md`` a member is reached from; None for the set's own root.
-
-    A file's is the one in its own directory or the nearest above; a
-    ``ROOT.md``'s is the next one above its own.
-    """
+def _head_of(repo: Repo, directory: str, path: str) -> str | None:
+    """The ``WORKSTREAM.md`` in ``path``'s directory or the nearest above; None if none."""
     here = posixpath.dirname(path)
-    if PurePosixPath(path).name == ROOT_NOTE:
-        here = posixpath.dirname(here)
     while _inside(here, directory):
-        candidate = f"{here}/{ROOT_NOTE}"
+        candidate = f"{here}/{HEAD_FILE}"
         if candidate in repo.markdown:
             return candidate
         here = posixpath.dirname(here)

@@ -28,6 +28,4 @@ workstream ends when the user accepts or deletes it.
 
 A workstream is a directory under `workstreams/`, and its head file is
 `WORKSTREAM.md` in it, named for its type as `SKILL.md` is. A child
-workstream is a subdirectory with a head file of its own. The rename of
-`working-docs/` to `workstreams/`, and of each `ROOT.md` to
-`WORKSTREAM.md`, is planned, so no instance exists yet.
+workstream is a subdirectory with a head file of its own.

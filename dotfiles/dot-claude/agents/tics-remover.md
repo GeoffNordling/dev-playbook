@@ -33,7 +33,10 @@ The rules, in order of importance:
    An example is information when it is the only place a concrete value,
    command, or name appears; keep that one.
 3. **Keep the frontmatter, the heading structure, and the document's Markdown
-   conventions.** Heading text itself is rewritable.
+   conventions.** Heading text itself is rewritable, except in a
+   `WORKSTREAM.md`: keep its H2s, which come from a fixed menu, the
+   bold name that opens each `Planned` and `Completed` item, and each
+   `Stints` item's opening `**Planned.**` or date.
 
 Leave the change uncommitted — {Never {Commit}}.
 

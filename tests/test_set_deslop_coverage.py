@@ -1,9 +1,9 @@
 """The deslop judge assignments stay in lockstep with the standards they slice.
 
-The doc-set-deslopper agent divides two standards among six judges
-by citing section anchors; the third, Working Documentation Sets, the
-judge reads whole when the set's directory holds ROOT.md, filing each
-section under the slice of the general rule it cites. Two drifts can
+The doc-set-deslopper agent divides three standards among six judges
+by citing section anchors; the fourth, Workstream Files, the
+judge reads whole when the set's directory is under workstreams/, filing
+each section under the slice of the general rule it cites. Two drifts can
 silently break the division:
 
   - a section added to a standard that no judge is assigned — the new
@@ -30,7 +30,7 @@ DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-deslopper.md"
 JUDGE = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-judge.md"
 WORKING_SETS = (
     REPO_ROOT
-    / "standards/knowledge-organization/documentation-sets/working-documentation-sets.md"
+    / "standards/knowledge-organization/documentation-sets/workstream-files.md"
 )
 
 # The sliced standards, each with the leaf headings the division deliberately
@@ -49,6 +49,15 @@ EXEMPT: dict[Path, frozenset[str]] = {
             "no-word-the-repo-bans",
             "the-vocabulary-file-is-well-formed",
             "the-person-is-the-user",
+        }
+    ),
+    REPO_ROOT / "standards/doc-type/workstream-conventions.md": frozenset(
+        {
+            # The doc-type checks decide these deterministically.
+            "headings-from-the-menu",
+            "a-worklist-item-opens-with-its-bold-name",
+            "a-stint-entry-in-form",
+            "every-child-reached-from-its-parent",
         }
     ),
 }
@@ -110,11 +119,11 @@ def test_exemptions_name_real_headings() -> None:
 
 
 def test_working_set_rules_are_read_whole() -> None:
-    """The judge reads Working Documentation Sets whole, so nothing is sliced
+    """The judge reads Workstream Files whole, so nothing is sliced
     there; the one thing that can drift is the link itself."""
     link = "~/workspace/dev-playbook/" + str(WORKING_SETS.relative_to(REPO_ROOT))
     assert any(link in line for _, line in content_lines(JUDGE)), (
-        f"{JUDGE.name} no longer reads {WORKING_SETS.name}; a working set's "
+        f"{JUDGE.name} no longer reads {WORKING_SETS.name}; a workstream's "
         "further rules reach no judge"
     )
 
@@ -136,7 +145,7 @@ def leaf_sections(standard: Path) -> dict[str, list[str]]:
 
 
 def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
-    """The judge routes a working-set section to the slice that owns the
+    """The judge routes a Workstream Files section to the slice that owns the
     general rule it qualifies, so every section must cite one such rule by
     anchor, and that anchor must be one the deslopper assigns."""
     assigned = {
@@ -153,5 +162,5 @@ def test_every_working_set_section_qualifies_an_assigned_rule() -> None:
         }
         assert cited, (
             f"{WORKING_SETS.name}#{slug} cites no rule the deslopper assigns; "
-            "an judge has no slice to file it under"
+            "a judge has no slice to file it under"
         )

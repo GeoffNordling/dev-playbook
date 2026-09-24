@@ -26,11 +26,13 @@ Target given that doesn't match the branch checked out: fail loud, don't commit.
 
 ## Worklist
 
-If the diff touches a working documentation set, a directory under
-`working-docs/`, read the `Planned` list of that set's `ROOT.md`, or
-of the strand's `ROOT.md` where the work has strands. Any item the
-diff finishes moves to `Completed` with today's date, in this commit.
-An item is finished when the state its body describes is in the tree.
+If the diff touches a file under `workstreams/`, read the `Planned`
+list of that file's head file, the `WORKSTREAM.md` in its own
+directory or the nearest directory above, and of each `WORKSTREAM.md`
+above it. Any item the diff finishes moves, its bold name still first,
+under the `Completed` heading of the same head file with today's date,
+in this commit; a head file with no `Completed` heading gets one. An
+item is finished when the state its body describes is in the tree.
 
 ## Staging
 

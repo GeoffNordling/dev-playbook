@@ -76,7 +76,9 @@ assigned sections, and the briefings.
 The fact slices:
 
 - **One home** —
-  [one home per fact](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact).
+  [one home per fact](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact),
+  [open holds questions only](~/workspace/dev-playbook/standards/doc-type/workstream-conventions.md#open-holds-questions-only),
+  for a `WORKSTREAM.md` member.
 - **Terms** —
   [crossing terms in CONTEXT.md](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd),
   [definitions at most two sentences](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#definitions-at-most-two-sentences),
@@ -108,12 +110,16 @@ The set slices:
   so no first person never binds it,
   [one name, one concept](~/workspace/dev-playbook/standards/prose/conventions.md#one-name-one-concept),
   [title case h1, sentence case below](~/workspace/dev-playbook/standards/prose/conventions.md#title-case-h1-sentence-case-below),
-  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions).
+  [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions)
+  — the H2s of a `WORKSTREAM.md`, and a bucket name another file of a
+  workstream takes from them, are exempt
+  ([headings from the menu](~/workspace/dev-playbook/standards/doc-type/workstream-conventions.md#headings-from-the-menu)).
 
-A working set's differences reach the judges through their own
-definition, which reads Working Documentation Sets whole when the
-directory or one above it holds `ROOT.md`; each section there qualifies one assigned
-rule, so it falls to that rule's slice. Any briefing the launching
+A workstream's differences reach the judges through their own
+definition, which reads Workstream Files whole when the directory is
+under `workstreams/`, and Workstream Conventions for a `WORKSTREAM.md`.
+Each Workstream Files section falls to the slice of the assigned rule
+it qualifies. Any briefing the launching
 prompt adds travels to every judge verbatim.
 
 ## Repair

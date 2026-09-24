@@ -81,7 +81,7 @@ upstream standard of that name; the rule and its check are
 ## Where a standard lives
 
 Under `standards/`, the one tree reserved for the type, or as a draft in
-a working documentation set under `working-docs/`; nothing else claims
+a workstream under `workstreams/`; nothing else claims
 the label, and
 `knowledge-organization.standard-lives-under-standards` checks it. Every
 immediate subdirectory of `standards/` holds at least one file typed `Standard`.

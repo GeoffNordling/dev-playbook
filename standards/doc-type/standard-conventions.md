@@ -2,13 +2,13 @@
 type: Standard
 title: Standard Conventions
 description: The form a file typed Standard takes — one population in its frontmatter, each rule a heading, a predicate, and a trailer, the why blocks that argue them, and every predicate decidable of one member
-population: "a file typed Standard, outside a working documentation set"
+population: "a file typed Standard, outside a workstream"
 ---
 
 # Standard Conventions
 
-A file typed `Standard`, under `standards/` and outside a working
-documentation set
+A file typed `Standard`, under `standards/` and outside a
+workstream
 ([Document Types](/standards/knowledge-organization/document-types.md#standard-lives-under-standards)):
 one population and its rules. The
 [Standard doc-type](/doc-types/standard/index.md) declares what a

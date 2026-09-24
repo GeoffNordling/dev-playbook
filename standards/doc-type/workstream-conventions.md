@@ -1,8 +1,8 @@
 ---
 type: Standard
 title: Workstream Conventions
-description: The form a Workstream's head file takes — its headings from one menu, Open holding questions only, each stint entry in one form, and every child reached by links from its parent
-population: "a document typed Workstream, outside a working documentation set"
+description: The form a Workstream's head file takes — its headings from one menu, Open holding questions only, each worklist item opening with its bold name, each stint entry in one form, and every child reached by links from its parent
+population: "a document typed Workstream"
 ---
 
 # Workstream Conventions
@@ -54,6 +54,19 @@ is a question, and no item holds an answer to it, recommended or not.
 
 > **Why.** An answer beside its question reads as settled. A question
 > answered moves to Settled.
+
+## A worklist item opens with its bold name
+
+Each item directly under the `Planned` or the `Completed` heading of a
+document typed `Workstream` starts with a bold name, such as
+`- **Write the board script.**`.
+
+`doc-type.a-worklist-item-opens-with-its-bold-name` · deterministic
+
+> **Why.** An item's state is the heading it sits under, and an item
+> moves from Planned to Completed by its name. The rules for the other
+> files of a workstream are
+> [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md).
 
 ## A stint entry in form
 

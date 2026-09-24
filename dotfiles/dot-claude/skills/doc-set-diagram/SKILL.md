@@ -44,13 +44,14 @@ when a file changes:
 Counts, tallies, statuses and dates stay out. They go stale between one
 drawing and the next.
 
-{If the set is a working set, a directory under `working-docs/`,
-{Read [Working Documentation Sets](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#every-member-reached-from-rootmd)}}
+{If the set's directory holds a `WORKSTREAM.md`,
+{Read [Workstream Files](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#every-file-reached-from-its-head-file)}
+and {Read [Every child reached from its parent](~/workspace/dev-playbook/standards/doc-type/workstream-conventions.md#every-child-reached-from-its-parent)}}
 and draw that tree in place of the index rows: `index.md` at the top
-with one edge to `ROOT.md`, then each edge a link from one member to
-another, descending from `ROOT.md`. A file with two children spends an
+with one edge to `WORKSTREAM.md`, then each edge a link from one member to
+another, descending from `WORKSTREAM.md`. A file with two children spends an
 elbow and puts the second child to the right. A member no path from
-`ROOT.md` reaches stands alone at the bottom, under no edge.
+`WORKSTREAM.md` reaches stands alone at the bottom, under no edge.
 
 ## The shape
 
@@ -74,7 +75,7 @@ index.md
                                      section · section
 ```
 
-The link tree of a working set, descending from `ROOT.md`:
+The link tree of a workstream, descending from `WORKSTREAM.md`:
 
 ```
 parent/
@@ -82,7 +83,7 @@ parent/
 index.md
    │
    ▼
-ROOT.md ···························· role: section · section · section
+WORKSTREAM.md ···························· role: section · section · section
    │
    ▼
 branching-file.md ·················· role: section · section ·
@@ -104,10 +105,10 @@ child-set/
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-A child set of a working set that holds its own `ROOT.md` is a strand
-([one directory under `working-docs/`](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#one-directory-under-working-docs)),
+A child set of a workstream that holds its own `WORKSTREAM.md` is a child workstream
+([one directory under `workstreams/`](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#one-directory-under-workstreams)),
 and takes the link tree form inside its border, its `index.md` at the
-top with one edge to its `ROOT.md`. A child set with no `ROOT.md` is a
+top with one edge to its `WORKSTREAM.md`. A child set with no `WORKSTREAM.md` is a
 set like any other, so it takes the bordered index-row form even
 though its parent takes the link tree.
 

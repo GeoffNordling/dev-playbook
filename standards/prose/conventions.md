@@ -86,7 +86,7 @@ The pairs:
 
 ## Every sentence in the present tense
 
-Every sentence is in the present tense, except a sentence reporting a measurement or an incident that happened, and except in a member of a working documentation set, which may write a guess as a guess.
+Every sentence is in the present tense, except a sentence reporting a measurement or an incident that happened, and except in a file of a workstream, which may write a guess as a guess.
 
 `prose.every-sentence-in-the-present-tense` · stochastic
 

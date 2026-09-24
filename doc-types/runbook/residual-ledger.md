@@ -162,7 +162,7 @@ the condition primitive gates a whole span, not a report's own contents.
 
 ### set-judge
 
-Could not express the set-member reads — the root and its linked working
+Could not express the set-member reads — the head file and its linked
 files are runtime-bound (named in the launching prompt), so `{Read}`'s one
 fixed on-disk link cannot cover them; they stay plain prose. Could not
 express "ask no questions" — the Never vocabulary has no verb for it.

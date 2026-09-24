@@ -8,7 +8,7 @@ description: How to write a rule so a verifier can decide it — one member, one
 
 The work is writing a rule's predicate so that a script or a judge can
 decide it. A predicate and a specification are defined in
-[Terms](/working-docs/doc-type-system/ROOT.md#terms). Test each draft
+[Terms](/workstreams/doc-type-system/WORKSTREAM.md#terms). Test each draft
 against the litmus first. The sections after it each give one habit of
 a predicate that passes, then the trailer that follows it, then what
 is not a predicate at all.
@@ -98,7 +98,7 @@ A condition is an H2 with no trailer.
 ## An objective, a goal, and a permission are not predicates
 
 - **An objective**
-  ([Terms](/working-docs/doc-type-system/ROOT.md#terms))
+  ([Terms](/workstreams/doc-type-system/WORKSTREAM.md#terms))
   ranks states that satisfy the predicates; it is never one of them.
 - **A goal** is a predicate with the lifetime of one issue; it lives
   in the issue.

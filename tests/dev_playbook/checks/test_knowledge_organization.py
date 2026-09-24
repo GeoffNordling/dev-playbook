@@ -11,7 +11,7 @@ from dev_playbook.checks.knowledge_organization import (
     alphabetical_unless_declared_otherwise,
     an_index_in_every_directory,
     atx_headings_only,
-    every_member_reached_from_rootmd,
+    every_file_reached_from_its_head_file,
     fragment_anchor_matches_the_slug,
     frontmatter_a_yaml_mapping,
     frontmatter_declares_type_vocabulary,
@@ -25,9 +25,8 @@ from dev_playbook.checks.knowledge_organization import (
     non_empty_description_no_closing_period,
     non_empty_title,
     okf_version_declared,
-    one_directory_under_working_docs,
+    one_directory_under_workstreams,
     one_entry_per_concept_document_and_child_directory,
-    one_list_of_items_state_by_section,
     readme_holds_an_h1,
     readmemd_is_typed_readme,
     recipe_description_carries_a_resource,
@@ -38,11 +37,12 @@ from dev_playbook.checks.knowledge_organization import (
     stable_named_anchor,
     standard_lives_under_standards,
     term_definition_avoid_line,
+    the_worklist_in_the_head_file_only,
     type_name_to_description,
     type_names_a_registered_type,
-    working_docs_holds_only_sets,
     workspace_path_for_a_stable_location,
     workspace_path_for_another_repo,
+    workstreams_holds_only_workstreams,
 )
 from dev_playbook.model import Repo
 
@@ -394,7 +394,7 @@ def test_guide_lives_under_guides() -> None:
     assert found(guide_lives_under_guides, {"a.md": concept("Guide")}) == [
         ("a.md", None)
     ]
-    in_set = {"working-docs/w/a.md": concept("Guide")}
+    in_set = {"workstreams/w/a.md": concept("Guide")}
     assert found(guide_lives_under_guides, in_set) == []
 
 
@@ -481,16 +481,16 @@ def test_one_entry_per_concept_document_and_child_directory() -> None:
 
 
 def test_one_entry_per_concept_document_and_child_directory_in_a_working_set() -> None:
-    listing = "# I\n\nHolds.\n\n- [A](/working-docs/w/a.md) — One doc\n- `setup.sh` — makes the lab\n- [run](/working-docs/w/run.mjs) — runs it\n"
-    files = {"working-docs/w/index.md": listing, "working-docs/w/a.md": concept()}
+    listing = "# I\n\nHolds.\n\n- [A](/workstreams/w/a.md) — One doc\n- `setup.sh` — makes the lab\n- [run](/workstreams/w/run.mjs) — runs it\n"
+    files = {"workstreams/w/index.md": listing, "workstreams/w/a.md": concept()}
     assert found(one_entry_per_concept_document_and_child_directory, files) == []
     files = {
-        "working-docs/w/index.md": listing,
-        "working-docs/w/a.md": concept(),
-        "working-docs/w/b.md": concept(),
+        "workstreams/w/index.md": listing,
+        "workstreams/w/a.md": concept(),
+        "workstreams/w/b.md": concept(),
     }
     assert found(one_entry_per_concept_document_and_child_directory, files) == [
-        ("working-docs/w/index.md", None)
+        ("workstreams/w/index.md", None)
     ]
 
 
@@ -611,92 +611,70 @@ def test_add_never_shadow() -> None:
     assert found(add_never_shadow, bad) == [("index.md", None), ("index.md", None)]
 
 
-# --- working-documentation-sets.md ---
+# --- workstream-files.md ---
 
 
-def test_working_docs_holds_only_sets() -> None:
-    good = {"working-docs/index.md": "# I\n", "working-docs/w/ROOT.md": "# R\n"}
-    assert found(working_docs_holds_only_sets, good) == []
-    bad = good | {"working-docs/notes.md": "# N\n"}
-    assert found(working_docs_holds_only_sets, bad) == [("working-docs/notes.md", None)]
-
-
-def test_one_directory_under_working_docs() -> None:
-    good = {
-        "working-docs/w/index.md": "# I\n",
-        "working-docs/w/ROOT.md": "# R\n",
-        "working-docs/w/sub/check-fixes.md": "# D\n",
-        "working-docs/w/code/My_Module.py": "x = 1\n",
-        "working-docs/w/image/Containerfile": "FROM fedora\n",
-        "working-docs/w/.gitignore": "node_modules\n",
-    }
-    assert found(one_directory_under_working_docs, good) == []
-    bad = {"working-docs/v/Notes.md": "# N\n", "working-docs/v/good.Draft.md": "# D\n"}
-    assert found(one_directory_under_working_docs, bad) == [
-        ("working-docs/v/Notes.md", None),
-        ("working-docs/v/ROOT.md", None),
-        ("working-docs/v/good.Draft.md", None),
-        ("working-docs/v/index.md", None),
+def test_workstreams_holds_only_workstreams() -> None:
+    good = {"workstreams/index.md": "# I\n", "workstreams/w/WORKSTREAM.md": "# R\n"}
+    assert found(workstreams_holds_only_workstreams, good) == []
+    bad = good | {"workstreams/notes.md": "# N\n"}
+    assert found(workstreams_holds_only_workstreams, bad) == [
+        ("workstreams/notes.md", None)
     ]
 
 
-def test_one_list_of_items_state_by_section() -> None:
-    leaf = "# R\n\n## Planned\n\nLead-in.\n\n- **Item** body\n\n## Completed\n\n- **Done** body\n"
+def test_one_directory_under_workstreams() -> None:
     good = {
-        "working-docs/w/ROOT.md": "# R\n\nThe set.\n",
-        "working-docs/w/s/ROOT.md": leaf,
-        "working-docs/w/s/note.md": "# N\n",
-        "working-docs/v/ROOT.md": leaf,
-        "working-docs/v/s/ROOT.md": leaf,
+        "workstreams/w/index.md": "# I\n",
+        "workstreams/w/WORKSTREAM.md": "# R\n",
+        "workstreams/w/sub/check-fixes.md": "# D\n",
+        "workstreams/w/code/My_Module.py": "x = 1\n",
+        "workstreams/w/image/Containerfile": "FROM fedora\n",
+        "workstreams/w/.gitignore": "node_modules\n",
     }
-    assert found(one_list_of_items_state_by_section, good) == []
-    twice = {
-        "working-docs/w/ROOT.md": "# R\n\n## Planned\n\n## Planned\n",
-        "working-docs/w/s/ROOT.md": leaf,
-    }
-    assert found(one_list_of_items_state_by_section, twice) == [
-        ("working-docs/w/ROOT.md", None)
+    assert found(one_directory_under_workstreams, good) == []
+    bad = {"workstreams/v/Notes.md": "# N\n", "workstreams/v/good.Draft.md": "# D\n"}
+    assert found(one_directory_under_workstreams, bad) == [
+        ("workstreams/v/Notes.md", None),
+        ("workstreams/v/WORKSTREAM.md", None),
+        ("workstreams/v/good.Draft.md", None),
+        ("workstreams/v/index.md", None),
     ]
+
+
+def test_the_worklist_in_the_head_file_only() -> None:
+    worklist = "# R\n\n## Planned\n\n- **Item** body\n\n## Completed\n"
+    good = {
+        "workstreams/w/WORKSTREAM.md": worklist,
+        "workstreams/w/s/WORKSTREAM.md": worklist,
+        "workstreams/w/note.md": "# N\n\n## Notes\n\n### Planned\n",
+        "guides/g.md": worklist,
+    }
+    assert found(the_worklist_in_the_head_file_only, good) == []
+    bad = {"workstreams/w/note.md": "# N\n\n## Completed\n\n## Planned\n"}
+    assert found(the_worklist_in_the_head_file_only, bad) == [
+        ("workstreams/w/note.md", 3),
+        ("workstreams/w/note.md", 5),
+    ]
+
+
+def test_every_file_reached_from_its_head_file() -> None:
+    good = {
+        "workstreams/w/index.md": "# I\n\n- [N](/workstreams/w/note.md) — N\n",
+        "workstreams/w/WORKSTREAM.md": "# R\n\n[Note](note.md)\n",
+        "workstreams/w/note.md": "# N\n",
+        "workstreams/w/s/WORKSTREAM.md": "# S\n\n[Deep](deep.md)\n",
+        "workstreams/w/s/deep.md": "# D\n",
+    }
+    assert found(every_file_reached_from_its_head_file, good) == []
     bad = {
-        "working-docs/w/ROOT.md": "# R\n\n## Planned\n\n- plain item\n",
-        "working-docs/w/note.md": "# N\n\n## Completed\n",
+        "workstreams/w/index.md": "# I\n\n[Lost](/workstreams/w/lost.md)\n",
+        "workstreams/w/WORKSTREAM.md": "# R\n",
+        "workstreams/w/lost.md": "# L\n",
+        "workstreams/w/s/WORKSTREAM.md": "# S\n",
+        "workstreams/w/s/leaf.md": "# F\n",
     }
-    assert found(one_list_of_items_state_by_section, bad) == [
-        ("working-docs/w/ROOT.md", None),
-        ("working-docs/w/ROOT.md", 5),
-        ("working-docs/w/note.md", 3),
-    ]
-
-
-def test_one_list_of_items_state_by_section_reads_bullets_directly_under() -> None:
-    leaf = (
-        "# R\n\n## Planned\n\n- **Item** body\n\n### Detail\n\n- plain detail\n\n"
-        "## Completed\n\n- **Done** body\n\n## Planned\n\n- plain again\n"
-    )
-    files = {"working-docs/w/ROOT.md": leaf}
-    assert found(one_list_of_items_state_by_section, files) == [
-        ("working-docs/w/ROOT.md", None),
-        ("working-docs/w/ROOT.md", 17),
-    ]
-
-
-def test_every_member_reached_from_rootmd() -> None:
-    good = {
-        "working-docs/w/index.md": "# I\n\n- [N](/working-docs/w/note.md) — N\n",
-        "working-docs/w/ROOT.md": "# R\n\n[Note](note.md) [S](/working-docs/w/s/ROOT.md)\n",
-        "working-docs/w/note.md": "# N\n\n[Deep](/working-docs/w/s/deep.md)\n",
-        "working-docs/w/s/ROOT.md": "# S\n\n[Deep](deep.md)\n",
-        "working-docs/w/s/deep.md": "# D\n",
-    }
-    assert found(every_member_reached_from_rootmd, good) == []
-    bad = {
-        "working-docs/w/index.md": "# I\n\n[Lost](/working-docs/w/lost.md)\n",
-        "working-docs/w/ROOT.md": "# R\n",
-        "working-docs/w/lost.md": "# L\n",
-        "working-docs/w/s/ROOT.md": "# S\n\n[Leaf](leaf.md)\n",
-        "working-docs/w/s/leaf.md": "# F\n",
-    }
-    assert found(every_member_reached_from_rootmd, bad) == [
-        ("working-docs/w/lost.md", None),
-        ("working-docs/w/s/ROOT.md", None),
+    assert found(every_file_reached_from_its_head_file, bad) == [
+        ("workstreams/w/lost.md", None),
+        ("workstreams/w/s/leaf.md", None),
     ]

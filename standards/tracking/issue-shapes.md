@@ -178,7 +178,7 @@ decision.
 
 > **Why.** The plan, the open questions, and the decisions of the work
 > live in a
-> [working documentation set](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md)
+> [workstream](/standards/knowledge-organization/documentation-sets/workstream-files.md)
 > on the branch, so the body has nothing to accrue.
 
 ## Epic

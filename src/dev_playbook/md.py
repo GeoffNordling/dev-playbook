@@ -45,7 +45,7 @@ MD_LINK_PATTERN = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
 # trailing sentence mark is not part of the path; see BARE_PATH_TRAILER.
 WORKSPACE_REF_PATTERN = re.compile(r"~/workspace/[^\s)`]+")
 BARE_PATH_TRAILER = ".,;:"
-# A lowercase kebab-case name: runbook names, arguments, working-set files.
+# A lowercase kebab-case name: runbook names, arguments, the files of a workstream.
 KEBAB_CASE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 # A URI: a scheme, then a colon.
 URI_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")

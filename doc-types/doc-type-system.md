@@ -9,8 +9,8 @@ description: This repo's doc-type instantiation — the registry rulings, the fi
 This repo's instantiation of [Doc-Type](/doc-types/doc-type.md): which
 document kinds matter here, which doc-types are built, and what binds
 their instances. The target state the system is moving toward is the
-working set's, not this file's
-([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)).
+workstream's, not this file's
+([Doc-Type System](/workstreams/doc-type-system/doc-type-system/WORKSTREAM.md)).
 
 ## Registry rulings
 
@@ -88,7 +88,7 @@ No view is generated today. The three prototype generators,
 `chaingen`, `cardgen`, and `rulegen`, and the text files they wrote are
 deleted and kept in git history, the last of them at commit `b266ce4`;
 the fact base's extractors are the planned successors
-([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
+([Planned](/workstreams/doc-type-system/fact-base/WORKSTREAM.md#planned)).
 Loop's view is the Mermaid graph inside each instance.
 
 ## Shape and obligation

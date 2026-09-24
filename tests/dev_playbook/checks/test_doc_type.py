@@ -9,6 +9,7 @@ from dev_playbook.checks.doc_type import (
     a_sequence_is_one_list,
     a_step_opens_with_its_name,
     a_stint_entry_in_form,
+    a_worklist_item_opens_with_its_bold_name,
     an_act_links_a_runbook,
     arguments_bare_kebab_case_names,
     body_opens_with_an_h1,
@@ -142,7 +143,7 @@ def test_a_sequence_is_one_list() -> None:
         {
             "guides/bad.md": typed("Guide", BAD_GUIDE),
             "notes/bad.md": typed("General-Sheet", BAD_GUIDE),
-            "working-docs/w/draft.md": typed("Guide", BAD_GUIDE),
+            "workstreams/w/draft.md": typed("Guide", BAD_GUIDE),
         },
     ) == [
         ("guides/bad.md", 12),
@@ -491,6 +492,34 @@ def test_headings_from_the_menu() -> None:
         headings_from_the_menu,
         {"workstreams/w/WORKSTREAM.md": typed("Workstream", body)},
     ) == [("workstreams/w/WORKSTREAM.md", 12), ("workstreams/w/WORKSTREAM.md", 14)]
+
+
+def test_a_worklist_item_opens_with_its_bold_name() -> None:
+    body = """\
+# Work
+
+## Planned
+
+- **Write the board script.** It reads the head files.
+- plain item
+
+### Detail
+
+- plain detail
+
+## Completed
+
+- **Done.** Body.
+* plain again
+
+## Goal
+
+- plain goal
+"""
+    assert found(
+        a_worklist_item_opens_with_its_bold_name,
+        {"workstreams/w/WORKSTREAM.md": typed("Workstream", body)},
+    ) == [("workstreams/w/WORKSTREAM.md", 11), ("workstreams/w/WORKSTREAM.md", 20)]
 
 
 STINTS = """\

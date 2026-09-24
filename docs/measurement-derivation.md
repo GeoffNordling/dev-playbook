@@ -43,7 +43,7 @@ promoted column is NULL whenever its key was absent or arrived as something
 other than a string — including the whole-row case where stdin was not
 parseable JSON at all. The sibling `ledger` table is the software factory's
 run ledger, written and read only by the factory's own code, isolated
-under `working-docs/software-factory/`, and is outside this document's
+under `workstreams/software-factory/`, and is outside this document's
 scope.
 
 Which events reach the store is declared by the hook wiring in

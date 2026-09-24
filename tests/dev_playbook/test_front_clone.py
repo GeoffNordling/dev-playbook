@@ -1,6 +1,6 @@
 """Behavioral tests for scripts/front-clone — the clone round trip.
 
-Experiment one of the delegation set: a front's commits are made inside a
+Experiment one of the delegation workstream: a front's commits are made inside a
 throwaway clone that gets deleted, so the host has to move them into the real
 repository first. These tests build real git repositories under tmp_path and
 run the real plumbing against them, because the questions being asked are git's

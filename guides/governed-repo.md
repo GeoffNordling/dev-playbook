@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Governed Repo
-description: What a repo in the workspace declares rather than leaves to be inferred — the GOVERNED roster that names it, where a Decision Record sits, what a merged record freezes, and the working documentation set it stands up on main; read when adding a repo to the workspace or writing a Decision Record
+description: What a repo in the workspace declares rather than leaves to be inferred — the GOVERNED roster that names it, where a Decision Record sits, what a merged record freezes, and the workstream it stands up on main; read when adding a repo to the workspace or writing a Decision Record
 ---
 
 # Governed Repo
@@ -12,7 +12,7 @@ flight inside it. The roster is consulted when a repo is added to the
 workspace, at the
 [roster enrollment](/guides/bootstrap.md#the-green-repo-enrolls-in-governed)
 that ends [Bootstrap](/guides/bootstrap.md); the rest is consulted
-when a Decision Record or a working documentation set is written.
+when a Decision Record or a workstream is written.
 
 ## The GOVERNED roster names every governed repo
 
@@ -45,11 +45,11 @@ reversed, destroys the one thing the record holds. The `status` key is
 the one exception, so a superseded record points at the record that
 replaced it.
 
-## A working documentation set stands on main
+## A workstream stands on main
 
-A working documentation set, the one
+A workstream, the one
 [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
 makes a set, is present on `main`.
-[A guess written as a guess](/standards/knowledge-organization/documentation-sets/working-documentation-sets.md#a-guess-written-as-a-guess)
+[A guess written as a guess](/standards/knowledge-organization/documentation-sets/workstream-files.md#a-guess-written-as-a-guess)
 is what lets a set stand on `main`: a reader meets a guess marked as a
 guess, and the worklist shows where the work is.

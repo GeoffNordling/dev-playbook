@@ -1,11 +1,11 @@
 """The doc-type family: the rules of ``standards/doc-type/``.
 
-Twenty-four rules are decided by functions over the model. One holds each
+Twenty-five rules are decided by functions over the model. One holds each
 ``doc-types/<name>/`` directory to a row of the registry rulings table. Three
 hold a file typed ``Guide`` to its steps and its lack of trailers. One holds
-the acts of a file typed ``Loop`` to a runbook link. Three hold a file typed
-``Workstream`` to its menu of headings, its stint entries, and the links that
-reach it from its parent. Thirteen hold a runbook, a
+the acts of a file typed ``Loop`` to a runbook link. Four hold a file typed
+``Workstream`` to its menu of headings, its worklist items, its stint entries,
+and the links that reach it from its parent. Thirteen hold a runbook, a
 skill bundle or an agent definition under ``.claude/`` or
 ``dotfiles/dot-claude/``, to its front matter, its body, and its bundle files.
 Three hold a file typed ``Standard`` to its population and its rule shape.
@@ -33,7 +33,7 @@ for _loop_rule in (
 
 DOC_TYPES = "doc-types"
 STANDARDS = "standards"
-WORKING_DOCS = "working-docs/"
+WORKSTREAMS = "workstreams/"
 GUIDE_TYPE = "Guide"
 LOOP_TYPE = "Loop"
 WORKSTREAM_TYPE = "Workstream"
@@ -77,6 +77,8 @@ BULLET = re.compile(r"^[-*]\s")
 STINT_OPENING = re.compile(r"^[-*]\s+\*\*(Planned|\d{4}-\d{2}-\d{2})\.\*\*")
 VERDICT = re.compile(r"Verdict:\s*(\w*)")
 VERDICTS = frozenset({"advance", "accept", "delete"})
+WORKLIST = ("Planned", "Completed")
+BOLD_START = re.compile(r"^[-*]\s+\*\*")
 
 
 @dataclass(frozen=True)
@@ -544,6 +546,23 @@ def headings_from_the_menu(repo: Repo) -> Iterator[Finding]:
             seen.add(heading.text)
 
 
+@check("doc-type.a-worklist-item-opens-with-its-bold-name")
+def a_worklist_item_opens_with_its_bold_name(repo: Repo) -> Iterator[Finding]:
+    """Each item directly under Planned or Completed starts with a bold name."""
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        for heading in doc.headings:
+            if heading.level != 2 or heading.text not in WORKLIST:
+                continue
+            end = next((h.line for h in doc.headings if h.line > heading.line), None)
+            for number, text in doc.content:
+                if number <= heading.line or (end is not None and number >= end):
+                    continue
+                if BULLET.match(text) and not BOLD_START.match(text):
+                    yield Finding(
+                        path, number, "a worklist item does not start with a bold name"
+                    )
+
+
 @check("doc-type.a-stint-entry-in-form")
 def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
     """Each Stints item opens planned or dated, links one Loop, and sits in order.
@@ -650,13 +669,14 @@ def _reached(graph: dict[str, set[str]], root: str) -> set[str]:
 
 
 def _typed(repo: Repo, doctype: str) -> Iterator[tuple[str, MarkdownFile]]:
-    """Every markdown file whose frontmatter ``type`` is ``doctype``, outside ``working-docs/``.
+    """Every markdown file whose frontmatter ``type`` is ``doctype``.
 
-    A member of a working documentation set may carry a type before it moves
-    to that type's home, and that type's form rules do not bind it there.
+    A file under ``workstreams/`` may carry a type before it moves to that
+    type's home, and that type's form rules do not bind it there; only
+    ``Workstream``, whose home is ``workstreams/``, is read there.
     """
     for path, doc in sorted(repo.markdown.items()):
-        if path.startswith(WORKING_DOCS):
+        if path.startswith(WORKSTREAMS) and doctype != WORKSTREAM_TYPE:
             continue
         if doc.frontmatter is not None and doc.frontmatter.get("type") == doctype:
             yield path, doc
