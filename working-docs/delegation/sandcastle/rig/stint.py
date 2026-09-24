@@ -88,6 +88,19 @@ def ending(answer: str) -> dict:
         raise Yield(f"the answer's last line is not JSON: {lines[-1][:80]}") from None
 
 
+def context_tokens(record: dict) -> int:
+    """The conversation's size at the call's last turn: its input, cached and new, and its output."""
+    if not record.get("usage"):
+        raise Yield(f"{record['name']} reported no token usage")
+    u = record["usage"]
+    return (
+        u["inputTokens"]
+        + u["cacheCreationInputTokens"]
+        + u["cacheReadInputTokens"]
+        + u["outputTokens"]
+    )
+
+
 def sandcastle_step(args, name: str, prompt: str, resume: str | None) -> dict:
     """Run one call sealed through call.mjs and return its record."""
     opts = {
@@ -142,6 +155,7 @@ class Stint:
         }
         self.calls = []
         self.notes = []
+        self.context = []
         self.spent = 0
         self.principal = None
         self.head = head_sha(args.copy)
@@ -184,6 +198,7 @@ class Stint:
             )
         record, end = self.call("principal-0", "principal-open")
         self.principal = record["session"]
+        self.context.append({"call": "principal-0", "tokens": context_tokens(record)})
         if record["commits"]:
             raise Yield("the principal changed the plan at launch")
         if end.get("verdict") != "launch":
@@ -233,6 +248,9 @@ class Stint:
                 REVIEW=review,
             )
             self.principal = record["session"]
+            self.context.append(
+                {"call": f"principal-{n}", "tokens": context_tokens(record)}
+            )
             verdict = end.get("verdict")
             after = self.plan()
             if verdict in ("continue", "done") and after["done"] != state["done"] + 1:
@@ -289,15 +307,17 @@ def main() -> int:
         "head": stint.head,
         "minutes": round((time.time() - started) / 60, 1),
         "notes": stint.notes,
+        "principalContext": stint.context,
         "calls": [
             {k: c[k] for k in ("name", "session", "resumed", "seconds", "commits")}
             for c in stint.calls
         ],
     }
     (args.stint / "stint.json").write_text(json.dumps(record, indent=2))
+    final = f"{stint.context[-1]['tokens']:,}" if stint.context else "none"
     print(
         f"yield: {reason} ({stint.spent}/{args.budget} iterations, {len(stint.calls)} calls,"
-        f" {len(stint.notes)} notes, {record['minutes']} min)"
+        f" {len(stint.notes)} notes, principal context {final} tokens, {record['minutes']} min)"
     )
     if args.close:
         subprocess.run(

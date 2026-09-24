@@ -258,7 +258,7 @@ the driver ran live on new copies of the `wordcount` workstream, budget
 
 **Settled.**
 
-- `rules.py` passes all 11 cases. Examples: a plan replaced by a link to
+- `rules.py` passes all 13 cases. Examples: a plan replaced by a link to
   a host file yields "symlink in the copy: ws/PLAN.md"; an iteration that
   checks off two tasks is noted, "iter-1 checked off 2 tasks, not 1", and
   the stint runs on to done.
@@ -267,6 +267,12 @@ the driver ran live on new copies of the `wordcount` workstream, budget
   done. The user ruled that a count other than 1 is a note, not a stop:
   the principal reads it with the iteration's summary, and `stint.json`
   lists it under `notes`.
+- The driver reports the principal's context size after each of its
+  calls, in `stint.json` under `principalContext`, and the last one on
+  the yield line. It adds the last turn's input, cached input, and
+  output tokens, and yields if a call reports none. Read from stint 4's
+  records: 34,755 tokens at open, 42,186 at checkpoint 1, and 52,021 at
+  checkpoint 2, the last equal to the principal's session file.
 - The driver no longer checks each call's billing. The user ruled that
   the proof above and the machine holding no API key are enough.
 - Two live runs yielded at the principal's opening call, both for a

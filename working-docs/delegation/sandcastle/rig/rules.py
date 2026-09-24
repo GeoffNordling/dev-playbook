@@ -72,6 +72,14 @@ def fake(behave):
             "commits": [],
             "uncommitted": [],
             "answer": "",
+            "usage": {
+                "inputTokens": 2,
+                "cacheCreationInputTokens": 300,
+                "cacheReadInputTokens": 10000 * (int(name.split("-")[1]) + 1)
+                if name.startswith("principal")
+                else 5000,
+                "outputTokens": 100,
+            },
         }
         out = behave(name, copy, rec)
         if out is not None:
@@ -202,6 +210,16 @@ def budget_eaten(name, copy, rec):
         return rec
 
 
+def no_usage(name, copy, rec):
+    """principal-1 does its bookkeeping but reports no token usage."""
+    if name == "principal-1":
+        check_first(copy, stint.OPEN_MARK, stint.DONE_MARK)
+        rec["commits"] = [commit(copy, name)]
+        rec["answer"] = '{"verdict": "continue", "reason": "r"}'
+        del rec["usage"]
+        return rec
+
+
 CASES = [
     ("happy path", lambda n, c, r: None, 6, "done"),
     (
@@ -222,6 +240,7 @@ CASES = [
         "iter-1: the copy's HEAD is not the call's last commit",
     ),
     ("reviewer commits", reviewer_writes, 6, "review-1 committed"),
+    ("no token usage", no_usage, 6, "principal-1 reported no token usage"),
 ]
 fails = 0
 for label, behave, budget, want in CASES:
@@ -236,6 +255,14 @@ resumes = [c["resumed"] for c in s.calls if c["name"].startswith("principal")]
 ok = resumes == [None, "s-principal-0", "s-principal-0"]
 fails += not ok
 print(f"{'PASS' if ok else 'FAIL'} principal resumed with its own session: {resumes}")
+got, s = run(lambda n, c, r: None)
+ok = s.context == [
+    {"call": "principal-0", "tokens": 10402},
+    {"call": "principal-1", "tokens": 20402},
+    {"call": "principal-2", "tokens": 30402},
+]
+fails += not ok
+print(f"{'PASS' if ok else 'FAIL'} principal context recorded per call: {s.context}")
 got, s = run(two_tasks)
 ok = got == "done" and s.notes == ["iter-1 checked off 2 tasks, not 1"]
 fails += not ok
