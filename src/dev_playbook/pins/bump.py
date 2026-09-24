@@ -9,23 +9,26 @@ answers one question and makes one edit, and stops there:
   ``--write``   Move it.
 
 ``--check`` is a probe run in a throwaway detached worktree of the consumer's
-``origin/main``: the gate at the current pin, the pin rewritten, the gate again,
-the worktree removed. The caller's own checkout is never read or written, so it
-may sit on any branch, dirty or clean, with sessions working in it. A green
-probe can then be committed straight to ``main``, while a red one belongs on a
-branch where the findings can be worked, and neither choice is made here. The
-steps, with the refusal each one carries:
+``origin/main``: the pin rewritten, the gate run once, the worktree removed.
+The caller's own checkout is never read or written, so it may sit on any
+branch, dirty or clean, with sessions working in it. A green probe can then be
+committed straight to ``main``, while a red one belongs on a branch where the
+findings can be worked, and neither choice is made here. The steps:
 
   - **preflight** — the repo is a consumer carrying a dev-playbook pin, and its
     ``origin/main`` was just fetched.
-  - **baseline** — the gate is already green at the *current* pin. Bumping a red
-    repo makes the new findings indistinguishable from the ones that were
-    already there, so a red baseline refuses rather than reporting a verdict
-    this release has not earned.
-  - **verify** — rewrite the pin and run the gate again. pre-commit clones the
-    new rev during this run, so this is the moment the new standard takes
-    effect in that repo and, with a host's ``uv lock``, the only step that
-    touches the network.
+  - **verify** — rewrite the pin and run the gate. pre-commit clones the new
+    rev during this run, so this is the moment the new standard takes effect
+    in that repo and, with a host's ``uv lock``, the only step that touches the
+    network.
+
+There is no baseline run at the current pin. The question is "green at the
+new pin", and every finding there is worked whichever release brought it: a
+repo red before the bump has more findings to work, not a reason to refuse.
+``update-pins`` has judged the same way from the start, and a hand probe that
+refused what the timer would have handed to the agent left a repo nobody
+could bump (mission-control, 2026-09-24, four ``ref-lint`` links its current
+pin already broke). Exit 2 is now an environment fault alone.
 
 ``--write`` makes the durable edit — the pinned block's ``rev:`` line and its
 hook ids, and in a host the dev-playbook source's rev in ``pyproject.toml``
@@ -100,16 +103,6 @@ def check(repo: Path, url: str, sha: str, ids: tuple[str, ...]) -> int:
         return 0
 
     with probe_worktree(repo) as tree:
-        print(
-            f"bump-pin: {repo.name}: checking baseline at {old[:12]}", file=sys.stderr
-        )
-        baseline_ok, baseline_output = run_gate(tree)
-        if not baseline_ok:
-            raise ToolError(
-                f"{repo.name} is already red at its current pin ({old[:12]}), so "
-                f"these findings are not this release's:\n{baseline_output}"
-            )
-
         move_pin(tree, url, sha, ids)
         print(
             f"bump-pin: {repo.name}: {old[:12]} -> {sha[:12]}, verifying",
