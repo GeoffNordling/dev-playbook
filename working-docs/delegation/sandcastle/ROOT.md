@@ -72,7 +72,10 @@ since the parent uses it too.
   SessionEnd hooks set to wait.
 - **Plan the landing on main.** The code in `rig/` lands in `scripts/`,
   and the pipeline's document beside it, through one PR or several; which
-  PRs, in what order, carrying what.
+  PRs, in what order, carrying what. The code stops depending on a
+  scratch lab folder: today `setup.sh` builds the fake real repository,
+  the config copy, and the image there. This comes first, since nothing
+  else runs on real work until the code has its home.
 - **Write a sandboxed commit skill.** It commits with plain git and never
   pushes, since a sealed agent has no GitHub. Today's iteration prompt
   commits through `commit-sonnet`, which pushes
@@ -149,6 +152,12 @@ since the parent uses it too.
   `rig/rules.py` checks its stop rules with no tokens. The user ruled that
   every call runs in a container, so the local step is removed
   ([The headless driver](/working-docs/delegation/sandcastle/experiment-log.md#the-headless-driver)).
+- **Close the implementation testing.** Done 2026-09-24: the user ruled
+  that an iteration ticking other than one task is a note the principal
+  and the user see, not a stop, and that the driver checks no call's
+  billing. The pipeline's remaining work is the Planned list above and
+  the board in the
+  [parent's worklist](/working-docs/delegation/ROOT.md#planned).
 
 - **Re-word the members.** Done 2026-09-24: `pipeline.md`,
   `survey.md`, `experiment-log.md`, and `rig/index.md` in the

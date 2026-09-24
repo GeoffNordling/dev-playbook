@@ -202,13 +202,6 @@ def budget_eaten(name, copy, rec):
         return rec
 
 
-def billed(name, copy, rec):
-    """iter-3 is billed to an API key."""
-    if name == "iter-3":
-        rec["apiKeySource"] = "ANTHROPIC_API_KEY"
-        return rec
-
-
 CASES = [
     ("happy path", lambda n, c, r: None, 6, "done"),
     (
@@ -219,7 +212,6 @@ CASES = [
     ),
     ("budget runs out", budget_eaten, 4, "budget: 4 of 4 iterations spent"),
     ("uncommitted work", dirty, 6, "iter-2 left work uncommitted"),
-    ("two tasks in one", two_tasks, 6, "iter-1 checked off 2 tasks, not 1"),
     ("marker moved", marker, 6, "iter-1 moved a checkpoint marker"),
     ("plan is a symlink", link, 6, "symlink in the copy: ws/PLAN.md"),
     ("no JSON ending", prose, 6, "the answer's last line is not JSON"),
@@ -230,7 +222,6 @@ CASES = [
         "iter-1: the copy's HEAD is not the call's last commit",
     ),
     ("reviewer commits", reviewer_writes, 6, "review-1 committed"),
-    ("metered billing", billed, 6, "iter-3 billed ANTHROPIC_API_KEY"),
 ]
 fails = 0
 for label, behave, budget, want in CASES:
@@ -245,5 +236,11 @@ resumes = [c["resumed"] for c in s.calls if c["name"].startswith("principal")]
 ok = resumes == [None, "s-principal-0", "s-principal-0"]
 fails += not ok
 print(f"{'PASS' if ok else 'FAIL'} principal resumed with its own session: {resumes}")
+got, s = run(two_tasks)
+ok = got == "done" and s.notes == ["iter-1 checked off 2 tasks, not 1"]
+fails += not ok
+print(
+    f"{'PASS' if ok else 'FAIL'} two tasks in one is noted, not stopped: {got}, {s.notes}"
+)
 shutil.rmtree(LAB)
 sys.exit(fails)

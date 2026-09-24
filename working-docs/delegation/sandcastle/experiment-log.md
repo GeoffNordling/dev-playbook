@@ -258,10 +258,17 @@ the driver ran live on new copies of the `wordcount` workstream, budget
 
 **Settled.**
 
-- `rules.py` passes all 12 cases. Examples: an iteration that checks off
-  two tasks yields "iter-1 checked off 2 tasks, not 1"; a plan replaced
-  by a link to a host file yields "symlink in the copy: ws/PLAN.md"; a
-  call billed `ANTHROPIC_API_KEY` yields at once.
+- `rules.py` passes all 11 cases. Examples: a plan replaced by a link to
+  a host file yields "symlink in the copy: ws/PLAN.md"; an iteration that
+  checks off two tasks is noted, "iter-1 checked off 2 tasks, not 1", and
+  the stint runs on to done.
+- The driver counts the plan's unchecked task lines before and after each
+  iteration, so it sees how many boxes were ticked, not how much work was
+  done. The user ruled that a count other than 1 is a note, not a stop:
+  the principal reads it with the iteration's summary, and `stint.json`
+  lists it under `notes`.
+- The driver no longer checks each call's billing. The user ruled that
+  the proof above and the machine holding no API key are enough.
 - Two live runs yielded at the principal's opening call, both for a
   correct reason:
   - Stint 2: the check gate left

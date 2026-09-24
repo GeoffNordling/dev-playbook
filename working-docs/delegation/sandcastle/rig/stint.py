@@ -141,6 +141,7 @@ class Stint:
             "BUDGET": args.budget,
         }
         self.calls = []
+        self.notes = []
         self.spent = 0
         self.principal = None
         self.head = head_sha(args.copy)
@@ -161,12 +162,10 @@ class Stint:
         )
         self.calls.append(record)
         print(
-            f"{name}: {record['seconds']}s session={record['session']} billed={record['apiKeySource']}"
+            f"{name}: {record['seconds']}s session={record['session']}"
             f" commits={len(record['commits'])} uncommitted={len(record['uncommitted'])}",
             flush=True,
         )
-        if record["apiKeySource"] != "none":
-            raise Yield(f"{name} billed {record['apiKeySource']}")
         if record["isError"]:
             raise Yield(f"{name} ended in error")
         if record["uncommitted"]:
@@ -198,7 +197,7 @@ class Stint:
                 self.spent += 1
                 name = f"iter-{self.spent}"
                 record, end = self.call(name, "iteration")
-                summaries.append(f"- {name}: {end.get('summary')}")
+                summary = f"- {name}: {end.get('summary')}"
                 if end.get("blocker"):
                     raise Yield(f"{name} blocked: {end['blocker']}")
                 if not record["commits"]:
@@ -206,10 +205,13 @@ class Stint:
                 after = self.plan()
                 if (after["done"], after["open"]) != (before["done"], before["open"]):
                     raise Yield(f"{name} moved a checkpoint marker")
-                if after["segment"] != before["segment"] - 1:
-                    raise Yield(
-                        f"{name} checked off {before['segment'] - after['segment']} tasks, not 1"
-                    )
+                ticked = before["segment"] - after["segment"]
+                if ticked != 1:
+                    note = f"{name} checked off {ticked} tasks, not 1"
+                    self.notes.append(note)
+                    print(f"note: {note}", flush=True)
+                    summary += f" (the driver notes: {note})"
+                summaries.append(summary)
             if self.head == seg_base:
                 raise Yield(f"segment {n} has no commits to review")
             record, _ = self.call(
@@ -286,6 +288,7 @@ def main() -> int:
         "principal": stint.principal,
         "head": stint.head,
         "minutes": round((time.time() - started) / 60, 1),
+        "notes": stint.notes,
         "calls": [
             {k: c[k] for k in ("name", "session", "resumed", "seconds", "commits")}
             for c in stint.calls
@@ -293,7 +296,8 @@ def main() -> int:
     }
     (args.stint / "stint.json").write_text(json.dumps(record, indent=2))
     print(
-        f"yield: {reason} ({stint.spent}/{args.budget} iterations, {len(stint.calls)} calls, {record['minutes']} min)"
+        f"yield: {reason} ({stint.spent}/{args.budget} iterations, {len(stint.calls)} calls,"
+        f" {len(stint.notes)} notes, {record['minutes']} min)"
     )
     if args.close:
         subprocess.run(
