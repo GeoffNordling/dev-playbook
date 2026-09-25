@@ -67,9 +67,12 @@ the installed `dev_playbook` package:
 - `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by the prose checks, which check prose against it, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.checks.prose`).
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook check` self-check). Consumed by `repo-init`.
 
-The one larger surface is a subpackage: `dev_playbook.transcript_export`,
+One larger surface is a subpackage: `dev_playbook.transcript_export`,
 the Claude Code session model, classifier, and renderer behind
 `transcript-export`.
+A second is `dev_playbook.stint`, behind the `stint` console script:
+an unattended stint run in sealed containers
+([Running a Stint](/guides/running-a-stint.md)).
 
 A `scripts/` shim reaches the package by inserting the repo's `src/` directory
 (`Path(__file__).resolve().parents[1] / "src"`) at the front of `sys.path`, so

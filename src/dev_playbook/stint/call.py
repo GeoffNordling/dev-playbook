@@ -237,7 +237,7 @@ class Sealed:
                 try:
                     receiver.stop()
                 except ReceiverFault as err:
-                    raise CallFault(f"{name}: {err}") from err
+                    raise CallFault(str(err)) from err
             seconds = round(time.monotonic() - started)
         finally:
             shutil.rmtree(temp)
@@ -258,5 +258,5 @@ class Sealed:
         )
         record.write(calls)
         if source != "none":
-            raise BillingFault(f"{name} was billed to {source}, not the subscription")
+            raise BillingFault(f"billed to {source}, not the subscription")
         return record
