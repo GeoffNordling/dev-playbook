@@ -34,7 +34,7 @@ A checkout directory holds:
   `index-tree.json`.
 - `<kind>/<subject>.json` — a view file of a per-subject kind, the
   subject being the thing in the checkout the file is about, at the
-  subject's path: `markdown-file/docs/working-in-loops.md.json`,
+  subject's path: `markdown-file/workstreams/system/working-in-loops.md.json`,
   `runbook-chain/dotfiles/dot-claude/agents/doc-repairer.md.json`.
 
 A view file is named by its path under the checkout directory. Writing
@@ -44,7 +44,7 @@ update needs.
 ## Identities
 
 An identity is a repo-relative path, with an optional `#slug` naming a
-heading by its GitHub slug: `docs/working-in-loops.md#placement`. A
+heading by its GitHub slug: `workstreams/system/working-in-loops.md#placement`. A
 directory identity ends in `/`. The slug rule is the one
 [md.py](/src/dev_playbook/md.py) already computes. Every payload field
 that names a thing in the checkout holds an identity, so two panels that

@@ -16,7 +16,7 @@ were promoted out of the in-progress tier, and one is new. The `personal` tier
 is gone and `deprecated` holds nothing but its README.
 
 This record holds what **changed**. The standing verdict on every live skill is
-[the ledger](/docs/external-skill-verdicts.md), which this sweep rewrote; go
+the ledger (`docs/external-skill-verdicts.md`, since deleted), which this sweep rewrote; go
 there to ask where a skill stands today, and here to ask why it moved.
 
 This was also the bootstrap run of a repeatable procedure. The sweep dockets

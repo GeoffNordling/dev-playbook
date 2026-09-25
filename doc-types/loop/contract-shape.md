@@ -78,7 +78,7 @@ is its driver, not the loop
 
 ## The graph
 
-[Working in Loops](/docs/working-in-loops.md#a-loop-is-a-graph) says
+[Working in Loops](/workstreams/system/working-in-loops.md#a-loop-is-a-graph) says
 every loop is a graph, and the graph form is the one used for
 visualization, tracking, and resuming. The same shape drawn that way:
 the three verbs and the receiver are the nodes, the conditions are the
