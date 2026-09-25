@@ -262,7 +262,6 @@ class Sealed:
                 "model": self.model,
                 "prompt": prompt,
                 "resume": resume,
-                "command": None,
             }
             (calls / f"{name}.request.json").write_text(
                 json.dumps(request, indent=2) + "\n", encoding="utf-8"
