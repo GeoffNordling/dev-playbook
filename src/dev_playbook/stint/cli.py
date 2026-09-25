@@ -86,6 +86,7 @@ def main(argv: list[str] | None = None) -> int:
             credentials=CREDENTIALS,
             events=EVENTS_DB,
             runner=run_node,
+            workspace=Path.home() / "workspace",
         )
         record = launch(order, host)
     except (ToolError, CopyFault) as err:

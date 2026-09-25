@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Running a Stint
-description: How a launching agent runs an unattended stint with the stint command — what to prepare, the one-time setup, the run and its arguments, what comes back to the repository, the stint's folder, the exit codes, and every rule that stops a stint
+description: How a launching agent runs an unattended stint with the stint command — what to prepare, the one-time setup and what the image holds, the pre-commit gate every commit runs, the run and its arguments, what comes back to the repository, the stint's folder, the exit codes, and every rule that stops a stint
 ---
 
 # Running a Stint
@@ -26,8 +26,20 @@ and segment are
   metered credential on the host, in the config copy's settings, in the work
   copy's `.claude/` settings, or in a `.sandcastle/.env`. After every call,
   it refuses one that Claude reports was billed to anything else.
+- **Every commit runs the repository's pre-commit gate.** Before each
+  agent starts, the call installs the hooks of the work copy's
+  `.pre-commit-config.yaml` in the container, so an agent's `git commit`
+  runs the same hooks it runs on the host. A consumer repository runs
+  dev-playbook's published `playbook-check` at its pinned commit and its
+  own hooks, such as `playbook check --local`; dev-playbook runs its own
+  hooks from the branch being worked. A hook set only for `pre-push`, such
+  as `make-check`, does not run, since nothing is pushed.
+- **`make check` runs in the container.** The image holds what the gate
+  and the check call: pre-commit, make, Node and npm, and the Chromium
+  that Playwright drives.
 - **The container holds no GitHub credential.** Only local git works in it,
-  and nothing is pushed.
+  and nothing is pushed. The work copy's `origin` is the repository's own
+  URL, for the checks that read the GitHub name from it.
 - **The hooks keep logging.** Every hook event inside a container lands in
   the host's measurement database.
 - **Host git never runs in the copy.** Between calls the stint reads the
@@ -36,16 +48,30 @@ and segment are
 ```text
   the repository           ~/stints/<repo>/<name>/                  a container per call
   ──────────────           ──────────────────────                   ────────────────────
-  base ──open──▶  <repo>/   the work copy, branch <name>  ──rw──▶  ~/assignment/<repo>
-                  config/   dev-playbook main             ──ro──▶  ~/workspace/dev-playbook
+  base ──open──▶  <repo>/          the work copy, branch <name>  ──rw──▶  ~/assignment/<repo>
+                  config/          dev-playbook main             ──ro──▶  ~/workspace/dev-playbook
+                  siblings/<other>/ <other>'s main               ──ro──▶  ~/workspace/<other>
+                  cache/           pre-commit, uv, npm downloads ──rw──▶  ~/.cache
                   calls/, sessions/, review-<n>.md, stint.json
-  branch <name> ◀──close── <repo>/ and config/ deleted
+  branch <name> ◀──close── <repo>/, config/, siblings/, and cache/ deleted
 ```
+
+`<repo>` is the repository's own name, also when `REPO` is one of its
+worktrees, because the checks read a repository's name from its folder.
+
+The sibling copies are for the link checks of the pre-commit gate, which
+on the host read every repository under `~/workspace/`. The stint copies
+each repository the base's files link to as `~/workspace/<other>/`, from
+the `main` of its checkout on the host, and mounts it where the host
+keeps it. A consumer that links to no other repository gets none. The
+cache is the stint's own: every call of the stint shares it, and no other
+stint does.
 
 ## Before the first stint
 
-Run setup once, and again after `claude` or the dotfiles change, since the
-image carries both:
+Run setup once, and again after `claude`, the dotfiles, or the Playwright
+version in dev-playbook's `uv.lock` change, since the image carries all
+three:
 
 ```bash
 stint setup --playbook ~/workspace/dev-playbook --claude ~/.local/bin/claude
@@ -53,7 +79,10 @@ stint setup --playbook ~/workspace/dev-playbook --claude ~/.local/bin/claude
 
 It installs Sandcastle from the committed lock file and builds the image
 `localhost/stint:latest`. It runs on the Fedora machine only, which has
-podman.
+podman. The image holds pre-commit, make, Node and npm, and the Chromium
+of the Playwright version that dev-playbook's `uv.lock` pins. A tool the
+gate or the check calls that is not in the image, and that uv, npm, or
+pre-commit cannot install, fails the call.
 
 ## What the repository must hold
 
@@ -64,6 +93,9 @@ The base ref must already hold the workstream folder, with three files:
   segments that end with the exact line `<!-- [ ] checkpoint -->`. Each
   task says how to verify it.
 - `PROGRESS.md` — the log each iteration appends to.
+
+The base ref must hold a `.pre-commit-config.yaml`; the stint refuses to
+launch without one.
 
 The repository needs a `.gitignore` that covers what its check writes, such
 as `__pycache__/`: a call that leaves any file uncommitted stops the stint.
@@ -120,10 +152,10 @@ The exit code says how the stint ended:
 | `2` | The tool could not run: not set up, a bad argument, or a failed step |
 
 On exit 0 or 1 with the copy closed, the repository has the branch `<name>`
-holding every commit the stint made, and both copies are deleted. On a
-stop, the branch holds the work up to the stop. A work copy that cannot
-close, such as one holding uncommitted work, is kept in the folder, and the
-last line names it.
+holding every commit the stint made, and the copies and the cache are
+deleted. On a stop, the branch holds the work up to the stop. A work copy
+that cannot close, such as one holding uncommitted work, is kept in the
+folder, and the last line names it.
 
 The stint's folder, `<home>/<repo>/<name>/`, stays:
 
@@ -132,6 +164,7 @@ The stint's folder, `<home>/<repo>/<name>/`, stays:
 | `stint.json` | The reason it ended, iterations spent, the branch's last commit, the notes, the principal's context size per call, and each call's session and commits |
 | `calls/<call>.json` | One call's record: its session, billing source, tokens, commits, uncommitted files, and answer |
 | `calls/<call>.request.json` | What the call asked Sandcastle to run, the prompt included |
+| `calls/<call>-setup.log` | Sandcastle's log of the hook install that runs before the agent |
 | `calls/<call>.log`, `calls/<call>-probe.log` | Sandcastle's logs of the agent and of the uncommitted-work probe |
 | `review-<n>.md` | The reviewer's report for segment `n` |
 | `sessions/` | Every agent's session file; the principal's is resumed from here |

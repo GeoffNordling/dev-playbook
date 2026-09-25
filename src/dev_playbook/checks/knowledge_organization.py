@@ -56,7 +56,16 @@ TYPE_NAME = re.compile(r"[A-Z][A-Za-z0-9]*(?:-[A-Z][A-Za-z0-9]*)*")
 # A file name's extension: lowercase letters and digits after the last dot.
 EXTENSION = re.compile(r"^[a-z0-9]*$")
 FIXED_NAMES = frozenset(
-    {INDEX, HEAD_FILE, README, "PROMPT.md", "SKILL.md", "CLAUDE.md"}
+    {
+        INDEX,
+        HEAD_FILE,
+        README,
+        "PLAN.md",
+        "PROGRESS.md",
+        "PROMPT.md",
+        "SKILL.md",
+        "CLAUDE.md",
+    }
 )
 BULLET = re.compile(r"^\s*[-*+]\s")
 TOP_BULLET = re.compile(r"^[-*+]\s")

@@ -162,7 +162,10 @@ def fake_node(source: str = "none") -> tuple[list[dict], Runner]:
     def runner(request: dict) -> dict:
         seen.append(request)
         mounts = {m["sandboxPath"]: Path(m["hostPath"]) for m in request["mounts"]}
-        assert all(m["readonly"] for m in request["mounts"])
+        writable = [m["sandboxPath"] for m in request["mounts"] if not m["readonly"]]
+        assert writable == ["/home/agent/.cache"]
+        assert mounts["/home/agent/.cache"].is_dir()
+        assert mounts["/home/agent/workspace/alpha"].name == "alpha"
         credentials = mounts["/home/agent/.claude/.credentials.json"]
         assert credentials.read_text() == "secret"
         send(
@@ -185,8 +188,11 @@ def sealed(
     tmp_path: Path, config: Path, copy: Path, events: Path, runner: Runner
 ) -> Sealed:
     (tmp_path / "credentials.json").write_text("secret")
+    sibling = tmp_path / "siblings" / "alpha"
+    sibling.mkdir(parents=True, exist_ok=True)
     return Sealed(
         config=config,
+        siblings=(sibling,),
         copy=copy,
         folder=tmp_path / "stint",
         model="m",

@@ -226,20 +226,6 @@ is with the user, at a high level, the agent guiding. An unattended
 stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Run the pre-commit gate in the stint's work copy.** Everything
-  below needs it: without the gate, no call holds the permanent
-  Standards, and `--check` cannot become the target check. Today no
-  hook runs on an iteration's commit: the work copy is a plain
-  `git clone` (`src/dev_playbook/stint/workcopy.py:267`), which copies
-  no hooks, and the image has no `pre-commit`
-  (`src/dev_playbook/stint/Containerfile`). The iteration prompt runs
-  `--check` as the only gate instead
-  (`src/dev_playbook/stint/prompts/iteration.md.in:18`). The fix: the
-  image gets `pre-commit`, the hooks are installed in the work copy
-  after it opens, inside the container, and the hook environments are
-  cached across calls, since every call is a fresh container and the
-  hook set comes from each target repo's `.pre-commit-config.yaml`,
-  so the image cannot build them in advance.
 - **Bring the `stint` command to the model.** `--check` becomes the
   target check, which iterations may run at any time and the driver
   runs at each checkpoint; the checkpoint runs the target's verifiers
@@ -320,6 +306,17 @@ stint runs with the `stint` command
   together, recorded in
   [Stint Model](/workstreams/system/drive/stint-model.md); what it left
   is under [Planned](#planned).
+- **Run the pre-commit gate in the stint's work copy.** Done
+  2026-09-25: before each agent, the call installs the work copy's
+  pre-commit hooks in the container, so every commit runs the gate it
+  runs on the host; the hook downloads live in a cache the stint's
+  calls share. The image gained pre-commit, make, Node, and Chromium,
+  so `make check` runs in the container. The work copy is named for its
+  repository, carries the repository's `origin` URL, and has read-only
+  copies of the repositories the base links to, for the gate's link
+  checks. Real Sonnet stints on dev-playbook, mission-control, and
+  story-forge committed through the gate;
+  [Running a Stint](/guides/running-a-stint.md) has the details.
 - **Split the tracking standard.** Done 2026-09-25:
   [`standards/tracking/`](/standards/tracking/index.md) holds two
   sections, [GitHub Tracking](/standards/tracking/github/index.md),
