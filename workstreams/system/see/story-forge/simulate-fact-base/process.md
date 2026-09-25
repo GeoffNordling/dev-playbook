@@ -97,6 +97,23 @@ args: { "repo": "<absolute path of this checkout>",
         "maxSlices": 6 }
 ```
 
+## Runs
+
+- **2026-09-25-pilot, `maxSlices: 3`, story-forge `3a1d875`.** The plan
+  made 3 slices of 105 to 128 files each, one expecting 19 kinds. Each
+  Sonnet builder grew to about 220k to 230k tokens of context, too
+  much to trust. The builders spent most of it typing one row per
+  instance by hand: one `facts.json` reached 154 KB. Two first
+  attempts ended as interrupted, not failed, and were retried from
+  scratch. story-forge stayed clean.
+  - **Lesson: agents describe kinds, a script lists instances.** A
+    builder reads 2 or 3 sample files per kind and answers the seven
+    questions; a script finds every instance from the encoding the
+    builder reports. Listing instances is extractor work, and a
+    hand-wave stands in for code.
+  - **Lesson: small slices.** About 3 to 5 kinds per builder, not 8 to
+    19; more builders, each small.
+
 ## After the run
 
 - Check the receipts: every cited file exists and the cited line
