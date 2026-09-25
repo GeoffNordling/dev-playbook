@@ -136,8 +136,8 @@ rule it was ignored outright.
 
 So the only file guardrail available headless is all-or-nothing per tool, plus
 deny-by-default. There is no configuration substitute for the write fence an
-attended session gets from `EnterWorktree`, which is why the container in
-[sandboxing.md](/docs/sandboxing.md) is the only fence left for AFK work.
+attended session gets from `EnterWorktree`, which is why the sealed container of
+[a stint](/guides/running-a-stint.md) is the only fence left for AFK work.
 
 This was measured under one permission mode and two path forms. A `--debug`
 run would show whether the harness reports the rules it is discarding.

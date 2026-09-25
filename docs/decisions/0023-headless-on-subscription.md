@@ -28,6 +28,6 @@ before any call and aborts on one finding.
 **Path-scoped permission rules do not take effect headless** — not as allow
 rules, not as deny rules, not from CLI flags and not from a settings file, and
 the failure is silent. So the write fence an attended session gets from
-`EnterWorktree` has no configuration substitute, and the container in
-[sandboxing.md](/docs/sandboxing.md) is the only fence left for work with no
+`EnterWorktree` has no configuration substitute, and the sealed container of
+[a stint](/guides/running-a-stint.md) is the only fence left for work with no
 user attached.

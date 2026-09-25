@@ -9,7 +9,6 @@ intentions, and explorations — and the Decision Records.
 - [Measurement Derivation](/docs/measurement-derivation.md) — How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
 - [Pin Update Process](/docs/pin-update-process.md) — The one place to learn how a change to dev-playbook main reaches every governed repo — the timer, the update-pins run, the green and red landings, the ledger, the hand tools — with a pointer to where each part is documented in full
 - [Pin Updates Ledger](/docs/pin-updates.md) — Recent runs of update-pins, one row per governed repo over the last three release heads — when it ran, the release head, the verdict, where the bump landed, and the branches still unmerged
-- [Sandboxing Claude agents](/docs/sandboxing.md) — The native sandbox is off, pending a redesign under issue 261; the container direction for work with no user attached has a working prototype, not yet integrated
 - [System Legibility](/docs/system-legibility.md) — The doctrine — the user understands the systems they own without reading all of them — and the principles and ambitions that serve it
 - [Working in Loops](/docs/working-in-loops.md) — The doctrine — agents work in loops, and the user works on the loops
 - [Writing Improvement Process](/docs/writing-improvement-process.md) — The document-writing problem, the intention to improve it iteratively, and the capture step that records what goes wrong each time a document is written
