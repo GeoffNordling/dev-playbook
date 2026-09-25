@@ -7,8 +7,7 @@ description: The head file of the See child workstream — deterministic code sh
 # See Workstream
 
 The child workstream that lets the user see a system without reading
-it. Speculative, per
-[System Workstream](/workstreams/system/WORKSTREAM.md). It holds three
+it. This workstream is speculative. It holds three
 child workstreams, and this head file holds only what crosses them.
 
 ## Goal

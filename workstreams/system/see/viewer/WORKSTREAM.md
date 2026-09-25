@@ -7,10 +7,7 @@ description: The plan for cloa-viewer, a local visual IDE that shows a checkout'
 # CLOA Viewer
 
 cloa-viewer is a local visual IDE for every checkout in the workspace,
-and this child workstream is its plan. Speculative, per
-[See Workstream](/workstreams/system/see/WORKSTREAM.md):
-it designs a tool still being built, a guess is written as a guess, and
-an open question sits beside its topic.
+and this child workstream is its plan. This workstream is speculative.
 
 Everything the viewer draws is a selection of the fact base, which is
 its own child workstream
@@ -92,7 +89,7 @@ The acceptance picture. The user starts the viewer once, from
 shows the tree, every tracked markdown file in its two groups
 ([index-tree](/workstreams/system/see/viewer/registry.md#index-tree)),
 each with its description. The user clicks
-`dotfiles/dot-claude/agents/doc-set-deslopper.md`: its chain appears,
+`dotfiles/dot-claude/agents/doc-repairer.md`: its chain appears,
 the CLOA object itself. A button on that panel opens the file's details,
 its frontmatter facts, its links in and out, and its rendered source, for
 the times the chain is not enough. The user edits the file in the IDE:

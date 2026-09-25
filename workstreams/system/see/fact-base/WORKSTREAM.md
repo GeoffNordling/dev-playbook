@@ -9,8 +9,7 @@ description: The head file of the fact base child workstream — one determinist
 The child workstream that holds the compiled object: one deterministic
 object of nodes and edges extracted from a checkout, every view a
 selection from it, and the ontology that says what in it may point at
-what. Speculative, per
-[See Workstream](/workstreams/system/see/WORKSTREAM.md). Its files:
+what. This workstream is speculative. Its files:
 
 - [Fact Base](/workstreams/system/see/fact-base/fact-base.md) — the
   theory.

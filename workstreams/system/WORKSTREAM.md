@@ -6,8 +6,7 @@ description: The head file of the system workstream — the user sees the worksp
 
 # System Workstream
 
-This workstream is speculative: every member writes a guess as a guess,
-and every member inherits that voice. The workstream holds the user's
+This workstream is speculative. The workstream holds the user's
 one aim for the systems of `~/workspace`, split in two child
 workstreams, and this head file holds only what crosses them.
 

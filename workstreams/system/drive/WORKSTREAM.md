@@ -7,8 +7,7 @@ description: The head file of the Drive child workstream — work advances witho
 # Drive Workstream
 
 The child workstream that drives work without the user always in the
-loop. Speculative, per
-[System Workstream](/workstreams/system/WORKSTREAM.md). The work is a
+loop. This workstream is speculative. The work is a
 standard workflow: the user and an agent brief a piece of work, agents
 advance it, with the user present or not, and the work comes back to
 the user for a verdict. This head file holds the ideas, the tracking,

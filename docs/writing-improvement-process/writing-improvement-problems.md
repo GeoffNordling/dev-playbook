@@ -16,8 +16,8 @@ when it recurs; a countermeasure, once built, is linked from its entry.
 contrast pairs, closing cadence, and the rest. The named tics live in
 [slop-tics.md](/guides/slop-tics.md).
 
-**Action.** `/document-remove-tics` dispatches the tics-remover agent to
-remove them from a document.
+**Action.** `/doc-deslop <file> slop tics` dispatches a doc-repairer
+agent to remove them from a document.
 
 **Examples.** Each tic in slop-tics.md carries its own before/after
 examples.

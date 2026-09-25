@@ -43,8 +43,8 @@ and the workstream is the whole tree, child workstreams included.
 
 ## A guess written as a guess
 
-Every file of a workstream writes a guess as a guess, and the
-workstream's top head file declares the workstream speculative. This
+Every file of a workstream writes a guess as a guess, and every head
+file declares its workstream speculative in one sentence. This
 is the whole exemption from
 [every sentence in the present tense](/standards/prose/conventions.md#every-sentence-in-the-present-tense).
 

@@ -10,8 +10,7 @@ The child workstream that simulates the fact base and its views by
 hand, with agents, on a consumer repository before any extractor is
 coded: story-forge, the user's job-search repo at
 `~/workspace/story-forge`, read on its main branch and never edited
-from here. Speculative, per
-[See Workstream](/workstreams/system/see/WORKSTREAM.md). It takes its
+from here. This workstream is speculative. It takes its
 doc-types from [`doc-types/`](/doc-types/index.md) and its method from
 the fact base child workstream
 ([Fact Base Workstream](/workstreams/system/see/fact-base/WORKSTREAM.md)),

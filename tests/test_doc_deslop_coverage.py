@@ -1,7 +1,7 @@
 """The deslop judge assignments stay in lockstep with the standards they slice.
 
-The doc-set-deslopper agent divides four standards among six judges
-by citing section anchors. Two drifts can silently break the division:
+The doc-repairer agent divides the standards among the slices of its
+passes by citing section anchors. Two drifts can silently break the division:
 
   - a section added to a standard that no judge is assigned — the new
     rule is never judged;
@@ -23,7 +23,7 @@ from dev_playbook.md import content_lines, github_slug
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/doc-set-deslopper.md"
+DESLOPPER = REPO_ROOT / "dotfiles/dot-claude/agents/doc-repairer.md"
 WORKSTREAM_FILES = (
     REPO_ROOT
     / "standards/knowledge-organization/documentation-sets/workstream-files.md"
@@ -36,10 +36,8 @@ EXEMPT: dict[Path, frozenset[str]] = {
     / "standards/knowledge-organization/documentation-sets/documentation-sets.md": frozenset(),
     REPO_ROOT / "standards/prose/conventions.md": frozenset(
         {
-            # A set member is always a declarative document, never
-            # harness-loaded, so this voice rule never binds it.
-            "no-first-person",
             # The prose checks decide these deterministically.
+            "no-first-person",
             "judgment-not-judgement",
             "no-banned-word",
             "no-word-the-repo-bans",
@@ -86,7 +84,7 @@ def leaf_slugs(standard: Path) -> frozenset[str]:
 
 
 def assigned_slugs(standard: Path) -> frozenset[str]:
-    """Slugs the deslopper's assignments cite for one standard."""
+    """Slugs the repairer's assignments cite for one standard."""
     citation = re.compile(
         r"~/workspace/dev-playbook/"
         + re.escape(str(standard.relative_to(REPO_ROOT)))
@@ -142,7 +140,7 @@ def leaf_sections(standard: Path) -> dict[str, list[str]]:
 def test_every_workstream_files_section_qualifies_an_assigned_rule() -> None:
     """A Workstream Files section sits in the slice of the general rule it
     qualifies, so every section must cite one such rule by anchor, and that
-    anchor must be one the deslopper assigns."""
+    anchor must be one the repairer assigns."""
     assigned = {
         "/" + str(standard.relative_to(REPO_ROOT)): assigned_slugs(standard)
         for standard in EXEMPT
@@ -156,6 +154,6 @@ def test_every_workstream_files_section_qualifies_an_assigned_rule() -> None:
             if anchor in assigned.get(path, frozenset())
         }
         assert cited, (
-            f"{WORKSTREAM_FILES.name}#{slug} cites no rule the deslopper assigns; "
+            f"{WORKSTREAM_FILES.name}#{slug} cites no rule the repairer assigns; "
             "a judge has no slice to file it under"
         )
