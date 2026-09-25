@@ -87,6 +87,22 @@ tr.row:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .zero { color: var(--writes); font-weight: 600; }
 .pip { display: inline-block; width: 7px; height: 12px; margin-right: 2px; border-radius: 1px; vertical-align: -1px; }
 
+
+/* Pipeline */
+.ctrl { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
+.ctrl input { width: 180px; }
+.bg { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+.island { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+.island h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.steps { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding-bottom: 4px; }
+.step { min-width: 170px; max-width: 220px; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--bg); }
+.step h5 { margin: 0 0 6px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.step .who .jump { display: block; font-weight: 600; margin-bottom: 2px; }
+.step .io { font-size: 12px; margin-top: 6px; }
+.step .io b { color: var(--muted); font-weight: 600; }
+.arrow { align-self: center; padding: 0 8px; color: var(--muted); font-size: 18px; }
+.step.inputs { border-style: dashed; }
+
 /* Panel */
 #panel h2 { font-size: 17px; margin: 0 0 4px; }
 #panel h4 { margin: 16px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
@@ -204,7 +220,7 @@ panel.addEventListener('click', ev => {
 });
 
 // ---------- tabs ----------
-const VIEWS = { Map: renderMap, Lineage: renderLineage, Flow: renderFlow, Checks: renderChecks };
+const VIEWS = { Pipeline: renderPipeline, Map: renderMap, Lineage: renderLineage, Flow: renderFlow, Checks: renderChecks };
 const view = document.getElementById('view');
 const tabs = document.getElementById('tabs');
 function go(name) {
@@ -223,6 +239,95 @@ for (const name of Object.keys(VIEWS)) {
   tabs.appendChild(b);
 }
 const legend = rels => `<div class="legend">${rels.map(r => `<span class="${r === 'form-of' ? 'dash' : ''}" style="--c:var(--${r})">${esc(RELTEXT[r][0])}</span>`).join('')}</div>`;
+
+
+// ---------- Pipeline ----------
+let bgN = null;
+function renderPipeline() {
+  const procs = D.nodes.filter(n => n.type === 'Process').map(n => n.id);
+  const R = new Map(procs.map(p => [p, new Set()])), W = new Map(procs.map(p => [p, new Set()]));
+  for (const e of D.edges) {
+    if (e.relation === 'reads') R.get(e.source).add(e.target);
+    if (e.relation === 'writes') W.get(e.source).add(e.target);
+  }
+  const readers = new Map();
+  for (const [p, ks] of R) for (const k of ks) readers.set(k, (readers.get(k) || 0) + 1);
+  const maxR = Math.max(...readers.values());
+  if (bgN === null) bgN = maxR - 1;
+  view.innerHTML = `<p class="intro">What the system does, in order, computed from the graph. A skill comes after the skills whose output it reads; skills that feed each other in a loop share one step. Skills that pass no data to each other fall into separate groups.</p>
+    <div class="ctrl"><label for="bgN">A kind read by more than <b id="bgNv"></b> skills is reference material, not data a step works on:</label>
+      <input type="range" id="bgN" min="0" max="${maxR}" value="${bgN}"></div><div id="pipe"></div>`;
+  const slider = document.getElementById('bgN');
+  slider.oninput = () => { bgN = +slider.value; draw(); };
+  function draw() {
+    document.getElementById('bgNv').textContent = bgN;
+    const bg = new Set([...readers].filter(([k, c]) => c > bgN).map(([k]) => k));
+    const r = p => [...R.get(p)].filter(k => !bg.has(k)), w = p => [...W.get(p)].filter(k => !bg.has(k));
+    // Groups: skills and kinds joined by reads, writes, or made-from, background kinds left out.
+    const adj = new Map();
+    const link = (a, b) => { (adj.get(a) || adj.set(a, new Set()).get(a)).add(b); (adj.get(b) || adj.set(b, new Set()).get(b)).add(a); };
+    for (const p of procs) { for (const k of r(p)) link(k, p); for (const k of w(p)) link(p, k); }
+    for (const e of D.edges) if (e.relation === 'derived-from' && e.source !== e.target && !bg.has(e.source) && !bg.has(e.target)) link(e.source, e.target);
+    const seen = new Set(), groups = [];
+    for (const n of adj.keys()) {
+      if (seen.has(n)) continue;
+      const g = new Set(), st = [n];
+      while (st.length) { const x = st.pop(); if (g.has(x)) continue; g.add(x); seen.add(x); st.push(...adj.get(x)); }
+      groups.push(g);
+    }
+    groups.sort((a, b) => b.size - a.size);
+    // Steps: condense loops (strongly connected skills), then order by longest path.
+    const after = new Map(procs.map(p => [p, procs.filter(q => q !== p && w(q).some(k => r(p).includes(k)))]));
+    let idx = 0; const index = new Map(), low = new Map(), stack = [], on = new Set(), comp = new Map(); let nc = 0;
+    const strong = v => {
+      index.set(v, idx); low.set(v, idx); idx++; stack.push(v); on.add(v);
+      for (const u of after.get(v)) {
+        if (!index.has(u)) { strong(u); low.set(v, Math.min(low.get(v), low.get(u))); }
+        else if (on.has(u)) low.set(v, Math.min(low.get(v), index.get(u)));
+      }
+      if (low.get(v) === index.get(v)) { let u; do { u = stack.pop(); on.delete(u); comp.set(u, nc); } while (u !== v); nc++; }
+    };
+    procs.forEach(p => { if (!index.has(p)) strong(p); });
+    const level = new Map([...Array(nc).keys()].map(c => [c, 0]));
+    for (let i = 0; i < nc; i++) for (const p of procs) for (const q of after.get(p)) {
+      const cp = comp.get(p), cq = comp.get(q);
+      if (cp !== cq && level.get(cp) < level.get(cq) + 1) level.set(cp, level.get(cq) + 1);
+    }
+    const kindList = ks => ks.length ? [...new Set(ks)].sort().map(jump).join(', ') : '<span class="empty">nothing in the graph</span>';
+    let h = `<div class="bg">Reference material (${bg.size}): ${bg.size ? [...bg].map(k => `${jump(k)} (${readers.get(k)})`).join(', ') : 'none'}</div>`;
+    groups.forEach((g, gi) => {
+      const ps = procs.filter(p => g.has(p));
+      if (!ps.length) return;
+      const produced = new Set(ps.flatMap(w));
+      const inputs = [...new Set(ps.flatMap(r))].filter(k => !produced.has(k));
+      const steps = new Map();
+      for (const p of ps) { const key = `${level.get(comp.get(p))}|${comp.get(p)}`; (steps.get(key) || steps.set(key, []).get(key)).push(p); }
+      const byLevel = new Map();
+      for (const [key, members] of steps) { const l = +key.split('|')[0]; (byLevel.get(l) || byLevel.set(l, []).get(l)).push(members); }
+      const cols = [...byLevel.keys()].sort((a, b) => a - b);
+      h += `<div class="island"><h3>Group ${gi + 1}: ${ps.length} skill${ps.length === 1 ? '' : 's'} or scripts, ${[...g].filter(x => x.startsWith('kind:')).length} kinds</h3><div class="steps">`;
+      h += `<div class="step inputs"><h5>You supply</h5><div class="io">${kindList(inputs)}</div></div>`;
+      cols.forEach((l, ci) => {
+        h += `<div class="arrow">→</div><div style="display:flex;flex-direction:column;gap:8px">`;
+        for (const members of byLevel.get(l)) {
+          const loop = members.length > 1 && members.some(p => after.get(p).some(q => members.includes(q)));
+          h += `<div class="step"><h5>Step ${ci + 1}${loop ? ' · a loop' : ''}</h5><div class="who">${members.map(jump).join('')}</div>
+            <div class="io"><b>reads</b> ${kindList(members.flatMap(r))}</div>
+            <div class="io"><b>writes</b> ${kindList(members.flatMap(w))}</div></div>`;
+        }
+        h += `</div>`;
+      });
+      h += `</div></div>`;
+    });
+    const used = new Set(groups.flatMap(g => [...g]));
+    const idle = kinds.filter(k => !used.has(k.id) && !bg.has(k.id));
+    h += `<p class="intro">${idle.length} kinds no skill or script touches, in the graph: ${idle.map(k => jump(k.id)).join(', ')}.</p>`;
+    const pipe = document.getElementById('pipe');
+    pipe.innerHTML = h;
+    pipe.querySelectorAll('.jump').forEach(j => j.onclick = () => show(j.dataset.id));
+  }
+  draw();
+}
 
 // ---------- Map ----------
 function renderMap() {

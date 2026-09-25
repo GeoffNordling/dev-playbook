@@ -308,3 +308,37 @@ next run.
   holds what the row claims. `list_instances.py` checks the
   recognition rules; the receipt check is not written yet.
 - Render views from `fact-base.json`.
+
+## Views
+
+`render_views.py` writes one self-contained page to `~/views/`:
+
+```
+python3 render_views.py <run> <target root> ~/views/<name>.html
+```
+
+First page, `story-forge-system.html` over `kinds-all`, four tabs. The
+user's verdict, from the goal "understand what the system does for
+me":
+
+| Tab | Verdict | Why |
+|---|---|---|
+| Flow (reads → skill → writes) | best | it says what each tool does |
+| Lineage (made from) | closer | it says where each kind comes from |
+| Map (kinds by area) | meh | raw data, not purpose |
+| Checks (rules per kind) | meh | true, but not the question |
+
+Lessons:
+
+- **Views answer purpose, not inventory.** The user asks "what does
+  the system do for me, and how", from a goal such as "find jobs and
+  prepare for them". A view of what exists is not an answer.
+- **A sentence or two says what the view shows.** Keep the plain
+  description at the top of each view.
+- **The graph has no goal layer.** Nothing in `fact-base.json` says
+  which kinds and skills serve "find jobs" and which serve "prepare".
+  A purpose view needs that layer, from the target's own words or
+  added by hand.
+- **`form-of` is not a step.** Journey-Window-Note is a form of
+  General-Sheet, and General-Sheet is made from Journey-Window-Notes.
+  Lay columns out by `derived-from` only.
