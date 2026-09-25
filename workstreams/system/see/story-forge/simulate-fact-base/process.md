@@ -199,6 +199,41 @@ and write the args and the result to `<run>/run.json`.
     eight relations, `derived-from` among them. The assembler writes
     `declarations.md`, a ranked list of what the target could declare
     to turn inferred rows into declared ones.
+- **2026-09-25-kinds-all, `maxSlices: 10`, story-forge `84194f6`, scope
+  `all`.** The first whole-repo run of the redesign. 10 slices of 3 to
+  5 kinds, sliced by kind; Index got one slice across every folder. 12
+  agents, 37 minutes, about 2.02M subagent tokens. story-forge stayed
+  clean.
+  - **Result.** 42 kinds, 136 nodes, 256 edges, 0 dangling stubs, 27
+    conflicts. `list_instances.py` placed 349 of 358 tracked files, 0
+    overlaps. The 9 orphans are the Config kind: 9 root files in 5
+    formats that no glob and frontmatter rule could match. All 256
+    receipts point at real lines. Of 12 read by hand, 11 hold what the
+    edge claims.
+  - **The Story-Projection test passes both halves, declared.**
+    `derived-from` Story from the instance's `sources:` key
+    (`distributed-scalable-systems.md:6`); `form-of` Story from the
+    `okf_types` sentence (`index.md:12`). The form-of half lives only in
+    English prose, so an extractor cannot read it. The run found one
+    consumer, a Training-Plan that links the projection; no process
+    reads or writes one and no rule checks one.
+  - **Compared with kinds-stories:** that run had 13 kinds and 105
+    instances in part of the repo. This run covers the whole repo, and
+    Index went from being split across folders to one kind with 42
+    instances.
+  - **Lesson: a declaration is not a pointer.** The one wrong receipt
+    of the 12: the root index's `okf_types` entries became 14 edges
+    `Index points-at <Kind>`. The line declares the kind; it names no
+    instance. A declaration belongs on the kind node as its receipt,
+    not as an edge from Index.
+  - **Lesson: some kinds are a list, not a pattern.** Config has no
+    shared glob, so its rule is `expressible: false` and its files
+    show as orphans. A rule that can name files outright would place
+    them.
+  - **Top of `declarations.md`:** each stochastic rule names the kind
+    it tests (11 rows); name the five unemployment-benefits kinds,
+    which are YAML and text files that cannot carry `type:` (10 rows);
+    add a path-to-kind list for code and harness files (8 rows).
 
 ## After the run
 
