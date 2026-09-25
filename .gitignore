@@ -34,3 +34,6 @@ dotfiles/dot-claude/skills/synced/
 # cloa-viewer web project — installed and built, never committed
 src/dev_playbook/cloa_viewer/web/node_modules/
 src/dev_playbook/cloa_viewer/web/dist/
+
+# stint's Sandcastle layer — installed by `stint setup`, never committed
+src/dev_playbook/stint/sandcastle/node_modules/

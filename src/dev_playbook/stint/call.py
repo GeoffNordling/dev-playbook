@@ -161,7 +161,10 @@ def run_node(request: dict) -> dict:
     )
     if done.returncode:
         raise CallFault(f"run.mjs exited {done.returncode}: {done.stderr[-2000:]}")
-    return json.loads(done.stdout)
+    lines = done.stdout.strip().splitlines()
+    if not lines:
+        raise CallFault("run.mjs printed no response")
+    return json.loads(lines[-1])
 
 
 @dataclass(frozen=True)
