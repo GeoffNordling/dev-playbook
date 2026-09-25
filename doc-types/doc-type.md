@@ -13,12 +13,9 @@ of the family, one runbook, one standard, one guide, one loop, one workstream. T
 are
 [Doc-Type System](/doc-types/doc-type-system.md).
 
-The theory of the system, what a doc-type is made of, its verbs, and
-its rules as predicates, is in-process work and lives in a
-workstream, not here:
-[Doc-Type System](/workstreams/doc-type-system/doc-type-system/WORKSTREAM.md),
-with the words in the synthesis workstream's
-[Terms](/workstreams/doc-type-system/WORKSTREAM.md#terms). The rules
+The whole system, what a doc-type is made of, its verbs, and its
+parts, is drawn in [Reference Model](/doc-types/reference-model.md),
+with its words in [CONTEXT.md](/CONTEXT.md#doc-types). The rules
 every doc-type is held to are the Standard
 [Doc-Type](/standards/doc-type/doc-type.md).
 
@@ -30,7 +27,7 @@ the base module, what more than one doc-type uses, and each doc-type's
 needs. The reference model holds the six blocks whole, in this order,
 Runbook, Standard, Guide, Loop, Workstream, and
 `tests/test_pseudocode_sync.py` fails when the texts differ
-([Reference Model](/workstreams/doc-type-system/doc-type-system/reference-model.md#the-language)).
+([Reference Model](/doc-types/reference-model.md#the-language)).
 
 ```python
 Verb = NewType("Verb", str)      # a verb is a string; the type says which strings
@@ -60,7 +57,6 @@ re-expresses the family in the current primitives, and whatever forces
 a drop to file-level detail is the **residual**; the primitives are
 refactored only when the reduction is worth the change cost. Residuals
 are recorded in the doc-type's residual ledger, one entry per instance
-that has one. The loop's current design is
-[Specifying a Loop](/workstreams/doc-type-system/loop-and-workstream/specifying-a-loop.md#the-loop-that-proposes),
-and the fact base child workstream plans to run it as a Loop
-([Planned](/workstreams/doc-type-system/fact-base/WORKSTREAM.md#planned)).
+that has one. The fact base child workstream plans to run it as a
+Loop
+([Planned](/workstreams/system/see/fact-base/WORKSTREAM.md#planned)).

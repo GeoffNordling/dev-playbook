@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Workstream Files
-description: What the files of a workstream add to Documentation Sets — a guess written as a guess, every file reached from its head file, one directory per workstream under `workstreams/`, the worklist in the head file only, buckets, menu headings as names, terms held in a head file, and an Acronyms appendix — each stated as the one difference against the general rule it qualifies
+description: What the files of a workstream add to Documentation Sets — a guess written as a guess, every file reached from its head file, one directory per workstream under `workstreams/`, the worklist in the head file only, buckets, menu headings as names, terms and acronyms each held in the nearest head file that holds their uses — each stated as the one difference against the general rule it qualifies
 population: "a Markdown file of a workstream, under `workstreams/`"
 ---
 
@@ -35,9 +35,11 @@ and the workstream is the whole tree, child workstreams included.
 > **Why.** The buckets are a menu,
 > [one home per fact](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact)
 > made navigable: a file uses the buckets its work needs, skips the
-> rest, and `Unfiled` catches what fits none of them. A term of the
-> work is defined in a head file rather than in the repo's `CONTEXT.md`
-> because it crosses no workstream while the work runs.
+> rest, and `Unfiled` catches what fits none of them. A term or an
+> acronym of the work is defined in a head file rather than in the
+> repo's `CONTEXT.md` while no file outside the work uses it, and in the
+> head file nearest its uses, so that the definition sits as low in
+> the tree as the rule allows and every other use links to it.
 
 ## A guess written as a guess
 
@@ -125,23 +127,24 @@ the whole exemption from
 > as `Open`, so a proposition in its place is a heading no reader knows
 > to look for.
 
-## A shared term in one head file
+## A term in the nearest head file that holds its uses
 
-A term coined by the work and used in more than one file of a
-workstream is defined in the `Terms` heading of one head file: that of
-the smallest workstream that holds every file using the term, in place
-of the entry
-[crossing terms in CONTEXT.md](/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd)
-puts in the repo's `CONTEXT.md`.
+A term coined by the work is defined once: in the `Terms` heading of
+the head file of the nearest workstream that holds every file using
+it, or, where a file outside `workstreams/` also uses it, in the repo's
+`CONTEXT.md`, per
+[crossing terms in CONTEXT.md](/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd).
+Every other file of the workstream that uses the term links to that
+definition.
 
-`knowledge-organization.a-shared-term-in-one-head-file` · stochastic
+`knowledge-organization.a-term-in-the-nearest-head-file-that-holds-its-uses` · stochastic
 
-## An `Acronyms` appendix in every file
+## An acronym in the nearest head file that holds its uses
 
-Every file of a workstream ends with an `Acronyms` appendix, holding a
-bare `None.` where the file uses no acronym, and an acronym is defined
-in the appendix of the highest file that uses it and in no other
-file's, in place of a definition above first use
+Only a head file has an `Acronyms` heading. An acronym a file of a
+workstream uses is defined once, in the `Acronyms` heading of the head
+file of the nearest workstream that holds every file using it, in
+place of a definition above first use
 ([definition before first use](/standards/prose/conventions.md#definition-before-first-use)).
 
-`knowledge-organization.an-acronyms-appendix-in-every-file` · stochastic
+`knowledge-organization.an-acronym-in-the-nearest-head-file-that-holds-its-uses` · stochastic

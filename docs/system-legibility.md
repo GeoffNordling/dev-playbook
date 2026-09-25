@@ -158,12 +158,10 @@ that file. It is a public surface for user/AI conversation.
 
 ## Ambitions
 
-- **An ontology solver.** The word **ontology** is reserved for a
-  future deterministic inventory of the declared abstractions — their
-  categories, relations, and axioms — with a solver that validates or
-  invalidates operations among them: a type checker for what is
-  declared here. Until that exists, the word stays out of the active
-  vocabulary.
+- **An ontology solver.** An **ontology** is a deterministic
+  inventory of the declared abstractions — their categories, relations,
+  and axioms — with a solver that validates or invalidates operations
+  among them: a type checker for what is declared here.
 - **Hardening.** Any part of this doctrine that grows a checkable
   claim moves toward a Standard whose rules a verifier decides.
 

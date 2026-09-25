@@ -1,18 +1,18 @@
-"""TEMPORARY: the six pseudocode blocks match the reference model's one.
+"""The six pseudocode blocks match the reference model's one.
 
 The doc-type system's pseudocode is split across six pages, the base in
 `doc-types/doc-type.md` and one class per `contract-shape.md`, and the
-reference model in the workstream holds the same text whole. This test
-fails when they differ. It parses nothing as Python: the pseudocode is a
-picture, not code. Delete this test when
-`workstreams/doc-type-system/doc-type-system/reference-model.md` is
-deleted; it fails with that instruction if the file is missing.
+reference model, `doc-types/reference-model.md`, holds the same text
+whole. This test fails when they differ. It parses nothing as Python:
+the pseudocode is a picture, not code. Delete this test when the
+reference model is deleted; it fails with that instruction if the file
+is missing.
 """
 
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "workstreams/doc-type-system/doc-type-system/reference-model.md"
+REFERENCE = ROOT / "doc-types/reference-model.md"
 PAGES = [
     ROOT / "doc-types/doc-type.md",
     ROOT / "doc-types/runbook/contract-shape.md",

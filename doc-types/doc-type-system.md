@@ -8,9 +8,8 @@ description: This repo's doc-type instantiation — the registry rulings, the fi
 
 This repo's instantiation of [Doc-Type](/doc-types/doc-type.md): which
 document kinds matter here, which doc-types are built, and what binds
-their instances. The target state the system is moving toward is the
-workstream's, not this file's
-([Doc-Type System](/workstreams/doc-type-system/doc-type-system/WORKSTREAM.md)).
+their instances. The whole system is drawn in
+[Reference Model](/doc-types/reference-model.md).
 
 ## Registry rulings
 
@@ -88,14 +87,14 @@ No view is generated today. The three prototype generators,
 `chaingen`, `cardgen`, and `rulegen`, and the text files they wrote are
 deleted and kept in git history, the last of them at commit `b266ce4`;
 the fact base's extractors are the planned successors
-([Planned](/workstreams/doc-type-system/fact-base/WORKSTREAM.md#planned)).
+([Planned](/workstreams/system/see/fact-base/WORKSTREAM.md#planned)).
 Loop's view is the Mermaid graph inside each instance.
 
 ## Shape and obligation
 
 A doc-type declares what a contract shape *is*; it never binds anyone
 to use it. The binding rule — every instance in the family must carry
-its contract — is a Standard's job, and the four sit together under
+its contract — is a Standard's job, and the five sit together under
 [standards/doc-type/](/standards/doc-type/index.md): Runbook's
 obligation rides
 [Runbook Conventions](/standards/doc-type/runbook-conventions.md),

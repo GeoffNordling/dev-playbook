@@ -10,6 +10,7 @@ work them are configured. Start at [dev-playbook](/README.md).
 
 - [dev-playbook](/README.md) — The dev-playbook meta repo — workspace standards, agent configuration, CLI tools, and reusable harness patterns
 - [Candidates](/CANDIDATES.md) — Uncommitted future work — described, not yet promoted to issues
+- [Refactor Decisions](/REFACTOR-DECISIONS.md) — TEMPORARY — the judgment calls of the workstream refactor of 2026-09-24, one per entry, for the user to review and reverse; delete this file after the review
 - [Vocabulary](/CONTEXT.md) — The workspace's established vocabulary — the canonical terms to use exactly
 
 ## Directories

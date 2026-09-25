@@ -8,8 +8,7 @@ description: The software factory moved whole out of the tree on 2026-09-20 and 
 
 This workstream is speculative: nothing in it is decided, and every member
 writes a guess as a guess. It holds the software factory whole, moved
-here on 2026-09-20 by the doc-type system refactor
-([its plan](/workstreams/doc-type-system/doc-type-system/WORKSTREAM.md)) so
+here on 2026-09-20 by the doc-type system refactor, so
 that no step of that work trips over it. The factory is out of that
 work's scope, and its future, a rewrite or deletion, is a later
 session's decision. Until then nothing in the repo links to, imports,

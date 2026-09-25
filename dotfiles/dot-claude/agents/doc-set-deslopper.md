@@ -83,7 +83,7 @@ The fact slices:
   [crossing terms in CONTEXT.md](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/documentation-sets.md#crossing-terms-in-contextmd),
   [definitions at most two sentences](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#definitions-at-most-two-sentences),
   [project terms only](~/workspace/dev-playbook/standards/knowledge-organization/context-content.md#project-terms-only),
-  [a shared term in one head file](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#a-shared-term-in-one-head-file).
+  [a term in the nearest head file that holds its uses](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#a-term-in-the-nearest-head-file-that-holds-its-uses).
 - **Placement** —
   [one rule, one place](~/workspace/dev-playbook/standards/prose/conventions.md#one-rule-one-place),
   [the canonical file, linked not copied](~/workspace/dev-playbook/standards/prose/conventions.md#the-canonical-file-linked-not-copied).
@@ -114,7 +114,7 @@ The set slices:
   [headings are propositions](~/workspace/dev-playbook/standards/prose/conventions.md#headings-are-propositions),
   [a guess written as a guess](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#a-guess-written-as-a-guess),
   [menu headings are names](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#menu-headings-are-names),
-  [an `Acronyms` appendix in every file](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#an-acronyms-appendix-in-every-file).
+  [an acronym in the nearest head file that holds its uses](~/workspace/dev-playbook/standards/knowledge-organization/documentation-sets/workstream-files.md#an-acronym-in-the-nearest-head-file-that-holds-its-uses).
 
 A section from Workstream Files binds only a member under
 `workstreams/`, and one from Workstream Conventions only a

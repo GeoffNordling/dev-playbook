@@ -1,6 +1,6 @@
 ---
 name: orient-cloa
-description: Orient the session on the user's system-legibility ideas — CLOA, the doc-type system, ontology solvers, the fact base, Loop, and the viewer — at the level of their head files.
+description: Orient the session on the user's system-legibility ideas — CLOA, the doc-type system, the fact base and its ontology, the viewer, and driving work in stints — at the level of their head files.
 disable-model-invocation: true
 model: inherit
 effort: medium
@@ -18,12 +18,12 @@ Read each file end-to-end:
 
 - {Read [System Legibility](~/workspace/dev-playbook/docs/system-legibility.md); the doctrine, and where CLOA is defined}.
 - {Read [The doc-type system](~/workspace/dev-playbook/doc-types/doc-type-system.md); the published definition}.
-- {Read [Synthesis Workstream](~/workspace/dev-playbook/workstreams/doc-type-system/WORKSTREAM.md); the five child workstreams, their shared terms, and the open questions that cross child workstreams}.
-- {Read [the doc-type system head file](~/workspace/dev-playbook/workstreams/doc-type-system/doc-type-system/WORKSTREAM.md); the language, the reference model, and ontology solvers}.
-- {Read [the Loop and Workstream head file](~/workspace/dev-playbook/workstreams/doc-type-system/loop-and-workstream/WORKSTREAM.md); the driver}.
-- {Read [the fact base head file](~/workspace/dev-playbook/workstreams/doc-type-system/fact-base/WORKSTREAM.md); the compiled object}.
-- {Read [the viewer head file](~/workspace/dev-playbook/workstreams/doc-type-system/viewer/WORKSTREAM.md); the CLOA viewer}.
-- {Read [the story-forge simulation head file](~/workspace/dev-playbook/workstreams/doc-type-system/story-forge-simulation/WORKSTREAM.md); the ideas tried by hand on one consumer repo}.
+- {Read [the system head file](~/workspace/dev-playbook/workstreams/system/WORKSTREAM.md); the two aims, See and Drive, what is built and closed, and the terms they share}.
+- {Read [the See head file](~/workspace/dev-playbook/workstreams/system/see/WORKSTREAM.md); the fact base, the viewer, and story-forge, and how they connect}.
+- {Read [the fact base head file](~/workspace/dev-playbook/workstreams/system/see/fact-base/WORKSTREAM.md); the compiled object}.
+- {Read [the viewer head file](~/workspace/dev-playbook/workstreams/system/see/viewer/WORKSTREAM.md); the CLOA viewer}.
+- {Read [the story-forge simulation head file](~/workspace/dev-playbook/workstreams/system/see/story-forge/WORKSTREAM.md); the ideas tried by hand on one consumer repo}.
+- {Read [the Drive head file](~/workspace/dev-playbook/workstreams/system/drive/WORKSTREAM.md); stints, loops, drivers, and the built `stint` command}.
 
 Stay at the head files. The files beside each `WORKSTREAM.md`, the
 `src/dev_playbook/cloa_viewer/` code, and the simulation's data are

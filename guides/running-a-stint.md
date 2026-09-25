@@ -12,7 +12,7 @@ back to the repository is the stint's branch. The `stint` command, from
 [`src/dev_playbook/stint/`](/src/dev_playbook/stint/cli.py), runs one stint
 from launch to its end. The words stint, principal, iteration, checkpoint,
 and segment are
-[the delegation workflow's terms](/workstreams/delegation/WORKSTREAM.md#terms).
+[the repo's terms](/CONTEXT.md#workstreams-and-loops).
 
 ## What the stint guarantees
 

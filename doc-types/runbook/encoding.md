@@ -14,7 +14,7 @@ prose; the primitive map below gives each primitive of the shape its
 written form. No parser reads it today: the prototype `chaingen` is
 deleted and kept in git history at commit `b266ce4`, and the fact
 base's `chain` extractor is its planned successor
-([Planned](/workstreams/doc-type-system/fact-base/WORKSTREAM.md#planned));
+([Planned](/workstreams/system/see/fact-base/WORKSTREAM.md#planned));
 everything the writer does not need — how an edge draws, how a name
 resolves — is the parser's and not this spec's. The
 Standard that binds a runbook to this grammar is
