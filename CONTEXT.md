@@ -77,7 +77,7 @@ One state that satisfies a specification, drawn out: a witness, as an example is
 ### Doc-types
 
 The parts of the doc-type system
-([Doc-Type](/doc-types/doc-type.md)).
+([Reference Model](/doc-types/reference-model.md)).
 
 **DocType**
 The base class of the reference model: a class extends it when its instance is one markdown file of that type.
@@ -95,7 +95,7 @@ A doc-type's map from written form to rows: which marks in a file of that type c
 One named node type or relation type that a doc-type owns, such as the runbook's `reads`, or a bedrock relation such as `contains`.
 
 **Residual**
-What a doc-type's selected primitives cannot express about one of its documents, recorded in that doc-type's residual ledger ([the doc-type build loop](/doc-types/doc-type.md#the-doc-type-build-loop)).
+What a doc-type's selected primitives cannot express about one of its documents, recorded in that doc-type's residual ledger ([the doc-type build loop](/workstreams/system/see/fact-base/WORKSTREAM.md#terms)).
 
 ### Fact base
 
@@ -170,7 +170,7 @@ The two axes a repository file sits on, its role and its content
 Prose a reader loads to understand something. It carries OKF frontmatter, and a check reads its type.
 
 **Harness-owned file**
-A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the harness-files registry enumerates. It carries no OKF frontmatter.
+A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the Harness kinds table of the [Type Registry](/doc-types/registry.md#harness-kinds) enumerates. It carries no OKF frontmatter.
 
 **Procedure**
 The steps of one job: its trigger, its target, the order of the steps, the conditions it branches on, the commands it issues, when it stops, what it reports. It binds one actor for the length of one run.

@@ -1,7 +1,8 @@
 """The doc-type family: the rules of ``standards/doc-type/``.
 
-Thirty rules are decided by functions over the model. One holds each
-``doc-types/<name>/`` directory to a row of the registry rulings table. Three
+Thirty-one rules are decided by functions over the model. Two hold each
+``doc-types/<name>/`` directory to a row of the Type Registry and to its five
+files. Three
 hold a file typed ``Guide`` to its steps and its lack of trailers. One holds
 the acts of a file typed ``Loop`` to a runbook link. Four hold a file typed
 ``Workstream`` to its menu of headings, its worklist items, its stint entries,
@@ -25,6 +26,13 @@ from dev_playbook.check_registry import Finding, check
 from dev_playbook.model import TRAILER_PATTERN, MarkdownFile, Repo
 
 DOC_TYPES = "doc-types"
+DOC_TYPE_FILES = (
+    "index.md",
+    "definition.md",
+    "contract-shape.md",
+    "encoding.md",
+    "residual-ledger.md",
+)
 STANDARDS = "standards"
 WORKSTREAMS = "workstreams/"
 GUIDE_TYPE = "Guide"
@@ -157,28 +165,43 @@ class Runbook:
 # --- doc-type.md --------------------------------------------------------------
 
 
-@check("doc-type.registered")
-def registered(repo: Repo) -> Iterator[Finding]:
-    """Each ``doc-types/<name>/`` is linked from a Ruling cell of the registry rulings."""
-    table = sources.REGISTRY_RULINGS
-    ruled: set[str] = set()
-    if table.path in repo.markdown:
-        for cell in _column(repo.markdown[table.path].section(table.heading), "Ruling"):
-            for _, target in md.markdown_links(cell):
-                parts = _resolve(table.path, target, repo.name, "").split("/")
-                if len(parts) > 2 and parts[0] == DOC_TYPES:
-                    ruled.add(parts[1])
-    directories = {
+def _doc_type_directories(repo: Repo) -> set[str]:
+    """The name of each ``doc-types/<name>/`` directory that holds a tracked file."""
+    return {
         parts[1]
         for path in repo.files
         if len(parts := path.split("/")) > 2 and parts[0] == DOC_TYPES
     }
-    for name in sorted(directories - ruled):
+
+
+@check("doc-type.registered")
+def registered(repo: Repo) -> Iterator[Finding]:
+    """Each ``doc-types/<name>/`` is linked from a Doc-type cell of the Type Registry."""
+    covered: set[str] = set()
+    for table in (sources.TYPE_REGISTRY, sources.HARNESS_KINDS):
+        if table.path not in repo.markdown:
+            continue
+        section = repo.markdown[table.path].section(table.heading)
+        for cell in _column(section, "Doc-type"):
+            for _, target in md.markdown_links(cell):
+                parts = _resolve(table.path, target, repo.name, "").split("/")
+                if len(parts) > 2 and parts[0] == DOC_TYPES:
+                    covered.add(parts[1])
+    for name in sorted(_doc_type_directories(repo) - covered):
         yield Finding(
             f"{DOC_TYPES}/{name}",
             None,
-            f"no Ruling cell of `{table.path}#{table.heading}` links a file in it",
+            f"no Doc-type cell of `{sources.TYPE_REGISTRY.path}` links a file in it",
         )
+
+
+@check("doc-type.five-files")
+def five_files(repo: Repo) -> Iterator[Finding]:
+    """Each ``doc-types/<name>/`` holds the five files of a doc-type."""
+    for name in sorted(_doc_type_directories(repo)):
+        for file in DOC_TYPE_FILES:
+            if f"{DOC_TYPES}/{name}/{file}" not in repo.files:
+                yield Finding(f"{DOC_TYPES}/{name}", None, f"no {file}")
 
 
 # --- guide-conventions.md -----------------------------------------------------

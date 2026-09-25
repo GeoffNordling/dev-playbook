@@ -7,7 +7,7 @@ description: Loop's contract shape — acts, verifications, and yields, peers or
 # Acts, Verifications, and Yields
 
 Acts, verifications, and yields are Loop's contract shape
-([Doc-Type](/doc-types/doc-type.md)): the form every Loop's contract
+([Reference Model](/doc-types/reference-model.md)): the form every Loop's contract
 takes. A loop drives a state toward a target state by iteratively
 taking prescribed actions and validating against prescribed standards
 ([Loop](/doc-types/loop/definition.md)).
@@ -38,9 +38,9 @@ and a yield that fires hands control out at its place in the graph.
 The loop drives a workstream and names none: one loop drives many,
 and each workstream's Stints records which loop drove it.
 
-The shape as code, one module importing the base in
-[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
-the same text whole and a test keeps them identical.
+The shape as code, one module importing the base drawn in
+[Reference Model](/doc-types/reference-model.md#the-language), which
+holds the same text whole; a test keeps them identical.
 
 ```python
 from doc_type import DocType

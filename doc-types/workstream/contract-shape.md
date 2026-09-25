@@ -7,7 +7,7 @@ description: Workstream's contract shape — a head file of peer headings picked
 # Headings and Stints
 
 Headings and stints are Workstream's contract shape
-([Doc-Type](/doc-types/doc-type.md)): the form every Workstream's
+([Reference Model](/doc-types/reference-model.md)): the form every Workstream's
 contract takes. A workstream holds one line of work
 ([Workstream](/doc-types/workstream/definition.md)), and what a reader
 needs of it is the job as it stands: its ideas, its target state, and
@@ -38,9 +38,9 @@ at most once; under Stints, the planned stint first, if any, then the
 recorded ones, newest first. A workstream is driven: a loop drives it,
 and it adds no verb of its own.
 
-The shape as code, one module importing the base in
-[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
-the same text whole and a test keeps them identical.
+The shape as code, one module importing the base drawn in
+[Reference Model](/doc-types/reference-model.md#the-language), which
+holds the same text whole; a test keeps them identical.
 
 ```python
 from doc_type import DocType

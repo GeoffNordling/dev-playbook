@@ -53,11 +53,11 @@ def test_type_registry_rows_name_a_type_in_the_first_cell(
         assert type_name.fullmatch(row[0]), row[0]
 
 
-def test_type_registry_rows_describe_the_type_in_the_second_cell(
+def test_type_registry_rows_describe_the_type_then_name_its_doc_type(
     dev_playbook_repo: Repo,
 ) -> None:
     for row in registry_rows(dev_playbook_repo):
-        assert len(row) == 2
+        assert len(row) == 3
         assert row[1], row[0]
 
 

@@ -844,7 +844,7 @@ def readme_holds_an_h1(repo: Repo) -> Iterator[Finding]:
             yield Finding(path, None, "no H1")
 
 
-# --- type-registry.md ----------------------------------------------------
+# --- local-types.md ------------------------------------------------------
 
 
 @check("knowledge-organization.type-name-to-description")

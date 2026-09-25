@@ -577,7 +577,7 @@ def test_readme_holds_an_h1() -> None:
     assert found(readme_holds_an_h1, {"d/README.md": no_h1}) == [("d/README.md", None)]
 
 
-# --- type-registry.md ---
+# --- local-types.md ---
 
 
 def local(types: str) -> dict[str, str]:

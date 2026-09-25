@@ -94,10 +94,10 @@ in the Standard the step links.
    ```
 
    The type check unions those names onto the
-   [global registry](/standards/knowledge-organization/document-types.md).
+   [Type Registry](/doc-types/registry.md#document-types).
    The mapping's rules, the entry shape, alphabetical keys,
    add-never-shadow, and name and description only, are
-   [Type Registry](/standards/knowledge-organization/type-registry.md#local-declaration).
+   [Local Types](/standards/knowledge-organization/local-types.md#local-declaration).
    Nothing goes under the repo's own `standards/` tree for this: that
    tree is the meta-standard's, and a registry document in it could not
    pass its checks.

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Doc-Type
-description: What any doc-type satisfies — a ruling, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
+description: What any doc-type satisfies — a registry row, five files, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
 population: "a doc-type: an immediate subdirectory of doc-types/"
 ---
 
@@ -9,7 +9,7 @@ population: "a doc-type: an immediate subdirectory of doc-types/"
 
 A doc-type is a directory `doc-types/<name>/`: the definition, contract
 shape, and encoding of one kind of markdown file, the theory of which
-is [Doc-Type](/doc-types/doc-type.md). These rules hold of every
+is [Reference Model](/doc-types/reference-model.md). These rules hold of every
 doc-type, the built and any built later; a rule over the
 instances of one doc-type is that doc-type's own Standard's.
 
@@ -30,17 +30,17 @@ instances of one doc-type is that doc-type's own Standard's.
 
 ## Registered
 
-The table under `## Registry rulings` in
-`doc-types/doc-type-system.md` has a row whose Ruling cell links to
-a file in `doc-types/<name>/`.
+A table in `doc-types/registry.md` has a row whose Doc-type cell links
+to a file in `doc-types/<name>/`.
 
 `doc-type.registered` · deterministic
 
-> **Why.** A doc-type nobody can find from the registry rulings or the
-> doc-types index is not in the system. The rulings table, not the
-> type registry, is the anchor, because a runbook carries no
-> frontmatter `type`: `Skill` and `Agent definition` are rulings onto
-> Runbook.
+## Five files
+
+`doc-types/<name>/` holds `index.md`, `definition.md`,
+`contract-shape.md`, `encoding.md`, and `residual-ledger.md`.
+
+`doc-type.five-files` · deterministic
 
 ## Verbs are the operations
 

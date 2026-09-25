@@ -50,7 +50,7 @@ The viewer draws the fact base's views of a real repo.
   with no declared structure sits at one; code sits at zero; a file
   with embedded structure sits between. A file's stochasticity is what
   lies outside its declared structure, which is what
-  [the doc-type build loop](/doc-types/doc-type.md#the-doc-type-build-loop)
+  [the doc-type build loop](/workstreams/system/see/fact-base/WORKSTREAM.md#terms)
   calls the residual. The bedrock of determinism is a threshold on
   content, not a line between file kinds.
 - **Shape is orthogonal to stochasticity.** A fully deterministic

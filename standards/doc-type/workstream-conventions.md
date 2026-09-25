@@ -21,23 +21,9 @@ that encoding.
 
 ## Headings from the menu
 
-Every H2 of a document typed `Workstream` is a heading in this table,
+Every H2 of a document typed `Workstream` is a heading in the
+[Workstream Heading Menu](/doc-types/workstream/heading-menu.md#headings),
 and no two of its H2s have the same text.
-
-| Heading | Holds |
-|---|---|
-| `Goal` | what the work is for |
-| `Done when` | the state at which a stint yields as finished |
-| `Principles` | the judgment calls that guide choices |
-| `Constraints` | the hard bounds, the boundaries of a stint included |
-| `Terms` | the terms the work coins |
-| `Settled` | the decisions made, with their dates |
-| `Open` | the questions not yet decided |
-| `Planned` | the work still to do |
-| `Completed` | the work done, with its dates |
-| `Stints` | the stint planned next and the stints recorded |
-| `Unfiled` | material awaiting triage |
-| `Acronyms` | the appendix |
 
 `doc-type.headings-from-the-menu` · deterministic
 

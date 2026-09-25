@@ -7,7 +7,7 @@ description: Guide's contract shape — sequences of named steps and named refer
 # Instruction
 
 Instruction is Guide's contract shape
-([Doc-Type](/doc-types/doc-type.md)): the form every Guide's contract
+([Reference Model](/doc-types/reference-model.md)): the form every Guide's contract
 takes. A guide instructs one kind of work
 ([Guide](/doc-types/guide/definition.md)), and what a reader needs
 before that work is of two kinds, the steps to take and the reference
@@ -40,9 +40,9 @@ order, each named; a sequence holds one or more steps and nothing else.
 Whether two sequences belong in one guide is the title's test, one kind
 of work, and no count.
 
-The shape as code, one module importing the base in
-[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
-the same text whole and a test keeps them identical.
+The shape as code, one module importing the base drawn in
+[Reference Model](/doc-types/reference-model.md#the-language), which
+holds the same text whole; a test keeps them identical.
 
 ```python
 from doc_type import DocType

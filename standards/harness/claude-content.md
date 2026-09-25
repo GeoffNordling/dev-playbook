@@ -15,7 +15,8 @@ file into every session on the machine, then walks up the directory
 tree from the session's cwd and stacks each `CLAUDE.md` it finds, so a
 session inside `<repo>/<dir>/` receives the nested file, the root file,
 and the global file at once. The registry of every file the harness
-loads is [Claude Code Files](/standards/harness/files.md); the voice a
+loads is the
+[Type Registry](/doc-types/registry.md#harness-kinds); the voice a
 `CLAUDE.md` speaks in is Doc Conventions'
 [No first person](/standards/prose/conventions.md#no-first-person).
 

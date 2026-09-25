@@ -13,6 +13,14 @@ predicates that define the set this is one member of. Where a choice
 in the model is open, the one that keeps the doc-types parallel is
 taken.
 
+A **doc-type** hands one documentation family a contract shape: the
+form every member of the family is read against, so a caller learns
+what it needs without reading the body. An **instance** is one member
+of the family: one runbook, one standard, one guide, one loop, one
+workstream. Which kinds of file each built doc-type covers is the
+[Type Registry](/doc-types/registry.md), and the words of the system
+are in [CONTEXT.md](/CONTEXT.md#doc-types).
+
 A markdown file is code in a fuzzy form, and the model that reads it
 is its stochastic compiler. A doc-type gives such a file what code
 has: structure, a contract, an API, and a type. The CLOA is a view of
@@ -25,6 +33,13 @@ The doc-types are the language; the toolchain is the code that
 parses, verifies, and gates them. Both halves are the system.
 
 ### The language
+
+The block below is split across pages the way code is. The base, what
+more than one doc-type uses, is here alone: the `DocType` class and the
+`Target` union. Each doc-type's `contract-shape.md` holds its own class
+and opens with the imports it needs, and
+`tests/test_pseudocode_sync.py` fails when those five classes differ
+from the rest of this block.
 
 ```python
 Verb = NewType("Verb", str)      # a verb is a string; the type says which strings

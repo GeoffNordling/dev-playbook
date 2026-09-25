@@ -7,7 +7,7 @@ description: Runbook's contract shape — nodes joined by labeled edges, the cha
 # Nodes and Edges
 
 Nodes joined by labeled edges, the **chain**, are Runbook's contract
-shape ([Doc-Type](/doc-types/doc-type.md)): the form every runbook's
+shape ([Reference Model](/doc-types/reference-model.md)): the form every runbook's
 contract takes. A runbook is an invocable command written as
 documentation ([Runbook](/doc-types/runbook/definition.md)).
 
@@ -28,9 +28,9 @@ accepts in, reports out — plus the effects, in the coarse order they
 fire. The fine-grained sequencing it drops stays in the instance's
 body.
 
-The shape as code, one module importing the base in
-[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
-the same text whole and a test keeps them identical.
+The shape as code, one module importing the base drawn in
+[Reference Model](/doc-types/reference-model.md#the-language), which
+holds the same text whole; a test keeps them identical.
 
 ```python
 from doc_type import DocType, Target, Verb
@@ -62,7 +62,7 @@ more: its contract lives outside this corpus.
 
 | Type     | What chains do with it | How it runs | Where its declaration lives |
 | -------- | ---------------------- | ----------- | --------------------------- |
-| Standard | read                   | —           | The Standard doc-type ([Doc-Type System](/doc-types/doc-type-system.md)) |
+| Standard | read                   | —           | The Standard doc-type ([Standard](/doc-types/standard/definition.md)) |
 | Agent    | do                     | fresh context, its own permissions — a subprocess | Its own chain |
 | Skill    | do                     | the calling context, the caller's permissions — in-process | Its own chain |
 | Script   | do                     | deterministic code via the shell | The code itself |

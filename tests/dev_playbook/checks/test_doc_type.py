@@ -5,6 +5,7 @@ from pathlib import Path
 
 from dev_playbook.check_registry import Finding
 from dev_playbook.checks.doc_type import (
+    DOC_TYPE_FILES,
     a_rule_heading_predicate_trailer,
     a_sequence_is_one_list,
     a_step_opens_with_its_name,
@@ -20,6 +21,7 @@ from dev_playbook.checks.doc_type import (
     every_bundle_file_reached_from_skillmd,
     every_child_reached_from_its_parent,
     every_entry_states_its_condition,
+    five_files,
     front_matter_holds_its_kinds_vocabulary,
     headings_from_the_menu,
     kebab_case_name,
@@ -78,24 +80,47 @@ def typed(doctype: str, body: str, extra: str = "") -> bytes:
 
 def test_registered() -> None:
     table = b"""\
-# System
+# Type Registry
 
-## Registry rulings
+## Document types
 
-| Kind | Family | Ruling |
+| Type | What it is | Doc-type |
 |---|---|---|
-| Guide | guides | The [Guide](/doc-types/guide/definition.md) doc-type |
-| Loop | [Loop](/doc-types/loop/definition.md) | Pending |
+| `Guide` | [Loop](/doc-types/loop/definition.md) | [Guide](/doc-types/guide/definition.md) |
+| `Log` | A log. | None |
+
+## Harness kinds
+
+| Kind | Doc-type |
+|---|---|
+| Skill | [Runbook](/doc-types/runbook/definition.md) |
 """
     assert found(
         registered,
         {
-            "doc-types/doc-type-system.md": table,
+            "doc-types/registry.md": table,
             "doc-types/guide/definition.md": b"# Guide\n",
             "doc-types/loop/definition.md": b"# Loop\n",
+            "doc-types/runbook/definition.md": b"# Runbook\n",
             "doc-types/index.md": b"# Index\n",
         },
     ) == [("doc-types/loop", None)]
+
+
+def test_five_files() -> None:
+    whole = {f"doc-types/guide/{name}": b"# G\n" for name in DOC_TYPE_FILES}
+    assert (
+        found(
+            five_files,
+            {
+                **whole,
+                "doc-types/loop/definition.md": b"# Loop\n",
+                "doc-types/loop/encoding.md": b"# Loop\n",
+                "doc-types/index.md": b"# Index\n",
+            },
+        )
+        == [("doc-types/loop", None)] * 3
+    )
 
 
 GOOD_GUIDE = """\

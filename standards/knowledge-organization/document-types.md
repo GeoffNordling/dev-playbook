@@ -11,8 +11,8 @@ The frontmatter a concept document carries, the prose `.md` file a
 reader loads to understand something. The
 boundary is drawn by exclusion from a repo's `.md` files: `index.md` is a
 typeless listing ([Indexes](/standards/knowledge-organization/indexes.md));
-the members of the Claude Code file registry
-([Claude Code Files](/standards/harness/files.md)) are harness-owned, a
+the harness kinds of the
+[Type Registry](/doc-types/registry.md#harness-kinds) are harness-owned, a
 tool consumes them as configuration or runs them as code, and they carry
 no frontmatter; and `classify()` in [md.py](/src/dev_playbook/md.py)
 holds the boundary in code with its further exclusions, the transient
@@ -29,25 +29,11 @@ YAML is a mapping.
 ## `type` names a registered type
 
 A concept document's frontmatter has a `type` key whose value names one
-row of the table below, or one entry of the `okf_types` mapping in the
-frontmatter of the repo's own root `index.md`
-([Type Registry](/standards/knowledge-organization/type-registry.md#local-declaration)).
-
-| Type | What it is |
-|------|------------|
-| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [Candidates](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
-| `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
-| `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
-| `Guide` | Instruction on how to do a kind of work, read before doing it and organized by the work; cites rules in passing and is never cited to reject work; lives under `guides/`, the one tree reserved for it. |
-| `Log` | A chronological operational record whose entries are appended as events occur (e.g. a friction log). |
-| `Loop` | A document that drives a state toward a target state by iteratively taking prescribed actions and validating against prescribed standards; lives under `loops/`, the one tree reserved for it (see [the Loop doc-type](/doc-types/loop/definition.md#where-a-loop-lives)). |
-| `Mirror` | A verbatim mirror of an external document, vendored so agents read it without network access; `resource` points at the upstream original. |
-| `README` | The GitHub-rendered landing/orientation doc for a directory or the repo; prose, with any listing delegated to a sibling `index.md`. Role-based: filename `README.md` ⟺ `type: README`. |
-| `Recipe-Description` | A prose description of a reusable harness pattern; the recipe itself is the backing code/skill/workflow, this doc only describes it. |
-| `Standard` | One population and its rules, a normative target a reviewer or check could cite to reject work; lives under `standards/<name>/`, the one tree reserved for it, one directory per Standard (see [the Standard doc-type](/doc-types/standard/definition.md#where-a-standard-lives)). |
-| `Survey` | An evaluative analysis of options or tradeoffs, gathered to inform a decision. |
-| `Vocabulary` | The canonical definitions of the workspace's established vocabulary (lives in `CONTEXT.md`). |
-| `Workstream` | The head file of one line of work, its ideas, target state, and context, driven by a loop; `WORKSTREAM.md`, the head of its directory (see [the Workstream doc-type](/doc-types/workstream/definition.md#where-a-workstream-lives)). |
+row of the Document types table of the
+[Type Registry](/doc-types/registry.md#document-types), or one entry of
+the `okf_types` mapping in the frontmatter of the repo's own root
+`index.md`
+([Local Types](/standards/knowledge-organization/local-types.md#local-declaration)).
 
 `knowledge-organization.type-names-a-registered-type` · deterministic
 

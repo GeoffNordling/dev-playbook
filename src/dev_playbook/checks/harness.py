@@ -101,7 +101,9 @@ def matches_a_member_row(repo: Repo) -> Iterator[Finding]:
         if below is None:
             continue
         if not any(p.fullmatch(below) for p in MEMBER_PATTERNS):
-            yield Finding(path, None, "matches no member row of the harness table")
+            yield Finding(
+                path, None, "matches no member row of the Type Registry's harness kinds"
+            )
 
 
 @check("harness.every-runbook-at-a-fixed-path")
