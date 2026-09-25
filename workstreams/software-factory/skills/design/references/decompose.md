@@ -27,7 +27,7 @@ gh issue edit <epic#> \
 
 Before slicing, test the epic's outcome — and then each slice as it is cut —
 against the two-question orthogonality test in the
-[One-goal principle](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#one-goal);
+[One-goal principle](~/workspace/dev-playbook/standards/tracking/github/issue-shapes.md#one-goal);
 apply its statement, never a paraphrase. What fails out is deferred exactly as
 the bullet says: a real tracker stub minted at `phase:intake`, named in the
 deferring body's `Out of scope`. Deferral itself implies no dependency edge.
@@ -43,7 +43,7 @@ a blocker that must already exist.
 
 One `gh issue create` per slice, in dependency order, each with a full
 four-tuple and every build-leaf heading
-[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#every-build-heading-in-bold)
+[issue shapes](~/workspace/dev-playbook/standards/tracking/github/issue-shapes.md#every-build-heading-in-bold)
 requires from minting on — a leaf missing one is a lint finding whatever its
 phase.
 

@@ -1,11 +1,10 @@
 # standards/tracking/ — index
 
-Tracking governs how work is tracked — the Candidate register, the
-issue shapes, the label scheme, and the GitHub settings.
+Tracking governs how work is tracked — GitHub tracking and workstream
+tracking, each in its own section. A GitHub issue is one way to track
+work, and a workstream is another. The two ways do not tangle.
 
-Ordering: alphabetical by title.
+## Directories
 
-- [Candidates](/standards/tracking/candidates.md) — The register of a repo's uncommitted future work — one CANDIDATES.md at the root, the entry shape, and the headings and nesting
-- [GitHub Settings](/standards/tracking/github-settings.md) — The GitHub settings every governed repo carries — a GitHub origin, squash-only merges with the PR message format and auto-deleted merged branches, and a default branch protected from destructive operations
-- [Issue Shapes](/standards/tracking/issue-shapes.md) — The five species of GitHub issue and the shape of each — its labels and its body headings — the build leaf, the spike, the session leaf, the epic, and the wayfinder map or ticket, plus the rules every body obeys
-- [Label Scheme](/standards/tracking/label-scheme.md) — The closed-world label set a governed repo's tracker mints — every label with its description, generated from the scheme data
+- [github/](/standards/tracking/github/index.md) — GitHub Tracking, work tracked on GitHub — the Candidate register, the issue shapes, and the label scheme
+- [workstreams/](/standards/tracking/workstreams/index.md) — Workstream Tracking, work tracked in a workstream's head file — the worklist and no GitHub issue

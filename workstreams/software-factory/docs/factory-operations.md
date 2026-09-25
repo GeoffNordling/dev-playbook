@@ -308,7 +308,7 @@ per PR; the user trims or rejects it, and what survives lands under
     incidental bugs, cleanups, adjacent improvements, and review findings
     the user rules real-but-not-this-issue. Each entry is a real tracker
     stub at `phase:intake`, named by issue link — never a Candidate
-    ([the one-goal principle](/standards/tracking/issue-shapes.md#one-goal)).
+    ([the one-goal principle](/standards/tracking/github/issue-shapes.md#one-goal)).
     `Nothing deferred.` explicitly when empty.
   - `## Suggestion dispositions` — one line per Suggestion thread the review
     loop settled, naming its outcome and the thread. It is the merge read's

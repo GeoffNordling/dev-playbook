@@ -19,7 +19,7 @@ that decided it.
 
 Before doing anything else:
 
-- {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md)
+- {Read [issue shapes](~/workspace/dev-playbook/standards/tracking/github/issue-shapes.md)
   end-to-end}.
 - {Read [software factory](~/workspace/dev-playbook/workstreams/software-factory/docs/software-factory.md)
   end-to-end}.
@@ -79,7 +79,7 @@ every question before the next round}:
    systems it lands on.
 2. **The slices** — cut thin vertical slices, each a complete path through
    every layer, boundaries falling on module seams per the module-design standard, each
-   slice tested against [One goal](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#one-goal)'s two-question test
+   slice tested against [One goal](~/workspace/dev-playbook/standards/tracking/github/issue-shapes.md#one-goal)'s two-question test
    at epic and slice altitude. What fails the test is deferred exactly as the
    bullet says: a real tracker stub at `phase:intake`, named in the epic's
    Out of scope.
@@ -101,7 +101,7 @@ A fresh issue — the map stays what it is, tied to the epic by links. Title it
 to pair with the map's: "Factory reliability mechanisms — wayfinder map"
 begets "Factory reliability mechanisms — build epic", the shared prefix
 tying the two at a glance. Label it `category:*` **only**. {Read
-[issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md#no-child-list)}
+[issue shapes](~/workspace/dev-playbook/standards/tracking/github/issue-shapes.md#no-child-list)}
 and {Write to GitHub the epic with the body defined there}:
 
 - **Outcome** — opens by naming the map once ("per the resolutions of the

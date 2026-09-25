@@ -25,7 +25,7 @@ yes/no questions:
    interface named under `Prohibited surfaces`, or an idea the brief put
    under `Out of scope`? The first half is mechanical: compare the file about
    to be edited against the path list, and no judgment is owed
-   ([the two headings](/standards/tracking/issue-shapes.md#every-build-heading-in-bold)).
+   ([the two headings](/standards/tracking/github/issue-shapes.md#every-build-heading-in-bold)).
 3. Does the fix contradict a decision recorded on the issue, PR, an epic's
    standing rulings, or a map?
 

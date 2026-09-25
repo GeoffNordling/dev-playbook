@@ -80,17 +80,18 @@ from dev_playbook.pins.release import (
     release_head,
 )
 
-# Every rule id this command can emit. Repo-settings drift, reachability, and
-# the live-repo tracking checks (label scheme, leaf labels and headings, epic
-# labels, wayfinder labels and body) answer the tracking Standards. Each id is a
+# Every rule id this command can emit. Repo-settings drift and reachability
+# answer the GitHub Standard; the live-repo tracking checks (label scheme, leaf
+# labels and headings, epic labels, wayfinder labels and body) answer the
+# tracking Standards. Each id is a
 # module-level constant so every emission site references the constant, never a
 # raw literal, and RULES (what --list-rules prints) cannot drift from what the
 # command actually emits.
-SQUASH_ONLY_MERGES = "tracking.squash-only-merges"
+SQUASH_ONLY_MERGES = "github.squash-only-merges"
 DEFAULT_BRANCH_PROTECTION = (
-    "tracking.default-branch-protected-from-destructive-operations"
+    "github.default-branch-protected-from-destructive-operations"
 )
-GITHUB_ORIGIN = "tracking.origin-on-github"
+GITHUB_ORIGIN = "github.origin-on-github"
 VALID_LABELS = "tracking.exactly-the-labels-the-scheme-declares"
 CLOSED_FENCES = "tracking.closed-fences"
 BUILD_LABELS = "tracking.one-label-from-each-prefix"
@@ -127,7 +128,7 @@ RULES = (
 )
 
 # The required headings of each brief format, stated here exactly as
-# standards/tracking/issue-shapes.md states them (§ Build headings, § Spike
+# standards/tracking/github/issue-shapes.md states them (§ Build headings, § Spike
 # headings, and § Session headings) — the doc and this rule read one contract
 # and cannot disagree.
 BUILD_HEADING_LIST = (
@@ -154,7 +155,7 @@ SESSION_HEADING_LIST = (
 # exactly as the ``/wayfinder`` skill states them (``§ The map body`` and
 # ``§ Tickets`` of dotfiles/.agents/skills/wayfinder/SKILL.md). The skill — not
 # this workspace — is the definition of a map's shape, per
-# standards/tracking/issue-shapes.md § Wayfinder map or ticket, so this rule
+# standards/tracking/github/issue-shapes.md § Wayfinder map or ticket, so this rule
 # mirrors the skill directly, the way BUILD_HEADING_LIST mirrors the brief standard.
 # The bundle is installed verbatim at a pin, which is what makes the mirror
 # stable: a pin bump delta-checks these tuples against the upstream text.
@@ -190,7 +191,7 @@ GOVERNED = (
 )
 
 # Expected GitHub settings, under the REST field names. The audit only reads;
-# the merge settings are set by hand per the repo-settings standard.
+# the merge settings are set by hand per the GitHub Settings standard.
 EXPECTED_SETTINGS = {
     "allow_squash_merge": True,
     "allow_merge_commit": False,
@@ -233,7 +234,7 @@ REQUIRED_RULES = {
     "DELETION": "deletion",
 }
 
-# The canonical ruleset of standards/tracking/repo-settings.md § Default branch
+# The canonical ruleset of standards/github/settings.md § Default branch
 # protection. Its name is audited so that the protection of every governed repo is
 # filed in one findable place: a repo whose branch is protected under some other
 # name is protected, but not the way the standard describes, and the finding is

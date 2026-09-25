@@ -66,7 +66,7 @@ Work enters as an idea and leaves as an issue a factory node can pick up.
 
 **Before the issue.** The idea funnel feeds `CANDIDATES.md`, a repo's register of
 work described but not yet committed to
-([Candidates](/standards/tracking/candidates.md)). A Candidate is pre-issue:
+([Candidates](/standards/tracking/github/candidates.md)). A Candidate is pre-issue:
 no issue exists, so no label does either.
 
 **`intake` — accounting and routing.** Every issue passes through, whether minted
@@ -94,7 +94,7 @@ Nothing merges out of definition. A design session exits:
   `design` in a session of its own, which re-authors its brief and crosses it
   into the factory on its issue-review verdict. The epic body carries the
   outcome and the decomposition rationale
-  ([issue-shapes.md](/standards/tracking/issue-shapes.md#no-child-list)).
+  ([issue-shapes.md](/standards/tracking/github/issue-shapes.md#no-child-list)).
 
 **`spike` — a question.** A spike is an issue whose deliverable is an answer.
 Everything it produces lands on the issue itself: the findings in its closing
@@ -132,4 +132,4 @@ does, who runs it, and under what contract is
 ## Labels
 
 The labels naming these states are defined in
-[Label Scheme](/standards/tracking/label-scheme.md).
+[Label Scheme](/standards/tracking/github/label-scheme.md).

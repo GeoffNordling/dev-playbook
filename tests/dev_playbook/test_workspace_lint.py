@@ -300,8 +300,8 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     )
     assert result.returncode == 0, result.stderr
     ids = set(result.stdout.split())
-    assert "tracking.squash-only-merges" in ids
-    assert "tracking.origin-on-github" in ids
+    assert "github.squash-only-merges" in ids
+    assert "github.origin-on-github" in ids
     # the tracking and software-factory rules this slice adds
     assert "tracking.exactly-the-labels-the-scheme-declares" in ids
     assert "tracking.every-build-heading-in-bold" in ids
@@ -309,7 +309,7 @@ def test_list_rules_prints_card_prefixed_ids_from_any_cwd(tmp_path: Path) -> Non
     assert "tracking.one-label-from-each-prefix" in ids
     assert "tracking.one-category-label-no-phase-or-tests" in ids
     assert all(
-        rule.split(".")[0] in {"tracking", "distribution", "software-factory"}
+        rule.split(".")[0] in {"github", "tracking", "distribution", "software-factory"}
         for rule in ids
     ), ids
 
@@ -382,9 +382,9 @@ def test_roster_order_is_the_audit_order(tmp_path: Path) -> None:
     result = run(
         ws, "--settings-only", repos="beta,alpha", gh_dir=gh_dir, gh_data=gh_data
     )
-    assert result.stdout.index(
-        "beta: tracking.squash-only-merges"
-    ) < result.stdout.index("alpha: tracking.squash-only-merges")
+    assert result.stdout.index("beta: github.squash-only-merges") < result.stdout.index(
+        "alpha: github.squash-only-merges"
+    )
 
 
 def test_default_roster_is_the_governed_constant() -> None:
@@ -458,7 +458,7 @@ def test_drifted_setting_is_a_finding(tmp_path: Path) -> None:
     assert result.returncode == 1
     # Queried as mergeCommitAllowed, reported under the REST name.
     assert (
-        "alpha: tracking.squash-only-merges allow_merge_commit is True (want False)"
+        "alpha: github.squash-only-merges allow_merge_commit is True (want False)"
         in result.stdout
     )
 
@@ -472,7 +472,7 @@ def test_unreachable_repo_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.squash-only-merges unreachable via gh api (me/unknown)"
+        "alpha: github.squash-only-merges unreachable via gh api (me/unknown)"
         in result.stdout
     )
 
@@ -492,7 +492,7 @@ def test_response_without_merge_fields_is_unreachable_not_six_drifts(
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert result.stdout.splitlines() == [
-        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
+        "alpha: github.squash-only-merges unreachable via gh api (me/alpha)"
     ]
 
 
@@ -508,7 +508,7 @@ def test_partial_response_is_unreachable_not_partial_drift(tmp_path: Path) -> No
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert result.stdout.splitlines() == [
-        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
+        "alpha: github.squash-only-merges unreachable via gh api (me/alpha)"
     ]
 
 
@@ -522,7 +522,7 @@ def test_null_repository_is_unreachable(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
+        "alpha: github.squash-only-merges unreachable via gh api (me/alpha)"
         in result.stdout
     )
 
@@ -534,7 +534,7 @@ def test_repo_without_origin_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.origin-on-github no GitHub origin; settings unchecked"
+        "alpha: github.origin-on-github no GitHub origin; settings unchecked"
         in result.stdout
     )
 
@@ -572,11 +572,11 @@ def test_unprotected_default_branch_is_two_findings(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protected-from-destructive-operations main is not protected against force-push"
+        "alpha: github.default-branch-protected-from-destructive-operations main is not protected against force-push"
         in result.stdout
     )
     assert (
-        "alpha: tracking.default-branch-protected-from-destructive-operations main is not protected against deletion"
+        "alpha: github.default-branch-protected-from-destructive-operations main is not protected against deletion"
         in result.stdout
     )
 
@@ -677,7 +677,7 @@ def test_unreadable_rules_are_surfaced_not_read_as_unprotected(tmp_path: Path) -
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protected-from-destructive-operations rules unreachable via gh api (me/alpha)"
+        "alpha: github.default-branch-protected-from-destructive-operations rules unreachable via gh api (me/alpha)"
         in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -703,7 +703,7 @@ def test_bypass_actor_on_the_guarding_ruleset_is_a_finding(tmp_path: Path) -> No
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protected-from-destructive-operations ruleset 'protect-main' grants bypass "
+        "alpha: github.default-branch-protected-from-destructive-operations ruleset 'protect-main' grants bypass "
         "to 2 actors (want none)" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -748,7 +748,7 @@ def test_protection_under_another_name_is_a_finding(tmp_path: Path) -> None:
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protected-from-destructive-operations main is protected by 'no-touchy', "
+        "alpha: github.default-branch-protected-from-destructive-operations main is protected by 'no-touchy', "
         "not by the canonical 'protect-main'" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -819,7 +819,7 @@ def test_unreadable_ruleset_is_surfaced_not_read_as_bypassless(
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert result.returncode == 1
     assert (
-        "alpha: tracking.default-branch-protected-from-destructive-operations a ruleset protecting main could not "
+        "alpha: github.default-branch-protected-from-destructive-operations a ruleset protecting main could not "
         "be read" in result.stdout
     )
     assert "not protected against" not in result.stdout
@@ -872,14 +872,14 @@ def test_the_required_rules_may_be_split_across_rulesets(tmp_path: Path) -> None
 
 
 def test_repo_without_origin_draws_one_finding_not_two(tmp_path: Path) -> None:
-    # tracking.origin-on-github already says the origin is missing; protection stays quiet
+    # github.origin-on-github already says the origin is missing; protection stays quiet
     # rather than reporting the same absent repo a second time.
     ws = tmp_path / "ws"
     make_workspace_repo(ws, "alpha", {"README.md": "# A\n"})
     gh_dir, gh_data = make_fake_gh(tmp_path, {})
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert (
-        "tracking.default-branch-protected-from-destructive-operations"
+        "github.default-branch-protected-from-destructive-operations"
         not in result.stdout
     )
     assert len(result.stdout.strip().splitlines()) == 1
@@ -1210,11 +1210,11 @@ def test_bad_json_response_reports_repo_unreachable_and_run_survives(
     result = run(ws, "--settings-only", gh_dir=gh_dir, gh_data=gh_data)
     assert "Traceback" not in result.stderr
     assert (
-        "alpha: tracking.squash-only-merges unreachable via gh api (me/alpha)"
+        "alpha: github.squash-only-merges unreachable via gh api (me/alpha)"
         in result.stdout
     )
     assert (
-        "beta: tracking.squash-only-merges allow_merge_commit is True (want False)"
+        "beta: github.squash-only-merges allow_merge_commit is True (want False)"
         in (result.stdout)
     )
     assert result.returncode == 1

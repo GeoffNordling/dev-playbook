@@ -39,7 +39,7 @@ runbook file, and the edge below it is what the deterministic parser
 generates from that span. A simple read, from intake:
 
 ```
-{Read [issue shapes](~/workspace/dev-playbook/standards/tracking/issue-shapes.md);
+{Read [issue shapes](~/workspace/dev-playbook/standards/tracking/github/issue-shapes.md);
 the brief formats and the rules every body obeys}
 
   ├─reads───► [issue-shapes] Standard

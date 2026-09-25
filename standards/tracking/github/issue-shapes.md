@@ -9,11 +9,11 @@ population: "a GitHub issue in a governed repo"
 
 A GitHub issue in a governed repo is committed work, at any size. Work
 not yet decided on is a Candidate in `CANDIDATES.md`
-([Candidates](/standards/tracking/candidates.md)). An issue is one of
+([Candidates](/standards/tracking/github/candidates.md)). An issue is one of
 five species, told from
 its labels and its sub-issues, and each species fixes the labels the
 issue carries and the headings its body carries. The labels are
-[Label Scheme](/standards/tracking/label-scheme.md)'s; the calls that
+[Label Scheme](/standards/tracking/github/label-scheme.md)'s; the calls that
 link issues are [Linking Issues](/guides/linking-issues.md).
 
 ## Written for the user
@@ -168,18 +168,6 @@ The body of a session leaf has `Summary`, `User intent`,
 fence. `Out of scope` may read `Unknown; dealt with when found.`
 
 `tracking.every-session-heading-in-bold` · deterministic
-
-### A stable body
-
-A session leaf's body holds no worklist, no open question, and no running
-decision.
-
-`tracking.a-stable-body` · stochastic
-
-> **Why.** The plan, the open questions, and the decisions of the work
-> live in a
-> [workstream](/standards/knowledge-organization/documentation-sets/workstream-files.md)
-> on the branch, so the body has nothing to accrue.
 
 ## Epic
 

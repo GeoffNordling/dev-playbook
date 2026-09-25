@@ -58,7 +58,7 @@ one of these sources. Everything else is a Suggestion at most:
 1. **A binding section of the issue brief** — `Acceptance criteria`,
    `Desired behavior`, `Out of scope`, `Prohibited surfaces`, and `Artifacts`
    in a brief that carries one
-   ([the section binds when present](/standards/tracking/issue-shapes.md#every-build-heading-in-bold);
+   ([the section binds when present](/standards/tracking/github/issue-shapes.md#every-build-heading-in-bold);
    the lint never requires the heading). `Key interfaces` is advisory and
    `User intent` guides micro-decisions — neither feeds Blocking.
 2. **A named rule of a standard the review was required to read** — each
@@ -264,7 +264,7 @@ finds every disposition of a kind.
   cycle that has since converged. It stays a Suggestion throughout: it never
   gates convergence and it never escalates.
 - **Defer** — a real tracker stub at `phase:intake`, labeled `origin:deferral`
-  ([Label Scheme](/standards/tracking/label-scheme.md#exactly-the-labels-the-scheme-declares)), so
+  ([Label Scheme](/standards/tracking/github/label-scheme.md#exactly-the-labels-the-scheme-declares)), so
   every issue born of a factory deferral is one query away. Doubt lands here: a
   stub is reversible, and information a decline drops is gone.
 - **Decline** — a one-line reply naming its reason from the vocabulary, and no

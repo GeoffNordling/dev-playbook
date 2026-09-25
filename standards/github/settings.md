@@ -21,7 +21,7 @@ repo's state on github.com, which `scripts/workspace-lint` reads over
 
 A governed repo's `origin` remote is a repository on github.com.
 
-`tracking.origin-on-github` · deterministic
+`github.origin-on-github` · deterministic
 
 ## Squash-only merges
 
@@ -36,7 +36,7 @@ table gives:
 | Allow rebase merging | off |
 | Automatically delete head branches | on |
 
-`tracking.squash-only-merges` · deterministic
+`github.squash-only-merges` · deterministic
 
 > **Why.** The branch's own commits do not survive the squash, so what
 > the branch settled survives only in the tree it merges or in the
@@ -59,7 +59,7 @@ empty bypass list, and one of those rulesets is named
 | Restrict deletions | checked |
 | Block force pushes | checked |
 
-`tracking.default-branch-protected-from-destructive-operations` · deterministic
+`github.default-branch-protected-from-destructive-operations` · deterministic
 
 > **Why.** Together the two rules make the branch's history
 > append-only: every commit that reaches the default branch stays

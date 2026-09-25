@@ -1,8 +1,8 @@
 """The tracking family: the rules of ``standards/tracking/``.
 
 One rule is decided by a function over the model: every list item in the
-root ``CANDIDATES.md`` starts with a bold name and an em dash. The fourteen
-rules over a governed repo's GitHub state are decided by
+root ``CANDIDATES.md`` starts with a bold name and an em dash. The eleven
+rules over a governed repo's issues and labels are decided by
 ``scripts/workspace-lint``, which reads them over ``gh api``, and are
 registered by hook name.
 """
@@ -22,9 +22,6 @@ LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s")
 ENTRY = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+\*\*[^*]+\*\* — ")
 
 WORKSPACE_LINT_RULES = (
-    "tracking.origin-on-github",
-    "tracking.squash-only-merges",
-    "tracking.default-branch-protected-from-destructive-operations",
     "tracking.closed-fences",
     "tracking.one-label-from-each-prefix",
     "tracking.every-build-heading-in-bold",

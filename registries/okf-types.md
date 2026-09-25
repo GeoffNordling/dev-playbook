@@ -18,7 +18,7 @@ is the [Doc-Type Registry](/registries/doc-types.md).
 
 | OKF type | What it is |
 |----------|------------|
-| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [Candidates](/standards/tracking/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
+| `Candidate-List` | A repo's register of uncommitted future work — Candidates described but not yet promoted to issues (see [Candidates](/standards/tracking/github/candidates.md)); lives in `CANDIDATES.md`, one per repo. |
 | `Decision-Record` | An immutable, numbered record of one hard-to-reverse decision and its rationale (see [decisions/records.md](/standards/decisions/records.md)). |
 | `General-Sheet` | A deliberately-broad genre for a working document whose type is not yet settled. |
 | `Guide` | Instruction on how to do a kind of work, read before doing it and organized by the work; cites rules in passing and is never cited to reject work; lives under `guides/`, the one tree reserved for it. |

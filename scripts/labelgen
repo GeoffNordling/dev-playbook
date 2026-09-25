@@ -3,7 +3,7 @@
 
 The scheme is policy-as-data in ``dev_playbook.label_scheme`` (``label_scheme.json``);
 this script writes it as a markdown table between the ``labelgen`` markers in
-standards/tracking/label-scheme.md, so the standard's table and the labels
+standards/tracking/github/label-scheme.md, so the standard's table and the labels
 bootstrap-labels mints read one authority and cannot disagree.
 
 Usage:
@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from dev_playbook.label_scheme import render_table  # noqa: E402
 
-DOC = ROOT / "standards" / "tracking" / "label-scheme.md"
+DOC = ROOT / "standards" / "tracking" / "github" / "label-scheme.md"
 START = "<!-- labelgen:start -->"
 END = "<!-- labelgen:end -->"
 BLOCK = re.compile(rf"{re.escape(START)}\n.*?{re.escape(END)}", re.DOTALL)

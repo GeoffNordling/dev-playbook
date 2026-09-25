@@ -6,5 +6,5 @@ The dev scripts the repo keeps for itself, with the logic behind them in
 - [Scripts](/scripts/README.md) — The local dev scripts, thin shims over the library code in src/dev_playbook/, and how the published playbook hook relates to them
 
 `labelgen` regenerates the label table in
-`standards/tracking/label-scheme.md`, rendered from `label_scheme.json`,
+`standards/tracking/github/label-scheme.md`, rendered from `label_scheme.json`,
 and fails on drift via `--check`.

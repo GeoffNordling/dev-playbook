@@ -72,7 +72,7 @@ the wayfinder body shape at all: the rule is the `/wayfinder` skill's,
 and the half of `tracking.wayfinder-shape` that checks a map's sections
 has no rule row.
 
-### tracking/repo-settings
+### github/settings
 
 Could not express GitHub origin over the member: the remote is the
 clone's, and the settings it opens are the population, so the rule binds

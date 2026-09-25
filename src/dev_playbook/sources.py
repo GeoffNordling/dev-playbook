@@ -110,6 +110,7 @@ STANDARD_DIRECTORIES = frozenset(
         "decisions",
         "distribution",
         "doc-type",
+        "github",
         "harness",
         "knowledge-organization",
         "prose",

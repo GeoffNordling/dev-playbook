@@ -9,8 +9,8 @@ population: "a repo's CANDIDATES.md"
 
 A repo's `CANDIDATES.md`, the register of the future work it has not
 committed to: a **Candidate** is work described but not yet decided, and
-committed work is a GitHub issue
-([Issue Shapes](/standards/tracking/issue-shapes.md)). The file is
+work committed to in GitHub tracking is a GitHub issue
+([Issue Shapes](/standards/tracking/github/issue-shapes.md)). The file is
 optional, one per repo, at the root
 ([One at the root, or none](/standards/build/skeleton.md#one-at-the-root-or-none)), typed
 `Candidate-List`

@@ -7,7 +7,7 @@ that is both its GitHub label description and its meaning in the Label Scheme
 standard — so the three consumers read one authority and cannot disagree:
 ``bootstrap-labels`` mints the scheme into a repo, ``workspace-lint`` checks
 live repos against it, and ``labelgen`` renders it as the table in
-standards/tracking/label-scheme.md.
+standards/tracking/github/label-scheme.md.
 """
 
 import json

@@ -216,9 +216,6 @@ Sessions with the user come first, each at a high level, the agent
 guiding. An unattended stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Split the tracking standard.** GitHub tracking and workstream
-  tracking, each in its own section of
-  [`standards/tracking/`](/standards/tracking/index.md).
 - **Think the system through.** A session with the user, before any
   more of the stint is designed or built. The parts were designed and
   approved one at a time: Loop, Workstream, the stint, and a Standard
@@ -289,6 +286,14 @@ guiding. An unattended stint runs with the `stint` command
   rewritten as the rules of a workstream's files, the exemptions the
   other rules grant a workstream reworded, the old terms replaced in
   every file, and every link fixed.
+- **Split the tracking standard.** Done 2026-09-25:
+  [`standards/tracking/`](/standards/tracking/index.md) holds two
+  sections, [GitHub Tracking](/standards/tracking/github/index.md),
+  the Candidate register, the issue shapes, and the label scheme, and
+  [Workstream Tracking](/standards/tracking/workstreams/index.md),
+  whose rule keeps a worklist item off GitHub issues. The GitHub
+  settings moved to their own Standard,
+  [`standards/github/`](/standards/github/index.md).
 
 ## Acronyms
 

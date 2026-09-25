@@ -11,7 +11,7 @@ The labels a governed repo's tracker mints. The scheme is closed-world:
 which labels exist is fixed as data in
 `src/dev_playbook/label_scheme.json`, and [labelgen](/scripts/labelgen)
 renders that data as the table below. Which labels an issue carries is
-[Issue Shapes](/standards/tracking/issue-shapes.md).
+[Issue Shapes](/standards/tracking/github/issue-shapes.md).
 
 <!-- labelgen:start -->
 | Label | Description |

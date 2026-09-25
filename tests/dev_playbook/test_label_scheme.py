@@ -18,7 +18,7 @@ from dev_playbook import label_scheme
 ROOT = Path(__file__).resolve().parents[2]
 BOOTSTRAP = ROOT / "scripts" / "bootstrap-labels"
 LABELGEN = ROOT / "scripts" / "labelgen"
-DOC = ROOT / "standards" / "tracking" / "label-scheme.md"
+DOC = ROOT / "standards" / "tracking" / "github" / "label-scheme.md"
 
 # The canonical scheme, in mint order: the metadata labels (category, mode,
 # tests) grey, then every phase label yellow, then the wayfinder labels blue —
