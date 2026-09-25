@@ -104,6 +104,7 @@ The set slices:
   [current state and next steps only](~/workspace/dev-playbook/standards/prose/conventions.md#current-state-and-next-steps-only),
   [the opening states the purpose](~/workspace/dev-playbook/standards/prose/conventions.md#the-opening-states-the-purpose),
   [block form fits its content](~/workspace/dev-playbook/standards/prose/conventions.md#block-form-fits-its-content),
+  [a graph in Mermaid](~/workspace/dev-playbook/standards/prose/conventions.md#a-graph-in-mermaid),
   [a rule reads in the positive](~/workspace/dev-playbook/standards/prose/conventions.md#a-rule-reads-in-the-positive),
   [no slop tics](~/workspace/dev-playbook/standards/prose/conventions.md#no-slop-tics),
   [the third person, never the second](~/workspace/dev-playbook/standards/prose/conventions.md#the-third-person-never-the-second)

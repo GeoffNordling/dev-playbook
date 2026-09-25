@@ -84,6 +84,14 @@ The pairs:
 
 `prose.block-form-fits-its-content` · stochastic
 
+## A graph in Mermaid
+
+A graph in a Markdown document, nodes joined by edges, is a fenced
+`mermaid` block. Exempt: a fenced block showing terminal output, which
+holds the text as the terminal printed it.
+
+`prose.a-graph-in-mermaid` · stochastic
+
 ## Every sentence in the present tense
 
 Every sentence is in the present tense, except a sentence reporting a measurement or an incident that happened, and except in a file of a workstream, which may write a guess as a guess.
@@ -242,7 +250,7 @@ The verdicts, over one rule:
 | `Write judgment, not judgement` | fails: the imperative, which addresses the reader |
 | `The prose spells judgment and never the British judgement` | fails: the predicate restated |
 
-[Slop Tics](/guides/slop-tics.md) is such a document: its fifteen
+[Slop Tics](/guides/slop-tics.md) is such a document: its
 sections open with `**Definition.**`, so `Flourish` names the term, and
 `The ordinary word, not the flourish` would put the fix where the name
 belongs.
