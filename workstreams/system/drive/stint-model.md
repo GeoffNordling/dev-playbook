@@ -47,11 +47,11 @@ only the rules the stint targets are run · authority goes down only: you ▶ pr
 ## Settled
 
 - **A workstream's target is one or more draft Standards.** A
-  [draft Standard](/workstreams/system/drive/WORKSTREAM.md#terms) is a
+  [draft Standard](/CONTEXT.md#governance) is a
   file typed `Standard` in the workstream, held to the Standards about
   Standards. `## Done when` points at them. It differs from any other
   Standard only in its place and its wiring, and wiring is never the
-  Standard's; whether it becomes a doc-type of its own is not decided.
+  Standard's, so it is a plain `Standard` and not a doc-type of its own.
 - **Wiring is what makes a Standard permanent.** A Standard under
   `standards/` is wired to the pre-commit gate, and its deterministic
   rules must hold on every commit. A draft Standard is wired to

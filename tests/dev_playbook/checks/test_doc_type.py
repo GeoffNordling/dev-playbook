@@ -547,6 +547,20 @@ def test_a_rule_heading_predicate_trailer() -> None:
     ]
 
 
+def test_a_rule_heading_predicate_trailer_names_a_draft_by_its_workstream() -> None:
+    draft = typed("Standard", GOOD_STANDARD)
+    head = {"workstreams/p/fam/WORKSTREAM.md": typed("Workstream", "# W\n")}
+    good = head | {"workstreams/p/fam/target.md": draft}
+    assert found(a_rule_heading_predicate_trailer, good) == []
+    bad = {
+        "workstreams/p/other/WORKSTREAM.md": typed("Workstream", "# W\n"),
+        "workstreams/p/other/target.md": draft,
+    }
+    assert {p for p, _ in found(a_rule_heading_predicate_trailer, bad)} == {
+        "workstreams/p/other/target.md"
+    }
+
+
 def test_the_files_why_ends_the_opening_prose() -> None:
     assert (
         found(

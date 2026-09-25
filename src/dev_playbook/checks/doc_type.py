@@ -35,6 +35,7 @@ DOC_TYPE_FILES = (
 )
 STANDARDS = "standards"
 WORKSTREAMS = "workstreams/"
+HEAD_FILE = "WORKSTREAM.md"
 GUIDE_TYPE = "Guide"
 LOOP_TYPE = "Loop"
 WORKSTREAM_TYPE = "Workstream"
@@ -598,8 +599,8 @@ def the_frontmatter_names_the_population(repo: Repo) -> Iterator[Finding]:
 def a_rule_heading_predicate_trailer(repo: Repo) -> Iterator[Finding]:
     """Each rule of a Standard is an H2 or H3, a paragraph, blocks, a trailer, a Why.
 
-    The trailer's name is the file's first directory under ``standards/`` and
-    its slug the heading's. After the paragraph come any number of
+    The trailer's name is the file's first directory under ``standards/``, or
+    a draft Standard's workstream directory, and its slug the heading's. After the paragraph come any number of
     paragraphs, lists, fenced blocks, blockquotes, or tables; after the trailer
     nothing, or one blockquote opening ``> **Why.**``. An H3 sits only under
     an H2 with no trailer.
@@ -607,6 +608,8 @@ def a_rule_heading_predicate_trailer(repo: Repo) -> Iterator[Finding]:
     for path, doc in _typed(repo, STANDARD_TYPE):
         parts = path.split("/")
         name = parts[1] if len(parts) > 2 and parts[0] == STANDARDS else None
+        if path.startswith(WORKSTREAMS):
+            name = _workstream_name(repo, path)
         lines = _body(doc)
         index = {line.number: i for i, line in enumerate(lines)}
         rules = {t.heading.line for t in doc.trailers if t.heading is not None}
@@ -1047,13 +1050,27 @@ def _typed(repo: Repo, doctype: str) -> Iterator[tuple[str, MarkdownFile]]:
 
     A file under ``workstreams/`` may carry a type before it moves to that
     type's home, and that type's form rules do not bind it there; only
-    ``Workstream``, whose home is ``workstreams/``, is read there.
+    ``Workstream``, whose home is ``workstreams/``, and ``Standard``, a draft
+    Standard there, are read there.
     """
     for path, doc in sorted(repo.markdown.items()):
-        if path.startswith(WORKSTREAMS) and doctype != WORKSTREAM_TYPE:
+        if path.startswith(WORKSTREAMS) and doctype not in (
+            WORKSTREAM_TYPE,
+            STANDARD_TYPE,
+        ):
             continue
         if doc.frontmatter is not None and doc.frontmatter.get("type") == doctype:
             yield path, doc
+
+
+def _workstream_name(repo: Repo, path: str) -> str | None:
+    """The name of the directory of ``path``'s head file; None if none is above it."""
+    here = posixpath.dirname(path)
+    while here.startswith(WORKSTREAMS):
+        if f"{here}/{HEAD_FILE}" in repo.markdown:
+            return posixpath.basename(here)
+        here = posixpath.dirname(here)
+    return None
 
 
 def _body(doc: MarkdownFile) -> list[Line]:

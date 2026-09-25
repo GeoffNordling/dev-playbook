@@ -2,13 +2,13 @@
 type: Standard
 title: Standard Conventions
 description: The form a file typed Standard takes — one population in its frontmatter, each rule a heading, a predicate, and a trailer, the why blocks that argue them, and every predicate decidable of one member
-population: "a file typed Standard, outside a workstream"
+population: "a file typed Standard"
 ---
 
 # Standard Conventions
 
-A file typed `Standard`, under `standards/` and outside a
-workstream
+A file typed `Standard`, under `standards/` or, as a
+[draft Standard](/CONTEXT.md#governance), in a workstream
 ([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md#standard-lives-under-standards)):
 one population and its rules. The
 [Standard doc-type](/doc-types/standard/index.md) declares what a
@@ -44,7 +44,8 @@ In a file typed `Standard`, a rule is an H2 or H3 whose section
 ends with a trailer line,
 `` `<name>.<slug>` · deterministic `` or
 `` `<name>.<slug>` · stochastic ``. `<name>` is the first
-directory under `standards/` in the file's path, and `<slug>` is
+directory under `standards/` in the file's path, or, for a draft
+Standard, the name of its workstream's directory, and `<slug>` is
 the GitHub slug of the heading. Between the heading and the
 trailer there is one paragraph, then any number of paragraphs,
 fenced blocks, blockquotes, lists, or tables. After the trailer,

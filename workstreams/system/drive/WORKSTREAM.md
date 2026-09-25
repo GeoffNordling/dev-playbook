@@ -80,14 +80,9 @@ approval before running it, and discusses results before acting on them.
 The words of the workflow, workstream, loop, yield, stint, driver,
 principal, iteration, segment, and checkpoint, are the repo's
 ([CONTEXT.md](/CONTEXT.md#workstreams-and-loops)), since the doc-types
-and [Running a Stint](/guides/running-a-stint.md) use them too. This
-head file coins one:
-
-- **Draft Standard** — a file typed `Standard` inside a workstream,
-  wired to a stint's `--check` and never to the gate, so its rules may
-  fail at any time; the workstream's target, deleted or promoted under
-  `standards/` on accept
-  ([Stint Model](/workstreams/system/drive/stint-model.md)).
+and [Running a Stint](/guides/running-a-stint.md) use them too, and
+so is [draft Standard](/CONTEXT.md#governance), since the Standards
+about Standards use it. This head file coins none.
 
 ### Shape
 
@@ -247,17 +242,6 @@ stint runs with the `stint` command
   so the image cannot build them in advance.
 - **Put the draft Standard in the doc-type system.** It does not wait
   on the gate. In order:
-  - **Decide whether a draft Standard is a doc-type.** A session. A
-    `DraftStandard` class in the reference model would give the draft
-    Standard its own rules in the pseudocode; the model now has it as a
-    plain `Standard` that differs only in place and wiring.
-  - **Let a draft Standard live in a workstream.** A file typed
-    `Standard` under `workstreams/` is held to the Standards about
-    Standards, against the exemption in
-    [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md)
-    and the one tree `standards/` reserves; its rule ids take the
-    workstream's name as their family; and nothing under
-    `workstreams/` is wired to the gate.
   - **Teach the Workstream doc-type the target.** `## Done when` links
     the workstream's draft Standards, a stint names the rule ids it
     targets, a new `targets` field of the `Stint` part, and only a leaf
@@ -299,6 +283,15 @@ stint runs with the `stint` command
 
 ## Completed
 
+- **Let a draft Standard live in a workstream.** Done 2026-09-25: the
+  user ruled it a plain `Standard`, not a doc-type of its own.
+  [Standard Conventions](/standards/doc-type/standard-conventions.md)
+  now binds it, with the leaf workstream's directory name as its rule
+  ids' family;
+  [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md)
+  keeps it in a leaf and each leaf's name unique; and the term moved to
+  [CONTEXT.md](/CONTEXT.md#governance). The gate reads rules under
+  `standards/` only, so nothing under `workstreams/` is wired to it.
 - **Design the delegation workflow.** Done 2026-09-24: a grilling session
   with the user set the five terms, the [Shape](#shape), and everything
   under [Settled](#settled), and renamed this workstream from `parallel-fronts`.

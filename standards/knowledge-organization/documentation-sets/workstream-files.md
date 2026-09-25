@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Workstream Files
-description: What the files of a workstream add to Documentation Sets — a guess written as a guess, every file reached from its head file, one directory per workstream under `workstreams/`, the worklist in the head file only, buckets, menu headings as names, terms and acronyms each held in the nearest head file that holds their uses — each stated as the one difference against the general rule it qualifies
+description: What the files of a workstream add to Documentation Sets — a guess written as a guess, every file reached from its head file, one directory per workstream under `workstreams/`, a draft Standard in a leaf workstream, each leaf's name unique, the worklist in the head file only, buckets, menu headings as names, terms and acronyms each held in the nearest head file that holds their uses — each stated as the one difference against the general rule it qualifies
 population: "a Markdown file of a workstream, under `workstreams/`"
 ---
 
@@ -25,7 +25,10 @@ A file may also carry a type whose home is elsewhere, such as `Guide`,
 before it moves there
 ([Guide lives under `guides/`](/standards/knowledge-organization/okf-frontmatter.md#guide-lives-under-guides));
 the form rules of that type do not bind it while it is under
-`workstreams/`.
+`workstreams/`, except a file typed `Standard`, a
+[draft Standard](/CONTEXT.md#governance), which
+[Standard Conventions](/standards/doc-type/standard-conventions.md)
+binds as it binds any Standard.
 
 A workstream may have **child workstreams**, each a directory below it
 with its own `WORKSTREAM.md`. Below, the head file of a file is the
@@ -87,6 +90,34 @@ kebab-case name, such as `check-fixes.md`, except `index.md`,
 > **Why.** `workstreams/` is a plain parent to the sets
 > [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
 > makes.
+
+## A draft Standard in a leaf workstream
+
+A file typed `Standard` under `workstreams/` is in a leaf workstream:
+no directory below the directory of its head file has a
+`WORKSTREAM.md`.
+
+`knowledge-organization.a-draft-standard-in-a-leaf-workstream` · deterministic
+
+> **Why.** A draft Standard is the target of the workstream that holds
+> it, and a loop advances a leaf workstream only, so the leaf is the
+> target's
+> [one home](/standards/knowledge-organization/documentation-sets/documentation-sets.md#one-home-per-fact),
+> and a draft Standard anywhere else is a target no stint can drive.
+
+## A leaf's name unique under `workstreams/`
+
+The directory of a leaf workstream, one with no child workstream, has a
+name that no other leaf workstream's directory under `workstreams/`
+has.
+
+`knowledge-organization.a-leafs-name-unique-under-workstreams` · deterministic
+
+> **Why.** The leaf is the one directory
+> [an index in every directory](/standards/knowledge-organization/documentation-sets/documentation-sets.md#an-index-in-every-directory)
+> makes, and a draft Standard's rule ids take its name as their family,
+> such as `view-rename.no-kind-word`, so two leaves of one name would
+> give two rules one id.
 
 ## The worklist in the head file only
 

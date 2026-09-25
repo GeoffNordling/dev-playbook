@@ -52,6 +52,8 @@ EXEMPT: dict[Path, frozenset[str]] = {
             "one-directory-under-workstreams",
             "workstreams-holds-only-workstreams",
             "the-worklist-in-the-head-file-only",
+            "a-draft-standard-in-a-leaf-workstream",
+            "a-leafs-name-unique-under-workstreams",
         }
     ),
     REPO_ROOT / "standards/doc-type/workstream-conventions.md": frozenset(

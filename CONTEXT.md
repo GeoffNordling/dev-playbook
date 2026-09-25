@@ -43,6 +43,10 @@ What a verifier returns for a member that fails a rule: the member, the rule's i
 A point where findings block work: pre-commit, pre-push, or CI.
 _Avoid_: audit, enforcement, venue.
 
+**Draft Standard**
+A file typed Standard inside a leaf workstream, whose rule ids take the workstream's directory name as their family. It is wired to a stint's `--check` and never to a gate, so its rules may fail at any time. It is the workstream's target; on accept it is deleted, or moved under `standards/` and wired to a gate.
+_Avoid_: candidate Standard, proto-Standard.
+
 **Zero findings**
 Every verifier of a specification, run against a state, returns nothing: the state is in the target state, up to judge error.
 
