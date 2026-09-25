@@ -9,8 +9,8 @@ TEMPORARY, delete after the merge: ``main`` does not yet hold three changes
 the stint needs, so the clone gets the patches in ``patches/`` applied and
 committed. Once ``main`` holds them, ``git apply`` refuses the patches as
 already applied, and the stint cannot launch until ``PATCHES`` and the step
-that applies them are deleted. The sandcastle workstream's head file lists
-this under Delete after the merge.
+that applies them are deleted. The delegation workstream's head file lists
+this in its worklist.
 """
 
 from importlib import resources

@@ -12,8 +12,8 @@ the user and an agent brief a piece of work, agents advance it, with the
 user present or not, and the work comes back to the user for a verdict.
 This head file holds the ideas, the tracking, and the words of that workflow.
 The machinery that runs an unattended stint, the Sandcastle pipeline, is
-described in the child
-[sandcastle workstream](/workstreams/delegation/sandcastle/WORKSTREAM.md).
+the `stint` command, described in
+[Running a Stint](/guides/running-a-stint.md).
 
 ## Goal
 
@@ -96,8 +96,8 @@ machinery an unattended stint runs on.
   attended stint it is the user and the top-level agent together; in an
   unattended stint it is the top-level agent alone.
 - **Sandcastle pipeline** — the machinery that runs an agent in a sealed
-  container, described in
-  [The Sandcastle Pipeline](/workstreams/delegation/sandcastle/pipeline.md).
+  container: the `stint` command, described in
+  [Running a Stint](/guides/running-a-stint.md).
 
 ### Shape
 
@@ -132,8 +132,8 @@ Decided with the user on 2026-09-24.
   as `loops/` is.
 - **A child workstream is a subdirectory with its own head file.** It
   has its own loop, stints, and verdicts.
-  The [sandcastle workstream](/workstreams/delegation/sandcastle/WORKSTREAM.md) is
-  this workstream's first.
+  The sandcastle workstream was this workstream's first; it was deleted
+  once its tool shipped as the `stint` command.
 - **A loop is distinct from a workstream.** The loop is how, general and
   without memory; the workstream is what and why, particular and with
   history. The loop and the driver belong to a stint, not to the
@@ -248,9 +248,14 @@ None.
 ## Planned
 
 Sessions with the user come first, each at a high level, the agent
-guiding. Running an unattended stint is the
-[sandcastle workstream's worklist](/workstreams/delegation/sandcastle/WORKSTREAM.md#planned).
+guiding. An unattended stint runs with the `stint` command
+([Running a Stint](/guides/running-a-stint.md)).
 
+- **After the merge to `main`, delete the stint's temporary patches.**
+  `src/dev_playbook/stint/patches/` and the `PATCHES` step in
+  `config.py` put three `dotfiles/` changes into the config copy until
+  `main` holds them. Once it does, `git apply` refuses them and no stint
+  launches until they are deleted; then run `stint setup` again.
 - **Split the tracking standard.** GitHub tracking and workstream
   tracking, each in its own section of
   [`standards/tracking/`](/standards/tracking/index.md).
@@ -265,7 +270,7 @@ guiding. Running an unattended stint is the
     pre-commit hooks already run on every commit. How the two meet,
     overlap, or load the run twice is unthought.
   - **Driver drift.** A Loop document describes a loop, and a driver,
-    such as the sandcastle `rig/` scripts, runs it. If the script
+    such as the `stint` command, runs it. If the script
     changes, for example the checkpoint moves from every 5 iterations
     to every 10, the Loop document still says 5, and no check compares
     the two. A check between them is needed. The graph is data, so
@@ -307,8 +312,7 @@ guiding. Running an unattended stint is the
   diagrams of a driven Sandcastle stint and of today's attended Ralph
   settled every question, recorded under [Settled](#settled).
 - **Separate the machinery.** Done 2026-09-24: the Sandcastle members
-  moved into the child
-  [sandcastle workstream](/workstreams/delegation/sandcastle/WORKSTREAM.md), so this
+  moved into the child sandcastle workstream, since deleted, so this
   workstream holds the workflow and that one holds how an unattended stint runs.
 - **Check overlap with active branches.** Done 2026-09-24: `main`'s
   refactor is merged into this branch, and no active branch conflicts
