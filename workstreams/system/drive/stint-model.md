@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Stint Model
-description: How a stint's target, its checks, and its agents fit together — one supervised loop at three levels, with a principal, workers, judges, and a reviewer; draft Standards as the target, wired to --check, and permanent Standards as the invariant, wired to the gate; done decided by the principal on zero findings — decided with the user on 2026-09-25, with its diagram
+description: How a stint's target, its checks, and its agents fit together — one supervised loop at three levels, with a principal, workers, verifiers, and a reviewer; draft Standards as the target, wired to --check, and permanent Standards as the invariant, wired to the gate; done decided by the principal on zero findings — decided with the user on 2026-09-25, with its diagram
 ---
 
 # Stint Model
@@ -21,7 +21,7 @@ the loop is a segment and its checkpoint:
 ```mermaid
 flowchart TD
     P["principal"] -- "plan" --> W["workers<br/>one plan item each,<br/>committed through the gate"]
-    W --> J["judges<br/>run the target"]
+    W --> J["verifiers<br/>run the target"]
     W --> R["reviewer<br/>reads the segment against the plan"]
     J -- "findings" --> P
     R -- "report" --> P
@@ -30,10 +30,10 @@ flowchart TD
 
 The levels:
 
-| Level | Principal | Target | Plan · log | Worker | Judges |
+| Level | Principal | Target | Plan · log | Worker | Verifiers |
 |---|---|---|---|---|---|
-| Workstream | the user | its draft Standard(s) | `## Stints` | a stint | the user, on accept |
-| Stint | the top-level agent | the rules it targets | `PLAN.md` · `PROGRESS.md` | an iteration | `check` · the verifier |
+| Workstream | the user | its draft Standard(s) | `## Stints` | a stint | `check` · a judge |
+| Stint | the top-level agent | the rules it targets | `PLAN.md` · `PROGRESS.md` | an iteration | `check` · a judge |
 | Iteration | none | one task | none | none | may run `check` as a signal |
 
 ## Settled
@@ -42,14 +42,14 @@ The levels:
   and an iteration are each the supervised loop of the diagram, at
   different scales. Each level has a
   [principal](/CONTEXT.md#governance) that owns the plan, workers
-  that do its items, judges that run the target and return findings,
+  that do its items, verifiers that run the target and return findings,
   and a reviewer. The iteration is the base case: one task and no
   loop. The pattern is shared in names only. The code runs the stint
   level, and a generic loop that nests is not built.
-- **The principal decides; the judges and the reviewer report.** A
-  judge runs rules and returns findings: `check` the deterministic
-  rules, the verifier the stochastic ones, as a classifier, one bool
-  per rule per member, and the pre-commit gate the invariant. The
+- **The principal decides; the verifiers and the reviewer report.**
+  A [verifier](/CONTEXT.md#governance) runs rules and returns
+  findings: `check` the deterministic rules, a judge the stochastic
+  ones, as a classifier, one bool per rule per member. The
   reviewer reads the segment against the plan and returns a sorted
   report, so that the principal's context holds the report and not
   the diff. They report as peers, and none sees another's output, so
@@ -95,13 +95,13 @@ The levels:
 - **Findings usually go down over a stint, but not always.** They are
   optional and helpful backpressure.
 - **Done needs zero findings.** The driver refuses the principal's
-  done while the judges report any finding over the rules the stint
-  targets. A principal that judges the target out of reach yields
+  done while the verifiers report any finding over the rules the stint
+  targets. A principal that finds the target out of reach yields
   stuck instead.
 - **Authority goes down only.** The user sets the principal's target; the
   principal sets the iterations' tasks. The principal may revise
   `PLAN.md`, and never the draft Standards, `check`, or the stint's entry. A
-  rule the principal judges wrong ends the stint as stuck, and the user rules
+  rule the principal finds wrong ends the stint as stuck, and the user rules
   on it.
 - **A worker that fails its task yields stuck.** This is one event at
   every level. A blocked iteration commits what it did, logs a

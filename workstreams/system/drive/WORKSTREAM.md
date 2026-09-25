@@ -138,8 +138,8 @@ Decided with the user on 2026-09-24.
      and judgment. The sorting is how the pattern scales: the user rules
      on the top findings only, since no user can read everything agents
      report, and ruling on a sorted list calibrates the user's taste.
-     In an unattended stint this reviewer is the plan reviewer, and a
-     second one, the verifier, judges the target's stochastic rules
+     Beside the reviewer, the verifiers of the stint's target report
+     to the principal
      ([Stint Model](/workstreams/system/drive/stint-model.md)).
   4. The principal changes the plan on the iterations' and the reviewer's
      reports, so the entity that manages the plan is the one that changes
@@ -242,8 +242,9 @@ stint runs with the `stint` command
   so the image cannot build them in advance.
 - **Bring the `stint` command to the model.** `--check` becomes the
   target check, which iterations may run at any time and the driver
-  runs at each checkpoint; the checkpoint runs the verifier and the
-  plan reviewer; the driver decides done as zero findings; and a
+  runs at each checkpoint; the checkpoint runs the target's verifiers
+  and the reviewer; the principal decides done, and the driver refuses
+  a done while findings remain; and a
   blocked iteration logs a deviation and exits, so the stop rules
   `iter-k blocked` and `iter-k committed nothing` go, and
   [Running a Stint](/guides/running-a-stint.md) follows. Where a leaf's
