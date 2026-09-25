@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-24 17:00 | 9a9242e4d479 | story-forge | green | main e6840c60a366 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | mission-control | green | main 6711ad2ef522 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | sysadmin-playbook | green | main 46db7508b002 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | sounds | green | main 53f5e14d88be | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | personal-trainer | green | main cf25136a6ec7 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | idea-tree | green | main e3058c9725a8 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | dwarf-flow | green | main 9d4bda2a41b4 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | lunch | green | main 853108207c1d | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
-| 2026-09-24 17:00 | 9a9242e4d479 | date-tree | green | main e1c1b17078a0 | no unmerged branches |
 | 2026-09-24 17:15 | 94fd50fab1ba | story-forge | green | main d0e13e98b686 | no unmerged branches |
 | 2026-09-24 17:15 | 94fd50fab1ba | mission-control | green | main fef97e29e015 | no unmerged branches |
 | 2026-09-24 17:15 | 94fd50fab1ba | sysadmin-playbook | green | main 5a746cfce7a5 | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-25 03:00 | a59c911d3cf6 | dwarf-flow | green | main 79b35cdfa7d2 | no unmerged branches |
 | 2026-09-25 03:00 | a59c911d3cf6 | lunch | green | main d2686ee83569 | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
 | 2026-09-25 03:00 | a59c911d3cf6 | date-tree | green | main 0755bc2f60d6 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | story-forge | green | main aaf00789872f | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | mission-control | green | main f13a2c063dd0 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | sysadmin-playbook | green | main d3e74effc374 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | sounds | green | main 59017879de46 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | personal-trainer | green | main f8909373f831 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | idea-tree | green | main d2e1cdeb3c38 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | dwarf-flow | green | main 0e465df48db4 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | lunch | green | main 9a4161606ddf | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | date-tree | green | main ed6c418498c5 | no unmerged branches |
