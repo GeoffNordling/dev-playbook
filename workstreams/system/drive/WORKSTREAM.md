@@ -216,11 +216,6 @@ Sessions with the user come first, each at a high level, the agent
 guiding. An unattended stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **After the merge to `main`, delete the stint's temporary patches.**
-  `src/dev_playbook/stint/patches/` and the `PATCHES` step in
-  `config.py` put three `dotfiles/` changes into the config copy until
-  `main` holds them. Once it does, `git apply` refuses them and no stint
-  launches until they are deleted; then run `stint setup` again.
 - **Split the tracking standard.** GitHub tracking and workstream
   tracking, each in its own section of
   [`standards/tracking/`](/standards/tracking/index.md).

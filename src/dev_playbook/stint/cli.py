@@ -18,7 +18,6 @@ from pathlib import Path
 from dev_playbook.errors import ToolError
 from dev_playbook.stint import install
 from dev_playbook.stint.call import run_node
-from dev_playbook.stint.config import PATCHES
 from dev_playbook.stint.launch import Host, Order, launch
 from dev_playbook.stint.receiver import EVENTS_DB
 from dev_playbook.stint.workcopy import CopyFault
@@ -86,7 +85,6 @@ def main(argv: list[str] | None = None) -> int:
             image=install.IMAGE,
             credentials=CREDENTIALS,
             events=EVENTS_DB,
-            patches=PATCHES,
             runner=run_node,
         )
         record = launch(order, host)

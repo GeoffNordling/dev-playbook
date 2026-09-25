@@ -15,7 +15,7 @@ from importlib import resources
 from pathlib import Path
 
 from dev_playbook.errors import ToolError
-from dev_playbook.stint.config import PATCHES, make_config
+from dev_playbook.stint.config import make_config
 from dev_playbook.stint.workcopy import CopyFault, git_in
 
 IMAGE = "localhost/stint:latest"
@@ -42,7 +42,7 @@ def setup(playbook: Path, claude: Path) -> None:
     with tempfile.TemporaryDirectory(prefix="stint-setup-") as temp:
         config, context = Path(temp) / "config", Path(temp) / "context"
         try:
-            make_config(playbook, config, PATCHES)
+            make_config(playbook, config)
             git_in(config, "archive", "-o", f"{temp}/tree.tar", "HEAD", *IMAGE_TREE)
         except CopyFault as err:
             raise ToolError(f"cannot make the config copy: {err}") from err

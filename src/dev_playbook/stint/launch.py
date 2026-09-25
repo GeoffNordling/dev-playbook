@@ -53,7 +53,6 @@ class Host:
     image: str
     credentials: Path
     events: Path
-    patches: list[Path]
     runner: Runner
 
 
@@ -76,7 +75,7 @@ def launch(order: Order, host: Host) -> StintRecord:
     print(f"stint {order.name}: {folder}", flush=True)
     try:
         try:
-            make_config(order.playbook, config, host.patches)
+            make_config(order.playbook, config)
             workcopy.open_copy(repo, copy, order.name, order.base)
             work = Assignment(
                 copy=copy,

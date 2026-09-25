@@ -112,7 +112,6 @@ def host(tmp_path: Path) -> Host:
         image="i",
         credentials=tmp_path / "credentials.json",
         events=events,
-        patches=[],
         runner=runner,
     )
 
