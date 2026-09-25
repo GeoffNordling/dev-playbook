@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-25 13:30 | 4cac0fbbea69 | story-forge | green | main aaf00789872f | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | mission-control | green | main f13a2c063dd0 | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | sysadmin-playbook | green | main d3e74effc374 | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | sounds | green | main 59017879de46 | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | personal-trainer | green | main f8909373f831 | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | idea-tree | green | main d2e1cdeb3c38 | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | dwarf-flow | green | main 0e465df48db4 | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | lunch | green | main 9a4161606ddf | no unmerged branches |
-| 2026-09-25 13:30 | 4cac0fbbea69 | date-tree | green | main ed6c418498c5 | no unmerged branches |
 | 2026-09-25 13:45 | a34f06e497df | story-forge | green | main b50d52372011 | no unmerged branches |
 | 2026-09-25 13:45 | a34f06e497df | mission-control | green | main fce1948ad365 | no unmerged branches |
 | 2026-09-25 13:45 | a34f06e497df | sysadmin-playbook | green | main aff5443ec3a2 | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-25 14:00 | bba24283da95 | dwarf-flow | green | main 0b556475c58b | no unmerged branches |
 | 2026-09-25 14:00 | bba24283da95 | lunch | green | main a62cde77d042 | no unmerged branches |
 | 2026-09-25 14:00 | bba24283da95 | date-tree | green | main 13ec1497354c | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | story-forge | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/story-forge/.claude/worktrees/bump-pin-2c9a7486b625, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T141503Z/story-forge.log |  |
+| 2026-09-25 14:15 | 2c9a7486b625 | mission-control | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/mission-control/.claude/worktrees/bump-pin-2c9a7486b625, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T141503Z/mission-control.log |  |
+| 2026-09-25 14:15 | 2c9a7486b625 | sysadmin-playbook | green | main 843055983d8b | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | sounds | green | main b714f68423f9 | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | personal-trainer | green | main e746fb69f105 | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | idea-tree | green | main 116b8555deab | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | dwarf-flow | green | main de7de901670b | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | lunch | green | main d88539fdbf72 | no unmerged branches |
+| 2026-09-25 14:15 | 2c9a7486b625 | date-tree | green | main 83070ad241d2 | no unmerged branches |
