@@ -147,7 +147,7 @@ A bounded spend of effort that advances one leaf workstream, with a loop and a d
 The program that runs a stint's loop: it starts each iteration, reads what the iteration reports, and stops the stint.
 
 **Principal**
-The top-level entity of a stint, which owns the plan and rules on the reports of the iterations and the reviewer. In an attended stint it is the user and the top-level agent together; in an unattended stint, the top-level agent alone.
+The owner of one level's plan, which rules on the reports of its workers, its judges, and its reviewer. For a workstream it is the user; for a stint, the top-level agent, joined by the user when the stint is attended.
 
 **Iteration**
 One fresh-context agent that does one task of a stint's plan, commits, and exits.

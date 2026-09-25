@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Stint Model
-description: How a stint's target, its checks, and its agents fit together — one or more draft Standards in the workstream as a temporary target, wired to --check and not to the gate, two reviewers, and done as zero findings — decided with the user on 2026-09-25, with its diagram
+description: How a stint's target, its checks, and its agents fit together — one supervised loop at three levels, with a principal, workers, judges, and a reviewer; draft Standards as the target, wired to --check, and permanent Standards as the invariant, wired to the gate; done decided by the principal on zero findings — decided with the user on 2026-09-25, with its diagram
 ---
 
 # Stint Model
@@ -15,50 +15,60 @@ head file's Planned list.
 
 ## Diagram
 
+One pattern, the supervised loop, used at three levels. One pass of
+the loop is a segment and its checkpoint:
+
+```mermaid
+flowchart TD
+    P["principal"] -- "plan" --> W["workers<br/>one plan item each,<br/>committed through the gate"]
+    W --> J["judges<br/>run the target"]
+    W --> R["reviewer<br/>reads the segment against the plan"]
+    J -- "findings" --> P
+    R -- "report" --> P
+    P -- "done · stuck" --> Y["yield to the principal above"]
 ```
-you + attended principal ── write ──▶ workstream (a leaf)
-                                      ├─ WORKSTREAM.md
-                                      │   ├─ ## Done when ──▶ the workstream's draft Standard(s)
-                                      │   └─ ## Stints    planned entry: loop + the rule ids it targets
-                                      ├─ draft Standard(s) typed Standard, ids <workstream>.<slug>, no gate
-                                      └─ check             check <rule-id>…; what --check runs
 
-stint branch                          PLAN.md · PROGRESS.md
+The levels:
 
-principal-0      reads the head file, the stint entry, PLAN.md ─▶ launch
-┌ segment ────────────────────────────────────────────────────────────────────────┐
-│ iter-k         does one task from PLAN.md                                       │
-│                runs check ─▶ the workstream's draft Standard(s), deterministic  │
-│                  ─▶ findings; any time, as often as it likes; no stop           │
-│                commits ─▶ pre-commit gate: the permanent Standards              │
-│                PROGRESS.md: done, or best effort + deviation + reason           │
-└─────────────────────────────────────────────────────────────────────────────────┘
-checkpoint   ┌─ driver runs check  the workstream's draft Standard(s), deterministic ─▶ findings ─┐
-             ├─ verifier           the workstream's draft Standard(s), stochastic    ─▶ findings ─┤
-             └─ plan reviewer      the segment against PLAN.md                       ─▶ report   ─┤
-                                                                                                  ▼
-principal-n      revises PLAN.md ─▶ continue · stop                   (done: zero findings from both)
-                                                                                                  ▼
-yield            ─▶ you: done · stuck · budget spent ─▶ verdict: advance · accept · delete
-
-only the rules the stint targets are run · authority goes down only: you ▶ principal ▶ iterations
-```
+| Level | Principal | Target | Plan · log | Worker | Judges |
+|---|---|---|---|---|---|
+| Workstream | the user | its draft Standard(s) | `## Stints` | a stint | the user, on accept |
+| Stint | the top-level agent | the rules it targets | `PLAN.md` · `PROGRESS.md` | an iteration | `check` · the verifier |
+| Iteration | none | one task | none | none | may run `check` as a signal |
 
 ## Settled
 
+- **One pattern, three levels, four roles.** A workstream, a stint,
+  and an iteration are each the supervised loop of the diagram, at
+  different scales. Each level has a
+  [principal](/CONTEXT.md#governance) that owns the plan, workers
+  that do its items, judges that run the target and return findings,
+  and a reviewer. The iteration is the base case: one task and no
+  loop. The pattern is shared in names only. The code runs the stint
+  level, and a generic loop that nests is not built.
+- **The principal decides; the judges and the reviewer report.** A
+  judge runs rules and returns findings: `check` the deterministic
+  rules, the verifier the stochastic ones, as a classifier, one bool
+  per rule per member, and the pre-commit gate the invariant. The
+  reviewer reads the segment against the plan and returns a sorted
+  report, so that the principal's context holds the report and not
+  the diff. They report as peers, and none sees another's output, so
+  every report reaches the principal unfiltered.
 - **A workstream's target is one or more draft Standards.** A
   [draft Standard](/CONTEXT.md#governance) is a
   file typed `Standard` in the workstream, held to the Standards about
   Standards. `## Done when` points at them. It differs from any other
   Standard only in its place and its wiring, and wiring is never the
   Standard's, so it is a plain `Standard` and not a doc-type of its own.
-- **Wiring is what makes a Standard permanent.** A Standard under
-  `standards/` is wired to the pre-commit gate, and its deterministic
-  rules must hold on every commit. A draft Standard is wired to
-  `--check` only: its rules may fail at any time, and a failure is a
-  signal toward the target, never a block.
+- **Wiring makes a Standard an invariant or a target.** A Standard
+  under `standards/` is wired to the pre-commit gate: it is the
+  invariant, and its deterministic rules must hold on every commit. A
+  draft Standard is wired to `--check` only: it is the target, its
+  rules may fail at any time, and a failure is a signal toward the
+  target, never a block.
 - **On accept, each draft Standard is deleted or promoted.** A
-  promoted one moves under `standards/` and is wired to the gate.
+  promoted one moves under `standards/` and is wired to the gate, so
+  it moves from target to invariant.
 - **A rule id is `<workstream>.<slug>`**, such as
   `view-rename.no-kind-word`, the name of the workstream that holds it,
   and no two rules of one workstream's draft Standards share a slug.
@@ -68,7 +78,7 @@ only the rules the stint targets are run · authority goes down only: you ▶ pr
   rules of the workstream's draft Standards, `check <rule-id>…`, prints one finding per failed
   member, and is what the stint's `--check` runs. It lives as long as
   the workstream does.
-- **You and the attended principal write the target before launch**:
+- **The user and an attended agent write the target before launch**:
   the draft Standards, `check`, and the stint's entry.
 - **A stint advances part of a workstream.** Its planned entry under
   `## Stints` names its loop and the rule ids it targets. Rules outside
@@ -82,25 +92,20 @@ only the rules the stint targets are run · authority goes down only: you ▶ pr
 - **An iteration may run `check` at any time.** Its output is a signal
   of direction, and no call stops on it. The driver's run at the
   checkpoint is the one that counts.
-- **Findings usually go down over a stint, but not always.** They are optional and helpful
-backpressure.
-- **Two reviewers, each with one job.** The verifier judges each
-  stochastic rule the stint targets as a classifier, one bool per rule per
-  member, and returns findings. The plan reviewer reads the segment
-  against `PLAN.md` for the big picture and returns a sorted report.
-  Neither sees the other's output: both report to the principal, as
-  peers, so that the verifier's verdicts reach the principal unfiltered.
-- **Done is zero findings from both `check` and the verifier**, over
-  the rules the stint targets. The driver decides it in code; the principal does
-  not claim it. The loop will have a pressure release valve to allow the
-  principal to pause and escalate to higher level if it feels the goal is unachieveable.
-- **Authority goes down only.** You set the principal's target; the
+- **Findings usually go down over a stint, but not always.** They are
+  optional and helpful backpressure.
+- **Done needs zero findings.** The driver refuses the principal's
+  done while the judges report any finding over the rules the stint
+  targets. A principal that judges the target out of reach yields
+  stuck instead.
+- **Authority goes down only.** The user sets the principal's target; the
   principal sets the iterations' tasks. The principal may revise
   `PLAN.md`, and never the draft Standards, `check`, or the stint's entry. A
-  rule the principal judges wrong ends the stint as stuck, and you rule
+  rule the principal judges wrong ends the stint as stuck, and the user rules
   on it.
-- **An agent that fails its task reports it.** A blocked iteration
-  commits what it did, logs a deviation and its reason in
-  `PROGRESS.md`, and exits. The stint continues, and the principal
-  handles the deviation at the checkpoint. Only the principal stops a
-  stint.
+- **A worker that fails its task yields stuck.** This is one event at
+  every level. A blocked iteration commits what it did, logs a
+  deviation and its reason in `PROGRESS.md`, and exits; the stint
+  continues, and the principal handles the deviation at the
+  checkpoint. A stuck stint yields to the user the same way. Only a
+  principal stops its own level.
