@@ -340,3 +340,30 @@ def close_copy(copy: Path) -> str:
         )
     shutil.rmtree(copy)
     return tip
+
+
+def read_plain(copy: Path, rel: str) -> str:
+    """Read a file in the copy as text, refusing a symlink anywhere on its path.
+
+    A planted link could otherwise pull a host file into a prompt.
+    """
+    path = copy
+    for part in Path(rel).parts:
+        path = path / part
+        if path.is_symlink():
+            raise CopyFault(f"symlink in the copy: {rel}")
+    return path.read_text(encoding="utf-8")
+
+
+def head_commit(copy: Path) -> str:
+    """The copy's HEAD commit, read from ``.git`` as plain text, never by git."""
+    head = read_plain(copy, ".git/HEAD").strip()
+    if not head.startswith("ref: "):
+        return head
+    ref = head.removeprefix("ref: ")
+    if (copy / ".git" / ref).exists():
+        return read_plain(copy, f".git/{ref}").strip()
+    for line in read_plain(copy, ".git/packed-refs").splitlines():
+        if line.endswith(" " + ref):
+            return line.split()[0]
+    raise CopyFault(f"HEAD names {ref}, which the copy does not hold")
