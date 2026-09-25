@@ -141,7 +141,7 @@ A shape of act, verification, and yield steps, defined once in a file typed Loop
 A loop's programmed exit to a receiver: another loop, the principal, or the user.
 
 **Stint**
-A bounded spend of effort that advances one workstream, with a loop and a driver chosen for it. An attended stint has the user in it; an unattended stint runs in sealed containers with no user, by the `stint` command, and ends by yielding to the user.
+A bounded spend of effort that advances one leaf workstream, with a loop and a driver chosen for it, toward the rules of the workstream's draft Standards it targets, if any. An attended stint has the user in it; an unattended stint runs in sealed containers with no user, by the `stint` command, and ends by yielding to the user.
 
 **Driver**
 The program that runs a stint's loop: it starts each iteration, reads what the iteration reports, and stops the stint.

@@ -62,6 +62,7 @@ EXEMPT: dict[Path, frozenset[str]] = {
             "headings-from-the-registry",
             "a-worklist-item-opens-with-its-bold-name",
             "a-stint-entry-in-form",
+            "stints-in-a-leaf-only",
             "every-child-reached-from-its-parent",
         }
     ),

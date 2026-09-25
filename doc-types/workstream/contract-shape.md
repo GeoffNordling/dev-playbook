@@ -24,14 +24,16 @@ stints that drove it.
   spend of effort on this workstream, with the loop that drove it. The
   next stint is written before it runs, with its loop and its budget;
   a past stint is recorded with what it spent, its branch, and the
-  user's verdict. Stints does for spend what Planned and Completed do
-  for work.
+  user's verdict. A stint may name the rules it targets, rules of the
+  workstream's [draft Standards](/CONTEXT.md#governance). Only a leaf
+  workstream has stints. Stints does for spend what Planned and
+  Completed do for work.
 - **Parent and children.** Derived from the directory and never
   written. A workstream's parent is the head file in the nearest
   directory above; its children are the head files below with no head
   file between.
 - **Pointers.** A heading's body points at any Target, any number of
-  times. A stint points at one Loop.
+  times. A stint points at one Loop, and at the rules it targets.
 
 The composition rule: any number of headings in file order, each name
 at most once; under Stints, the planned stint first, if any, then the
@@ -45,6 +47,7 @@ holds the same text whole; a test keeps them identical.
 ```python
 from doc_type import DocType
 from loop import Loop
+from standard import RuleId
 
 
 class Workstream(DocType):
@@ -65,9 +68,11 @@ class Workstream(DocType):
         spent:   str | None       # None for the planned stint
         branch:  str | None
         verdict: advance | accept | delete | None   # None until the user rules
+        targets: list[RuleId]     # rules of the workstream's draft Standards; empty for a stint with none
 
     headings: list[Heading]       # in file order, each name at most once
-    stints:   list[Stint]         # the planned stint first, if any, then the recorded ones, newest first
+    stints:   list[Stint]         # the planned stint first, if any, then the recorded ones, newest first;
+                                  # a leaf only, since a loop advances a leaf workstream only
 
     # parent and children are derived from the directory, never written;
     # its Standard requires each child's head file be reached by links from its parent's

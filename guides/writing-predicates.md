@@ -100,8 +100,10 @@ A condition is an H2 with no trailer.
 - **An objective**
   ([CONTEXT.md](/CONTEXT.md#specification))
   ranks states that satisfy the predicates; it is never one of them.
-- **A goal** is a predicate with the lifetime of one issue; it lives
-  in the issue.
+- **A goal** is a predicate with the lifetime of one workstream; it
+  lives in the workstream's
+  [draft Standard](/CONTEXT.md#governance), which is deleted or
+  promoted under `standards/` when the user accepts the workstream.
 - **A permission**, "two doc-types may share a verb", is the absence of
   a rule. Write nothing, and say in the introduction that the absence
   is deliberate.

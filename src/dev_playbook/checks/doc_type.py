@@ -79,6 +79,7 @@ BULLET = re.compile(r"^[-*]\s")
 STINT_OPENING = re.compile(r"^[-*]\s+\*\*(Planned|\d{4}-\d{2}-\d{2})\.\*\*")
 VERDICT = re.compile(r"Verdict:\s*(\w*)")
 VERDICTS = frozenset({"advance", "accept", "delete"})
+TARGETS = re.compile(r"Targets:\s*(`[^`]+`(?:,\s*`[^`]+`)*)\.")
 
 # The five rules that read a Loop's cut in order: each reads the cut the one
 # before it made, so a Loop's first disagreement is its only finding of them.
@@ -718,11 +719,13 @@ def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
     """Each Stints item opens planned or dated, links one Loop, and sits in order.
 
     The planned item is first; the dated ones follow, newest first. A
-    ``Verdict:`` is one of the three the user rules.
+    ``Verdict:`` is one of the three the user rules. A ``Targets:`` lists
+    rule ids of the draft Standards under the head file's directory.
     """
     for path, doc in _typed(repo, WORKSTREAM_TYPE):
         if not any(h.level == 2 and h.slug == "stints" for h in doc.headings):
             continue
+        rule_ids = _draft_rule_ids(repo, posixpath.dirname(path))
         section = doc.section("stints")
         starts = [n for n, text in section if BULLET.match(text)]
         ends = starts[1:] + [section[-1][0] + 1 if section else 0]
@@ -760,6 +763,44 @@ def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
                 yield Finding(
                     path, start, "a verdict is `advance`, `accept`, or `delete`"
                 )
+            if "Targets:" not in text:
+                continue
+            targets = TARGETS.search(text)
+            if targets is None:
+                yield Finding(
+                    path, start, "targets are rule ids in backticks, then a period"
+                )
+                continue
+            for rule_id in re.findall(r"`([^`]+)`", targets.group(1)):
+                if rule_id not in rule_ids:
+                    yield Finding(
+                        path,
+                        start,
+                        f"`{rule_id}` is no rule of the workstream's draft Standards",
+                    )
+
+
+def _draft_rule_ids(repo: Repo, directory: str) -> set[str]:
+    """The rule ids of every file typed ``Standard`` under ``directory``."""
+    return {
+        trailer.id
+        for path, doc in _typed(repo, STANDARD_TYPE)
+        if path.startswith(directory + "/")
+        for trailer in doc.trailers
+    }
+
+
+@check("doc-type.stints-in-a-leaf-only")
+def stints_in_a_leaf_only(repo: Repo) -> Iterator[Finding]:
+    """A Workstream with a Stints heading has no child Workstream."""
+    heads = [posixpath.dirname(path) for path, _ in _typed(repo, WORKSTREAM_TYPE)]
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        stints = next(
+            (h for h in doc.headings if h.level == 2 and h.slug == "stints"), None
+        )
+        here = posixpath.dirname(path)
+        if stints is not None and any(h.startswith(here + "/") for h in heads):
+            yield Finding(path, stints.line, "a workstream with a child has no Stints")
 
 
 @check("doc-type.every-child-reached-from-its-parent")
