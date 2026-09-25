@@ -1,10 +1,15 @@
 """One stint from launch to the end: both copies opened, the loop, both closed.
 
-The stint's folder is ``<home>/<repo>/<name>/``, made fresh. At launch it
-gets two copies: the work copy, ``<repo>/``, holding the new branch
-``<name>`` at the base; and the config copy, ``config/``. At the end the work
-copy is closed, which brings the branch into the repository and deletes the
-copy, and the config copy is deleted. A work copy that cannot close, such as
+The stint's folder is ``<home>/<repo>/<name>/``, made fresh, where ``<repo>``
+is the repository's canonical name: the same from its main checkout and from
+any worktree of it. At launch it gets two copies: the work copy, ``<repo>/``,
+holding the new branch ``<name>`` at the base; and the config copy,
+``config/``; and a sibling copy, ``siblings/<other>/``, of each repo the
+base references (``config.py``). The first call makes ``cache/``, which holds
+the gate's downloads. At the end the work copy is closed, which brings the
+branch into the repository and deletes the copy, and the config copy, the
+sibling copies, and the cache are deleted. The base must hold a ``.pre-commit-config.yaml``: it is the gate
+every agent's commit runs. A work copy that cannot close, such as
 one holding uncommitted work, is kept, and the record says so. The records
 stay in the folder; ``records.py`` lists them.
 """
@@ -15,11 +20,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dev_playbook.errors import ToolError
+from dev_playbook.gitrepo import canonical_repo_name
 from dev_playbook.stint import workcopy
-from dev_playbook.stint.call import Runner, Sealed, container_repo
-from dev_playbook.stint.config import make_config
+from dev_playbook.stint.call import CACHE, Runner, Sealed, container_repo
+from dev_playbook.stint.config import make_config, make_siblings, referenced_repos
 from dev_playbook.stint.loop import Assignment, Loop, Stop
 from dev_playbook.stint.records import StintRecord
+
+GATE_CONFIG = ".pre-commit-config.yaml"
+"""The file that names the repository's pre-commit gate."""
 
 
 @dataclass(frozen=True)
@@ -54,6 +63,8 @@ class Host:
     credentials: Path
     events: Path
     runner: Runner
+    workspace: Path
+    """Where the sibling repos' checkouts are, ``~/workspace`` but in a test."""
 
 
 def launch(order: Order, host: Host) -> StintRecord:
@@ -65,10 +76,19 @@ def launch(order: Order, host: Host) -> StintRecord:
     repo = order.repo.resolve()
     if not workcopy.is_checkout(repo):
         raise ToolError(f"{repo} is not a git checkout")
-    folder = (order.home / repo.name / order.name).resolve()
+    # Every call installs the base's hooks, and an agent's commit runs them:
+    # with no config there is no gate, and nothing holds the Standards.
+    if not workcopy.git_ok(repo, "cat-file", "-e", f"{order.base}:{GATE_CONFIG}"):
+        raise ToolError(f"{order.base} in {repo} holds no {GATE_CONFIG}")
+    # The copy is a clone with a ``.git`` of its own, so the checks inside
+    # the container name the repository after the copy's folder. A worktree's
+    # folder is named for its branch, not its repository, and a copy named
+    # after it would resolve ``~/workspace/<repo>/`` links to another checkout.
+    name = canonical_repo_name(repo)
+    folder = (order.home / name / order.name).resolve()
     if folder.exists():
         raise ToolError(f"{folder} already exists; a stint's folder is made fresh")
-    copy, config = folder / repo.name, folder / "config"
+    copy, config, siblings = folder / name, folder / "config", folder / "siblings"
     (folder / "calls").mkdir(parents=True)
     record = StintRecord(reason="", budget=order.budget)
     started = time.monotonic()
@@ -76,6 +96,8 @@ def launch(order: Order, host: Host) -> StintRecord:
     try:
         try:
             make_config(order.playbook, config)
+            names = referenced_repos(repo, order.base, name)
+            sibling_copies = make_siblings(names, host.workspace, siblings)
             workcopy.open_copy(repo, copy, order.name, order.base)
             work = Assignment(
                 copy=copy,
@@ -86,6 +108,7 @@ def launch(order: Order, host: Host) -> StintRecord:
             )
             sealed = Sealed(
                 config=config,
+                siblings=tuple(sibling_copies),
                 copy=copy,
                 folder=folder,
                 model=order.model,
@@ -102,7 +125,7 @@ def launch(order: Order, host: Host) -> StintRecord:
             record.reason = f"the tool failed: {err}"
             raise
         finally:
-            record.closed = close(copy, config)
+            record.closed = close(copy, config, siblings, folder / CACHE)
     finally:
         record.minutes = round((time.monotonic() - started) / 60, 1)
         record.write(folder)
@@ -110,8 +133,8 @@ def launch(order: Order, host: Host) -> StintRecord:
     return record
 
 
-def close(copy: Path, config: Path) -> bool:
-    """Close the work copy and delete the config copy; whether the copy closed."""
+def close(copy: Path, *throwaway: Path) -> bool:
+    """Close the work copy and delete the throwaway folders; whether the copy closed."""
     closed = True
     if copy.exists():
         try:
@@ -119,8 +142,9 @@ def close(copy: Path, config: Path) -> bool:
         except workcopy.CopyFault as err:
             print(f"the work copy is kept: {err}", flush=True)
             closed = False
-    if config.exists():
-        shutil.rmtree(config)
+    for path in throwaway:
+        if path.exists():
+            shutil.rmtree(path)
     return closed
 
 

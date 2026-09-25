@@ -160,6 +160,20 @@ def copy_origin(copy: Path) -> str:
     )
 
 
+def source_origin(source: Path) -> str | None:
+    """The repository's own ``origin`` URL, or None where it has none.
+
+    The copy carries it in place of the path it was cloned from, so code that
+    reads the repository's GitHub slug from its origin, such as
+    ``workspace-lint`` and its tests, reads the same slug in the copy as in
+    the repository. The container holds no GitHub credential, so an origin
+    that names GitHub still pushes nothing.
+    """
+    if not git_ok(source, "config", "--get", "remote.origin.url"):
+        return None
+    return git_in(source, "config", "--get", "remote.origin.url")
+
+
 def quarantine_ref(branch: str) -> str:
     """Where the stint's branch lands in the repository before it is checked."""
     return f"refs/stint-workcopy/{branch}"
@@ -280,6 +294,9 @@ def open_copy(source: Path, destination: Path, branch: str, base: str) -> str:
         )
 
     git_in(destination, "checkout", "-b", branch, base_sha)
+    origin = source_origin(source)
+    if origin is not None:
+        git_in(destination, "remote", "set-url", "origin", origin)
     metadata_path(destination).write_text(
         json.dumps(
             {"source": str(source), "branch": branch, "base": base_sha}, indent=2
@@ -310,8 +327,16 @@ def close_copy(copy: Path) -> str:
     if not is_checkout(source):
         raise CopyFault(f"{source}, which {copy} was cloned from, is not a checkout")
     origin = copy_origin(copy)
-    if Path(origin).resolve() != source.resolve():
-        raise CopyFault(f"{copy} has origin {origin}, not the {source} it records")
+    expected = source_origin(source)
+    if expected is None:
+        matches = Path(origin).resolve() == source.resolve()
+    else:
+        matches = origin == expected
+    if not matches:
+        raise CopyFault(
+            f"{copy} has origin {origin}, not {expected or source}, "
+            f"which the {source} it records gives it"
+        )
 
     held = quarantine_ref(branch)
     git_in(source, "fetch", "--no-tags", str(copy), f"+refs/heads/{branch}:{held}")

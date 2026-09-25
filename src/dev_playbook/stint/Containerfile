@@ -1,15 +1,38 @@
 # The stint's container image: Fedora, the host's claude binary, and the
 # user's dotfile links, laid out as the workspace standard lays out the
-# user's machine. `stint setup` builds it; the build context is a git archive
-# of a config copy (src, scripts, dotfiles, pyproject.toml) plus `claude`.
+# user's machine, plus what a repository's gate runs: pre-commit, make, Node,
+# and a Chromium for Playwright. `stint setup` builds it; the build context
+# is a git archive of a config copy (src, scripts, dotfiles, pyproject.toml)
+# plus `claude`.
 FROM fedora:latest
-RUN dnf install -y git stow jq python3 && dnf clean all
+# The first line is the agent's own tools; the second is what `make check`
+# and the hooks call; the rest are the libraries Playwright's Chromium loads,
+# which its own installer can name only for Debian and Ubuntu.
+RUN dnf install -y git stow jq python3 \
+        make nodejs npm findutils which \
+        nss nspr atk at-spi2-atk at-spi2-core cups-libs libdrm libxkbcommon \
+        libXcomposite libXdamage libXext libXfixes libXrandr libxcb \
+        mesa-libgbm pango cairo alsa-lib expat dbus-libs \
+    && dnf clean all
 RUN curl -LsSf https://astral.sh/uv/install.sh \
     | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
+# pre-commit at a fixed path: the hook it installs in the work copy names the
+# interpreter it was installed with, and each call is a new container.
+RUN env UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin \
+    uv tool install pre-commit
+# Chromium at the revision the Playwright of dev-playbook's lock expects.
+# Outside the home directory, which a call covers with its cache mount.
+ARG PLAYWRIGHT_VERSION
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+RUN test -n "$PLAYWRIGHT_VERSION" \
+    && uvx --from "playwright==$PLAYWRIGHT_VERSION" playwright install chromium \
+    && chmod -R a+rX /opt/ms-playwright
 RUN groupadd -g 1000 agent && useradd -u 1000 -g 1000 -m -d /home/agent agent
 COPY claude /usr/local/bin/claude
 USER 1000:1000
 ENV HOME=/home/agent
+# npm's cache beside uv's and pre-commit's, in the one folder a call mounts.
+ENV npm_config_cache=/home/agent/.cache/npm
 WORKDIR /home/agent
 # An identity for the agent's commits.
 RUN git config --global user.name "sandbox agent" && git config --global user.email "agent@example.invalid"

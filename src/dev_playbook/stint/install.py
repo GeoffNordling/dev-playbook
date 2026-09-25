@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+import tomllib
 from importlib import resources
 from pathlib import Path
 
@@ -34,6 +35,19 @@ def run(*command: str) -> None:
         )
 
 
+def playwright_version(config: Path) -> str:
+    """The Playwright version dev-playbook's ``uv.lock`` pins.
+
+    The image carries the Chromium that version expects, so ``make check``
+    can run the viewer's end-to-end tests with no download.
+    """
+    lock = tomllib.loads((config / "uv.lock").read_text(encoding="utf-8"))
+    found = [p["version"] for p in lock["package"] if p["name"] == "playwright"]
+    if len(found) != 1:
+        raise ToolError(f"{config / 'uv.lock'} pins playwright {len(found)} times")
+    return str(found[0])
+
+
 def setup(playbook: Path, claude: Path) -> None:
     """Install Sandcastle and build the image from ``playbook``'s main and ``claude``."""
     if not claude.is_file():
@@ -46,6 +60,7 @@ def setup(playbook: Path, claude: Path) -> None:
             git_in(config, "archive", "-o", f"{temp}/tree.tar", "HEAD", *IMAGE_TREE)
         except CopyFault as err:
             raise ToolError(f"cannot make the config copy: {err}") from err
+        playwright = playwright_version(config)
         with tarfile.open(f"{temp}/tree.tar") as tree:
             tree.extractall(context, filter="data")
         shutil.copyfile(claude.resolve(), context / "claude")
@@ -56,6 +71,8 @@ def setup(playbook: Path, claude: Path) -> None:
             "-q",
             "-t",
             IMAGE,
+            "--build-arg",
+            f"PLAYWRIGHT_VERSION={playwright}",
             "-f",
             str(PACKAGE / "Containerfile"),
             str(context),

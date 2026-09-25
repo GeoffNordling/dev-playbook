@@ -2,7 +2,8 @@
 
     host, this module                    sandcastle/run.mjs, Node
     billing guard
-    credential copy, receiver   ──▶  request  ──▶  run(): the agent
+    credential copy, receiver   ──▶  request  ──▶  run(): the setup, pre-commit install
+                                                    run(): the agent
                                                     run(): the probe, git status
     stream parsed, record kept  ◀──  response ◀──
     receiver stopped, temp folder deleted
@@ -11,11 +12,18 @@ Node does only what needs Sandcastle. Everything around it is here: what
 the container mounts, what it is billed to, and what the call left behind.
 The container sees three read-only files beside the work copy: the config
 copy of dev-playbook, a copy of the subscription credential, and the sink
-file that names the hook receiver.
+file that names the hook receiver; and, read-only, each sibling copy
+(``config.py``). It also mounts the stint's cache folder
+read-write as its ``~/.cache``, so the gate's environments are built once
+per stint, not once per call.
+
+The setup installs the repository's pre-commit hooks in the work copy, inside
+the container, so an agent's commit runs the gate. It runs there, not on the
+host, because the hook it writes names the interpreter that installed it.
 
 Each call leaves in ``<folder>/calls/``: ``<name>.request.json``, what Node
-was asked; ``<name>.log`` and ``<name>-probe.log``, Sandcastle's logs; and
-``<name>.json``, the CallRecord.
+was asked; ``<name>.log``, ``<name>-setup.log``, and ``<name>-probe.log``,
+Sandcastle's logs; and ``<name>.json``, the CallRecord.
 """
 
 import json
@@ -41,9 +49,19 @@ from dev_playbook.stint.receiver import NETWORK, Receiver, ReceiverFault
 from dev_playbook.stint.records import CallRecord, Usage
 
 AGENT_HOME = "/home/agent"
-CONFIG_MOUNT = f"{AGENT_HOME}/workspace/dev-playbook"
+WORKSPACE = f"{AGENT_HOME}/workspace"
+CONFIG_MOUNT = f"{WORKSPACE}/dev-playbook"
 CREDENTIALS_MOUNT = f"{AGENT_HOME}/.claude/.credentials.json"
 SINK_MOUNT = f"{AGENT_HOME}/.local/share/claude-measure/sink"
+CACHE_MOUNT = f"{AGENT_HOME}/.cache"
+"""Where pre-commit, uv, and npm keep their downloads; the stint's cache folder."""
+CACHE = "cache"
+"""The stint's cache folder, in its folder: every call mounts it read-write.
+
+It is the stint's own, never the host's ``~/.cache``, and never another
+stint's: an agent can write it, so sharing it would let one stint's agent
+change the hook environments of the next. Deleted when the stint ends.
+"""
 AGENT_ENV = {"CLAUDE_CODE_TMPDIR": "/tmp/agent-tmp"}
 """Claude's temp folder moves off ``/tmp/claude-<uid>``, which a mount can make root-owned."""
 
@@ -174,6 +192,8 @@ class Sealed:
 
     config: Path
     """The config copy: dev-playbook, mounted read-only."""
+    siblings: tuple[Path, ...]
+    """The sibling copies, each mounted read-only at ``~/workspace/<name>``."""
     copy: Path
     """The work copy."""
     folder: Path
@@ -193,6 +213,8 @@ class Sealed:
         billing_guard(self.config, self.copy)
         calls = self.folder / "calls"
         calls.mkdir(parents=True, exist_ok=True)
+        cache = self.folder / CACHE
+        cache.mkdir(exist_ok=True)
         temp = self.folder / f"tmp-{name}"
         temp.mkdir()
         try:
@@ -218,14 +240,29 @@ class Sealed:
                         "sandboxPath": SINK_MOUNT,
                         "readonly": True,
                     },
+                    *[
+                        {
+                            "hostPath": str(sibling),
+                            "sandboxPath": f"{WORKSPACE}/{sibling.name}",
+                            "readonly": True,
+                        }
+                        for sibling in self.siblings
+                    ],
+                    {
+                        "hostPath": str(cache),
+                        "sandboxPath": CACHE_MOUNT,
+                        "readonly": False,
+                    },
                 ],
                 "env": AGENT_ENV,
                 "sessions": str(self.folder / "sessions"),
                 "log": str(calls / f"{name}.log"),
+                "setupLog": str(calls / f"{name}-setup.log"),
                 "probeLog": str(calls / f"{name}-probe.log"),
                 "model": self.model,
                 "prompt": prompt,
                 "resume": resume,
+                "command": None,
             }
             (calls / f"{name}.request.json").write_text(
                 json.dumps(request, indent=2) + "\n", encoding="utf-8"

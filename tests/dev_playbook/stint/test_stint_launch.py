@@ -8,6 +8,7 @@ container and no tokens.
 import json
 import sqlite3
 import subprocess
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -89,6 +90,7 @@ def repo(tmp_path: Path) -> Path:
     repo = tmp_path / "mc"
     (repo / "ws").mkdir(parents=True)
     (repo / "ws" / "PLAN.md").write_text(PLAN)
+    (repo / ".pre-commit-config.yaml").write_text("repos: []\n")
     git(repo, "init", "-q", "-b", "main")
     commit(repo, "seed")
     git(repo, "branch", "-q", "seed")
@@ -113,6 +115,7 @@ def host(tmp_path: Path) -> Host:
         credentials=tmp_path / "credentials.json",
         events=events,
         runner=runner,
+        workspace=tmp_path,
     )
 
 
@@ -165,3 +168,64 @@ def test_a_failed_launch_still_writes_the_record(
     written = json.loads((folder / "stint.json").read_text())
     assert written["reason"].startswith("the tool failed: ")
     assert not (folder / "config").exists()
+
+
+def test_a_base_with_no_gate_is_refused(tmp_path: Path, repo: Path, host: Host) -> None:
+    git(repo, "rm", "-q", ".pre-commit-config.yaml")
+    commit(repo, "no gate")
+    git(repo, "branch", "-q", "-f", "seed")
+    with pytest.raises(ToolError, match="holds no .pre-commit-config.yaml"):
+        launch(order(tmp_path, repo), host)
+    assert not (tmp_path / "home").exists()
+
+
+def test_a_copy_of_a_worktree_is_named_for_its_repository(
+    tmp_path: Path, repo: Path, host: Host
+) -> None:
+    worktree = tmp_path / "feature-x"
+    git(repo, "worktree", "add", "-q", str(worktree), "-b", "feature-x", "seed")
+    copies: list[str] = []
+
+    def spy(request: dict) -> dict:
+        copies.append(request["copy"])
+        return runner(request)
+
+    spied = replace(host, runner=spy)
+    record = launch(order(tmp_path, worktree), spied)
+    assert record.reason == "done"
+    assert {Path(c) for c in copies} == {tmp_path / "home" / "mc" / "s1" / "mc"}
+
+
+def test_each_referenced_repo_gets_a_read_only_sibling_copy(
+    tmp_path: Path, repo: Path, host: Host
+) -> None:
+    lib = tmp_path / "lib"
+    (lib / "docs").mkdir(parents=True)
+    (lib / "docs" / "a.md").write_text("published\n")
+    git(lib, "init", "-q", "-b", "main")
+    commit(lib, "lib")
+    (repo / "ws" / "links.md").write_text(
+        "See ~/workspace/lib/docs/a.md, ~/workspace/gone/b.md, and"
+        " ~/workspace/mc/ws/PLAN.md.\n"
+    )
+    commit(repo, "links")
+    git(repo, "branch", "-q", "-f", "seed")
+    seen: list[dict[str, Path]] = []
+
+    def spy(request: dict) -> dict:
+        mounts = {
+            m["sandboxPath"]: Path(m["hostPath"])
+            for m in request["mounts"]
+            if m["sandboxPath"].startswith("/home/agent/workspace/")
+        }
+        assert (mounts["/home/agent/workspace/lib"] / "docs" / "a.md").is_file()
+        seen.append(mounts)
+        return runner(request)
+
+    launch(order(tmp_path, repo), replace(host, runner=spy))
+    folder = tmp_path / "home" / "mc" / "s1"
+    assert seen[0] == {
+        "/home/agent/workspace/dev-playbook": folder / "config",
+        "/home/agent/workspace/lib": folder / "siblings" / "lib",
+    }
+    assert not (folder / "siblings").exists()

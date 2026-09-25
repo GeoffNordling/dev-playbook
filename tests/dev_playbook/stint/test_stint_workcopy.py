@@ -247,6 +247,17 @@ def test_a_record_naming_another_repository_stops_the_close(
         workcopy.close_copy(copy)
 
 
+def test_the_copy_carries_the_repositorys_own_origin(repo: Path, copy: Path) -> None:
+    """Code that reads the GitHub slug from origin reads the same slug in the copy."""
+    url = "https://github.com/owner/real.git"
+    git(repo, "remote", "add", "origin", url)
+    workcopy.open_copy(repo, copy, "stint-a", "HEAD")
+    assert workcopy.copy_origin(copy) == url
+    commit(copy, "second.md", "two\n", "the stint's work")
+    workcopy.close_copy(copy)
+    assert git(repo, "log", "-1", "--format=%s", "stint-a") == "the stint's work"
+
+
 def test_an_unreadable_record_stops_the_close(repo: Path, copy: Path) -> None:
     workcopy.open_copy(repo, copy, "stint-a", "HEAD")
     workcopy.metadata_path(copy).write_text("{not json", encoding="utf-8")
