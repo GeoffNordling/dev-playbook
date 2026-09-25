@@ -1,7 +1,7 @@
 ---
 type: Guide
 title: Running a Stint
-description: How a launching agent runs an unattended stint with the stint command — what to prepare, the one-time setup and what the image holds, the pre-commit gate every commit runs, the run and its arguments, what comes back to the repository, the stint's folder, the exit codes, and every rule that stops a stint
+description: How a launching agent runs an unattended stint with the stint command — what to prepare, the one-time setup and what the image holds, the pre-commit gate every commit runs, the target check the stint runs at each checkpoint, the run and its arguments, what comes back to the repository, the stint's folder, the exit codes, and every rule that stops a stint
 ---
 
 # Running a Stint
@@ -34,6 +34,13 @@ and segment are
   own hooks, such as `playbook check --local`; dev-playbook runs its own
   hooks from the branch being worked. A hook set only for `pre-push`, such
   as `make-check`, does not run, since nothing is pushed.
+- **The target check blocks nothing, and done needs it clean.** `--check`
+  runs the rules the stint works toward, such as a workstream's
+  `check <rule-id>…`. Its findings are a signal, so an iteration may run
+  it at any time and commit while it fails. At each checkpoint the stint
+  runs it in its own container, spending no tokens, and the principal
+  reads its findings. The stint refuses the principal's done while the
+  check exits nonzero.
 - **`make check` runs in the container.** The image holds what the gate
   and the check call: pre-commit, make, Node and npm, and the Chromium
   that Playwright drives.
@@ -122,7 +129,7 @@ Every argument is required, and none has a default:
 | `REPO` | The repository the stint changes |
 | `--base` | The ref the branch starts at; it holds the workstream |
 | `--workstream` | The workstream folder, relative to the repository |
-| `--check` | The command that must pass after every change |
+| `--check` | The target check: a command whose exit 0 is zero findings |
 | `--budget` | The most iterations the stint may spend; at least the plan's open tasks |
 | `--name` | The stint's name, and its branch's |
 | `--home` | Where stint folders live |
@@ -136,10 +143,13 @@ stint ended.
 
 - `principal-0` reads the plan and answers `launch`, or why not.
 - `iter-1`, `iter-2`, … each do the first unchecked task, check it off, and
-  commit.
-- At each checkpoint, `review-<n>` reads the segment's commits cold and
-  commits nothing, and `principal-<n>`, the same conversation resumed,
-  checks off the checkpoint and answers `continue`, `done`, or `stop`.
+  commit. An iteration that cannot do its task leaves it unchecked, logs a
+  deviation in `PROGRESS.md`, commits, and reports a blocker.
+- At each checkpoint, `check-<n>` runs `--check` on the segment's last
+  commit, and `review-<n>` reads the segment's commits cold and commits
+  nothing. Both report to `principal-<n>`, the same conversation resumed,
+  which rules on their findings and the deviations, checks off the
+  checkpoint, and answers `continue`, `done`, or `stuck`.
 
 ## What comes back
 
@@ -148,7 +158,7 @@ The exit code says how the stint ended:
 | Exit | Meaning |
 |---|---|
 | `0` | Done: the principal said done, and the branch landed in the repository |
-| `1` | Any other end: a stop rule, the principal's `stop`, or a work copy kept |
+| `1` | Any other end: a stop rule, the principal's `stuck`, or a work copy kept |
 | `2` | The tool could not run: not set up, a bad argument, or a failed step |
 
 On exit 0 or 1 with the copy closed, the repository has the branch `<name>`
@@ -161,11 +171,12 @@ The stint's folder, `<home>/<repo>/<name>/`, stays:
 
 | File | What it holds |
 |---|---|
-| `stint.json` | The reason it ended, iterations spent, the branch's last commit, the notes, the principal's context size per call, and each call's session and commits |
-| `calls/<call>.json` | One call's record: its session, billing source, tokens, commits, uncommitted files, and answer |
-| `calls/<call>.request.json` | What the call asked Sandcastle to run, the prompt included |
+| `stint.json` | The reason it ended, iterations spent, the branch's last commit, the notes, the principal's context size per call, each call's session and commits, and each check's exit code |
+| `calls/<call>.json` | One call's record: its session, billing source, tokens, commits, uncommitted files, and answer; for `check-<n>`, its exit code, output, and uncommitted files |
+| `calls/<call>.request.json` | What the call asked Sandcastle to run, the prompt or the command included |
 | `calls/<call>-setup.log` | Sandcastle's log of the hook install that runs before the agent |
-| `calls/<call>.log`, `calls/<call>-probe.log` | Sandcastle's logs of the agent and of the uncommitted-work probe |
+| `calls/<call>.log`, `calls/<call>-probe.log` | Sandcastle's logs of the agent or the check, and of the uncommitted-work probe |
+| `check-<n>.txt` | The target check's output at checkpoint `n`, and its exit code |
 | `review-<n>.md` | The reviewer's report for segment `n` |
 | `sessions/` | Every agent's session file; the principal's is resumed from here |
 
@@ -179,22 +190,27 @@ Each rule is checked in code, and the reason is the last line and
 | `not launched: N tasks, budget B` | The plan has more open tasks than the budget |
 | `stuck at launch: …` | The principal did not answer `launch` |
 | `the principal changed the plan at launch` | `principal-0` committed |
-| `iter-k blocked: …` | The iteration reported a blocker |
-| `iter-k committed nothing` | The iteration made no commit |
 | `iter-k moved a checkpoint marker` | An iteration touched a checkpoint line |
-| `<call> left work uncommitted` | A file was left uncommitted in the copy |
+| `segment n has no commits to review` | The segment's iterations committed nothing, not even a deviation |
+| `<call> left work uncommitted` | A file was left uncommitted in the copy, by an agent or by the check |
 | `<call>: the copy's HEAD is not the call's last commit` | The copy's branch does not match what the call reported |
+| `check-n moved the copy's HEAD` | The target check committed |
 | `symlink in the copy: …` | A path the stint reads is a symlink |
 | `the answer's last line is not JSON` | An answer did not end with its JSON line |
 | `review-n committed` | The reviewer committed |
 | `principal-n did not check off the checkpoint` | The principal did not mark the checkpoint done |
 | `principal-n said done with N tasks left` | Done was said too early |
+| `principal-n said done while the check reports findings (exit E)` | Done was said while the target check at that checkpoint exited nonzero |
 | `budget: S of B iterations spent` | The budget ran out before done |
+| `principal-n left N unchecked tasks above the checkpoint` | A task no segment will reach was left behind the checked-off line |
+| `principal-n said continue with no task in the next segment` | The next segment is empty |
 | `<call>: would route to metered billing: …` | The billing guard refused the call |
 | `<call>: billed to …, not the subscription` | Claude reported a source other than the subscription |
 | `<call> ended in error` | Claude's session ended in an error |
 | `<call>: run.mjs exited …`, `<call>: N hook rows lost …` | The container call failed, or a hook row did not reach the database |
-| `stop: …` | The principal stopped the stint |
+| `stuck: …` | The principal yielded the stint as stuck |
 
-An iteration that checks off more or fewer than one task is not stopped;
-the stint records a note, and the principal sees it at the checkpoint.
+An iteration that checks off more or fewer than one task, or reports a
+blocker, is not stopped; the stint records a note, and the principal sees
+it at the checkpoint. An iteration that checks off no task, or reports a
+blocker, ends its segment early, so the checkpoint comes next.

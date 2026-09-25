@@ -23,8 +23,8 @@ to a workstream:
   principal, resumed where it left.
 - **drive** — what a loop does to a
   [workstream](/doc-types/workstream/definition.md). The loop names no
-  workstream: a stint binds one loop to one workstream, and the
-  workstream records it.
+  workstream, and no workstream names it: a stint binds one loop to one
+  workstream for one run.
 
 The target is not a field of the loop: it is written in the standards
 the verifications measure against. An act reads a standard to know
@@ -42,8 +42,7 @@ the standards it verifies against are run by the loop, never at a gate
 
 The documents typed `Loop` under `loops/`, one file per loop. A Loop
 instance is the specification of a procedure that brings a system
-closer to its target state; the workflow script, skill, or person that
-runs it is the loop's driver, not the loop. A loop does one thing
+closer to its target state. A loop does one thing
 ([System Legibility](/docs/system-legibility.md#standing-principles)):
 its acts, its verifications, and its yields, drawn as one graph. One
 loop drives many workstreams.

@@ -632,43 +632,35 @@ STINTS = """\
 
 ## Stints
 
-- **Planned.** Loop: [Design](/loops/design.md). Budget: one session.
-- **2026-09-24.** Loop: [Design](/loops/design.md). Budget: two sessions.
+- **Planned.** Budget: one session.
+- **2026-09-24.** Budget: two sessions.
   Spent: two sessions. Verdict: advance.
-- **2026-09-20.** Loop: [Design](/loops/design.md). Verdict: accept.
+- **2026-09-20.** Verdict: accept.
 """
 
 
 def test_a_stint_entry_in_form() -> None:
-    loop = typed("Loop", "# Design\n")
     head = "workstreams/w/WORKSTREAM.md"
-    assert (
-        found(
-            a_stint_entry_in_form,
-            {head: typed("Workstream", STINTS), "loops/design.md": loop},
-        )
-        == []
-    )
+    assert found(a_stint_entry_in_form, {head: typed("Workstream", STINTS)}) == []
     bad = (
-        STINTS.replace("2026-09-20", "2026-09-30")
-        .replace("Verdict: accept", "Verdict: merged")
-        .replace(
-            "Budget: one session.", "Budget: one session. Also [x](/loops/design.md)."
+        STINTS.replace("2026-09-20", "2026-09-30").replace(
+            "Verdict: accept", "Verdict: merged"
         )
-        + "- **Planned.** Loop: [Notes](/notes.md).\n- Next, maybe.\n"
+        + "- **Planned.** Budget: one more.\n- Next, maybe.\n"
     )
-    assert found(
-        a_stint_entry_in_form,
-        {head: typed("Workstream", bad), "loops/design.md": loop, "notes.md": b"# N\n"},
-    ) == [(head, 10), (head, 13), (head, 13), (head, 14), (head, 14), (head, 15)]
+    assert found(a_stint_entry_in_form, {head: typed("Workstream", bad)}) == [
+        (head, 13),
+        (head, 13),
+        (head, 14),
+        (head, 15),
+    ]
 
 
 def test_a_stint_entry_in_form_reads_targets() -> None:
-    loop = typed("Loop", "# Design\n")
     draft = typed("Standard", "# D\n\n## One\n\nP.\n\n`w.one` · deterministic\n")
     head = "workstreams/w/WORKSTREAM.md"
-    entry = "# W\n\n## Stints\n\n- **Planned.** Loop: [D](/loops/design.md). {}\n"
-    files = {"loops/design.md": loop, "workstreams/w/target.md": draft}
+    entry = "# W\n\n## Stints\n\n- **Planned.** Budget: one session. {}\n"
+    files = {"workstreams/w/target.md": draft}
     good = entry.format("Targets: `w.one`.")
     assert found(a_stint_entry_in_form, files | {head: typed("Workstream", good)}) == []
     for bad in ("Targets: `w.two`.", "Targets: w.one."):

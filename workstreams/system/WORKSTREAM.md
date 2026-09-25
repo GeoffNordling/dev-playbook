@@ -43,7 +43,7 @@ flowchart LR
     SF["Story-forge<br/>(simulates the fact base and its views by hand on a real repo)"] -- proves the value of --> FB
   end
   subgraph DRIVE["Drive: work advances without the user in the loop"]
-    W["Workstream, loop, stint, driver"] -- unattended stints run on --> SC["stint command<br/>(built)"]
+    W["Workstream, loop, stint"] -- unattended stints run on --> SC["stint command<br/>(built)"]
   end
 ```
 

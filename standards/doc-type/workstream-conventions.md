@@ -58,8 +58,7 @@ document typed `Workstream` starts with a bold name, such as
 
 Each item of the bulleted list under the `Stints` heading of a
 document typed `Workstream` opens with `**Planned.**` or with a date,
-`**YYYY-MM-DD.**`, and has exactly one link to a file typed `Loop`.
-At most one item opens with `**Planned.**`, and it is the first; the
+`**YYYY-MM-DD.**`. At most one item opens with `**Planned.**`, and it is the first; the
 dated items follow it, newest first. An item that holds `Verdict:`
 follows it with `advance`, `accept`, or `delete`. An item that holds
 `Targets:` follows it with one or more rule ids, each in backticks and
@@ -68,11 +67,6 @@ a file typed `Standard` under the head file's directory, a
 [draft Standard](/CONTEXT.md#governance) of the workstream.
 
 `doc-type.a-stint-entry-in-form` · deterministic
-
-> **Why.** Stints is the ledger of the loops that drove the workstream,
-> the next spend and the past ones, and the board script reads it.
-> `Targets` is optional: a stint may run with no draft Standard, and
-> then nothing but its plan says what it is for.
 
 ## Stints in a leaf only
 

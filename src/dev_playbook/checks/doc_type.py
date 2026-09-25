@@ -716,7 +716,7 @@ def a_worklist_item_opens_with_its_bold_name(repo: Repo) -> Iterator[Finding]:
 
 @check("doc-type.a-stint-entry-in-form")
 def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
-    """Each Stints item opens planned or dated, links one Loop, and sits in order.
+    """Each Stints item opens planned or dated and sits in order.
 
     The planned item is first; the dated ones follow, newest first. A
     ``Verdict:`` is one of the three the user rules. A ``Targets:`` lists
@@ -747,17 +747,6 @@ def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
                 if dates and label > dates[-1]:
                     yield Finding(path, start, "the dated stints run newest first")
                 dates.append(label)
-            loops = [
-                target
-                for link in doc.links
-                if start <= link.line < end
-                and _type_of(repo, target := _resolve(path, link.target, repo.name, ""))
-                == LOOP_TYPE
-            ]
-            if len(loops) != 1:
-                yield Finding(
-                    path, start, f"a stint links one file typed Loop, not {len(loops)}"
-                )
             verdict = VERDICT.search(text)
             if verdict is not None and verdict.group(1) not in VERDICTS:
                 yield Finding(

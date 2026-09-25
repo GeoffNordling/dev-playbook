@@ -36,6 +36,8 @@ class PlanState:
     """Unchecked tasks before the first open checkpoint and after the last done one."""
     left: int
     """Unchecked tasks in the whole plan."""
+    behind: int
+    """Unchecked tasks above the last done checkpoint, which no segment will reach."""
 
 
 def plan_state(text: str) -> PlanState:
@@ -51,4 +53,5 @@ def plan_state(text: str) -> PlanState:
         open=len(open_),
         segment=sum(1 for i in tasks if start < i < end),
         left=len(tasks),
+        behind=sum(1 for i in tasks if i < start),
     )

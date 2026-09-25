@@ -3,26 +3,40 @@ reported:
 
 {{SUMMARIES}}
 
+The stint ran the target check, `{{CHECK}}`, on the segment's last commit.
+It exited {{CHECK_EXIT}}; exit 0 is zero findings. It printed:
+
+{{CHECK_OUTPUT}}
+
 The reviewer reported:
 
 {{REVIEW}}
 
 Iterations spent: {{SPENT}} of {{BUDGET}}.
 
-1. Rule on every finding against the head file's Goal, Done when, and
-   Constraints: **accept** it, and add a fix task to the plan, or
-   **reject** it, with the reason. A finding the head file cannot settle
-   ends the stint as stuck.
-2. Write each ruling in the log's `## Decisions`:
-   `- checkpoint {{N}}: <finding in a few words> — <accept | reject>: <why>`.
-3. Change the first `<!-- [ ] checkpoint -->` line to
-   `<!-- [x] checkpoint -->`. Place any fix tasks above the next
+1. Rule on every finding of the reviewer against the head file's Goal,
+   Done when, and Constraints: **accept** it, and add a fix task to the
+   plan, or **reject** it, with the reason. A finding the head file cannot
+   settle ends the stint as stuck.
+2. Make sure the tasks ahead clear the check's findings, and add a task
+   where none does. You never change the draft Standards, the check, or
+   the head file's stint entry: a finding you find wrong ends the stint as
+   stuck, and the user rules on it.
+3. Take up every deviation in the log since the last checkpoint: rewrite
+   the task, split it, or drop it; or end the stint as stuck.
+4. Write each ruling and each change in the log's `## Decisions`:
+   `- checkpoint {{N}}: <finding or deviation in a few words> — <what you decided>: <why>`.
+5. Change the first `<!-- [ ] checkpoint -->` line to
+   `<!-- [x] checkpoint -->`. No unchecked task may stay above it: move
+   each one below it, or drop it. Place new tasks above the next
    `<!-- [ ] checkpoint -->`, or, when none is left, add them with a new
    `<!-- [ ] checkpoint -->` after them, and only if the budget has room.
-   Revise the tasks ahead if what you learned calls for it, and record
-   each change in `## Decisions` too.
-4. Run `/commit-sandbox`.
+   Revise the tasks ahead if what you learned calls for it.
+6. Run `/commit-sandbox`.
 
 End your reply with one line of JSON and nothing after it:
-`{"verdict": "continue" | "done" | "budget" | "stuck", "reason": "<one line>"}`
-where `done` means every task is checked and the Done when holds.
+`{"verdict": "continue" | "done" | "stuck", "reason": "<one line>"}`.
+You decide. Say `done` only when every task is checked, the Done when
+holds, and the check exited 0; the stint refuses a done while the check
+reports findings. Say `stuck` when the target is out of reach, or a finding
+or a deviation is one the head file cannot settle.

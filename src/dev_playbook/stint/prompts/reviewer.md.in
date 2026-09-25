@@ -21,7 +21,7 @@ commit to its task. Read this segment's entries in `{{PROGRESS}}`, and
 check each judgment call against the sources.
 
 Run each task's Verify clause against the artifact, never against the
-agent's word. Run `{{CHECK}}` once. At the last checkpoint, the one with
+agent's word. At the last checkpoint, the one with
 no `<!-- [ ] checkpoint -->` line after it, check each `## Done when`
 criterion too. A failed clause or an unmet criterion is a finding.
 

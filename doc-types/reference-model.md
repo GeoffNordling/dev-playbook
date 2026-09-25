@@ -59,7 +59,7 @@ Target = DocType | File | Issue | PullRequest | External   # what an edge lands 
 # PullRequest a GitHub pull request; the factory's contract is issue in, PR out
 # External    the catch-all for whatever the doc-type system does not define:
 #             git history, scratch, the launch prompt, the rest of GitHub,
-#             the user, a stint's principal, a loop's driver
+#             the user, a stint's principal
 
 
 from doc_type import DocType, Target, Verb
@@ -157,11 +157,10 @@ class Loop(DocType):
     acts:          list[Act]      # peers; the graph, not the list, orders them
     verifications: list[Verification]
     yields:        list[Yield]
-    # no workstream: one loop drives many, and each workstream's Stints records which loop drove it
+    # no workstream: one loop drives many, and no workstream names it
 
 
 from doc_type import DocType
-from loop import Loop
 from standard import RuleId
 
 
@@ -178,7 +177,6 @@ class Workstream(DocType):
         body: str                 # opaque, but for Stints
 
     class Stint:                  # a part: one entry under Stints, a unit of accounting
-        loop:    Loop             # the loop that drives, or will drive, the workstream
         budget:  str              # checkpoints × iterations, plus slack, to a hard limit
         spent:   str | None       # None for the planned stint
         branch:  str | None
@@ -233,9 +231,8 @@ Verifier, check, judge, and gate are the words of
 verifiers and never gates.
 
 A loop points at Runbooks and Standards and contains neither. It
-names no workstream, since one loop drives many; a workstream's Stints
-names the loop of each stint, planned or recorded, and that link has
-no verb. Another loop's yield is the other thing that points at a
+names no workstream, since one loop drives many, and no workstream
+names it. Another loop's yield is the only thing that points at a
 loop. A stochastic rule certifies at
 a loop's verification the same way a deterministic one does: zero
 findings. Which checks run at a gate is that gate's wiring, not the

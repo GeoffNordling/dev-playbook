@@ -16,16 +16,21 @@ PLAN = """\
 
 
 def test_the_open_segment_is_after_the_last_done_checkpoint() -> None:
-    assert plan_state(PLAN) == PlanState(done=1, open=2, segment=2, left=3)
+    assert plan_state(PLAN) == PlanState(done=1, open=2, segment=2, left=3, behind=0)
 
 
 def test_a_plan_with_no_checkpoints_is_one_segment() -> None:
-    assert plan_state("- [ ] a\n- [ ] b\n") == PlanState(0, 0, 2, 2)
+    assert plan_state("- [ ] a\n- [ ] b\n") == PlanState(0, 0, 2, 2, 0)
 
 
 def test_a_finished_plan_has_nothing_left() -> None:
     text = "- [x] a\n<!-- [x] checkpoint -->\n"
-    assert plan_state(text) == PlanState(done=1, open=0, segment=0, left=0)
+    assert plan_state(text) == PlanState(done=1, open=0, segment=0, left=0, behind=0)
+
+
+def test_a_task_left_above_a_done_checkpoint_is_behind() -> None:
+    text = "- [ ] a\n<!-- [x] checkpoint -->\n- [ ] b\n<!-- [ ] checkpoint -->\n"
+    assert plan_state(text) == PlanState(done=1, open=1, segment=1, left=2, behind=1)
 
 
 def test_an_indented_task_line_is_not_a_task() -> None:

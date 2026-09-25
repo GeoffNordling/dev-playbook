@@ -14,15 +14,13 @@ it.
 
 None. A workstream is driven: a [loop](/doc-types/loop/definition.md)
 drives it, as a standard is held to and a runbook is invoked. It points
-at whatever its work needs, and each of its stints names the loop that
-drove it, but none of those pointers is a verb.
+at whatever its work needs, but none of those pointers is a verb.
 
 ## The family
 
-The head files typed `Workstream`, one per line of work. The loop and
-its driver belong to a stint, not to the workstream: one loop drives
-many workstreams, and each stint records which loop drove it. A
-workstream ends when the user accepts or deletes it.
+The head files typed `Workstream`, one per line of work. A workstream
+names no loop: one loop drives many workstreams. A workstream ends when
+the user accepts or deletes it.
 
 ## Where a workstream lives
 

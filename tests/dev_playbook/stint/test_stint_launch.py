@@ -67,6 +67,8 @@ def agent(name: str, copy: Path) -> tuple[str, list[str]]:
 
 
 def runner(request: dict) -> dict:
+    if request["job"] == "check":
+        return {"exit": 0, "output": [], "probe": [""]}
     name = Path(request["log"]).stem
     answer, commits = agent(name, Path(request["copy"]))
     result = json.dumps({"type": "result", "result": answer, "is_error": False})
@@ -143,6 +145,8 @@ def test_a_stint_lands_its_branch_and_deletes_both_copies(
     folder = tmp_path / "home" / "mc" / "s1"
     assert sorted(p.name for p in folder.iterdir()) == [
         "calls",
+        "check-1.txt",
+        "check-2.txt",
         "review-1.md",
         "review-2.md",
         "stint.json",

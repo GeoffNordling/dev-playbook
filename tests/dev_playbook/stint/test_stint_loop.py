@@ -15,9 +15,9 @@ import pytest
 
 from dev_playbook.gitrepo import no_git_env
 from dev_playbook.stint.call import CallFault
-from dev_playbook.stint.loop import Assignment, Loop, Stop
+from dev_playbook.stint.loop import SHOWN, Assignment, Loop, Stop, shown
 from dev_playbook.stint.plan import DONE_MARK, OPEN_MARK
-from dev_playbook.stint.records import CallRecord, StintRecord, Usage
+from dev_playbook.stint.records import CallRecord, CheckRecord, StintRecord, Usage
 
 PLAN = f"""\
 # Plan
@@ -107,14 +107,35 @@ def fake(copy: Path, behave: Behave) -> Callable[[str, str, str | None], CallRec
     return call
 
 
-def run(copy: Path, behave: Behave, budget: int = 6) -> tuple[str, StintRecord]:
+Exits = Callable[[str], int]
+"""The target check's exit code at each of its runs, by the run's name."""
+
+
+def clean(name: str) -> int:
+    return 0
+
+
+def checker(exits: Exits) -> Callable[[str, str], CheckRecord]:
+    """A check that reports one finding line per nonzero exit, and writes nothing."""
+
+    def check(name: str, command: str) -> CheckRecord:
+        code = exits(name)
+        output = [f"finding at {name}"] if code else []
+        return CheckRecord(name, 0, code, output, [])
+
+    return check
+
+
+def run(
+    copy: Path, behave: Behave, budget: int = 6, exits: Exits = clean
+) -> tuple[str, StintRecord]:
     """Run the loop; return ``done`` or the stop's reason, and the record."""
     record = StintRecord(reason="", budget=budget)
     work = Assignment(
         copy=copy, repo="/r", workstream="ws", check="true", budget=budget
     )
     try:
-        Loop(work, fake(copy, behave), record, copy.parent).run()
+        Loop(work, fake(copy, behave), checker(exits), record, copy.parent).run()
         return "done", record
     except Stop as stop:
         return str(stop), record
@@ -203,10 +224,17 @@ def no_usage(name: str, copy: Path, rec: dict) -> dict | None:
     return None
 
 
+def deviate(copy: Path, name: str, rec: dict) -> dict:
+    """Log a deviation, commit it, and report the blocker, as a blocked iteration does."""
+    (copy / "ws" / "PROGRESS.md").write_text("- deviation: one — the spec is missing\n")
+    rec["commits"] = [commit(copy, name)]
+    rec["answer"] = '{"summary": "s", "blocker": "the spec is missing"}'
+    return rec
+
+
 def blocked(name: str, copy: Path, rec: dict) -> dict | None:
     if name == "iter-1":
-        rec["answer"] = '{"summary": "s", "blocker": "the spec is missing"}'
-        return rec
+        return deviate(copy, name, rec)
     return None
 
 
@@ -236,8 +264,8 @@ def faulted(name: str, copy: Path, rec: dict) -> dict | None:
         (lying_head, 6, "iter-1: the copy's HEAD is not the call's last commit"),
         (reviewer_writes, 6, "review-1 committed"),
         (no_usage, 6, "principal-1 reported no token usage"),
-        (blocked, 6, "iter-1 blocked: the spec is missing"),
-        (idle, 6, "iter-1 committed nothing"),
+        (blocked, 6, "principal-1 left 2 unchecked tasks above the checkpoint"),
+        (idle, 6, "segment 1 has no commits to review"),
         (faulted, 6, "iter-1: run.mjs exited 1"),
     ],
 )
@@ -282,3 +310,75 @@ def test_each_review_is_kept_in_the_folder(copy: Path) -> None:
     run(copy, honest)
     assert (copy.parent / "review-1.md").read_text() == "0 findings\n"
     assert (copy.parent / "review-2.md").is_file()
+
+
+def test_findings_before_the_end_are_a_signal_not_a_stop(copy: Path) -> None:
+    got, record = run(copy, honest, exits=lambda name: int(name == "check-1"))
+    assert got == "done"
+    assert [c.exit for c in record.checks] == [1, 0]
+
+
+def test_a_done_while_the_check_reports_findings_is_refused(copy: Path) -> None:
+    got, _ = run(copy, honest, exits=lambda name: 1)
+    assert got == "principal-2 said done while the check reports findings (exit 1)"
+
+
+def test_the_principal_is_shown_the_checks_output(copy: Path) -> None:
+    prompts: dict[str, str] = {}
+    inner = fake(copy, honest)
+
+    def spy(name: str, prompt: str, resume: str | None) -> CallRecord:
+        prompts[name] = prompt
+        return inner(name, prompt, resume)
+
+    record = StintRecord(reason="", budget=6)
+    work = Assignment(copy=copy, repo="/r", workstream="ws", check="true", budget=6)
+    exits = checker(lambda name: int(name == "check-1"))
+    Loop(work, spy, exits, record, copy.parent).run()
+    assert "It exited 1;" in prompts["principal-1"]
+    assert "finding at check-1" in prompts["principal-1"]
+    assert (copy.parent / "check-1.txt").read_text() == "finding at check-1\nexit 1\n"
+
+
+def test_long_check_output_is_cut_for_the_principal() -> None:
+    cut = shown([f"f{i}" for i in range(SHOWN + 3)]).splitlines()
+    assert len(cut) == SHOWN + 1
+    assert cut[-1] == "(3 more lines not shown)"
+
+
+def test_a_blocked_iteration_ends_its_segment_for_the_principal(copy: Path) -> None:
+    def replan(name: str, copy: Path, rec: dict) -> dict | None:
+        if name == "iter-1":
+            return deviate(copy, name, rec)
+        if name == "principal-1":
+            plan = copy / "ws" / "PLAN.md"
+            tasks = "- [ ] one\n- [ ] two\n- [ ] three\n- [ ] four\n"
+            plan.write_text(f"# Plan\n\n{DONE_MARK}\n{tasks}{OPEN_MARK}\n")
+            rec["commits"] = [commit(copy, name)]
+            rec["answer"] = '{"verdict": "continue", "reason": "r"}'
+            return rec
+        return None
+
+    got, record = run(copy, replan)
+    assert got == "done"
+    assert [c.name for c in record.calls][:4] == [
+        "principal-0",
+        "iter-1",
+        "review-1",
+        "principal-1",
+    ]
+    assert record.notes == [
+        "iter-1 blocked: the spec is missing",
+        "iter-1 checked off 0 tasks, not 1",
+    ]
+
+
+def test_a_check_that_leaves_files_stops_the_stint(copy: Path) -> None:
+    def messy(name: str, command: str) -> CheckRecord:
+        return CheckRecord(name, 0, 0, [], ["?? .cache/x"])
+
+    record = StintRecord(reason="", budget=6)
+    work = Assignment(copy=copy, repo="/r", workstream="ws", check="true", budget=6)
+    loop = Loop(work, fake(copy, honest), messy, record, copy.parent)
+    with pytest.raises(Stop, match="check-1 left work uncommitted"):
+        loop.run()

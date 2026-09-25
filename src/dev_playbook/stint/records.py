@@ -2,10 +2,12 @@
 
 The stint's folder, ``<home>/<repo>/<name>/``, outlives the stint:
 
-    calls/<call>.json   a CallRecord, one per agent call
+    calls/<call>.json   a CallRecord, one per agent call, or a CheckRecord
     calls/<call>.request.json   what Sandcastle was asked to run
     calls/<call>.log    Sandcastle's log of the call
+    calls/<call>-setup.log      Sandcastle's log of an agent call's hook install
     calls/<call>-probe.log      Sandcastle's log of the uncommitted-work probe
+    check-<n>.txt       the target check's output at checkpoint n
     review-<n>.md       the reviewer's report for segment n
     sessions/           the agents' session files, the principal's included
     stint.json          the StintRecord
@@ -66,6 +68,27 @@ class CallRecord:
 
 
 @dataclass(frozen=True)
+class CheckRecord:
+    """One run of the target check, in a sealed container, run by the stint."""
+
+    name: str
+    """Such as ``check-2``, the run at checkpoint 2."""
+    seconds: int
+    exit: int
+    """The check's exit code; 0 is zero findings."""
+    output: list[str]
+    """What the check printed, stdout and stderr, one line each."""
+    uncommitted: list[str]
+    """Files the check left uncommitted, as git's short status lines."""
+
+    def write(self, calls: Path) -> None:
+        """Write the record to ``calls/<name>.json``."""
+        (calls / f"{self.name}.json").write_text(
+            json.dumps(asdict(self), indent=2) + "\n", encoding="utf-8"
+        )
+
+
+@dataclass(frozen=True)
 class ContextSize:
     """The principal's conversation size after one of its calls."""
 
@@ -90,16 +113,24 @@ class StintRecord:
     principal: str | None = None
     """The principal's session ID."""
     notes: list[str] = field(default_factory=list)
-    """Things the driver saw that were not reasons to stop."""
+    """Things the stint saw that were not reasons to stop."""
     principal_context: list[ContextSize] = field(default_factory=list)
     calls: list[CallRecord] = field(default_factory=list)
+    checks: list[CheckRecord] = field(default_factory=list)
 
     def write(self, folder: Path) -> None:
-        """Write the record to ``stint.json``; each call keeps its name, session, and commits."""
+        """Write the record to ``stint.json``.
+
+        Each call keeps its name, session, and commits; each check, its name
+        and exit code.
+        """
         record = asdict(self)
         record["calls"] = [
             {k: c[k] for k in ("name", "session", "resumed", "seconds", "commits")}
             for c in record["calls"]
+        ]
+        record["checks"] = [
+            {k: c[k] for k in ("name", "seconds", "exit")} for c in record["checks"]
         ]
         (folder / "stint.json").write_text(
             json.dumps(record, indent=2) + "\n", encoding="utf-8"

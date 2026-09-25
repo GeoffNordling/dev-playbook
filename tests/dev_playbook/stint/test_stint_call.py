@@ -237,3 +237,24 @@ def test_a_failed_runner_still_deletes_the_temp_folder(
     with pytest.raises(CallFault, match="exited 1"):
         sealed(tmp_path, config, copy, events, runner)("iter-1", "do it", None)
     assert not (tmp_path / "stint" / "tmp-iter-1").exists()
+
+
+def test_a_check_runs_with_no_credential_and_keeps_its_record(
+    tmp_path: Path, config: Path, copy: Path, events: Path
+) -> None:
+    seen: list[dict] = []
+
+    def runner(request: dict) -> dict:
+        seen.append(request)
+        return {"exit": 1, "output": ["a finding"], "probe": ["?? x", ""]}
+
+    rec = sealed(tmp_path, config, copy, events, runner).check("check-1", "make x")
+    assert (rec.exit, rec.output, rec.uncommitted) == (1, ["a finding"], ["?? x"])
+    assert seen[0]["job"] == "check"
+    assert seen[0]["command"] == "make x"
+    paths = [m["sandboxPath"] for m in seen[0]["mounts"]]
+    assert "/home/agent/.claude/.credentials.json" not in paths
+    assert "/home/agent/workspace/alpha" in paths
+    calls = tmp_path / "stint" / "calls"
+    assert json.loads((calls / "check-1.json").read_text())["exit"] == 1
+    assert (calls / "check-1.request.json").is_file()

@@ -77,7 +77,7 @@ approval before running it, and discusses results before acting on them.
 
 ## Terms
 
-The words of the workflow, workstream, loop, yield, stint, driver,
+The words of the workflow, workstream, loop, yield, stint,
 principal, iteration, segment, and checkpoint, are the repo's
 ([CONTEXT.md](/CONTEXT.md#workstreams-and-loops)), since the doc-types
 and [Running a Stint](/guides/running-a-stint.md) use them too, and
@@ -90,13 +90,12 @@ The guess as it stands:
 
 ```
 Loop                        loops/<name>.md — the shape: act · verify · yield
-Driver                      a program from the driver menu that runs a loop
 Workstream                  one line of work, its head file typed Workstream
 ├─ head file                the headings picked from the menu
 ├─ documentation sets       whatever the work accumulates
 ├─ child workstreams        a subdirectory with its own head file
 └─ stints                   bounded spends of effort, one after another,
-   │                        each with its own loop and driver
+   │                        each run by a loop
    ├─ attended              the user and Claude in a session
    └─ unattended            a sealed container, its own branch, no user
       ├─ plan               checkpoints × iterations, plus slack; a hard limit
@@ -119,9 +118,7 @@ Decided with the user on 2026-09-24.
   has its own loop, stints, and verdicts.
 - **A loop is distinct from a workstream.** The loop is how, general and
   without memory; the workstream is what and why, particular and with
-  history. The loop and the driver belong to a stint, not to the
-  workstream: the user chooses them for each stint, and the workstream's
-  Stints heading records which ran.
+  history.
 - **The brief is the workstream's head file.** One object serves attended
   and unattended work alike.
 - **A workstream picks its headings from one menu.** The user and the
@@ -129,7 +126,7 @@ Decided with the user on 2026-09-24.
   [Headings from the registry](/standards/doc-type/workstream-conventions.md#headings-from-the-registry).
 - **Open holds questions only.** An answer, recommended or not, is a
   separate thing and does not sit with the question.
-- **The Ralph pattern has four parts**, and every driver keeps them:
+- **The Ralph pattern has four parts**, and every loop keeps them:
   1. The plan is written in the standard format. An attended principal
      makes it; an unattended principal is given it.
   2. Independent fresh-context iterations each do one chunk.
@@ -147,16 +144,16 @@ Decided with the user on 2026-09-24.
 - **An unattended principal keeps the whole stint in its own context,
   and never forks.** It knows the history of what it is doing because it
   lived it. The attended Ralph keeps its own mechanism, changing the
-  plan through a fork of the top session, and the unattended driver is
-  built separately; both follow the
+  plan through a fork of the top session, and the unattended `stint`
+  command is built separately; both follow the
   [Stint Model](/workstreams/system/drive/stint-model.md).
-- **The drivers form a menu.** Today: the Ralph workflow, which runs in a
+- **Today's loops.** The Ralph workflow, which runs in a
   Claude Code session through the `Workflow` runtime
   ([`ralph-loop.js`](/dotfiles/dot-claude/workflows/ralph-loop.js)), and
   the `stint` command, which runs an unattended stint to its yield
   ([Running a Stint](/guides/running-a-stint.md)).
 - **A headless agent never runs a Claude Code workflow.** An unattended
-  stint's driver is headless code the user writes and maintains, as a
+  stint runs headless code the user writes and maintains, as a
   professional practice, even where a headless agent could run a
   workflow. The Ralph pattern (fresh agent, status, stop rule,
   checkpoints) is written in Python as the `stint` command, and every
@@ -185,15 +182,15 @@ Decided with the user on 2026-09-24.
 - **Workstream and Loop are built doc-types.** Both live under
   [`doc-types/`](/doc-types/index.md), in the closed doc-type system;
   this workstream holds only the workflow that uses them.
-- **The `stint` command is the driver of an unattended stint.** It
-  supports this workstream as a tool.
+- **The `stint` command runs an unattended stint.** It supports this
+  workstream as a tool.
 - **The unattended principal rules on the findings itself.** It judges
   the reviewer's sorted findings against the head file's Goal, Done when,
   and Constraints, and writes each ruling in the progress file, so the
   user sees every ruling at the yield. A finding the head file cannot
   settle ends the stint as stuck.
 - **The unattended principal is one headless Claude session.** The
-  driver resumes the same session at each checkpoint, so its context
+  stint resumes the same session at each checkpoint, so its context
   holds the whole stint, and it runs sealed like every other call.
 - **The context-window risk is accepted.** The principal takes in every
   report of the stint, which may break the constraint that no agent runs
@@ -227,16 +224,10 @@ is with the user, at a high level, the agent guiding. An unattended
 stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Bring the `stint` command to the model.** `--check` becomes the
-  target check, which iterations may run at any time and the driver
-  runs at each checkpoint; the checkpoint runs the target's verifiers
-  and the reviewer; the principal decides done, and the driver refuses
-  a done while findings remain; and a
-  blocked iteration logs a deviation and exits, so the stop rules
-  `iter-k blocked` and `iter-k committed nothing` go, and
-  [Running a Stint](/guides/running-a-stint.md) follows. Where a leaf's
-  `check` script sits, and any rule that holds it there, is decided
-  here.
+- **Build the judge.** It runs a stint's stochastic rules, reading them
+  from the `Targets:` ids of the head file's Planned stint entry — the
+  model's one source for them, so the stint's arguments repeat none of
+  it. The checkpoint runs it beside `check` and the reviewer.
 - **Bring the attended Ralph to the model.** The Ralph workflow
   (`ralph-loop.js`), its skills (`ralph-setup`, `ralph-checkpoint`),
   and its agents (`ralph-reviewer`, `ralph-checkpointer`) take the
@@ -251,7 +242,7 @@ stint runs with the `stint` command
     container stops, which stay on the branch, and which reach `main`
     only on an accept. It also settles who writes the stint's entry
     under `## Stints`, and when: the container at the yield, or the
-    driver after the user's verdict, since a verdict exists only after
+    loop after the user's verdict, since a verdict exists only after
     the yield.
   - **Write the Loop.** The checkpointed loop of
     [Stint Model](/workstreams/system/drive/stint-model.md), from the
@@ -268,6 +259,19 @@ stint runs with the `stint` command
 
 ## Completed
 
+- **Bring the `stint` command to the model.** Done 2026-09-25:
+  `--check` is now the target check, which iterations may run at any
+  time and the stint runs at each checkpoint; the checkpoint runs the
+  target's verifiers and the reviewer; the principal decides done, and
+  the stint refuses a done while the check reports findings; and a
+  blocked iteration logs a deviation and ends its segment, so the stop
+  rules `iter-k blocked` and `iter-k committed nothing` are gone, and
+  [Running a Stint](/guides/running-a-stint.md) follows. Where a leaf's
+  `check` script sits stays undecided: `--check` takes any command, so
+  nothing in the stint depends on it. The judge that would decide a
+  stint's stochastic rules is not built; it would read the `Targets:`
+  ids of the head file's Planned stint entry, the model's one source
+  for them, rather than repeat the ids in a new argument.
 - **Put the draft Standard in the doc-type system.** Done 2026-09-25:
   the user ruled it a plain `Standard`, not a doc-type of its own.
   [Standard Conventions](/standards/doc-type/standard-conventions.md)

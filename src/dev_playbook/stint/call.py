@@ -8,6 +8,10 @@
     stream parsed, record kept  ◀──  response ◀──
     receiver stopped, temp folder deleted
 
+The stint's run of the target check is a job of its own, ``Sealed.check``:
+the command in place of the setup and the agent, then the probe. It spends no
+tokens, so it gets no credential and no receiver.
+
 Node does only what needs Sandcastle. Everything around it is here: what
 the container mounts, what it is billed to, and what the call left behind.
 The container sees three read-only files beside the work copy: the config
@@ -46,7 +50,7 @@ from dev_playbook.checks.billing import (
 )
 from dev_playbook.stint import workcopy
 from dev_playbook.stint.receiver import NETWORK, Receiver, ReceiverFault
-from dev_playbook.stint.records import CallRecord, Usage
+from dev_playbook.stint.records import CallRecord, CheckRecord, Usage
 
 AGENT_HOME = "/home/agent"
 WORKSPACE = f"{AGENT_HOME}/workspace"
@@ -167,6 +171,11 @@ def usage_of(reported: dict | None) -> Usage | None:
     )
 
 
+def uncommitted(probe: list[str]) -> list[str]:
+    """The probe's git short status lines, without the blank ones."""
+    return [line for line in probe if len(line) > 3 and line[2] == " "]
+
+
 def run_node(request: dict) -> dict:
     """Run ``sandcastle/run.mjs`` on the request and return its response."""
     script = resources.files("dev_playbook.stint").joinpath("sandcastle", "run.mjs")
@@ -208,64 +217,100 @@ class Sealed:
     runner: Runner
     """Hands a request to Sandcastle; ``run_node`` except in a test."""
 
-    def __call__(self, name: str, prompt: str, resume: str | None) -> CallRecord:
-        """Make one call; a fault in it raises CallFault after the record is kept."""
-        billing_guard(self.config, self.copy)
+    def request(self, job: str, name: str, *mounts: dict) -> dict:
+        """The fields every job's request holds; ``mounts`` go after the config copy's."""
         calls = self.folder / "calls"
         calls.mkdir(parents=True, exist_ok=True)
         cache = self.folder / CACHE
         cache.mkdir(exist_ok=True)
+        return {
+            "job": job,
+            "copy": str(self.copy),
+            "repo": container_repo(self.copy),
+            "image": self.image,
+            "network": NETWORK,
+            "mounts": [
+                {
+                    "hostPath": str(self.config),
+                    "sandboxPath": CONFIG_MOUNT,
+                    "readonly": True,
+                },
+                *mounts,
+                *[
+                    {
+                        "hostPath": str(sibling),
+                        "sandboxPath": f"{WORKSPACE}/{sibling.name}",
+                        "readonly": True,
+                    }
+                    for sibling in self.siblings
+                ],
+                {
+                    "hostPath": str(cache),
+                    "sandboxPath": CACHE_MOUNT,
+                    "readonly": False,
+                },
+            ],
+            "log": str(calls / f"{name}.log"),
+            "probeLog": str(calls / f"{name}-probe.log"),
+        }
+
+    def keep(self, name: str, request: dict) -> None:
+        """Write what the job asks Sandcastle to ``calls/<name>.request.json``."""
+        (self.folder / "calls" / f"{name}.request.json").write_text(
+            json.dumps(request, indent=2) + "\n", encoding="utf-8"
+        )
+
+    def check(self, name: str, command: str) -> CheckRecord:
+        """Run the target check; a fault in the run raises CallFault.
+
+        The check is a shell command, not an agent, so it has no credential,
+        no hook receiver, and no billing to guard.
+        """
+        request = {**self.request("check", name), "command": command}
+        self.keep(name, request)
+        started = time.monotonic()
+        response = self.runner(request)
+        record = CheckRecord(
+            name=name,
+            seconds=round(time.monotonic() - started),
+            exit=response["exit"],
+            output=response["output"],
+            uncommitted=uncommitted(response["probe"]),
+        )
+        record.write(self.folder / "calls")
+        return record
+
+    def __call__(self, name: str, prompt: str, resume: str | None) -> CallRecord:
+        """Make one call; a fault in it raises CallFault after the record is kept."""
+        billing_guard(self.config, self.copy)
         temp = self.folder / f"tmp-{name}"
-        temp.mkdir()
+        temp.mkdir(parents=True)
         try:
             shutil.copyfile(self.credentials, temp / ".credentials.json")
-            request = {
-                "copy": str(self.copy),
-                "repo": container_repo(self.copy),
-                "image": self.image,
-                "network": NETWORK,
-                "mounts": [
-                    {
-                        "hostPath": str(self.config),
-                        "sandboxPath": CONFIG_MOUNT,
-                        "readonly": True,
-                    },
-                    {
-                        "hostPath": str(temp / ".credentials.json"),
-                        "sandboxPath": CREDENTIALS_MOUNT,
-                        "readonly": True,
-                    },
-                    {
-                        "hostPath": str(temp / "sink"),
-                        "sandboxPath": SINK_MOUNT,
-                        "readonly": True,
-                    },
-                    *[
-                        {
-                            "hostPath": str(sibling),
-                            "sandboxPath": f"{WORKSPACE}/{sibling.name}",
-                            "readonly": True,
-                        }
-                        for sibling in self.siblings
-                    ],
-                    {
-                        "hostPath": str(cache),
-                        "sandboxPath": CACHE_MOUNT,
-                        "readonly": False,
-                    },
-                ],
+            request = self.request(
+                "agent",
+                name,
+                {
+                    "hostPath": str(temp / ".credentials.json"),
+                    "sandboxPath": CREDENTIALS_MOUNT,
+                    "readonly": True,
+                },
+                {
+                    "hostPath": str(temp / "sink"),
+                    "sandboxPath": SINK_MOUNT,
+                    "readonly": True,
+                },
+            )
+            calls = self.folder / "calls"
+            request |= {
                 "env": AGENT_ENV,
                 "sessions": str(self.folder / "sessions"),
-                "log": str(calls / f"{name}.log"),
                 "setupLog": str(calls / f"{name}-setup.log"),
-                "probeLog": str(calls / f"{name}-probe.log"),
                 "model": self.model,
                 "prompt": prompt,
                 "resume": resume,
             }
-            (calls / f"{name}.request.json").write_text(
-                json.dumps(request, indent=2) + "\n", encoding="utf-8"
-            )
+            self.keep(name, request)
             receiver = Receiver(temp / "sink", self.events)
             started = time.monotonic()
             try:
@@ -288,12 +333,10 @@ class Sealed:
             is_error=is_error,
             usage=usage_of(response["usage"]),
             commits=response["commits"],
-            uncommitted=[
-                line for line in response["probe"] if len(line) > 3 and line[2] == " "
-            ],
+            uncommitted=uncommitted(response["probe"]),
             answer=answer,
         )
-        record.write(calls)
+        record.write(self.folder / "calls")
         if source != "none":
             raise BillingFault(f"billed to {source}, not the subscription")
         return record

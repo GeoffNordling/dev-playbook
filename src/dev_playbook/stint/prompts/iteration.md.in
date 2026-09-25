@@ -11,16 +11,26 @@ Checkpoint markers cut the plan into segments. A line reading exactly
 of the plan above the first `<!-- [ ] checkpoint -->` line. Work only
 inside it. Never add, remove, move, or edit a marker.
 
-1. Run `{{CHECK}}`. If it fails, or a file named above is missing, stop and
-   report a blocker. Red on entry is not yours to fix.
-2. Read the head file, the plan, and the log.
-3. Do the first unchecked task in your segment, and that task only.
-4. Run `{{CHECK}}` again. If your work broke it, fix it. Never commit red.
-5. Check the task off in the plan. Append one line to the log's `## Log`:
+The stint's target check is `{{CHECK}}`. You may run it at any time. Its
+findings show how far the work is from the target: they are a signal, never
+a block, and you need not clear them. What blocks is the repository's
+pre-commit gate, which every commit runs. Never skip it.
+
+1. Read the head file, the plan, and the log.
+2. Do the first unchecked task in your segment, and that task only.
+3. Check the task off in the plan. Append one line to the log's `## Log`:
    what you did, and what is next. Where the plan and its sources did not
    settle something you had to decide, add one indented line under it:
    `- judgment: <what was unsettled> → <what you did>, because <why>`.
-6. Run `/commit-sandbox`. Leave nothing uncommitted.
-7. End your reply with one line of JSON and nothing after it:
-   `{"summary": "<one line>", "tasksLeft": <unchecked tasks left in your segment>, "blocker": null}`
-   with `blocker` a one-line reason instead of null if step 1 stopped you.
+4. Run `/commit-sandbox`. When the gate refuses the commit, fix what it
+   finds and commit again. Leave nothing uncommitted.
+
+If you cannot do the task, leave it unchecked. Append one line to the log's
+`## Log` instead: `- deviation: <the task in a few words> — <why you could
+not do it>`. Commit what you did and the log line, and stop. The principal
+takes it up at the checkpoint.
+
+End your reply with one line of JSON and nothing after it:
+`{"summary": "<one line>", "tasksLeft": <unchecked tasks left in your segment>, "blocker": null}`
+with `blocker` the deviation's reason, in one line, instead of null when you
+could not do the task.

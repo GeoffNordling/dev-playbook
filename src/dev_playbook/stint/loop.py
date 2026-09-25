@@ -2,13 +2,17 @@
 
     principal-0   reads the plan; answers launch, or why not
     iter-1..k     one task each, checked off and committed
+    check-n       the target check on segment n's last commit, no tokens
     review-n      reads segment n's commits cold, commits nothing
-    principal-n   the same conversation, resumed: continue, done, or stop
+    principal-n   the same conversation, resumed: continue, done, or stuck
 
-The loop repeats iterations, a review, and the principal's checkpoint until
-the principal says done or a rule stops it. Every rule is checked here, in
-code, and costs no tokens. The loop takes the function that makes one call,
-so a test can pass a fake one.
+The loop repeats iterations, then the checkpoint: the check and the review
+report, and the principal decides. It ends when the principal says done and
+the check reports zero findings, or when a rule stops it. An iteration that
+checks off no task, blocked or not, ends its segment early, so the principal
+sees it at once. Every rule is checked here, in code, and costs no tokens.
+The loop takes the functions that make one call and run the check, so a test
+can pass fake ones.
 
 Between calls the loop reads the copy as plain files, never with host git.
 """
@@ -22,10 +26,20 @@ from pathlib import Path
 from dev_playbook.stint import workcopy
 from dev_playbook.stint.call import CallFault
 from dev_playbook.stint.plan import PlanState, plan_state
-from dev_playbook.stint.records import CallRecord, ContextSize, StintRecord
+from dev_playbook.stint.records import (
+    CallRecord,
+    CheckRecord,
+    ContextSize,
+    StintRecord,
+)
 
 Call = Callable[[str, str, str | None], CallRecord]
 """Make one call: its name, its prompt, and the session to resume, if any."""
+Check = Callable[[str, str], CheckRecord]
+"""Run the target check: the run's name and the command."""
+
+SHOWN = 100
+"""The most lines of the check's output the principal's prompt holds."""
 
 
 class Stop(Exception):
@@ -43,7 +57,7 @@ class Assignment:
     workstream: str
     """The workstream folder, relative to the repository."""
     check: str
-    """The command that must pass after every change."""
+    """The target check: the command whose exit 0 is zero findings."""
     budget: int
     """The most iterations the stint may spend."""
 
@@ -79,15 +93,31 @@ def ending(answer: str) -> dict:
     return found
 
 
+def shown(output: list[str]) -> str:
+    """The check's output as the principal's prompt holds it, at most SHOWN lines."""
+    if not output:
+        return "(no output)"
+    if len(output) <= SHOWN:
+        return "\n".join(output)
+    rest = len(output) - SHOWN
+    return "\n".join([*output[:SHOWN], f"({rest} more lines not shown)"])
+
+
 class Loop:
     """One stint's run, writing what happens into its record as it goes."""
 
     def __init__(
-        self, work: Assignment, call: Call, record: StintRecord, folder: Path
+        self,
+        work: Assignment,
+        call: Call,
+        check: Check,
+        record: StintRecord,
+        folder: Path,
     ) -> None:
         """Read the copy's HEAD and set the values every prompt shares."""
         self.work = work
         self.make_call = call
+        self.run_check = check
         self.record = record
         self.folder = folder
         ws = work.workstream
@@ -141,6 +171,23 @@ class Loop:
             raise Stop(f"{name}: the copy's HEAD is not the call's last commit")
         return rec
 
+    def check(self, n: int) -> CheckRecord:
+        """Run the target check at checkpoint n; keep its output in the folder."""
+        name = f"check-{n}"
+        try:
+            rec = self.run_check(name, self.work.check)
+        except CallFault as err:
+            raise Stop(f"{name}: {err}") from err
+        self.record.checks.append(rec)
+        print(f"{name}: {rec.seconds}s exit={rec.exit}", flush=True)
+        if rec.uncommitted:
+            raise Stop(f"{name} left work uncommitted: {rec.uncommitted[:5]}")
+        if self.read(lambda: workcopy.head_commit(self.work.copy)) != self.head:
+            raise Stop(f"{name} moved the copy's HEAD")
+        text = "\n".join([*rec.output, f"exit {rec.exit}"])
+        (self.folder / f"{name}.txt").write_text(text + "\n", encoding="utf-8")
+        return rec
+
     def principal(self, rec: CallRecord) -> dict:
         """Keep the principal's session and context size; return its verdict line."""
         if rec.usage is None:
@@ -150,7 +197,7 @@ class Loop:
         return ending(rec.answer)
 
     def note(self, text: str) -> None:
-        """Record something the driver saw that is not a reason to stop."""
+        """Record something the stint saw that is not a reason to stop."""
         self.record.notes.append(text)
         print(f"note: {text}", flush=True)
 
@@ -176,21 +223,24 @@ class Loop:
                 rec = self.call(name, "iteration")
                 end = ending(rec.answer)
                 summary = f"- {name}: {end.get('summary')}"
-                if end.get("blocker"):
-                    raise Stop(f"{name} blocked: {end['blocker']}")
-                if not rec.commits:
-                    raise Stop(f"{name} committed nothing")
                 after = self.plan()
                 if (after.done, after.open) != (before.done, before.open):
                     raise Stop(f"{name} moved a checkpoint marker")
                 ticked = before.segment - after.segment
+                notes = []
+                if end.get("blocker"):
+                    notes.append(f"{name} blocked: {end['blocker']}")
                 if ticked != 1:
-                    note = f"{name} checked off {ticked} tasks, not 1"
+                    notes.append(f"{name} checked off {ticked} tasks, not 1")
+                for note in notes:
                     self.note(note)
-                    summary += f" (the driver notes: {note})"
+                    summary += f" (the stint notes: {note})"
                 summaries.append(summary)
+                if end.get("blocker") or not ticked:
+                    break
             if self.head == start:
                 raise Stop(f"segment {n} has no commits to review")
+            check = self.check(n)
             rec = self.call(f"review-{n}", "reviewer", RANGE=f"{start}..{self.head}")
             if rec.commits:
                 raise Stop(f"review-{n} committed")
@@ -205,6 +255,8 @@ class Loop:
                 OF=state.done + state.open,
                 SPENT=self.record.spent,
                 SUMMARIES="\n".join(summaries),
+                CHECK_EXIT=check.exit,
+                CHECK_OUTPUT=shown(check.output),
                 REVIEW=review,
             )
             end = self.principal(rec)
@@ -215,11 +267,21 @@ class Loop:
             if verdict == "done":
                 if after.left or after.open:
                     raise Stop(f"principal-{n} said done with {after.left} tasks left")
+                if check.exit:
+                    raise Stop(
+                        f"principal-{n} said done while the check reports findings"
+                        f" (exit {check.exit})"
+                    )
                 return
             if verdict != "continue":
                 raise Stop(f"{verdict}: {end.get('reason')}")
             if self.record.spent >= budget:
                 raise Stop(f"budget: {self.record.spent} of {budget} iterations spent")
+            if after.behind:
+                raise Stop(
+                    f"principal-{n} left {after.behind} unchecked tasks"
+                    " above the checkpoint"
+                )
             if not after.segment:
                 raise Stop(
                     f"principal-{n} said continue with no task in the next segment"

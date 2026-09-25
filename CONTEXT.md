@@ -141,10 +141,7 @@ A shape of act, verification, and yield steps, defined once in a file typed Loop
 A loop's programmed exit to a receiver: another loop, the principal, or the user.
 
 **Stint**
-A bounded spend of effort that advances one leaf workstream, with a loop and a driver chosen for it, toward the rules of the workstream's draft Standards it targets, if any. An attended stint has the user in it; an unattended stint runs in sealed containers with no user, by the `stint` command, and ends by yielding to the user.
-
-**Driver**
-The program that runs a stint's loop: it starts each iteration and reads what the iteration reports.
+A bounded spend of effort that advances one leaf workstream toward the rules of the workstream's draft Standards it targets, if any. An attended stint has the user in it; an unattended stint runs in sealed containers with no user, by the `stint` command, and ends by yielding to the user.
 
 **Principal**
 The owner of one level's plan, which rules on the reports of its workers, its verifiers, and its reviewer. For a workstream it is the user; for a stint, the top-level agent, joined by the user when the stint is attended.

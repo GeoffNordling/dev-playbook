@@ -42,7 +42,7 @@ class Order:
     workstream: str
     """The workstream folder in the repository, with its plan and progress log."""
     check: str
-    """The command that must pass after every change."""
+    """The target check: the command whose exit 0 is zero findings."""
     budget: int
     """The most iterations the stint may spend."""
     name: str
@@ -117,7 +117,7 @@ def launch(order: Order, host: Host) -> StintRecord:
                 events=host.events,
                 runner=host.runner,
             )
-            Loop(work, sealed, record, folder).run()
+            Loop(work, sealed, sealed.check, record, folder).run()
             record.reason = "done"
         except Stop as stop:
             record.reason = str(stop)

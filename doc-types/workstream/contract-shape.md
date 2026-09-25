@@ -21,10 +21,9 @@ stints that drove it.
   optional and all are peers; a workstream picks the ones its work
   needs. A heading's body is opaque to the contract, except Stints.
 - **Stint.** One entry under Stints, a unit of accounting: one bounded
-  spend of effort on this workstream, with the loop that drove it. The
-  next stint is written before it runs, with its loop and its budget;
-  a past stint is recorded with what it spent, its branch, and the
-  user's verdict. A stint may name the rules it targets, rules of the
+  spend of effort on this workstream. The next stint is written before
+  it runs, with its budget; a past stint is recorded with what it
+  spent, its branch, and the user's verdict. A stint may name the rules it targets, rules of the
   workstream's [draft Standards](/CONTEXT.md#governance). Only a leaf
   workstream has stints. Stints does for spend what Planned and
   Completed do for work.
@@ -33,7 +32,7 @@ stints that drove it.
   directory above; its children are the head files below with no head
   file between.
 - **Pointers.** A heading's body points at any Target, any number of
-  times. A stint points at one Loop, and at the rules it targets.
+  times. A stint points at the rules it targets.
 
 The composition rule: any number of headings in file order, each name
 at most once; under Stints, the planned stint first, if any, then the
@@ -46,7 +45,6 @@ holds the same text whole; a test keeps them identical.
 
 ```python
 from doc_type import DocType
-from loop import Loop
 from standard import RuleId
 
 
@@ -63,7 +61,6 @@ class Workstream(DocType):
         body: str                 # opaque, but for Stints
 
     class Stint:                  # a part: one entry under Stints, a unit of accounting
-        loop:    Loop             # the loop that drives, or will drive, the workstream
         budget:  str              # checkpoints × iterations, plus slack, to a hard limit
         spent:   str | None       # None for the planned stint
         branch:  str | None

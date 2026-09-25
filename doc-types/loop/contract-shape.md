@@ -36,7 +36,7 @@ The composition rule: any number of acts, verifications, and yields,
 as peers. The graph orders them; a step whose condition holds fires,
 and a yield that fires hands control out at its place in the graph.
 The loop drives a workstream and names none: one loop drives many,
-and each workstream's Stints records which loop drove it.
+and no workstream names it.
 
 The shape as code, one module importing the base drawn in
 [Reference Model](/doc-types/reference-model.md#the-language), which
@@ -68,12 +68,11 @@ class Loop(DocType):
     acts:          list[Act]      # peers; the graph, not the list, orders them
     verifications: list[Verification]
     yields:        list[Yield]
-    # no workstream: one loop drives many, and each workstream's Stints records which loop drove it
+    # no workstream: one loop drives many, and no workstream names it
 ```
 
 A loop carries no target field and no runtime: the standards the
-verifications point at describe the target, and whatever runs the loop
-is its driver, not the loop
+verifications point at describe the target
 ([System Legibility](/docs/system-legibility.md#standing-principles)).
 
 ## The graph

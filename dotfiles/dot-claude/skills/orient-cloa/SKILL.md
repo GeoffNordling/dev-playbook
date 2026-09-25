@@ -23,7 +23,7 @@ Read each file end-to-end:
 - {Read [the fact base head file](~/workspace/dev-playbook/workstreams/system/see/fact-base/WORKSTREAM.md); the compiled object}.
 - {Read [the viewer head file](~/workspace/dev-playbook/workstreams/system/see/viewer/WORKSTREAM.md); the CLOA viewer}.
 - {Read [the story-forge simulation head file](~/workspace/dev-playbook/workstreams/system/see/story-forge/WORKSTREAM.md); the ideas tried by hand on one consumer repo}.
-- {Read [the Drive head file](~/workspace/dev-playbook/workstreams/system/drive/WORKSTREAM.md); stints, loops, drivers, and the built `stint` command}.
+- {Read [the Drive head file](~/workspace/dev-playbook/workstreams/system/drive/WORKSTREAM.md); stints, loops, and the built `stint` command}.
 
 Stay at the head files. The files beside each `WORKSTREAM.md`, the
 `src/dev_playbook/cloa_viewer/` code, and the simulation's data are

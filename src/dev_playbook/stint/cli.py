@@ -7,7 +7,7 @@
 Every argument is required; none has a default. Exit codes:
 
     0   done: the principal said done, and the branch landed
-    1   any other end: a stop rule, a stop by the principal, or a copy kept
+    1   any other end: a stop rule, the principal's stuck, or a copy kept
     2   the tool could not run: not set up, a bad argument, a failed step
 """
 
@@ -45,7 +45,9 @@ def parser() -> argparse.ArgumentParser:
         "--workstream", required=True, help="the workstream folder, repo-relative"
     )
     run.add_argument(
-        "--check", required=True, help="the command that must pass after each change"
+        "--check",
+        required=True,
+        help="the target check: a command whose exit 0 is zero findings",
     )
     run.add_argument(
         "--budget", type=int, required=True, help="the most iterations to spend"

@@ -81,7 +81,7 @@ The levels:
 - **The user and an attended agent write the target before launch**:
   the draft Standards, `check`, and the stint's entry.
 - **A stint advances part of a workstream.** Its planned entry under
-  `## Stints` names its loop and the rule ids it targets. Rules outside
+  `## Stints` names the rule ids it targets. Rules outside
   that list are not checked.
 - **`PLAN.md` and `PROGRESS.md` are one stint's breakdown**, on its
   branch: the tasks, in segments, that one iteration each does. They
@@ -90,11 +90,11 @@ The levels:
   iteration's commit. An iteration has to pass the gate and nothing
   more.
 - **An iteration may run `check` at any time.** Its output is a signal
-  of direction, and no call stops on it. The driver's run at the
+  of direction, and no call stops on it. The stint's run at the
   checkpoint is the one that counts.
 - **Findings usually go down over a stint, but not always.** They are
   optional and helpful backpressure.
-- **Done needs zero findings.** The driver refuses the principal's
+- **Done needs zero findings.** The stint refuses the principal's
   done while the verifiers report any finding over the rules the stint
   targets. A principal that finds the target out of reach yields
   stuck instead.
