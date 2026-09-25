@@ -9,8 +9,11 @@
 The loop repeats iterations, then the checkpoint: the check and the review
 report, and the principal decides. It ends when the principal says done and
 the check reports zero findings, or when a rule stops it. An iteration that
-checks off no task, blocked or not, ends its segment early, so the principal
-sees it at once. Every rule is checked here, in code, and costs no tokens.
+checks off no task, stuck or not, ends its segment early, so the principal
+sees it at once. The target is read from the workstream at launch (``target.py``), and no
+call may change the files that set it: the head file, the draft Standards,
+and ``check``. Every rule is checked here, in code, and costs
+no tokens; the guide lists them all, in "What stops a stint".
 The loop takes the functions that make one call and run the check, so a test
 can pass fake ones.
 
@@ -32,6 +35,7 @@ from dev_playbook.stint.records import (
     ContextSize,
     StintRecord,
 )
+from dev_playbook.stint.target import TargetFault, read_target
 
 Call = Callable[[str, str, str | None], CallRecord]
 """Make one call: its name, its prompt, and the session to resume, if any."""
@@ -56,8 +60,6 @@ class Assignment:
     """The work copy's path inside the container."""
     workstream: str
     """The workstream folder, relative to the repository."""
-    check: str
-    """The target check: the command whose exit 0 is zero findings."""
     budget: int
     """The most iterations the stint may spend."""
 
@@ -114,23 +116,39 @@ class Loop:
         record: StintRecord,
         folder: Path,
     ) -> None:
-        """Read the copy's HEAD and set the values every prompt shares."""
+        """Read the copy's HEAD and the target; set the values every prompt shares."""
         self.work = work
         self.make_call = call
         self.run_check = check
         self.record = record
         self.folder = folder
         ws = work.workstream
+        try:
+            self.target = self.read(lambda: read_target(work.copy, ws))
+        except TargetFault as err:
+            raise Stop(f"not launched: {err}") from err
         self.shared = {
             "REPO": work.repo,
             "HEAD": f"{ws}/WORKSTREAM.md",
             "PLAN": f"{ws}/PLAN.md",
             "PROGRESS": f"{ws}/PROGRESS.md",
-            "CHECK": work.check,
+            "CHECK": self.target.command,
             "BUDGET": work.budget,
         }
         self.head = self.read(lambda: workcopy.head_commit(work.copy))
         record.head = self.head
+
+    def changed_target(self) -> list[str]:
+        """The target files that differ from launch, or are gone."""
+
+        def now(rel: str) -> str | None:
+            if not (self.work.copy / rel).exists():
+                return None
+            return workcopy.read_plain(self.work.copy, rel)
+
+        return self.read(
+            lambda: [rel for rel, text in self.target.files.items() if now(rel) != text]
+        )
 
     def read[T](self, reader: Callable[[], T]) -> T:
         """Read the copy, turning a refusal into a stop."""
@@ -169,13 +187,15 @@ class Loop:
             self.record.head = self.head
         if self.read(lambda: workcopy.head_commit(self.work.copy)) != self.head:
             raise Stop(f"{name}: the copy's HEAD is not the call's last commit")
+        if changed := self.changed_target():
+            raise Stop(f"{name} changed the target: {', '.join(changed)}")
         return rec
 
     def check(self, n: int) -> CheckRecord:
         """Run the target check at checkpoint n; keep its output in the folder."""
         name = f"check-{n}"
         try:
-            rec = self.run_check(name, self.work.check)
+            rec = self.run_check(name, self.target.command)
         except CallFault as err:
             raise Stop(f"{name}: {err}") from err
         self.record.checks.append(rec)
@@ -228,15 +248,15 @@ class Loop:
                     raise Stop(f"{name} moved a checkpoint marker")
                 ticked = before.segment - after.segment
                 notes = []
-                if end.get("blocker"):
-                    notes.append(f"{name} blocked: {end['blocker']}")
+                if end.get("stuck"):
+                    notes.append(f"{name} stuck: {end['stuck']}")
                 if ticked != 1:
                     notes.append(f"{name} checked off {ticked} tasks, not 1")
                 for note in notes:
                     self.note(note)
                     summary += f" (the stint notes: {note})"
                 summaries.append(summary)
-                if end.get("blocker") or not ticked:
+                if end.get("stuck") or not ticked:
                     break
             if self.head == start:
                 raise Stop(f"segment {n} has no commits to review")

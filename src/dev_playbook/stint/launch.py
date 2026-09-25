@@ -41,8 +41,6 @@ class Order:
     """The ref the stint's branch starts at; it holds the workstream."""
     workstream: str
     """The workstream folder in the repository, with its plan and progress log."""
-    check: str
-    """The target check: the command whose exit 0 is zero findings."""
     budget: int
     """The most iterations the stint may spend."""
     name: str
@@ -80,6 +78,10 @@ def launch(order: Order, host: Host) -> StintRecord:
     # with no config there is no gate, and nothing holds the Standards.
     if not workcopy.git_ok(repo, "cat-file", "-e", f"{order.base}:{GATE_CONFIG}"):
         raise ToolError(f"{order.base} in {repo} holds no {GATE_CONFIG}")
+    # The head file sets the target, and the loop stops a call that changes it.
+    head_file = f"{order.workstream}/WORKSTREAM.md"
+    if not workcopy.git_ok(repo, "cat-file", "-e", f"{order.base}:{head_file}"):
+        raise ToolError(f"{order.base} in {repo} holds no {head_file}")
     # The copy is a clone with a ``.git`` of its own, so the checks inside
     # the container name the repository after the copy's folder. A worktree's
     # folder is named for its branch, not its repository, and a copy named
@@ -103,7 +105,6 @@ def launch(order: Order, host: Host) -> StintRecord:
                 copy=copy,
                 repo=container_repo(copy),
                 workstream=order.workstream,
-                check=order.check,
                 budget=order.budget,
             )
             sealed = Sealed(

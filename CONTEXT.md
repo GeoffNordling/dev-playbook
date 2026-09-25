@@ -44,7 +44,7 @@ A point where findings block work: pre-commit, pre-push, or CI.
 _Avoid_: audit, enforcement, venue.
 
 **Draft Standard**
-A file typed Standard inside a leaf workstream, whose rule ids take the workstream's directory name as their family. It is wired to a stint's `--check` and never to a gate, so its rules may fail at any time. It is the workstream's target; on accept it is deleted, or moved under `standards/` and wired to a gate.
+A file typed Standard inside a leaf workstream, whose rule ids take the workstream's directory name as their family. It is wired to its workstream's `check`, which a stint runs, and never to a gate, so its rules may fail at any time. It is the workstream's target; on accept it is deleted, or moved under `standards/` and wired to a gate.
 _Avoid_: candidate Standard, proto-Standard.
 
 **Zero findings**

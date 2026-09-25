@@ -19,13 +19,14 @@ Iterations spent: {{SPENT}} of {{BUDGET}}.
    plan, or **reject** it, with the reason. A finding the head file cannot
    settle ends the stint as stuck.
 2. Make sure the tasks ahead clear the check's findings, and add a task
-   where none does. You never change the draft Standards, the check, or
-   the head file's stint entry: a finding you find wrong ends the stint as
-   stuck, and the user rules on it.
-3. Take up every deviation in the log since the last checkpoint: rewrite
-   the task, split it, or drop it; or end the stint as stuck.
+   where none does. You never change the head file, the draft Standards,
+   or the check; the stint stops on a change to any of them.
+   A finding you find wrong ends the stint as stuck, and the user rules
+   on it.
+3. Take up every `- stuck:` line in the log since the last checkpoint:
+   rewrite the task, split it, or drop it; or end the stint as stuck.
 4. Write each ruling and each change in the log's `## Decisions`:
-   `- checkpoint {{N}}: <finding or deviation in a few words> — <what you decided>: <why>`.
+   `- checkpoint {{N}}: <finding or stuck task in a few words> — <what you decided>: <why>`.
 5. Change the first `<!-- [ ] checkpoint -->` line to
    `<!-- [x] checkpoint -->`. No unchecked task may stay above it: move
    each one below it, or drop it. Place new tasks above the next
@@ -39,4 +40,4 @@ End your reply with one line of JSON and nothing after it:
 You decide. Say `done` only when every task is checked, the Done when
 holds, and the check exited 0; the stint refuses a done while the check
 reports findings. Say `stuck` when the target is out of reach, or a finding
-or a deviation is one the head file cannot settle.
+or a stuck task is one the head file cannot settle.

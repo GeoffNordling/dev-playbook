@@ -57,7 +57,7 @@ def agent(name: str, copy: Path) -> tuple[str, list[str]]:
         return '{"verdict": "launch", "reason": "ok"}', []
     if name.startswith("iter"):
         tick(copy, "- [ ] ", "- [x] ")
-        return '{"summary": "s", "blocker": null}', [commit(copy, name)]
+        return '{"summary": "s", "stuck": null}', [commit(copy, name)]
     if name.startswith("review"):
         return "0 findings", []
     tick(copy, OPEN_MARK, DONE_MARK)
@@ -87,11 +87,22 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv(name, raising=False)
 
 
+HEAD_FILE = (
+    "---\ntype: Workstream\n---\n\n# WS\n\n## Stints\n\n"
+    "- **Planned.** Budget: six. Targets: `ws.one`.\n"
+)
+DRAFT = "---\ntype: Standard\n---\n\n# Draft\n\n`ws.one` · deterministic\n"
+
+
 @pytest.fixture
 def repo(tmp_path: Path) -> Path:
     repo = tmp_path / "mc"
     (repo / "ws").mkdir(parents=True)
     (repo / "ws" / "PLAN.md").write_text(PLAN)
+    (repo / "ws" / "WORKSTREAM.md").write_text(HEAD_FILE)
+    (repo / "ws" / "draft.md").write_text(DRAFT)
+    (repo / "ws" / "check").write_text("#!/bin/sh\nexit 0\n")
+    (repo / "ws" / "check").chmod(0o755)
     (repo / ".pre-commit-config.yaml").write_text("repos: []\n")
     git(repo, "init", "-q", "-b", "main")
     commit(repo, "seed")
@@ -126,7 +137,6 @@ def order(tmp_path: Path, repo: Path, name: str = "s1") -> Order:
         repo=repo,
         base="seed",
         workstream="ws",
-        check="true",
         budget=6,
         name=name,
         home=tmp_path / "home",
@@ -179,6 +189,17 @@ def test_a_base_with_no_gate_is_refused(tmp_path: Path, repo: Path, host: Host) 
     commit(repo, "no gate")
     git(repo, "branch", "-q", "-f", "seed")
     with pytest.raises(ToolError, match="holds no .pre-commit-config.yaml"):
+        launch(order(tmp_path, repo), host)
+    assert not (tmp_path / "home").exists()
+
+
+def test_a_base_with_no_head_file_is_refused(
+    tmp_path: Path, repo: Path, host: Host
+) -> None:
+    git(repo, "rm", "-q", "ws/WORKSTREAM.md")
+    commit(repo, "no head file")
+    git(repo, "branch", "-q", "-f", "seed")
+    with pytest.raises(ToolError, match="holds no ws/WORKSTREAM.md"):
         launch(order(tmp_path, repo), host)
     assert not (tmp_path / "home").exists()
 

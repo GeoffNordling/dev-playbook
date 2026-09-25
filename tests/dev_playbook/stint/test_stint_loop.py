@@ -30,6 +30,13 @@ PLAN = f"""\
 {OPEN_MARK}
 """
 
+HEAD_FILE = (
+    "---\ntype: Workstream\n---\n\n# WS\n\n## Stints\n\n"
+    "- **Planned.** Budget: six. Targets: `ws.one`.\n"
+)
+DRAFT = "---\ntype: Standard\n---\n\n# Draft\n\n`ws.one` · deterministic\n"
+NOTES = "---\ntype: General-Sheet\n---\n\n# Notes\n"
+
 Behave = Callable[[str, Path, dict], dict | None]
 
 
@@ -57,8 +64,13 @@ def check_first(copy: Path, old: str, new: str) -> None:
 @pytest.fixture
 def copy(tmp_path: Path) -> Path:
     copy = tmp_path / "mc"
-    (copy / "ws").mkdir(parents=True)
+    (copy / "ws" / "rules").mkdir(parents=True)
     (copy / "ws" / "PLAN.md").write_text(PLAN)
+    (copy / "ws" / "WORKSTREAM.md").write_text(HEAD_FILE)
+    (copy / "ws" / "rules" / "draft.md").write_text(DRAFT)
+    (copy / "ws" / "rules" / "notes.md").write_text(NOTES)
+    (copy / "ws" / "check").write_text("#!/bin/sh\nexit 0\n")
+    (copy / "ws" / "check").chmod(0o755)
     git(copy, "init", "-q", "-b", "main")
     commit(copy, "seed")
     return copy
@@ -92,7 +104,7 @@ def fake(copy: Path, behave: Behave) -> Callable[[str, str, str | None], CallRec
         elif name.startswith("iter"):
             check_first(copy, "- [ ] ", "- [x] ")
             rec["commits"] = [commit(copy, name)]
-            rec["answer"] = f'`{{"summary": "{name}", "blocker": null}}`'
+            rec["answer"] = f'`{{"summary": "{name}", "stuck": null}}`'
         elif name.startswith("review"):
             rec["answer"] = "0 findings"
         else:
@@ -131,9 +143,7 @@ def run(
 ) -> tuple[str, StintRecord]:
     """Run the loop; return ``done`` or the stop's reason, and the record."""
     record = StintRecord(reason="", budget=budget)
-    work = Assignment(
-        copy=copy, repo="/r", workstream="ws", check="true", budget=budget
-    )
+    work = Assignment(copy=copy, repo="/r", workstream="ws", budget=budget)
     try:
         Loop(work, fake(copy, behave), checker(exits), record, copy.parent).run()
         return "done", record
@@ -149,7 +159,7 @@ def dirty(name: str, copy: Path, rec: dict) -> dict | None:
     if name == "iter-2":
         (copy / "junk").write_text("x")
         rec["uncommitted"] = ["?? junk"]
-        rec["answer"] = '{"summary": "s", "blocker": null}'
+        rec["answer"] = '{"summary": "s", "stuck": null}'
         return rec
     return None
 
@@ -159,7 +169,7 @@ def marker(name: str, copy: Path, rec: dict) -> dict | None:
         check_first(copy, "- [ ] ", "- [x] ")
         check_first(copy, OPEN_MARK, DONE_MARK)
         rec["commits"] = [commit(copy, name)]
-        rec["answer"] = '{"summary": "s", "blocker": null}'
+        rec["answer"] = '{"summary": "s", "stuck": null}'
         return rec
     return None
 
@@ -171,7 +181,7 @@ def link(name: str, copy: Path, rec: dict) -> dict | None:
         (copy / "ws" / "PLAN.md").unlink()
         os.symlink(secret, copy / "ws" / "PLAN.md")
         rec["commits"] = [commit(copy, name)]
-        rec["answer"] = '{"summary": "s", "blocker": null}'
+        rec["answer"] = '{"summary": "s", "stuck": null}'
         return rec
     return None
 
@@ -190,7 +200,7 @@ def lying_head(name: str, copy: Path, rec: dict) -> dict | None:
         check_first(copy, "- [ ] ", "- [x] ")
         commit(copy, "a")
         rec["commits"] = ["0" * 40]
-        rec["answer"] = '{"summary": "s", "blocker": null}'
+        rec["answer"] = '{"summary": "s", "stuck": null}'
         return rec
     return None
 
@@ -224,25 +234,44 @@ def no_usage(name: str, copy: Path, rec: dict) -> dict | None:
     return None
 
 
-def deviate(copy: Path, name: str, rec: dict) -> dict:
-    """Log a deviation, commit it, and report the blocker, as a blocked iteration does."""
-    (copy / "ws" / "PROGRESS.md").write_text("- deviation: one — the spec is missing\n")
+def get_stuck(copy: Path, name: str, rec: dict) -> dict:
+    """Log why, commit it, and report stuck, as a stuck iteration does."""
+    (copy / "ws" / "PROGRESS.md").write_text("- stuck: one — the spec is missing\n")
     rec["commits"] = [commit(copy, name)]
-    rec["answer"] = '{"summary": "s", "blocker": "the spec is missing"}'
+    rec["answer"] = '{"summary": "s", "stuck": "the spec is missing"}'
     return rec
 
 
-def blocked(name: str, copy: Path, rec: dict) -> dict | None:
+def stuck(name: str, copy: Path, rec: dict) -> dict | None:
     if name == "iter-1":
-        return deviate(copy, name, rec)
+        return get_stuck(copy, name, rec)
     return None
 
 
 def idle(name: str, copy: Path, rec: dict) -> dict | None:
     if name == "iter-1":
-        rec["answer"] = '{"summary": "s", "blocker": null}'
+        rec["answer"] = '{"summary": "s", "stuck": null}'
         return rec
     return None
+
+
+def edit(rel: str, caller: str) -> Behave:
+    """A behavior in which ``caller`` does its usual work and also edits ``rel``."""
+
+    def behave(name: str, copy: Path, rec: dict) -> dict | None:
+        if name != caller:
+            return None
+        (copy / rel).write_text("changed\n")
+        if name.startswith("iter"):
+            check_first(copy, "- [ ] ", "- [x] ")
+            rec["answer"] = '{"summary": "s", "stuck": null}'
+        else:
+            check_first(copy, OPEN_MARK, DONE_MARK)
+            rec["answer"] = '{"verdict": "continue", "reason": "r"}'
+        rec["commits"] = [commit(copy, name)]
+        return rec
+
+    return behave
 
 
 def faulted(name: str, copy: Path, rec: dict) -> dict | None:
@@ -264,9 +293,20 @@ def faulted(name: str, copy: Path, rec: dict) -> dict | None:
         (lying_head, 6, "iter-1: the copy's HEAD is not the call's last commit"),
         (reviewer_writes, 6, "review-1 committed"),
         (no_usage, 6, "principal-1 reported no token usage"),
-        (blocked, 6, "principal-1 left 2 unchecked tasks above the checkpoint"),
+        (stuck, 6, "principal-1 left 2 unchecked tasks above the checkpoint"),
         (idle, 6, "segment 1 has no commits to review"),
         (faulted, 6, "iter-1: run.mjs exited 1"),
+        (
+            edit("ws/WORKSTREAM.md", "iter-1"),
+            6,
+            "iter-1 changed the target: ws/WORKSTREAM.md",
+        ),
+        (
+            edit("ws/rules/draft.md", "principal-1"),
+            6,
+            "principal-1 changed the target: ws/rules/draft.md",
+        ),
+        (edit("ws/check", "iter-2"), 6, "iter-2 changed the target: ws/check"),
     ],
 )
 def test_a_rule_stops_the_stint(
@@ -274,6 +314,46 @@ def test_a_rule_stops_the_stint(
 ) -> None:
     got, _ = run(copy, behave, budget)
     assert got.startswith(want)
+
+
+def test_a_workstream_with_no_target_is_not_launched(copy: Path) -> None:
+    (copy / "ws" / "check").chmod(0o644)
+    got, record = run(copy, honest)
+    assert got == "not launched: ws/check is not an executable file"
+    assert record.calls == []
+
+
+def test_the_check_runs_the_targeted_rules(copy: Path) -> None:
+    commands: list[str] = []
+    inner = checker(clean)
+
+    def spy(name: str, command: str) -> CheckRecord:
+        commands.append(command)
+        return inner(name, command)
+
+    record = StintRecord(reason="", budget=6)
+    work = Assignment(copy=copy, repo="/r", workstream="ws", budget=6)
+    Loop(work, fake(copy, honest), spy, record, copy.parent).run()
+    assert commands == ["ws/check ws.one", "ws/check ws.one"]
+
+
+def test_a_file_that_is_not_a_standard_may_change(copy: Path) -> None:
+    got, _ = run(copy, edit("ws/rules/notes.md", "iter-1"))
+    assert got == "done"
+
+
+def test_a_deleted_draft_standard_stops_the_stint(copy: Path) -> None:
+    def delete(name: str, copy: Path, rec: dict) -> dict | None:
+        if name == "iter-1":
+            (copy / "ws" / "rules" / "draft.md").unlink()
+            check_first(copy, "- [ ] ", "- [x] ")
+            rec["commits"] = [commit(copy, name)]
+            rec["answer"] = '{"summary": "s", "stuck": null}'
+            return rec
+        return None
+
+    got, _ = run(copy, delete)
+    assert got == "iter-1 changed the target: ws/rules/draft.md"
 
 
 def test_the_principal_resumes_its_own_session(copy: Path) -> None:
@@ -297,7 +377,7 @@ def test_two_tasks_in_one_is_noted_not_stopped(copy: Path) -> None:
             check_first(copy, "- [ ] ", "- [x] ")
             check_first(copy, "- [ ] ", "- [x] ")
             rec["commits"] = [commit(copy, name)]
-            rec["answer"] = '{"summary": "s", "blocker": null}'
+            rec["answer"] = '{"summary": "s", "stuck": null}'
             return rec
         return None
 
@@ -332,7 +412,7 @@ def test_the_principal_is_shown_the_checks_output(copy: Path) -> None:
         return inner(name, prompt, resume)
 
     record = StintRecord(reason="", budget=6)
-    work = Assignment(copy=copy, repo="/r", workstream="ws", check="true", budget=6)
+    work = Assignment(copy=copy, repo="/r", workstream="ws", budget=6)
     exits = checker(lambda name: int(name == "check-1"))
     Loop(work, spy, exits, record, copy.parent).run()
     assert "It exited 1;" in prompts["principal-1"]
@@ -346,10 +426,10 @@ def test_long_check_output_is_cut_for_the_principal() -> None:
     assert cut[-1] == "(3 more lines not shown)"
 
 
-def test_a_blocked_iteration_ends_its_segment_for_the_principal(copy: Path) -> None:
+def test_a_stuck_iteration_ends_its_segment_for_the_principal(copy: Path) -> None:
     def replan(name: str, copy: Path, rec: dict) -> dict | None:
         if name == "iter-1":
-            return deviate(copy, name, rec)
+            return get_stuck(copy, name, rec)
         if name == "principal-1":
             plan = copy / "ws" / "PLAN.md"
             tasks = "- [ ] one\n- [ ] two\n- [ ] three\n- [ ] four\n"
@@ -368,7 +448,7 @@ def test_a_blocked_iteration_ends_its_segment_for_the_principal(copy: Path) -> N
         "principal-1",
     ]
     assert record.notes == [
-        "iter-1 blocked: the spec is missing",
+        "iter-1 stuck: the spec is missing",
         "iter-1 checked off 0 tasks, not 1",
     ]
 
@@ -378,7 +458,7 @@ def test_a_check_that_leaves_files_stops_the_stint(copy: Path) -> None:
         return CheckRecord(name, 0, 0, [], ["?? .cache/x"])
 
     record = StintRecord(reason="", budget=6)
-    work = Assignment(copy=copy, repo="/r", workstream="ws", check="true", budget=6)
+    work = Assignment(copy=copy, repo="/r", workstream="ws", budget=6)
     loop = Loop(work, fake(copy, honest), messy, record, copy.parent)
     with pytest.raises(Stop, match="check-1 left work uncommitted"):
         loop.run()

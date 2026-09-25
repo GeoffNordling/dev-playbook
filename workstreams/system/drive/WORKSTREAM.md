@@ -206,7 +206,7 @@ Decided with the user on 2026-09-24.
   on the stint's branch, as a Ralph run keeps them today. At the verdict,
   the stint's entry under Stints records the outcome.
 - **A workstream's target is one or more draft Standards.**
-  `## Done when` points at them, they are wired to `--check` and not to the
+  `## Done when` points at them, they are wired to the workstream's `check` and not to the
   gate, and a stint targets some of their rules. The whole model of a
   stint, decided 2026-09-25, is
   [Stint Model](/workstreams/system/drive/stint-model.md).
@@ -224,10 +224,11 @@ is with the user, at a high level, the agent guiding. An unattended
 stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Build the judge.** It runs a stint's stochastic rules, reading them
-  from the `Targets:` ids of the head file's Planned stint entry — the
-  model's one source for them, so the stint's arguments repeat none of
-  it. The checkpoint runs it beside `check` and the reviewer.
+- **Build the judge.** It runs a stint's stochastic rules, as `check`
+  runs the deterministic ones: the stint already reads the `Targets:`
+  ids and splits them by kind, and today refuses a stochastic one. The
+  judge takes those ids and returns findings in `check`'s shape, and
+  the checkpoint runs it beside `check` and the reviewer.
 - **Bring the attended Ralph to the model.** The Ralph workflow
   (`ralph-loop.js`), its skills (`ralph-setup`, `ralph-checkpoint`),
   and its agents (`ralph-reviewer`, `ralph-checkpointer`) take the
@@ -259,6 +260,14 @@ stint runs with the `stint` command
 
 ## Completed
 
+- **Read the target from the workstream.** Done 2026-09-25: the stint
+  reads the rule ids from the `Targets:` of the head file's planned
+  stint entry and runs the workstream's `check` on the deterministic
+  ones, as `<workstream>/check <rule-id>…`; `--check` is gone. A call
+  that changes the head file, a draft Standard, or `check` stops the
+  stint, and a worker that cannot do its task is now `stuck`, not a
+  deviation. The stop rules are listed once, in
+  [Running a Stint](/guides/running-a-stint.md#what-stops-a-stint).
 - **Bring the `stint` command to the model.** Done 2026-09-25:
   `--check` is now the target check, which iterations may run at any
   time and the stint runs at each checkpoint; the checkpoint runs the

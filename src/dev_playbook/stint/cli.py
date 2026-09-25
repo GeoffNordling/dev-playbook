@@ -1,7 +1,7 @@
 """The ``stint`` command: run an unattended stint in sealed containers.
 
     stint setup --playbook PATH --claude PATH
-    stint run REPO --base REF --workstream DIR --check CMD --budget N
+    stint run REPO --base REF --workstream DIR --budget N
               --name NAME --home DIR --playbook PATH --model MODEL
 
 Every argument is required; none has a default. Exit codes:
@@ -45,11 +45,6 @@ def parser() -> argparse.ArgumentParser:
         "--workstream", required=True, help="the workstream folder, repo-relative"
     )
     run.add_argument(
-        "--check",
-        required=True,
-        help="the target check: a command whose exit 0 is zero findings",
-    )
-    run.add_argument(
         "--budget", type=int, required=True, help="the most iterations to spend"
     )
     run.add_argument("--name", required=True, help="the stint's name and branch")
@@ -76,7 +71,6 @@ def main(argv: list[str] | None = None) -> int:
             repo=args.repo,
             base=args.base,
             workstream=args.workstream,
-            check=args.check,
             budget=args.budget,
             name=args.name,
             home=args.home,

@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Stint Model
-description: How a stint's target, its checks, and its agents fit together — one supervised loop at three levels, with a principal, workers, verifiers, and a reviewer; draft Standards as the target, wired to --check, and permanent Standards as the invariant, wired to the gate; done decided by the principal on zero findings — decided with the user on 2026-09-25, with its diagram
+description: How a stint's target, its checks, and its agents fit together — one supervised loop at three levels, with a principal, workers, verifiers, and a reviewer; draft Standards as the target, wired to the workstream's check, and permanent Standards as the invariant, wired to the gate; done decided by the principal on zero findings — decided with the user on 2026-09-25, with its diagram
 ---
 
 # Stint Model
@@ -63,7 +63,7 @@ The levels:
 - **Wiring makes a Standard an invariant or a target.** A Standard
   under `standards/` is wired to the pre-commit gate: it is the
   invariant, and its deterministic rules must hold on every commit. A
-  draft Standard is wired to `--check` only: it is the target, its
+  draft Standard is wired to the workstream's `check` only: it is the target, its
   rules may fail at any time, and a failure is a signal toward the
   target, never a block.
 - **On accept, each draft Standard is deleted or promoted.** A
@@ -74,10 +74,17 @@ The levels:
   and no two rules of one workstream's draft Standards share a slug.
 - **A loop advances a leaf workstream only.** A workstream with
   children is never a stint's target, so every rule id names a leaf.
-- **`check` sits beside the head file.** It runs the deterministic
-  rules of the workstream's draft Standards, `check <rule-id>…`, prints one finding per failed
-  member, and is what the stint's `--check` runs. It lives as long as
-  the workstream does.
+- **`check` sits beside the head file.** It is an executable file
+  named `check` in the workstream folder. It runs the deterministic
+  rules of the workstream's draft Standards it is given, run from the
+  repository's root as `<workstream>/check <rule-id>…`, and prints one
+  finding per failed member; exit 0 is zero findings. It lives as long
+  as the workstream does.
+- **The stint reads its target from the workstream.** It takes the
+  rule ids from the planned entry's `Targets:`, splits them by each
+  rule's trailer, and gives the deterministic ones to `check` and the
+  stochastic ones to the judge. No argument of the `stint` command
+  repeats them.
 - **The user and an attended agent write the target before launch**:
   the draft Standards, `check`, and the stint's entry.
 - **A stint advances part of a workstream.** Its planned entry under
@@ -102,10 +109,16 @@ The levels:
   principal sets the iterations' tasks. The principal may revise
   `PLAN.md`, and never the draft Standards, `check`, or the stint's entry. A
   rule the principal finds wrong ends the stint as stuck, and the user rules
-  on it.
+  on it. The stint stops any call that changes the head file or a draft
+  Standard.
 - **A worker that fails its task yields stuck.** This is one event at
-  every level. A blocked iteration commits what it did, logs a
-  deviation and its reason in `PROGRESS.md`, and exits; the stint
-  continues, and the principal handles the deviation at the
-  checkpoint. A stuck stint yields to the user the same way. Only a
-  principal stops its own level.
+  every level. A stuck iteration commits what it did, logs a `- stuck:`
+  line and its reason in `PROGRESS.md`, and exits; the stint continues,
+  and the principal takes it up at the checkpoint. A stuck stint yields
+  to the user the same way.
+- **The principal decides; the loop enforces.** The principal is the one
+  agent that ends its level, with done or stuck. The loop's code also
+  stops the stint, with no tokens spent, when a call breaks the rules
+  above, such as a done while the check reports findings. The stop rules
+  are listed once, in
+  [Running a Stint](/guides/running-a-stint.md#what-stops-a-stint).

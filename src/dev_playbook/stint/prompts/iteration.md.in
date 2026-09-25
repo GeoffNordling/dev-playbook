@@ -25,12 +25,16 @@ pre-commit gate, which every commit runs. Never skip it.
 4. Run `/commit-sandbox`. When the gate refuses the commit, fix what it
    finds and commit again. Leave nothing uncommitted.
 
-If you cannot do the task, leave it unchecked. Append one line to the log's
-`## Log` instead: `- deviation: <the task in a few words> — <why you could
-not do it>`. Commit what you did and the log line, and stop. The principal
-takes it up at the checkpoint.
+If you cannot do the task, you are stuck. Leave the task unchecked. Append
+one line to the log's `## Log` instead: `- stuck: <the task in a few words>
+— <why you could not do it>`. Commit what you did and the log line, and
+stop. The principal takes it up at the checkpoint.
+
+The files that set the stint's target are not yours to change: the head
+file; the draft Standards, the files typed `Standard` in the workstream
+folder; and the check. A change to any of them stops the stint.
 
 End your reply with one line of JSON and nothing after it:
-`{"summary": "<one line>", "tasksLeft": <unchecked tasks left in your segment>, "blocker": null}`
-with `blocker` the deviation's reason, in one line, instead of null when you
-could not do the task.
+`{"summary": "<one line>", "tasksLeft": <unchecked tasks left in your segment>, "stuck": null}`
+with `stuck` the reason, in one line, instead of null when you could not
+do the task.

@@ -34,9 +34,8 @@ and segment are
   own hooks, such as `playbook check --local`; dev-playbook runs its own
   hooks from the branch being worked. A hook set only for `pre-push`, such
   as `make-check`, does not run, since nothing is pushed.
-- **The target check blocks nothing, and done needs it clean.** `--check`
-  runs the rules the stint works toward, such as a workstream's
-  `check <rule-id>…`. Its findings are a signal, so an iteration may run
+- **The target check blocks nothing, and done needs it clean.** The
+  workstream's `check` runs the rules the stint works toward. Its findings are a signal, so an iteration may run
   it at any time and commit while it fails. At each checkpoint the stint
   runs it in its own container, spending no tokens, and the principal
   reads its findings. The stint refuses the principal's done while the
@@ -93,16 +92,32 @@ pre-commit cannot install, fails the call.
 
 ## What the repository must hold
 
-The base ref must already hold the workstream folder, with three files:
+The base ref must already hold the workstream folder, with these files:
 
-- `WORKSTREAM.md` — the goal, `## Done when`, and the constraints.
+- `WORKSTREAM.md` — the goal, `## Done when`, the constraints, and a
+  `## Stints` whose first entry is the planned one, naming the rule ids
+  the stint targets:
+
+  ```markdown
+  - **Planned.** Budget: five iterations. Targets: `wordcount.counts-words`.
+  ```
+
+- The draft Standards — Markdown files typed `Standard` in the folder, which
+  hold every targeted rule. Each rule's trailer says it is `deterministic`;
+  a stochastic rule needs the judge, which is not built, so the stint
+  refuses one.
+- `check` — an executable file that runs the deterministic rules it is
+  given. The stint runs it from the repository's root as
+  `<workstream>/check <rule-id>…`, with the targeted ids. Exit 0 is zero
+  findings; any other exit is findings, printed one per line.
 - `PLAN.md` — the tasks, each a `- [ ] ` line at a line's start, in
   segments that end with the exact line `<!-- [ ] checkpoint -->`. Each
   task says how to verify it.
 - `PROGRESS.md` — the log each iteration appends to.
 
 The base ref must hold a `.pre-commit-config.yaml`; the stint refuses to
-launch without one.
+launch without one. It also refuses to launch, with `not launched: …`, when
+the head file names no planned target it can run.
 
 The repository needs a `.gitignore` that covers what its check writes, such
 as `__pycache__/`: a call that leaves any file uncommitted stops the stint.
@@ -114,7 +129,6 @@ The branch `<name>` must not exist yet.
 stint run ~/workspace/mission-control \
   --base main \
   --workstream workstreams/wordcount \
-  --check "python3 -m unittest discover -s tests" \
   --budget 5 \
   --name wordcount-1 \
   --home ~/stints \
@@ -129,7 +143,6 @@ Every argument is required, and none has a default:
 | `REPO` | The repository the stint changes |
 | `--base` | The ref the branch starts at; it holds the workstream |
 | `--workstream` | The workstream folder, relative to the repository |
-| `--check` | The target check: a command whose exit 0 is zero findings |
 | `--budget` | The most iterations the stint may spend; at least the plan's open tasks |
 | `--name` | The stint's name, and its branch's |
 | `--home` | Where stint folders live |
@@ -143,13 +156,18 @@ stint ended.
 
 - `principal-0` reads the plan and answers `launch`, or why not.
 - `iter-1`, `iter-2`, … each do the first unchecked task, check it off, and
-  commit. An iteration that cannot do its task leaves it unchecked, logs a
-  deviation in `PROGRESS.md`, commits, and reports a blocker.
-- At each checkpoint, `check-<n>` runs `--check` on the segment's last
+  commit. An iteration that cannot do its task is stuck: it leaves the task
+  unchecked, logs a `- stuck:` line in `PROGRESS.md`, commits, and reports
+  why.
+- At each checkpoint, `check-<n>` runs `check` on the segment's last
   commit, and `review-<n>` reads the segment's commits cold and commits
   nothing. Both report to `principal-<n>`, the same conversation resumed,
-  which rules on their findings and the deviations, checks off the
+  which rules on their findings and on each stuck iteration, checks off the
   checkpoint, and answers `continue`, `done`, or `stuck`.
+
+No call may change the files that set the target: the head file, the
+draft Standards, and `check`. The stint reads them at launch and stops at
+the first call that changes one.
 
 ## What comes back
 
@@ -182,16 +200,20 @@ The stint's folder, `<home>/<repo>/<name>/`, stays:
 
 ## What stops a stint
 
-Each rule is checked in code, and the reason is the last line and
-`stint.json`'s `reason`:
+This table is the one list of the stint's stop rules. Each rule is checked
+in code, in [`loop.py`](/src/dev_playbook/stint/loop.py) and
+[`launch.py`](/src/dev_playbook/stint/launch.py), and the reason is the
+last line and `stint.json`'s `reason`:
 
 | Reason | What happened |
 |---|---|
 | `not launched: N tasks, budget B` | The plan has more open tasks than the budget |
+| `not launched: …` naming the target | The head file has no planned entry with `Targets:`, a target is no rule of a draft Standard or is stochastic, or `check` is not an executable file |
 | `stuck at launch: …` | The principal did not answer `launch` |
 | `the principal changed the plan at launch` | `principal-0` committed |
 | `iter-k moved a checkpoint marker` | An iteration touched a checkpoint line |
-| `segment n has no commits to review` | The segment's iterations committed nothing, not even a deviation |
+| `segment n has no commits to review` | The segment's iterations committed nothing, not even a `- stuck:` line |
+| `<call> changed the target: …` | A call changed, or deleted, the head file, a draft Standard, or `check` |
 | `<call> left work uncommitted` | A file was left uncommitted in the copy, by an agent or by the check |
 | `<call>: the copy's HEAD is not the call's last commit` | The copy's branch does not match what the call reported |
 | `check-n moved the copy's HEAD` | The target check committed |
@@ -210,7 +232,7 @@ Each rule is checked in code, and the reason is the last line and
 | `<call>: run.mjs exited …`, `<call>: N hook rows lost …` | The container call failed, or a hook row did not reach the database |
 | `stuck: …` | The principal yielded the stint as stuck |
 
-An iteration that checks off more or fewer than one task, or reports a
-blocker, is not stopped; the stint records a note, and the principal sees
-it at the checkpoint. An iteration that checks off no task, or reports a
-blocker, ends its segment early, so the checkpoint comes next.
+An iteration that checks off more or fewer than one task, or is stuck, is
+not stopped; the stint records a note, and the principal sees it at the
+checkpoint. An iteration that checks off no task, or is stuck, ends its
+segment early, so the checkpoint comes next.

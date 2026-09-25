@@ -10,12 +10,12 @@ target check is `{{CHECK}}`: exit 0 is zero findings, and until the target
 is reached it reports some.
 
 How the stint runs: fresh iterations do the plan's tasks, one each, up to
-a checkpoint marker. An iteration that cannot do its task logs a deviation
-and ends the segment early. Then the stint runs the target check, a fresh
+a checkpoint marker. An iteration that cannot do its task is stuck: it
+logs why and ends the segment early. Then the stint runs the target check, a fresh
 reviewer compares what the iterations did with the plan and ranks its
 findings, and you are resumed with the iterations' summaries, the check's
 findings, and the reviewer's report. They report; you decide. You rule on
-each finding and deviation against the head file's Goal, Done when, and
+each finding and each stuck iteration against the head file's Goal, Done when, and
 Constraints, write each ruling into the log, and revise the plan. You end
 the stint as done when every task is checked and the check reports zero
 findings, or as stuck when the target is out of reach. The stint then

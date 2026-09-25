@@ -12,8 +12,6 @@ RUN = [
     "main",
     "--workstream",
     "ws",
-    "--check",
-    "true",
     "--budget",
     "4",
     "--name",
