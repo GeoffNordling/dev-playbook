@@ -217,46 +217,39 @@ None.
 
 ## Planned
 
-In order of dependency: each item needs the ones above it, except
-where it says otherwise. The design is
-[Stint Model](/workstreams/system/drive/stint-model.md), and a session
-is with the user, at a high level, the agent guiding. An unattended
+In order of priority. The design is
+[Stint Model](/workstreams/system/drive/stint-model.md). An unattended
 stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Build the judge.** It runs a stint's stochastic rules, as `check`
-  runs the deterministic ones: the stint already reads the `Targets:`
-  ids and splits them by kind, and today refuses a stochastic one. The
-  judge takes those ids and returns findings in `check`'s shape, and
-  the checkpoint runs it beside `check` and the reviewer.
+- **Run a toy stint for real.** Design, plan, build, and test one small
+  real stint, end to end: start backwards from a toy child workstream. Then, consider the
+  [Stint Model](/workstreams/system/drive/stint-model.md), carry it
+  into the `stint` program and the workstream's Markdown, and finish
+  with an actual run in the container. The run's feedback comes before
+  any other tool.
+
+  Questions raised so far, to consider and not to follow as tasks:
+  - What an objective is to a workstream, beside a goal (the draft
+    Standards) and a predicate (a rule in a Standard).
+  - The judge, which would run a stint's stochastic rules as `check`
+    runs the deterministic ones; the stint refuses a stochastic target
+    until it exists.
+  - What a stint returns: which of `PLAN.md`, `PROGRESS.md`, and the
+    commits stay on the branch or reach `main`, and who writes the
+    stint's entry under `## Stints`, and when.
+  - The stint's Loop, a file in `loops/` that names no workstream.
+  - `run.mjs`'s check job and the target guard, which have never run
+    in a real container.
+- **Build the board script.** It reads the head files and the live
+  stints and prints the ✈️/💤 board.
+- **Build the coordinator agent.** Advisory only; it reads the board.
 - **Bring the attended Ralph to the model.** The Ralph workflow
   (`ralph-loop.js`), its skills (`ralph-setup`, `ralph-checkpoint`),
   and its agents (`ralph-reviewer`, `ralph-checkpointer`) take the
   [Stint Model](/workstreams/system/drive/stint-model.md)'s target,
-  verifiers, done rule, and deviations, and its names. The fork that
+  verifiers, done rule, and stuck workers, and its names. The fork that
   changes the plan stays.
-- **Write the stint's Loop.** The first file in `loops/`. In order:
-  - **Design what a stint returns.** A session. Inside the container,
-    iterations and checkpoints write files on the stint's branch:
-    `PLAN.md`, `PROGRESS.md`, commits, and the head file's worklist
-    moves. The design settles which of these come back when the
-    container stops, which stay on the branch, and which reach `main`
-    only on an accept. It also settles who writes the stint's entry
-    under `## Stints`, and when: the container at the yield, or the
-    loop after the user's verdict, since a verdict exists only after
-    the yield.
-  - **Write the Loop.** The checkpointed loop of
-    [Stint Model](/workstreams/system/drive/stint-model.md), from the
-    segment to the yield, as a graph that names no workstream.
-- **Build the board script.** It reads the head files and the live
-  stints and prints the ✈️/💤 board.
-- **Build the coordinator agent.** Advisory only; it reads the board.
-- **Decide what an objective is to a workstream.** A session, and it
-  waits on nothing above. An idea written down takes one of three
-  forms: a goal, spent when it is met, now a workstream's draft
-  Standards; a predicate, standing, a rule in a Standard; or an
-  objective, standing, a scalar descended under the predicates. Where
-  an objective sits in a workstream or a loop is not decided.
 
 ## Completed
 
