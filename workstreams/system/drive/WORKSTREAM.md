@@ -256,6 +256,19 @@ guiding. An unattended stint runs with the `stint` command
 - **Write the unattended stint's Loop.** The first file in `loops/`,
   once the system is thought through and what a stint returns is
   designed.
+- **Run the pre-commit gate in the stint's work copy.** Today no hook
+  runs on an iteration's commit: the work copy is a plain `git clone`
+  (`src/dev_playbook/stint/workcopy.py:267`), which copies no hooks,
+  and the image has no `pre-commit` (`src/dev_playbook/stint/Containerfile`).
+  The iteration prompt runs `--check` as the only gate instead
+  (`src/dev_playbook/stint/prompts/iteration.md.in:18`). The fix: the
+  image gets `pre-commit`, the hooks are installed in the work copy
+  after it opens, inside the container, and the hook environments are
+  cached across calls, since every call is a fresh container and the
+  hook set comes from each target repo's `.pre-commit-config.yaml`,
+  so the image cannot build them in advance. Once it lands, the gate
+  holds the permanent Standards on every commit, and `--check` is
+  free to become the stint's target check, run at each checkpoint.
 - **Build the board script.** It reads the head files and the live stints
   and prints the ✈️/💤 board.
 - **Build the coordinator agent.** Advisory only.
