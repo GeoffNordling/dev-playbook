@@ -71,8 +71,9 @@ None: the goal is standing.
   durable: it sticks around when the conversation is over, and it is
   how the user gets hands off the wheel.
 - **A big fuzzy target can't be looped.** When the goal is large,
-  unspecified, and high dimensional, a loop can't even know how to get
-  to the target state, much less get there.
+  unspecified, and high dimensional, invoking the magic phrase "loop"
+  is not enough; the loop needs a well-defined target and a hope of
+  reaching it without the user.
 
 ## Terms
 
