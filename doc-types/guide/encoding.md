@@ -87,7 +87,8 @@ No line of a Guide is a rule trailer,
 
 ## Where a Guide lives
 
-A Guide is `guides/<work>.md`, typed `Guide`, its filename kebab-case
+A Guide is `guides/<work>.md`, or a draft in a workstream,
+typed `Guide`, its filename kebab-case
 naming the work as a noun or a gerund compound (`bootstrap.md`,
 `linking-issues.md`). The registry's rule is
 [Guide lives under `guides/`](/standards/knowledge-organization/document-types.md#guide-lives-under-guides).

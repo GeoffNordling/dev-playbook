@@ -2,12 +2,13 @@
 type: Standard
 title: Guide Conventions
 description: The form a document typed Guide takes — every ordered list a sequence of steps under its own heading, each step opening with its bold name, no trailer line, rules linked and never stated, and a description naming the work it is read before
-population: "a document typed Guide"
+population: "a document typed Guide, outside a workstream"
 ---
 
 # Guide Conventions
 
-A document typed `Guide`, under `guides/`
+A document typed `Guide`, under `guides/` and outside a
+workstream
 ([Document Types](/standards/knowledge-organization/document-types.md#guide-lives-under-guides)).
 The [Guide doc-type](/doc-types/guide/index.md) declares what a guide
 is and the encoding its file takes,

@@ -1,0 +1,28 @@
+Checkpoint {{N}} of {{OF}}. The iterations since the last checkpoint
+reported:
+
+{{SUMMARIES}}
+
+The reviewer reported:
+
+{{REVIEW}}
+
+Iterations spent: {{SPENT}} of {{BUDGET}}.
+
+1. Rule on every finding against the head file's Goal, Done when, and
+   Constraints: **accept** it, and add a fix task to the plan, or
+   **reject** it, with the reason. A finding the head file cannot settle
+   ends the stint as stuck.
+2. Write each ruling in the log's `## Decisions`:
+   `- checkpoint {{N}}: <finding in a few words> — <accept | reject>: <why>`.
+3. Change the first `<!-- [ ] checkpoint -->` line to
+   `<!-- [x] checkpoint -->`. Place any fix tasks above the next
+   `<!-- [ ] checkpoint -->`, or, when none is left, add them with a new
+   `<!-- [ ] checkpoint -->` after them, and only if the budget has room.
+   Revise the tasks ahead if what you learned calls for it, and record
+   each change in `## Decisions` too.
+4. Run `/commit-sandbox`.
+
+End your reply with one line of JSON and nothing after it:
+`{"verdict": "continue" | "done" | "budget" | "stuck", "reason": "<one line>"}`
+where `done` means every task is checked and the Done when holds.

@@ -146,7 +146,7 @@ for a question-and-answer round), the `uv run playbook check` run (bare
 command, no link for a does edge), or the step-completion gates (no
 control-flow primitive).
 
-### doc-set-deslop
+### doc-deslop
 
 Could not express the pre-flight `git status` check (no on-disk link, so
 no `{Read}`), the stop on a hint that names no set or two, the
@@ -160,14 +160,14 @@ which no primitive covers.
 Could not express step 2's "only if something stands out" condition —
 the condition primitive gates a whole span, not a report's own contents.
 
-### set-judge
+### doc-judge
 
-Could not express the set-member reads — the root and its linked working
+Could not express the set-member reads — the head file and its linked
 files are runtime-bound (named in the launching prompt), so `{Read}`'s one
 fixed on-disk link cannot cover them; they stay plain prose. Could not
 express "ask no questions" — the Never vocabulary has no verb for it.
 
-### set-deslopper
+### doc-repairer
 
 Could not express reading every set member — `{Read}` needs one fixed
 on-disk link, and set membership is runtime-determined.

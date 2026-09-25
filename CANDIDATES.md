@@ -30,7 +30,7 @@ description: Uncommitted future work — described, not yet promoted to issues
 ## Doc-type system
 
 - **General-Sheet's replacement** — the deliberately-broad placeholder type
-  is replaced, and the type working-set files carry is settled with it.
+  is replaced, and the type the files of a workstream carry is settled with it.
 - **The doc-type family's own type** — the files under `doc-types/` carry
   `General-Sheet` today; decide what type they carry.
 - **Where exclusions are written** — decide whether a population's
@@ -44,7 +44,7 @@ description: Uncommitted future work — described, not yet promoted to issues
   which sits in the Standard definition's Scope today. Hierarchical
   imports across repositories are the mechanism under both.
 - **The software factory's split** — the factory is isolated under
-  `working-docs/software-factory/` since 2026-09-20, its rewrite or
+  `workstreams/software-factory/` since 2026-09-20, its rewrite or
   deletion undecided; when it is rewritten, its object-state rules (the pull request body's sections, the cycle header,
   the label four-tuple) become a Standard under `standards/software-factory/`,
   the two regions and the moves between them become a Guide where they are,

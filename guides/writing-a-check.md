@@ -137,9 +137,8 @@ location:line: <rule id> message
 
 The location is a repo-relative path, and `:line` is left out for a
 finding on the whole file. A count of checks, files, and findings goes
-to stderr. Then it runs two steps that are not functions over the
-model: the loop family's `loop_lint` module, and
-`pre-commit validate-manifest` where the repo publishes a
+to stderr. Then it runs one step that is not a function over the
+model: `pre-commit validate-manifest` where the repo publishes a
 `.pre-commit-hooks.yaml`. It exits 0 when the run is clean, 1 on any
 finding, and 2 when the model or the layer cannot be loaded, the layer
 test fails, or a step cannot run.

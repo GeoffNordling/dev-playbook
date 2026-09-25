@@ -36,6 +36,15 @@ def test_registered_types_are_the_type_registry_rows(dev_playbook_repo: Repo) ->
     assert names == sources.REGISTERED_TYPES
 
 
+def test_workstream_headings_are_the_menu_rows(dev_playbook_repo: Repo) -> None:
+    doc = dev_playbook_repo.markdown[sources.WORKSTREAM_MENU.path]
+    lines = [
+        t for _, t in doc.section(sources.WORKSTREAM_MENU.heading) if t.startswith("|")
+    ]
+    names = {line.strip("|").split("|")[0].strip().strip("`") for line in lines[2:]}
+    assert names == sources.WORKSTREAM_HEADINGS
+
+
 def test_type_registry_rows_name_a_type_in_the_first_cell(
     dev_playbook_repo: Repo,
 ) -> None:

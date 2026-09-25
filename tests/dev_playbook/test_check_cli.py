@@ -304,17 +304,6 @@ class TestSteps:
         assert captured.out == ""
         assert "playbook check: without workspace" in captured.err
 
-    def test_loop_lint_runs_as_a_step(
-        self,
-        tmp_path: Path,
-        monkeypatch: pytest.MonkeyPatch,
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        root = a_repo(tmp_path, {"README.md": "# R\n"})
-        fake_registry(monkeypatch)
-        assert check_cli.main(["check", str(root)]) == 0
-        assert "loop-lint: clean (0 loop(s)" in capsys.readouterr().err
-
     def test_validate_manifest_runs_where_a_manifest_exists(
         self,
         tmp_path: Path,

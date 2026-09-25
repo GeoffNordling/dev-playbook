@@ -42,6 +42,32 @@ REGISTERED_TYPES = frozenset(
         "Standard",
         "Survey",
         "Vocabulary",
+        "Workstream",
+    }
+)
+
+# The menu a Workstream's head file picks its headings from.
+WORKSTREAM_MENU = Section(
+    "standards/doc-type/workstream-conventions.md",
+    "headings-from-the-menu",
+)
+
+# Every heading in the WORKSTREAM_MENU table, shipped as REGISTERED_TYPES is;
+# the test beside this module pins the set to the table.
+WORKSTREAM_HEADINGS = frozenset(
+    {
+        "Goal",
+        "Done when",
+        "Principles",
+        "Constraints",
+        "Terms",
+        "Settled",
+        "Open",
+        "Planned",
+        "Completed",
+        "Stints",
+        "Unfiled",
+        "Acronyms",
     }
 )
 
@@ -79,6 +105,7 @@ CANONICAL_FILES = frozenset(
 # ship here; the test beside this module pins the set.
 STANDARD_DIRECTORIES = frozenset(
     {
+        "billing",
         "build",
         "decisions",
         "distribution",

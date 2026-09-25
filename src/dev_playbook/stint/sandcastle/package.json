@@ -1,0 +1,8 @@
+{
+  "name": "stint-sandcastle",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ai-hero/sandcastle": "^0.12.0"
+  }
+}

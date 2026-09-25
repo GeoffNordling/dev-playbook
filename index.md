@@ -22,4 +22,4 @@ work them are configured. Start at [dev-playbook](/README.md).
 - [loops/](/loops/index.md) — The Loop instances — every document typed `Loop`, each a graph of acts, verifications, and yields that drives a state toward a target state
 - [scripts/](/scripts/index.md) — Executable hook entry points and local dev scripts that automate cross-repo workspace tasks; shared libraries live in src/dev_playbook/
 - [standards/](/standards/index.md) — Cross-project engineering standards that apply to every repository in the workspace
-- [working-docs/](/working-docs/index.md) — The working documentation sets, one directory per line of in-process work, each kept as long as its work runs
+- [workstreams/](/workstreams/index.md) — The workstreams, one directory per line of in-process work, each kept as long as its work runs

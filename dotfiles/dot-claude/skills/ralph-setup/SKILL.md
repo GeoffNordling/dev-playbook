@@ -71,10 +71,10 @@ it tells it when the task is done.
 
 Order so prerequisites come first.
 
-Never write a task that drains, archives, or deletes the working documentation
-set the plan reads from. That set is read-only source for the whole run, and it
-is what the user and the main session read the finished work against when the
-loop ends. Cleaning it up is main-session work after the last checkpoint, never
+Never write a task that drains, archives, or deletes the files of the
+workstream the plan reads from. Those files are read-only source for the whole run, and they
+are what the user and the main session read the finished work against when the
+loop ends. Cleaning them up is main-session work after the last checkpoint, never
 a loop task — and neither is it a `## Done when` criterion.
 
 Then place the agreed number of `<!-- [ ] checkpoint -->` lines, the last of them

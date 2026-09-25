@@ -1,13 +1,17 @@
 """The doc-type family: the rules of ``standards/doc-type/``.
 
-Twenty-one rules are decided by functions over the model. One holds each
+Thirty rules are decided by functions over the model. One holds each
 ``doc-types/<name>/`` directory to a row of the registry rulings table. Three
 hold a file typed ``Guide`` to its steps and its lack of trailers. One holds
-the acts of a file typed ``Loop`` to a runbook link. Thirteen hold a runbook, a
+the acts of a file typed ``Loop`` to a runbook link. Four hold a file typed
+``Workstream`` to its menu of headings, its worklist items, its stint entries,
+and the links that reach it from its parent. Thirteen hold a runbook, a
 skill bundle or an agent definition under ``.claude/`` or
 ``dotfiles/dot-claude/``, to its front matter, its body, and its bundle files.
 Three hold a file typed ``Standard`` to its population and its rule shape.
-The five other rules over a Loop are decided by ``loop-lint``.
+Five more hold a file typed ``Loop`` to its encoding: one paragraph, one
+Mermaid graph, and the Acts, Verifications and Yields sections that agree
+with it.
 """
 
 import posixpath
@@ -17,22 +21,15 @@ from dataclasses import dataclass
 from typing import Any
 
 from dev_playbook import md, sources
-from dev_playbook.check_registry import Finding, check, tool_check
+from dev_playbook.check_registry import Finding, check
 from dev_playbook.model import TRAILER_PATTERN, MarkdownFile, Repo
-
-for _loop_rule in (
-    "doc-type.one-paragraph-then-one-graph",
-    "doc-type.acts-verifications-and-yields-in-that-order",
-    "doc-type.nodes-and-entries-agree",
-    "doc-type.edges-lead-to-steps",
-    "doc-type.every-entry-states-its-condition",
-):
-    tool_check(_loop_rule, hook="loop-lint", module=__name__)
 
 DOC_TYPES = "doc-types"
 STANDARDS = "standards"
+WORKSTREAMS = "workstreams/"
 GUIDE_TYPE = "Guide"
 LOOP_TYPE = "Loop"
+WORKSTREAM_TYPE = "Workstream"
 STANDARD_TYPE = "Standard"
 WHY = "> **Why.**"
 # The blocks a rule may hold after its first paragraph.
@@ -69,6 +66,54 @@ PLACEHOLDERS = ("$ARGUMENTS", "$0")
 BUNDLE_DIRECTORIES = ("references", "scripts")
 REFERENCE_DEFINITION = re.compile(r"^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)")
 LOOP_ENTRY = re.compile(r"^[-*]\s+`[^`]+`\s+—\s")
+BULLET = re.compile(r"^[-*]\s")
+STINT_OPENING = re.compile(r"^[-*]\s+\*\*(Planned|\d{4}-\d{2}-\d{2})\.\*\*")
+VERDICT = re.compile(r"Verdict:\s*(\w*)")
+VERDICTS = frozenset({"advance", "accept", "delete"})
+
+# The five rules that read a Loop's cut in order: each reads the cut the one
+# before it made, so a Loop's first disagreement is its only finding of them.
+ONE_GRAPH = "doc-type.one-paragraph-then-one-graph"
+THREE_VERB_SECTIONS = "doc-type.acts-verifications-and-yields-in-that-order"
+NODES_AND_ENTRIES_AGREE = "doc-type.nodes-and-entries-agree"
+EDGES_LEAD_TO_STEPS = "doc-type.edges-lead-to-steps"
+ENTRIES_STATE_CONDITIONS = "doc-type.every-entry-states-its-condition"
+VERBS = ("Acts", "Verifications", "Yields")
+VERB_OF = {"Acts": "act", "Verifications": "verification", "Yields": "yield"}
+RECEIVER = "receiver"
+# What each kind of node may lead to. A receiver is a node under no heading.
+STEPS = frozenset({"act", "verification", "yield"})
+MAY_LEAD_TO = {
+    "act": STEPS,
+    "verification": STEPS,
+    "yield": STEPS | {RECEIVER},
+    RECEIVER: STEPS,
+}
+CONDITION_OF = {
+    "act": ("fires when", "fires every iteration"),
+    "verification": ("fires when", "fires every iteration"),
+    "yield": ("yields when",),
+}
+LOOP_HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
+FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*(\S*)\s*$")
+LOOP_ENTRY_PARTS = re.compile(r"^[-*]\s+`([^`]+)`\s+—\s+(.*\S)\s*$")
+INLINE_LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+# A Mermaid node: an id and an optional shape from the flowchart set —
+# [text], (text), ([text]), [[text]], [(text)], ((text)), >text], {text},
+# {{text}}. The label inside is opaque.
+MERMAID_NODE = re.compile(
+    r"^([A-Za-z_][\w-]*)"
+    r"(\(\[.*?\]\)|\[\[.*?\]\]|\[\(.*?\)\]|\(\(.*?\)\)|\{\{.*?\}\}"
+    r"|\[.*?\]|\(.*?\)|\{.*?\}|>.*?\])?$"
+)
+# An arrow between two node terms, with an optional |label|.
+MERMAID_ARROW = re.compile(r"\s*(?:-->|-\.->|==>|---|-\.-|===)(?:\|[^|]*\|)?\s*")
+# Statements that draw nothing the checks read.
+MERMAID_DIRECTIVE = re.compile(
+    r"^(%%|subgraph\b|end$|direction\b|classDef\b|class\b|style\b|linkStyle\b)"
+)
+WORKLIST = ("Planned", "Completed")
+BOLD_START = re.compile(r"^[-*]\s+\*\*")
 
 
 @dataclass(frozen=True)
@@ -197,6 +242,36 @@ def an_act_links_a_runbook(repo: Repo) -> Iterator[Finding]:
             ]
             if targets and not any(RUNBOOK.match(t) for t in targets):
                 yield Finding(path, start, "an act links a runbook")
+
+
+@check("doc-type.one-paragraph-then-one-graph")
+def one_paragraph_then_one_graph(repo: Repo) -> Iterator[Finding]:
+    """A Loop is one H1, one paragraph, then one readable ``mermaid`` flowchart."""
+    yield from _loop_findings(repo, ONE_GRAPH)
+
+
+@check("doc-type.acts-verifications-and-yields-in-that-order")
+def acts_verifications_and_yields_in_that_order(repo: Repo) -> Iterator[Finding]:
+    """After a Loop's graph, the three verb H2s in order, each a list of entries."""
+    yield from _loop_findings(repo, THREE_VERB_SECTIONS)
+
+
+@check("doc-type.nodes-and-entries-agree")
+def nodes_and_entries_agree(repo: Repo) -> Iterator[Finding]:
+    """Every entry of a Loop is a node; every node has an entry or is yielded to."""
+    yield from _loop_findings(repo, NODES_AND_ENTRIES_AGREE)
+
+
+@check("doc-type.edges-lead-to-steps")
+def edges_lead_to_steps(repo: Repo) -> Iterator[Finding]:
+    """Every edge of a Loop leads to a step, except a yield's, which may reach a receiver."""
+    yield from _loop_findings(repo, EDGES_LEAD_TO_STEPS)
+
+
+@check("doc-type.every-entry-states-its-condition")
+def every_entry_states_its_condition(repo: Repo) -> Iterator[Finding]:
+    """Every entry of a Loop states its condition and links what its verb needs."""
+    yield from _loop_findings(repo, ENTRIES_STATE_CONDITIONS)
 
 
 # --- runbook-conventions.md ---------------------------------------------------
@@ -516,12 +591,385 @@ def the_files_why_ends_the_opening_prose(repo: Repo) -> Iterator[Finding]:
             )
 
 
+# --- workstream-conventions.md ------------------------------------------------
+
+
+@check("doc-type.headings-from-the-menu")
+def headings_from_the_menu(repo: Repo) -> Iterator[Finding]:
+    """Each H2 of a Workstream is a heading of the menu, and none is used twice."""
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        seen: set[str] = set()
+        for heading in doc.headings:
+            if heading.level != 2:
+                continue
+            if heading.text not in sources.WORKSTREAM_HEADINGS:
+                yield Finding(
+                    path, heading.line, f"`{heading.text}` is not a menu heading"
+                )
+            elif heading.text in seen:
+                yield Finding(path, heading.line, f"`{heading.text}` is used twice")
+            seen.add(heading.text)
+
+
+@check("doc-type.a-worklist-item-opens-with-its-bold-name")
+def a_worklist_item_opens_with_its_bold_name(repo: Repo) -> Iterator[Finding]:
+    """Each item directly under Planned or Completed starts with a bold name."""
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        for heading in doc.headings:
+            if heading.level != 2 or heading.text not in WORKLIST:
+                continue
+            end = next((h.line for h in doc.headings if h.line > heading.line), None)
+            for number, text in doc.content:
+                if number <= heading.line or (end is not None and number >= end):
+                    continue
+                if BULLET.match(text) and not BOLD_START.match(text):
+                    yield Finding(
+                        path, number, "a worklist item does not start with a bold name"
+                    )
+
+
+@check("doc-type.a-stint-entry-in-form")
+def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
+    """Each Stints item opens planned or dated, links one Loop, and sits in order.
+
+    The planned item is first; the dated ones follow, newest first. A
+    ``Verdict:`` is one of the three the user rules.
+    """
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        if not any(h.level == 2 and h.slug == "stints" for h in doc.headings):
+            continue
+        section = doc.section("stints")
+        starts = [n for n, text in section if BULLET.match(text)]
+        ends = starts[1:] + [section[-1][0] + 1 if section else 0]
+        dates: list[str] = []
+        for index, (start, end) in enumerate(zip(starts, ends, strict=True)):
+            text = " ".join(t for n, t in section if start <= n < end)
+            opening = STINT_OPENING.match(text)
+            if opening is None:
+                yield Finding(
+                    path,
+                    start,
+                    "a stint opens with `**Planned.**` or `**YYYY-MM-DD.**`",
+                )
+                continue
+            label = opening.group(1)
+            if label == "Planned" and index != 0:
+                yield Finding(path, start, "the planned stint is the first item")
+            if label != "Planned":
+                if dates and label > dates[-1]:
+                    yield Finding(path, start, "the dated stints run newest first")
+                dates.append(label)
+            loops = [
+                target
+                for link in doc.links
+                if start <= link.line < end
+                and _type_of(repo, target := _resolve(path, link.target, repo.name, ""))
+                == LOOP_TYPE
+            ]
+            if len(loops) != 1:
+                yield Finding(
+                    path, start, f"a stint links one file typed Loop, not {len(loops)}"
+                )
+            verdict = VERDICT.search(text)
+            if verdict is not None and verdict.group(1) not in VERDICTS:
+                yield Finding(
+                    path, start, "a verdict is `advance`, `accept`, or `delete`"
+                )
+
+
+@check("doc-type.every-child-reached-from-its-parent")
+def every_child_reached_from_its_parent(repo: Repo) -> Iterator[Finding]:
+    """Each child Workstream is reached by links from its parent's head file."""
+    heads = {posixpath.dirname(path): path for path, _ in _typed(repo, WORKSTREAM_TYPE)}
+    for path in sorted(heads.values()):
+        parent = _parent_head(heads, path)
+        if parent is None:
+            continue
+        top = posixpath.dirname(parent)
+        prefix = f"{top}/" if top else ""
+        members = {p for p in repo.markdown if p.startswith(prefix)}
+        graph = {
+            member: {
+                target
+                for link in repo.markdown[member].links
+                if (target := _resolve(member, link.target, repo.name, "")) in members
+            }
+            for member in members
+        }
+        if path not in _reached(graph, parent):
+            yield Finding(path, None, f"not reached by links from {parent}")
+
+
 # --- helpers ------------------------------------------------------------------
 
 
+class _Disagreement(Exception):
+    """The first place a Loop's graph and prose disagree, under one rule."""
+
+    def __init__(self, rule: str, message: str) -> None:
+        """Record the rule the disagreement falls under, and the message."""
+        super().__init__(message)
+        self.rule = rule
+
+
+def _loop_findings(repo: Repo, rule: str) -> Iterator[Finding]:
+    """Each Loop whose first disagreement falls under ``rule``."""
+    for path, doc in _typed(repo, LOOP_TYPE):
+        try:
+            _check_loop(repo, path, doc)
+        except _Disagreement as err:
+            if err.rule == rule:
+                yield Finding(path, None, str(err))
+
+
+def _check_loop(repo: Repo, path: str, doc: MarkdownFile) -> None:
+    """Every rule over one Loop, in order; raises at the first disagreement."""
+    _, body = md.parse_frontmatter(doc.text)
+    mermaid, sections = _slice_loop(body)
+    entries = _entries_of(sections)
+    nodes, edges = _graph_of(mermaid)
+    for node in entries:
+        if node not in nodes:
+            raise _Disagreement(
+                NODES_AND_ENTRIES_AGREE,
+                f"`{node}` has an entry but is not a node of the graph",
+            )
+    kind = {node: entries[node][0] if node in entries else RECEIVER for node in nodes}
+    yielded_to = {t for s, t in edges if kind[s] == "yield"}
+    for node in sorted(nodes):
+        if kind[node] == RECEIVER and node not in yielded_to:
+            raise _Disagreement(
+                NODES_AND_ENTRIES_AGREE,
+                f"`{node}` has no entry and no yield leads to it",
+            )
+    for s, t in edges:
+        if kind[t] not in MAY_LEAD_TO[kind[s]]:
+            raise _Disagreement(
+                EDGES_LEAD_TO_STEPS,
+                f"edge `{s}` → `{t}` is {kind[s]} → {kind[t]}; the shape does not allow it",
+            )
+    for node, (verb, rest) in entries.items():
+        _check_entry(repo, path, node, verb, rest)
+
+
+def _slice_loop(body: str) -> tuple[list[str], list[tuple[str, list[str]]]]:
+    """Cut a Loop's body into (mermaid lines, H2 sections after the graph).
+
+    Before the fence: the H1 and exactly one paragraph. The fence: one
+    ``mermaid`` block. After it: H2s only, each with the lines beneath it.
+    """
+    before: list[str] = []
+    mermaid: list[str] | None = None
+    sections: list[tuple[str, list[str]]] = []
+    fence: str | None = None
+    in_mermaid = seen_h1 = False
+    for line in body.split("\n"):
+        if m := FENCE.match(line):
+            marker, info = m.group(1)[0], m.group(2)
+            if fence is None:
+                fence = marker
+                if info == "mermaid":
+                    if mermaid is not None:
+                        raise _Disagreement(
+                            ONE_GRAPH, "two mermaid blocks; the encoding is one"
+                        )
+                    if sections:
+                        raise _Disagreement(
+                            ONE_GRAPH, "the mermaid block sits after a verb section"
+                        )
+                    mermaid, in_mermaid = [], True
+                continue
+            if marker == fence:
+                fence, in_mermaid = None, False
+                continue
+        if in_mermaid and mermaid is not None:
+            mermaid.append(line)
+            continue
+        if fence is None and (m := LOOP_HEADING.match(line)):
+            level, text = len(m.group(1)), m.group(2).strip()
+            if level == 1:
+                if seen_h1:
+                    raise _Disagreement(ONE_GRAPH, "two H1s")
+                seen_h1 = True
+                continue
+            if mermaid is None:
+                raise _Disagreement(
+                    ONE_GRAPH,
+                    f"heading {text!r} before the graph; only the paragraph sits there",
+                )
+            if level != 2:
+                raise _Disagreement(
+                    THREE_VERB_SECTIONS,
+                    f"heading {text!r} is H{level}; the verb sections are H2s",
+                )
+            sections.append((text, []))
+            continue
+        if mermaid is None:
+            if seen_h1:
+                before.append(line)
+        elif sections:
+            sections[-1][1].append(line)
+        elif line.strip():
+            raise _Disagreement(
+                THREE_VERB_SECTIONS,
+                f"text between the graph and the first verb heading: {line.strip()!r}",
+            )
+    if mermaid is None:
+        raise _Disagreement(ONE_GRAPH, "no mermaid block")
+    paragraphs = [p for p in "\n".join(before).split("\n\n") if p.strip()]
+    if len(paragraphs) != 1:
+        raise _Disagreement(
+            ONE_GRAPH,
+            f"{len(paragraphs)} paragraphs before the graph; the encoding is one",
+        )
+    return mermaid, sections
+
+
+def _entries_of(sections: list[tuple[str, list[str]]]) -> dict[str, tuple[str, str]]:
+    """Map node id → (verb, entry text), from the three verb sections in order."""
+    names = [text for text, _ in sections]
+    if names != list(VERBS):
+        raise _Disagreement(
+            THREE_VERB_SECTIONS,
+            f"verb sections are {names}; the encoding is {list(VERBS)} in that order",
+        )
+    entries: dict[str, tuple[str, str]] = {}
+    for heading, lines in sections:
+        verb = VERB_OF[heading]
+        for line in lines:
+            if not line.strip():
+                continue
+            if m := LOOP_ENTRY_PARTS.match(line):
+                node, rest = m.group(1), m.group(2)
+                if node in entries:
+                    raise _Disagreement(
+                        THREE_VERB_SECTIONS, f"`{node}` has two entries"
+                    )
+                entries[node] = (verb, rest)
+            elif line.startswith((" ", "\t")) and entries:
+                node = next(reversed(entries))
+                entries[node] = (
+                    entries[node][0],
+                    entries[node][1] + " " + line.strip(),
+                )
+            else:
+                raise _Disagreement(
+                    THREE_VERB_SECTIONS,
+                    f"{heading}: not an entry, `- `id` — …`: {line.strip()!r}",
+                )
+    return entries
+
+
+def _graph_of(mermaid: list[str]) -> tuple[set[str], list[tuple[str, str]]]:
+    """The node ids and (source, target) edges of a Mermaid flowchart."""
+    lines = [line.strip() for line in mermaid if line.strip()]
+    if not lines or not lines[0].startswith(("flowchart", "graph")):
+        raise _Disagreement(ONE_GRAPH, "the mermaid block is not a flowchart")
+    nodes: set[str] = set()
+    edges: list[tuple[str, str]] = []
+    for stmt in lines[1:]:
+        if MERMAID_DIRECTIVE.match(stmt):
+            continue
+        if "&" in stmt:
+            raise _Disagreement(
+                ONE_GRAPH,
+                f"`&` fan-out is not read; write one edge per line: {stmt!r}",
+            )
+        ids = []
+        for term in MERMAID_ARROW.split(stmt):
+            m = MERMAID_NODE.match(term.strip())
+            if not m:
+                raise _Disagreement(
+                    ONE_GRAPH, f"cannot read node {term.strip()!r} in {stmt!r}"
+                )
+            ids.append(m.group(1))
+            nodes.add(m.group(1))
+        edges.extend(zip(ids, ids[1:], strict=False))
+    return nodes, edges
+
+
+def _check_entry(repo: Repo, path: str, node: str, verb: str, rest: str) -> None:
+    """One entry's condition and links."""
+    if not any(phrase in rest for phrase in CONDITION_OF[verb]):
+        raise _Disagreement(
+            ENTRIES_STATE_CONDITIONS,
+            f"`{node}` states no condition ({' / '.join(CONDITION_OF[verb])})",
+        )
+    links = INLINE_LINK.findall(rest)
+    if verb == "yield":
+        if not links and "the user" not in rest and "the principal" not in rest:
+            raise _Disagreement(
+                ENTRIES_STATE_CONDITIONS,
+                f"`{node}` names no receiver: the user, the principal, or a linked Loop",
+            )
+        for link in links:
+            if _type_of(repo, _loop_link(repo, path, link)) != LOOP_TYPE:
+                raise _Disagreement(
+                    ENTRIES_STATE_CONDITIONS,
+                    f"`{node}` yields to {link!r}, which is not typed Loop",
+                )
+        return
+    if not links:
+        what = "runbook" if verb == "act" else "Standard"
+        raise _Disagreement(ENTRIES_STATE_CONDITIONS, f"`{node}` links no {what}")
+    target = _loop_link(repo, path, links[0])
+    for link in links[1:]:
+        _loop_link(repo, path, link)
+    if verb == "verification" and _type_of(repo, target) != STANDARD_TYPE:
+        raise _Disagreement(
+            ENTRIES_STATE_CONDITIONS,
+            f"`{node}` verifies {links[0]!r}; a verification links a file typed Standard",
+        )
+
+
+def _loop_link(repo: Repo, path: str, link: str) -> str:
+    """The repo file a Loop entry's link reaches; raises when it reaches none."""
+    target = _resolve(path, link, repo.name, "")
+    if target not in repo.files:
+        raise _Disagreement(ENTRIES_STATE_CONDITIONS, f"link {link!r} does not resolve")
+    return target
+
+
+def _type_of(repo: Repo, path: str) -> str | None:
+    """The frontmatter ``type`` of a tracked markdown file; None for any other."""
+    doc = repo.markdown.get(path)
+    if doc is None or doc.frontmatter is None:
+        return None
+    return doc.frontmatter.get("type")
+
+
+def _parent_head(heads: dict[str, str], path: str) -> str | None:
+    """The head file in the nearest directory above ``path``'s own; None at the top."""
+    here = posixpath.dirname(path)
+    while here:
+        here = posixpath.dirname(here)
+        if here in heads:
+            return heads[here]
+    return None
+
+
+def _reached(graph: dict[str, set[str]], root: str) -> set[str]:
+    """Every file a chain of links leads to from ``root``, ``root`` included."""
+    seen = {root}
+    frontier = [root]
+    while frontier:
+        for target in graph.get(frontier.pop(), set()):
+            if target not in seen:
+                seen.add(target)
+                frontier.append(target)
+    return seen
+
+
 def _typed(repo: Repo, doctype: str) -> Iterator[tuple[str, MarkdownFile]]:
-    """Every markdown file whose frontmatter ``type`` is ``doctype``."""
+    """Every markdown file whose frontmatter ``type`` is ``doctype``.
+
+    A file under ``workstreams/`` may carry a type before it moves to that
+    type's home, and that type's form rules do not bind it there; only
+    ``Workstream``, whose home is ``workstreams/``, is read there.
+    """
     for path, doc in sorted(repo.markdown.items()):
+        if path.startswith(WORKSTREAMS) and doctype != WORKSTREAM_TYPE:
+            continue
         if doc.frontmatter is not None and doc.frontmatter.get("type") == doctype:
             yield path, doc
 

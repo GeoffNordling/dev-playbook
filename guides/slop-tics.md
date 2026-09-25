@@ -13,10 +13,13 @@ and before-and-after examples.
 
 ## Changelog residue
 
-**Definition.** Traces of an earlier draft or of the path to the knowledge, left
-in a document whose job is to say what is true now. Git holds the history. The
-words are "already", "previously", "it turns out", "no longer", "used to", "I
-had assumed", and any sentence whose subject is a change of mind.
+**Definition.** Traces of an earlier draft, of the path to the knowledge, or of
+the conversation that produced the document, left in a document whose job is to
+say what is true now. Git holds the history. The words are "already",
+"previously", "it turns out", "no longer", "used to", "I had assumed", any
+sentence whose subject is a change of mind, and any closure claim that records
+what was said privately about the work's future: "no more are expected", "no
+further development is planned".
 
 It accumulates. A document edited across many sessions collects a layer each
 time: told to move a tool from Adopt to Reject, Claude writes "we previously
@@ -32,6 +35,30 @@ most-rewritten documents carry the most residue.
   stands.
 - **Before** "Docstrings — already settled" (a section heading) → **After**
   "Docstrings"
+- **Before** "It is complete, and no further development of it is planned." →
+  **After** deleted; the map already shows the part as built.
+- **Before** "The generated text files were the proof of concept; all three
+  are deleted and kept in git history." (in a Principles entry) → **After**
+  deleted.
+
+## Misplaced status
+
+**Definition.** Status written into a section whose job is to say what holds,
+such as Principles, Terms, or a theory page. What is built, not yet built,
+dated, or deleted has its own place: Planned, Completed, or git history. In the
+wrong section it goes stale the moment the work moves, and nobody editing the
+worklist sees it.
+
+**Action.** Delete the status. Where the worklist lacks it, move it there.
+
+**Examples.**
+
+- **Before** "A drift check binds the document to the code it describes; a
+  loop has none yet." (in a Principles entry) → **After** deleted; the drift
+  check is a Planned item.
+- **Before** "...per Fact Base Workstream, whose Planned list holds the
+  solver's build." → **After** "...per Fact Base Workstream."
+- **Before** "Rulings, 2026-09-23: a story's..." → **After** "A story's..."
 
 ## Unnecessary enumeration
 
@@ -98,6 +125,8 @@ proposed, in either order: assertion then denial, or denial then assertion.
   from happening." → **After** "The named tics in Claude's writing."
 - **Before** "X is hand-maintained — there is no generator." → **After** "X is
   the source of truth."
+- **Before** "The fact base holds declarations and state, never findings." →
+  **After** "The fact base records what is declared."
 
 ## Closing cadence
 
@@ -202,6 +231,39 @@ fits.
 - **Before** "`import-linter` is the gate." → **After** "Only `import-linter`
   fails the build, and it checks the import graph against rules I write."
 
+## Needless definition
+
+**Definition.** A term defined because the document has a Terms section, not
+because a reader needs it. A plain word used in its plain sense gets no
+definition. Define a term only when a reader would misread it without one.
+
+**Action.** Delete the definition. Where the term has a real home elsewhere,
+link the first use to it.
+
+**Examples.**
+
+- **Before** "**Checkout** — one working copy of a repo, a main checkout or a
+  worktree." → **After** deleted.
+- **Before** "**Schema** — the fact base's set of node types and relation
+  types." → **After** deleted.
+
+## Inflated analogy
+
+**Definition.** A comparison said once in passing, grown into doctrine: defined
+terms, a principle built on it, and framing repeated through a lead document.
+The analogy was an aid to thought and now carries weight it cannot bear.
+
+**Action.** State the comparison once, where it helps, or delete it. Delete
+the terms and principles built on it.
+
+**Examples.**
+
+- **Before** The user says once that tests are "like a safety net". The
+  document then defines **Net** and **Hole**, adds the principle "Every gap in
+  the net is a hole a regression falls through", and calls each new check "a
+  strand". → **After** the terms and the principle are deleted, and the prose
+  says "The tests catch regressions."
+
 ## Obvious qualifier
 
 **Definition.** A qualifier — sometimes a whole sentence — that carries nothing,
@@ -243,6 +305,23 @@ stronger writing and are usually false. The words are "everything", "never",
 - **Before** "I am fundamentally incapable of reading Claude's slop-filled
   style..." → **After** "I am incapable of reading Claude's slop-filled
   style..."
+
+## Synthesized voice
+
+**Definition.** The user's ideas paraphrased into generated prose: abstract,
+even, and in terms the user never used. It reads as the model's summary of the
+user, and the user does not recognize it as their own.
+
+**Action.** Write it the way the user said it, from their words in the
+conversation or in git history. Where their words are not at hand, report
+that; do not paraphrase again.
+
+**Examples.**
+
+- **Before** "**Logic and statistics meet at one seam.** Predicates define a
+  set, with no probabilities attached. An act is a draw from a distribution
+  over states..." → **After** "**Markdown is code.** Just a fuzzy, random form
+  of it, with the LLM as the stochastic compiler." (the user's own words)
 
 ## Hypothetical misreader
 
