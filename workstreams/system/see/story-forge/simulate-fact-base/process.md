@@ -163,6 +163,35 @@ and write the args and the result to `<run>/run.json`.
     (`84194f6`), with a description saying it produces a new,
     transformed Story. The next run tests whether the simulation reads
     that.
+- **2026-09-25-kinds-stories, `maxSlices: 4`, story-forge `84194f6`,
+  scope the pilot's first slice** (`stories/`, `resume/`, `career/`,
+  `andrew-ng-ai-engineering-skills-map/`, `standards/stories/`,
+  `standards/resume/`). The first run of the redesign: builders
+  describe kinds, `list_instances.py` lists the files. 4 slices of 3 or
+  4 kinds. 6 agents, 19 minutes, about 720k subagent tokens, about
+  half the pilot's for about a third of its files.
+  - **Result.** 13 kinds, 105 instances, 0 overlaps, 0 orphans: every
+    file in scope has exactly one kind, by script. 57 edges between
+    kinds, 3 dangling stubs (all to kinds out of scope), 15 conflicts.
+    All 57 receipts point at real lines; 6 read by hand all hold what
+    the edge claims.
+  - **The Story-Projection test passes.** `form-of` is declared, from
+    `index.md:12`, the `okf_types` entry the user rewrote. `reads` is
+    only inferred, as `points-at` from the one instance's `sources:`
+    key: no standard or check names Story-Projection, and no process
+    in the target makes one.
+  - **Lesson: a declaration moves a relation from inferred to
+    declared.** The one-line rename in the target turned a failed test
+    into a declared row. The gaps that remain are gaps in the target's
+    declarations, which the simulation now reports by name.
+  - **Lesson: a kind that spans folders fights the slice-by-folder
+    plan.** Index lives in every folder; its slice's recognition rule
+    covered only the folders in scope, and a whole-repo run must give
+    such kinds one slice across all folders.
+  - **Lesson: the relation words need one list.** Builders wrote
+    `points-at` where the target meant "reads"; the build prompt's verbs
+    are a suggestion, and the assembler can only merge what the
+    builders named alike.
 
 ## After the run
 
