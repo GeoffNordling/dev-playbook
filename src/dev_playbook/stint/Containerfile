@@ -34,6 +34,9 @@ ENV HOME=/home/agent
 # npm's cache beside uv's and pre-commit's, in the one folder a call mounts.
 ENV npm_config_cache=/home/agent/.cache/npm
 WORKDIR /home/agent
+# The agent's own ~/.local/share, before a call's sink mount inside it makes
+# podman create the missing parents as root, where uvx could not write.
+RUN mkdir -p /home/agent/.local/share/claude-measure
 # An identity for the agent's commits.
 RUN git config --global user.name "sandbox agent" && git config --global user.email "agent@example.invalid"
 # Only so sync-dotfiles can run at build time; at run time the read-only

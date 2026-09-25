@@ -70,7 +70,8 @@ a chain. A head file is reached from its parent's by
 Every directory directly under `workstreams/` has an `index.md` and a
 `WORKSTREAM.md`. Every Markdown file under it has a lowercase
 kebab-case name, such as `check-fixes.md`, except `index.md`,
-`WORKSTREAM.md`, `README.md`, `PROMPT.md`, `SKILL.md`, and `CLAUDE.md`.
+`WORKSTREAM.md`, `README.md`, `PLAN.md`, `PROGRESS.md`, `PROMPT.md`,
+`SKILL.md`, and `CLAUDE.md`.
 
 `knowledge-organization.one-directory-under-workstreams` · deterministic
 

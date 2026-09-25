@@ -638,6 +638,8 @@ def test_one_directory_under_workstreams() -> None:
     good = {
         "workstreams/w/index.md": "# I\n",
         "workstreams/w/WORKSTREAM.md": "# R\n",
+        "workstreams/w/PLAN.md": "# P\n",
+        "workstreams/w/PROGRESS.md": "# L\n",
         "workstreams/w/sub/check-fixes.md": "# D\n",
         "workstreams/w/code/My_Module.py": "x = 1\n",
         "workstreams/w/image/Containerfile": "FROM fedora\n",
