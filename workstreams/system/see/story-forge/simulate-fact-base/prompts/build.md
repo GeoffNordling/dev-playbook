@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Build Prompt
-description: The prompt every Sonnet builder reads — describe the kinds of one slice of a target repository from sample files, answer seven questions per kind with a receipt or UNDECLARED, give each kind a recognition rule a script can apply, and record the edges between kinds
+description: The prompt every Sonnet builder reads — describe the kinds of one slice of a target repository from sample files, answer seven questions per kind with a receipt or UNDECLARED, give each kind a recognition rule a script can apply, and record the edges between kinds in a fixed list of relations
 ---
 
 # Build Prompt
@@ -109,10 +109,23 @@ That is a finding, not a failure.
       "file": "<path of the receipt>", "line": 12 } ] }
 ```
 
-Relations between kinds include `points-at`, `form-of`, `reads`,
-`writes`, and `checks`; use another verb when none fits. A
-process or rule node joins its kinds with `reads`, `writes`, or
-`checks` edges. When a target lies outside your slice, write it as
+Use only these relations, so the assembler can merge the slices:
+
+| Relation | Source → target | Meaning |
+|---|---|---|
+| `form-of` | kind → kind | An instance of the source is also a variant or specialization of the target kind. |
+| `derived-from` | kind → kind | An instance of the source is built from instances of the target, such as a summary made from several stories. |
+| `points-at` | kind → kind | An instance names an instance of the target, by a link, a path, or an id, and nothing more is declared. |
+| `part-of` | kind → kind | An instance lives inside an instance of the target, as a section or an entry. |
+| `reads` | process → kind | The process reads instances of the kind. |
+| `writes` | process → kind | The process creates or changes instances of the kind. |
+| `checks` | rule → kind | The rule tests instances of the kind. |
+| `governs` | kind → kind | An instance of the source states the rules for the target, as a standard does. |
+
+Prefer the most specific relation the receipt supports: `derived-from`
+over `points-at` when a file says one is made from the other. If no
+relation fits, use the closest one and write the mismatch under
+**Does not fit**. When a target lies outside your slice, write it as
 `stub:<path or kind name>`; the assembler connects it.
 
 The receipt `line` must hold the text that proves the claim. If you

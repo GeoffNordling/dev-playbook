@@ -70,9 +70,10 @@ const ASSEMBLE_SCHEMA = {
     overlaps: { type: 'integer' },
     orphans: { type: 'integer' },
     conflicts: { type: 'integer' },
+    declarationsSuggested: { type: 'integer' },
     storyProjectionTest: { type: 'string', description: 'pass or fail for each half, with receipts, and where any gap lies' },
   },
-  required: ['kinds', 'instances', 'edges', 'danglingStubs', 'overlaps', 'orphans', 'conflicts', 'storyProjectionTest'],
+  required: ['kinds', 'instances', 'edges', 'danglingStubs', 'overlaps', 'orphans', 'conflicts', 'declarationsSuggested', 'storyProjectionTest'],
 }
 
 phase('Plan')

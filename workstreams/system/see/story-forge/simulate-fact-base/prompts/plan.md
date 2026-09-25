@@ -60,6 +60,10 @@ Make at most `maxSlices` slices. Rules:
 
 - Each slice holds **3 to 5 kinds**. A kind belongs to one slice, so no
   two builders describe the same kind.
+- Slice by kind, not by folder. A kind whose files live in many
+  folders, such as an index, a standard, a skill, or a script, belongs
+  to one slice whose recognition rule covers every folder in scope.
+  Give such kinds a slice of their own where you can.
 - Keep kinds that point at each other in the same slice where you can,
   so fewer edges leave a slice.
 - Every file in scope should belong to some kind. List the files you

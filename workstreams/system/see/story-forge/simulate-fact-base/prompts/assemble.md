@@ -1,7 +1,7 @@
 ---
 type: General-Sheet
 title: Assemble Prompt
-description: The prompt the Opus assembler reads — run the instance script, merge every slice's kinds into one graph of kinds, connect the stub edges, draft one doc-type per kind with receipts or UNDECLARED, and list the conflicts and residuals
+description: The prompt the Opus assembler reads — run the instance script, merge every slice's kinds into one graph of kinds, connect the stub edges, draft one doc-type per kind with receipts or UNDECLARED, list the conflicts and residuals, and rank the declarations the target could add
 ---
 
 # Assemble Prompt
@@ -39,7 +39,7 @@ instances by hand. If the script fails, stop and report its error.
 
 Open a target file only to settle a conflict or to check a receipt.
 
-## 3. Write four files in `<run>`
+## 3. Write five files in `<run>`
 
 **`fact-base.json`** — one merged fact base:
 
@@ -71,12 +71,20 @@ overlap, orphan, empty rule, and unexpressible rule from
 **`residuals.md`** — what no primitive expressed, from each slice's
 **Does not fit** section and from your own reading.
 
+**`declarations.md`** — the declarations the target could add to turn
+`inferred` rows into `declared` ones, ranked by how many inferred rows
+each would turn. For each: what to declare, where in the target it
+would go (the declared-kinds list, a standard, a check, a folder
+index), and the inferred rows it would turn, by source, relation, and
+target. Suggest only; the target is read-only.
+
 ## A test case
 
 The target's `index.md` declares `Story-Projection`: it takes several
 Stories and produces a new, transformed Story told from one angle.
-Does the assembled graph say both halves, that a Story-Projection
-reads Stories and that it is a form of Story, each with a receipt? If
+Does the assembled graph say both halves, that a Story-Projection is
+`derived-from` Story and that it is a `form-of` Story, each with a
+receipt, and is each half declared or inferred? If
 it does not, say what is missing, and whether the gap is in the
 target's declarations or in the simulation.
 

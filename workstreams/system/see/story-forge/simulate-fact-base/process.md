@@ -43,7 +43,9 @@ uses it, then moves up to the fact base workstream.
    Runs `list_instances.py`, which applies every recognition rule to
    the target's tracked files. Merges the slices into one graph of
    kinds, connects the stubs, drafts one doc-type per kind, and lists
-   the conflicts.
+   the conflicts. Ranks the declarations the target could add to turn
+   inferred rows into declared ones: the menu for side quests in the
+   target.
 
 The Sonnet agents never read the doc-type theory or the earlier
 examples: a builder stays on its slice. The two Opus agents carry the
@@ -61,7 +63,7 @@ Every write lands in one run directory,
 | `partition.json`, `briefs/<slice>.md` | Plan |
 | `slices/<slice>/facts.json`, `kinds.md` | Build |
 | `instances.json` | `list_instances.py`, run by Assemble |
-| `fact-base.json`, `doc-types.md`, `conflicts.md`, `residuals.md` | Assemble |
+| `fact-base.json`, `doc-types.md`, `conflicts.md`, `residuals.md`, `declarations.md` | Assemble |
 | `run.json` | The session that launched the run: its args and result |
 
 ## Keeping runs
@@ -192,6 +194,11 @@ and write the args and the result to `<run>/run.json`.
     `points-at` where the target meant "reads"; the build prompt's verbs
     are a suggestion, and the assembler can only merge what the
     builders named alike.
+  - **Changes after this run.** The plan slices by kind, not folder, so
+    a kind found in every folder gets one slice. The build prompt fixes
+    eight relations, `derived-from` among them. The assembler writes
+    `declarations.md`, a ranked list of what the target could declare
+    to turn inferred rows into declared ones.
 
 ## After the run
 
