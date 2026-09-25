@@ -2,12 +2,13 @@
 type: Standard
 title: Standard Conventions
 description: The form a file typed Standard takes — one population in its frontmatter, each rule a heading, a predicate, and a trailer, the why blocks that argue them, and every predicate decidable of one member
-population: "a file typed Standard"
+population: "a file typed Standard, outside a workstream"
 ---
 
 # Standard Conventions
 
-A file typed `Standard`, under `standards/`
+A file typed `Standard`, under `standards/` and outside a
+workstream
 ([Document Types](/standards/knowledge-organization/document-types.md#standard-lives-under-standards)):
 one population and its rules. The
 [Standard doc-type](/doc-types/standard/index.md) declares what a
@@ -74,21 +75,6 @@ Each rule's predicate is true or false of one member of the population
 at one moment, with no comparison to another member and no taste.
 
 `doc-type.every-predicate-decidable-of-one-member` · stochastic
-
-> **Why.** A predicate is decided from the bytes of the repo at one
-> commit, by reading them or by a pure function of them such as a
-> formatter. It is not a test over run-time behaviour, what a script
-> exits or prints; not an instruction to an author; not a fact held
-> outside the files, the day a decision was made, the latest upstream
-> release, a GitHub setting, git history, another repo; and not a
-> definition that scopes other rules. Behaviour and instruction go to a
-> Guide, the why to the why block, a scoping definition to an H2 with
-> no trailer. Kind is judged from the sentence, not the trailer: a
-> sentence a script decides from the files with no judgment call is
-> deterministic, a sentence with a judgment word is stochastic, and
-> where a sentence mixes the two the mechanical part stays
-> deterministic and the judgment moves to the why block.
-
 
 ## A why states no predicate
 

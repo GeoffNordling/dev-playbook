@@ -18,7 +18,8 @@ graph and prose agree, and the checks that decide them, are in
 ## The graph
 
 One fenced `mermaid` block, a `flowchart`. Every act, every verification, and every yield is a node, and so is
-every receiver a yield hands control to, the user or another loop.
+every receiver a yield hands control to: the user, the principal, or
+another loop.
 Every edge label is a condition, written short; the entry under the
 verb heading carries it in full. Node ids are free-form and unique
 within the file; which verb a node is comes from the heading its entry
@@ -39,12 +40,13 @@ shape the label cannot carry:
 - **An act** links the runbook it points at, a skill or an agent
   definition, then states its condition: `fires when …`, or `fires
   every iteration`.
-- **A verification** links the Standard it measures against, a file
-  typed `Standard` at `standards/<name>/<topic>.md`, then states its
-  condition the same way. What the verification runs is the verifier
-  of each of that Standard's rules, a check or a judge, never a gate
+- **A verification** links each Standard it measures against, one or
+  more files typed `Standard` at `standards/<name>/<topic>.md`, then
+  states its condition the same way. What the verification runs is the
+  verifier of each of those Standards' rules, a check or a judge, never a gate
   ([Checks](/standards/standard/checks.md)).
-- **A yield** names its receiver, the user or a linked Loop, then
+- **A yield** names its receiver, the user, the principal, or a
+  linked Loop, then
   states its condition: `yields when …`.
 
 ## The paragraph

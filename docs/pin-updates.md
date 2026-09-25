@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-24 16:30 | c9cd7e817208 | story-forge | green | main 6cec1a5844f7 | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | mission-control | green | main ac15c6905c7b | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | sysadmin-playbook | green | main 5f28c11c6330 | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | sounds | green | main 0a0002a6b010 | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | personal-trainer | green | main bdde9e3afb60 | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | idea-tree | green | main d480358301a1 | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | dwarf-flow | green | main c24d93e65629 | no unmerged branches |
-| 2026-09-24 16:30 | c9cd7e817208 | lunch | red | PR https://github.com/GeoffNordling/lunch/pull/5 | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
-| 2026-09-24 16:30 | c9cd7e817208 | date-tree | red | PR https://github.com/GeoffNordling/date-tree/pull/4 | no unmerged branches |
 | 2026-09-24 16:45 | b0611fc83d52 | story-forge | green | main 857e6e4d8e9c | no unmerged branches |
 | 2026-09-24 16:45 | b0611fc83d52 | mission-control | green | main d2dc94279800 | no unmerged branches |
 | 2026-09-24 16:45 | b0611fc83d52 | sysadmin-playbook | green | main 96d74df72dfb | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-24 17:00 | 9a9242e4d479 | dwarf-flow | green | main 9d4bda2a41b4 | no unmerged branches |
 | 2026-09-24 17:00 | 9a9242e4d479 | lunch | green | main 853108207c1d | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
 | 2026-09-24 17:00 | 9a9242e4d479 | date-tree | green | main e1c1b17078a0 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | story-forge | green | main d0e13e98b686 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | mission-control | green | main fef97e29e015 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | sysadmin-playbook | green | main 5a746cfce7a5 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | sounds | green | main 6aa7b7a304a6 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | personal-trainer | green | main a1798a783756 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | idea-tree | green | main fef13e0f52ca | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | dwarf-flow | green | main 4c09e1f3a171 | no unmerged branches |
+| 2026-09-24 17:15 | 94fd50fab1ba | lunch | green | main 5b7b5b3dd22b | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
+| 2026-09-24 17:15 | 94fd50fab1ba | date-tree | green | main 348cdfa6b1d4 | no unmerged branches |

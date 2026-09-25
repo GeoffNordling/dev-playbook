@@ -1,4 +1,4 @@
-"""GNU-format finding rendering, shared by playbook check, loop-lint, and workspace-lint.
+"""GNU-format finding rendering, shared by playbook check and workspace-lint.
 
 Every check prints findings in the one format guides/writing-a-check.md gives:
 ``location:line: name.rule message`` — a colon after the location, single
@@ -24,8 +24,7 @@ def render(location: str, rule: str, message: str, line: int | None = None) -> s
 def print_rules(rules: Iterable[str]) -> int:
     """Print a command's rule ids, one per line, sorted and deduplicated.
 
-    The shared body of the ``--list-rules`` flag of loop-lint and
-    workspace-lint: it needs no repository and runs from any cwd. Returns 0, the flag's exit code.
+    The body of workspace-lint's ``--list-rules`` flag: it needs no repository and runs from any cwd. Returns 0, the flag's exit code.
     """
     for rule in sorted(set(rules)):
         print(rule)

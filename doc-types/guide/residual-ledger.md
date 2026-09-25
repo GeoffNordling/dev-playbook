@@ -33,7 +33,7 @@ else. A Guide with nothing to record has no entry.
   it. A reference's name is all the shape shows, so the dependency is
   in the bodies alone.
 - **[Slop Tics](/guides/slop-tics.md).** Every reference has the same
-  body, a definition, one action, and examples, and `tics-remover`
+  body, a definition, one action, and examples, and `doc-repairer`
   relies on finding the action in whichever entry it matched. A
   reference's body is opaque to the shape, so the uniformity is
   unstated.

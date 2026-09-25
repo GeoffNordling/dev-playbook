@@ -1,16 +1,15 @@
 ---
 type: General-Sheet
 title: Doc-Type System
-description: This repo's doc-type instantiation — the registry rulings, the four built doc-types, what each directory holds, and the Standard that binds each one
+description: This repo's doc-type instantiation — the registry rulings, the five built doc-types, what each directory holds, and the Standard that binds each one
 ---
 
 # Doc-Type System
 
 This repo's instantiation of [Doc-Type](/doc-types/doc-type.md): which
 document kinds matter here, which doc-types are built, and what binds
-their instances. The target state the system is moving toward is the
-working set's, not this file's
-([Doc-Type System](/working-docs/doc-type-system/doc-type-system/ROOT.md)).
+their instances. The whole system is drawn in
+[Reference Model](/doc-types/reference-model.md).
 
 ## Registry rulings
 
@@ -40,6 +39,7 @@ reader must learn. A row reading *pending* is not yet ruled.
 | Recipe-Description | recipes | Pending |
 | Standard | standards | The [Standard](/doc-types/standard/definition.md) doc-type |
 | Survey | surveys | Pending; the user's to rule |
+| Workstream | workstreams | The [Workstream](/doc-types/workstream/definition.md) doc-type |
 | Vocabulary | — | Separate — the vocabulary API ([System Legibility](/docs/system-legibility.md)), not a doc-type |
 | Skill | runbooks | The [Runbook](/doc-types/runbook/definition.md) doc-type |
 | Agent definition | runbooks | The [Runbook](/doc-types/runbook/definition.md) doc-type |
@@ -51,7 +51,7 @@ reader must learn. A row reading *pending* is not yet ruled.
 
 ## The built doc-types
 
-Four, each one directory under `doc-types/`:
+Five, each one directory under `doc-types/`:
 
 - **Runbook** — an invocable command, a skill or an agent definition
   ([definition](/doc-types/runbook/definition.md)).
@@ -60,13 +60,16 @@ Four, each one directory under `doc-types/`:
   ([definition](/doc-types/standard/definition.md)).
 - **Guide** — instructs one kind of work
   ([definition](/doc-types/guide/definition.md)).
-- **Loop** — a document that drives a state toward a target state,
-  pointing at runbooks and standards
+- **Loop** — a document that drives a workstream toward a target
+  state, pointing at runbooks and standards
   ([definition](/doc-types/loop/definition.md)).
+- **Workstream** — one line of work, its ideas, target state, and
+  context, driven by a loop
+  ([definition](/doc-types/workstream/definition.md)).
 
 Instances never live in the doc-type tree. They stay with their
-populations, under the harness roots, `standards/`, `guides/`, and
-`loops/`, and a contract rides inside its instance file.
+populations, under the harness roots, `standards/`, `guides/`,
+`loops/`, and `workstreams/`, and a contract rides inside its instance file.
 
 ## The bundle
 
@@ -84,14 +87,14 @@ No view is generated today. The three prototype generators,
 `chaingen`, `cardgen`, and `rulegen`, and the text files they wrote are
 deleted and kept in git history, the last of them at commit `b266ce4`;
 the fact base's extractors are the planned successors
-([Planned](/working-docs/doc-type-system/fact-base/ROOT.md#planned)).
+([Planned](/workstreams/system/see/fact-base/WORKSTREAM.md#planned)).
 Loop's view is the Mermaid graph inside each instance.
 
 ## Shape and obligation
 
 A doc-type declares what a contract shape *is*; it never binds anyone
 to use it. The binding rule — every instance in the family must carry
-its contract — is a Standard's job, and the four sit together under
+its contract — is a Standard's job, and the five sit together under
 [standards/doc-type/](/standards/doc-type/index.md): Runbook's
 obligation rides
 [Runbook Conventions](/standards/doc-type/runbook-conventions.md),
@@ -100,5 +103,7 @@ checked by `playbook check`; Loop's rides
 by `playbook check`; Standard's rides
 [Standard Conventions](/standards/doc-type/standard-conventions.md),
 checked by `playbook check`; Guide's rides
-[Guide Conventions](/standards/doc-type/guide-conventions.md). The
-shape is never itself a Standard, so the four remain peers.
+[Guide Conventions](/standards/doc-type/guide-conventions.md);
+Workstream's rides
+[Workstream Conventions](/standards/doc-type/workstream-conventions.md),
+checked by `playbook check`. The shape is never itself a Standard, so the five remain peers.

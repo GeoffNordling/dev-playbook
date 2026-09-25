@@ -97,7 +97,7 @@ Standard with special cases, the files that add rules for one kind of
 its member, is a directory `standards/<name>/<topic>/` holding the
 general Standard as `<topic>.md` and one file per special case,
 `documentation-sets/documentation-sets.md` and
-`documentation-sets/working-documentation-sets.md` for a nested pair.
+`documentation-sets/workstream-files.md` for a nested pair.
 That the type sits under `standards/` is the doc-type's rule, in
 [definition.md](/doc-types/standard/definition.md#where-a-standard-lives).
 

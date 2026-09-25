@@ -2,8 +2,7 @@
 
 ``playbook check [DIR]`` builds the model once, loads dev-playbook's checks,
 runs every check function, prints each finding in GNU format with its rule
-id, then runs the two steps that are not functions over the model: the loop
-family's ``loop_lint`` module, kept whole for the loop workstream, and
+id, then runs the one step that is not a function over the model:
 ``pre-commit validate-manifest`` where the repo publishes a
 ``.pre-commit-hooks.yaml``. Over dev-playbook, whose checks are its own, the
 layer test runs first.
@@ -37,7 +36,7 @@ import sys
 import tomllib
 from pathlib import Path
 
-from dev_playbook import check_registry, findings, loop_lint
+from dev_playbook import check_registry, findings
 from dev_playbook.model import ModelError, Repo
 
 MANIFEST = ".pre-commit-hooks.yaml"
@@ -201,7 +200,7 @@ def run_check(root: Path, local: bool, without: frozenset[str]) -> int:
     )
     if local:
         return 1 if count else 0
-    steps = [loop_lint.main([str(root)])]
+    steps: list[int] = []
     if (root / MANIFEST).is_file():
         steps.append(validate_manifest(root / MANIFEST))
     if 2 in steps:

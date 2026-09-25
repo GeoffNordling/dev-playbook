@@ -12,10 +12,11 @@ alphabetical.
 ## Directories
 
 - [standard/](/standards/standard/index.md) — Meta-Standard governs how the workspace's standards are laid out, found, and kept honest — the tree, the catalog, and the checks
+- [billing/](/standards/billing/index.md) — Billing governs how work is billed to Claude — the subscription as the only route, the credentials that would meter a run, and the four surfaces that carry one
 - [build/](/standards/build/index.md) — Build governs how a repository is laid out, built, and checked — the file skeleton, the canonical artifacts, and the Python project
 - [decisions/](/standards/decisions/index.md) — Decision Records governs how hard-to-reverse or surprising decisions are recorded — the Decision Record's warrant, template, numbering, and status vocabulary
 - [distribution/](/standards/distribution/index.md) — Distribution governs how dev-playbook's checks reach the governed repos — a publisher's hook manifest and its local block, a host's local hook and pinned dev dependency, and a consumer gating only through its checks
-- [doc-type/](/standards/doc-type/index.md) — Doc-Type governs the doc-types and the files typed by them — what any doc-type satisfies, and the form a Standard, a Runbook, a Loop, and a Guide take
+- [doc-type/](/standards/doc-type/index.md) — Doc-Type governs the doc-types and the files typed by them — what any doc-type satisfies, and the form a Standard, a Runbook, a Loop, a Guide, and a Workstream take
 - [harness/](/standards/harness/index.md) — Harness Files governs which files Claude Code loads and where each sits — the members and their classes, a runbook's location, and a CLAUDE.md's content
 - [knowledge-organization/](/standards/knowledge-organization/index.md) — Knowledge Organization governs how knowledge is organized in markdown — document types, indexes, the README and CONTEXT.md, cross-references, and documentation sets
 - [prose/](/standards/prose/index.md) — Prose governs how prose is written in every workspace document — voice, structure, and brevity
