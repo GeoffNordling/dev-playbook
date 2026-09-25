@@ -9,6 +9,7 @@ dependencies = [
 [project.scripts]
 cloa-viewer = "dev_playbook.cloa_viewer.cli:main"
 playbook = "dev_playbook.check_cli:main"
+stint = "dev_playbook.stint.cli:main"
 
 # uv's own build backend ships inside the uv binary, so building this package
 # (including the editable build a consumer's `uv sync` runs) needs no network
