@@ -59,51 +59,10 @@ since the parent uses it too.
 
 ## Planned
 
-In order:
-
-1. **Close the workstream: move the tool to `src/dev_playbook/stint/`.**
-   A greenfield refactor, not a copy, on this branch only. No PR and no
-   merge: the agents that own this branch's other workstreams take it to
-   `main` later. The user ruled: one package, the work copy included; an
-   installed `stint` command; every argument required, no defaults; the
-   experiments stay in the workstream as history. Done so far:
-   `workcopy.py` (was `front_clone.py`), `plan.py`, `records.py`,
-   `loop.py`, and `prompts/`, with their tests in
-   `tests/dev_playbook/stint/`. The chunks left, each committed with
-   `playbook check` and pytest passing:
-   1. **One sealed call.** `call.py` makes one call and returns a
-      `CallRecord`: the billing guard (the metered variables in the
-      environment, the credential keys in the config copy's
-      `settings.json`), the credential copy, the hook receiver started
-      and stopped around the call, and the parsing of the stream (the
-      init line's `apiKeySource`, the result line's answer and error).
-      `receiver.py` moves in as an importable module run in a thread.
-   2. **The Sandcastle layer.** `sandcastle/run.mjs` is the only Node
-      code: JSON in, Sandcastle `run()` for the agent and then for the
-      uncommitted-work probe, JSON out (session, usage, commits, the
-      raw stream lines, the probe's output). `relocated.mjs` and
-      `package.json` move in, with a `package-lock.json`; `node_modules`
-      is ignored, and a Makefile target installs it.
-   3. **The command.** `cli.py`: `stint setup` installs the Node part and
-      builds the image `localhost/stint:latest` from the config copy and
-      the host's `claude` binary; `stint run REPO --base --workstream
-      --check --budget --name --home --playbook --model`, all required.
-      Exit 0 done, 1 any other stop or a copy kept, 2 the tool could not
-      run. `config.py` makes the config copy; `launch.py` opens both
-      copies, runs the loop, closes both, writes `stint.json`; the
-      `Containerfile` moves to `image/`. `pyproject.toml` gains
-      `stint = "dev_playbook.stint.cli:main"`. The whole-command case of
-      `rules.py` becomes a test.
-   4. **Patches, documentation, and the live test.** The three changes go
-      into `dotfiles/` on this branch (`commit-sandbox` already is); the
-      patches move to `src/dev_playbook/stint/patches/` and `config.py`
-      applies them, as a temporary measure listed under Delete after the
-      merge below. A usage guide for a launching agent; `scripts/README.md`
-      and the workstream's members pointed at the new home; `rig/` marked
-      as history, its `index.md` saying the scripts no longer run. Then a
-      live `stint setup` and `stint run` with real Claude on a small
-      practice repository: the branch lands and both copies are deleted.
-      Last, move this item to Completed.
+Nothing is planned. The tool is the `stint` command in
+[`src/dev_playbook/stint/`](/src/dev_playbook/stint/cli.py); the
+delegation workflow's remaining work is on the
+[parent's worklist](/workstreams/delegation/WORKSTREAM.md#planned).
 
 ### Delete after the merge
 
@@ -203,10 +162,19 @@ In order:
   the push. The stint's prompts run it, and
   `rig/patches/commit-sandbox.patch` puts it in the config copy until it
   is on `main`.
-
 - **Re-word the members.** Done 2026-09-24: `pipeline.md`,
   `survey.md`, `experiment-log.md`, and `rig/index.md` in the
   delegation workflow's terms.
+- **Close the workstream: move the tool to `src/dev_playbook/stint/`.**
+  Done 2026-09-24: one package, the work copy included, as the installed
+  `stint` command with every argument required
+  ([Running a Stint](/guides/running-a-stint.md)). Node does only
+  Sandcastle's `run()`; the call, the loop, and the records are Python,
+  tested with no container. A live `stint setup` and `stint run` with
+  Sonnet on a practice repository ran the four-task `wordcount` plan to
+  done in 9 calls and 9.6 minutes: every call billed to the subscription,
+  the hooks logged, the branch landed with its six commits, and both
+  copies were deleted. The experiments' code stays in `rig/` as history.
 
 ## Acronyms
 
