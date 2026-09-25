@@ -16,30 +16,30 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-24 16:45 | b0611fc83d52 | story-forge | green | main 857e6e4d8e9c | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | mission-control | green | main d2dc94279800 | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | sysadmin-playbook | green | main 96d74df72dfb | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | sounds | green | main cae4ea77efeb | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | personal-trainer | green | main be45a05db167 | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | idea-tree | green | main 37358460e3cc | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | dwarf-flow | green | main 4bfbd2c4db0d | no unmerged branches |
-| 2026-09-24 16:45 | b0611fc83d52 | lunch | green | main eb9cec73b54b | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
-| 2026-09-24 16:45 | b0611fc83d52 | date-tree | green | main 44de42e667f7 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | story-forge | green | main e6840c60a366 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | mission-control | green | main 6711ad2ef522 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | sysadmin-playbook | green | main 46db7508b002 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | sounds | green | main 53f5e14d88be | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | personal-trainer | green | main cf25136a6ec7 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | idea-tree | green | main e3058c9725a8 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | dwarf-flow | green | main 9d4bda2a41b4 | no unmerged branches |
-| 2026-09-24 17:00 | 9a9242e4d479 | lunch | green | main 853108207c1d | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
-| 2026-09-24 17:00 | 9a9242e4d479 | date-tree | green | main e1c1b17078a0 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | story-forge | green | main d0e13e98b686 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | mission-control | green | main fef97e29e015 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | sysadmin-playbook | green | main 5a746cfce7a5 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | sounds | green | main 6aa7b7a304a6 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | personal-trainer | green | main a1798a783756 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | idea-tree | green | main fef13e0f52ca | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | dwarf-flow | green | main 4c09e1f3a171 | no unmerged branches |
-| 2026-09-24 17:15 | 94fd50fab1ba | lunch | green | main 5b7b5b3dd22b | unmerged: adopt-dev-playbook-governance (2026-08-24, 1 ahead) |
-| 2026-09-24 17:15 | 94fd50fab1ba | date-tree | green | main 348cdfa6b1d4 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | story-forge | green | main aaf00789872f | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | mission-control | green | main f13a2c063dd0 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | sysadmin-playbook | green | main d3e74effc374 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | sounds | green | main 59017879de46 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | personal-trainer | green | main f8909373f831 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | idea-tree | green | main d2e1cdeb3c38 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | dwarf-flow | green | main 0e465df48db4 | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | lunch | green | main 9a4161606ddf | no unmerged branches |
+| 2026-09-25 13:30 | 4cac0fbbea69 | date-tree | green | main ed6c418498c5 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | story-forge | green | main b50d52372011 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | mission-control | green | main fce1948ad365 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | sysadmin-playbook | green | main aff5443ec3a2 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | sounds | green | main 18ef900867c8 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | personal-trainer | green | main 97ad9201fbf9 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | idea-tree | green | main 382aee4a9dba | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | dwarf-flow | green | main c36f72ed01a8 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | lunch | green | main db8444ea95f0 | no unmerged branches |
+| 2026-09-25 13:45 | a34f06e497df | date-tree | green | main 521989f3bdf4 | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | story-forge | green | main 93e5671b625a | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | mission-control | green | main 90037854179c | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | sysadmin-playbook | green | main fc4f4a0b3e25 | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | sounds | green | main d19e56202591 | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | personal-trainer | green | main 2604ecb4d165 | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | idea-tree | green | main 0c7445dd5f60 | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | dwarf-flow | green | main 0b556475c58b | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | lunch | green | main a62cde77d042 | no unmerged branches |
+| 2026-09-25 14:00 | bba24283da95 | date-tree | green | main 13ec1497354c | no unmerged branches |

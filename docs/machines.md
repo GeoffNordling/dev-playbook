@@ -49,6 +49,10 @@ run.
   some of the workspace's repos. `SKIP=workspace` stands those checks down;
   `playbook checks` lists them by their tag.
 
+[A stint](/guides/running-a-stint.md) does not run on a secondary either:
+every agent call it makes runs in a podman container, and only the primary
+has podman.
+
 The primary carries every repo and runs every check, so nothing goes
 permanently unchecked. Which gates each check reaches is the committed
 wiring, `.pre-commit-config.yaml`, `make check`, and the workflows; a

@@ -86,6 +86,10 @@ The terms, such as predicate, fact base, workstream, and stint, are in
   [System Legibility](/docs/system-legibility.md), the oldest document
   of this work, is read again against them, and each of its ideas is
   kept, rewritten, or dropped.
+  - **Absorb Working in Loops.**
+    [Working in Loops](/workstreams/system/working-in-loops.md) is old
+    and outdated, but may hold good ideas. Its ideas are scrubbed into
+    this workstream the same way, and the file is then deleted.
 
 ## Acronyms
 

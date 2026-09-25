@@ -90,10 +90,7 @@ Every document of the workstream, so that each is reached from here.
   `src/dev_playbook/label_scheme.json`, which bootstrap-labels mints into
   every governed repo, and the workspace-lint rules over them.
 - The frozen Decision Records that cite the factory.
-- `wayfinder`, `commit`, and `candidate-promote`, which name the
-  factory in a phrase. `candidate-promote`'s fourth step still runs
-  `/intake`, which is here, so that skill does not work until the
-  factory's fate is decided.
+- `wayfinder` and `commit`, which name the factory in a phrase.
 - The Runbook doc-type's residual ledger keeps its sections for the
   moved runbooks, and `doc-types/runbook/contract-shape.md` its
   `adjudicator` excerpt; the doc-type plan's step 7 tidies both.

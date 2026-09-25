@@ -18,12 +18,12 @@ from dev_playbook.checks.knowledge_organization import (
     guide_lives_under_guides,
     headings_slugify_distinctly,
     introduction_between_h1_and_listing,
-    keys_in_alphabetical_order,
     language_section_present,
     loop_lives_under_loops,
     no_okf_type,
     non_empty_description_no_closing_period,
     non_empty_title,
+    okf_type_name_to_description,
     okf_version_declared,
     one_directory_under_workstreams,
     one_entry_per_concept_document_and_child_directory,
@@ -31,15 +31,16 @@ from dev_playbook.checks.knowledge_organization import (
     readmemd_is_typed_readme,
     recipe_description_carries_a_resource,
     reference_resolves,
+    registry_lives_under_registries,
     relative_path_inside_the_bundle,
     resource_a_repo_root_path_or_a_uri,
     root_absolute_path_in_the_same_repo,
+    rows_in_alphabetical_order,
     stable_named_anchor,
     standard_lives_under_standards,
     term_definition_avoid_line,
     the_worklist_in_the_head_file_only,
-    type_name_to_description,
-    type_names_a_registered_type,
+    type_is_a_registered_okf_type,
     workspace_path_for_a_stable_location,
     workspace_path_for_another_repo,
     workstreams_holds_only_workstreams,
@@ -296,7 +297,7 @@ def test_relative_path_inside_the_bundle_reads_claude_only_for_its_copy() -> Non
     assert found(relative_path_inside_the_bundle, files) == [(f"{SKILL}/SKILL.md", 1)]
 
 
-# --- document-types.md ---
+# --- okf-frontmatter.md ---
 
 
 def test_frontmatter_a_yaml_mapping() -> None:
@@ -315,26 +316,25 @@ def test_atx_headings_only() -> None:
     assert found(atx_headings_only, record) == []
 
 
-def test_type_names_a_registered_type_reports_a_list_type() -> None:
+def test_type_is_a_registered_okf_type_reports_a_list_type() -> None:
     files = {"a.md": concept("[Guide, Standard]"), "b.md": concept("Guide")}
-    assert found(type_names_a_registered_type, files) == [("a.md", None)]
+    assert found(type_is_a_registered_okf_type, files) == [("a.md", None)]
 
 
-def test_type_names_a_registered_type() -> None:
-    assert found(type_names_a_registered_type, {"a.md": concept("Guide")}) == []
+def test_type_is_a_registered_okf_type() -> None:
+    assert found(type_is_a_registered_okf_type, {"a.md": concept("Guide")}) == []
     files = {"a.md": concept("Bogus"), "b.md": doc("title: B\ndescription: D\n")}
-    assert found(type_names_a_registered_type, files) == [
+    assert found(type_is_a_registered_okf_type, files) == [
         ("a.md", None),
         ("b.md", None),
     ]
 
 
-def test_type_names_a_registered_type_reads_local_types() -> None:
-    index = doc("okf_version: '0.1'\nokf_types:\n  Resume: A resume\n", "# I\n")
-    files = {"index.md": index, "a.md": concept("Resume")}
-    assert found(type_names_a_registered_type, files) == []
+def test_type_is_a_registered_okf_type_reads_local_types() -> None:
+    files = local("| `Resume` | A resume |\n") | {"a.md": concept("Resume")}
+    assert found(type_is_a_registered_okf_type, files) == []
     files[CANONICAL] = "x\n"
-    assert found(type_names_a_registered_type, files) == [("a.md", None)]
+    assert found(type_is_a_registered_okf_type, files) == [("a.md", None)]
 
 
 def test_non_empty_title() -> None:
@@ -387,6 +387,15 @@ def test_standard_lives_under_standards() -> None:
 def test_loop_lives_under_loops() -> None:
     assert found(loop_lives_under_loops, {"loops/a.md": concept("Loop")}) == []
     assert found(loop_lives_under_loops, {"a.md": concept("Loop")}) == [("a.md", None)]
+
+
+def test_registry_lives_under_registries() -> None:
+    home = {"registries/a.md": concept("Registry")}
+    assert found(registry_lives_under_registries, home) == []
+    stray = {"a.md": concept("Registry")}
+    assert found(registry_lives_under_registries, stray) == [("a.md", None)]
+    in_set = {"workstreams/w/a.md": concept("Registry")}
+    assert found(registry_lives_under_registries, in_set) == []
 
 
 def test_guide_lives_under_guides() -> None:
@@ -577,38 +586,40 @@ def test_readme_holds_an_h1() -> None:
     assert found(readme_holds_an_h1, {"d/README.md": no_h1}) == [("d/README.md", None)]
 
 
-# --- type-registry.md ---
+# --- local-okf-types.md ---
 
 
-def local(types: str) -> dict[str, str]:
-    return {"index.md": doc(f"okf_version: '0.1'\nokf_types:\n{types}", "# I\n")}
+LOCAL = "registries/okf-types.md"
 
 
-def test_type_name_to_description() -> None:
-    assert found(type_name_to_description, local("  Resume: A resume\n")) == []
-    bad = local("  bad name: A thing\n  Story: ''\n")
-    assert found(type_name_to_description, bad) == [
-        ("index.md", None),
-        ("index.md", None),
-    ]
+def local(rows: str) -> dict[str, str]:
+    """A consumer's local OKF types table; its first row is on line 11."""
+    table = f"## OKF types\n\n| OKF type | What it is |\n|---|---|\n{rows}"
+    return {LOCAL: doc("type: Registry\ntitle: T\ndescription: D\n", table)}
+
+
+def test_okf_type_name_to_description() -> None:
+    good = local("| `Resume` | A resume |\n")
+    assert found(okf_type_name_to_description, good) == []
+    bad = local("| bad name | A thing |\n| `Story` |  |\n")
+    assert found(okf_type_name_to_description, bad) == [(LOCAL, 11), (LOCAL, 12)]
     apex = bad | {CANONICAL: "x\n"}
-    assert found(type_name_to_description, apex) == []
+    assert found(okf_type_name_to_description, apex) == []
+    no_table = {LOCAL: doc("type: Registry\ntitle: T\ndescription: D\n")}
+    assert found(okf_type_name_to_description, no_table) == [(LOCAL, None)]
 
 
-def test_keys_in_alphabetical_order() -> None:
-    assert (
-        found(keys_in_alphabetical_order, local("  Alpha: A\n  beta-x: B\n  Zed: Z\n"))
-        == []
-    )
-    assert found(keys_in_alphabetical_order, local("  Zed: Z\n  Alpha: A\n")) == [
-        ("index.md", None)
-    ]
+def test_rows_in_alphabetical_order() -> None:
+    good = local("| `Alpha` | A |\n| `Beta-X` | B |\n| `Zed` | Z |\n")
+    assert found(rows_in_alphabetical_order, good) == []
+    bad = local("| `Zed` | Z |\n| `Alpha` | A |\n")
+    assert found(rows_in_alphabetical_order, bad) == [(LOCAL, 11)]
 
 
 def test_add_never_shadow() -> None:
-    assert found(add_never_shadow, local("  Resume: A resume\n")) == []
-    bad = local("  Api: A\n  Readme: R\n  API: B\n")
-    assert found(add_never_shadow, bad) == [("index.md", None), ("index.md", None)]
+    assert found(add_never_shadow, local("| `Resume` | A resume |\n")) == []
+    bad = local("| `Api` | A |\n| `Readme` | R |\n| `API` | B |\n")
+    assert found(add_never_shadow, bad) == [(LOCAL, 12), (LOCAL, 13)]
 
 
 # --- workstream-files.md ---

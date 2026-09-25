@@ -9,7 +9,7 @@ population: "a file typed Standard, outside a workstream"
 
 A file typed `Standard`, under `standards/` and outside a
 workstream
-([Document Types](/standards/knowledge-organization/document-types.md#standard-lives-under-standards)):
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md#standard-lives-under-standards)):
 one population and its rules. The
 [Standard doc-type](/doc-types/standard/index.md) declares what a
 Standard is and the encoding its file takes,

@@ -1,18 +1,18 @@
 ---
 type: General-Sheet
 title: Measurement Derivation
-description: How raw captured hook events become measurements — the store, the assertions every report runs first, event semantics, filters, and metric formulas
+description: Research for a report over the captured hook events — the assertions it would run first, event semantics, filters, metric formulas, and the cost join
 ---
 
 # Measurement Derivation
 
-Every Claude Code session on the primary machine appends its hook events to a
-local SQLite store, raw and uninterpreted. This document turns that store into
-numbers: what a report asserts before it computes anything, what each captured
-event means, which rows it excludes and why, how hands-on minutes, waiting
-latency, and interventions are computed, how a session binds to an issue, and
-how cost is joined in. Each rule carries the issue that settled it, so a
-reporting session derives from here rather than re-researching.
+Every Claude Code session on the primary machine appends its hook events,
+raw and uninterpreted, to a local SQLite store. No report reads that store
+yet. This document is research for one: what a report would assert before
+it computes anything, what each captured event means, which rows it would
+exclude and why, how hands-on minutes and waiting latency would be
+computed, and how cost would join in. Each finding carries the issue that
+settled it, so work on a report starts from here rather than re-researching.
 
 All interpretation happens at report time. Capture appends rows and does
 nothing else beyond one mechanical trim (issue #255, rulings 16 and 23), which
@@ -20,47 +20,16 @@ is what makes a metric change a query change rather than lost data — and what
 makes every rule below a query's obligation rather than a guarantee the store
 meets.
 
-## Standing and amendment
-
-The rules here come from transcript research and live hook probes, not yet
-from the capture store itself. Issue #270 re-validates every one of them
-against live captured data — per-session event counts by type, each filter's
-identifiability, the identity joins — and any mismatch amends this document,
-with the underlying defect raised as a bug against capture.
-
 ## The store
 
-The database is `~/.local/share/claude-measure/events.db` (SQLite, WAL). The
-`events` table holds one row per hook invocation: `received_at` (UTC ISO-8601,
-stamped when the hook received the event), `event`, `session_id`, `prompt_id`,
-`payload`. `event`, `session_id`, and `prompt_id` are promoted copies of the
-payload's `hook_event_name`, `session_id`, and `prompt_id`, kept as columns
-for querying convenience; `payload` holds the harness's JSON byte-verbatim —
-bar the single trim named under
-[Event semantics](/docs/measurement-derivation.md#event-semantics) (#255,
-ruling 23) — and is the authority for every field, promoted or not. A
-promoted column is NULL whenever its key was absent or arrived as something
-other than a string — including the whole-row case where stdin was not
-parseable JSON at all. The sibling `ledger` table is the software factory's
-run ledger, written and read only by the factory's own code, isolated
-under `workstreams/software-factory/`, and is outside this document's
-scope.
-
-Which events reach the store is declared by the hook wiring in
-`/dotfiles/dot-claude/settings.json`, one [`measure-event`](/dotfiles/dot-claude/hooks/measure-event)
-entry per hook, all asynchronous. That wiring is the authority on the captured
-set: a report reads it rather than trusting a remembered list. The settings
-file is shared by every machine, but capture runs on the primary alone
-([machines.md](/docs/machines.md)) — the hook itself detects the host and
-exits without recording elsewhere — and is forward-only from the day the
-wiring merged: there is no backfill.
-
-An `errors.log` sits beside the database. A line in it is an event that
-arrived and could not be recorded. Capture never fails a session (#255, ruling
-3), so a lost row is silent at write time and this log is the only trace of
-it.
-
-A report opens the database read-only.
+The store, its schema, its `errors.log`, and how capture behaves inside a
+container are the
+[`measure-event`](/dotfiles/dot-claude/hooks/measure-event) hook's to
+state. Which events reach the store is the hook wiring in
+`/dotfiles/dot-claude/settings.json`, so a report reads that wiring
+rather than trusting a remembered list. Capture is forward-only from the
+day the wiring merged: there is no backfill. A report opens the database
+read-only.
 
 ## Assertions before any metric
 
@@ -115,7 +84,7 @@ assertion checks.
 | `Stop` | The end of an agent turn | `prompt_id` pairs the turn with the submission that started it. No `Stop` fires when a user interrupts with ESC; the turn simply ends. |
 | `SubagentStart` | A subagent dispatch — the dispatch signal | `agent_id` — the key a real `SubagentStop` matches on. Dispatches are counted here, never at `SubagentStop`. |
 | `SubagentStop` | A subagent finishing, plus phantoms | `agent_id`, which matches the stop to its `SubagentStart`; `agent_type` (empty on a phantom); and `agent_transcript_path` — on a real stop the child transcript outright, on a phantom a well-formed path to nothing, so any reader handles non-existence (#270). |
-| `PostToolUse` | An executed tool call, any tool | `tool_name` and `duration_ms` on every row. A Bash row is byte-verbatim: `tool_input` holds the command line as it ran — the source of phase transitions and session-to-issue binding — and `tool_response` its output. Every other tool's row is the envelope alone, with `tool_input` and `tool_response` dropped at capture and so deliberately absent — the one exception to byte-verbatim payloads (#255, ruling 23). The third assertion therefore expects `tool_input` on Bash rows only; on the rest, `tool_name` and `duration_ms` are the fields that carry meaning. |
+| `PostToolUse` | An executed tool call, any tool | `tool_name` and `duration_ms` on every row. A Bash row is byte-verbatim: `tool_input` holds the command line as it ran, and `tool_response` its output. Every other tool's row is the envelope alone, with `tool_input` and `tool_response` dropped at capture and so deliberately absent — the one exception to byte-verbatim payloads (#255, ruling 23). The third assertion therefore expects `tool_input` on Bash rows only; on the rest, `tool_name` and `duration_ms` are the fields that carry meaning. |
 | `PostCompact` | A compaction — the context-pressure signal | — |
 | `Notification` | A harness notification, including the permission-request and waiting-on-user moments the bell announces | Unverified: capture of this event begins with the wiring that added it (#255, ruling 23), so no field is named here — and none asserted — until real payloads are read. |
 
@@ -217,40 +186,6 @@ chronological predecessor — the latest `Stop` of the same session strictly
 before t(s). Pairing by `prompt_id` is wrong here: a `Stop` shares its
 `prompt_id` with the submission that started its turn, so that join measures
 the agent's turn duration, not the user's waiting (#270).
-
-### Interventions per issue
-
-Interventions are the user submissions in the session bound to the issue,
-beyond the launch prompt that started the overwatch (#255). The count is a
-lower bound, since ESC interrupts leave no event; the target is zero, so any
-nonzero count is real regardless.
-
-## Session-to-issue binding
-
-A session binds to an issue through executed commands, not prose. A Bash
-`PostToolUse` row whose `tool_input` holds a `gh issue edit <N> … phase:*`
-command is deterministic evidence that a phase moved for issue `<N>` in that
-session (#255, ruling 2). A command that never ran records nothing, and
-GitHub's own issue timeline stays the corroborating record.
-
-The session tree carries attribution: subagent sessions attach to their
-parent through `SubagentStart`/`SubagentStop` in the hook stream and through
-`parent_session_id` in agentsview. `cwd` and git branch corroborate and never
-decide (#255, ruling 5) — the traverse that motivated this rule ran its
-overwatch from the main checkout on `main` while its nodes worked in
-worktrees.
-
-Sessions and work items are different units, so binding resolves per event.
-`/clear` ends one session and starts another mid-work-item, a compaction fires
-`SessionStart` inside one session, and a single session can touch several
-issues.
-
-The binding grammar is a coupling point: it holds only while phase labels keep
-moving through executed `gh issue edit` commands (#255, ruling 13). Tests
-pinning those command shapes land when measurement consolidates with the
-skills sweep (#255, ruling 19). A session that plainly worked an issue but
-carries no binding command is reported as an unbound session, never guessed
-into place.
 
 ## Cost enrichment
 

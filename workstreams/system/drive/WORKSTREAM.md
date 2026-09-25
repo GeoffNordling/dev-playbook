@@ -125,7 +125,7 @@ Decided with the user on 2026-09-24.
   and unattended work alike.
 - **A workstream picks its headings from one menu.** The user and the
   agent pick the ones the work needs. The menu is
-  [Headings from the menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu).
+  [Headings from the registry](/standards/doc-type/workstream-conventions.md#headings-from-the-registry).
 - **Open holds questions only.** An answer, recommended or not, is a
   separate thing and does not sit with the question.
 - **The Ralph pattern has four parts**, and every driver keeps them:

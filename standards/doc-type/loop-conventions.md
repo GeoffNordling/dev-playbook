@@ -9,7 +9,7 @@ population: "a document typed Loop, outside a workstream"
 
 A document typed `Loop`, under `loops/` and outside a
 workstream
-([Document Types](/standards/knowledge-organization/document-types.md#loop-lives-under-loops)).
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md#loop-lives-under-loops)).
 The [Loop doc-type](/doc-types/loop/index.md) declares what a loop is and
 the encoding its file takes,
 [Acts, Verifications, and Yields Encoding](/doc-types/loop/encoding.md); a

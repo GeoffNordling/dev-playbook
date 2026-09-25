@@ -120,7 +120,7 @@ computes from what they left on the pull request, within the one node.
 | `pr_review` | the `open-pr` agent definition, launched by `traverse-issue`, always first; then the [elected](#the-review-stop) reviewer definitions, launched together each cycle; then the `adjudicator` definition, at the verdict points its [launch rule](#the-review-stop) names | AFK throughout — the verdict on the stop is the script's, computed from thread state. |
 
 The table is factory-only. The definition region's skills — `/intake`,
-`/design`, `/candidate-promote` — are invoked by the user and never dispatched,
+`/design` — are invoked by the user and never dispatched,
 and the `spike` node has no runner.
 
 **Headless launch.** `build`, `open-pr`, the reviewers and the `adjudicator` are

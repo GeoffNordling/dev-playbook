@@ -7,7 +7,7 @@ description: Standard's contract shape — one population and its rules, each a 
 # Population and Rules
 
 One population and its rules are Standard's contract shape
-([Doc-Type](/doc-types/doc-type.md)): the form every Standard's
+([Reference Model](/doc-types/reference-model.md)): the form every Standard's
 contract takes. A Standard describes a state; the population is the
 class of object held to it, and each rule is one predicate a member is
 checked against.
@@ -44,9 +44,9 @@ says where the check runs
 the Standard's own, sit beside what they argue for, not in a
 separate file.
 
-The shape as code, one module importing the base in
-[Doc-Type](/doc-types/doc-type.md#the-base); the reference model holds
-the same text whole and a test keeps them identical.
+The shape as code, one module importing the base drawn in
+[Reference Model](/doc-types/reference-model.md#the-language), which
+holds the same text whole; a test keeps them identical.
 
 ```python
 from doc_type import DocType, Id, Target

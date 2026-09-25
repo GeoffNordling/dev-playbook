@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Claude Code Files
-description: The registry of repo files the Claude Code harness consumes — each member's class, role, and content standard, and where a runbook sits
+description: The repo files the Claude Code harness consumes — every tracked file under a harness root a registered member, and where a runbook sits
 population: "a file in a governed repo that the Claude Code harness consumes"
 ---
 
@@ -9,13 +9,13 @@ population: "a file in a governed repo that the Claude Code harness consumes"
 
 A file in a governed repo that the Claude Code harness consumes: loaded
 as configuration, run as code, or injected into agent context. It
-carries no OKF frontmatter and sits outside the document-type checks; the
+carries no OKF frontmatter and sits outside the OKF frontmatter checks; the
 concept/harness boundary is the population of
-[Document Types](/standards/knowledge-organization/document-types.md),
+[OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md),
 and `classify()` in [md.py](/src/dev_playbook/md.py) encodes it. Claude
 Code is the only harness in use.
 
-## Every harness file matches a member row
+## Every harness file is a registered member
 
 Every tracked file under `.claude/` or `dotfiles/dot-claude/` has
 one of these paths below that directory: `CLAUDE.md`,
@@ -24,22 +24,14 @@ one of these paths below that directory: `CLAUDE.md`,
 `hooks/` and any file under it, `workflows/<name>.js`,
 `statusline.sh`.
 
-| Member | Class | Role | Content standard |
-|---|---|---|---|
-| `CLAUDE.md`, `<dir>/CLAUDE.md` | context | injected into every session at or below its directory | [claude-content.md](/standards/harness/claude-content.md) |
-| skill bundles | runbook | loaded when a skill is invoked | [Runbook Conventions](/standards/doc-type/runbook-conventions.md) |
-| `agents/*.md` | runbook | loaded when a typed agent is launched | [Runbook Conventions](/standards/doc-type/runbook-conventions.md) |
-| `rules/*.md` | context | injected into every session | none yet |
-| `settings.json`, `settings.local.json` | configuration | read as configuration | none yet |
-| `hooks/` | code | run as code around harness events | none yet |
-| `workflows/*.js` | code | run as code by the Workflow tool | none yet |
-| `statusline.sh` | code | run as code to draw the status line | none yet |
+The members are the rows of the
+[Harness File Registry](/registries/harness-files.md#members).
 
-`harness.every-harness-file-matches-a-member-row` · deterministic
+`harness.every-harness-file-is-a-registered-member` · deterministic
 
-> **Why.** Claude Code fixes which files it reads; the table is the
-> workspace's record of that set, and the predicate holds the repo to
-> the table.
+> **Why.** Claude Code fixes which files it reads; the Harness File
+> Registry is the workspace's record of that set, and the
+> predicate holds the repo to the table.
 
 ## Every runbook at a fixed path
 

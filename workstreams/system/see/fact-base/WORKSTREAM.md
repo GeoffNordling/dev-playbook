@@ -24,7 +24,7 @@ what. This workstream is speculative. Its files:
   — one planned view.
 
 Each encoding a doc-type defines is an extractor here
-([Doc-Type System](/doc-types/doc-type-system.md)); every view the
+([Reference Model](/doc-types/reference-model.md#the-toolchain)); every view the
 viewer draws is a selection from here
 ([CLOA Viewer](/workstreams/system/see/viewer/WORKSTREAM.md)).
 
@@ -70,6 +70,14 @@ terms the main part of the repo also uses are in
 
 - **ABox** — the facts of a knowledge base, each a triple of subject,
   predicate, and object. The fact base is an ABox.
+- **doc-type build loop** — the procedure that produces a doc-type
+  from a family. An agent re-expresses the family in the current
+  primitives, and whatever forces a drop to file-level detail is the
+  **residual**, recorded in the doc-type's residual ledger, one entry
+  per instance that has one. The primitives are refactored only when
+  the reduction is worth the change cost. The fact base is this loop
+  with the target widened from one family to the whole checkout
+  ([The build loop runs over every object](/workstreams/system/see/fact-base/fact-base.md#the-build-loop-runs-over-every-object)).
 - **TBox** — the schema of a knowledge base: classes, properties with
   a domain and a range, and a class hierarchy. The doc-types are a
   TBox.

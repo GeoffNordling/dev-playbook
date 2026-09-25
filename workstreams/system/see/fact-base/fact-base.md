@@ -182,7 +182,7 @@ raised in a consumer repo is not settled
 ## The build loop runs over every object
 
 The doc-type build loop
-([Doc-Type](/doc-types/doc-type.md#the-doc-type-build-loop)) is an
+([Fact Base Workstream](/workstreams/system/see/fact-base/WORKSTREAM.md#terms)) is an
 expectation-maximization (EM) procedure: re-express the target in the
 current primitives, record what will not fit as the residual, propose a
 primitive that shrinks it. The fact base is that loop with the target

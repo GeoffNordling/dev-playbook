@@ -82,11 +82,6 @@ no frontmatter or spans, so the does edge ends at the file.
 Could not express being the runbook that fixes a Standard's findings
 (flattened to a plain read) or an agent's inputs — agents have no `arguments` frontmatter.
 
-### handoff
-
-Could not express telling the two reports apart — both render
-`outcome: str`.
-
 ### ralph-setup
 
 Could not express the report's name (`launch_command` rides only in
@@ -121,13 +116,6 @@ Could not express telling the two reports apart (both `outcome: str`).
 Could not express the two exact-text mid-session acknowledgments —
 they target the conversation, not the invoker, and no primitive covers
 them.
-
-### candidate-promote
-
-Could not express reading the invoking repo's `CANDIDATES.md` —
-`{Read}` needs one fixed on-disk link and the target changes per
-invocation — or the typed report (`issue_number: int`) — reports
-render only `outcome: str`.
 
 ### grilling
 
@@ -172,12 +160,6 @@ express "ask no questions" — the Never vocabulary has no verb for it.
 Could not express reading every set member — `{Read}` needs one fixed
 on-disk link, and set membership is runtime-determined.
 
-### enable-repo-governance
-
-Could not express the size-conditional
-landing choice in § 5 (a decision, not a fixed condition) or the
-GitHub-token permission preflight, which has no primitive.
-
 ### update-standards-pin
 
 Could not express the exit-code routing table in § Probe the bump (a table
@@ -194,23 +176,6 @@ on-disk link for a does edge.
 Could not express spawning the
 anonymous exploration sub-agent — `{Launch}` needs a link to one agent
 definition file, and this is an ad hoc Task-tool call with none.
-
-### diagnosing-bugs
-
-Could not express the redact-every-secret discipline, a behavior-mode
-setting with no primitive. Could not express Phase 3's ranked-list check-in
-(targets the conversation mid-run, not a terminal report) or the
-throwaway-harness and captured-trace writes — menu options among Phase 1's
-ten ways, so an unconditional scratch edge would misstate them. Could
-not express the commit that carries the confirmed hypothesis — writes—git
-bucket needs a fixed `-C <repo>` a same-repo commit can't honestly carry.
-
-### research
-
-Could not express spawning the background research agent — `{Launch}` needs
-a link to one agent definition file, and this is an ad hoc, unnamed dispatch
-with none. Could not express reading primary sources — `{Read}` needs one
-fixed on-disk link, and the sources vary with the question asked.
 
 ### domain-modeling
 
@@ -247,13 +212,3 @@ Could not express running each task's Verify clause or reading each task's
 sources — both are chosen per task, so there is no fixed target — or the
 ranking itself, which is a decision with no primitive.
 
-### prototype
-
-Could not express committing the prototype to a throwaway branch —
-`git_detail()` requires a fixed `-C` fenced command, and here the repo
-and branch are chosen at runtime, not fixed.
-
-## Acronyms
-
-- **AFK** — Away From Keyboard: a run that proceeds without the user present.
-- **HITL** — the user in the loop: a run that stops for the user.

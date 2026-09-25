@@ -20,10 +20,10 @@ stated against the general rule it qualifies, and a file is otherwise
 judged as any file is. The form of the head file itself is
 [Workstream Conventions](/standards/doc-type/workstream-conventions.md).
 A file whose type is not yet settled carries `type: General-Sheet`
-([Document Types](/standards/knowledge-organization/document-types.md#type-names-a-registered-type)).
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md#type-is-a-registered-okf-type)).
 A file may also carry a type whose home is elsewhere, such as `Guide`,
 before it moves there
-([Guide lives under `guides/`](/standards/knowledge-organization/document-types.md#guide-lives-under-guides));
+([Guide lives under `guides/`](/standards/knowledge-organization/okf-frontmatter.md#guide-lives-under-guides));
 the form rules of that type do not bind it while it is under
 `workstreams/`.
 
@@ -108,7 +108,7 @@ bucket, the
 inside the file, and a bucket holds facts of its own type only; the
 section under the file's H1, which says what the file is and what it is
 for, is exempt. A head file's buckets are the headings of
-[its menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu);
+[its menu](/standards/doc-type/workstream-conventions.md#headings-from-the-registry);
 any other file uses those names where they fit, coins its own where
 none does, and puts material awaiting triage under `Unfiled`.
 

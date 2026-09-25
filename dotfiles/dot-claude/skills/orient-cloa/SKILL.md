@@ -17,7 +17,7 @@ The detail under each head file waits until a task needs it.
 Read each file end-to-end:
 
 - {Read [System Legibility](~/workspace/dev-playbook/docs/system-legibility.md); the doctrine, and where CLOA is defined}.
-- {Read [The doc-type system](~/workspace/dev-playbook/doc-types/doc-type-system.md); the published definition}.
+- {Read [the reference model](~/workspace/dev-playbook/doc-types/reference-model.md); the published definition}.
 - {Read [the system head file](~/workspace/dev-playbook/workstreams/system/WORKSTREAM.md); the two aims, See and Drive, what is built and closed, and the terms they share}.
 - {Read [the See head file](~/workspace/dev-playbook/workstreams/system/see/WORKSTREAM.md); the fact base, the viewer, and story-forge, and how they connect}.
 - {Read [the fact base head file](~/workspace/dev-playbook/workstreams/system/see/fact-base/WORKSTREAM.md); the compiled object}.

@@ -35,7 +35,6 @@ Solid edges are state moves; dotted edges are informational.
 flowchart LR
     subgraph definition[Definition — user-led]
         ideas([idea funnel]) -.-> cand[CANDIDATES.md]
-        cand -->|/candidate-promote| intake[intake]
         stub([new or adopted issue]) --> intake
         intake -->|needs thought| design[design]
         intake -->|mode:spike| spike[spike]
@@ -68,8 +67,7 @@ Work enters as an idea and leaves as an issue a factory node can pick up.
 **Before the issue.** The idea funnel feeds `CANDIDATES.md`, a repo's register of
 work described but not yet committed to
 ([Candidates](/standards/tracking/candidates.md)). A Candidate is pre-issue:
-no issue exists, so no label does either. `/candidate-promote` finds the entry,
-opens intake on it, and deletes the entry as the issue lands.
+no issue exists, so no label does either.
 
 **`intake` — accounting and routing.** Every issue passes through, whether minted
 fresh, adopted as a rushed stub, or promoted from a Candidate. Intake grills for

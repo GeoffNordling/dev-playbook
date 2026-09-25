@@ -43,7 +43,7 @@ Fact base, view, and extractor are the repo's words
 
 - **CLOA object** — what a doc-type's contract shape defines for one
   document, a runbook's chain, a Standard's rules
-  ([Doc-Type](/doc-types/doc-type.md)). In the fact base it is
+  ([Reference Model](/doc-types/reference-model.md)). In the fact base it is
   the nodes and edges that document's doc-type extractor yields.
 - **view file** — one JSON file the server writes and the viewer shows as
   one panel; every view file has one kind
@@ -57,9 +57,9 @@ Fact base, view, and extractor are the repo's words
   ([Planned](/workstreams/system/see/viewer/WORKSTREAM.md#planned)).
 - **registry** — the list of kinds the tool can show
   ([Registry](/workstreams/system/see/viewer/registry.md)).
-  Goes with kind: registry is the doc-type registry of
-  [Document Types](/standards/knowledge-organization/document-types.md),
-  and this list becomes the views in the same rename.
+  Goes with kind: registry is also the word for the files under
+  [registries/](/registries/index.md), and this list becomes the views
+  in the same rename.
 - **panel** — one view file rendered on screen.
 - **state directory** — the directory outside every repo where view files
   live

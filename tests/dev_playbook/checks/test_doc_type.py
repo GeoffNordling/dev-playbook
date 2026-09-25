@@ -5,6 +5,7 @@ from pathlib import Path
 
 from dev_playbook.check_registry import Finding
 from dev_playbook.checks.doc_type import (
+    DOC_TYPE_FILES,
     a_rule_heading_predicate_trailer,
     a_sequence_is_one_list,
     a_step_opens_with_its_name,
@@ -20,8 +21,11 @@ from dev_playbook.checks.doc_type import (
     every_bundle_file_reached_from_skillmd,
     every_child_reached_from_its_parent,
     every_entry_states_its_condition,
+    five_files,
     front_matter_holds_its_kinds_vocabulary,
-    headings_from_the_menu,
+    headings_from_the_registry,
+    its_instances_are_its_own,
+    its_instances_are_registered,
     kebab_case_name,
     model_and_effort_from_closed_sets,
     name_matches_its_home,
@@ -78,24 +82,105 @@ def typed(doctype: str, body: str, extra: str = "") -> bytes:
 
 def test_registered() -> None:
     table = b"""\
-# System
+# Doc-Type Registry
 
-## Registry rulings
+## Doc-types
 
-| Kind | Family | Ruling |
-|---|---|---|
-| Guide | guides | The [Guide](/doc-types/guide/definition.md) doc-type |
-| Loop | [Loop](/doc-types/loop/definition.md) | Pending |
+| Doc-type | OKF type | Harness members | Conventions |
+|---|---|---|---|
+| [Guide](/doc-types/guide/definition.md) | `Guide` | - | [Loop](/doc-types/loop/definition.md) |
 """
     assert found(
         registered,
         {
-            "doc-types/doc-type-system.md": table,
+            "registries/doc-types.md": table,
             "doc-types/guide/definition.md": b"# Guide\n",
             "doc-types/loop/definition.md": b"# Loop\n",
             "doc-types/index.md": b"# Index\n",
         },
     ) == [("doc-types/loop", None)]
+
+
+REGISTRIES = {
+    "registries/okf-types.md": b"""\
+# OKF Type Registry
+
+## OKF types
+
+| OKF type | What it is |
+|---|---|
+| `Guide` | A guide. |
+| `Loop` | A loop. |
+""",
+    "registries/harness-files.md": b"""\
+# Harness File Registry
+
+## Members
+
+| Member | Class | Role | Content standard |
+|---|---|---|---|
+| skill bundles | runbook | loaded | none |
+| `agents/*.md` | runbook | loaded | none |
+""",
+}
+NONE = "\u2014"
+
+
+def doc_type_registry(*rows: tuple[str, str, str]) -> dict[str, bytes]:
+    lines = [
+        "# Doc-Type Registry",
+        "",
+        "## Doc-types",
+        "",
+        "| Doc-type | OKF type | Harness members | Conventions |",
+        "|---|---|---|---|",
+    ]
+    for name, okf, members in rows:
+        link = f"[{name}](/doc-types/{name}/definition.md)"
+        lines.append(f"| {link} | {okf} | {members} | C |")
+    registry = "\n".join(lines) + "\n"
+    return REGISTRIES | {"registries/doc-types.md": registry.encode()}
+
+
+def test_its_instances_are_registered() -> None:
+    good = doc_type_registry(
+        ("guide", "`Guide`", NONE),
+        ("runbook", NONE, "skill bundles; `agents/*.md`"),
+    )
+    assert found(its_instances_are_registered, good) == []
+    bad = doc_type_registry(
+        ("guide", "`Log`", NONE),
+        ("runbook", NONE, "hooks"),
+        ("loop", NONE, NONE),
+    )
+    assert found(its_instances_are_registered, bad) == [
+        ("doc-types/guide", None),
+        ("doc-types/runbook", None),
+        ("doc-types/loop", None),
+    ]
+
+
+def test_its_instances_are_its_own() -> None:
+    good = doc_type_registry(("guide", "`Guide`", NONE), ("loop", "`Loop`", NONE))
+    assert found(its_instances_are_its_own, good) == []
+    bad = doc_type_registry(("guide", "`Guide`", NONE), ("loop", "`Guide`", NONE))
+    assert found(its_instances_are_its_own, bad) == [("doc-types/loop", None)]
+
+
+def test_five_files() -> None:
+    whole = {f"doc-types/guide/{name}": b"# G\n" for name in DOC_TYPE_FILES}
+    assert (
+        found(
+            five_files,
+            {
+                **whole,
+                "doc-types/loop/definition.md": b"# Loop\n",
+                "doc-types/loop/encoding.md": b"# Loop\n",
+                "doc-types/index.md": b"# Index\n",
+            },
+        )
+        == [("doc-types/loop", None)] * 3
+    )
 
 
 GOOD_GUIDE = """\
@@ -481,7 +566,7 @@ def test_the_files_why_ends_the_opening_prose() -> None:
     ) == [("standards/fam/late.md", 8), ("standards/fam/twice.md", 10)]
 
 
-def test_headings_from_the_menu() -> None:
+def test_headings_from_the_registry() -> None:
     body = """\
 # Work
 
@@ -494,7 +579,7 @@ def test_headings_from_the_menu() -> None:
 ## Goal
 """
     assert found(
-        headings_from_the_menu,
+        headings_from_the_registry,
         {"workstreams/w/WORKSTREAM.md": typed("Workstream", body)},
     ) == [("workstreams/w/WORKSTREAM.md", 12), ("workstreams/w/WORKSTREAM.md", 14)]
 

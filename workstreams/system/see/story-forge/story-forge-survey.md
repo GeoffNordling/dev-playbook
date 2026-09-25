@@ -40,8 +40,9 @@ constant in that module in the form `<family>.<slug>`
 That triple, typed population, Standard with ids, lint keyed by id, is
 the doc-type system's Standard and verifier, grown rather than
 designed. The domain vocabulary is `CONTEXT.md`, about 45 terms in six
-clusters, each with an Avoid list; the type registry is the
-`okf_types` block in `index.md`'s frontmatter, ten types.
+clusters, each with an Avoid list; its local OKF types are ten rows of
+its own `registries/okf-types.md`
+([Local OKF Types](/standards/knowledge-organization/local-okf-types.md)).
 
 The document ontology maps onto it without invention. Runbook: the
 nine skills, all with `model` and `effort`, four with `arguments`, and

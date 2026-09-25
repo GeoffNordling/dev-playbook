@@ -13,7 +13,7 @@ The exclusion is stated in the population of standards/prose/conventions.md;
 this module is where every check reads it.
 """
 
-# The OKF document type meaning "verbatim mirror of an external document".
+# The OKF type meaning "verbatim mirror of an external document".
 VERBATIM_DOC_TYPE = "Mirror"
 
 

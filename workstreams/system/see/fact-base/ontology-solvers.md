@@ -58,7 +58,7 @@ inconsistencies and violations. Act: fix what a finding names. Yield:
 when a finding needs a judgment. Which thing the act fixes is the
 fork: the repo, which is the loop that brings a repo to a Standard,
 with the ontology as that Standard; or the pseudocode, which is
-[the doc-type build loop](/doc-types/doc-type.md#the-doc-type-build-loop)
+[the doc-type build loop](/workstreams/system/see/fact-base/WORKSTREAM.md#terms)
 with the findings the user rules the model's fault as its residual.
 The solver never reports a missing class. That comes from residuals,
 as today.

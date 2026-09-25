@@ -26,6 +26,6 @@ the one kind of work its title names.
 
 Under `guides/`, or as a draft in a workstream under
 `workstreams/`; the registry's rule is
-[Guide lives under `guides/`](/standards/knowledge-organization/document-types.md#guide-lives-under-guides).
+[Guide lives under `guides/`](/standards/knowledge-organization/okf-frontmatter.md#guide-lives-under-guides).
 A consumer repo keeps its own `guides/` for its own work, the way it
 keeps its own `standards/`.

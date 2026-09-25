@@ -1,7 +1,7 @@
-"""Where a check reads data out of a Standard: the path and heading, named once.
+"""Where a check reads data out of a document: the path and heading, named once.
 
-Some rules consume data a Standard's body holds, such as the registry table
-of document types or the canonical files a repo copies. The path and the
+Some rules consume data a document holds, such as the OKF Type Registry's table
+of OKF types or the canonical files a repo copies. The path and the
 heading are constants here, and the test beside this module pins each one
 to its document: the file is tracked and the heading is present. A check
 reads the section through the model, ``repo.markdown[path].section(slug)``,
@@ -13,22 +13,26 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Section:
-    """One heading of one Standard, by path and heading slug."""
+    """One heading of one document, by path and heading slug."""
 
     path: str
     heading: str
 
 
-# The global table of document types: every registered `type` and what it is.
-TYPE_REGISTRY = Section(
-    "standards/knowledge-organization/document-types.md",
-    "type-names-a-registered-type",
-)
+# The global table of OKF types: every registered `type` and what it is.
+OKF_TYPE_REGISTRY = Section("registries/okf-types.md", "okf-types")
 
-# Every type name in the TYPE_REGISTRY table. A consumer runs the installed
+# The table joining each built doc-type to the OKF type or harness members
+# its instances are.
+DOC_TYPE_REGISTRY = Section("registries/doc-types.md", "doc-types")
+
+# The table of the files the Claude Code harness consumes, one row per member.
+HARNESS_FILE_REGISTRY = Section("registries/harness-files.md", "members")
+
+# Every type name in the OKF_TYPE_REGISTRY table. A consumer runs the installed
 # package, not dev-playbook's tree, so the names ship here; the test beside
 # this module pins the set, and the table's shape, to the table.
-REGISTERED_TYPES = frozenset(
+REGISTERED_OKF_TYPES = frozenset(
     {
         "Candidate-List",
         "Decision-Record",
@@ -39,6 +43,7 @@ REGISTERED_TYPES = frozenset(
         "Mirror",
         "README",
         "Recipe-Description",
+        "Registry",
         "Standard",
         "Survey",
         "Vocabulary",
@@ -47,12 +52,9 @@ REGISTERED_TYPES = frozenset(
 )
 
 # The menu a Workstream's head file picks its headings from.
-WORKSTREAM_MENU = Section(
-    "standards/doc-type/workstream-conventions.md",
-    "headings-from-the-menu",
-)
+WORKSTREAM_HEADING_REGISTRY = Section("registries/workstream-headings.md", "headings")
 
-# Every heading in the WORKSTREAM_MENU table, shipped as REGISTERED_TYPES is;
+# Every heading in the WORKSTREAM_HEADING_REGISTRY table, shipped as REGISTERED_OKF_TYPES is;
 # the test beside this module pins the set to the table.
 WORKSTREAM_HEADINGS = frozenset(
     {
@@ -71,8 +73,6 @@ WORKSTREAM_HEADINGS = frozenset(
     }
 )
 
-# The table whose Ruling cells link each doc-type's directory.
-REGISTRY_RULINGS = Section("doc-types/doc-type-system.md", "registry-rulings")
 
 # The rule that names the workspace's banned word; a test asserts the word
 # there is the one the prose checks hold.

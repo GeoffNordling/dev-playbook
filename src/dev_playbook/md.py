@@ -328,8 +328,8 @@ def classify(relpath: str) -> str:
       standard), and every non-``.md`` file.
 
     The concept/harness split mirrors the file roles in the docs
-    standard and the Claude Code file registry
-    (standards/harness/files.md); keep them in step.
+    standard and the Harness File Registry
+    (registries/harness-files.md); keep them in step.
     """
     parts = PurePosixPath(relpath).parts
     name = parts[-1]

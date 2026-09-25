@@ -93,15 +93,17 @@ def read_the_standards_first(repo: Repo) -> Iterator[Finding]:
         )
 
 
-@check("harness.every-harness-file-matches-a-member-row")
-def matches_a_member_row(repo: Repo) -> Iterator[Finding]:
+@check("harness.every-harness-file-is-a-registered-member")
+def is_a_registered_member(repo: Repo) -> Iterator[Finding]:
     """Every tracked file under a harness root has one of the member paths."""
     for path in repo.files:
         below = _below_root(path)
         if below is None:
             continue
         if not any(p.fullmatch(below) for p in MEMBER_PATTERNS):
-            yield Finding(path, None, "matches no member row of the harness table")
+            yield Finding(
+                path, None, "matches no member row of the Harness File Registry"
+            )
 
 
 @check("harness.every-runbook-at-a-fixed-path")

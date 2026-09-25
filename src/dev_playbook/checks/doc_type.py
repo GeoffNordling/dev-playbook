@@ -1,7 +1,8 @@
 """The doc-type family: the rules of ``standards/doc-type/``.
 
-Thirty rules are decided by functions over the model. One holds each
-``doc-types/<name>/`` directory to a row of the registry rulings table. Three
+Thirty-three rules are decided by functions over the model. Four hold each
+``doc-types/<name>/`` directory to its five files and to a row of the Doc-Type
+Registry that names registered instances no other row names. Three
 hold a file typed ``Guide`` to its steps and its lack of trailers. One holds
 the acts of a file typed ``Loop`` to a runbook link. Four hold a file typed
 ``Workstream`` to its menu of headings, its worklist items, its stint entries,
@@ -25,6 +26,13 @@ from dev_playbook.check_registry import Finding, check
 from dev_playbook.model import TRAILER_PATTERN, MarkdownFile, Repo
 
 DOC_TYPES = "doc-types"
+DOC_TYPE_FILES = (
+    "index.md",
+    "definition.md",
+    "contract-shape.md",
+    "encoding.md",
+    "residual-ledger.md",
+)
 STANDARDS = "standards"
 WORKSTREAMS = "workstreams/"
 GUIDE_TYPE = "Guide"
@@ -157,28 +165,102 @@ class Runbook:
 # --- doc-type.md --------------------------------------------------------------
 
 
-@check("doc-type.registered")
-def registered(repo: Repo) -> Iterator[Finding]:
-    """Each ``doc-types/<name>/`` is linked from a Ruling cell of the registry rulings."""
-    table = sources.REGISTRY_RULINGS
-    ruled: set[str] = set()
-    if table.path in repo.markdown:
-        for cell in _column(repo.markdown[table.path].section(table.heading), "Ruling"):
-            for _, target in md.markdown_links(cell):
-                parts = _resolve(table.path, target, repo.name, "").split("/")
-                if len(parts) > 2 and parts[0] == DOC_TYPES:
-                    ruled.add(parts[1])
-    directories = {
+def _doc_type_directories(repo: Repo) -> set[str]:
+    """The name of each ``doc-types/<name>/`` directory that holds a tracked file."""
+    return {
         parts[1]
         for path in repo.files
         if len(parts := path.split("/")) > 2 and parts[0] == DOC_TYPES
     }
-    for name in sorted(directories - ruled):
+
+
+@check("doc-type.registered")
+def registered(repo: Repo) -> Iterator[Finding]:
+    """Each ``doc-types/<name>/`` is linked from a Doc-type cell of the Doc-Type Registry."""
+    table = sources.DOC_TYPE_REGISTRY
+    covered: set[str] = set()
+    if table.path in repo.markdown:
+        section = repo.markdown[table.path].section(table.heading)
+        for cell in _column(section, "Doc-type"):
+            for _, target in md.markdown_links(cell):
+                parts = _resolve(table.path, target, repo.name, "").split("/")
+                if len(parts) > 2 and parts[0] == DOC_TYPES:
+                    covered.add(parts[1])
+    for name in sorted(_doc_type_directories(repo) - covered):
         yield Finding(
             f"{DOC_TYPES}/{name}",
             None,
-            f"no Ruling cell of `{table.path}#{table.heading}` links a file in it",
+            f"no Doc-type cell of `{table.path}` links a file in it",
         )
+
+
+NONE_CELL = "—"
+
+
+def _table_cells(repo: Repo, table: sources.Section, column: str) -> list[str]:
+    """The cells of ``column`` in ``table``, or none when the file is absent."""
+    if table.path not in repo.markdown:
+        return []
+    return _column(repo.markdown[table.path].section(table.heading), column)
+
+
+def _doc_type_rows(repo: Repo) -> list[tuple[str, set[str], set[str]]]:
+    """Each Doc-Type Registry row: its directory name, OKF types, and harness members."""
+    table = sources.DOC_TYPE_REGISTRY
+    names = _table_cells(repo, table, "Doc-type")
+    okf = _table_cells(repo, table, "OKF type")
+    harness = _table_cells(repo, table, "Harness members")
+    rows = []
+    for name_cell, okf_cell, harness_cell in zip(names, okf, harness, strict=True):
+        name = ""
+        for _, target in md.markdown_links(name_cell):
+            parts = _resolve(table.path, target, repo.name, "").split("/")
+            if len(parts) > 2 and parts[0] == DOC_TYPES:
+                name = parts[1]
+        okf_types = {okf_cell} - {NONE_CELL, ""}
+        members = {m.strip() for m in harness_cell.split(";")} - {NONE_CELL, ""}
+        rows.append((name, okf_types, members))
+    return rows
+
+
+@check("doc-type.its-instances-are-registered")
+def its_instances_are_registered(repo: Repo) -> Iterator[Finding]:
+    """Each Doc-Type Registry row names a registered OKF type or registered harness members."""
+    okf_types = set(_table_cells(repo, sources.OKF_TYPE_REGISTRY, "OKF type"))
+    members = set(_table_cells(repo, sources.HARNESS_FILE_REGISTRY, "Member"))
+    for name, row_okf, row_members in _doc_type_rows(repo):
+        where = f"{DOC_TYPES}/{name}"
+        if not row_okf and not row_members:
+            yield Finding(where, None, "its registry row names no instances")
+        for okf in sorted(row_okf - okf_types):
+            yield Finding(where, None, f"{okf} is not a registered OKF type")
+        for member in sorted(row_members - members):
+            yield Finding(where, None, f"{member} is not a registered harness member")
+
+
+@check("doc-type.its-instances-are-its-own")
+def its_instances_are_its_own(repo: Repo) -> Iterator[Finding]:
+    """No OKF type or harness member is named by two Doc-Type Registry rows."""
+    owner: dict[str, str] = {}
+    for name, row_okf, row_members in _doc_type_rows(repo):
+        for instance in sorted(row_okf | row_members):
+            if instance in owner:
+                yield Finding(
+                    f"{DOC_TYPES}/{name}",
+                    None,
+                    f"{instance} is also named by {DOC_TYPES}/{owner[instance]}",
+                )
+            else:
+                owner[instance] = name
+
+
+@check("doc-type.five-files")
+def five_files(repo: Repo) -> Iterator[Finding]:
+    """Each ``doc-types/<name>/`` holds the five files of a doc-type."""
+    for name in sorted(_doc_type_directories(repo)):
+        for file in DOC_TYPE_FILES:
+            if f"{DOC_TYPES}/{name}/{file}" not in repo.files:
+                yield Finding(f"{DOC_TYPES}/{name}", None, f"no {file}")
 
 
 # --- guide-conventions.md -----------------------------------------------------
@@ -594,8 +676,8 @@ def the_files_why_ends_the_opening_prose(repo: Repo) -> Iterator[Finding]:
 # --- workstream-conventions.md ------------------------------------------------
 
 
-@check("doc-type.headings-from-the-menu")
-def headings_from_the_menu(repo: Repo) -> Iterator[Finding]:
+@check("doc-type.headings-from-the-registry")
+def headings_from_the_registry(repo: Repo) -> Iterator[Finding]:
     """Each H2 of a Workstream is a heading of the menu, and none is used twice."""
     for path, doc in _typed(repo, WORKSTREAM_TYPE):
         seen: set[str] = set()

@@ -15,7 +15,8 @@ file into every session on the machine, then walks up the directory
 tree from the session's cwd and stacks each `CLAUDE.md` it finds, so a
 session inside `<repo>/<dir>/` receives the nested file, the root file,
 and the global file at once. The registry of every file the harness
-loads is [Claude Code Files](/standards/harness/files.md); the voice a
+loads is the
+[Harness File Registry](/registries/harness-files.md#members); the voice a
 `CLAUDE.md` speaks in is Doc Conventions'
 [No first person](/standards/prose/conventions.md#no-first-person).
 
@@ -32,7 +33,7 @@ The first line of a `CLAUDE.md` is not `---`.
 `harness.no-frontmatter` · deterministic
 
 > **Why.** A `CLAUDE.md` is injected into the session as operating
-> configuration, and no document-type check reads it.
+> configuration, and no OKF frontmatter check reads it.
 
 ## Operational content only
 
