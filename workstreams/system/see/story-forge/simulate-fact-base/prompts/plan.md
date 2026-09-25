@@ -1,21 +1,24 @@
 ---
 type: General-Sheet
 title: Plan Prompt
-description: The prompt the Opus plan agent reads — learn what a fact base is, split story-forge into slices with every file in exactly one, and write one short brief per slice for the Sonnet builders
+description: The prompt the Opus plan agent reads — learn what a fact base is, find the kinds of a target repository starting from the kinds it declares, group them into slices of 3 to 5 kinds, and write one short brief per slice for the Sonnet builders
 ---
 
 # Plan Prompt
 
-You plan one run that simulates a fact base for the story-forge
-repository. A fact base is a knowledge graph: nodes and edges, each
-row carrying a receipt, the file and line that proves it. Sonnet
-agents will build it, one slice each, in parallel. An assembler joins
-their slices afterwards. Your job is to split the repository into
-slices and to brief each builder.
+You plan one run that simulates a fact base for a target repository. A
+fact base is a knowledge graph: nodes and edges, each row carrying a
+receipt, the file and line that proves it. Sonnet agents will build
+it, one slice each, in parallel. Each builder describes **kinds**
+(families of files that share one form) from 2 or 3 sample files, and
+writes a recognition rule; a script lists the instances afterwards. An
+assembler joins the slices. Your job is to find the kinds, group them
+into slices, and brief each builder.
 
 The launch message gives you `repo` (the dev-playbook checkout),
-`storyForge` (the story-forge root), `run` (the run directory), and
-`maxSlices`. Use absolute paths. Do not change directory.
+`target` (the target root), `run` (the run directory), `maxSlices`,
+and `scope`: a list of folders, or `all`. Use absolute paths. Do not
+change directory.
 
 ## 1. Learn what you are planning for
 
@@ -25,66 +28,71 @@ Read these in `repo`:
 - `workstreams/system/see/fact-base/fact-base.md` — what a fact base is.
 - `doc-types/reference-model.md` — the doc-type system.
 - `registries/doc-types.md` — how a kind of file joins a doc-type.
-- `workstreams/system/see/story-forge/WORKSTREAM.md` — the rules for
-  work on story-forge.
+- `workstreams/system/see/story-forge/simulate-fact-base/process.md` —
+  this process, and the lessons of earlier runs in its Runs section.
 
 Then the examples. They are inspiration and a warm start, not a
 template:
 
-- `workstreams/system/see/story-forge/stories-fact-base.md` and the
-  first rows of `stories-fact-base.json` — one story-forge kind, Story,
-  done in full.
+- `workstreams/system/see/story-forge/stories-fact-base.md` — one
+  kind, Story, done in full.
 - `workstreams/system/see/fact-base/fact-base-ralph.md` — the same
   method on another subsystem.
-- `workstreams/system/see/story-forge/story-forge-survey.md` — an
-  earlier map of story-forge. Treat its claims as hypotheses.
 
-## 2. Read story-forge's top level
+## 2. Read the target's top level
 
-In `storyForge`: `CLAUDE.md`, `index.md` (its `okf_types` frontmatter
-declares the kinds), `CONTEXT.md`, `standards/index.md`, and the
-`index.md` of each top-level directory. Record the commit:
-`git -C <storyForge> rev-parse HEAD`. List every tracked file with
-`git -C <storyForge> ls-files`.
+In `target`: `CLAUDE.md`, the root `index.md`, `CONTEXT.md`,
+`standards/index.md`, and the `index.md` of each top-level directory,
+where they exist. Record the commit: `git -C <target> rev-parse HEAD`.
+List the tracked files with `git -C <target> ls-files`. When `scope`
+is a list of folders, keep only the files under them.
 
-## 3. Split into slices
+**Start from the kinds the target declares.** A repository may list
+its own types, such as the `okf_types` map in the frontmatter of the
+root `index.md`, and its files may carry a `type:` frontmatter value.
+Every declared kind in scope becomes a kind in your plan, under its
+declared name. Then add the kinds the target does not declare: skills,
+scripts, standards, indexes, config, and so on. Mark those as guesses.
 
-Make between 3 and `maxSlices` slices. Rules:
+## 3. Group the kinds into slices
 
-- Every tracked file belongs to exactly one slice. Code, scripts,
-  tests, and config belong to a slice too.
-- A kind belongs to one slice, so no two builders describe the same
-  kind.
-- Balance the work: a slice with many files of one simple kind can be
-  large; a slice of many different kinds stays small.
+Make at most `maxSlices` slices. Rules:
+
+- Each slice holds **3 to 5 kinds**. A kind belongs to one slice, so no
+  two builders describe the same kind.
+- Keep kinds that point at each other in the same slice where you can,
+  so fewer edges leave a slice.
+- Every file in scope should belong to some kind. List the files you
+  cannot place in `unplaced`; the script reports them again later.
 
 ## 4. Write the outputs
 
 Write `<run>/partition.json`:
 
 ```json
-{ "storyForgeCommit": "<sha>",
-  "slices": [ { "id": "<kebab-case>", "folders": ["..."], "files": ["..."],
-                "kindsExpected": ["..."], "edgesOut": ["<kind> -> <kind>"] } ] }
+{ "targetCommit": "<sha>", "scope": ["<folder>", "..."] ,
+  "declaredKinds": { "<Name>": "<file>:<line>" },
+  "slices": [ { "id": "<kebab-case>", "kinds": ["..."], "folders": ["..."],
+                "edgesOut": ["<kind> -> <kind>"] } ],
+  "unplaced": ["..."] }
 ```
 
 Write `<run>/briefs/<id>.md` for each slice. A brief is short, under
 40 lines, and holds only what the builder needs for its own slice:
 
-- the folders and files it owns;
-- the kinds you expect it to find, marked as guesses;
+- the kinds it owns; for a declared kind, quote the declaration with
+  its file and line; mark the others as guesses;
+- the folders where their files live, and 2 or 3 sample paths per kind;
 - the edges you expect to leave the slice;
-- any convention from story-forge's `CLAUDE.md`, `CONTEXT.md`, or
-  standards that applies to these files, with its path;
-- optional: an existing data file it may start from, such as
-  `stories-fact-base.json` for the slice that owns `stories/`.
+- any convention from the target's `CLAUDE.md`, `CONTEXT.md`, or
+  standards that applies to these kinds, with its path.
 
 Put no doc-type theory in a brief. The builder already has a generic
 prompt that says what to record and how.
 
 ## Rules
 
-- story-forge is read-only. Write nothing there.
+- The target is read-only. Write nothing there.
 - Write only inside `<run>`.
 - Privacy is a soft guardrail: add no new private content, use generic
   terms, and redact what looks personal.
