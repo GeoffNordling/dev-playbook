@@ -164,7 +164,8 @@ def run_node(request: dict) -> dict:
     lines = done.stdout.strip().splitlines()
     if not lines:
         raise CallFault("run.mjs printed no response")
-    return json.loads(lines[-1])
+    response: dict = json.loads(lines[-1])
+    return response
 
 
 @dataclass(frozen=True)

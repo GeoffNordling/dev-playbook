@@ -17,6 +17,7 @@ from dev_playbook.checks.billing import BILLING_ENV_VARS
 from dev_playbook.stint.call import (
     BillingFault,
     CallFault,
+    Runner,
     Sealed,
     billing_guard,
     read_stream,
@@ -58,7 +59,8 @@ def send(sink: Path, row: object) -> None:
 
 def stored(db: Path) -> int:
     with sqlite3.connect(db) as conn:
-        return conn.execute("SELECT count(*) FROM events").fetchone()[0]
+        count: int = conn.execute("SELECT count(*) FROM events").fetchone()[0]
+        return count
 
 
 def test_the_receiver_stores_each_row(tmp_path: Path, events: Path) -> None:
@@ -153,7 +155,7 @@ def test_a_stream_with_no_init_line_is_refused() -> None:
         read_stream([RESULT])
 
 
-def fake_node(source: str = "none") -> tuple[list[dict], object]:
+def fake_node(source: str = "none") -> tuple[list[dict], Runner]:
     """A runner that checks what the container would mount, then answers."""
     seen: list[dict] = []
 
@@ -179,7 +181,9 @@ def fake_node(source: str = "none") -> tuple[list[dict], object]:
     return seen, runner
 
 
-def sealed(tmp_path: Path, config: Path, copy: Path, events: Path, runner) -> Sealed:
+def sealed(
+    tmp_path: Path, config: Path, copy: Path, events: Path, runner: Runner
+) -> Sealed:
     (tmp_path / "credentials.json").write_text("secret")
     return Sealed(
         config=config,
