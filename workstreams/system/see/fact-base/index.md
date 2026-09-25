@@ -6,7 +6,7 @@ Start at the head file.
 
 Ordering: the head file, then reading order.
 
-- [Fact Base Workstream](/workstreams/system/see/fact-base/WORKSTREAM.md) — The head file of the fact base child workstream — one deterministic object of nodes and edges per checkout, with the ontology inside it, its standing over the viewer, its principles and terms, the worklist from hand simulations through extractors, the ontology's solver, and a stamped findings artifact, and what is done
+- [Fact Base Workstream](/workstreams/system/see/fact-base/WORKSTREAM.md) — The head file of the fact base child workstream — one deterministic object of nodes and edges per checkout, with the ontology inside it, its standing over the viewer, its principles and terms, the worklist from hand simulations through extractors and the ontology's solver, and what is done
 - [Fact Base](/workstreams/system/see/fact-base/fact-base.md) — The fact base — one deterministic object of nodes and edges extracted from a checkout, every view a selection from it, and how the doc-type build loop and its residuals apply to every object it holds
 - [Ontology Solvers](/workstreams/system/see/fact-base/ontology-solvers.md) — The ontology of the fact base in industry terms — the fact base as an ABox, the doc-types as a TBox, a Standard's rules as shapes, the one solver that checks them, and the document and domain ontologies another repository splits into, none of it decided
 - [Precedent](/workstreams/system/see/fact-base/precedent.md) — The fact base's prior art — typed property graphs from Tuple-Attribute and Rigi to Kythe and Glean, and the competitive pass that found no direct competitor

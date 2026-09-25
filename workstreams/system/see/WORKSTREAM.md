@@ -56,9 +56,7 @@ The viewer draws the fact base's views of a real repo.
   content, not a line between file kinds.
 - **Shape is orthogonal to stochasticity.** A fully deterministic
   runbook or loop still gets its doc-type document, because the
-  document is the legible form. A drift check binds the document to
-  the code it describes; a loop has none yet
-  ([Driver drift](/workstreams/system/drive/WORKSTREAM.md#planned)).
+  document is the legible form.
 - **An extractor is the inverse of a declared encoding.** An agent
   that writes an extractor also writes the doc-type it read from, in
   the reference model's pseudocode, so its assumptions are inspected
@@ -85,16 +83,6 @@ share:
 - **Derivation** — a deterministic function from rows to rows. It
   reads the fact base and derives new rows from existing ones, with no
   judgment, and never touches a file.
-- **Vocabulary** — the closed set of primitives one doc-type owns
-  ([the chain](/doc-types/runbook/contract-shape.md#edges)).
-- **Schema** — the fact base's set of node types and relation types:
-  the union of every vocabulary plus the bedrock relations. The fact
-  base has a schema and no vocabulary of its own.
-- **Checkout** — one working copy of a repo, a main checkout or a
-  worktree: the unit a fact base describes and the viewer shows.
-- **Envelope** — the fixed top-level fields every view file and every
-  hand-written fact base carries around its payload
-  ([the envelope](/workstreams/system/see/viewer/contract.md#the-envelope)).
 
 ## Acronyms
 

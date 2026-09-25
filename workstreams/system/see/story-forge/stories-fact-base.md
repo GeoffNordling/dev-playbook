@@ -52,7 +52,7 @@ answerable from extractable facts; D means it needs a declared fact.
 ## The data file
 
 [stories-fact-base.json](/workstreams/system/see/story-forge/stories-fact-base.json),
-in the viewer's envelope, `kind: fact-base`, `kind_version: 0`. 299
+in the viewer's [envelope](/workstreams/system/see/viewer/contract.md#the-envelope), `kind: fact-base`, `kind_version: 0`. 299
 nodes and 537 edges, every row with a receipt. No derived row: every
 row came from an extractor.
 

@@ -15,7 +15,7 @@ of 2026-09-11 found. Speculative, per
 ## Terms
 
 Fact base, extractor, and view are the repo's words
-([CONTEXT.md](/CONTEXT.md)); receipt and schema are See's
+([CONTEXT.md](/CONTEXT.md)); receipt is See's
 ([Terms](/workstreams/system/see/WORKSTREAM.md#terms)).
 This page defines none.
 

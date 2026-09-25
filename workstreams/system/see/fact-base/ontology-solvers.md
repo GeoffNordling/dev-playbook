@@ -12,8 +12,8 @@ the fact base map onto one, and the two ontologies, document and
 domain, that extending the system to another repository shows. The
 ontology is part of the fact base, and the doc-type system enables it:
 without doc-types there is no ontology to solve. Speculative, per
-[Fact Base Workstream](/workstreams/system/see/fact-base/WORKSTREAM.md),
-whose Planned list holds the solver's build. Nothing here is decided.
+[Fact Base Workstream](/workstreams/system/see/fact-base/WORKSTREAM.md).
+Nothing here is decided.
 
 ## The source is one recorded talk
 

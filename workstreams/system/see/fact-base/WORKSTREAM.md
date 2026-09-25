@@ -1,7 +1,7 @@
 ---
 type: Workstream
 title: Fact Base Workstream
-description: The head file of the fact base child workstream — one deterministic object of nodes and edges per checkout, with the ontology inside it, its standing over the viewer, its principles and terms, the worklist from hand simulations through extractors, the ontology's solver, and a stamped findings artifact, and what is done
+description: The head file of the fact base child workstream — one deterministic object of nodes and edges per checkout, with the ontology inside it, its standing over the viewer, its principles and terms, the worklist from hand simulations through extractors and the ontology's solver, and what is done
 ---
 
 # Fact Base Workstream
@@ -49,10 +49,11 @@ over it.
 
 ## Principles
 
-- **The fact base holds declarations and state, never findings.**
-  Findings are a separate stamped artifact. Deterministic ones are
-  recomputable from the fact base; stochastic ones are cached with
-  commit, judge, and time.
+- **The fact base records what is declared, not what happens.** A
+  fact says what a file declares or what a parser found. A `reads`
+  edge from a runbook says the runbook tells an agent to read a file,
+  not that the agent will
+  ([The record is not the behavior](/workstreams/system/see/fact-base/fact-base.md#the-record-is-not-the-behavior)).
 - **The ontology is part of the fact base, and there is one solver.**
   The fact base is the ABox; the doc-types are the TBox, and the
   doc-type system is what makes an ontology to solve at all
@@ -78,38 +79,10 @@ terms the main part of the repo also uses are in
 
 In order; each produces what the next needs.
 
-- **Simulations by hand.** Enumerate the use cases, the questions a
-  person asks of the system, and hand-write a fact base per subsystem
-  like the Ralph one, in the viewer's envelope, every row with a
-  receipt. The use cases recorded for the runbook population in the
-  first design session: what is there, split Agent and Skill; where the
-  user enters, the runbooks no other runbook does, and their complement
-  the leaves; who does whom, the `does` edges and their connected
-  clusters; what each can touch, the writes buckets and the never bans;
-  what the fleet runs on, model, effort, and tools per Agent; and how
-  heavy each is, counted from the object and from the file. One subject
-  was named, the software factory, whose agents are singletons in the
-  `does` graph because the factory's own graph lives in
-  `software-factory.md`, which issue-overwatch reads as a bare imported
-  node; the factory is isolated under `workstreams/software-factory/`
-  since 2026-09-20, so that subject waits on its fate. Each use case
-  names a subsystem; each simulation firms the seven views, adds
-  extractors, and writes residuals. The consumer-repo simulation is
-  [Story-Forge Simulation](/workstreams/system/see/story-forge/WORKSTREAM.md),
-  the first data point for residual ownership across repos
-  ([Open questions](/workstreams/system/see/fact-base/fact-base.md#open-questions)).
-  No code is written until the simulations cover the expected use
-  cases.
-- **The simulation as a loop.** The second simulation is already
-  repeatable work, and the third is a loop, not a session: an agent
-  re-expresses the subsystem in the current primitives, writes the fact
-  base and the residuals, and proposes primitives; the user accepts or
-  rejects and justifies neither. This is
-  [the doc-type build loop](/doc-types/doc-type.md#the-doc-type-build-loop)
-  run as a Loop. The same loop later writes extractors and derivations.
-  The user designs from scratch only at a beginning, the way
-  [Fact Base](/workstreams/system/see/fact-base/fact-base.md) was
-  designed.
+- **Simulations by hand.** Stochastic agents simulate the fact base
+  and its views before any of it is built, to test that it has real
+  value first
+  ([Story-Forge Simulation](/workstreams/system/see/story-forge/WORKSTREAM.md)).
 - **Extractors.** `chaingen` and `rulegen`, deleted and kept in git
   history at commits `b266ce4` and `9be0089`, are the models for the
   `chain` and `standard` extractors in the package, alongside the
@@ -128,9 +101,6 @@ In order; each produces what the next needs.
   solver run over the fact base, its violations findings with
   receipts
   ([Ontology Solvers](/workstreams/system/see/fact-base/ontology-solvers.md)).
-- **Findings as a stamped artifact.** The artifact Principles names:
-  its shape, its stamp of commit, judge, and time, and how a
-  deterministic finding is recomputed from the fact base.
 - **The per-predicate tail query.**
   [Deterministic Separation](/workstreams/system/see/fact-base/deterministic-separation.md)
   as a view: for each rule id, which stochastic nodes lie between its

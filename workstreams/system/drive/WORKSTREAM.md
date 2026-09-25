@@ -249,23 +249,10 @@ guiding. An unattended stint runs with the `stint` command
   - **Does a stint's review verify against a Standard?** Accepted
     tentatively: the reviewer is a verification against a stochastic
     Standard, "a segment does what its plan said".
-  - **What an old page on specifying a loop left.** It was written
-    before the model and is deleted; these of its ideas are kept to
-    settle here, each kept, rewritten, or dropped:
-    - An idea written down takes one of three forms: a goal, spent
-      when it is met, now a head file's `## Done when`; a predicate,
-      standing, a rule in a Standard; or an objective, standing, a
-      scalar descended under the predicates.
-    - A loop that proposes: it drafts candidate predicates, each cited
-      or marked invented, with the members that fail each today. The
-      user says yes or no, and a no is kept with its reason and never
-      proposed again, so the loop's memory is the Standard and the
-      rejections, never a transcript. Rejecting a predicate costs the
-      user five lines; rejecting a diff costs an hour.
-    - Soft guidance, such as *parallel* or *parsimonious*, reaches only
-      the proposing act; the applying act sees only findings.
-    - Intent that resists every form stays the user's, and the loop
-      asks rather than guesses.
+  - **An idea written down takes one of three forms.** A goal, spent
+    when it is met, a head file's `## Done when`; a predicate,
+    standing, a rule in a Standard; or an objective, standing, a
+    scalar descended under the predicates.
 - **Design what a stint returns.** A session with the user, before the
   unattended stint's Loop is written. Inside the container, iterations
   and checkpoints write files on the stint's branch: `PLAN.md`,

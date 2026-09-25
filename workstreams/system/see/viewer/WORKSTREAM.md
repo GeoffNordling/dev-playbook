@@ -42,9 +42,7 @@ Its files:
 ## Terms
 
 Fact base, view, and extractor are the repo's words
-([CONTEXT.md](/CONTEXT.md)); checkout and envelope are See's
-([Terms](/workstreams/system/see/WORKSTREAM.md#terms)). The terms of
-this child workstream:
+([CONTEXT.md](/CONTEXT.md)). The terms of this child workstream:
 
 - **CLOA object** — what a doc-type's contract shape defines for one
   document, a runbook's chain, a Standard's rules
@@ -113,11 +111,7 @@ targets.
   panel that needs a primitive the shape lacks is a residual for that
   doc-type's ledger, never a term the viewer invents
   ([Fact Base](/workstreams/system/see/fact-base/fact-base.md#the-objects-are-already-defined)).
-  The generated text files, `chains.txt` and its two siblings, were
-  the proof of concept, the first prototype of this dashboard; all
-  three are deleted and kept in git history, the last at commit
-  `b266ce4`. They constrained nothing, and carrying them to the screen
-  was never the goal. How an object draws is the renderer's to decide, which the
+  How an object draws is the renderer's to decide, which the
   doc-type itself says
   ([Nodes and Edges Encoding](/doc-types/runbook/encoding.md)), so the
   drawing rules are stated here, in the kind's registry entry, and the

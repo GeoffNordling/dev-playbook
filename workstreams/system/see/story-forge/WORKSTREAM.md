@@ -63,11 +63,10 @@ The user rules the fact base and its views worth building, or not.
   contact. The line is drawn in file terms because the user's sense of
   what is private is latent, so it is ruled case by case: before a
   commit, the session lists every verbatim field the diff carries, the
-  user rules each, and a ruling becomes a bullet here. Rulings,
-  2026-09-23: a story's `description` is out, replaced in the fact
-  base by `[redacted, N words]` so the row keeps its shape and the
-  receipt its line; story `title` attrs and the resume filenames were
-  seen and allowed.
+  user rules each, and a ruling becomes a bullet here. A story's
+  `description` is out, replaced in the fact base by
+  `[redacted, N words]` so the row keeps its shape and the receipt its
+  line; story `title` attrs and the resume filenames are allowed.
 - **Views render locally.** Every view is a `.html` file in this workstream,
   which the user opens in their own browser or in VS Code, never the
   terminal and never a Claude artifact or any other hosted page, so no
@@ -83,9 +82,7 @@ The user rules the fact base and its views worth building, or not.
 - **A hand-wave stands in for code, never for magic.** A simulation
   may put an agent where a script will go only when the agent's
   output is something deterministic code can produce later, and the
-  agent must name what it assumed. Sanity check of 2026-09-23: every
-  assumption in `code/extract.py` is a regex over a convention a
-  doc-type can declare, so none is magic.
+  agent must name what it assumed.
 
 ## Terms
 

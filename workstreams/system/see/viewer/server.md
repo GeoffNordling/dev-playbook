@@ -50,7 +50,7 @@ chosen on the page, not on the command line.
   watcher stopped, and its state directory removed.
 - **Refresh** — run the extractors and rules to write the checkout's
   fact base, then every registered kind's selection, validating each
-  view file against the envelope and its kind schema before writing it,
+  view file against the [envelope](/workstreams/system/see/viewer/contract.md#the-envelope) and its kind schema before writing it,
   and write the refresh record.
 - **Watch the checkout** — on any change to a tracked file, wait a short
   settle time, then refresh. Each current extractor runs in under a

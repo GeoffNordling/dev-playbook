@@ -19,7 +19,7 @@ One subsystem, the Ralph loop, was simulated by hand before any code:
 [Ralph Fact Base](/workstreams/system/see/fact-base/fact-base-ralph.md)
 defines it, and
 [fact-base-ralph.json](/workstreams/system/see/fact-base/fact-base-ralph.json)
-is the data as an extractor would write it, in the viewer's envelope:
+is the data as an extractor would write it, in the viewer's [envelope](/workstreams/system/see/viewer/contract.md#the-envelope):
 nineteen nodes, forty-one edges, every row with a receipt.
 
 ## Goal
@@ -40,8 +40,8 @@ fast, and identical until the checkout changes.
 ## Terms
 
 Fact base, node, edge, extractor, view, primitive, and residual are
-the repo's words ([CONTEXT.md](/CONTEXT.md)); receipt, derivation,
-vocabulary, and schema are See's
+the repo's words ([CONTEXT.md](/CONTEXT.md)); receipt and derivation
+are See's
 ([Terms](/workstreams/system/see/WORKSTREAM.md#terms)). This page
 defines none.
 

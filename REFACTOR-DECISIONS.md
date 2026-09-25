@@ -134,3 +134,27 @@ TEMPORARY label and kept the test.
   are in HEAD and are not from this refactor.
 - The acronym VEC in the story-forge survey names the user's state
   employment agency.
+
+## Slop tics found in review
+
+Principles the user named while reviewing, to fold into the slop tics
+document at the end.
+
+- **History and closure claims.** Write what is current. "No more
+  doc-types are expected" and "no further development is planned"
+  record a private conversation, not the state of the work.
+- **Text diagrams in Markdown.** A graph in a Markdown file is Mermaid.
+  Box-drawing text suits the terminal only.
+- **An analogy inflated into doctrine.** A comparison said once in
+  passing becomes defined terms, a principle, and repeated framing in a
+  lead document. State it once, if at all.
+- **Synthesized voice.** Principles that paraphrase the user's ideas in
+  generated prose. Write them the way the user said them.
+- **Status in a principle.** A Principles entry states what holds. What
+  is built, not yet built, dated, or deleted belongs in Planned,
+  Completed, or git history.
+- **Defining terms for the sake of it.** Define a term only when a
+  reader would misread it without the definition. A plain word
+  (checkout, schema, vocabulary) used in its plain sense gets none.
+- **The obvious negation.** "X, never Y" where no reader would expect
+  Y. It fills a line and hides the claim that matters.
