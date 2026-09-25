@@ -146,9 +146,10 @@ Decided with the user on 2026-09-24.
      it.
 - **An unattended principal keeps the whole stint in its own context,
   and never forks.** It knows the history of what it is doing because it
-  lived it. The attended Ralph, which changes the plan through a fork of
-  the top session, stays as it is, and the unattended driver is built
-  separately.
+  lived it. The attended Ralph keeps its own mechanism, changing the
+  plan through a fork of the top session, and the unattended driver is
+  built separately; both follow the
+  [Stint Model](/workstreams/system/drive/stint-model.md).
 - **The drivers form a menu.** Today: the Ralph workflow, which runs in a
   Claude Code session through the `Workflow` runtime
   ([`ralph-loop.js`](/dotfiles/dot-claude/workflows/ralph-loop.js)), and
@@ -236,6 +237,12 @@ stint runs with the `stint` command
   [Running a Stint](/guides/running-a-stint.md) follows. Where a leaf's
   `check` script sits, and any rule that holds it there, is decided
   here.
+- **Bring the attended Ralph to the model.** The Ralph workflow
+  (`ralph-loop.js`), its skills (`ralph-setup`, `ralph-checkpoint`),
+  and its agents (`ralph-reviewer`, `ralph-checkpointer`) take the
+  [Stint Model](/workstreams/system/drive/stint-model.md)'s target,
+  verifiers, done rule, and deviations, and its names. The fork that
+  changes the plan stays.
 - **Write the stint's Loop.** The first file in `loops/`. In order:
   - **Design what a stint returns.** A session. Inside the container,
     iterations and checkpoints write files on the stint's branch:
