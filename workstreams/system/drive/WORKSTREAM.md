@@ -81,7 +81,13 @@ The words of the workflow, workstream, loop, yield, stint, driver,
 principal, iteration, segment, and checkpoint, are the repo's
 ([CONTEXT.md](/CONTEXT.md#workstreams-and-loops)), since the doc-types
 and [Running a Stint](/guides/running-a-stint.md) use them too. This
-head file coins none.
+head file coins one:
+
+- **Draft Standard** — a file typed `Standard` inside a workstream,
+  wired to a stint's `--check` and never to the gate, so its rules may
+  fail at any time; the workstream's target, deleted or promoted under
+  `standards/` on accept
+  ([Stint Model](/workstreams/system/drive/stint-model.md)).
 
 ### Shape
 
@@ -137,6 +143,9 @@ Decided with the user on 2026-09-24.
      and judgment. The sorting is how the pattern scales: the user rules
      on the top findings only, since no user can read everything agents
      report, and ruling on a sorted list calibrates the user's taste.
+     In an unattended stint this reviewer is the plan reviewer, and a
+     second one, the verifier, judges the target's stochastic rules
+     ([Stint Model](/workstreams/system/drive/stint-model.md)).
   4. The principal changes the plan on the iterations' and the reviewer's
      reports, so the entity that manages the plan is the one that changes
      it.
@@ -203,8 +212,11 @@ Decided with the user on 2026-09-24.
 - **A stint's plan is `PLAN.md` and `PROGRESS.md`** beside the head file
   on the stint's branch, as a Ralph run keeps them today. At the verdict,
   the stint's entry under Stints records the outcome.
-- **A workstream's target is not a Standard, for now.** Done when stays a
-  heading; the idea returns after the first real stint.
+- **A workstream's target is one or more draft Standards.**
+  `## Done when` points at them, they are wired to `--check` and not to the
+  gate, and a stint targets some of their rules. The whole model of a
+  stint, decided 2026-09-25, is
+  [Stint Model](/workstreams/system/drive/stint-model.md).
 
 ## Open
 
@@ -212,66 +224,78 @@ None.
 
 ## Planned
 
-Sessions with the user come first, each at a high level, the agent
-guiding. An unattended stint runs with the `stint` command
+In order of dependency: each item needs the ones above it, except
+where it says otherwise. The design is
+[Stint Model](/workstreams/system/drive/stint-model.md), and a session
+is with the user, at a high level, the agent guiding. An unattended
+stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Think the system through.** A session with the user, before any
-  more of the stint is designed or built. The parts were designed and
-  approved one at a time: Loop, Workstream, the stint, and a Standard
-  as what a verification runs. Nobody has yet thought through how they
-  work together. The session reads the old Loop writing against the
-  model approved on 2026-09-24 and settles or reopens each of these:
-  - **How a Standard plugs into a loop.** A verification runs a
-    Standard, and a Standard has deterministic rules that the
-    pre-commit hooks already run on every commit. How the two meet,
-    overlap, or load the run twice is unthought.
-  - **Driver drift.** A Loop document describes a loop, and a driver,
-    such as the `stint` command, runs it. If the script
-    changes, for example the checkpoint moves from every 5 iterations
-    to every 10, the Loop document still says 5, and no check compares
-    the two. A check between them is needed. The graph is data, so
-    the driver can read the Loop document as its instructions, and
-    then the steps cannot drift at all; what the document cannot
-    carry, such as a count, still needs a check.
-  - **Is `## Done when` a spec written for one run?** That is, the
-    target of a stint, verified to zero findings like a Standard, or
-    only the condition of the finish yield.
-  - **Does a stint's review verify against a Standard?** Accepted
-    tentatively: the reviewer is a verification against a stochastic
-    Standard, "a segment does what its plan said".
-  - **An idea written down takes one of three forms.** A goal, spent
-    when it is met, a head file's `## Done when`; a predicate,
-    standing, a rule in a Standard; or an objective, standing, a
-    scalar descended under the predicates.
-- **Design what a stint returns.** A session with the user, before the
-  unattended stint's Loop is written. Inside the container, iterations
-  and checkpoints write files on the stint's branch: `PLAN.md`,
-  `PROGRESS.md`, commits, and the head file's worklist moves. The
-  design settles which of these come back when the container stops,
-  which stay on the branch, and which reach `main` only on an accept.
-  It also settles who writes the stint's entry under `## Stints`, and
-  when: the container at the yield, or the driver after the user's
-  verdict, since a verdict exists only after the yield.
-- **Write the unattended stint's Loop.** The first file in `loops/`,
-  once the system is thought through and what a stint returns is
-  designed.
-- **Run the pre-commit gate in the stint's work copy.** Today no hook
-  runs on an iteration's commit: the work copy is a plain `git clone`
-  (`src/dev_playbook/stint/workcopy.py:267`), which copies no hooks,
-  and the image has no `pre-commit` (`src/dev_playbook/stint/Containerfile`).
-  The iteration prompt runs `--check` as the only gate instead
+- **Run the pre-commit gate in the stint's work copy.** Everything
+  below needs it: without the gate, no call holds the permanent
+  Standards, and `--check` cannot become the target check. Today no
+  hook runs on an iteration's commit: the work copy is a plain
+  `git clone` (`src/dev_playbook/stint/workcopy.py:267`), which copies
+  no hooks, and the image has no `pre-commit`
+  (`src/dev_playbook/stint/Containerfile`). The iteration prompt runs
+  `--check` as the only gate instead
   (`src/dev_playbook/stint/prompts/iteration.md.in:18`). The fix: the
   image gets `pre-commit`, the hooks are installed in the work copy
   after it opens, inside the container, and the hook environments are
   cached across calls, since every call is a fresh container and the
   hook set comes from each target repo's `.pre-commit-config.yaml`,
-  so the image cannot build them in advance. Once it lands, the gate
-  holds the permanent Standards on every commit, and `--check` is
-  free to become the stint's target check, run at each checkpoint.
-- **Build the board script.** It reads the head files and the live stints
-  and prints the ✈️/💤 board.
-- **Build the coordinator agent.** Advisory only.
+  so the image cannot build them in advance.
+- **Put the draft Standard in the doc-type system.** It does not wait
+  on the gate. In order:
+  - **Decide whether a draft Standard is a doc-type.** A session. A
+    `DraftStandard` class in the reference model would give the draft
+    Standard its own rules in the pseudocode; the model now has it as a
+    plain `Standard` that differs only in place and wiring.
+  - **Let a draft Standard live in a workstream.** A file typed
+    `Standard` under `workstreams/` is held to the Standards about
+    Standards, against the exemption in
+    [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md)
+    and the one tree `standards/` reserves; its rule ids take the
+    workstream's name as their family; and nothing under
+    `workstreams/` is wired to the gate.
+  - **Teach the Workstream doc-type the target.** `## Done when` links
+    the workstream's draft Standards, a stint names the rule ids it
+    targets, a new `targets` field of the `Stint` part, and only a leaf
+    workstream has a stint, in the Workstream doc-type and
+    [Workstream Conventions](/standards/doc-type/workstream-conventions.md).
+  - **Fix the goal wherever it is stale.**
+    [Writing Predicates](/guides/writing-predicates.md) says a goal
+    lives in an issue, and the terms in [CONTEXT.md](/CONTEXT.md)
+    still say so; both follow the model.
+- **Bring the `stint` command to the model.** `--check` becomes the
+  target check, which iterations may run at any time and the driver
+  runs at each checkpoint; the checkpoint runs the verifier and the
+  plan reviewer; the driver decides done as zero findings; and a
+  blocked iteration logs a deviation and exits, so the stop rules
+  `iter-k blocked` and `iter-k committed nothing` go, and
+  [Running a Stint](/guides/running-a-stint.md) follows.
+- **Write the stint's Loop.** The first file in `loops/`. In order:
+  - **Design what a stint returns.** A session. Inside the container,
+    iterations and checkpoints write files on the stint's branch:
+    `PLAN.md`, `PROGRESS.md`, commits, and the head file's worklist
+    moves. The design settles which of these come back when the
+    container stops, which stay on the branch, and which reach `main`
+    only on an accept. It also settles who writes the stint's entry
+    under `## Stints`, and when: the container at the yield, or the
+    driver after the user's verdict, since a verdict exists only after
+    the yield.
+  - **Write the Loop.** The checkpointed loop of
+    [Stint Model](/workstreams/system/drive/stint-model.md), from the
+    segment to the yield, as a graph that names no workstream.
+- **Build the board script.** It reads the head files and the live
+  stints and prints the ✈️/💤 board.
+- **Build the coordinator agent.** Advisory only; it reads the board.
+- **Decide what an objective is to a workstream.** A session, and it
+  waits on nothing above. An idea written down takes one of three
+  forms: a goal, spent when it is met, now a workstream's draft
+  Standards; a predicate, standing, a rule in a Standard; or an
+  objective, standing, a scalar descended under the predicates. Where
+  an objective sits in a workstream or a loop is not decided.
 
 ## Completed
 
@@ -299,6 +323,11 @@ guiding. An unattended stint runs with the `stint` command
   rewritten as the rules of a workstream's files, the exemptions the
   other rules grant a workstream reworded, the old terms replaced in
   every file, and every link fixed.
+- **Think the system through.** Done 2026-09-25: a session with the
+  user settled how a stint's target, its checks, and its agents fit
+  together, recorded in
+  [Stint Model](/workstreams/system/drive/stint-model.md); what it left
+  is under [Planned](#planned).
 - **Split the tracking standard.** Done 2026-09-25:
   [`standards/tracking/`](/standards/tracking/index.md) holds two
   sections, [GitHub Tracking](/standards/tracking/github/index.md),
