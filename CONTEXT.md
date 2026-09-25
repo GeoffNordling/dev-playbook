@@ -168,7 +168,7 @@ The boundary a document or a set declares: a document's frontmatter `description
 ### File roles
 
 The two axes a repository file sits on, its role and its content
-([Document Types](/standards/knowledge-organization/document-types.md)).
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md)).
 
 **Concept document**
 Prose a reader loads to understand something. It carries OKF frontmatter, and a check reads its type.

@@ -1,11 +1,11 @@
 ---
 type: Standard
-title: Document Types
-description: The frontmatter profile every concept document carries — a registered type, a title, a description, a resource where an asset backs the document, and the README type on a README.md alone
+title: OKF Frontmatter
+description: The OKF frontmatter every concept document carries — a registered OKF type, a title, a description, a resource where an asset backs the document, and the README type on a README.md alone
 population: "a concept document"
 ---
 
-# Document Types
+# OKF Frontmatter
 
 The frontmatter a concept document carries, the prose `.md` file a
 reader loads to understand something. The
@@ -26,16 +26,15 @@ YAML is a mapping.
 
 `knowledge-organization.frontmatter-a-yaml-mapping` · deterministic
 
-## `type` names a registered type
+## `type` is a registered OKF type
 
 A concept document's frontmatter has a `type` key whose value names one
-row of the
-[OKF Type Registry](/registries/okf-types.md#okf-types), or one entry of
-the `okf_types` mapping in the frontmatter of the repo's own root
-`index.md`
-([Local Types](/standards/knowledge-organization/local-types.md#local-declaration)).
+row of dev-playbook's
+[OKF Type Registry](/registries/okf-types.md#okf-types), or one row of
+the repo's own `registries/okf-types.md`
+([Local OKF Types](/standards/knowledge-organization/local-okf-types.md#local-declaration)).
 
-`knowledge-organization.type-names-a-registered-type` · deterministic
+`knowledge-organization.type-is-a-registered-okf-type` · deterministic
 
 ## Non-empty `title`
 
@@ -104,6 +103,13 @@ A concept document typed `Guide` lives under `guides/` or in a
 workstream under `workstreams/`.
 
 `knowledge-organization.guide-lives-under-guides` · deterministic
+
+## Registry lives under `registries/`
+
+A concept document typed `Registry` lives under `registries/` or in a
+workstream under `workstreams/`.
+
+`knowledge-organization.registry-lives-under-registries` · deterministic
 
 ## `README.md` is typed `README`
 

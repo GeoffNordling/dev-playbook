@@ -30,6 +30,6 @@ each `doc-types/<name>/` to a row here.
 |---|---|---|---|
 | [Guide](/doc-types/guide/definition.md) | `Guide` | — | [Guide Conventions](/standards/doc-type/guide-conventions.md) |
 | [Loop](/doc-types/loop/definition.md) | `Loop` | — | [Loop Conventions](/standards/doc-type/loop-conventions.md) |
-| [Runbook](/doc-types/runbook/definition.md) | — | skill bundles, `agents/*.md` | [Runbook Conventions](/standards/doc-type/runbook-conventions.md) |
+| [Runbook](/doc-types/runbook/definition.md) | — | skill bundles; `agents/*.md` | [Runbook Conventions](/standards/doc-type/runbook-conventions.md) |
 | [Standard](/doc-types/standard/definition.md) | `Standard` | — | [Standard Conventions](/standards/doc-type/standard-conventions.md) |
 | [Workstream](/doc-types/workstream/definition.md) | `Workstream` | — | [Workstream Conventions](/standards/doc-type/workstream-conventions.md) |

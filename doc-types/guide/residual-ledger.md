@@ -26,7 +26,7 @@ else. A Guide with nothing to record has no entry.
   enrollment sequences after them. The shape lists sequences in file
   order and says nothing of how they relate.
 - **[Adopting a Repo-Scoped Standard](/guides/consuming.md).** The last
-  step binds only a repo that registers a document type; the condition
+  step binds only a repo that registers a local OKF type; the condition
   sits in the step's name because a step has no condition of its own.
 - **[Linking Issues](/guides/linking-issues.md).** The first reference,
   the database id, is a prerequisite of the two write references after

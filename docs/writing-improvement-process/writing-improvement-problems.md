@@ -76,7 +76,7 @@ Never duplicate facts across multiple documents.
 
 - **Before** "A runbook is harness-owned — Claude Code loads it as
   configuration, not as prose to learn from — so it is not an OKF
-  concept document." (Document Types owns this) → **After**
+  concept document." (OKF Frontmatter owns this) → **After**
   deleted.
 
 ## Section-scale duplication

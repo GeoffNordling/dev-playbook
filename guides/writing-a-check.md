@@ -54,7 +54,7 @@ dev-playbook, `story_forge` in story-forge.
    governs is absent, the function yields nothing: dev-playbook's
    checks run in every repo, and `standard.no-shadowing` finds nothing
    in a repo with no `standards/` tree. In dev-playbook, data a
-   Standard's body holds, such as the type registry table, is read
+   document holds, such as the OKF Type Registry's table, is read
    through the named constants in `src/dev_playbook/sources.py`. A
    check that reads sibling repos on this machine carries
    `needs=[WORKSPACE]`, as `knowledge-organization.reference-resolves`

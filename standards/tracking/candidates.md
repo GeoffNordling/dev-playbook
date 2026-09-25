@@ -14,7 +14,7 @@ committed work is a GitHub issue
 optional, one per repo, at the root
 ([One at the root, or none](/standards/build/skeleton.md#one-at-the-root-or-none)), typed
 `Candidate-List`
-([Document Types](/standards/knowledge-organization/document-types.md));
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md));
 its absence means nothing has been recorded yet.
 
 > **Why.** Commitment is a decision, not a capability: an entry may be

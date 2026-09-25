@@ -10,7 +10,7 @@ An **OKF type** is the `type` value in a concept document's frontmatter,
 the one field the OKF spec requires
 ([OKF spec](/docs/mirrors/okf-spec.md)). This table is the global set
 every repo inherits; a consumer repo adds its own
-([Local Types](/standards/knowledge-organization/local-types.md)). An
+([Local OKF Types](/standards/knowledge-organization/local-okf-types.md)). An
 OKF type is a label, not a contract: which OKF types a doc-type covers
 is the [Doc-Type Registry](/registries/doc-types.md).
 

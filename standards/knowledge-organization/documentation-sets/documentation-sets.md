@@ -22,7 +22,7 @@ restates the context of its day and is never rewritten; so is a
 `type: Mirror` mirror, upstream text vendored verbatim and never
 edited here. A member's **concern** is the one purpose its frontmatter
 `description` states
-([Document Types](/standards/knowledge-organization/document-types.md#non-empty-description-no-closing-period));
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md#non-empty-description-no-closing-period));
 a set's concern is its index's introduction
 ([Indexes](/standards/knowledge-organization/indexes.md#introduction-between-h1-and-listing)).
 The rules bind the set level, how the members relate to each other and

@@ -8,7 +8,7 @@ description: The headings a Workstream's head file picks its H2s from, each with
 
 The headings a Workstream's head file may use as its H2s. Every heading
 is optional and all are peers. The rule
-[Headings from the menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu)
+[Headings from the registry](/standards/doc-type/workstream-conventions.md#headings-from-the-registry)
 reads this table.
 
 ## Headings

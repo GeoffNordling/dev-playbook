@@ -17,7 +17,7 @@ stints that drove it.
 ## The shape
 
 - **Heading.** One section of the head file, its name picked from one
-  menu, [Headings from the menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu). Every heading is
+  menu, [Headings from the registry](/standards/doc-type/workstream-conventions.md#headings-from-the-registry). Every heading is
   optional and all are peers; a workstream picks the ones its work
   needs. A heading's body is opaque to the contract, except Stints.
 - **Stint.** One entry under Stints, a unit of accounting: one bounded

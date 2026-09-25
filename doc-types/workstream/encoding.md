@@ -26,7 +26,7 @@ skips it.
 ## Headings
 
 A heading is an H2 whose text is one name from the menu in
-[Headings from the menu](/standards/doc-type/workstream-conventions.md#headings-from-the-menu).
+[Headings from the registry](/standards/doc-type/workstream-conventions.md#headings-from-the-registry).
 Each name is used at most once. An H3 or deeper under a heading is part of its body, and
 the body is opaque, except under Stints.
 

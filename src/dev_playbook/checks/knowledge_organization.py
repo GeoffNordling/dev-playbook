@@ -1,13 +1,13 @@
 """The knowledge-organization family: the rules of ``standards/knowledge-organization/``.
 
-Thirty-six rules, each decided by a function over the model. Three hold the
+Thirty-seven rules, each decided by a function over the model. Three hold the
 root ``CONTEXT.md`` to its type, its ``## Language`` section, and the shape of
 an entry. Eight hold a reference in a markdown file to the cross-reference
 grammar: it resolves, its anchor names a distinct, unnumbered heading, and its
 form fits where the target lives and whether the file has a fixed repo root.
-Eleven hold a concept document to its frontmatter, one a directory of concept
+Twelve hold a concept document to its frontmatter, one a directory of concept
 documents to its ``index.md``, five an ``index.md`` to its listing, one a
-``README.md`` to its H1, three a consumer's ``okf_types`` mapping to its shape,
+``README.md`` to its H1, three a consumer's table of local OKF types to its shape,
 and four ``workstreams/`` to the files of its workstreams.
 
 Two checks, the ones that read a ``~/workspace/<other repo>/`` target, read
@@ -19,7 +19,6 @@ import re
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Any
 
 from dev_playbook import md, sources
 from dev_playbook.check_registry import WORKSPACE, Finding, check
@@ -36,7 +35,6 @@ README_TYPE = "README"
 LANGUAGE = "Language"
 AVOID = "_Avoid_:"
 ORDERING = "Ordering:"
-LOCAL_TYPES = "okf_types"
 OKF_VERSION = "okf_version"
 PLANNED_AND_COMPLETED = ("Planned", "Completed")
 RESOURCE_REQUIRED = "Recipe-Description"
@@ -44,6 +42,7 @@ LIVES_UNDER = {
     "Standard": "standards/",
     "Loop": "loops/",
     "Guide": "guides/",
+    "Registry": "registries/",
 }
 # Where the harness files ``~/.claude/`` holds are tracked, in dev-playbook.
 CLAUDE_SOURCE = "dotfiles/dot-claude"
@@ -478,7 +477,7 @@ def _bundle_target(repo: Repo, ref: Reference, bundle: str) -> bool:
     return resolved.kind == "repo" and _inside(resolved.path, bundle)
 
 
-# --- document-types.md ---------------------------------------------------
+# --- okf-frontmatter.md ---------------------------------------------------
 
 
 def _in_workstream(path: str) -> bool:
@@ -492,21 +491,54 @@ def _concept_documents(repo: Repo) -> Iterator[MarkdownFile]:
             yield doc
 
 
-def _local_types(repo: Repo) -> dict[Any, Any] | None:
-    """The root index's ``okf_types`` mapping, where a consumer declares one."""
+@dataclass(frozen=True)
+class LocalRow:
+    """One row of a consumer's table of local OKF types, with its line."""
+
+    line: int
+    cells: list[str]
+
+    @property
+    def name(self) -> str | None:
+        """The OKF type the first cell names, or None when it names none."""
+        cell = self.cells[0] if self.cells else ""
+        name = cell[1:-1] if len(cell) > 1 and cell[0] == cell[-1] == "`" else ""
+        return name if TYPE_NAME.fullmatch(name) else None
+
+
+def _local_table(repo: Repo) -> tuple[tuple[int, str], ...] | None:
+    """The consumer's ``## OKF types`` section, or None where it declares none.
+
+    Raises ``KeyError`` when the file is present and the heading is not.
+    """
     if repo.is_dev_playbook:
         return None
-    index = repo.markdown.get(ROOT_INDEX)
-    if index is None or index.frontmatter is None:
-        return None
-    declared = index.frontmatter.get(LOCAL_TYPES)
-    return declared if isinstance(declared, dict) else None
+    table = sources.OKF_TYPE_REGISTRY
+    doc = repo.markdown.get(table.path)
+    return None if doc is None else doc.section(table.heading)
+
+
+def _local_rows(repo: Repo) -> list[LocalRow]:
+    """The body rows of the consumer's table of local OKF types."""
+    try:
+        section = _local_table(repo) or ()
+    except KeyError:
+        return []
+    rows = [
+        LocalRow(n, [c.strip() for c in text.strip().strip("|").split("|")])
+        for n, text in section
+        if text.lstrip().startswith("|")
+    ]
+    return rows[2:]
+
+
+def _local_names(repo: Repo) -> list[tuple[int, str]]:
+    return [(row.line, row.name) for row in _local_rows(repo) if row.name]
 
 
 def _registry(repo: Repo) -> frozenset[str]:
-    local = _local_types(repo) or {}
-    names = {k for k in local if isinstance(k, str) and TYPE_NAME.fullmatch(k)}
-    return sources.REGISTERED_TYPES | names
+    names = {name for _, name in _local_names(repo)}
+    return sources.REGISTERED_OKF_TYPES | names
 
 
 @check("knowledge-organization.frontmatter-a-yaml-mapping")
@@ -520,9 +552,9 @@ def frontmatter_a_yaml_mapping(repo: Repo) -> Iterator[Finding]:
             yield Finding(doc.path, None, "no frontmatter mapping")
 
 
-@check("knowledge-organization.type-names-a-registered-type")
-def type_names_a_registered_type(repo: Repo) -> Iterator[Finding]:
-    """A concept document's ``type`` names a registered type or a local ``okf_types`` entry."""
+@check("knowledge-organization.type-is-a-registered-okf-type")
+def type_is_a_registered_okf_type(repo: Repo) -> Iterator[Finding]:
+    """A concept document's ``type`` is a registered OKF type or a local one."""
     registry = _registry(repo)
     for doc in _concept_documents(repo):
         if doc.frontmatter is None:
@@ -533,7 +565,12 @@ def type_names_a_registered_type(repo: Repo) -> Iterator[Finding]:
         elif not isinstance(doctype, str):
             yield Finding(doc.path, None, f"type {doctype!r} is not one name")
         elif doctype not in registry:
-            yield Finding(doc.path, None, f"type '{doctype}' is not registered")
+            yield Finding(
+                doc.path,
+                None,
+                f"type '{doctype}' is not a registered OKF type; declare a local"
+                f" one as a row of {sources.OKF_TYPE_REGISTRY.path}",
+            )
 
 
 @check("knowledge-organization.non-empty-title")
@@ -613,6 +650,12 @@ def loop_lives_under_loops(repo: Repo) -> Iterator[Finding]:
 def guide_lives_under_guides(repo: Repo) -> Iterator[Finding]:
     """A concept document typed ``Guide`` lives under ``guides/`` or under ``workstreams/``."""
     yield from _lives_under(repo, "Guide")
+
+
+@check("knowledge-organization.registry-lives-under-registries")
+def registry_lives_under_registries(repo: Repo) -> Iterator[Finding]:
+    """A concept document typed ``Registry`` lives under ``registries/`` or under ``workstreams/``."""
+    yield from _lives_under(repo, "Registry")
 
 
 @check("knowledge-organization.readmemd-is-typed-readme")
@@ -844,59 +887,54 @@ def readme_holds_an_h1(repo: Repo) -> Iterator[Finding]:
             yield Finding(path, None, "no H1")
 
 
-# --- local-types.md ------------------------------------------------------
+# --- local-okf-types.md ------------------------------------------------------
 
 
-@check("knowledge-organization.type-name-to-description")
-def type_name_to_description(repo: Repo) -> Iterator[Finding]:
-    """Each ``okf_types`` key is a type name and its value one non-empty line."""
-    if repo.is_dev_playbook:
+@check("knowledge-organization.okf-type-name-to-description")
+def okf_type_name_to_description(repo: Repo) -> Iterator[Finding]:
+    """Each local row names an OKF type in backticks and describes it in a non-empty cell."""
+    path = sources.OKF_TYPE_REGISTRY.path
+    try:
+        _local_table(repo)
+    except KeyError:
+        yield Finding(path, None, f"no `## OKF types` table in {path}")
         return
-    index = repo.markdown.get(ROOT_INDEX)
-    if index is None or index.frontmatter is None:
-        return
-    if LOCAL_TYPES not in index.frontmatter:
-        return
-    declared = index.frontmatter[LOCAL_TYPES]
-    if not isinstance(declared, dict):
-        yield Finding(ROOT_INDEX, None, f"'{LOCAL_TYPES}' is not a mapping")
-        return
-    for key, value in declared.items():
-        if not isinstance(key, str) or not TYPE_NAME.fullmatch(key):
+    for row in _local_rows(repo):
+        if row.name is None:
+            yield Finding(path, row.line, f"{row.cells[0]!r} is not an OKF type name")
+        elif len(row.cells) < 2 or not row.cells[1]:
             yield Finding(
-                ROOT_INDEX, None, f"'{LOCAL_TYPES}' key {key!r} is not a type name"
-            )
-        elif not isinstance(value, str) or not value.strip() or "\n" in value.strip():
-            yield Finding(
-                ROOT_INDEX, None, f"local type '{key}' has no one-line description"
+                path, row.line, f"local OKF type '{row.name}' has no description"
             )
 
 
-def _local_names(repo: Repo) -> list[str]:
-    declared = _local_types(repo) or {}
-    return [k for k in declared if isinstance(k, str) and TYPE_NAME.fullmatch(k)]
-
-
-@check("knowledge-organization.keys-in-alphabetical-order")
-def keys_in_alphabetical_order(repo: Repo) -> Iterator[Finding]:
-    """The keys of the ``okf_types`` mapping are in case-insensitive alphabetical order."""
-    lowered = [name.lower() for name in _local_names(repo)]
+@check("knowledge-organization.rows-in-alphabetical-order")
+def rows_in_alphabetical_order(repo: Repo) -> Iterator[Finding]:
+    """The rows of the local OKF types table are in case-insensitive alphabetical order."""
+    names = _local_names(repo)
+    lowered = [name.lower() for _, name in names]
     if lowered != sorted(lowered):
         yield Finding(
-            ROOT_INDEX, None, f"'{LOCAL_TYPES}' keys are not in alphabetical order"
+            sources.OKF_TYPE_REGISTRY.path,
+            names[0][0],
+            "the local OKF types are not in alphabetical order",
         )
 
 
 @check("knowledge-organization.add-never-shadow")
 def add_never_shadow(repo: Repo) -> Iterator[Finding]:
-    """No ``okf_types`` key equals, ignoring case, a registered type or an earlier key."""
-    upstream = {name.lower() for name in sources.REGISTERED_TYPES}
+    """No local row names, ignoring case, a registered OKF type or an earlier row's."""
+    upstream = {name.lower() for name in sources.REGISTERED_OKF_TYPES}
     seen = set(upstream)
-    for name in _local_names(repo):
+    for line, name in _local_names(repo):
         lowered = name.lower()
         if lowered in seen:
-            what = "a registered type" if lowered in upstream else "an earlier key"
-            yield Finding(ROOT_INDEX, None, f"local type '{name}' shadows {what}")
+            what = "a registered OKF type" if lowered in upstream else "an earlier row"
+            yield Finding(
+                sources.OKF_TYPE_REGISTRY.path,
+                line,
+                f"local OKF type '{name}' shadows {what}",
+            )
         seen.add(lowered)
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 from dev_playbook.check_registry import Finding
 from dev_playbook.checks.harness import (
     behaviors_then_principles,
-    matches_a_member_row,
+    is_a_registered_member,
     no_frontmatter,
     read_the_standards_first,
     runbook_at_a_fixed_path,
@@ -85,9 +85,9 @@ def test_read_the_standards_first() -> None:
     assert found(read_the_standards_first, {GLOBAL: b"## Behaviors\n### Other\n"}) == []
 
 
-def test_every_harness_file_matches_a_member_row() -> None:
+def test_every_harness_file_is_a_registered_member() -> None:
     assert found(
-        matches_a_member_row,
+        is_a_registered_member,
         {
             ".claude/settings.local.json": b"{}\n",
             ".claude/workflows/loop.js": b"\n",

@@ -6,7 +6,7 @@ and a Workstream take.
 
 Ordering: alphabetical by title.
 
-- [Doc-Type](/standards/doc-type/doc-type.md) — What any doc-type satisfies — a registry row, five files, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
+- [Doc-Type](/standards/doc-type/doc-type.md) — What any doc-type satisfies — a registry row naming its own registered instances, five files, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
 - [Guide Conventions](/standards/doc-type/guide-conventions.md) — The form a document typed Guide takes — every ordered list a sequence of steps under its own heading, each step opening with its bold name, no trailer line, rules linked and never stated, and a description naming the work it is read before
 - [Loop Conventions](/standards/doc-type/loop-conventions.md) — The form a document typed Loop takes — one paragraph, one Mermaid graph, and the Acts, Verifications, and Yields sections that agree with it
 - [Runbook Conventions](/standards/doc-type/runbook-conventions.md) — The format a runbook takes — front matter, the description, model and effort, the H1, the chain, and the rules a skill bundle and an agent definition each add

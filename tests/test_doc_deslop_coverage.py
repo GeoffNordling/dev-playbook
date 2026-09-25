@@ -57,7 +57,7 @@ EXEMPT: dict[Path, frozenset[str]] = {
     REPO_ROOT / "standards/doc-type/workstream-conventions.md": frozenset(
         {
             # The doc-type checks decide these deterministically.
-            "headings-from-the-menu",
+            "headings-from-the-registry",
             "a-worklist-item-opens-with-its-bold-name",
             "a-stint-entry-in-form",
             "every-child-reached-from-its-parent",

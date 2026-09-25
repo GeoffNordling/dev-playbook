@@ -19,13 +19,13 @@ that encoding.
 > the head file by its headings, so the headings are one fixed menu,
 > and the stints are one form a script can read.
 
-## Headings from the menu
+## Headings from the registry
 
 Every H2 of a document typed `Workstream` is a heading in the
 [Workstream Heading Registry](/registries/workstream-headings.md#headings),
 and no two of its H2s have the same text.
 
-`doc-type.headings-from-the-menu` · deterministic
+`doc-type.headings-from-the-registry` · deterministic
 
 > **Why.** Every heading is optional and all are peers, so a
 > workstream picks the ones its work needs; a heading outside the menu

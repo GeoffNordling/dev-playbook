@@ -1,13 +1,13 @@
 # standards/knowledge-organization/ — index
 
 Knowledge Organization governs how knowledge is organized in markdown —
-document types, indexes, the README and CONTEXT.md, cross-references, and
+OKF types, indexes, the README and CONTEXT.md, cross-references, and
 documentation sets.
 
 Ordering: reading order.
 
-- [Document Types](/standards/knowledge-organization/document-types.md) — The frontmatter profile every concept document carries — a registered type, a title, a description, a resource where an asset backs the document, and the README type on a README.md alone
-- [Local Types](/standards/knowledge-organization/local-types.md) — The okf_types mapping a consumer repo declares its own document types in — where it sits, each entry's shape, the order of its keys, and no key that shadows a registered type
+- [OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md) — The OKF frontmatter every concept document carries — a registered OKF type, a title, a description, a resource where an asset backs the document, and the README type on a README.md alone
+- [Local OKF Types](/standards/knowledge-organization/local-okf-types.md) — The table a consumer repo declares its own OKF types in — where it sits, each row's shape, the order of its rows, and no row that shadows a registered OKF type
 - [Indexes](/standards/knowledge-organization/indexes.md) — The index.md file — typeless, an introduction naming what the directory holds, a listing of every concept document with its description, alphabetical unless declared otherwise, authored not generated
 - [README Content](/standards/knowledge-organization/readme-content.md) — The README content floor — an H1 and a purpose sentence, with no agent instructions, no decisions, and no roster of harness-injected files
 - [CONTEXT.md Content](/standards/knowledge-organization/context-content.md) — The CONTEXT.md vocabulary center — Vocabulary frontmatter, the Language section, the entry shape, and the rules that keep a glossary tight

@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Doc-Type
-description: What any doc-type satisfies — a registry row, five files, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
+description: What any doc-type satisfies — a registry row naming its own registered instances, five files, a verb set, a composition rule, an encoding, a Standard over its instances, and a one-sentence definition
 population: "a doc-type: an immediate subdirectory of doc-types/"
 ---
 
@@ -34,6 +34,22 @@ The table in `registries/doc-types.md` has a row whose Doc-type cell
 links to a file in `doc-types/<name>/`.
 
 `doc-type.registered` · deterministic
+
+## Its instances are registered
+
+The row of `doc-types/<name>/` in `registries/doc-types.md` names an
+OKF type of `registries/okf-types.md` in its OKF type cell, or members
+of `registries/harness-files.md`, separated by `; `, in its Harness
+members cell.
+
+`doc-type.its-instances-are-registered` · deterministic
+
+## Its instances are its own
+
+No OKF type or harness member that the row of `doc-types/<name>/` in
+`registries/doc-types.md` names is named by another row.
+
+`doc-type.its-instances-are-its-own` · deterministic
 
 ## Five files
 

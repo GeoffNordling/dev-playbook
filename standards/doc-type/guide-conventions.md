@@ -9,7 +9,7 @@ population: "a document typed Guide, outside a workstream"
 
 A document typed `Guide`, under `guides/` and outside a
 workstream
-([Document Types](/standards/knowledge-organization/document-types.md#guide-lives-under-guides)).
+([OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md#guide-lives-under-guides)).
 The [Guide doc-type](/doc-types/guide/index.md) declares what a guide
 is and the encoding its file takes,
 [Instruction Encoding](/doc-types/guide/encoding.md); a doc-type binds

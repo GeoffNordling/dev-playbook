@@ -78,26 +78,24 @@ in the Standard the step links.
 4. **Bump the pin.** Bump the pin to a dev-playbook `rev` that has
    `playbook check --local`. Until the pin moves, the new Standard is
    unchecked.
-5. **Register a local document type (only if the standard needs one).**
-   Skip this step unless the new standard governs a **document type**
-   the global OKF registry does not carry. If it does, declare the type
-   in the frontmatter of the repo's root `index.md`, an `okf_types`
-   mapping beside `okf_version`:
+5. **Register a local OKF type (only if the standard needs one).**
+   Skip this step unless the new standard governs an **OKF type** that
+   dev-playbook's
+   [OKF Type Registry](/registries/okf-types.md#okf-types) does not
+   carry. If it does, declare the type in the repo's own
+   `registries/okf-types.md`, typed `Registry` and listed by
+   `registries/index.md`, in a table of the same shape:
 
-   ```yaml
-   ---
-   okf_version: "0.1"
-   okf_types:
-     Resume: A resume markdown source, master or batch variant
-     Story: One work-experience story in SPAR form
-   ---
+   ```markdown
+   ## OKF types
+
+   | OKF type | What it is |
+   |----------|------------|
+   | `Resume` | A resume markdown source, master or batch variant |
+   | `Story` | One work-experience story in SPAR form |
    ```
 
-   The type check unions those names onto the
-   [OKF Type Registry](/registries/okf-types.md#okf-types).
-   The mapping's rules, the entry shape, alphabetical keys,
-   add-never-shadow, and name and description only, are
-   [Local Types](/standards/knowledge-organization/local-types.md#local-declaration).
-   Nothing goes under the repo's own `standards/` tree for this: that
-   tree is the meta-standard's, and a registry document in it could not
-   pass its checks.
+   The type check unions those rows onto dev-playbook's registry. The
+   table's rules, the row shape, alphabetical rows, and
+   add-never-shadow, are
+   [Local OKF Types](/standards/knowledge-organization/local-okf-types.md#local-declaration).

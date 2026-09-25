@@ -9,13 +9,13 @@ population: "a file in a governed repo that the Claude Code harness consumes"
 
 A file in a governed repo that the Claude Code harness consumes: loaded
 as configuration, run as code, or injected into agent context. It
-carries no OKF frontmatter and sits outside the document-type checks; the
+carries no OKF frontmatter and sits outside the OKF frontmatter checks; the
 concept/harness boundary is the population of
-[Document Types](/standards/knowledge-organization/document-types.md),
+[OKF Frontmatter](/standards/knowledge-organization/okf-frontmatter.md),
 and `classify()` in [md.py](/src/dev_playbook/md.py) encodes it. Claude
 Code is the only harness in use.
 
-## Every harness file matches a member row
+## Every harness file is a registered member
 
 Every tracked file under `.claude/` or `dotfiles/dot-claude/` has
 one of these paths below that directory: `CLAUDE.md`,
@@ -27,7 +27,7 @@ one of these paths below that directory: `CLAUDE.md`,
 The members are the rows of the
 [Harness File Registry](/registries/harness-files.md#members).
 
-`harness.every-harness-file-matches-a-member-row` · deterministic
+`harness.every-harness-file-is-a-registered-member` · deterministic
 
 > **Why.** Claude Code fixes which files it reads; the Harness File
 > Registry is the workspace's record of that set, and the

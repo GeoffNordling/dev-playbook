@@ -16,30 +16,36 @@ def test_every_section_names_a_tracked_file_and_a_present_heading(
 
 
 def test_type_registry_section_holds_the_table(dev_playbook_repo: Repo) -> None:
-    doc = dev_playbook_repo.markdown[sources.TYPE_REGISTRY.path]
+    doc = dev_playbook_repo.markdown[sources.OKF_TYPE_REGISTRY.path]
     rows = [
-        t for _, t in doc.section(sources.TYPE_REGISTRY.heading) if t.startswith("| `")
+        t
+        for _, t in doc.section(sources.OKF_TYPE_REGISTRY.heading)
+        if t.startswith("| `")
     ]
     assert any(row.startswith("| `Standard`") for row in rows)
 
 
 def registry_rows(repo: Repo) -> list[list[str]]:
-    doc = repo.markdown[sources.TYPE_REGISTRY.path]
+    doc = repo.markdown[sources.OKF_TYPE_REGISTRY.path]
     lines = [
-        t for _, t in doc.section(sources.TYPE_REGISTRY.heading) if t.startswith("|")
+        t
+        for _, t in doc.section(sources.OKF_TYPE_REGISTRY.heading)
+        if t.startswith("|")
     ]
     return [[cell.strip() for cell in line.strip("|").split("|")] for line in lines[2:]]
 
 
 def test_registered_types_are_the_type_registry_rows(dev_playbook_repo: Repo) -> None:
     names = {row[0].strip("`") for row in registry_rows(dev_playbook_repo)}
-    assert names == sources.REGISTERED_TYPES
+    assert names == sources.REGISTERED_OKF_TYPES
 
 
 def test_workstream_headings_are_the_menu_rows(dev_playbook_repo: Repo) -> None:
-    doc = dev_playbook_repo.markdown[sources.WORKSTREAM_MENU.path]
+    doc = dev_playbook_repo.markdown[sources.WORKSTREAM_HEADING_REGISTRY.path]
     lines = [
-        t for _, t in doc.section(sources.WORKSTREAM_MENU.heading) if t.startswith("|")
+        t
+        for _, t in doc.section(sources.WORKSTREAM_HEADING_REGISTRY.heading)
+        if t.startswith("|")
     ]
     names = {line.strip("|").split("|")[0].strip().strip("`") for line in lines[2:]}
     assert names == sources.WORKSTREAM_HEADINGS

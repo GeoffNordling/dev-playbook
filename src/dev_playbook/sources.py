@@ -1,7 +1,7 @@
 """Where a check reads data out of a document: the path and heading, named once.
 
 Some rules consume data a document holds, such as the OKF Type Registry's table
-of document types or the canonical files a repo copies. The path and the
+of OKF types or the canonical files a repo copies. The path and the
 heading are constants here, and the test beside this module pins each one
 to its document: the file is tracked and the heading is present. A check
 reads the section through the model, ``repo.markdown[path].section(slug)``,
@@ -20,16 +20,19 @@ class Section:
 
 
 # The global table of OKF types: every registered `type` and what it is.
-TYPE_REGISTRY = Section("registries/okf-types.md", "okf-types")
+OKF_TYPE_REGISTRY = Section("registries/okf-types.md", "okf-types")
 
 # The table joining each built doc-type to the OKF type or harness members
 # its instances are.
 DOC_TYPE_REGISTRY = Section("registries/doc-types.md", "doc-types")
 
-# Every type name in the TYPE_REGISTRY table. A consumer runs the installed
+# The table of the files the Claude Code harness consumes, one row per member.
+HARNESS_FILE_REGISTRY = Section("registries/harness-files.md", "members")
+
+# Every type name in the OKF_TYPE_REGISTRY table. A consumer runs the installed
 # package, not dev-playbook's tree, so the names ship here; the test beside
 # this module pins the set, and the table's shape, to the table.
-REGISTERED_TYPES = frozenset(
+REGISTERED_OKF_TYPES = frozenset(
     {
         "Candidate-List",
         "Decision-Record",
@@ -49,9 +52,9 @@ REGISTERED_TYPES = frozenset(
 )
 
 # The menu a Workstream's head file picks its headings from.
-WORKSTREAM_MENU = Section("registries/workstream-headings.md", "headings")
+WORKSTREAM_HEADING_REGISTRY = Section("registries/workstream-headings.md", "headings")
 
-# Every heading in the WORKSTREAM_MENU table, shipped as REGISTERED_TYPES is;
+# Every heading in the WORKSTREAM_HEADING_REGISTRY table, shipped as REGISTERED_OKF_TYPES is;
 # the test beside this module pins the set to the table.
 WORKSTREAM_HEADINGS = frozenset(
     {
