@@ -342,3 +342,15 @@ Lessons:
 - **`form-of` is not a step.** Journey-Window-Note is a form of
   General-Sheet, and General-Sheet is made from Journey-Window-Notes.
   Lay columns out by `derived-from` only.
+
+Pipeline tab (computed groups and steps, slider for the reference
+threshold N): **underwhelming**, reason not yet named. Guesses to test
+next session:
+
+- It still shows plumbing (reads X, writes Y), not what a step does for
+  the user. Each skill node has a one-sentence `summary`; the view does
+  not show it.
+- The step order is weak: step 1 mixes mock, `tag_registry.py`, and
+  fetch, so no story reads left to right.
+- Missing edges make it look wrong: no job skill reads Story, and
+  fetch-role-posting writes nothing. These are graph gaps.
