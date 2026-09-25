@@ -974,6 +974,45 @@ def workstreams_holds_only_workstreams(repo: Repo) -> Iterator[Finding]:
             )
 
 
+def _leaves(repo: Repo) -> set[str]:
+    """Each workstream directory with a head file and no head file below it."""
+    heads = {
+        posixpath.dirname(path)
+        for path in repo.markdown
+        if _in_workstream(path) and PurePosixPath(path).name == HEAD_FILE
+    }
+    return {head for head in heads if not any(_inside(o, head) for o in heads - {head})}
+
+
+@check("knowledge-organization.a-draft-standard-in-a-leaf-workstream")
+def a_draft_standard_in_a_leaf_workstream(repo: Repo) -> Iterator[Finding]:
+    """A file typed ``Standard`` under ``workstreams/`` sits in a leaf workstream."""
+    leaves = _leaves(repo)
+    for path, doc in sorted(repo.markdown.items()):
+        front = doc.frontmatter
+        if not _in_workstream(path) or not front or front.get("type") != "Standard":
+            continue
+        head = _head_of(repo, WORKSTREAMS, path)
+        if head is None or posixpath.dirname(head) not in leaves:
+            yield Finding(path, None, "a draft Standard outside a leaf workstream")
+
+
+@check("knowledge-organization.a-leafs-name-unique-under-workstreams")
+def a_leafs_name_unique_under_workstreams(repo: Repo) -> Iterator[Finding]:
+    """No two leaf workstreams have directories of one name."""
+    by_name: dict[str, list[str]] = {}
+    for leaf in sorted(_leaves(repo)):
+        by_name.setdefault(posixpath.basename(leaf), []).append(leaf)
+    for name, leaves in sorted(by_name.items()):
+        if len(leaves) > 1:
+            for leaf in leaves:
+                yield Finding(
+                    f"{leaf}/{HEAD_FILE}",
+                    None,
+                    f"another leaf workstream is named {name!r}",
+                )
+
+
 @check("knowledge-organization.one-directory-under-workstreams")
 def one_directory_under_workstreams(repo: Repo) -> Iterator[Finding]:
     """Each workstream has an ``index.md`` and a ``WORKSTREAM.md``, and kebab-case names."""

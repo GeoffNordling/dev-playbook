@@ -80,14 +80,9 @@ approval before running it, and discusses results before acting on them.
 The words of the workflow, workstream, loop, yield, stint, driver,
 principal, iteration, segment, and checkpoint, are the repo's
 ([CONTEXT.md](/CONTEXT.md#workstreams-and-loops)), since the doc-types
-and [Running a Stint](/guides/running-a-stint.md) use them too. This
-head file coins one:
-
-- **Draft Standard** — a file typed `Standard` inside a workstream,
-  wired to a stint's `--check` and never to the gate, so its rules may
-  fail at any time; the workstream's target, deleted or promoted under
-  `standards/` on accept
-  ([Stint Model](/workstreams/system/drive/stint-model.md)).
+and [Running a Stint](/guides/running-a-stint.md) use them too, and
+so is [draft Standard](/CONTEXT.md#governance), since the Standards
+about Standards use it. This head file coins none.
 
 ### Shape
 
@@ -143,8 +138,8 @@ Decided with the user on 2026-09-24.
      and judgment. The sorting is how the pattern scales: the user rules
      on the top findings only, since no user can read everything agents
      report, and ruling on a sorted list calibrates the user's taste.
-     In an unattended stint this reviewer is the plan reviewer, and a
-     second one, the verifier, judges the target's stochastic rules
+     Beside the reviewer, the verifiers of the stint's target report
+     to the principal
      ([Stint Model](/workstreams/system/drive/stint-model.md)).
   4. The principal changes the plan on the iterations' and the reviewer's
      reports, so the entity that manages the plan is the one that changes
@@ -231,35 +226,16 @@ is with the user, at a high level, the agent guiding. An unattended
 stint runs with the `stint` command
 ([Running a Stint](/guides/running-a-stint.md)).
 
-- **Put the draft Standard in the doc-type system.** It does not wait
-  on the gate. In order:
-  - **Decide whether a draft Standard is a doc-type.** A session. A
-    `DraftStandard` class in the reference model would give the draft
-    Standard its own rules in the pseudocode; the model now has it as a
-    plain `Standard` that differs only in place and wiring.
-  - **Let a draft Standard live in a workstream.** A file typed
-    `Standard` under `workstreams/` is held to the Standards about
-    Standards, against the exemption in
-    [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md)
-    and the one tree `standards/` reserves; its rule ids take the
-    workstream's name as their family; and nothing under
-    `workstreams/` is wired to the gate.
-  - **Teach the Workstream doc-type the target.** `## Done when` links
-    the workstream's draft Standards, a stint names the rule ids it
-    targets, a new `targets` field of the `Stint` part, and only a leaf
-    workstream has a stint, in the Workstream doc-type and
-    [Workstream Conventions](/standards/doc-type/workstream-conventions.md).
-  - **Fix the goal wherever it is stale.**
-    [Writing Predicates](/guides/writing-predicates.md) says a goal
-    lives in an issue, and the terms in [CONTEXT.md](/CONTEXT.md)
-    still say so; both follow the model.
 - **Bring the `stint` command to the model.** `--check` becomes the
   target check, which iterations may run at any time and the driver
-  runs at each checkpoint; the checkpoint runs the verifier and the
-  plan reviewer; the driver decides done as zero findings; and a
+  runs at each checkpoint; the checkpoint runs the target's verifiers
+  and the reviewer; the principal decides done, and the driver refuses
+  a done while findings remain; and a
   blocked iteration logs a deviation and exits, so the stop rules
   `iter-k blocked` and `iter-k committed nothing` go, and
-  [Running a Stint](/guides/running-a-stint.md) follows.
+  [Running a Stint](/guides/running-a-stint.md) follows. Where a leaf's
+  `check` script sits, and any rule that holds it there, is decided
+  here.
 - **Write the stint's Loop.** The first file in `loops/`. In order:
   - **Design what a stint returns.** A session. Inside the container,
     iterations and checkpoints write files on the stint's branch:
@@ -285,6 +261,22 @@ stint runs with the `stint` command
 
 ## Completed
 
+- **Put the draft Standard in the doc-type system.** Done 2026-09-25:
+  the user ruled it a plain `Standard`, not a doc-type of its own.
+  [Standard Conventions](/standards/doc-type/standard-conventions.md)
+  now binds it, with the leaf workstream's directory name as its rule
+  ids' family;
+  [Workstream Files](/standards/knowledge-organization/documentation-sets/workstream-files.md)
+  keeps it in a leaf and each leaf's name unique; and the term moved to
+  [CONTEXT.md](/CONTEXT.md#governance). The gate reads rules under
+  `standards/` only, so nothing under `workstreams/` is wired to it.
+  The `Stint` part gained an optional `targets` field, `Targets:` in
+  the entry, checked against the leaf's draft Standards; only a leaf
+  has `## Stints`
+  ([Workstream Conventions](/standards/doc-type/workstream-conventions.md));
+  and [Writing Predicates](/guides/writing-predicates.md) puts a goal
+  in a draft Standard, not an issue. `## Done when` stays free text: a
+  stint may run with no draft Standard.
 - **Design the delegation workflow.** Done 2026-09-24: a grilling session
   with the user set the five terms, the [Shape](#shape), and everything
   under [Settled](#settled), and renamed this workstream from `parallel-fronts`.

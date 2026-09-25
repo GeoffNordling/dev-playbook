@@ -35,6 +35,7 @@ DOC_TYPE_FILES = (
 )
 STANDARDS = "standards"
 WORKSTREAMS = "workstreams/"
+HEAD_FILE = "WORKSTREAM.md"
 GUIDE_TYPE = "Guide"
 LOOP_TYPE = "Loop"
 WORKSTREAM_TYPE = "Workstream"
@@ -78,6 +79,7 @@ BULLET = re.compile(r"^[-*]\s")
 STINT_OPENING = re.compile(r"^[-*]\s+\*\*(Planned|\d{4}-\d{2}-\d{2})\.\*\*")
 VERDICT = re.compile(r"Verdict:\s*(\w*)")
 VERDICTS = frozenset({"advance", "accept", "delete"})
+TARGETS = re.compile(r"Targets:\s*(`[^`]+`(?:,\s*`[^`]+`)*)\.")
 
 # The five rules that read a Loop's cut in order: each reads the cut the one
 # before it made, so a Loop's first disagreement is its only finding of them.
@@ -598,8 +600,8 @@ def the_frontmatter_names_the_population(repo: Repo) -> Iterator[Finding]:
 def a_rule_heading_predicate_trailer(repo: Repo) -> Iterator[Finding]:
     """Each rule of a Standard is an H2 or H3, a paragraph, blocks, a trailer, a Why.
 
-    The trailer's name is the file's first directory under ``standards/`` and
-    its slug the heading's. After the paragraph come any number of
+    The trailer's name is the file's first directory under ``standards/``, or
+    a draft Standard's workstream directory, and its slug the heading's. After the paragraph come any number of
     paragraphs, lists, fenced blocks, blockquotes, or tables; after the trailer
     nothing, or one blockquote opening ``> **Why.**``. An H3 sits only under
     an H2 with no trailer.
@@ -607,6 +609,8 @@ def a_rule_heading_predicate_trailer(repo: Repo) -> Iterator[Finding]:
     for path, doc in _typed(repo, STANDARD_TYPE):
         parts = path.split("/")
         name = parts[1] if len(parts) > 2 and parts[0] == STANDARDS else None
+        if path.startswith(WORKSTREAMS):
+            name = _workstream_name(repo, path)
         lines = _body(doc)
         index = {line.number: i for i, line in enumerate(lines)}
         rules = {t.heading.line for t in doc.trailers if t.heading is not None}
@@ -715,11 +719,13 @@ def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
     """Each Stints item opens planned or dated, links one Loop, and sits in order.
 
     The planned item is first; the dated ones follow, newest first. A
-    ``Verdict:`` is one of the three the user rules.
+    ``Verdict:`` is one of the three the user rules. A ``Targets:`` lists
+    rule ids of the draft Standards under the head file's directory.
     """
     for path, doc in _typed(repo, WORKSTREAM_TYPE):
         if not any(h.level == 2 and h.slug == "stints" for h in doc.headings):
             continue
+        rule_ids = _draft_rule_ids(repo, posixpath.dirname(path))
         section = doc.section("stints")
         starts = [n for n, text in section if BULLET.match(text)]
         ends = starts[1:] + [section[-1][0] + 1 if section else 0]
@@ -757,6 +763,44 @@ def a_stint_entry_in_form(repo: Repo) -> Iterator[Finding]:
                 yield Finding(
                     path, start, "a verdict is `advance`, `accept`, or `delete`"
                 )
+            if "Targets:" not in text:
+                continue
+            targets = TARGETS.search(text)
+            if targets is None:
+                yield Finding(
+                    path, start, "targets are rule ids in backticks, then a period"
+                )
+                continue
+            for rule_id in re.findall(r"`([^`]+)`", targets.group(1)):
+                if rule_id not in rule_ids:
+                    yield Finding(
+                        path,
+                        start,
+                        f"`{rule_id}` is no rule of the workstream's draft Standards",
+                    )
+
+
+def _draft_rule_ids(repo: Repo, directory: str) -> set[str]:
+    """The rule ids of every file typed ``Standard`` under ``directory``."""
+    return {
+        trailer.id
+        for path, doc in _typed(repo, STANDARD_TYPE)
+        if path.startswith(directory + "/")
+        for trailer in doc.trailers
+    }
+
+
+@check("doc-type.stints-in-a-leaf-only")
+def stints_in_a_leaf_only(repo: Repo) -> Iterator[Finding]:
+    """A Workstream with a Stints heading has no child Workstream."""
+    heads = [posixpath.dirname(path) for path, _ in _typed(repo, WORKSTREAM_TYPE)]
+    for path, doc in _typed(repo, WORKSTREAM_TYPE):
+        stints = next(
+            (h for h in doc.headings if h.level == 2 and h.slug == "stints"), None
+        )
+        here = posixpath.dirname(path)
+        if stints is not None and any(h.startswith(here + "/") for h in heads):
+            yield Finding(path, stints.line, "a workstream with a child has no Stints")
 
 
 @check("doc-type.every-child-reached-from-its-parent")
@@ -1047,13 +1091,27 @@ def _typed(repo: Repo, doctype: str) -> Iterator[tuple[str, MarkdownFile]]:
 
     A file under ``workstreams/`` may carry a type before it moves to that
     type's home, and that type's form rules do not bind it there; only
-    ``Workstream``, whose home is ``workstreams/``, is read there.
+    ``Workstream``, whose home is ``workstreams/``, and ``Standard``, a draft
+    Standard there, are read there.
     """
     for path, doc in sorted(repo.markdown.items()):
-        if path.startswith(WORKSTREAMS) and doctype != WORKSTREAM_TYPE:
+        if path.startswith(WORKSTREAMS) and doctype not in (
+            WORKSTREAM_TYPE,
+            STANDARD_TYPE,
+        ):
             continue
         if doc.frontmatter is not None and doc.frontmatter.get("type") == doctype:
             yield path, doc
+
+
+def _workstream_name(repo: Repo, path: str) -> str | None:
+    """The name of the directory of ``path``'s head file; None if none is above it."""
+    here = posixpath.dirname(path)
+    while here.startswith(WORKSTREAMS):
+        if f"{here}/{HEAD_FILE}" in repo.markdown:
+            return posixpath.basename(here)
+        here = posixpath.dirname(here)
+    return None
 
 
 def _body(doc: MarkdownFile) -> list[Line]:

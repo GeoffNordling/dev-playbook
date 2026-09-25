@@ -36,6 +36,7 @@ from dev_playbook.checks.doc_type import (
     references_one_level_deep,
     registered,
     skillmd_at_most_500_lines,
+    stints_in_a_leaf_only,
     the_files_why_ends_the_opening_prose,
     the_frontmatter_names_the_population,
     tools_comma_separated_tool_names,
@@ -547,6 +548,20 @@ def test_a_rule_heading_predicate_trailer() -> None:
     ]
 
 
+def test_a_rule_heading_predicate_trailer_names_a_draft_by_its_workstream() -> None:
+    draft = typed("Standard", GOOD_STANDARD)
+    head = {"workstreams/p/fam/WORKSTREAM.md": typed("Workstream", "# W\n")}
+    good = head | {"workstreams/p/fam/target.md": draft}
+    assert found(a_rule_heading_predicate_trailer, good) == []
+    bad = {
+        "workstreams/p/other/WORKSTREAM.md": typed("Workstream", "# W\n"),
+        "workstreams/p/other/target.md": draft,
+    }
+    assert {p for p, _ in found(a_rule_heading_predicate_trailer, bad)} == {
+        "workstreams/p/other/target.md"
+    }
+
+
 def test_the_files_why_ends_the_opening_prose() -> None:
     assert (
         found(
@@ -646,6 +661,27 @@ def test_a_stint_entry_in_form() -> None:
         a_stint_entry_in_form,
         {head: typed("Workstream", bad), "loops/design.md": loop, "notes.md": b"# N\n"},
     ) == [(head, 10), (head, 13), (head, 13), (head, 14), (head, 14), (head, 15)]
+
+
+def test_a_stint_entry_in_form_reads_targets() -> None:
+    loop = typed("Loop", "# Design\n")
+    draft = typed("Standard", "# D\n\n## One\n\nP.\n\n`w.one` · deterministic\n")
+    head = "workstreams/w/WORKSTREAM.md"
+    entry = "# W\n\n## Stints\n\n- **Planned.** Loop: [D](/loops/design.md). {}\n"
+    files = {"loops/design.md": loop, "workstreams/w/target.md": draft}
+    good = entry.format("Targets: `w.one`.")
+    assert found(a_stint_entry_in_form, files | {head: typed("Workstream", good)}) == []
+    for bad in ("Targets: `w.two`.", "Targets: w.one."):
+        workstream = typed("Workstream", entry.format(bad))
+        assert found(a_stint_entry_in_form, files | {head: workstream}) == [(head, 10)]
+
+
+def test_stints_in_a_leaf_only() -> None:
+    stints = typed("Workstream", "# W\n\n## Stints\n")
+    leaf = {"workstreams/w/WORKSTREAM.md": stints}
+    assert found(stints_in_a_leaf_only, leaf) == []
+    parent = leaf | {"workstreams/w/c/WORKSTREAM.md": typed("Workstream", "# C\n")}
+    assert found(stints_in_a_leaf_only, parent) == [("workstreams/w/WORKSTREAM.md", 8)]
 
 
 def test_every_child_reached_from_its_parent() -> None:

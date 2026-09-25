@@ -41,10 +41,14 @@ a label, a colon, and a value, ending in a period:
 ## Stints
 
 - **Planned.** Loop: [Design Review](/loops/design-review.md). Budget: one session, to the user's approval.
-- **2026-09-24.** Loop: [Design Review](/loops/design-review.md). Budget: two sessions. Spent: two sessions. Branch: `worktree-sandcastle-fronts`. Verdict: advance.
+- **2026-09-24.** Loop: [Design Review](/loops/design-review.md). Budget: two sessions. Targets: `view-rename.no-kind-word`, `view-rename.one-view-per-file`. Spent: two sessions. Branch: `worktree-sandcastle-fronts`. Verdict: advance.
 ```
 
-`Loop` links a file typed `Loop`, and `Budget` is free text. A
+`Loop` links a file typed `Loop`, and `Budget` is free text.
+`Targets`, optional, lists rule ids in backticks, each a rule of a
+[draft Standard](/CONTEXT.md#governance) under the head file's
+directory; a stint with no draft Standard omits it. Only a leaf
+workstream has a Stints section. A
 recorded entry adds `Spent` and `Branch`, and `Verdict`, one of
 `advance`, `accept`, or `delete`, once the user has ruled. The planned
 entry, if there is one, is first; the recorded entries follow, newest

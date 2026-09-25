@@ -43,6 +43,10 @@ What a verifier returns for a member that fails a rule: the member, the rule's i
 A point where findings block work: pre-commit, pre-push, or CI.
 _Avoid_: audit, enforcement, venue.
 
+**Draft Standard**
+A file typed Standard inside a leaf workstream, whose rule ids take the workstream's directory name as their family. It is wired to a stint's `--check` and never to a gate, so its rules may fail at any time. It is the workstream's target; on accept it is deleted, or moved under `standards/` and wired to a gate.
+_Avoid_: candidate Standard, proto-Standard.
+
 **Zero findings**
 Every verifier of a specification, run against a state, returns nothing: the state is in the target state, up to judge error.
 
@@ -137,13 +141,13 @@ A shape of act, verification, and yield steps, defined once in a file typed Loop
 A loop's programmed exit to a receiver: another loop, the principal, or the user.
 
 **Stint**
-A bounded spend of effort that advances one workstream, with a loop and a driver chosen for it. An attended stint has the user in it; an unattended stint runs in sealed containers with no user, by the `stint` command, and ends by yielding to the user.
+A bounded spend of effort that advances one leaf workstream, with a loop and a driver chosen for it, toward the rules of the workstream's draft Standards it targets, if any. An attended stint has the user in it; an unattended stint runs in sealed containers with no user, by the `stint` command, and ends by yielding to the user.
 
 **Driver**
-The program that runs a stint's loop: it starts each iteration, reads what the iteration reports, and stops the stint.
+The program that runs a stint's loop: it starts each iteration and reads what the iteration reports.
 
 **Principal**
-The top-level entity of a stint, which owns the plan and rules on the reports of the iterations and the reviewer. In an attended stint it is the user and the top-level agent together; in an unattended stint, the top-level agent alone.
+The owner of one level's plan, which rules on the reports of its workers, its verifiers, and its reviewer. For a workstream it is the user; for a stint, the top-level agent, joined by the user when the stint is attended.
 
 **Iteration**
 One fresh-context agent that does one task of a stint's plan, commits, and exits.
@@ -152,7 +156,7 @@ One fresh-context agent that does one task of a stint's plan, commits, and exits
 The tasks of a stint's plan from one checkpoint to the next.
 
 **Checkpoint**
-The review point at the end of a segment: a reviewer reads the segment's work against the plan, and the principal revises the plan.
+The review point at the end of a segment, where the principal takes the reports and revises the plan.
 
 ### Documentation sets
 

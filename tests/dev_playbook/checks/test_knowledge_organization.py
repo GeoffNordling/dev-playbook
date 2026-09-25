@@ -7,6 +7,8 @@ import pytest
 
 from dev_playbook.check_registry import Finding
 from dev_playbook.checks.knowledge_organization import (
+    a_draft_standard_in_a_leaf_workstream,
+    a_leafs_name_unique_under_workstreams,
     add_never_shadow,
     alphabetical_unless_declared_otherwise,
     an_index_in_every_directory,
@@ -631,6 +633,36 @@ def test_workstreams_holds_only_workstreams() -> None:
     bad = good | {"workstreams/notes.md": "# N\n"}
     assert found(workstreams_holds_only_workstreams, bad) == [
         ("workstreams/notes.md", None)
+    ]
+
+
+def test_a_draft_standard_in_a_leaf_workstream() -> None:
+    standard = "---\ntype: Standard\n---\n# S\n"
+    good = {
+        "workstreams/p/WORKSTREAM.md": "# P\n",
+        "workstreams/p/notes.md": concept(),
+        "workstreams/p/leaf/WORKSTREAM.md": "# L\n",
+        "workstreams/p/leaf/target.md": standard,
+    }
+    assert found(a_draft_standard_in_a_leaf_workstream, good) == []
+    bad = good | {"workstreams/p/target.md": standard}
+    assert found(a_draft_standard_in_a_leaf_workstream, bad) == [
+        ("workstreams/p/target.md", None)
+    ]
+
+
+def test_a_leafs_name_unique_under_workstreams() -> None:
+    good = {
+        "workstreams/a/WORKSTREAM.md": "# A\n",
+        "workstreams/a/x/WORKSTREAM.md": "# X\n",
+        "workstreams/b/WORKSTREAM.md": "# B\n",
+        "workstreams/b/a/WORKSTREAM.md": "# A\n",
+    }
+    assert found(a_leafs_name_unique_under_workstreams, good) == []
+    bad = good | {"workstreams/b/x/WORKSTREAM.md": "# X\n"}
+    assert found(a_leafs_name_unique_under_workstreams, bad) == [
+        ("workstreams/a/x/WORKSTREAM.md", None),
+        ("workstreams/b/x/WORKSTREAM.md", None),
     ]
 
 

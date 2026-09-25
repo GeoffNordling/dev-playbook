@@ -1,7 +1,7 @@
 ---
 type: Standard
 title: Workstream Conventions
-description: The form a Workstream's head file takes — its headings from one menu, Open holding questions only, each worklist item opening with its bold name, each stint entry in one form, and every child reached by links from its parent
+description: The form a Workstream's head file takes — its headings from one menu, Open holding questions only, each worklist item opening with its bold name, each stint entry in one form, targeting only rules of its own draft Standards, Stints in a leaf only, and every child reached by links from its parent
 population: "a document typed Workstream"
 ---
 
@@ -61,12 +61,29 @@ document typed `Workstream` opens with `**Planned.**` or with a date,
 `**YYYY-MM-DD.**`, and has exactly one link to a file typed `Loop`.
 At most one item opens with `**Planned.**`, and it is the first; the
 dated items follow it, newest first. An item that holds `Verdict:`
-follows it with `advance`, `accept`, or `delete`.
+follows it with `advance`, `accept`, or `delete`. An item that holds
+`Targets:` follows it with one or more rule ids, each in backticks and
+separated by commas, then a period, and each id is the id of a rule in
+a file typed `Standard` under the head file's directory, a
+[draft Standard](/CONTEXT.md#governance) of the workstream.
 
 `doc-type.a-stint-entry-in-form` · deterministic
 
 > **Why.** Stints is the ledger of the loops that drove the workstream,
 > the next spend and the past ones, and the board script reads it.
+> `Targets` is optional: a stint may run with no draft Standard, and
+> then nothing but its plan says what it is for.
+
+## Stints in a leaf only
+
+A document typed `Workstream` that has a `Stints` heading has no
+child: no directory below its own has a document typed `Workstream`.
+
+`doc-type.stints-in-a-leaf-only` · deterministic
+
+> **Why.** A loop advances a leaf workstream only; a parent advances
+> when its children do, so a stint recorded on a parent is spend on
+> no one line of work.
 
 ## Every child reached from its parent
 

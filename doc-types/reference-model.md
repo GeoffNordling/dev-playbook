@@ -162,6 +162,7 @@ class Loop(DocType):
 
 from doc_type import DocType
 from loop import Loop
+from standard import RuleId
 
 
 class Workstream(DocType):
@@ -182,9 +183,11 @@ class Workstream(DocType):
         spent:   str | None       # None for the planned stint
         branch:  str | None
         verdict: advance | accept | delete | None   # None until the user rules
+        targets: list[RuleId]     # rules of the workstream's draft Standards; empty for a stint with none
 
     headings: list[Heading]       # in file order, each name at most once
-    stints:   list[Stint]         # the planned stint first, if any, then the recorded ones, newest first
+    stints:   list[Stint]         # the planned stint first, if any, then the recorded ones, newest first;
+                                  # a leaf only, since a loop advances a leaf workstream only
 
     # parent and children are derived from the directory, never written;
     # its Standard requires each child's head file be reached by links from its parent's
