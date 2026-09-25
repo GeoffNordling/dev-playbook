@@ -87,7 +87,7 @@ In order:
   [Billing Credentials](/standards/billing/credentials.md).
 - **Experiment one: the clone round-trip.** Commits made in a throwaway
   clone reach the real repository at the same SHA, or the run stops.
-  [`front-clone`](/scripts/front-clone) is the plumbing, and
+  [`front-clone`](/src/dev_playbook/stint/workcopy.py) is the plumbing, and
   [the log](/workstreams/delegation/sandcastle/experiment-log.md#experiment-one-the-clone-round-trip)
   records what the run settled.
 - **Experiment two: Sandcastle against a copy.** Sandcastle, pointed at a

@@ -36,7 +36,7 @@ member describes the result.
 1. **Guard.** The billing checks of `playbook check` assert no metered credential on this device,
    and the run itself refuses to start if anything it hands the container
    carries one.
-2. **Open.** [`front-clone`](/scripts/front-clone) `open` clones the real
+2. **Open.** [`front-clone`](/src/dev_playbook/stint/workcopy.py) `open` clones the real
    repository into a throwaway work copy, on the stint's branch. The clone
    shares no files with the real repository, checked after every clone:
    a shared file would carry the SELinux relabel back to the real one. Beside it go a copy of dev-playbook at published `main`

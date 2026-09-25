@@ -1,13 +1,13 @@
-"""The booby trap: nothing a front plants in its clone runs on the host.
+"""The booby trap: nothing an agent plants in its copy runs on the host.
 
-A front has write access to its clone's ``.git``, so it can set any config key,
+An agent has write access to its copy's ``.git``, so it can set any config key,
 drop any hook, and name any filter driver. Git executes several of those on its
-own when a command runs in that repository, and ``front-clone close`` runs on
+own when a command runs in that repository, and ``close_copy`` runs on
 the host, outside the container. These tests plant a trigger at every point
 git offers, run the closing half, and assert no trigger fired.
 
 The control proves the traps are live: an ordinary ``git status`` in the same
-clone sets one off. Without it, a trap that never worked would pass as safe.
+copy sets one off. Without it, a trap that never worked would pass as safe.
 """
 
 import os
@@ -16,10 +16,10 @@ from pathlib import Path
 
 import pytest
 
-from dev_playbook import front_clone
 from dev_playbook.gitrepo import no_git_env
+from dev_playbook.stint import workcopy
 
-# Every hook name git documents. A front could plant any of them, and which
+# Every hook name git documents. An agent could plant any of them, and which
 # ones a given git command fires is git's business, not this module's.
 HOOKS = [
     "applypatch-msg",
@@ -69,7 +69,7 @@ def make_repo(path: Path) -> Path:
     """A scratch repository with one commit on ``main``."""
     path.mkdir(parents=True)
     git(path, "init", "-b", "main")
-    git(path, "config", "user.name", "Front Clone Test")
+    git(path, "config", "user.name", "Work Copy Test")
     git(path, "config", "user.email", "test@example.invalid")
     git(path, "config", "commit.gpgsign", "false")
     (path / "first.md").write_text("one\n", encoding="utf-8")
@@ -90,16 +90,16 @@ def write_script(path: Path, body: str) -> None:
     path.chmod(0o755)
 
 
-def plant(clone: Path, markers: Path) -> None:
-    """Set every trigger a front could set in its clone.
+def plant(copy: Path, markers: Path) -> None:
+    """Set every trigger an agent could set in its copy.
 
-    Called after the front's honest commit, so planting never fires anything
+    Called after the agent's honest commit, so planting never fires anything
     the test itself runs.
     """
-    gitdir = clone / ".git"
+    gitdir = copy / ".git"
     for hook in HOOKS:
         write_script(gitdir / "hooks" / hook, trap(markers, f"hook-{hook}"))
-    elsewhere = clone.parent / "planted-hooks"
+    elsewhere = copy.parent / "planted-hooks"
     for hook in HOOKS:
         write_script(elsewhere / hook, trap(markers, f"hookspath-{hook}"))
 
@@ -123,11 +123,11 @@ def plant(clone: Path, markers: Path) -> None:
         "filter.trap.required": "true",
         "uploadpack.packObjectsHook": trap(markers, "pack-objects-hook"),
         "remote.origin.uploadpack": trap(markers, "remote-uploadpack"),
-        "include.path": str(clone.parent / "planted.gitconfig"),
+        "include.path": str(copy.parent / "planted.gitconfig"),
     }
     for key, value in keys.items():
-        git(clone, "config", key, value)
-    (clone.parent / "planted.gitconfig").write_text(
+        git(copy, "config", key, value)
+    (copy.parent / "planted.gitconfig").write_text(
         f"[core]\n\tfsmonitor = {trap(markers, 'included-fsmonitor')}; false\n",
         encoding="utf-8",
     )
@@ -137,25 +137,25 @@ def plant(clone: Path, markers: Path) -> None:
     )
     # A racy timestamp makes git re-read a file's content, which is when a
     # clean filter is consulted.
-    for path in clone.iterdir():
+    for path in copy.iterdir():
         if path.is_file():
             os.utime(path, None)
 
 
 @pytest.fixture
 def planted(tmp_path: Path) -> tuple[Path, Path, Path, str]:
-    """A clone holding one honest commit and every trap; its markers directory."""
+    """A copy holding one honest commit and every trap; its markers directory."""
     repo = make_repo(tmp_path / "real")
-    clone = tmp_path / "work"
+    copy = tmp_path / "work"
     markers = tmp_path / "markers"
     markers.mkdir()
-    front_clone.open_clone(repo, clone, "front-a")
-    (clone / "front.md").write_text("work\n", encoding="utf-8")
-    git(clone, "add", "front.md")
-    git(clone, "commit", "-m", "the front's honest commit")
-    made = git(clone, "rev-parse", "HEAD")
-    plant(clone, markers)
-    return repo, clone, markers, made
+    workcopy.open_copy(repo, copy, "stint-a", "HEAD")
+    (copy / "work.md").write_text("work\n", encoding="utf-8")
+    git(copy, "add", "work.md")
+    git(copy, "commit", "-m", "the agent's honest commit")
+    made = git(copy, "rev-parse", "HEAD")
+    plant(copy, markers)
+    return repo, copy, markers, made
 
 
 def fired(markers: Path) -> list[str]:
@@ -164,10 +164,10 @@ def fired(markers: Path) -> list[str]:
 
 
 def test_the_traps_are_live(planted: tuple[Path, Path, Path, str]) -> None:
-    """The control: ordinary git in the clone sets a trap off."""
-    _, clone, markers, _ = planted
+    """The control: ordinary git in the copy sets a trap off."""
+    _, copy, markers, _ = planted
     subprocess.run(
-        ["git", "-C", str(clone), "status", "--porcelain"],
+        ["git", "-C", str(copy), "status", "--porcelain"],
         capture_output=True,
         env=no_git_env(),
     )
@@ -175,25 +175,17 @@ def test_the_traps_are_live(planted: tuple[Path, Path, Path, str]) -> None:
 
 
 def test_close_fires_no_trap(planted: tuple[Path, Path, Path, str]) -> None:
-    repo, clone, markers, made = planted
-    assert front_clone.close_clone(clone) == made
+    repo, copy, markers, made = planted
+    assert workcopy.close_copy(copy) == made
     assert fired(markers) == []
-    assert git(repo, "rev-parse", "front-a") == made
-
-
-def test_close_from_the_command_line_fires_no_trap(
-    planted: tuple[Path, Path, Path, str],
-) -> None:
-    _, clone, markers, _ = planted
-    assert front_clone.main(["close", str(clone)]) == 0
-    assert fired(markers) == []
-    assert not clone.exists()
+    assert git(repo, "rev-parse", "stint-a") == made
+    assert not copy.exists()
 
 
 def test_a_refused_close_fires_no_trap(planted: tuple[Path, Path, Path, str]) -> None:
-    """The refusal path reads the clone too, and must be as careful."""
-    _, clone, markers, _ = planted
-    (clone / "unsaved.md").write_text("never committed\n", encoding="utf-8")
-    with pytest.raises(front_clone.LapFault, match="uncommitted"):
-        front_clone.close_clone(clone)
+    """The refusal path reads the copy too, and must be as careful."""
+    _, copy, markers, _ = planted
+    (copy / "unsaved.md").write_text("never committed\n", encoding="utf-8")
+    with pytest.raises(workcopy.CopyFault, match="uncommitted"):
+        workcopy.close_copy(copy)
     assert fired(markers) == []

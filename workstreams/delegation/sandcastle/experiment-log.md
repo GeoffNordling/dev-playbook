@@ -33,7 +33,7 @@ Pointed at the real repository, Sandcastle opens it into the container,
 real repository at the same SHA? No container and no driver, so a failure
 would point at git alone.
 
-**Ran.** [`front-clone`](/scripts/front-clone) against dev-playbook, with
+**Ran.** [`front-clone`](/src/dev_playbook/stint/workcopy.py) against dev-playbook, with
 `tests/dev_playbook/test_front_clone.py`.
 
 **Settled.**

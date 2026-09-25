@@ -65,7 +65,6 @@ the installed `dev_playbook` package:
 - `dev_playbook.gitrepo` — canonical repo-name resolution (main checkout and worktrees answer alike) and gitignore-aware file listing. Consumed by the repo model.
 - `dev_playbook.dotfiles` — the dotfiles install: which machine this is (`machine`), the per-machine settings merge (`settings`), and the stow/mirror/loader steps (`sync`). Consumed by `sync-dotfiles`.
 - `dev_playbook.voice` — the agent-facing voice vocabulary: the first-person words instruction text may not speak in, each with the wording of the fault it trips. Consumed by the prose checks, which check prose against it, and `repo-init`, which refuses a repo name that carries one (or the banned actor noun, via `dev_playbook.checks.prose`).
-- `dev_playbook.front_clone` — the round trip a lap's commits make: the clone opened without shared object files, the record it keeps of its own source and base, and the verified fetch back into the real repository. Consumed by `front-clone`.
 - `dev_playbook.repo_init` — the fresh-repo scaffold: canonical-artifact rendering and the local init steps (`git init`, `uv lock`, hook install, `playbook check` self-check). Consumed by `repo-init`.
 
 The one larger surface is a subpackage: `dev_playbook.transcript_export`,
@@ -105,7 +104,6 @@ Run ad hoc on user or skill demand; not part of the pre-commit pipeline.
 | `repo-init` | Scaffold a fresh workspace repo conforming to the build standard — canonical artifacts, `git init`, `uv lock`, hook install, `playbook check` self-check; the GitHub tail is [bootstrap.md](/guides/bootstrap.md) |
 | `transcript-export` | Render Claude Code sessions to readable per-session XML transcripts: `transcript-export <out_dir> <session_id… \| --find PATTERN \| --recent N \| --all>` |
 | `sync-dotfiles` | Install [`dotfiles/`](/dotfiles/README.md) into `$HOME` — stow the packages and wire up the `~/.bashrc.d` loader |
-| `front-clone` | Open and close a front's throwaway clone for one lap: `open` clones with `--no-hardlinks`, verifies the clone shares no object file with its source, and starts the front's branch at the lap's base commit; `close` returns the commits by fetching from the clone, verifies the branch tip matches, and deletes it. Every check refuses rather than repairs, and a refused close leaves the clone on disk |
 
 Run any script with `--help`; each script's docstring documents its behavior in
 full.
