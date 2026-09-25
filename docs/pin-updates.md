@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-25 14:00 | bba24283da95 | story-forge | green | main 93e5671b625a | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | mission-control | green | main 90037854179c | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | sysadmin-playbook | green | main fc4f4a0b3e25 | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | sounds | green | main d19e56202591 | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | personal-trainer | green | main 2604ecb4d165 | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | idea-tree | green | main 0c7445dd5f60 | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | dwarf-flow | green | main 0b556475c58b | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | lunch | green | main a62cde77d042 | no unmerged branches |
-| 2026-09-25 14:00 | bba24283da95 | date-tree | green | main 13ec1497354c | no unmerged branches |
 | 2026-09-25 14:15 | 2c9a7486b625 | story-forge | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/story-forge/.claude/worktrees/bump-pin-2c9a7486b625, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T141503Z/story-forge.log |  |
 | 2026-09-25 14:15 | 2c9a7486b625 | mission-control | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/mission-control/.claude/worktrees/bump-pin-2c9a7486b625, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T141503Z/mission-control.log |  |
 | 2026-09-25 14:15 | 2c9a7486b625 | sysadmin-playbook | green | main 843055983d8b | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-25 14:30 | c1e9ae2f2ab5 | dwarf-flow | green | main 6fa2522b9f37 | no unmerged branches |
 | 2026-09-25 14:30 | c1e9ae2f2ab5 | lunch | green | main 4b493e6ba5a9 | no unmerged branches |
 | 2026-09-25 14:30 | c1e9ae2f2ab5 | date-tree | green | main ccf1866bac2c | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | story-forge | red | PR https://github.com/GeoffNordling/story-forge/pull/21 | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | mission-control | red | PR https://github.com/GeoffNordling/mission-control/pull/12 | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | sysadmin-playbook | green | main 3ffc18e8c4cd | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | sounds | green | main 2930be10bf63 | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | personal-trainer | green | main 7a623e0bd771 | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | idea-tree | green | main daa72294412e | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | dwarf-flow | green | main a8a18a8f0e3b | unmerged: season-2-summer-100 (2026-09-25, 28 ahead) |
+| 2026-09-25 21:45 | 405a36eda701 | lunch | green | main c99fe950a5b9 | no unmerged branches |
+| 2026-09-25 21:45 | 405a36eda701 | date-tree | green | main 400206903da1 | no unmerged branches |
