@@ -20,6 +20,7 @@ from importlib import resources
 from pathlib import Path
 
 from dev_playbook.stint import workcopy
+from dev_playbook.stint.call import CallFault
 from dev_playbook.stint.plan import PlanState, plan_state
 from dev_playbook.stint.records import CallRecord, ContextSize, StintRecord
 
@@ -117,7 +118,12 @@ class Loop:
         self, name: str, template: str, resume: str | None = None, **values: object
     ) -> CallRecord:
         """Make one call and apply the rules every call shares."""
-        rec = self.make_call(name, fill(template, {**self.shared, **values}), resume)
+        try:
+            rec = self.make_call(
+                name, fill(template, {**self.shared, **values}), resume
+            )
+        except CallFault as err:
+            raise Stop(f"{name}: {err}") from err
         self.record.calls.append(rec)
         print(
             f"{name}: {rec.seconds}s session={rec.session}"

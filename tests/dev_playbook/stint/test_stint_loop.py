@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 from dev_playbook.gitrepo import no_git_env
+from dev_playbook.stint.call import CallFault
 from dev_playbook.stint.loop import Assignment, Loop, Stop
 from dev_playbook.stint.plan import DONE_MARK, OPEN_MARK
 from dev_playbook.stint.records import CallRecord, StintRecord, Usage
@@ -216,6 +217,12 @@ def idle(name: str, copy: Path, rec: dict) -> dict | None:
     return None
 
 
+def faulted(name: str, copy: Path, rec: dict) -> dict | None:
+    if name == "iter-1":
+        raise CallFault("run.mjs exited 1")
+    return None
+
+
 @pytest.mark.parametrize(
     ("behave", "budget", "want"),
     [
@@ -231,6 +238,7 @@ def idle(name: str, copy: Path, rec: dict) -> dict | None:
         (no_usage, 6, "principal-1 reported no token usage"),
         (blocked, 6, "iter-1 blocked: the spec is missing"),
         (idle, 6, "iter-1 committed nothing"),
+        (faulted, 6, "iter-1: run.mjs exited 1"),
     ],
 )
 def test_a_rule_stops_the_stint(

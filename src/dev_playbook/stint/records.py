@@ -3,7 +3,9 @@
 The stint's folder, ``<home>/<repo>/<name>/``, outlives the stint:
 
     calls/<call>.json   a CallRecord, one per agent call
+    calls/<call>.request.json   what Sandcastle was asked to run
     calls/<call>.log    Sandcastle's log of the call
+    calls/<call>-probe.log      Sandcastle's log of the uncommitted-work probe
     review-<n>.md       the reviewer's report for segment n
     sessions/           the agents' session files, the principal's included
     stint.json          the StintRecord
