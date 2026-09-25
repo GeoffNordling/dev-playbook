@@ -61,19 +61,56 @@ since the parent uses it too.
 
 In order:
 
-1. **Plan closing the workstream.** What moves where, on this branch
-   only: the code in `rig/` to the place `main` will use it from, such as
-   `scripts/`, with the pipeline's document beside it; the code freed
-   from the scratch lab folder where `setup.sh` builds the fake real
-   repository, the config copy, and the image; the documentation and any
-   standards the tool needs; and the dev-playbook changes that ride as
-   patches in a throwaway config copy
-   ([Part 4](/workstreams/delegation/sandcastle/experiment-log.md#part-4-real-claude)):
-   `measure-event` sending rows to the host from a sandbox, the Stop and
-   SessionEnd hooks set to wait, and the `commit-sandbox` skill. No PR
-   and no merge: the agents that own this branch's other workstreams
-   take it to `main` later.
-2. **Close the workstream.** Carry out the plan on this branch.
+1. **Close the workstream: move the tool to `src/dev_playbook/stint/`.**
+   A greenfield refactor, not a copy, on this branch only. No PR and no
+   merge: the agents that own this branch's other workstreams take it to
+   `main` later. The user ruled: one package, the work copy included; an
+   installed `stint` command; every argument required, no defaults; the
+   experiments stay in the workstream as history. Done so far:
+   `workcopy.py` (was `front_clone.py`), `plan.py`, `records.py`,
+   `loop.py`, and `prompts/`, with their tests in
+   `tests/dev_playbook/stint/`. The chunks left, each committed with
+   `playbook check` and pytest passing:
+   1. **One sealed call.** `call.py` makes one call and returns a
+      `CallRecord`: the billing guard (the metered variables in the
+      environment, the credential keys in the config copy's
+      `settings.json`), the credential copy, the hook receiver started
+      and stopped around the call, and the parsing of the stream (the
+      init line's `apiKeySource`, the result line's answer and error).
+      `receiver.py` moves in as an importable module run in a thread.
+   2. **The Sandcastle layer.** `sandcastle/run.mjs` is the only Node
+      code: JSON in, Sandcastle `run()` for the agent and then for the
+      uncommitted-work probe, JSON out (session, usage, commits, the
+      raw stream lines, the probe's output). `relocated.mjs` and
+      `package.json` move in, with a `package-lock.json`; `node_modules`
+      is ignored, and a Makefile target installs it.
+   3. **The command.** `cli.py`: `stint setup` installs the Node part and
+      builds the image `localhost/stint:latest` from the config copy and
+      the host's `claude` binary; `stint run REPO --base --workstream
+      --check --budget --name --home --playbook --model`, all required.
+      Exit 0 done, 1 any other stop or a copy kept, 2 the tool could not
+      run. `config.py` makes the config copy; `launch.py` opens both
+      copies, runs the loop, closes both, writes `stint.json`; the
+      `Containerfile` moves to `image/`. `pyproject.toml` gains
+      `stint = "dev_playbook.stint.cli:main"`. The whole-command case of
+      `rules.py` becomes a test.
+   4. **Patches, documentation, and the live test.** The three changes go
+      into `dotfiles/` on this branch (`commit-sandbox` already is); the
+      patches move to `src/dev_playbook/stint/patches/` and `config.py`
+      applies them, as a temporary measure listed under Delete after the
+      merge below. A usage guide for a launching agent; `scripts/README.md`
+      and the workstream's members pointed at the new home; `rig/` marked
+      as history, its `index.md` saying the scripts no longer run. Then a
+      live `stint setup` and `stint run` with real Claude on a small
+      practice repository: the branch lands and both copies are deleted.
+      Last, move this item to Completed.
+
+### Delete after the merge
+
+- The patches in `src/dev_playbook/stint/patches/` and the step in
+  `config.py` that applies them: once `main` holds the three changes, the
+  config copy needs none, and `git apply` fails loud on a patch already
+  applied.
 
 ## Completed
 
