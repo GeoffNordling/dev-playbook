@@ -24,13 +24,13 @@ one of these paths below that directory: `CLAUDE.md`,
 `hooks/` and any file under it, `workflows/<name>.js`,
 `statusline.sh`.
 
-The members are the Harness kinds table of the
-[Type Registry](/doc-types/registry.md#harness-kinds).
+The members are the rows of the
+[Harness File Registry](/registries/harness-files.md#members).
 
 `harness.every-harness-file-matches-a-member-row` · deterministic
 
-> **Why.** Claude Code fixes which files it reads; the Type Registry's
-> Harness kinds table is the workspace's record of that set, and the
+> **Why.** Claude Code fixes which files it reads; the Harness File
+> Registry is the workspace's record of that set, and the
 > predicate holds the repo to the table.
 
 ## Every runbook at a fixed path

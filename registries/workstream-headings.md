@@ -1,10 +1,10 @@
 ---
 type: Registry
-title: Workstream Heading Menu
+title: Workstream Heading Registry
 description: The headings a Workstream's head file picks its H2s from, each with what it holds
 ---
 
-# Workstream Heading Menu
+# Workstream Heading Registry
 
 The headings a Workstream's head file may use as its H2s. Every heading
 is optional and all are peers. The rule

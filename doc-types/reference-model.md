@@ -18,7 +18,7 @@ form every member of the family is read against, so a caller learns
 what it needs without reading the body. An **instance** is one member
 of the family: one runbook, one standard, one guide, one loop, one
 workstream. Which kinds of file each built doc-type covers is the
-[Type Registry](/doc-types/registry.md), and the words of the system
+[Doc-Type Registry](/registries/doc-types.md), and the words of the system
 are in [CONTEXT.md](/CONTEXT.md#doc-types).
 
 A markdown file is code in a fuzzy form, and the model that reads it

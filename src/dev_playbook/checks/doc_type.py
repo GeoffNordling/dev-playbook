@@ -1,7 +1,7 @@
 """The doc-type family: the rules of ``standards/doc-type/``.
 
 Thirty-one rules are decided by functions over the model. Two hold each
-``doc-types/<name>/`` directory to a row of the Type Registry and to its five
+``doc-types/<name>/`` directory to a row of the Doc-Type Registry and to its five
 files. Three
 hold a file typed ``Guide`` to its steps and its lack of trailers. One holds
 the acts of a file typed ``Loop`` to a runbook link. Four hold a file typed
@@ -176,11 +176,10 @@ def _doc_type_directories(repo: Repo) -> set[str]:
 
 @check("doc-type.registered")
 def registered(repo: Repo) -> Iterator[Finding]:
-    """Each ``doc-types/<name>/`` is linked from a Doc-type cell of the Type Registry."""
+    """Each ``doc-types/<name>/`` is linked from a Doc-type cell of the Doc-Type Registry."""
+    table = sources.DOC_TYPE_REGISTRY
     covered: set[str] = set()
-    for table in (sources.TYPE_REGISTRY, sources.HARNESS_KINDS):
-        if table.path not in repo.markdown:
-            continue
+    if table.path in repo.markdown:
         section = repo.markdown[table.path].section(table.heading)
         for cell in _column(section, "Doc-type"):
             for _, target in md.markdown_links(cell):
@@ -191,7 +190,7 @@ def registered(repo: Repo) -> Iterator[Finding]:
         yield Finding(
             f"{DOC_TYPES}/{name}",
             None,
-            f"no Doc-type cell of `{sources.TYPE_REGISTRY.path}` links a file in it",
+            f"no Doc-type cell of `{table.path}` links a file in it",
         )
 
 

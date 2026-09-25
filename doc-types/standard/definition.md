@@ -24,7 +24,7 @@ repository into the state the first time is a guide's or a runbook's.
 
 A standard is one file, `standards/<name>/<topic>.md`, typed
 `Standard` in the
-[Type Registry](/doc-types/registry.md#document-types):
+[OKF Type Registry](/registries/okf-types.md#okf-types):
 one population and its rules, each rule a predicate over one member's
 state. The state is described twice. The rule's predicate is the prose
 form, what a writer reads to know what to make; the verifier the table

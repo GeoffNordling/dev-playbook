@@ -22,7 +22,7 @@ that encoding.
 ## Headings from the menu
 
 Every H2 of a document typed `Workstream` is a heading in the
-[Workstream Heading Menu](/doc-types/workstream/heading-menu.md#headings),
+[Workstream Heading Registry](/registries/workstream-headings.md#headings),
 and no two of its H2s have the same text.
 
 `doc-type.headings-from-the-menu` · deterministic

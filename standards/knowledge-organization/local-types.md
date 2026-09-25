@@ -10,8 +10,7 @@ population: "a local type declaration: the `okf_types` mapping in the frontmatte
 Where a consumer repo declares a document type that no other repo
 shares: an `okf_types` mapping in the frontmatter of its own root
 `index.md`, beside `okf_version`. The types every repo inherits are the
-Document types table of the
-[Type Registry](/doc-types/registry.md#document-types), which lives in
+[OKF Type Registry](/registries/okf-types.md#okf-types), which lives in
 dev-playbook; these rules read that table and never govern it. A check
 resolves a document's `type` against the union of the two, and against
 the registry alone when the repo declares no `okf_types`
@@ -55,8 +54,8 @@ name, compared case-insensitively.
 ### Add, never shadow
 
 No key of the `okf_types` mapping is equal, ignoring case, to a type
-name in the Document types table of `doc-types/registry.md`, or to an
-earlier key of the same mapping.
+name in the table of `registries/okf-types.md`, or to an earlier key of
+the same mapping.
 
 `knowledge-organization.add-never-shadow` · deterministic
 

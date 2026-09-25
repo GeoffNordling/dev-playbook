@@ -30,8 +30,8 @@ instances of one doc-type is that doc-type's own Standard's.
 
 ## Registered
 
-A table in `doc-types/registry.md` has a row whose Doc-type cell links
-to a file in `doc-types/<name>/`.
+The table in `registries/doc-types.md` has a row whose Doc-type cell
+links to a file in `doc-types/<name>/`.
 
 `doc-type.registered` · deterministic
 

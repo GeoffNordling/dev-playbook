@@ -102,7 +102,7 @@ def matches_a_member_row(repo: Repo) -> Iterator[Finding]:
             continue
         if not any(p.fullmatch(below) for p in MEMBER_PATTERNS):
             yield Finding(
-                path, None, "matches no member row of the Type Registry's harness kinds"
+                path, None, "matches no member row of the Harness File Registry"
             )
 
 

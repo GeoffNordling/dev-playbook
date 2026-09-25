@@ -94,7 +94,7 @@ in the Standard the step links.
    ```
 
    The type check unions those names onto the
-   [Type Registry](/doc-types/registry.md#document-types).
+   [OKF Type Registry](/registries/okf-types.md#okf-types).
    The mapping's rules, the entry shape, alphabetical keys,
    add-never-shadow, and name and description only, are
    [Local Types](/standards/knowledge-organization/local-types.md#local-declaration).

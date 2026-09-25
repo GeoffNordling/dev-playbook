@@ -57,9 +57,9 @@ Fact base, view, and extractor are the repo's words
   ([Planned](/workstreams/system/see/viewer/WORKSTREAM.md#planned)).
 - **registry** — the list of kinds the tool can show
   ([Registry](/workstreams/system/see/viewer/registry.md)).
-  Goes with kind: registry is the
-  [Type Registry](/doc-types/registry.md),
-  and this list becomes the views in the same rename.
+  Goes with kind: registry is also the word for the files under
+  [registries/](/registries/index.md), and this list becomes the views
+  in the same rename.
 - **panel** — one view file rendered on screen.
 - **state directory** — the directory outside every repo where view files
   live

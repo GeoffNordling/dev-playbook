@@ -1,6 +1,6 @@
 """Where a check reads data out of a document: the path and heading, named once.
 
-Some rules consume data a document holds, such as the Type Registry's table
+Some rules consume data a document holds, such as the OKF Type Registry's table
 of document types or the canonical files a repo copies. The path and the
 heading are constants here, and the test beside this module pins each one
 to its document: the file is tracked and the heading is present. A check
@@ -19,13 +19,12 @@ class Section:
     heading: str
 
 
-# The global table of document types: every registered `type`, what it is, and
-# the doc-type that covers it.
-TYPE_REGISTRY = Section("doc-types/registry.md", "document-types")
+# The global table of OKF types: every registered `type` and what it is.
+TYPE_REGISTRY = Section("registries/okf-types.md", "okf-types")
 
-# The Type Registry's table of harness kinds, each with the doc-type that
-# covers it.
-HARNESS_KINDS = Section("doc-types/registry.md", "harness-kinds")
+# The table joining each built doc-type to the OKF type or harness members
+# its instances are.
+DOC_TYPE_REGISTRY = Section("registries/doc-types.md", "doc-types")
 
 # Every type name in the TYPE_REGISTRY table. A consumer runs the installed
 # package, not dev-playbook's tree, so the names ship here; the test beside
@@ -50,7 +49,7 @@ REGISTERED_TYPES = frozenset(
 )
 
 # The menu a Workstream's head file picks its headings from.
-WORKSTREAM_MENU = Section("doc-types/workstream/heading-menu.md", "headings")
+WORKSTREAM_MENU = Section("registries/workstream-headings.md", "headings")
 
 # Every heading in the WORKSTREAM_MENU table, shipped as REGISTERED_TYPES is;
 # the test beside this module pins the set to the table.

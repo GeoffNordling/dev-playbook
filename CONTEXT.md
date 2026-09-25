@@ -79,6 +79,10 @@ One state that satisfies a specification, drawn out: a witness, as an example is
 The parts of the doc-type system
 ([Reference Model](/doc-types/reference-model.md)).
 
+**Doc-type**
+A contract for one kind of file: a directory `doc-types/<name>/` whose parts a check reads out of each instance. The [Doc-Type Registry](/registries/doc-types.md) joins each one to the OKF type or harness members its instances are.
+_Avoid_: document type.
+
 **DocType**
 The base class of the reference model: a class extends it when its instance is one markdown file of that type.
 
@@ -169,8 +173,12 @@ The two axes a repository file sits on, its role and its content
 **Concept document**
 Prose a reader loads to understand something. It carries OKF frontmatter, and a check reads its type.
 
+**OKF type**
+The `type` value in a concept document's frontmatter, a label from the [OKF Type Registry](/registries/okf-types.md) or a repo's local declaration. It is not a doc-type: an OKF type names a kind of document, and only some kinds have a doc-type.
+_Avoid_: document type.
+
 **Harness-owned file**
-A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the Harness kinds table of the [Type Registry](/doc-types/registry.md#harness-kinds) enumerates. It carries no OKF frontmatter.
+A file a tool consumes as configuration or runs as code or instructions: every non-`.md` file, plus the Claude Code file set the [Harness File Registry](/registries/harness-files.md#members) enumerates. It carries no OKF frontmatter.
 
 **Procedure**
 The steps of one job: its trigger, its target, the order of the steps, the conditions it branches on, the commands it issues, when it stops, what it reports. It binds one actor for the length of one run.

@@ -80,28 +80,20 @@ def typed(doctype: str, body: str, extra: str = "") -> bytes:
 
 def test_registered() -> None:
     table = b"""\
-# Type Registry
+# Doc-Type Registry
 
-## Document types
+## Doc-types
 
-| Type | What it is | Doc-type |
-|---|---|---|
-| `Guide` | [Loop](/doc-types/loop/definition.md) | [Guide](/doc-types/guide/definition.md) |
-| `Log` | A log. | None |
-
-## Harness kinds
-
-| Kind | Doc-type |
-|---|---|
-| Skill | [Runbook](/doc-types/runbook/definition.md) |
+| Doc-type | OKF type | Harness members | Conventions |
+|---|---|---|---|
+| [Guide](/doc-types/guide/definition.md) | `Guide` | - | [Loop](/doc-types/loop/definition.md) |
 """
     assert found(
         registered,
         {
-            "doc-types/registry.md": table,
+            "registries/doc-types.md": table,
             "doc-types/guide/definition.md": b"# Guide\n",
             "doc-types/loop/definition.md": b"# Loop\n",
-            "doc-types/runbook/definition.md": b"# Runbook\n",
             "doc-types/index.md": b"# Index\n",
         },
     ) == [("doc-types/loop", None)]
