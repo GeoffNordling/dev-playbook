@@ -1,42 +1,30 @@
 ---
 type: General-Sheet
 title: Headless Operation
-description: What `claude -p` guarantees on subscription — billing and the credentials that outrank the login, how stable the policy is, what a run declares about itself, what the harness loads, what the flags buy, and the path-scoped permissions that do not work
+description: Research on `claude -p` — the credential order, how stable subscription billing is, what a run declares about itself, what the harness loads, two flags, and the path-scoped permissions that do not work
 ---
 
 # Headless Operation
 
 Claude Code runs headless with `claude -p` — no terminal, no prompts, one
-process per invocation. This covers how it is billed, what the harness loads
-into every run, what each run reports about itself, and why its file
-permissions cannot be scoped to a directory.
-The decision to use it is [0023](/docs/decisions/0023-headless-on-subscription.md).
+process per invocation. This document is research: facts found while
+building headless runs, kept so that further work on them starts from
+what is already known. The decision to use it is
+[0023](/docs/decisions/0023-headless-on-subscription.md). The billing rules
+are [Billing Credentials](/standards/billing/credentials.md), and the
+sealed container that runs unattended work is
+[a stint](/guides/running-a-stint.md).
 
-## Billing
-
-`claude -p` draws from subscription usage, and nothing in this workspace may
-reach the metered API.
+## Credential order
 
 Claude Code resolves credentials in a fixed order, and the subscription login
 sits at the bottom of it. Anthropic's [IAM
 documentation](https://code.claude.com/docs/en/iam) states that in
-non-interactive mode a configured key is always used when present — so a stray
-`ANTHROPIC_API_KEY` moves the workspace to per-token billing with no prompt and
-no warning. Environment variables outrank the login:
-
-`ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_BASE_URL`,
-`CLAUDE_CODE_USE_BEDROCK`, `CLAUDE_CODE_USE_VERTEX`, `CLAUDE_CODE_USE_FOUNDRY`,
-`ANTHROPIC_PROFILE`, `ANTHROPIC_FEDERATION_RULE_ID`,
-`ANTHROPIC_ORGANIZATION_ID`.
-
-Settings keys mint or redirect a credential the same way: `apiKeyHelper`,
-`awsAuthRefresh`, `awsCredentialExport`.
-
-`CLAUDE_CODE_OAUTH_TOKEN` also outranks the login, and is safe: it is a
-subscription credential, not a metered one.
+non-interactive mode a configured key is always used when present, with no
+prompt and no warning.
 
 `--bare` skips the keychain and the subscription login outright and demands
-an API key, and it is never passed.
+an API key.
 
 ## How stable the policy is
 
@@ -61,8 +49,8 @@ emits is an `init` reporting the session's own configuration back:
 `permission_denials`, `duration_ms`, and the model's final text.
 
 **A run is testable because every guardrail is asserted against state the
-harness declares, with no agent behavior in the verdict.** A node that
-complied once proves nothing about the next run; an `init` message reporting
+harness declares, with no agent behavior in the verdict.** A run that
+complied once proves nothing about the next; an `init` message reporting
 `tools: ['Read']` is a fact about the process.
 
 `apiKeySource` appears only in the stream — the plain `--output-format json`
@@ -75,7 +63,7 @@ only part of it is the caller's:
 
 | Part | Owner | Off switch |
 |---|---|---|
-| system prompt | Anthropic | `--bare`, which is never passed |
+| system prompt | Anthropic | `--bare` |
 | CLAUDE.md, rules, skills, agents | the workspace | per file |
 | base tools | Anthropic | `--allowedTools` trims; the base cannot be replaced |
 | loop body — parse, dispatch, permission gate, compaction, retries | Anthropic, unreadable | none |
@@ -94,26 +82,15 @@ unmeasured. The task
 prompt or `--append-system-prompt` can state that no user is present, that
 every decision is the model's, and that the result goes to disk.
 
-## What the flags buy
+## Two flags
 
-- **`--session-id`** is honored verbatim, so a caller can mint a run's
-  identifier up front rather than capturing it from the child afterwards.
 - **`--model`** pins the model, and the pin is confirmed in `init`.
-- **`--agents`** takes inline agent definitions, which resolve and appear in
-  `init`.
-- **`--json-schema`** yields a terminal report validated by the harness, so a
-  node reports a checked shape instead of prose to be parsed. It silently adds
-  a `StructuredOutput` tool to the session, which any assertion over `tools`
-  has to expect.
 - **`--effort`** accepts `low`, `medium`, `high`, `xhigh`, `max`, and
   `ultracode`. Nothing reports it back, so the pin cannot be verified.
 
-Hooks fire as they do in an attended session, so the measurement pipeline
-covers headless runs unchanged.
-
 ## Path-scoped permissions do not work
 
-A node was asked to write two files, one under an allowed directory and one
+A run was asked to write two files, one under an allowed directory and one
 outside it, and judged on whether the outside file existed afterwards and on
 `permission_denials`:
 
@@ -136,8 +113,7 @@ rule it was ignored outright.
 
 So the only file guardrail available headless is all-or-nothing per tool, plus
 deny-by-default. There is no configuration substitute for the write fence an
-attended session gets from `EnterWorktree`, which is why the sealed container of
-[a stint](/guides/running-a-stint.md) is the only fence left for AFK work.
+attended session gets from `EnterWorktree`.
 
 This was measured under one permission mode and two path forms. A `--debug`
 run would show whether the harness reports the rules it is discarding.
