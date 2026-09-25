@@ -31,24 +31,21 @@ the repo, outside `workstreams/`:
   Standard, Guide, Loop, and Workstream, under
   [`doc-types/`](/doc-types/index.md), drawn whole in
   [Reference Model](/doc-types/reference-model.md) and held to the
-  Standard [Doc-Type](/standards/doc-type/doc-type.md). No more
-  doc-types are expected.
+  Standard [Doc-Type](/standards/doc-type/doc-type.md).
 - **The `stint` command**, a tool Drive uses: it runs one unattended
   stint in sealed Sandcastle containers, from launch to its end
-  ([Running a Stint](/guides/running-a-stint.md)). It is complete, and
-  no further development of it is planned.
+  ([Running a Stint](/guides/running-a-stint.md)).
 
-```
-SYSTEM · see and drive the workspace's systems
-├─ SEE · understand a checkout without reading it all
-│    doc-type system ──enables──▶ FACT BASE ⊃ ontology ──enables──▶ VIEWER
-│     (built, closed)             (not built)                        (a slice built)
-│                                      ▲
-│                       STORY-FORGE ───┘ simulates the fact base and its views
-│                                        by hand on a real repo, to prove value
-└─ DRIVE · work advances without the user in the loop
-     workstream · loop · stint · driver ──unattended stints run on──▶ stint command
-                                                                      (built, closed)
+```mermaid
+flowchart LR
+  subgraph SEE["See: understand a checkout without reading it all"]
+    DT["Doc-type system<br/>(built)"] -- enables --> FB["Fact base, with the ontology<br/>(not built)"]
+    FB -- enables --> V["Viewer<br/>(a slice built)"]
+    SF["Story-forge<br/>(simulates the fact base and its views by hand on a real repo)"] -- proves the value of --> FB
+  end
+  subgraph DRIVE["Drive: work advances without the user in the loop"]
+    W["Workstream, loop, stint, driver"] -- unattended stints run on --> SC["stint command<br/>(built)"]
+  end
 ```
 
 The two meet at one seam: a loop's verification reads the facts that
@@ -60,34 +57,27 @@ None: the goal is standing.
 
 ## Principles
 
-- **Logic and statistics meet at one seam.** Predicates define a set,
-  with no probabilities attached. An act is a draw from a distribution
-  over states, and the draw lands in the set or outside it. A loop does
-  not change the LLM; it changes what the next draw is given: a
-  verification finds where the last sample fell outside, and the act
-  draws again with those findings in the prompt, so successive samples
-  land in the set more often. Deterministic rules decide membership
-  exactly; stochastic rules decide it with an error rate.
-- **Three working policies for rules.** A change to the repo is the
-  expensive way out. No credit goes to the count of rules, so delete is
-  the default for a rule that restates another or binds something too
-  small to matter. "Keep it because a check emits the id" is backwards,
-  since the check follows the rule.
+- **Markdown is code.** Just a fuzzy, random form of it, with the LLM
+  as the stochastic compiler. The doc-types give markdown files
+  structure, contracts, APIs, and typing. CLOA is about embedding
+  deterministic structure within them.
+- **The picture and the predicates, both.** The user naturally thinks
+  in the literal picture, the reference model. The predicates let us
+  generalize beyond specific examples into a general description of
+  the whole. A reference model shows one point in the distribution;
+  the predicates describe the distribution.
+- **Describe structure, not steps.** Not what an agent should do, but
+  the structure the user wants enforced. That kind of specification is
+  durable: it sticks around when the conversation is over, and it is
+  how the user gets hands off the wheel.
+- **A big fuzzy target can't be looped.** When the goal is large,
+  unspecified, and high dimensional, a loop can't even know how to get
+  to the target state, much less get there.
 
 ## Terms
 
-The terms that cross into the main part of the repo, such as
-predicate, fact base, workstream, and stint, are in
-[CONTEXT.md](/CONTEXT.md). The terms this head file coins:
-
-- **Distribution** — the states an act could leave behind, each
-  weighted by how likely it is, given the state it starts from and the
-  prompt it is given. Some of the weight falls inside the target state,
-  some outside. A distribution is not a set.
-- **Sample** — one state an act did leave behind: one draw from its
-  distribution. The samples of one loop are not independent: each
-  starts from the last, with its findings in the prompt, so the loop is
-  a path through the space of states.
+The terms, such as predicate, fact base, workstream, and stint, are in
+[CONTEXT.md](/CONTEXT.md).
 
 ## Planned
 

@@ -52,9 +52,7 @@ over it.
 - **The fact base holds declarations and state, never findings.**
   Findings are a separate stamped artifact. Deterministic ones are
   recomputable from the fact base; stochastic ones are cached with
-  commit, judge, and time. This is the seam between a set and a
-  distribution
-  ([Principles](/workstreams/system/WORKSTREAM.md#principles)).
+  commit, judge, and time.
 - **The ontology is part of the fact base, and there is one solver.**
   The fact base is the ABox; the doc-types are the TBox, and the
   doc-type system is what makes an ontology to solve at all

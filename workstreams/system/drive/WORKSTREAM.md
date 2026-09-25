@@ -14,11 +14,10 @@ advance it, with the user present or not, and the work comes back to
 the user for a verdict. This head file holds the ideas, the tracking,
 and the shape of that workflow.
 
-The `stint` command is built and done: it runs one unattended stint in
-sealed Sandcastle containers, from launch to its end, as described in
+The `stint` command runs one unattended stint in sealed Sandcastle
+containers, from launch to its end, as described in
 [Running a Stint](/guides/running-a-stint.md). It is a tool this
-workstream's unattended stints run on, and no further development of
-it is planned here.
+workstream's unattended stints run on.
 
 ## Goal
 
@@ -182,9 +181,8 @@ Decided with the user on 2026-09-24.
 - **Workstream and Loop are built doc-types.** Both live under
   [`doc-types/`](/doc-types/index.md), in the closed doc-type system;
   this workstream holds only the workflow that uses them.
-- **The `stint` command is built and done.** It is the driver of an
-  unattended stint and supports this workstream as a tool; no further
-  development of it is planned.
+- **The `stint` command is the driver of an unattended stint.** It
+  supports this workstream as a tool.
 - **The unattended principal rules on the findings itself.** It judges
   the reviewer's sorted findings against the head file's Goal, Done when,
   and Constraints, and writes each ruling in the progress file, so the
