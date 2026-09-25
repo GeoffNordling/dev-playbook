@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea, and leave it briefed and routed. Use when the user hands over a raw idea or a rushed stub to be triaged, or when /candidate-promote passes a promoted entry through.
+description: Triage work at the front door — adopt a rushed, untriaged issue or capture a fresh idea, and leave it briefed and routed. Use when the user hands over a raw idea or a rushed stub to be triaged.
 disable-model-invocation: false
 model: inherit
 effort: xhigh

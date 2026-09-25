@@ -33,7 +33,7 @@ nothing for that repo.
 [workspace_lint.py](~/workspace/dev-playbook/src/dev_playbook/workspace_lint.py)
 for the `GOVERNED` roster}: governance is declared there, never inferred from a
 repo sitting under the workspace root. {If the roster omits this repo, {Report
-that it is ungoverned, and that /enable-repo-governance is what adopts it} and
+that it is ungoverned and must be enrolled in the roster first} and
 stop} — bumping an unenrolled repo installs a standard nothing checks.
 
 Done when the repo's name is in the roster.
