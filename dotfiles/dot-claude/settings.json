@@ -82,8 +82,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/measure-event\"",
-            "async": true
+            "command": "python3 \"$HOME/.claude/hooks/measure-event\""
           }
         ]
       }
@@ -122,8 +121,7 @@
           },
           {
             "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/measure-event\"",
-            "async": true
+            "command": "python3 \"$HOME/.claude/hooks/measure-event\""
           }
         ]
       }

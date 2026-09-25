@@ -7,6 +7,11 @@ every machine invokes this hook — but the store lives on the Fedora primary
 alone, so anywhere else the guard in main() exits without recording. The
 harness pipes the event JSON in on stdin; this appends one row and exits.
 
+Inside a sandboxed run there is no store to append to — the container's own
+filesystem is thrown away with the container — so the row is handed to a
+receiver on the host instead. record() takes that path when the sink file
+exists, and nothing else in this hook changes.
+
 Storage is append-only and uninterpreted: no parsing for meaning, filtering,
 or deduplication at write time — a row dropped here is one no future query
 can ask for. The one exception is mechanical rather than interpretive: a
@@ -24,6 +29,7 @@ session, so it may not depend on an interpreter's package set or a knob.
 """
 
 import json
+import socket
 import sqlite3
 import sys
 from datetime import UTC, datetime
@@ -32,6 +38,17 @@ from pathlib import Path
 STORE = Path("~/.local/share/claude-measure").expanduser()
 DB_PATH = STORE / "events.db"
 ERROR_LOG = STORE / "errors.log"
+
+# Written by the launcher of a sandboxed run and mounted read-only, carrying
+# one line: `<address> <port>` of a receiver listening on the host. Its
+# presence is how this hook detects that it is inside a container with no real
+# store to write — the same self-detection idea as on_fedora(), not a knob.
+SINK_PATH = STORE / "sink"
+
+# The cap on every socket call to that receiver. Far more than the millisecond
+# a loopback hop takes, and still a hard bound: a session must never wait on
+# measurement, so on expiry the event is dropped rather than retried.
+SINK_TIMEOUT_SECONDS = 10.0
 
 # Concurrent sessions write to one database. WAL lets their readers and this
 # writer coexist, and the busy timeout makes a collision queue rather than
@@ -113,8 +130,45 @@ def for_storage(payload: str) -> str:
     return json.dumps({k: v for k, v in parsed.items() if k not in TRIMMED})
 
 
+def row_values(received_at: str, payload: str) -> tuple[str | None, ...]:
+    """One event as the row it becomes, in INSERT's column order.
+
+    Both destinations below send exactly this, so a column added to INSERT is
+    added to the sandboxed path in the same edit.
+    """
+    return (received_at, *promoted_values(payload), payload)
+
+
+def send_to_sink(row: tuple[str | None, ...]) -> None:
+    """Hand one row to the receiver the sink file names, over its own connection.
+
+    Used only inside a sandboxed run, where DB_PATH would be a database in the
+    container's own filesystem, thrown away with the container. The receiver is
+    the host process that started the run; it does the insert into the real
+    store, as the user.
+
+    The row goes as one JSON list and the write half is then closed, so the
+    length of the message is the connection itself — nothing to frame and
+    nothing to parse incrementally.
+    """
+    address, port = SINK_PATH.read_text().split()
+    with socket.create_connection(
+        (address, int(port)), timeout=SINK_TIMEOUT_SECONDS
+    ) as sock:
+        sock.sendall(json.dumps(row).encode("utf-8"))
+        sock.shutdown(socket.SHUT_WR)
+
+
 def record(received_at: str, payload: str) -> None:
-    """Append one row, creating the store, the database, and the table as needed."""
+    """Append one row, creating the store, the database, and the table as needed.
+
+    A sandboxed run is the exception: there the sink file exists, and the row
+    is sent to the host receiver instead of written here.
+    """
+    if SINK_PATH.exists():
+        send_to_sink(row_values(received_at, payload))
+        return
+
     STORE.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(DB_PATH, timeout=BUSY_TIMEOUT_SECONDS)
     try:
@@ -122,7 +176,7 @@ def record(received_at: str, payload: str) -> None:
         # anything; the rest read back the mode they already have.
         connection.execute("PRAGMA journal_mode=WAL")
         connection.execute(SCHEMA)
-        connection.execute(INSERT, (received_at, *promoted_values(payload), payload))
+        connection.execute(INSERT, row_values(received_at, payload))
         connection.commit()
     finally:
         connection.close()
