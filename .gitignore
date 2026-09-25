@@ -37,3 +37,6 @@ src/dev_playbook/cloa_viewer/web/dist/
 
 # stint's Sandcastle layer — installed by `stint setup`, never committed
 src/dev_playbook/stint/sandcastle/node_modules/
+
+# story-forge fact-base simulation runs: derived output, never committed
+workstreams/system/see/story-forge/simulate-fact-base/runs/

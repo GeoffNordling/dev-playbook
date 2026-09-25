@@ -106,6 +106,11 @@ them: Story, Assessment Record, Prep-unit, Work-Search Contact.
 
 ## Planned
 
+- **The whole-repo fact base by computation.** Many agents simulate
+  the fact base for all of story-forge in one repeatable run: an Opus
+  planner, one Sonnet builder per slice, an Opus assembler, in
+  [Simulate a Fact Base](/workstreams/system/see/story-forge/simulate-fact-base/process.md).
+  Views over the whole repo are drawn from its output.
 - **Operations and views over the stories fact base.** What a person
   does with the base once it exists: the views the user asks for next,
   the two thresholds ruled, and a Sonnet agent sent to check the
