@@ -1,20 +1,20 @@
 ---
 type: Workstream
 title: System Workstream
-description: The head file of the system workstream — the user sees the workspace's systems and drives work on them without always being in the loop, through two child workstreams, See and Drive, with the principles and terms they share and the worklist
+description: The head file of the system workstream — the user sees the workspace's systems and drives work on them without always being in the loop, through three child workstreams, See, Drive, and Wall, with the principles and terms they share and the worklist
 ---
 
 # System Workstream
 
 This workstream is speculative. The workstream holds the user's
-one aim for the systems of `~/workspace`, split in two child
+one aim for the systems of `~/workspace`, split in three child
 workstreams, and this head file holds only what crosses them.
 
 ## Goal
 
 The user sees and steers the workspace's systems without reading them,
 and work on them advances without the user always in the loop. The
-reason is [System Legibility](/docs/system-legibility.md). Two child
+reason is [System Legibility](/docs/system-legibility.md). Three child
 workstreams carry the goal:
 
 - **See**: deterministic code shows what a checkout does, at the CLOA.
@@ -22,6 +22,9 @@ workstreams carry the goal:
 - **Drive**: work advances in stints, most of them unattended, and the
   user gives verdicts. Head file:
   [Drive Workstream](/workstreams/system/drive/WORKSTREAM.md).
+- **Wall**: every exchange between the user and an agent crosses a
+  declared, typed wall, out as typed reports and in as typed commands.
+  Head file: [Wall Workstream](/workstreams/system/wall/WORKSTREAM.md).
 
 Two parts are built and closed, and each lives in the main part of
 the repo, outside `workstreams/`:
@@ -45,6 +48,11 @@ flowchart LR
   subgraph DRIVE["Drive: work advances without the user in the loop"]
     W["Workstream, loop, stint"] -- unattended stints run on --> SC["stint command<br/>(built)"]
   end
+  subgraph WALL["Wall: the typed boundary between the user and an agent"]
+    WL["Typed reports out,<br/>typed commands in"]
+  end
+  WL -- its typing is drawn by --> SEE
+  WL -- the agent works behind it in --> DRIVE
 ```
 
 The two meet at one seam: a loop's verification reads the facts that

@@ -104,6 +104,18 @@ them: Story, Assessment Record, Prep-unit, Work-Search Contact.
   does with the base once it exists: the views the user asks for next,
   the two thresholds ruled, and a Sonnet agent sent to check the
   surrogate's assumptions against the real files before each new view.
+- **Views as typed operations.** The views of the stories fact base do
+  not work well for the user yet. The next attempt expresses each view
+  in typed terms: the objects as classes, and what a view shows as
+  typed methods on them, per See's
+  [Type each verb's signature](/workstreams/system/see/WORKSTREAM.md#planned).
+- **A view from a plain description.** The user describes a view in
+  plain language. An agent builds it, then finds the typing in the
+  fact base that supports it, and restates the user's description in
+  the terms of the
+  [deterministic wall](/workstreams/system/wall/WORKSTREAM.md)
+  only. A part of the description that no typing supports is a
+  residual.
 - **The domain layer read off the residuals.** Which node types,
   extractors, and primitives story-forge owns and dev-playbook does
   not: the first data point for the fact base's open question.

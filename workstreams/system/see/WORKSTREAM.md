@@ -83,6 +83,19 @@ share:
   reads the fact base and derives new rows from existing ones, with no
   judgment, and never touches a file.
 
+## Planned
+
+- **Type each verb's signature.** In the
+  [Reference Model](/doc-types/reference-model.md), each doc-type is a
+  class, and `operations` lists its verbs as bare names. Each of the
+  twelve verbs gets a typed signature, its inputs and its output, such
+  as `Standard.hold(member) -> list[Finding]` or
+  `Loop.drive(Workstream) -> Stint`, so a document is a class with
+  methods. This reopens the closed doc-type system. The fact base then
+  extracts one edge type per method, and the viewer and story-forge
+  draw those typed operations
+  ([Wall Workstream](/workstreams/system/wall/WORKSTREAM.md#in-typed-commands)).
+
 ## Acronyms
 
 - **API** — Application Programming Interface.
