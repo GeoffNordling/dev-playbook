@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-25 14:15 | 2c9a7486b625 | story-forge | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/story-forge/.claude/worktrees/bump-pin-2c9a7486b625, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T141503Z/story-forge.log |  |
-| 2026-09-25 14:15 | 2c9a7486b625 | mission-control | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/mission-control/.claude/worktrees/bump-pin-2c9a7486b625, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T141503Z/mission-control.log |  |
-| 2026-09-25 14:15 | 2c9a7486b625 | sysadmin-playbook | green | main 843055983d8b | no unmerged branches |
-| 2026-09-25 14:15 | 2c9a7486b625 | sounds | green | main b714f68423f9 | no unmerged branches |
-| 2026-09-25 14:15 | 2c9a7486b625 | personal-trainer | green | main e746fb69f105 | no unmerged branches |
-| 2026-09-25 14:15 | 2c9a7486b625 | idea-tree | green | main 116b8555deab | no unmerged branches |
-| 2026-09-25 14:15 | 2c9a7486b625 | dwarf-flow | green | main de7de901670b | no unmerged branches |
-| 2026-09-25 14:15 | 2c9a7486b625 | lunch | green | main d88539fdbf72 | no unmerged branches |
-| 2026-09-25 14:15 | 2c9a7486b625 | date-tree | green | main 83070ad241d2 | no unmerged branches |
 | 2026-09-25 14:30 | c1e9ae2f2ab5 | story-forge | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/story-forge/.claude/worktrees/bump-pin-c1e9ae2f2ab5, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T143003Z/story-forge.log |  |
 | 2026-09-25 14:30 | c1e9ae2f2ab5 | mission-control | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/mission-control/.claude/worktrees/bump-pin-c1e9ae2f2ab5, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T143003Z/mission-control.log |  |
 | 2026-09-25 14:30 | c1e9ae2f2ab5 | sysadmin-playbook | green | main c39d847fb11c | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-25 21:45 | 405a36eda701 | dwarf-flow | green | main a8a18a8f0e3b | unmerged: season-2-summer-100 (2026-09-25, 28 ahead) |
 | 2026-09-25 21:45 | 405a36eda701 | lunch | green | main c99fe950a5b9 | no unmerged branches |
 | 2026-09-25 21:45 | 405a36eda701 | date-tree | green | main 400206903da1 | no unmerged branches |
+| 2026-09-26 16:00 | 4f6fb1b733ee | story-forge | red | PR https://github.com/GeoffNordling/story-forge/pull/22 | unmerged: bump-pin-405a36eda701 (2026-09-25, 2 ahead) |
+| 2026-09-26 16:00 | 4f6fb1b733ee | mission-control | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/mission-control/.claude/worktrees/bump-pin-4f6fb1b733ee, log at /home/geoff/.local/state/dev-playbook/update-pins/20260926T160004Z/mission-control.log |  |
+| 2026-09-26 16:00 | 4f6fb1b733ee | sysadmin-playbook | green | main afd676d53900 | no unmerged branches |
+| 2026-09-26 16:00 | 4f6fb1b733ee | sounds | green | main 218006af058b | no unmerged branches |
+| 2026-09-26 16:00 | 4f6fb1b733ee | personal-trainer | green | main 0db87e22147e | no unmerged branches |
+| 2026-09-26 16:00 | 4f6fb1b733ee | idea-tree | green | main 6a4cbcb0a3fe | no unmerged branches |
+| 2026-09-26 16:00 | 4f6fb1b733ee | dwarf-flow | green | main 68f5727d29f9 | unmerged: season-4-winter-100 (2026-09-26, 11 ahead); worktree-screen-narration (2026-09-25, 1 ahead) |
+| 2026-09-26 16:00 | 4f6fb1b733ee | lunch | green | main aef1811febfc | no unmerged branches |
+| 2026-09-26 16:00 | 4f6fb1b733ee | date-tree | green | main 8f743021c51c | no unmerged branches |
