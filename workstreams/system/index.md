@@ -13,3 +13,4 @@ Ordering: the head file, then reading order, then the child workstreams.
 - [see/](/workstreams/system/see/index.md) — The See child workstream: deterministic code shows what a checkout does, at the CLOA
 - [drive/](/workstreams/system/drive/index.md) — The Drive child workstream: work advances in stints, most of them unattended, and the user gives verdicts
 - [wall/](/workstreams/system/wall/index.md) — The Wall child workstream: the deterministic wall, the typed boundary between the user and an agent
+- [baml/](/workstreams/system/baml/index.md) — The BAML child workstream: a minimal, inactive line of thought on whether BAML is a wheel this system reinvents

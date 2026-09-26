@@ -263,6 +263,7 @@ def test_record_appends_the_rows_on_origin_main_and_touches_the_ledger_alone(
     assert git_out(hook_repo, "rev-parse", "origin/main") == sha
     touched = git_out(hook_repo, "show", "--name-only", "--format=", sha)
     assert touched == release.LEDGER
+    assert "[skip ci]" in git_out(hook_repo, "log", "-1", "--format=%b", sha)
     # The command's own checkout was never written.
     assert git_out(hook_repo, "status", "--porcelain") == ""
     assert (
@@ -375,6 +376,7 @@ def test_green_lands_one_commit_on_main_and_leaves_the_checkout_alone(
     assert "Pin dev-playbook at " + NEW[:12] in git_out(
         repo, "log", "-1", "--format=%s", "origin/main"
     )
+    assert "[skip ci]" in git_out(repo, "log", "-1", "--format=%b", "origin/main")
     # Exactly one commit, on top of what main had.
     assert git_out(repo, "rev-list", "--count", "main..origin/main") == "1"
     # The checkout still reads the old pin, clean, on main.

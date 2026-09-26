@@ -41,6 +41,14 @@ GitHub renders Markdown before LaTeX, so:
 
 `AskUserQuestion` is denied globally in `~/.claude/settings.json`.
 
+### No unsandboxed autonomous agents on personal WSL
+
+The user's hard guardrail: never run unsandboxed autonomous agents on their
+personal WSL machine (`/proc/version` contains `microsoft`). If they ask for
+one there, such as a Ralph loop, a long unattended `/tune`, a Workflow, or
+work in bypass-permissions mode, tell them it violates their policy before
+doing anything. Do not start it unless they confirm after that reminder.
+
 ### Never merge a PR
 
 Open a PR and push to it, but never merge one — the user merges every PR by hand.

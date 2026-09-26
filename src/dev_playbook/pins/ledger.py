@@ -117,7 +117,8 @@ def record(new_rows: list[Row], hook_repo: Path | None = None) -> str:
     """Append ``new_rows`` to the ledger on dev-playbook ``origin/main``, trim, push; the commit sha.
 
     In a throwaway worktree, so the checkout this command runs from — the
-    timer's main checkout, or a session's worktree — is never written.
+    timer's main checkout, or a session's worktree — is never written. The
+    commit touches the ledger alone, so it carries ``[skip ci]``.
     """
     repo = hook_repo if hook_repo is not None else HOOK_REPO_ROOT
     fetch_origin(repo)
@@ -137,7 +138,7 @@ def record(new_rows: list[Row], hook_repo: Path | None = None) -> str:
             "commit",
             "-q",
             "-m",
-            f"Pin updates: {len(new_rows)} row(s) at {', '.join(heads)}",
+            f"Pin updates: {len(new_rows)} row(s) at {', '.join(heads)}\n\n[skip ci]",
         )
         sha = git_out(tree, "rev-parse", "HEAD")
         git_out(tree, "push", "-q", "origin", "HEAD:main")
