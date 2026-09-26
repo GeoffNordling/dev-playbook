@@ -46,4 +46,7 @@ Dependency Graph and the Repository Intelligence Graph, but both extract
 from source code, not markdown, and neither carries receipts. The
 nearest markdown-side precedent for the chain's span grammar is Gherkin,
 a controlled natural language parsed deterministically to an AST; no
-tool combines that with graph extraction.
+tool combines that with graph extraction. BAML types the output of one
+model call, not the instruction markdown, and so overlaps only the
+stochastic judges, not the fact base
+([BAML Workstream](/workstreams/system/baml/WORKSTREAM.md)).

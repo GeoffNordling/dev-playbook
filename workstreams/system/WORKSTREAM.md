@@ -23,6 +23,10 @@ workstreams carry the goal:
   user gives verdicts. Head file:
   [Drive Workstream](/workstreams/system/drive/WORKSTREAM.md).
 
+A third child workstream, minimal and inactive, asks whether BAML is a
+wheel this system reinvents:
+[BAML Workstream](/workstreams/system/baml/WORKSTREAM.md).
+
 Two parts are built and closed, and each lives in the main part of
 the repo, outside `workstreams/`:
 
@@ -93,5 +97,6 @@ The terms, such as predicate, fact base, workstream, and stint, are in
 
 ## Acronyms
 
+- **BAML** — Basically a Made-up Language.
 - **CLOA** — Correct Level of Abstraction.
 - **LLM** — Large Language Model.
