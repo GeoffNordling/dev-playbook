@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System Views</title>
+<style>
+:root {
+  --bg: #f7f6f2; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #d9d6cc;
+  --accent: #2f5d8a; --dim: 0.18;
+  --form-of: #8a3fb0; --derived-from: #c2571a; --points-at: #7d8a96; --part-of: #3c8c5a;
+  --reads: #2f6fb0; --writes: #c23a3a; --checks: #b08a1a; --governs: #4a4a9a;
+  --declared: #2e7d4f; --inferred: #b5651d;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181a; --panel: #212326; --ink: #e8e6df; --muted: #9a988f; --line: #3a3c40;
+    --accent: #7fb0e0;
+    --form-of: #c88ae8; --derived-from: #f09a5c; --points-at: #9aa6b2; --part-of: #6cc48c;
+    --reads: #6fa8e8; --writes: #f07a7a; --checks: #e0c050; --governs: #9a9ae8;
+    --declared: #6cc48c; --inferred: #f0a060;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17181a; --panel: #212326; --ink: #e8e6df; --muted: #9a988f; --line: #3a3c40;
+  --accent: #7fb0e0;
+  --form-of: #c88ae8; --derived-from: #f09a5c; --points-at: #9aa6b2; --part-of: #6cc48c;
+  --reads: #6fa8e8; --writes: #f07a7a; --checks: #e0c050; --governs: #9a9ae8;
+  --declared: #6cc48c; --inferred: #f0a060;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { padding: 14px 20px 0; }
+h1 { font-size: 18px; margin: 0 0 2px; }
+.sub { color: var(--muted); font-size: 12.5px; }
+nav { display: flex; gap: 4px; padding: 10px 20px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+nav button { background: none; border: 1px solid transparent; border-bottom: none; color: var(--muted);
+  padding: 7px 14px; font: inherit; cursor: pointer; border-radius: 6px 6px 0 0; }
+nav button.on { background: var(--panel); color: var(--ink); border-color: var(--line); margin-bottom: -1px; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; min-height: calc(100vh - 110px); }
+@media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+#view { padding: 16px 20px; overflow: auto; }
+#panel { border-left: 1px solid var(--line); background: var(--panel); padding: 16px 18px;
+  overflow: auto; max-height: calc(100vh - 110px); position: sticky; top: 0; }
+.intro { color: var(--muted); max-width: 900px; margin: 0 0 14px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.legend span::before { content: ""; display: inline-block; width: 18px; height: 3px; margin-right: 5px;
+  vertical-align: middle; background: var(--c); }
+.legend span.dash::before { background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 7px); }
+
+/* Map */
+.areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+.area { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.area h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.kind { display: grid; grid-template-columns: 10px 1fr 34px; align-items: center; gap: 6px;
+  padding: 3px 4px; border-radius: 4px; cursor: pointer; transition: opacity .12s; }
+.kind:hover, .kind.sel { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.kind .dot { width: 8px; height: 8px; border-radius: 50%; }
+.kind .name { position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kind .name { z-index: 0; }
+.kind .bar { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); opacity: .13; border-radius: 3px; z-index: -1; }
+.kind .n { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+.dimmed .kind:not(.lit) { opacity: var(--dim); }
+.kind .why { display: none; }
+.dimmed .kind.lit .why { display: inline; color: var(--muted); font-size: 11px; margin-left: 6px; }
+
+/* SVG views */
+svg { display: block; }
+svg text { fill: var(--ink); font: 12.5px system-ui, sans-serif; }
+svg .box { fill: var(--panel); stroke: var(--line); }
+svg .node { cursor: pointer; transition: opacity .12s; }
+svg .node:hover .box, svg .node.sel .box { stroke: var(--accent); stroke-width: 2; }
+svg .edge { fill: none; stroke-width: 1.6; opacity: .75; transition: opacity .12s; }
+svg.hover .edge:not(.lit) { opacity: .06; }
+svg.hover .node:not(.lit) { opacity: .25; }
+svg .count { fill: var(--muted); font-size: 11px; }
+svg .colhead { fill: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; }
+
+/* Checks */
+table { border-collapse: collapse; width: 100%; max-width: 1000px; background: var(--panel); }
+th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; cursor: pointer; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.row { cursor: pointer; }
+tr.row:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.zero { color: var(--writes); font-weight: 600; }
+.pip { display: inline-block; width: 7px; height: 12px; margin-right: 2px; border-radius: 1px; vertical-align: -1px; }
+
+
+/* Pipeline */
+.ctrl { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
+.ctrl input { width: 180px; }
+.bg { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+.island { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+.island h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.steps { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding-bottom: 4px; }
+.step { min-width: 170px; max-width: 220px; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--bg); }
+.step h5 { margin: 0 0 6px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.step .who .jump { display: block; font-weight: 600; margin-bottom: 2px; }
+.step .io { font-size: 12px; margin-top: 6px; }
+.step .io b { color: var(--muted); font-weight: 600; }
+.arrow { align-self: center; padding: 0 8px; color: var(--muted); font-size: 18px; }
+.step.inputs { border-style: dashed; }
+
+/* Panel */
+#panel h2 { font-size: 17px; margin: 0 0 4px; }
+#panel h4 { margin: 16px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+#panel .summary { margin: 8px 0; }
+#panel ul { margin: 0; padding-left: 16px; }
+#panel li { margin: 3px 0; }
+.badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 10px; border: 1px solid currentColor; margin-right: 4px; }
+.declared { color: var(--declared); } .inferred { color: var(--inferred); }
+.rel { font-weight: 600; font-size: 12px; }
+.how { color: var(--muted); font-size: 12.5px; }
+a { color: var(--accent); }
+a.r { font-size: 11.5px; font-family: ui-monospace, monospace; text-decoration: none; }
+a.r:hover { text-decoration: underline; }
+.jump { color: var(--accent); cursor: pointer; text-decoration: underline dotted; }
+code, pre { font-family: ui-monospace, monospace; font-size: 12px; }
+pre { background: var(--bg); padding: 6px 8px; border-radius: 4px; white-space: pre-wrap; word-break: break-all; }
+details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+.empty { color: var(--muted); font-style: italic; }
+#panel .files li { font-family: ui-monospace, monospace; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <div class="sub" id="sub"></div>
+</header>
+<nav id="tabs"></nav>
+<main>
+  <section id="view"></section>
+  <aside id="panel"><p class="empty">Click a kind, a skill or script, or a rule to see what the graph says about it. Every claim links to the file that proves it.</p></aside>
+</main>
+<script>
+const D = /*DATA*/null;
+const byId = new Map(D.nodes.map(n => [n.id, n]));
+const kinds = D.nodes.filter(n => n.type === 'Kind');
+const REL = ['form-of', 'derived-from', 'points-at', 'part-of', 'reads', 'writes', 'checks', 'governs'];
+const RELTEXT = {
+  'form-of': ['is a form of', 'forms of this kind'],
+  'derived-from': ['is made from', 'made from this kind'],
+  'points-at': ['points at', 'pointed at by'],
+  'part-of': ['is part of', 'parts'],
+  'reads': ['reads', 'read by'],
+  'writes': ['writes', 'written by'],
+  'checks': ['checks', 'checked by'],
+  'governs': ['sets the rules for', 'rules set by'],
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const short = id => {
+  const n = byId.get(id);
+  if (id.startsWith('kind:')) return id.slice(5);
+  if (id.startsWith('process:')) {
+    const p = id.slice(8);
+    const m = p.match(/skills\/([^/]+)\/SKILL\.md$/);
+    return m ? `skill: ${m[1]}` : p.split('/').pop();
+  }
+  if (id.startsWith('rule:')) return id.split('#').pop();
+  return id;
+};
+const receipt = (file, line) => file
+  ? `<a class="r" href="file://${esc(D.targetRoot)}/${esc(file)}" title="open in the target repo">${esc(file)}${line ? ':' + line : ''}</a>` : '';
+const jump = id => `<span class="jump" data-id="${esc(id)}">${esc(short(id))}</span>`;
+const prov = p => p ? `<span class="badge ${esc(p)}">${esc(p)}</span>` : '';
+
+document.getElementById('title').textContent = 'story-forge: the whole system, by kind';
+document.getElementById('sub').innerHTML =
+  `${kinds.length} kinds, ${D.nodes.filter(n => n.type === 'Process').length} skills and scripts, ` +
+  `${D.nodes.filter(n => n.type === 'Rule').length} rules, ${D.edges.length} edges, at commit <code>${esc(D.commit.slice(0, 8))}</code>. ` +
+  `Kinds and file counts are complete; edges come from 2 or 3 sample files per kind, so an edge means "at least one file does this".`;
+
+// ---------- detail panel ----------
+const panel = document.getElementById('panel');
+let selected = null;
+function show(id) {
+  selected = id;
+  const n = byId.get(id);
+  if (!n) throw new Error(`no node ${id}`);
+  const a = n.attrs || {};
+  const out = D.edges.filter(e => e.source === id);
+  const inc = D.edges.filter(e => e.target === id);
+  const edgeLi = (e, other) => {
+    const also = (e.also || []).map(x => ' ' + receipt(x.file, x.line)).join('');
+    return `<li>${jump(other)} ${prov(e.provenance)}<div class="how">${esc(e.how)}</div>${receipt(e.file, e.line)}${also}</li>`;
+  };
+  const group = (list, dir) => REL.map(r => {
+    const es = list.filter(e => e.relation === r);
+    if (!es.length) return '';
+    const label = dir === 'out' ? RELTEXT[r][0] : RELTEXT[r][1];
+    return `<h4 style="color:var(--${r})">${esc(label)} (${es.length})</h4><ul>${es.map(e => edgeLi(e, dir === 'out' ? e.target : e.source)).join('')}</ul>`;
+  }).join('');
+  let h = `<h2>${esc(short(id))}</h2><div>${prov(n.provenance)}<span class="badge">${esc(n.type === 'Process' ? 'skill or script' : n.type.toLowerCase())}</span>`;
+  if (n.type === 'Kind') h += `<span class="badge">${a.count} file${a.count === 1 ? "" : "s"}</span><span class="badge">${esc(D.areas[a.slice])}</span>`;
+  if (a.ruleKind) h += `<span class="badge">${esc(a.ruleKind)}</span>`;
+  h += `</div><p class="summary">${esc(a.summary)}</p>`;
+  h += `<div class="how">${n.type === 'Kind' ? 'Declared or first seen at' : 'Defined at'} ${receipt(n.file, n.line)}</div>`;
+  if (a.verifier) h += `<div class="how">Verified by ${receipt(a.verifier.file, a.verifier.line)}</div>`;
+  if (n.type === 'Kind') {
+    h += `<h4>How a file is recognised</h4><pre>${esc(JSON.stringify(a.recognise))}</pre>`;
+    if (a.fields?.length) h += `<h4>Fields seen on the samples (${a.fields.length})</h4><ul>${a.fields.map(f => `<li><code>${esc(f.name)}</code> ${receipt(f.file, f.line)}</li>`).join('')}</ul>`;
+  }
+  h += group(out, 'out') + group(inc, 'in');
+  if (!out.length && !inc.length) h += `<p class="empty">No edges in the graph.</p>`;
+  if (n.type === 'Kind') {
+    h += `<h4>Files (${a.files.length})</h4><details><summary>list all</summary><ul class="files">${a.files.map(f => `<li>${receipt(f)}</li>`).join('')}</ul></details>`;
+    if (a.unexpressible) h += `<p class="how">${esc(a.unexpressible)}</p>`;
+    const notes = ['note', 'recogniseNote', 'fieldsNote', 'provenanceNote', 'notes'].filter(k => a[k]);
+    if (notes.length) h += `<h4>Builder notes</h4>${notes.map(k => `<details><summary>${esc(k)}</summary><p class="how">${esc(Array.isArray(a[k]) ? a[k].join(' ') : a[k])}</p></details>`).join('')}`;
+  }
+  panel.innerHTML = h;
+  panel.scrollTop = 0;
+  document.querySelectorAll('[data-node]').forEach(el => el.classList.toggle('sel', el.dataset.node === id));
+}
+panel.addEventListener('click', ev => {
+  const t = ev.target.closest('.jump');
+  if (t) show(t.dataset.id);
+});
+
+// ---------- tabs ----------
+const VIEWS = { Pipeline: renderPipeline, Map: renderMap, Lineage: renderLineage, Flow: renderFlow, Checks: renderChecks };
+const view = document.getElementById('view');
+const tabs = document.getElementById('tabs');
+function go(name) {
+  [...tabs.children].forEach(b => b.classList.toggle('on', b.textContent === name));
+  view.innerHTML = '';
+  try { VIEWS[name](); }
+  catch (err) { view.innerHTML = `<p class="zero">This view failed: ${esc(err.message)}</p>`; throw err; }
+  if (selected) document.querySelectorAll('[data-node]').forEach(el => el.classList.toggle('sel', el.dataset.node === selected));
+  try { localStorage.setItem('tab', name); } catch (e) {}
+  history.replaceState(null, '', '#' + name);
+}
+for (const name of Object.keys(VIEWS)) {
+  const b = document.createElement('button');
+  b.textContent = name;
+  b.onclick = () => go(name);
+  tabs.appendChild(b);
+}
+const legend = rels => `<div class="legend">${rels.map(r => `<span class="${r === 'form-of' ? 'dash' : ''}" style="--c:var(--${r})">${esc(RELTEXT[r][0])}</span>`).join('')}</div>`;
+
+
+// ---------- Pipeline ----------
+let bgN = null;
+function renderPipeline() {
+  const procs = D.nodes.filter(n => n.type === 'Process').map(n => n.id);
+  const R = new Map(procs.map(p => [p, new Set()])), W = new Map(procs.map(p => [p, new Set()]));
+  for (const e of D.edges) {
+    if (e.relation === 'reads') R.get(e.source).add(e.target);
+    if (e.relation === 'writes') W.get(e.source).add(e.target);
+  }
+  const readers = new Map();
+  for (const [p, ks] of R) for (const k of ks) readers.set(k, (readers.get(k) || 0) + 1);
+  const maxR = Math.max(...readers.values());
+  if (bgN === null) bgN = maxR - 1;
+  view.innerHTML = `<p class="intro">What the system does, in order, computed from the graph. A skill comes after the skills whose output it reads; skills that feed each other in a loop share one step. Skills that pass no data to each other fall into separate groups.</p>
+    <div class="ctrl"><label for="bgN">A kind read by more than <b id="bgNv"></b> skills is reference material, not data a step works on:</label>
+      <input type="range" id="bgN" min="0" max="${maxR}" value="${bgN}"></div><div id="pipe"></div>`;
+  const slider = document.getElementById('bgN');
+  slider.oninput = () => { bgN = +slider.value; draw(); };
+  function draw() {
+    document.getElementById('bgNv').textContent = bgN;
+    const bg = new Set([...readers].filter(([k, c]) => c > bgN).map(([k]) => k));
+    const r = p => [...R.get(p)].filter(k => !bg.has(k)), w = p => [...W.get(p)].filter(k => !bg.has(k));
+    // Groups: skills and kinds joined by reads, writes, or made-from, background kinds left out.
+    const adj = new Map();
+    const link = (a, b) => { (adj.get(a) || adj.set(a, new Set()).get(a)).add(b); (adj.get(b) || adj.set(b, new Set()).get(b)).add(a); };
+    for (const p of procs) { for (const k of r(p)) link(k, p); for (const k of w(p)) link(p, k); }
+    for (const e of D.edges) if (e.relation === 'derived-from' && e.source !== e.target && !bg.has(e.source) && !bg.has(e.target)) link(e.source, e.target);
+    const seen = new Set(), groups = [];
+    for (const n of adj.keys()) {
+      if (seen.has(n)) continue;
+      const g = new Set(), st = [n];
+      while (st.length) { const x = st.pop(); if (g.has(x)) continue; g.add(x); seen.add(x); st.push(...adj.get(x)); }
+      groups.push(g);
+    }
+    groups.sort((a, b) => b.size - a.size);
+    // Steps: condense loops (strongly connected skills), then order by longest path.
+    const after = new Map(procs.map(p => [p, procs.filter(q => q !== p && w(q).some(k => r(p).includes(k)))]));
+    let idx = 0; const index = new Map(), low = new Map(), stack = [], on = new Set(), comp = new Map(); let nc = 0;
+    const strong = v => {
+      index.set(v, idx); low.set(v, idx); idx++; stack.push(v); on.add(v);
+      for (const u of after.get(v)) {
+        if (!index.has(u)) { strong(u); low.set(v, Math.min(low.get(v), low.get(u))); }
+        else if (on.has(u)) low.set(v, Math.min(low.get(v), index.get(u)));
+      }
+      if (low.get(v) === index.get(v)) { let u; do { u = stack.pop(); on.delete(u); comp.set(u, nc); } while (u !== v); nc++; }
+    };
+    procs.forEach(p => { if (!index.has(p)) strong(p); });
+    const level = new Map([...Array(nc).keys()].map(c => [c, 0]));
+    for (let i = 0; i < nc; i++) for (const p of procs) for (const q of after.get(p)) {
+      const cp = comp.get(p), cq = comp.get(q);
+      if (cp !== cq && level.get(cp) < level.get(cq) + 1) level.set(cp, level.get(cq) + 1);
+    }
+    const kindList = ks => ks.length ? [...new Set(ks)].sort().map(jump).join(', ') : '<span class="empty">nothing in the graph</span>';
+    let h = `<div class="bg">Reference material (${bg.size}): ${bg.size ? [...bg].map(k => `${jump(k)} (${readers.get(k)})`).join(', ') : 'none'}</div>`;
+    groups.forEach((g, gi) => {
+      const ps = procs.filter(p => g.has(p));
+      if (!ps.length) return;
+      const produced = new Set(ps.flatMap(w));
+      const inputs = [...new Set(ps.flatMap(r))].filter(k => !produced.has(k));
+      const steps = new Map();
+      for (const p of ps) { const key = `${level.get(comp.get(p))}|${comp.get(p)}`; (steps.get(key) || steps.set(key, []).get(key)).push(p); }
+      const byLevel = new Map();
+      for (const [key, members] of steps) { const l = +key.split('|')[0]; (byLevel.get(l) || byLevel.set(l, []).get(l)).push(members); }
+      const cols = [...byLevel.keys()].sort((a, b) => a - b);
+      h += `<div class="island"><h3>Group ${gi + 1}: ${ps.length} skill${ps.length === 1 ? '' : 's'} or scripts, ${[...g].filter(x => x.startsWith('kind:')).length} kinds</h3><div class="steps">`;
+      h += `<div class="step inputs"><h5>You supply</h5><div class="io">${kindList(inputs)}</div></div>`;
+      cols.forEach((l, ci) => {
+        h += `<div class="arrow">→</div><div style="display:flex;flex-direction:column;gap:8px">`;
+        for (const members of byLevel.get(l)) {
+          const loop = members.length > 1 && members.some(p => after.get(p).some(q => members.includes(q)));
+          h += `<div class="step"><h5>Step ${ci + 1}${loop ? ' · a loop' : ''}</h5><div class="who">${members.map(jump).join('')}</div>
+            <div class="io"><b>reads</b> ${kindList(members.flatMap(r))}</div>
+            <div class="io"><b>writes</b> ${kindList(members.flatMap(w))}</div></div>`;
+        }
+        h += `</div>`;
+      });
+      h += `</div></div>`;
+    });
+    const used = new Set(groups.flatMap(g => [...g]));
+    const idle = kinds.filter(k => !used.has(k.id) && !bg.has(k.id));
+    h += `<p class="intro">${idle.length} kinds no skill or script touches, in the graph: ${idle.map(k => jump(k.id)).join(', ')}.</p>`;
+    const pipe = document.getElementById('pipe');
+    pipe.innerHTML = h;
+    pipe.querySelectorAll('.jump').forEach(j => j.onclick = () => show(j.dataset.id));
+  }
+  draw();
+}
+
+// ---------- Map ----------
+function renderMap() {
+  view.innerHTML = `<p class="intro">Every kind of file in the repo, grouped by area. The bar and number show how many files each kind has. The dot shows whether story-forge <span class="declared">declares</span> the kind or the agents <span class="inferred">inferred</span> it. Hover a kind to light up every kind it connects to, with the relation.</p><div class="areas" id="areas"></div>`;
+  const wrap = document.getElementById('areas');
+  const max = Math.max(...kinds.map(k => k.attrs.count));
+  for (const [sid, label] of Object.entries(D.areas)) {
+    const ks = kinds.filter(k => k.attrs.slice === sid).sort((x, y) => y.attrs.count - x.attrs.count);
+    const card = document.createElement('div');
+    card.className = 'area';
+    card.innerHTML = `<h3>${esc(label)}</h3>` + ks.map(k => `
+      <div class="kind" data-node="${esc(k.id)}">
+        <span class="dot" style="background:var(--${k.provenance})"></span>
+        <span class="name">${esc(short(k.id))}<span class="why"></span><span class="bar" style="width:${Math.max(4, 100 * Math.log1p(k.attrs.count) / Math.log1p(max))}%"></span></span>
+        <span class="n">${k.attrs.unexpressible ? '?' : k.attrs.count}</span>
+      </div>`).join('');
+    wrap.appendChild(card);
+  }
+  // kind-to-kind links, including through a process: A read by P, P writes B.
+  const links = new Map();
+  const add = (a, b, why) => { if (a === b) return; if (!links.has(a)) links.set(a, new Map()); const m = links.get(a); if (!m.has(b)) m.set(b, new Set()); m.get(b).add(why); };
+  for (const e of D.edges) {
+    if (e.source.startsWith('kind:') && e.target.startsWith('kind:')) {
+      add(e.source, e.target, RELTEXT[e.relation][1]);
+      add(e.target, e.source, RELTEXT[e.relation][0]);
+    }
+  }
+  wrap.addEventListener('mouseover', ev => {
+    const el = ev.target.closest('.kind'); if (!el) return;
+    const id = el.dataset.node, m = links.get(id) || new Map();
+    wrap.classList.add('dimmed');
+    wrap.querySelectorAll('.kind').forEach(k => {
+      const lit = k.dataset.node === id || m.has(k.dataset.node);
+      k.classList.toggle('lit', lit);
+      k.querySelector('.why').textContent = m.has(k.dataset.node) ? [...m.get(k.dataset.node)].join(', ') : '';
+    });
+  });
+  wrap.addEventListener('mouseleave', () => wrap.classList.remove('dimmed'));
+  wrap.addEventListener('click', ev => { const el = ev.target.closest('.kind'); if (el) show(el.dataset.node); });
+}
+
+// ---------- shared SVG helpers ----------
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, parent) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+function box(svg, id, x, y, w, h, label, sub) {
+  const g = svgEl('g', { class: 'node', 'data-node': id, transform: `translate(${x},${y})` }, svg);
+  svgEl('rect', { class: 'box', width: w, height: h, rx: 6 }, g);
+  const n = byId.get(id);
+  if (n?.provenance) svgEl('rect', { x: 0, y: 0, width: 4, height: h, rx: 2, fill: `var(--${n.provenance})` }, g);
+  const t = svgEl('text', { x: 12, y: sub ? h / 2 - 2 : h / 2 + 4 }, g); t.textContent = label;
+  if (sub) { const s = svgEl('text', { x: 12, y: h / 2 + 13, class: 'count' }, g); s.textContent = sub; }
+  return g;
+}
+function curve(svg, x1, y1, x2, y2, rel, key, dashed) {
+  const mx = (x1 + x2) / 2;
+  return svgEl('path', {
+    class: 'edge', d: `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,
+    stroke: `var(--${rel})`, 'marker-end': `url(#arrow-${rel})`, 'data-key': key,
+    ...(dashed ? { 'stroke-dasharray': '5 4' } : {}),
+  }, svg);
+}
+function markers(svg, rels) {
+  const defs = svgEl('defs', {}, svg);
+  for (const r of rels) {
+    const m = svgEl('marker', { id: `arrow-${r}`, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, defs);
+    svgEl('path', { d: 'M0,0 L10,5 L0,10 z', fill: `var(--${r})` }, m);
+  }
+}
+// Hover a node: light it, its edges, and the nodes at their other ends.
+function hoverable(svg, edgeEnds) {
+  svg.addEventListener('mouseover', ev => {
+    const g = ev.target.closest('.node'); if (!g) return;
+    const id = g.dataset.node;
+    const near = new Set([id]);
+    svg.classList.add('hover');
+    svg.querySelectorAll('.edge').forEach(p => {
+      const [a, b] = edgeEnds.get(p.dataset.key);
+      const lit = a === id || b === id;
+      p.classList.toggle('lit', lit);
+      if (lit) { near.add(a); near.add(b); }
+    });
+    svg.querySelectorAll('.node').forEach(n => n.classList.toggle('lit', near.has(n.dataset.node)));
+  });
+  svg.addEventListener('mouseleave', () => svg.classList.remove('hover'));
+  svg.addEventListener('click', ev => { const g = ev.target.closest('.node'); if (g) show(g.dataset.node); });
+}
+function orderByNeighbours(layers, nbrs) {
+  for (let pass = 0; pass < 6; pass++) {
+    const seq = pass % 2 ? [...layers.keys()].reverse() : [...layers.keys()];
+    for (const i of seq) {
+      const pos = new Map();
+      layers.forEach(l => l.forEach((id, j) => pos.set(id, j)));
+      const bary = id => { const ns = (nbrs.get(id) || []).filter(x => pos.has(x)); return ns.length ? ns.reduce((s, x) => s + pos.get(x), 0) / ns.length : pos.get(id); };
+      layers[i].sort((a, b) => bary(a) - bary(b));
+    }
+  }
+}
+
+// ---------- Lineage ----------
+function renderLineage() {
+  const es = D.edges.filter(e => e.relation === 'form-of' || e.relation === 'derived-from');
+  const selfs = es.filter(e => e.source === e.target);
+  const flow = es.filter(e => e.source !== e.target); // drawn from origin (target) to product (source)
+  const ids = [...new Set(flow.flatMap(e => [e.source, e.target]))];
+  // Columns come from "made from" only. "Form of" is a type relation, not a step:
+  // a kind may be a form of a kind that is itself made from it.
+  const made = flow.filter(e => e.relation === 'derived-from');
+  const layer = new Map(ids.map(id => [id, 0]));
+  for (let i = 0; i <= ids.length; i++) {
+    let moved = false;
+    for (const e of made) if (layer.get(e.source) < layer.get(e.target) + 1) { layer.set(e.source, layer.get(e.target) + 1); moved = true; }
+    if (!moved) break;
+    if (i === ids.length) throw new Error('the derived-from edges form a cycle');
+  }
+  // A kind with no "made from" edge of its own sits one column right of what it is a form of.
+  for (const e of flow) if (e.relation === 'form-of' && !made.some(m => m.source === e.source || m.target === e.source)) layer.set(e.source, layer.get(e.target) + 1);
+  const layers = [];
+  for (const id of ids.sort()) (layers[layer.get(id)] ||= []).push(id);
+  const nbrs = new Map();
+  for (const e of flow) { (nbrs.get(e.source) || nbrs.set(e.source, []).get(e.source)).push(e.target); (nbrs.get(e.target) || nbrs.set(e.target, []).get(e.target)).push(e.source); }
+  orderByNeighbours(layers, nbrs);
+  const W = 200, H = 44, GX = 70, GY = 40, X0 = 10, Y0 = 60;
+  const rows = Math.max(...layers.map(l => l.length));
+  view.innerHTML = `<p class="intro">Which kinds are made from which. Arrows run from the source material to what is made from it: a solid line means "made from", a dashed line means "is a form of". The left column holds raw material; each column to the right is one step further from it. Only ${es.length} edges in the graph say this, so the chains are short.</p>${legend(['derived-from', 'form-of'])}`;
+  const svg = svgEl('svg', { width: X0 + layers.length * (W + GX), height: Y0 + rows * (H + GY) + 10 }, view);
+  markers(svg, ['derived-from', 'form-of']);
+  layers.forEach((_, i) => { const t = svgEl('text', { x: X0 + i * (W + GX), y: 16, class: 'colhead' }, svg); t.textContent = i === 0 ? 'source material' : `step ${i}`; });
+  const at = new Map();
+  layers.forEach((l, i) => l.forEach((id, j) => at.set(id, [X0 + i * (W + GX), Y0 + j * (H + GY)])));
+  const ends = new Map();
+  flow.forEach((e, k) => {
+    const [sx, sy] = at.get(e.target), [tx, ty] = at.get(e.source);
+    // Two edges between the same pair: nudge the second so both show.
+    const twin = flow.findIndex(f => f.source === e.source && f.target === e.target) !== k ? 6 : 0;
+    if (tx > sx) curve(svg, sx + W, sy + H / 2 + twin, tx - 2, ty + H / 2 + twin, e.relation, k, e.relation === 'form-of');
+    else svgEl('path', { class: 'edge', d: `M${sx + W / 2},${sy} C${sx + W / 2},${sy - 40} ${tx + W / 2},${ty - 40} ${tx + W / 2},${ty - 2}`,
+      stroke: `var(--${e.relation})`, 'marker-end': `url(#arrow-${e.relation})`, 'data-key': k, 'stroke-dasharray': '5 4' }, svg);
+    ends.set(String(k), [e.source, e.target]);
+  });
+  for (const [id, [x, y]] of at) {
+    const n = byId.get(id);
+    const loop = selfs.find(e => e.source === id);
+    box(svg, id, x, y, W, H, short(id), `${n.attrs.count} file${n.attrs.count === 1 ? '' : 's'}${loop ? ' · also made from itself' : ''}`);
+  }
+  hoverable(svg, ends);
+  const rest = kinds.filter(k => !at.has(k.id)).length;
+  view.insertAdjacentHTML('beforeend', `<p class="intro" style="margin-top:14px">${rest} of ${kinds.length} kinds have no "made from" or "form of" edge. Either they are made by hand, or the relation exists and no file declares it.</p>`);
+}
+
+// ---------- Flow ----------
+function renderFlow() {
+  const procs = D.nodes.filter(n => n.type === 'Process');
+  const rd = D.edges.filter(e => e.relation === 'reads'), wr = D.edges.filter(e => e.relation === 'writes');
+  const left = [...new Set(rd.map(e => e.target))], right = [...new Set(wr.map(e => e.target))];
+  const P = procs.map(p => p.id);
+  const kindOf = p => p.includes('/skills/') ? 0 : p.startsWith('process:scripts/') ? 1 : 2;
+  P.sort((a, b) => kindOf(a) - kindOf(b) || short(a).localeCompare(short(b)));
+  const L = 'L|', R = 'R|';
+  const layers = [left.map(x => L + x), P, right.map(x => R + x)];
+  const nbrs = new Map();
+  const link = (a, b) => { (nbrs.get(a) || nbrs.set(a, []).get(a)).push(b); (nbrs.get(b) || nbrs.set(b, []).get(b)).push(a); };
+  rd.forEach(e => link(L + e.target, e.source)); wr.forEach(e => link(e.source, R + e.target));
+  orderByNeighbours(layers, nbrs);
+  const W = 210, H = 30, GY = 8, Y0 = 30, XS = [10, 400, 790];
+  view.innerHTML = `<p class="intro">What each skill and script does. Kinds on the left are read by the skill or script in the middle; kinds on the right are written by it. A kind can be on both sides. Hover to follow one path. Skills are listed first, then scripts, then code modules.</p>${legend(['reads', 'writes'])}`;
+  const rows = Math.max(...layers.map(l => l.length));
+  const svg = svgEl('svg', { width: XS[2] + W + 10, height: Y0 + rows * (H + GY) + 10 }, view);
+  markers(svg, ['reads', 'writes']);
+  ['kinds read', 'skill or script', 'kinds written'].forEach((s, i) => { const t = svgEl('text', { x: XS[i], y: 16, class: 'colhead' }, svg); t.textContent = s; });
+  const at = new Map();
+  layers.forEach((l, i) => {
+    const off = (rows - l.length) * (H + GY) / 2;
+    l.forEach((id, j) => at.set(id, [XS[i], Y0 + off + j * (H + GY)]));
+  });
+  const ends = new Map();
+  rd.forEach((e, k) => { const [x1, y1] = at.get(L + e.target), [x2, y2] = at.get(e.source); curve(svg, x1 + W, y1 + H / 2, x2 - 2, y2 + H / 2, 'reads', 'r' + k); ends.set('r' + k, [e.target, e.source]); });
+  wr.forEach((e, k) => { const [x1, y1] = at.get(e.source), [x2, y2] = at.get(R + e.target); curve(svg, x1 + W, y1 + H / 2, x2 - 2, y2 + H / 2, 'writes', 'w' + k); ends.set('w' + k, [e.source, e.target]); });
+  for (const [key, [x, y]] of at) {
+    const id = key.startsWith(L) || key.startsWith(R) ? key.slice(2) : key;
+    box(svg, id, x, y, W, H, short(id));
+  }
+  hoverable(svg, ends);
+  const idle = kinds.filter(k => !left.includes(k.id) && !right.includes(k.id)).map(k => jump(k.id));
+  view.insertAdjacentHTML('beforeend', `<p class="intro" style="margin-top:14px">${idle.length} kinds no skill or script reads or writes, in the graph: ${idle.join(', ')}.</p>`);
+  view.querySelectorAll('.jump').forEach(j => j.onclick = () => show(j.dataset.id));
+}
+
+// ---------- Checks ----------
+function renderChecks() {
+  const rows = kinds.map(k => {
+    const ch = D.edges.filter(e => e.relation === 'checks' && e.target === k.id);
+    const det = ch.filter(e => byId.get(e.source)?.attrs.ruleKind === 'deterministic').length;
+    const sto = ch.filter(e => byId.get(e.source)?.attrs.ruleKind === 'stochastic').length;
+    const gov = D.edges.filter(e => e.relation === 'governs' && e.target === k.id).map(e => e.source);
+    return { k, det, sto, other: ch.length - det - sto, gov };
+  });
+  let sortKey = 'total';
+  const val = r => ({ total: r.det + r.sto + r.other, det: r.det, sto: r.sto, files: r.k.attrs.count, name: short(r.k.id), area: D.areas[r.k.attrs.slice] })[sortKey];
+  view.innerHTML = `<p class="intro">Which rules check each kind. A <em>deterministic</em> rule is checked by code (a lint or a test). A <em>stochastic</em> rule needs judgement, from an agent or a person. Red zero: no rule in the graph checks this kind. Click a column head to sort; click a row for the rules.</p><div id="tbl"></div>`;
+  const draw = () => {
+    const sorted = [...rows].sort((a, b) => { const x = val(a), y = val(b); return typeof x === 'string' ? x.localeCompare(y) : y - x; });
+    const pips = (n, c) => Array.from({ length: n }, () => `<span class="pip" style="background:var(--${c})"></span>`).join('');
+    document.getElementById('tbl').innerHTML = `<table><tr>
+      <th data-s="name">Kind</th><th data-s="area">Area</th><th data-s="files">Files</th><th data-s="det">Code checks</th><th data-s="sto">Judgement checks</th><th>Rules set by</th></tr>` +
+      sorted.map(r => `<tr class="row" data-node="${esc(r.k.id)}"><td>${esc(short(r.k.id))}</td><td class="how">${esc(D.areas[r.k.attrs.slice])}</td><td class="num">${r.k.attrs.count}</td>
+        <td>${r.det ? pips(r.det, 'declared') + ' ' + r.det : '<span class="zero">0</span>'}</td>
+        <td>${r.sto ? pips(r.sto, 'checks') + ' ' + r.sto : '<span class="zero">0</span>'}</td>
+        <td class="how">${r.gov.map(g => esc(short(g))).join(', ')}</td></tr>`).join('') + `</table>`;
+    const t = document.getElementById('tbl');
+    t.querySelectorAll('th[data-s]').forEach(th => th.onclick = () => { sortKey = th.dataset.s; draw(); });
+    t.querySelectorAll('tr.row').forEach(tr => tr.onclick = () => show(tr.dataset.node));
+  };
+  draw();
+  const none = rows.filter(r => !r.det && !r.sto && !r.other).length;
+  view.insertAdjacentHTML('afterbegin', `<p class="intro"><strong>${none} of ${kinds.length} kinds have no rule that checks them.</strong></p>`);
+}
+
+// The address can name a tab and a node: #Lineage/kind:Story
+const [hashTab, hashNode] = decodeURIComponent(location.hash.slice(1)).split('/');
+let start = hashTab || 'Map';
+if (!location.hash) { try { start = localStorage.getItem('tab') || 'Map'; } catch (e) {} }
+go(VIEWS[start] ? start : 'Map');
+if (hashNode) show(hashNode);
+</script>
+</body>
+</html>
