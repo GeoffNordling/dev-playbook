@@ -16,15 +16,6 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 
 | Time (UTC) | Release head | Repo | Verdict | Landing | Notes |
 |---|---|---|---|---|---|
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | story-forge | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/story-forge/.claude/worktrees/bump-pin-c1e9ae2f2ab5, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T143003Z/story-forge.log |  |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | mission-control | failed | the agent opened no PR; worktree kept at /home/geoff/workspace/mission-control/.claude/worktrees/bump-pin-c1e9ae2f2ab5, log at /home/geoff/.local/state/dev-playbook/update-pins/20260925T143003Z/mission-control.log |  |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | sysadmin-playbook | green | main c39d847fb11c | no unmerged branches |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | sounds | green | main a662ad890b8c | no unmerged branches |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | personal-trainer | green | main ec09939ad4e4 | no unmerged branches |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | idea-tree | green | main c7299f9f7bf7 | no unmerged branches |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | dwarf-flow | green | main 6fa2522b9f37 | no unmerged branches |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | lunch | green | main 4b493e6ba5a9 | no unmerged branches |
-| 2026-09-25 14:30 | c1e9ae2f2ab5 | date-tree | green | main ccf1866bac2c | no unmerged branches |
 | 2026-09-25 21:45 | 405a36eda701 | story-forge | red | PR https://github.com/GeoffNordling/story-forge/pull/21 | no unmerged branches |
 | 2026-09-25 21:45 | 405a36eda701 | mission-control | red | PR https://github.com/GeoffNordling/mission-control/pull/12 | no unmerged branches |
 | 2026-09-25 21:45 | 405a36eda701 | sysadmin-playbook | green | main 3ffc18e8c4cd | no unmerged branches |
@@ -43,3 +34,12 @@ that writes them are in [Pin Update Process](/docs/pin-update-process.md).
 | 2026-09-26 16:00 | 4f6fb1b733ee | dwarf-flow | green | main 68f5727d29f9 | unmerged: season-4-winter-100 (2026-09-26, 11 ahead); worktree-screen-narration (2026-09-25, 1 ahead) |
 | 2026-09-26 16:00 | 4f6fb1b733ee | lunch | green | main aef1811febfc | no unmerged branches |
 | 2026-09-26 16:00 | 4f6fb1b733ee | date-tree | green | main 8f743021c51c | no unmerged branches |
+| 2026-09-26 16:15 | 81c24c5d6b0b | story-forge | red | PR https://github.com/GeoffNordling/story-forge/pull/23 | unmerged: bump-pin-4f6fb1b733ee (2026-09-26, 3 ahead); bump-pin-405a36eda701 (2026-09-25, 2 ahead) |
+| 2026-09-26 16:15 | 81c24c5d6b0b | mission-control | red | PR https://github.com/GeoffNordling/mission-control/pull/13 | unmerged: bump-pin-405a36eda701 (2026-09-25, 2 ahead) |
+| 2026-09-26 16:15 | 81c24c5d6b0b | sysadmin-playbook | green | main d92d2babfb75 | no unmerged branches |
+| 2026-09-26 16:15 | 81c24c5d6b0b | sounds | green | main 7ecf713f1989 | no unmerged branches |
+| 2026-09-26 16:15 | 81c24c5d6b0b | personal-trainer | green | main a65e386a61d2 | no unmerged branches |
+| 2026-09-26 16:15 | 81c24c5d6b0b | idea-tree | green | main d3aeeb0554c4 | no unmerged branches |
+| 2026-09-26 16:15 | 81c24c5d6b0b | dwarf-flow | green | main 3a4ff6bd7470 | unmerged: season-4-winter-100 (2026-09-26, 11 ahead); worktree-screen-narration (2026-09-25, 1 ahead) |
+| 2026-09-26 16:15 | 81c24c5d6b0b | lunch | green | main 6d5f843b1e10 | no unmerged branches |
+| 2026-09-26 16:15 | 81c24c5d6b0b | date-tree | green | main 4fee74e40984 | no unmerged branches |
