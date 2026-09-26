@@ -128,6 +128,11 @@ def land_green(tree: Path, changed: list[str], old: str, sha: str) -> str:
     ``make check``, and a rejection from either is the caller's ``failed``
     row. The worktree is throwaway, so the commit's home is ``origin/main`` or
     nowhere.
+
+    The message carries ``[skip ci]``: both hooks have already verified the
+    commit, and a CI run on it would only repeat them at the cost of Actions
+    minutes on every governed repo at every release. A red bump keeps CI,
+    because its PR run is the signal the user reviews.
     """
     git_out(tree, "add", *changed)
     git_out(
@@ -137,7 +142,8 @@ def land_green(tree: Path, changed: list[str], old: str, sha: str) -> str:
         "-m",
         f"Pin dev-playbook at {sha[:12]}\n\n"
         f"update-pins moved the standards pin {old[:12]} -> {sha[:12]}; "
-        "the gate is green at the new pin.",
+        "the gate is green at the new pin.\n\n"
+        "[skip ci]",
     )
     landed = git_out(tree, "rev-parse", "HEAD")
     git_out(tree, "push", "-q", "origin", "HEAD:main")

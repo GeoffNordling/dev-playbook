@@ -30,12 +30,14 @@ steps:
    throwaway copy of the repo's `origin/main` and runs the repo's checks
    once.
 5. **Green.** Checks that pass land as one commit on the repo's `main`.
+   The commit carries `[skip ci]`: the commit hook and the pre-push hook
+   have already run the checks, so a CI run would only repeat them.
 6. **Red.** Checks that fail get a worktree on branch `bump-pin-<sha12>`
    and a headless Claude agent in it. The agent runs `/finish-pin-bump`:
    it fixes the findings, opens a PR, and writes each change it must not
    decide into the PR body as a question.
 7. **Record.** The run appends one row per repo to the ledger and pushes
-   it to dev-playbook `main`.
+   it to dev-playbook `main`, with `[skip ci]`.
 
 ## The user alone merges a pin PR
 

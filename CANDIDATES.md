@@ -14,6 +14,23 @@ description: Uncommitted future work — described, not yet promoted to issues
   gives `__initpy-files`. An anchor to such a heading fails the anchor
   check or passes it wrongly.
 
+## Distribution
+
+- **Take dev-playbook private** — considered and deferred on 2026-09-26
+  as too much work for now. Consumers clone the hook repo by URL through
+  pre-commit, and hosts also take it as a uv `git` source, so a private
+  repo breaks CI in every consumer until the canonical `ci.yml` carries
+  a read-only credential, such as a deploy key held as a secret in each
+  consumer; that `ci.yml` must reach the consumers by a pin bump while
+  the repo is still public. The other cost is Actions minutes: a public
+  repo's own CI is free, and a private repo's runs count against the
+  account's monthly quota. A one-time, ad hoc estimate on 2026-09-26,
+  from the first 36 hours of the 15-minute `update-pins` timer, put
+  dev-playbook's own CI at roughly a sixth of all billed minutes, with
+  the pin fan-out in the consumers making most of the rest. That
+  estimate was a guess at one moment, from a short sample; measure again
+  before acting on it.
+
 ## Doc-type system
 
 - **General-Sheet's replacement** — `General-Sheet` is a deliberately-broad
